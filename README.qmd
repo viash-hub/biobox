@@ -3,7 +3,7 @@ title: Base repository for reusable Viash components
 format: gfm
 ---
 
-This repository is a collection of reproducible and reusabel Viash components.
+This repository is a collection of reproducible and reusable Viash components.
 
 ## Objectives
 

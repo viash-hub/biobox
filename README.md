@@ -1,7 +1,7 @@
 # Base repository for reusable Viash components
 
 
-This repository is a collection of reproducible and reusabel Viash
+This repository is a collection of reproducible and reusable Viash
 components.
 
 ## Objectives
