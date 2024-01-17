@@ -1,0 +1,9 @@
+{
+  "yaml.schemas": {
+    ".vscode/viash_config.yaml": "**.vsh.yaml",
+  },
+  "files.watcherExclude": {
+    "**/target": true,
+    ".github": true
+  }
+}
