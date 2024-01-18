@@ -59,9 +59,9 @@ See the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
 For support, questions, or to join our community:
 
 - **Issues**: Submit questions or issues via the [GitHub issue
-  tracker](https://github.com/openpipelines-bio/base/issues).
+  tracker](https://github.com/viash-hub/base/issues).
 - **Discussions**: Join our discussions via [GitHub
-  Discussions](https://github.com/openpipelines-bio/base/discussions).
+  Discussions](https://github.com/viash-hub/base/discussions).
 
 ## License
 

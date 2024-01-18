@@ -49,8 +49,8 @@ See the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
 
 For support, questions, or to join our community:
 
-- **Issues**: Submit questions or issues via the [GitHub issue tracker](https://github.com/openpipelines-bio/base/issues).
-- **Discussions**: Join our discussions via [GitHub Discussions](https://github.com/openpipelines-bio/base/discussions).
+- **Issues**: Submit questions or issues via the [GitHub issue tracker](https://github.com/viash-hub/base/issues).
+- **Discussions**: Join our discussions via [GitHub Discussions](https://github.com/viash-hub/base/discussions).
 
 ## License
 This repository is licensed under an MIT license. See the [LICENSE](LICENSE) file for details.
