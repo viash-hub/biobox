@@ -10,6 +10,7 @@ functionality:
     licence: MIT
   requirements:
     cpus: 1
+    commands: [ arriba ]
   argument_groups:
     - name: Inputs
       arguments:
