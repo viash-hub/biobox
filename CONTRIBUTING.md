@@ -171,3 +171,61 @@ functionality:
               description: "Which normalization was used"
               required: true
 ```
+
+## Workflow
+
+### Step 1: Find a component to contribute
+
+### Step 2: Add config template
+
+Change all occurrences of `xxx` to the name of the component.
+
+Contents of `src/xxx/config.vsh.yaml`:
+
+```yaml
+functionality:
+  name: xxx
+  description: xxx
+  info:
+    keywords: [tag1, tag2]
+    homepage: yyy
+    documentation: yyy
+    repository: yyy
+    reference: "doi:yyy"
+    licence: yyy
+  argument_groups:
+    - name: Inputs
+      arguments:
+    - name: Outputs
+      arguments:
+    - name: Arguments
+      arguments:
+  resources:
+    - type: bash_script
+      path: script.sh
+  test_resources:
+    - type: bash_script
+      path: test.sh
+    - type: file
+      path: test_data
+platforms:
+  - type: docker
+    image: quay.io/biocontainers/xxx:0.1.0--py_0
+    setup:
+      - type: docker
+        run: |
+          echo "xxx: \"0.1.0\"" > /var/software_versions.txt
+  - type: nextflow
+```
+
+### Step 3: Find container
+
+Google `biocontainer xxx` and find the container that is most suitable. Typically the link will be `https://quay.io/repository/biocontainers/xxx?tab=tags`.
+
+### Step 4: Create help file
+
+```bash
+docker run --rm -it -v `pwd`/src/xxx/:/xxx quay.io/biocontainers/xxx:tag
+xxx --help > /xxx/help.txt
+```
+
