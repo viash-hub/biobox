@@ -1,0 +1,16 @@
+functionality:
+  name: pear
+  description: "PEAR is an ultrafast, memory-efficient and highly accurate pair-end read merger"
+  info:
+    keywords: [ "pair-end", "read", "merge" ]
+    homepage: https://cme.h-its.org/exelixis/web/software/pear
+    documentatoin: https://cme.h-its.org/exelixis/web/software/pear/doc.html
+    reference: doi:10.1093/bioinformatics/btt593
+    licence: "['Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported']"
+  resources:
+    - type: bash_script
+      path: script.sh
+platforms:
+  - type: docker
+    image: quay.io/biocontainers/pear:0.9.6--h9d449c0_10
+  - type: nextflow
