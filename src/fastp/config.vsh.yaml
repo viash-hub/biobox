@@ -1,0 +1,161 @@
+functionality:
+  name: fastp
+  description: |
+    An ultra-fast all-in-one FASTQ preprocessor (QC/adapters/trimming/filtering/splitting/merging...).
+
+    Features:
+
+    - comprehensive quality profiling for both before and after filtering data (quality curves, base contents, KMER, Q20/Q30, GC Ratio, duplication, adapter contents...)
+    - filter out bad reads (too low quality, too short, or too many N...)
+    - cut low quality bases for per read in its 5' and 3' by evaluating the mean quality from a sliding window (like Trimmomatic but faster).
+    - trim all reads in front and tail
+    - cut adapters. Adapter sequences can be automatically detected, which means you don't have to input the adapter sequences to trim them.
+    - correct mismatched base pairs in overlapped regions of paired end reads, if one base is with high quality while the other is with ultra low quality
+    - trim polyG in 3' ends, which is commonly seen in NovaSeq/NextSeq data. Trim polyX in 3' ends to remove unwanted polyX tailing (i.e. polyA tailing for mRNA-Seq data)
+    - preprocess unique molecular identifier (UMI) enabled data, shift UMI to sequence name.
+    - report JSON format result for further interpreting.
+    - visualize quality control and filtering results on a single HTML page (like FASTQC but faster and more informative).
+    - split the output to multiple files (0001.R1.gz, 0002.R1.gz...) to support parallel processing. Two modes can be used, limiting the total split file number, or limitting the lines of each split file.
+    - support long reads (data from PacBio / Nanopore devices).
+    - support reading from STDIN and writing to STDOUT
+    - support interleaved input
+    - support ultra-fast FASTQ-level deduplication
+  info:
+    keywords: [RNA-Seq, Trimming, Quality control]
+    repository: https://github.com/OpenGene/fast
+    documentation: https://github.com/OpenGene/fastp/blob/master/README.md
+    reference: "doi:10.1093/bioinformatics/bty560"
+    licence: MIT
+  argument_groups:
+    - name: Inputs
+      description: |
+        `fastp` supports both single-end (SE) and paired-end (PE) input.
+
+        - for SE data, you only have to specify read1 input by `-i` or `--in1`.
+        - for PE data, you should also specify read2 input by `-I` or `--in2`.
+      arguments:
+        - name: --in1
+          alternatives: [-i]
+          type: file
+          description: Input FastQ file. Must be single-end or paired-end R1. Can be gzipped.
+          required: true
+          example: in.R1.fq.gz
+        - name: --in2
+          alternatives: [-I]
+          type: file
+          description: Input FastQ file. Must be paired-end R2. Can be gzipped.
+          required: false
+          example: in.R2.fq.
+    - name: Outputs
+      description: |
+
+        - for SE data, you only have to specify read1 output by `-o` or `--out1`.
+        - for PE data, you should also specify read2 output by `-O` or `--out2`.
+        - if you don't specify the output file names, no output files will be written, but the QC will still be done for both data before and after filtering.
+        - the output will be gzip-compressed if its file name ends with `.gz`
+      arguments:
+        - name: --out1
+          alternatives: [-o]
+          type: file
+          description: The single-end or paired-end R1 reads that pass QC. Will be gzipped if its file name ends with `.gz`.
+          required: true
+          example: out.R1.fq.gz
+        - name: --out2
+          alternatives: [-O]
+          type: file
+          description: The paired-end R2 reads that pass QC. Will be gzipped if its file name ends with `.gz`.
+          required: false
+          example: out.R2.fq.gz
+        - name: --unpaired1
+          type: file
+          description: Store the reads that `read1` passes filters but its paired `read2` doesn't.
+          required: false
+          example: unpaired.R1.fq.gz
+        - name: --unpaired2
+          type: file
+          description: Store the reads that `read2` passes filters but its paired `read1` doesn't.
+          required: false
+          example: unpaired.R2.fq.gz
+        - name: --failed_out
+          type: file
+          description: |
+            Store the reads that fail filters.
+
+            If one read failed and is written to --failed_out, its failure reason will be appended to its read name. For example, failed_quality_filter, failed_too_short etc.
+            For PE data, if unpaired reads are not stored (by giving --unpaired1 or --unpaired2), the failed pair of reads will be put together. If one read passes the filters but its pair doesn't, the failure reason will be paired_read_is_failing.
+          required: false
+          example: failed.fq.gz
+
+    - name: Adapter trimming
+      description: |
+        Adapter trimming is enabled by default, but you can disable it by `-A` or `--disable_adapter_trimming`. Adapter sequences can be automatically detected for both PE/SE data.
+
+        - For SE data, the adapters are evaluated by analyzing the tails of first ~1M reads. This evaluation may be inacurrate, and you can specify the adapter sequence by `-a` or `--adapter_sequence` option. If adapter sequence is specified, the auto detection for SE data will be disabled.
+        - For PE data, the adapters can be detected by per-read overlap analysis, which seeks for the overlap of each pair of reads. This method is robust and fast, so normally you don't have to input the adapter sequence even you know it. But you can still specify the adapter sequences for read1 by `--adapter_sequence`, and for read2 by `--adapter_sequence_r2`. If `fastp` fails to find an overlap (i.e. due to low quality bases), it will use these sequences to trim adapters for read1 and read2 respectively.
+        - For PE data, the adapter sequence auto-detection is disabled by default since the adapters can be trimmed by overlap analysis. However, you can specify `--detect_adapter_for_pe` to enable it.
+        - For PE data, `fastp` will run a little slower if you specify the sequence adapters or enable adapter auto-detection, but usually result in a slightly cleaner output, since the overlap analysis may fail due to sequencing errors or adapter dimers.
+        - The most widely used adapter is the Illumina TruSeq adapters. If your data is from the TruSeq library, you can add `--adapter_sequence=AGATCGGAAGAGCACACGTCTGAACTCCAGTCA --adapter_sequence_r2=AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT` to your command lines, or enable auto detection for PE data by specifing `detect_adapter_for_pe`.
+        - `fastp` contains some built-in known adapter sequences for better auto-detection. If you want to make some adapters to be a part of the built-in adapters, please file an issue.
+
+        You can also specify --adapter_fasta to give a FASTA file to tell fastp to trim multiple adapters in this FASTA file. Here is a sample of such adapter FASTA file:
+
+        ```
+        >Illumina TruSeq Adapter Read 1
+        AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
+        >Illumina TruSeq Adapter Read 2
+        AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+        >polyA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        ```
+
+        The adapter sequence in this file should be at least 6bp long, otherwise it will be skipped. And you can give whatever you want to trim, rather than regular sequencing adapters (i.e. polyA).
+
+        `fastp` first trims the auto-detected adapter or the adapter sequences given by `--adapter_sequence | --adapter_sequence_r2`, then trims the adapters given by `--adapter_fasta` one by one.
+
+        The sequence distribution of trimmed adapters can be found at the HTML/JSON reports.
+      arguments:
+        - name: --disable_adapter_trimming
+          alternatives: [-A]
+          type: boolean_true
+          description: |
+            Disable adapter trimming.
+        - name: --adapter_sequence
+          alternatives: [-a]
+          type: string
+          description: |
+            The adapter sequences to be trimmed. For SE data, if not specified, the adapters will be auto-detected. For PE data, this is used if R1/R2 are found not overlapped
+        - name: --adapter_sequence_r2
+          alternatives: [-A]
+          type: string
+          description: |
+            The adapter sequences to be trimmed for R2. This is used for PE data if R1/R2 are found overlapped.
+        - name: --adapter_fasta
+          type: file
+          description: |
+            A FASTA file containing all the adapter sequences to be trimmed. For SE data, if not specified, the adapters will be auto-detected. For PE data, this is used if R1/R2 are found not overlapped.
+    - name: Arguments
+      arguments:
+        - name: --verbose
+          alternatives: [-V]
+          type: boolean_true
+          description: Output verbose log information (i.e. when every 1M reads are processed).
+        - name: --fix_mgi_id
+          type: boolean_true
+          description: |
+            The MGI FASTQ ID format is not compatible with many BAM operation tools, enable this option to fix it.
+  resources:
+    - type: bash_script
+      path: script.sh
+  test_resources:
+    - type: bash_script
+      path: test.sh
+    - type: file
+      path: test_data
+platforms:
+  - type: docker
+    image: quay.io/biocontainers/fastp:0.23.4--hadf994f_2
+    setup:
+      - type: docker
+        run: |
+          fastp --version 2>&1 | sed 's# #: "#;s#$#"#' > /var/software_versions.txt
+  - type: nextflow
