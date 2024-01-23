@@ -1,6 +1,14 @@
 functionality:
   name: bgzip
   description: Block compression/decompression utility
+  info:
+    homepage: https://www.htslib.org/
+    documentation: https://www.htslib.org/doc/bgzip.html
+    repository: https://github.com/samtools/htslib
+    licence: MIT
+  requirements:
+    cpus: 1
+    commands: [ bgzip ]
   arguments:
     - name: --input
       type: file
@@ -21,11 +29,6 @@ functionality:
       description: number of threads to use
       required: false
       default: 1
-    # - name: log
-    #   type: file
-    #   direction: output
-    #   description: log file
-    #   required: false
   resources:
     - type: bash_script
       text: |
@@ -36,8 +39,7 @@ functionality:
         "$meta_executable" --input "$meta_resources_dir/test/test.vcf" --output "$meta_resources_dir/test.vcf.gz"
     - type: file
       path: test
-  info:
-    repository: https://github.com/samtools/htslib
+
 platforms:
   - type: docker
     image: quay.io/biocontainers/htslib:1.19--h81da01d_0
