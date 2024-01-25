@@ -34,99 +34,28 @@ functionality:
             The full list of available datasets can be viewed using "busco --list-datasets".
             When unsure, the "--auto-lineage" flag can be set to automatically find the optimal lineage path.
             Requested datasets will automatically be downloaded if not already present in the download folder.
-        - name: --output_folder_prefix
-          type: string
-          required: false
-          description: |
-            Name of the analysis run, output folders will be labeled with this name. if not specified the output will take the form "BUSCO_<input_file_name>"
-    - name: Arguments
+
+    - name: Outputs
       arguments:
-        - name: --augustus
-          type: boolean_true
+        - name: --output_dir
+          alternatives: ["-o"]
+          required: true
+          direction: output
+          type: file
           description: |
-            Use augustus gene predictor for eukaryote runs.
-        - name: --augustus_parameters
+            Path to output directory for publishing BUSCO results
+        - name: --output_prefix
           type: string
           required: false
           description: |
-            Additional parameters to be passed to Augustus (see Augustus documentation: https://github.com/Gaius-Augustus/Augustus/blob/master/docs/RUNNING-AUGUSTUS.md).
-            Parameters should be contained within a single string, without whitespace and seperated by commas.
-          example: "--PARAM1=VALUE1,--PARAM2=VALUE2"
-        - name: --augustus_species
-          type: string
-          required: false
-          description: |
-            Specify the augustus species
-        - name: --auto_lineage
-          type: boolean_true
-          description: |
-            Run auto-lineage pipelilne to automatically determine BUSCO lineage dataset that is mort closely related to the assembly or gene set being assessed.
-        - name: --auto_lineage_euk
-          type: boolean_true
-          description: |
-            Run auto-placement just on eukaryota tree to find optimal lineage path.
-        - name: --auto_lineage_prok
-          type: boolean_true
-          description: |
-            Run auto_lineage just on prokaryota trees to find optimum lineage path.
-        - name: --contig_break
-          type: integer
-          default: 10
-          description: |
-            Number of contiguous Ns to signify a break between contigs in BBTools analysis.
-        - name: --datasets_version
-          type: string
-          required: false
-          description: |
-            Specify the version of BUSCO datasets
-          example: odb10
-        - name: --download
-          type: string
-          description: |
-            Download dataset. Possible values are a specific dataset name, "all", "prokaryota", "eukaryota", or "virus". If used together with other command line arguments, make sure to place this last.
-        - name: --download_base_url
-          type: string
-          description: |
-            Set the url to the remote BUSCO dataset location.
-        - name: --download_path
-          type: string
-          description: |
-            Specify filepath for storing BUSCO dataset downloads. The default is a busco_downloads subdirectory in the current working directory.
-        - name: --e_value
-          type: double
-          default: 0.001
-          description: |
-            E-value cutoff for BLAST searches.
+            Name of the analysis run, output folders and files will be labeled with this name. if not specified the output will be the input file name."
+
+    - name: Resource and Run Settings
+      arguments:
         - name: --force
           type: boolean_true
           description: |
             Force rewriting of existing files. Must be used when output files with the provided name already exist.
-        - name: --limit
-          type: integer
-          default: 3
-          description: |
-            Number of candidate regions (contig or transcript) from the BLAST output to consider per BUSCO.
-            This option is only effective in pipelines using BLAST, i.e. the genome pipeline (see --augustus) or the prokaryota transcriptome pipeline.
-        - name: --long
-          type: boolean_true
-          description: |
-            Optimize Augustus self-training mode. This adds considerably to the run time, but can improve results for some non-model organisms.
-        - name: --metaeuk_parameters
-          type: string
-          description: |
-            Pass additional arguments to Metaeuk for the first run (see Metaeuk documentation https://github.com/soedinglab/metaeuk).
-            All parameters should be contained within a single string with no white space, with each parameter separated by a comma.
-          example: "--max-overlap=15,--min-exon-aa=15"
-        - name: --metaeuk_rerun_parameters
-          type: string
-          description: |
-            Pass additional arguments to Metaeuk for the second run (see Metaeuk documentation https://github.com/soedinglab/metaeuk).
-            All parameters should be contained within a single string with no white space, with each parameter separated by a comma.
-          example: "--max-overlap=15,--min-exon-aa=15"
-        - name: --miniprot
-          type: boolean_true
-          description: |
-            Use Miniprot gene predictor.
         - name: --offline
           type: boolean_true
           description: |
@@ -146,14 +75,118 @@ functionality:
           type: boolean_true
           description: |
             Continue a run that had already partially completed. Restarting skips calls to tools that have completed but performs all pre- and post-processing steps.
-        - name: --scaffold_composition
-          type: boolean_true
-          description: |
-            Writes ACGTN content per scaffold to a file scaffold_composition.txt. Used by BBTools.
         - name: --tar
           type: boolean_true
           description: |
             Compress some subdirectories with many files to save space.
+
+    - name: Download Settings
+      arguments:
+        - name: --download
+          type: string
+          required: false
+          description: |
+            Download dataset. Possible values are a specific dataset name, "all", "prokaryota", "eukaryota", or "virus".
+        - name: --download_base_url
+          type: string
+          description: |
+            Set the url to the remote BUSCO dataset location.
+        - name: --download_path
+          type: string
+          description: |
+            Specify filepath for storing BUSCO dataset downloads. The default is a busco_downloads subdirectory in the current working directory.
+
+    - name: Lineage Dataset Settings
+      arguments:
+        - name: --auto_lineage
+          type: boolean_true
+          description: |
+            Run auto-lineage pipelilne to automatically determine BUSCO lineage dataset that is mort closely related to the assembly or gene set being assessed.
+        - name: --auto_lineage_euk
+          type: boolean_true
+          description: |
+            Run auto-placement just on eukaryota tree to find optimal lineage path.
+        - name: --auto_lineage_prok
+          type: boolean_true
+          description: |
+            Run auto_lineage just on prokaryota trees to find optimum lineage path.
+        - name: --datasets_version
+          type: string
+          required: false
+          description: |
+            Specify the version of BUSCO datasets
+          example: odb10
+
+    - name: Augustus Settings
+      arguments:
+        - name: --augustus
+          type: boolean_true
+          description: |
+            Use augustus gene predictor for eukaryote runs.
+        - name: --augustus_parameters
+          type: string
+          required: false
+          description: |
+            Additional parameters to be passed to Augustus (see Augustus documentation: https://github.com/Gaius-Augustus/Augustus/blob/master/docs/RUNNING-AUGUSTUS.md).
+            Parameters should be contained within a single string, without whitespace and seperated by commas.
+          example: "--PARAM1=VALUE1,--PARAM2=VALUE2"
+        - name: --augustus_species
+          type: string
+          required: false
+          description: |
+            Specify the augustus species
+        - name: --long
+          type: boolean_true
+          description: |
+            Optimize Augustus self-training mode. This adds considerably to the run time, but can improve results for some non-model organisms.
+
+    - name: BBTools Settings
+      arguments:
+        - name: --contig_break
+          type: integer
+          default: 10
+          description: |
+            Number of contiguous Ns to signify a break between contigs in BBTools analysis.
+        - name: --limit
+          type: integer
+          default: 3
+          description: |
+            Number of candidate regions (contig or transcript) from the BLAST output to consider per BUSCO.
+            This option is only effective in pipelines using BLAST, i.e. the genome pipeline (see --augustus) or the prokaryota transcriptome pipeline.
+        - name: --scaffold_composition
+          type: boolean_true
+          description: |
+            Writes ACGTN content per scaffold to a file scaffold_composition.txt.
+
+    - name: BLAST Settings
+      arguments:
+        - name: --e_value
+          type: double
+          default: 0.001
+          description: |
+            E-value cutoff for BLAST searches.
+
+    - name: Protein Gene Prediction settings
+      arguments:
+        - name: --miniprot
+          type: boolean_true
+          description: |
+            Use Miniprot gene predictor.
+
+    - name: MetaEuk Settings
+      arguments:
+        - name: --metaeuk_parameters
+          type: string
+          description: |
+            Pass additional arguments to Metaeuk for the first run (see Metaeuk documentation https://github.com/soedinglab/metaeuk).
+            All parameters should be contained within a single string with no white space, with each parameter separated by a comma.
+          example: "--max-overlap=15,--min-exon-aa=15"
+        - name: --metaeuk_rerun_parameters
+          type: string
+          description: |
+            Pass additional arguments to Metaeuk for the second run (see Metaeuk documentation https://github.com/soedinglab/metaeuk).
+            All parameters should be contained within a single string with no white space, with each parameter separated by a comma.
+          example: "--max-overlap=15,--min-exon-aa=15"
 
   resources:
     - type: bash_script
