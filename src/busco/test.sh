@@ -1,6 +1,8 @@
 test_dir="$meta_resources_dir/test_data"
 
 echo "> Running busco"
+echo "$(busco --version 2>&1 | sed -n 's/BUSCO \([0-9.]*\)/\1/p')"
+
 "$meta_executable" \
     --input $test_dir/protein.fasta \
     --mode protein \
