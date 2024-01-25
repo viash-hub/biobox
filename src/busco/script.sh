@@ -24,10 +24,16 @@ else
     prefix="$(basename -- $par_input)"
 fi
 
+if [[ -n "$meta_cpus" ]]; then 
+    cpus="$meta_cpus"
+else 
+    cpus=1
+fi
+
 busco \
     --in "$par_input" \
     --mode "$par_mode" \
-    --cpu "$meta_cpus" \
+    --cpu "$cpus" \
     --out "$prefix" \
     ${par_lineage_dataset:+--lineage_dataset "$par_lineage_dataset"} \
     ${par_augustus:+--augustus} \
