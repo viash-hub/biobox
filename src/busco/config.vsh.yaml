@@ -25,6 +25,7 @@ functionality:
           required: true
           description: |
             Busco assesment mode
+          example: protein
         - name: --lineage_dataset
           alternatives: ["-l"]
           type: string
@@ -34,6 +35,7 @@ functionality:
             The full list of available datasets can be viewed using "busco --list-datasets".
             When unsure, the "--auto-lineage" flag can be set to automatically find the optimal lineage path.
             Requested datasets will automatically be downloaded if not already present in the download folder.
+          example: stramenopiles_odb10
 
     - name: Outputs
       arguments:
@@ -44,11 +46,13 @@ functionality:
           type: file
           description: |
             Path to output directory for publishing BUSCO results
+          example: output
         - name: --output_prefix
           type: string
           required: false
           description: |
             Name of the analysis run, output folders and files will be labeled with this name. if not specified the output will be the input file name."
+          example: busco_protein
 
     - name: Resource and Run Settings
       arguments:
@@ -101,7 +105,7 @@ functionality:
         - name: --auto_lineage
           type: boolean_true
           description: |
-            Run auto-lineage pipelilne to automatically determine BUSCO lineage dataset that is mort closely related to the assembly or gene set being assessed.
+            Run auto-lineage pipelilne to automatically determine BUSCO lineage dataset that is most closely related to the assembly or gene set being assessed.
         - name: --auto_lineage_euk
           type: boolean_true
           description: |
