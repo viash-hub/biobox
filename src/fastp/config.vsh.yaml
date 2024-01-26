@@ -5,24 +5,24 @@ functionality:
 
     Features:
 
-    - comprehensive quality profiling for both before and after filtering data (quality curves, base contents, KMER, Q20/Q30, GC Ratio, duplication, adapter contents...)
-    - filter out bad reads (too low quality, too short, or too many N...)
-    - cut low quality bases for per read in its 5' and 3' by evaluating the mean quality from a sliding window (like Trimmomatic but faster).
-    - trim all reads in front and tail
-    - cut adapters. Adapter sequences can be automatically detected, which means you don't have to input the adapter sequences to trim them.
-    - correct mismatched base pairs in overlapped regions of paired end reads, if one base is with high quality while the other is with ultra low quality
-    - trim polyG in 3' ends, which is commonly seen in NovaSeq/NextSeq data. Trim polyX in 3' ends to remove unwanted polyX tailing (i.e. polyA tailing for mRNA-Seq data)
-    - preprocess unique molecular identifier (UMI) enabled data, shift UMI to sequence name.
-    - report JSON format result for further interpreting.
-    - visualize quality control and filtering results on a single HTML page (like FASTQC but faster and more informative).
-    - split the output to multiple files (0001.R1.gz, 0002.R1.gz...) to support parallel processing. Two modes can be used, limiting the total split file number, or limitting the lines of each split file.
-    - support long reads (data from PacBio / Nanopore devices).
-    - support reading from STDIN and writing to STDOUT
-    - support interleaved input
-    - support ultra-fast FASTQ-level deduplication
+      - comprehensive quality profiling for both before and after filtering data (quality curves, base contents, KMER, Q20/Q30, GC Ratio, duplication, adapter contents...)
+      - filter out bad reads (too low quality, too short, or too many N...)
+      - cut low quality bases for per read in its 5' and 3' by evaluating the mean quality from a sliding window (like Trimmomatic but faster).
+      - trim all reads in front and tail
+      - cut adapters. Adapter sequences can be automatically detected, which means you don't have to input the adapter sequences to trim them.
+      - correct mismatched base pairs in overlapped regions of paired end reads, if one base is with high quality while the other is with ultra low quality
+      - trim polyG in 3' ends, which is commonly seen in NovaSeq/NextSeq data. Trim polyX in 3' ends to remove unwanted polyX tailing (i.e. polyA tailing for mRNA-Seq data)
+      - preprocess unique molecular identifier (UMI) enabled data, shift UMI to sequence name.
+      - report JSON format result for further interpreting.
+      - visualize quality control and filtering results on a single HTML page (like FASTQC but faster and more informative).
+      - split the output to multiple files (0001.R1.gz, 0002.R1.gz...) to support parallel processing. Two modes can be used, limiting the total split file number, or limitting the lines of each split file.
+      - support long reads (data from PacBio / Nanopore devices).
+      - support reading from STDIN and writing to STDOUT
+      - support interleaved input
+      - support ultra-fast FASTQ-level deduplication
   info:
     keywords: [RNA-Seq, Trimming, Quality control]
-    repository: https://github.com/OpenGene/fast
+    repository: https://github.com/OpenGene/fastp
     documentation: https://github.com/OpenGene/fastp/blob/master/README.md
     reference: "doi:10.1093/bioinformatics/bty560"
     licence: MIT
