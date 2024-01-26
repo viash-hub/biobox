@@ -1,0 +1,50 @@
+functionality:
+  name: cutadapt
+  description: |
+    Demultiplexing using cutadapt
+  arguments:
+    # - name: "--input"
+    #   type: file
+    #   required: true
+    #   default: file.fastq.gz
+    #   multiple: true
+    #   multiple_sep: " "
+    #   direction: input
+    #   must_exist: false
+    # - name: "--barcodesFile"
+    #   type: file
+    #   description: "Trim R1, the `file:/` part is automatically added later"
+    #   default: barcodes.txt
+    # - name: "-e"
+    #   alternatives: ["--error-rate"]
+    #   type: string
+    #   default: "0.10"
+    # - name: "-j"
+    #   alternatives: ["--cores"]
+    #   type: integer
+    #   default: 0
+    #   description: Use the specified amount of CPU cores, default is for autodetect
+    # - name: "--outputDir"
+    #   type: file
+    #   default: demux
+    #   direction: output
+    #   description: Folder to write the output to, this is used in the -p and -o arguments of cutadapt
+    # - name: "--report"
+    #   required: false
+    #   type: file
+    #   direction: output
+    #   description: Filename for the report
+    #   default: report.txt
+  resources:
+    - type: bash_script
+      path: script.sh
+platforms:
+  - type: docker
+    image: python:3.8
+    setup:
+      - type: python
+        pip:
+          - cutadapt
+  - type: nextflow
+    # directives:
+    #   label: fat
