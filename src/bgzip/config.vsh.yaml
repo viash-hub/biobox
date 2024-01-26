@@ -20,26 +20,48 @@ functionality:
       direction: output
       description: compressed or decompressed output
       required: true
-    - name: --extra
-      type: string
-      description: extra arguments to pass to bgzip
-      required: false
-    - name: --threads
-      type: integer
-      description: number of threads to use
-      required: false
-      default: 1
+    - name: --decompress
+      alternatives: -d
+      type: boolean_true
+      description: decompress the input file
   resources:
     - type: bash_script
       text: |
-        bgzip -c "$par_extra" --threads "$par_threads" "$par_input" > "$par_output"
+        [[ "$par_decompress" == "false" ]] && unset par_decompress
+        bgzip -c \
+          ${meta_cpus:+--threads "${meta_cpus}"} \
+          ${par_decompress:+-d} \
+          "$par_input" > "$par_output"
   test_resources:
     - type: bash_script
       text: |
-        "$meta_executable" --input "$meta_resources_dir/test/test.vcf" --output "$meta_resources_dir/test.vcf.gz"
+        set -e
+
+        "$meta_executable" --input "$meta_resources_dir/test_data/test.vcf" --output "test.vcf.gz"
+
+        echo ">> Checking output of compressing"
+        [ ! -f "test.vcf.gz" ] && echo "Output file test.vcf.gz does not exist" && exit 1
+
+        "$meta_executable" --input "test.vcf.gz" --output "test.vcf" --decompress
+
+        echo ">> Checking output of decompressing"
+        [ ! -f "test.vcf" ] && echo "Output file test.vcf does not exist" && exit 1
+
+        echo ">> Checking original and decompressed files are the same"
+        set +e
+        cmp --silent -- "$meta_resources_dir/test_data/test.vcf" "test.vcf"
+        [ $? -ne 0 ] && echo "files are different" && exit 1
+        set -e
+        
+        echo "> Test successful"
     - type: file
-      path: test
+      path: test_data
 
 platforms:
   - type: docker
     image: quay.io/biocontainers/htslib:1.19--h81da01d_0
+    setup:
+      - type: docker
+        run: |
+          bgzip -h | grep 'Version:' 2>&1 |  sed 's/Version:\s\(.*\)/arriba: "\1"/' > /var/software_versions.txt
+  - type: nextflow
