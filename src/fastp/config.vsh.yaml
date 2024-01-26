@@ -85,7 +85,28 @@ functionality:
             For PE data, if unpaired reads are not stored (by giving --unpaired1 or --unpaired2), the failed pair of reads will be put together. If one read passes the filters but its pair doesn't, the failure reason will be paired_read_is_failing.
           required: false
           example: failed.fq.gz
-
+        - name: --overlapped_out
+          type: file
+          description: |
+            For each read pair, output the overlapped region if it has no any mismatched base.
+    - name: Report output arguments
+      arguments:
+        - name: --json
+          alternatives: [-j]
+          type: file
+          description: |
+            The json format report file name
+          example: out.json
+        - name: --html
+          type: file
+          description: |
+            The html format report file name
+          example: out.html
+        - name: --report_title
+          type: string
+          description: |
+            The title of the html report, default is "fastp report".
+          example: fastp report
     - name: Adapter trimming
       description: |
         Adapter trimming is enabled by default, but you can disable it by `-A` or `--disable_adapter_trimming`. Adapter sequences can be automatically detected for both PE/SE data.
@@ -119,13 +140,16 @@ functionality:
           type: boolean_true
           description: |
             Disable adapter trimming.
+        - name: --detect_adapter_for_pe
+          type: boolean_true
+          description: |
+            By default, the auto-detection for adapter is for SE data input only, turn on this option to enable it for PE data.
         - name: --adapter_sequence
           alternatives: [-a]
           type: string
           description: |
             The adapter sequences to be trimmed. For SE data, if not specified, the adapters will be auto-detected. For PE data, this is used if R1/R2 are found not overlapped
         - name: --adapter_sequence_r2
-          alternatives: [-A]
           type: string
           description: |
             The adapter sequences to be trimmed for R2. This is used for PE data if R1/R2 are found overlapped.
@@ -133,16 +157,363 @@ functionality:
           type: file
           description: |
             A FASTA file containing all the adapter sequences to be trimmed. For SE data, if not specified, the adapters will be auto-detected. For PE data, this is used if R1/R2 are found not overlapped.
-    - name: Arguments
+    - name: Base trimming
+      arguments:
+        - name: --trim_front1
+          alternatives: [-f]
+          type: integer
+          description: |
+            Trimming how many bases in front for read1, default is 0.
+          example: 0
+        - name: --trim_tail1
+          alternatives: [-t]
+          type: integer
+          description: |
+            Trimming how many bases in tail for read1, default is 0.
+          example: 0
+        - name: --max_len1
+          alternatives: [-b]
+          type: integer
+          description: |
+            If read1 is longer than max_len1, then trim read1 at its tail to make it as long as max_len1. Default 0 means no limitation.
+        - name: --trim_front2
+          alternatives: [-F]
+          type: integer
+          description: |
+            Trimming how many bases in front for read2, default is 0.
+          example: 0
+        - name: --trim_tail2
+          alternatives: [-T]
+          type: integer
+          description: |
+            Trimming how many bases in tail for read2, default is 0.
+          example: 0
+        - name: --max_len2
+          alternatives: [-B]
+          type: integer
+          description: |
+            If read2 is longer than max_len2, then trim read2 at its tail to make it as long as max_len2. Default 0 means no limitation.
+    - name: Merging mode
+      description: Allows merging paired-end reads into a single longer read if they are overlapping.
+      arguments:
+        - name: --merge
+          alternatives: [-m]
+          type: boolean_true
+          description: |
+            For paired-end input, merge each pair of reads into a single read if they are overlapped. The merged reads will be written to the file given by --merged_out, the unmerged reads will be written to the files specified by --out1 and --out2. The merging mode is disabled by default.
+        - name: --merged_out
+          type: file
+          description: |
+            In the merging mode, specify the file name to store merged output, or specify --stdout to stream the merged output.
+          example: merged.fq.gz
+        - name: --include_unmerged
+          type: boolean_true
+          description: |
+            In the merging mode, write the unmerged or unpaired reads to the file specified by --merge. Disabled by default.
+    - name: Additional input arguments
+      description: Affects how the input is read.
+      arguments:
+        - name: --interleaved_in
+          type: boolean_true
+          description: |
+            Indicate that <in1> is an interleaved FASTQ which contains both read1 and read2. Disabled by default.
+        - name: --fix_mgi_id
+          type: boolean_true
+          description: |
+            The MGI FASTQ ID format is not compatible with many BAM operation tools, enable this option to fix it.
+        - name: --phred64
+          alternatives: ["-6"]
+          type: boolean_true
+          description: |
+            Indicate the input is using phred64 scoring (it'll be converted to phred33, so the output will still be phred33)
+    - name: Additional output arguments
+      description: Affects how the output is written.
+      arguments:
+        - name: --compression
+          alternatives: ["-z"]
+          type: integer
+          description: |
+            Compression level for gzip output (1 ~ 9). 1 is fastest, 9 is smallest, default is 4.
+          example: 4
+        - name: --dont_overwrite
+          type: boolean_true
+          description: |
+            Don't overwrite existing files. Overwritting is allowed by default.
+    - name: Logging arguments
       arguments:
         - name: --verbose
           alternatives: [-V]
           type: boolean_true
           description: Output verbose log information (i.e. when every 1M reads are processed).
-        - name: --fix_mgi_id
+    - name: Processing arguments
+      arguments:
+        - name: --reads_to_process
+          type: long
+          description: |
+            Specify how many reads/pairs to be processed. Default 0 means process all reads.
+          example: 1000000
+    - name: Deduplication arguments
+      arguments:
+        - name: --dedup
           type: boolean_true
           description: |
-            The MGI FASTQ ID format is not compatible with many BAM operation tools, enable this option to fix it.
+            Enable deduplication to drop the duplicated reads/pairs
+        - name: --dup_calc_accuracy
+          type: integer
+          description: |
+            Accuracy level to calculate duplication (1~6). Higher level uses more memory (1G, 2G, 4G, 8G, 16G, 24G). Default 1 for no-dedup mode, and 3 for dedup mode.
+          example: 3
+        - name: --dont_eval_duplication
+          type: boolean_true
+          description: |
+            Don't evaluate duplication rate to save time and use less memory.
+    - name: PolyG tail trimming arguments
+      arguments:
+        - name: --trim_poly_g
+          alternatives: [-g]
+          type: boolean_true
+          description: |
+            Force polyG tail trimming, by default trimming is automatically enabled for Illumina NextSeq/NovaSeq data
+        - name: --poly_g_min_len
+          type: integer
+          description: |
+            The minimum length to detect polyG in the read tail. 10 by default.
+          example: 10
+        - name: --disable_trim_poly_g
+          alternatives: [-G]
+          type: boolean_true
+          description: |
+            Disable polyG tail trimming, by default trimming is automatically enabled for Illumina NextSeq/NovaSeq data
+    - name: PolyX tail trimming arguments
+      arguments:
+        - name: --trim_poly_x
+          alternatives: [-x]
+          type: boolean_true
+          description: |
+            Enable polyX trimming in 3' ends.
+        - name: --poly_x_min_len
+          type: integer
+          description: |
+            The minimum length to detect polyX in the read tail. 10 by default.
+          example: 10
+    - name: Cut arguments
+      arguments:
+        - name: --cut_front
+          alternatives: ["-5"]
+          type: integer
+          description: |
+            Move a sliding window from front (5') to tail, drop the bases in the window if its mean quality < threshold, stop otherwise.
+        - name: --cut_tail
+          alternatives: ["-3"]
+          type: integer
+          description: |
+            Move a sliding window from tail (3') to front, drop the bases in the window if its mean quality < threshold, stop otherwise.
+        - name: --cut_right
+          alternatives: ["-r"]
+          type: integer
+          description: |
+            Move a sliding window from front to tail, if meet one window with mean quality < threshold, drop the bases in the window and the right part, and then stop.
+        - name: --cut_window_size
+          alternatives: ["-W"]
+          type: integer
+          description: |
+            The window size option shared by cut_front, cut_tail or cut_sliding. Range: 1~1000, default: 4.
+          example: 4
+        - name: --cut_mean_quality
+          alternatives: ["-M"]
+          type: integer
+          description: |
+            The mean quality requirement option shared by cut_front, cut_tail or cut_sliding. Range: 1~36 default: 20 (Q20)
+          example: 20
+        - name: --cut_front_window_size
+          type: integer
+          description: |
+            The window size option of cut_front, default to cut_window_size if not specified.
+          example: 4
+        - name: --cut_front_mean_quality
+          type: integer
+          description: |
+            The mean quality requirement option of cut_front, default to cut_mean_quality if not specified.
+          example: 20
+        - name: --cut_tail_window_size
+          type: integer
+          description: |
+            The window size option of cut_tail, default to cut_window_size if not specified.
+          example: 4
+        - name: --cut_tail_mean_quality
+          type: integer
+          description: |
+            The mean quality requirement option of cut_tail, default to cut_mean_quality if not specified.
+          example: 20
+        - name: --cut_right_window_size
+          type: integer
+          description: |
+            The window size option of cut_right, default to cut_window_size if not specified.
+          example: 4
+        - name: --cut_right_mean_quality
+          type: integer
+          description: |
+            The mean quality requirement option of cut_right, default to cut_mean_quality if not specified.
+          example: 20
+    - name: Quality filtering arguments
+      arguments:
+        - name: --disable_quality_filtering
+          alternatives: [-Q]
+          type: boolean_true
+          description: |
+            Quality filtering is enabled by default. If this option is specified, quality filtering is disabled.
+        - name: --qualified_quality_phred
+          alternatives: [-q]
+          type: integer
+          description: |
+            The quality value that a base is qualified. Default 15 means phred quality >=Q15 is qualified.
+          example: 15
+        - name: --unqualified_percent_limit
+          alternatives: [-u]
+          type: integer
+          description: |
+            How many percents of bases are allowed to be unqualified (0~100). Default 40 means 40%.
+          example: 40
+        - name: --n_base_limit
+          alternatives: [-n]
+          type: integer
+          description: |
+            If one read's number of N base is >n_base_limit, then this read/pair is discarded. Default is 5.
+          example: 5
+        - name: --average_qual
+          alternatives: [-e]
+          type: integer
+          description: |
+            If one read's average quality score <avg_qual, then this read/pair is discarded. Default 0 means no requirement.
+          example: 0
+    - name: Length filtering arguments
+      arguments:
+        - name: --disable_length_filtering
+          alternatives: [-L]
+          type: boolean_true
+          description: |
+            Length filtering is enabled by default. If this option is specified, length filtering is disabled.
+        - name: --length_required
+          alternatives: [-l]
+          type: integer
+          description: |
+            Reads shorter than length_required will be discarded, default is 15.
+          example: 15
+        - name: --length_limit
+          type: integer
+          description: |
+            Reads longer than length_limit will be discarded, default 0 means no limitation.
+          example: 0
+    - name: Low complexity filtering arguments
+      arguments:
+        - name: --low_complexity_filter
+          alternatives: [-y]
+          type: boolean_true
+          description: |
+            Enable low complexity filter. The complexity is defined as the percentage of base that is different from its next base (base[i] != base[i+1]).
+        - name: --complexity_threshold
+          alternatives: [-Y]
+          type: integer
+          description: |
+            The threshold for low complexity filter (0~100). Default is 30, which means 30% complexity is required.
+          example: 30
+    - name: Index filtering arguments
+      arguments:
+        - name: --filter_by_index1
+          type: file
+          description: |
+            Specify a file contains a list of barcodes of index1 to be filtered out, one barcode per line.
+        - name: --filter_by_index2
+          type: file
+          description: |
+            Specify a file contains a list of barcodes of index2 to be filtered out, one barcode per line.
+        - name: --filter_by_index_threshold
+          type: integer
+          description: |
+            The allowed difference of index barcode for index filtering, default 0 means completely identical.
+          example: 0
+    - name: Overlapped region correction
+      arguments:
+        - type: boolean_true
+          name: --correction
+          alternatives: [-c]
+          description: |
+            Enable base correction in overlapped regions (only for PE data), default is disabled.
+        - name: --overlap_len_require
+          type: integer
+          description: |
+            The minimum length to detect overlapped region of PE reads. This will affect overlap analysis based PE merge, adapter trimming and correction. 30 by default.
+          example: 30
+        - name: --overlap_diff_limit
+          type: integer
+          description: |
+            The maximum number of mismatched bases to detect overlapped region of PE reads. This will affect overlap analysis based PE merge, adapter trimming and correction. 5 by default.
+          example: 5
+        - name: --overlap_diff_percent_limit
+          type: integer
+          description: |
+            The maximum percentage of mismatched bases to detect overlapped region of PE reads. This will affect overlap analysis based PE merge, adapter trimming and correction. Default 20 means 20%.
+          example: 20
+    - name: UMI arguments
+      arguments:
+        - name: --umi
+          alternatives: [-U]
+          type: boolean_true
+          description: |
+            Enable unique molecular identifier (UMI) preprocessing.
+        - name: --umi_loc
+          type: string
+          description: |
+            Specify the location of UMI, can be (index1/index2/read1/read2/per_index/per_read, default is none.
+          choices: [index1, index2, read1, read2, per_index, per_read]
+        - name: --umi_len
+          type: integer
+          description: |
+            Iif the UMI is in read1/read2, its length should be provided.
+          example: 0
+        - name: --umi_prefix
+          type: string
+          description: |
+            If specified, an underline will be used to connect prefix and UMI (i.e. prefix=UMI, UMI=AATTCG, final=UMI_AATTCG). No prefix by default.
+        - name: --umi_skip
+          type: integer
+          description: |
+            If the UMI is in read1/read2, fastp can skip several bases following UMI, default is 0.
+          example: 0
+        - name: --umi_delim
+          type: string
+          description: |
+            If the UMI is in index1/index2, fastp can use a delimiter to separate UMI from the read sequence, default is none.
+    - name: Overrepresentation analysis arguments
+      arguments:
+        - name: --overrepresentation_analysis
+          alternatives: [-p]
+          type: boolean_true
+          description: |
+            Enable overrepresentation analysis.
+        - name: --overrepresentation_sampling
+          type: integer
+          description: |
+            One in (--overrepresentation_sampling) reads will be computed for overrepresentation analysis (1~10000), smaller is slower, default is 20.
+          example: 20
+    # # would need to set all outputs to multiple: true
+    # - name: Split arguments
+    #   arguments:
+    #     - name: --split
+    #       alternatives: [-s]
+    #       type: boolean_true
+    #       description: |
+    #         Split output by limiting total split file number with this option (2~999), a sequential number prefix will be added to output name ( 0001.out.fq, 0002.out.fq...), disabled by default.
+    #     - name: --split_by_lines
+    #       alternatives: [-S]
+    #       type: long
+    #       description: |
+    #         Split output by limiting lines of each file with this option(>=1000), a sequential number prefix will be added to output name ( 0001.out.fq, 0002.out.fq...), disabled by default.
+    #     - name: --split_prefix_digits
+    #       type: integer
+    #       description: |
+    #         The digits for the sequential number padding (1~10), default is 4, so the filename will be padded as 0001.xxx, 0 to disable padding.
+    #       example: 4
   resources:
     - type: bash_script
       path: script.sh
