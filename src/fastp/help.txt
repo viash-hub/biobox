@@ -1,3 +1,7 @@
+```bash
+fastp --help
+```
+
 usage: fastp [options] ... 
 options:
   -i, --in1                            read1 input file name (string [=])
