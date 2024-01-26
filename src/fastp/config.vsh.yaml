@@ -45,7 +45,7 @@ functionality:
           type: file
           description: Input FastQ file. Must be paired-end R2. Can be gzipped.
           required: false
-          example: in.R2.fq.
+          example: in.R2.fq.gz
     - name: Outputs
       description: |
 
@@ -60,22 +60,26 @@ functionality:
           description: The single-end or paired-end R1 reads that pass QC. Will be gzipped if its file name ends with `.gz`.
           required: true
           example: out.R1.fq.gz
+          direction: output
         - name: --out2
           alternatives: [-O]
           type: file
           description: The paired-end R2 reads that pass QC. Will be gzipped if its file name ends with `.gz`.
           required: false
           example: out.R2.fq.gz
+          direction: output
         - name: --unpaired1
           type: file
           description: Store the reads that `read1` passes filters but its paired `read2` doesn't.
           required: false
           example: unpaired.R1.fq.gz
+          direction: output
         - name: --unpaired2
           type: file
           description: Store the reads that `read2` passes filters but its paired `read1` doesn't.
           required: false
           example: unpaired.R2.fq.gz
+          direction: output
         - name: --failed_out
           type: file
           description: |
@@ -85,10 +89,12 @@ functionality:
             For PE data, if unpaired reads are not stored (by giving --unpaired1 or --unpaired2), the failed pair of reads will be put together. If one read passes the filters but its pair doesn't, the failure reason will be paired_read_is_failing.
           required: false
           example: failed.fq.gz
+          direction: output
         - name: --overlapped_out
           type: file
           description: |
             For each read pair, output the overlapped region if it has no any mismatched base.
+          direction: output
     - name: Report output arguments
       arguments:
         - name: --json
@@ -97,11 +103,13 @@ functionality:
           description: |
             The json format report file name
           example: out.json
+          direction: output
         - name: --html
           type: file
           description: |
             The html format report file name
           example: out.html
+          direction: output
         - name: --report_title
           type: string
           description: |
@@ -205,6 +213,7 @@ functionality:
           type: file
           description: |
             In the merging mode, specify the file name to store merged output, or specify --stdout to stream the merged output.
+          direction: output
           example: merged.fq.gz
         - name: --include_unmerged
           type: boolean_true
