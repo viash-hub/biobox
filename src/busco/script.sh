@@ -24,12 +24,6 @@ else
     prefix="$(basename -- $par_input)"
 fi
 
-if [[ -n "$meta_cpus" ]]; then 
-    cpus="$meta_cpus"
-else 
-    cpus=1
-fi
-
 busco \
     --in "$par_input" \
     --mode "$par_mode" \
