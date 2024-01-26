@@ -182,6 +182,7 @@ functionality:
         - name: --max_len1
           alternatives: [-b]
           type: integer
+          min: 0
           description: |
             If read1 is longer than max_len1, then trim read1 at its tail to make it as long as max_len1. Default 0 means no limitation.
         - name: --trim_front2
@@ -199,6 +200,7 @@ functionality:
         - name: --max_len2
           alternatives: [-B]
           type: integer
+          min: 0
           description: |
             If read2 is longer than max_len2, then trim read2 at its tail to make it as long as max_len2. Default 0 means no limitation.
     - name: Merging mode
@@ -244,6 +246,8 @@ functionality:
           description: |
             Compression level for gzip output (1 ~ 9). 1 is fastest, 9 is smallest, default is 4.
           example: 4
+          min: 1
+          max: 9
         - name: --dont_overwrite
           type: boolean_true
           description: |
@@ -261,6 +265,7 @@ functionality:
           description: |
             Specify how many reads/pairs to be processed. Default 0 means process all reads.
           example: 1000000
+          min: 0
     - name: Deduplication arguments
       arguments:
         - name: --dedup
@@ -272,6 +277,8 @@ functionality:
           description: |
             Accuracy level to calculate duplication (1~6). Higher level uses more memory (1G, 2G, 4G, 8G, 16G, 24G). Default 1 for no-dedup mode, and 3 for dedup mode.
           example: 3
+          min: 1
+          max: 6
         - name: --dont_eval_duplication
           type: boolean_true
           description: |
@@ -288,6 +295,7 @@ functionality:
           description: |
             The minimum length to detect polyG in the read tail. 10 by default.
           example: 10
+          min: 1
         - name: --disable_trim_poly_g
           alternatives: [-G]
           type: boolean_true
@@ -305,6 +313,7 @@ functionality:
           description: |
             The minimum length to detect polyX in the read tail. 10 by default.
           example: 10
+          min: 1
     - name: Cut arguments
       arguments:
         - name: --cut_front
@@ -328,42 +337,50 @@ functionality:
           description: |
             The window size option shared by cut_front, cut_tail or cut_sliding. Range: 1~1000, default: 4.
           example: 4
+          min: 1
         - name: --cut_mean_quality
           alternatives: ["-M"]
           type: integer
           description: |
             The mean quality requirement option shared by cut_front, cut_tail or cut_sliding. Range: 1~36 default: 20 (Q20)
           example: 20
+          min: 0
         - name: --cut_front_window_size
           type: integer
           description: |
             The window size option of cut_front, default to cut_window_size if not specified.
           example: 4
+          min: 1
         - name: --cut_front_mean_quality
           type: integer
           description: |
             The mean quality requirement option of cut_front, default to cut_mean_quality if not specified.
           example: 20
+          min: 0
         - name: --cut_tail_window_size
           type: integer
           description: |
             The window size option of cut_tail, default to cut_window_size if not specified.
           example: 4
+          min: 1
         - name: --cut_tail_mean_quality
           type: integer
           description: |
             The mean quality requirement option of cut_tail, default to cut_mean_quality if not specified.
           example: 20
+          min: 0
         - name: --cut_right_window_size
           type: integer
           description: |
             The window size option of cut_right, default to cut_window_size if not specified.
           example: 4
+          min: 1
         - name: --cut_right_mean_quality
           type: integer
           description: |
             The mean quality requirement option of cut_right, default to cut_mean_quality if not specified.
           example: 20
+          min: 0
     - name: Quality filtering arguments
       arguments:
         - name: --disable_quality_filtering
@@ -377,24 +394,29 @@ functionality:
           description: |
             The quality value that a base is qualified. Default 15 means phred quality >=Q15 is qualified.
           example: 15
+          min: 0
         - name: --unqualified_percent_limit
           alternatives: [-u]
           type: integer
           description: |
             How many percents of bases are allowed to be unqualified (0~100). Default 40 means 40%.
           example: 40
+          min: 0
+          max: 100
         - name: --n_base_limit
           alternatives: [-n]
           type: integer
           description: |
             If one read's number of N base is >n_base_limit, then this read/pair is discarded. Default is 5.
           example: 5
+          min: 0
         - name: --average_qual
           alternatives: [-e]
           type: integer
           description: |
             If one read's average quality score <avg_qual, then this read/pair is discarded. Default 0 means no requirement.
           example: 0
+          min: 0
     - name: Length filtering arguments
       arguments:
         - name: --disable_length_filtering
@@ -408,11 +430,13 @@ functionality:
           description: |
             Reads shorter than length_required will be discarded, default is 15.
           example: 15
+          min: 0
         - name: --length_limit
           type: integer
           description: |
             Reads longer than length_limit will be discarded, default 0 means no limitation.
           example: 0
+          min: 0
     - name: Low complexity filtering arguments
       arguments:
         - name: --low_complexity_filter
@@ -426,6 +450,7 @@ functionality:
           description: |
             The threshold for low complexity filter (0~100). Default is 30, which means 30% complexity is required.
           example: 30
+          min: 0
     - name: Index filtering arguments
       arguments:
         - name: --filter_by_index1
@@ -441,6 +466,7 @@ functionality:
           description: |
             The allowed difference of index barcode for index filtering, default 0 means completely identical.
           example: 0
+          min: 0
     - name: Overlapped region correction
       arguments:
         - type: boolean_true
@@ -453,16 +479,20 @@ functionality:
           description: |
             The minimum length to detect overlapped region of PE reads. This will affect overlap analysis based PE merge, adapter trimming and correction. 30 by default.
           example: 30
+          min: 0
         - name: --overlap_diff_limit
           type: integer
           description: |
             The maximum number of mismatched bases to detect overlapped region of PE reads. This will affect overlap analysis based PE merge, adapter trimming and correction. 5 by default.
           example: 5
+          min: 0
         - name: --overlap_diff_percent_limit
           type: integer
           description: |
             The maximum percentage of mismatched bases to detect overlapped region of PE reads. This will affect overlap analysis based PE merge, adapter trimming and correction. Default 20 means 20%.
           example: 20
+          min: 0
+          max: 100
     - name: UMI arguments
       arguments:
         - name: --umi
@@ -478,8 +508,9 @@ functionality:
         - name: --umi_len
           type: integer
           description: |
-            Iif the UMI is in read1/read2, its length should be provided.
+            If the UMI is in read1/read2, its length should be provided.
           example: 0
+          min: 0
         - name: --umi_prefix
           type: string
           description: |
@@ -489,6 +520,7 @@ functionality:
           description: |
             If the UMI is in read1/read2, fastp can skip several bases following UMI, default is 0.
           example: 0
+          min: 0
         - name: --umi_delim
           type: string
           description: |
@@ -505,6 +537,7 @@ functionality:
           description: |
             One in (--overrepresentation_sampling) reads will be computed for overrepresentation analysis (1~10000), smaller is slower, default is 20.
           example: 20
+          min: 1
     # # would need to set all outputs to multiple: true
     # - name: Split arguments
     #   arguments:
