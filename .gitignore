@@ -1,0 +1,17 @@
+*.DS_Store
+*__pycache__
+
+# IDE ignores
+.idea/
+
+# R specific ignores
+.Rhistory
+.Rproj.user
+*.Rproj
+
+# viash specific ignores
+target/
+
+# nextflow specific ignores
+.nextflow*
+work
