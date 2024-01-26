@@ -1,4 +1,4 @@
-# arriba test data
+# fastp test data
 
 # Test data was obtained from https://github.com/snakemake/snakemake-wrappers/tree/master/bio/fastp/test
 
