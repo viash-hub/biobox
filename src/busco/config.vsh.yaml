@@ -202,5 +202,5 @@ functionality:
       path: test_data
 platforms:
   - type: docker
-    image: ezlabgva/busco:v5.6.1_cv1
+    image: quay.io/biocontainers/busco:5.6.1--pyhdfd78af_0
   - type: nextflow
