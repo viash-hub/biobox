@@ -33,7 +33,7 @@ fi
 busco \
     --in "$par_input" \
     --mode "$par_mode" \
-    --cpu "$cpus" \
+    ${meta_cpus:+--cpu "${meta_cpus}" \
     --out "$prefix" \
     ${par_lineage_dataset:+--lineage_dataset "$par_lineage_dataset"} \
     ${par_augustus:+--augustus} \
