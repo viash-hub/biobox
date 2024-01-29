@@ -7,8 +7,8 @@ if [[ $par_tmpdir ]] && [[ ! -d "$par_tmpdir" ]]; then
     mkdir -p $tmpDir
 fi
 
-if [[ $par_Rpath ]] && [[ ! -d "$par_Rpath" ]]; then
-    mkdir -p $par_Rpath
+if [[ $par_r_path ]] && [[ ! -d "$par_r_path" ]]; then
+    mkdir -p $par_r_path
 fi
 
 [[ "$par_feature_level" == "false" ]] && unset par_feature_level
@@ -71,7 +71,7 @@ featureCounts \
   ${par_donotsort:+--donotsort} \
   ${par_by_read_group:+--byReadGroup} \
   ${par_long_reads:+-L} \
-  ${par_Rpath:+--Rpath "${par_Rpath}"} \
+  ${par_r_path:+--r_path "${par_r_path}"} \
   ${par_detailed_results_format:+-R "${par_detailed_results_format}"} \
   ${par_tmpdir:+--tmpDir "${par_tmpdir}"} \
   ${par_max_M_op:+--maxMOp "${par_max_M_op}"} \
