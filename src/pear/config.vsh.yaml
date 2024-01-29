@@ -30,12 +30,26 @@ functionality:
           example: "reverse.fastq"
     - name: Outputs
       arguments:
-        - name: --output
-          alternatives: -o
-          type: string
-          description: The prefix of the output file(s). The output files will be named as <output>.assembled.fastq and <output>.unassembled.forward.fastq, <output>.unassembled.reverse.fastq and <output>.discarded.fastq.
+        - name: --assembled
+          type: file
+          description: The output file containing assembled reads. Can be compressed with gzip.
           required: true
-          example: "output.fastq"
+          direction: output
+        - name: --unassembled_forward
+          type: file
+          description: The output file containing forward reads that could not be assembled. Can be compressed with gzip.
+          required: true
+          direction: output
+        - name: --unassembled_reverse
+          type: file
+          description: The output file containing reverse reads that could not be assembled. Can be compressed with gzip.
+          required: true
+          direction: output
+        - name: --discarded
+          type: file
+          description: The output file containing reads that were discarded due to too low quality or too many uncalled bases. Can be compressed with gzip.
+          required: true
+          direction: output
     - name: Arguments
       arguments:
         - name: --p_value

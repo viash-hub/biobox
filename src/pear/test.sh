@@ -8,7 +8,10 @@ echo "> Run PEAR"
 "$meta_executable" \
   --forward_fastq "$dir_in/a.1.fastq" \
   --reverse_fastq "$dir_in/a.2.fastq" \
-  --output "test" \
+  --assembled "test.assembled.fastq.gz" \
+  --unassembled_forward "test.unassembled.forward.fastq.gz" \
+  --unassembled_reverse "test.unassembled.reverse.fastq.gz" \
+  --discarded "test.discarded.fastq.gz" \
   --p_value 0.01 \
   --memory "4G"
 
