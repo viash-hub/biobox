@@ -176,6 +176,11 @@ functionality:
 
 ### Step 1: Find a component to contribute
 
+* Find a tool to contribute to this repo
+* Check whether it is already in the [Project board](https://github.com/orgs/viash-hub/projects/1)
+* Check whether there is a corresponding [Snakemake wrapper](https://github.com/snakemake/snakemake-wrappers/blob/master/bio) or [nf-core module](https://github.com/nf-core/modules/tree/master/modules/nf-core) which we can use as inspiration
+* Add the component to the Project board to show that you are working on it
+
 ### Step 2: Add config template
 
 Change all occurrences of `xxx` to the name of the component.
