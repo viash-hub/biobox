@@ -1,14 +1,17 @@
 functionality:
   name: pear
-  description: "PEAR is an ultrafast, memory-efficient and highly accurate pair-end read merger"
+  description: |
+    PEAR is an ultrafast, memory-efficient and highly accurate pair-end read merger. It is fully parallelized and can run with as low as just a few kilobytes of memory.
+    
+    PEAR evaluates all possible paired-end read overlaps and without requiring the target fragment size as input. In addition, it implements a statistical test for minimizing false-positive results. Together with a highly optimized implementation, it can merge millions of paired end reads within a couple of minutes on a standard desktop computer.
   info:
     keywords: [ "pair-end", "read", "merge" ]
     homepage: https://cme.h-its.org/exelixis/web/software/pear
-    documentatoin: https://cme.h-its.org/exelixis/web/software/pear/doc.html
+    repository: https://github.com/tseemann/PEAR
+    documentation: https://cme.h-its.org/exelixis/web/software/pear/doc.html
     reference: doi:10.1093/bioinformatics/btt593
     licence: "['Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported']"
   requirements:
-    cpus: 1
     memory: 4GB
     commands: [ pear , gzip ]
   argument_groups:
@@ -41,7 +44,7 @@ functionality:
           type: double
           description: |
             Specify a p-value for the statistical test. If the computed p-value of a possible assembly exceeds the specified p-value then  paired-end  read  will not be assembled. Valid options are: 0.0001, 0.001, 0.01, 0.05 and 1.0. Setting 1.0 disablesthe test.
-          default: 0.01
+          example: 0.01
           required: false
         - name: --min_overlap
           alternatives: -v
