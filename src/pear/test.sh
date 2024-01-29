@@ -10,7 +10,6 @@ echo "> Run PEAR"
   --reverse_fastq "$dir_in/reads.right.fq.gz" \
   --output "test" \
   --p_value 0.01 \
-  --threads 4 \
   --memory "4G"
 
 echo ">> Checking output"

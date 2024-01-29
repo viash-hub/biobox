@@ -31,7 +31,7 @@ pear \
   ${par_phred_base:+-b "${par_phred_base}"} \
   ${par_memory:+-y "${par_memory}"} \
   ${par_cap:+-c "${par_cap}"} \
-  ${par_threads:+-j "${par_threads}"} \
+  ${meta_cpus:+-j "${meta_cpus}"} \
   ${par_emperical_freqs:+-e} \
   ${par_nbase:+-z}
 

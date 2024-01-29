@@ -7,6 +7,10 @@ functionality:
     documentatoin: https://cme.h-its.org/exelixis/web/software/pear/doc.html
     reference: doi:10.1093/bioinformatics/btt593
     licence: "['Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported']"
+  requirements:
+    cpus: 1
+    memory: 4GB
+    commands: [ pear , gzip ]
   argument_groups:
     - name: Inputs
       arguments:
@@ -122,13 +126,6 @@ functionality:
             Specify  the upper bound for the resulting quality score. If set to zero, capping is disabled.
           required: false
           default: 40
-        - name: --threads
-          alternatives: -j
-          type: integer
-          description: |
-            Number of threads to use.
-          required: false
-          example: 1
         - name: --nbase
           alternatives: -z
           type: boolean_true
