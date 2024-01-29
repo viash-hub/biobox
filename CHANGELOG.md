@@ -8,6 +8,8 @@
 
 * `fastp`: An ultra-fast all-in-one FASTQ preprocessor (PR #3).
 
+* `featureCounts`: Assign sequence reads to genomic features. 
+
 ## MAJOR CHANGES
 
 ## MINOR CHANGES
