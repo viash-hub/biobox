@@ -27,8 +27,8 @@ fi
 busco \
     --in "$par_input" \
     --mode "$par_mode" \
-    ${meta_cpus:+--cpu "${meta_cpus}" \
     --out "$prefix" \
+    ${meta_cpus:+--cpu "${meta_cpus}"} \
     ${par_lineage_dataset:+--lineage_dataset "$par_lineage_dataset"} \
     ${par_augustus:+--augustus} \
     ${par_augustus_parameters:+--augustus_parameters "$par_augustus_parameters"} \
