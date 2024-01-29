@@ -1,5 +1,5 @@
 functionality: 
-  name: subread_featurecounts
+  name: featurecounts
   description: |
     featureCounts is a read summarization program for counting reads generated from either RNA or genomic DNA sequencing experiments by implementing highly efficient chromosome hashing and feature blocking techniques. It works with either single or paired-end reads and provides a wide range of options appropriate for different sequencing applications.
   info:
@@ -22,7 +22,7 @@ functionality:
           description: | 
             Name of an annotation file. GTF/GFF format by default. See -F option for more format information.
           required: true
-          examples: annotation.gtf
+          example: annotation.gtf
         - name: --input
           alternatives: ["-i"]
           type: file
@@ -31,31 +31,31 @@ functionality:
           description: |
             A comma-separated list of SAM or BAM format files. They can be either name or location sorted. Location-sorted paired-end reads are automatically sorted by read names.
           required: true
-          examples: input_file1.bam
+          example: input_file1.bam
     
     - name: Outputs
       arguments:
         - name: --output
-          alternative: ["-o"]
+          alternatives: ["-o"]
           type: file
           direction: output
           description: | 
             Name of output file including read counts. A separate file including summary statistics of counting results is also included in the output ('<output>.summary'). Both files are in tab delimited format.
-          required: true
+          must_exist: true
           example: features.txt
         - name: --output_summary
           type: file
           direction: output
           description: | 
             Summary statistics of counting results is also included in the output ('<output>.summary'). 
-          required: true
+          must_exist: true
           example: features.txt.summary
         - name: --output_junctions
           type: file
           direction: output
           description: | 
             Count of number of reads supporting each exon-exon junction. See -J for more information.
-          required: false
+          must_exist: false
           example: features.txt.jcounts
           must_exist: false
         - name: --r_path
@@ -63,7 +63,7 @@ functionality:
           direction: output
           description: | 
             Directory to save the detailed assignment results. If unspecified, the directory where counting results are saved is used. See -R for more format information.
-          required: false
+          must_exist: false
           example: detailed_results/
           must_exist: false
 
@@ -325,11 +325,6 @@ functionality:
           type: boolean_true
           description: | 
             Output verbose information for debugging, such as un-matched chromosome/contig names.
-        - name: --version
-          alternatives: ["-v"]
-          type: boolean_true
-          description: | 
-            Output version of the program.
   
   resources:
     - type: bash_script
