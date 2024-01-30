@@ -66,7 +66,7 @@ if [[ -n "$par_full_table" ]]; then
     find "$tmp_dir/$prefix" -maxdepth 1 -type d -name 'run_*' -exec cp {}/full_table.tsv "$par_full_table" \;
 fi
 if [[ -n "$par_missing_busco_list" ]]; then
-    find "$tmp_dir/$prefix" -maxdepth 1 -type d -name 'run_*' -exec cp {}/missing_busco_list.txt "$par_missing_busco_list" \;
+    find "$tmp_dir/$prefix" -maxdepth 1 -type d -name 'run_*' -exec cp {}/missing_busco_list.tsv "$par_missing_busco_list" \;
 fi
 if [[ -n "$par_output_dir" ]]; then
     cp -r $tmp_dir/$prefix/run_* $par_output_dir

@@ -64,7 +64,7 @@ functionality:
           required: false
           direction: output
           type: file
-          example: missing_list.tsv
+          example: missing_busco_list.tsv
           description: |
             Missing list output in TSV format.
         - name: --output_dir
