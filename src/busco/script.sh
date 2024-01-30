@@ -55,6 +55,19 @@ busco \
     ${par_download_path:+--download_path "$par_download_path"} \
     ${par_download:+--download "$par_download"} 
 
-mkdir $par_output_dir
-mv $prefix/* $par_output_dir
+if [[ -n "$par_short_summary_json" ]]; then
+    cp "$tmp_dir/run_*/short_summary.json" "$par_short_summary_json"
+fi
+if [[ -n "$par_short_summary_txt" ]]; then
+    cp "$tmp_dir/run_*/short_summary.txt" "$par_short_summary_txt"
+fi
+if [[ -n "$par_full_table" ]]; then
+    cp "$tmp_dir/run_*/full_table.tsv" "$par_full_table"
+fi
+if [[ -n "$par_missing_busco_list" ]]; then
+    cp "$tmp_dir/run_*/missing_busco_list.txt" "$par_missing_busco_list"
+fi
+if [[ -n "$par_output" ]]; then
+    cp -r "$tmp_dir" "$par_output"
+fi
 
