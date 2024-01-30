@@ -8,7 +8,7 @@
 
 * `fastp`: An ultra-fast all-in-one FASTQ preprocessor (PR #3).
 
-* `bgzip`: Add bgzip functionality to compress and decompress files (PR #4).
+* `bgzip`: Add bgzip functionality to compress and decompress files (PR #13).
 
 ## MAJOR CHANGES
 
