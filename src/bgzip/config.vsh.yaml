@@ -7,7 +7,6 @@ functionality:
     repository: https://github.com/samtools/htslib
     licence: MIT
   requirements:
-    cpus: 1
     commands: [ bgzip ]
   argument_groups:
     - name: Inputs
