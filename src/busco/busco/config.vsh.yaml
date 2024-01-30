@@ -105,22 +105,6 @@ functionality:
           description: |
             Compress some subdirectories with many files to save space.
 
-    - name: Download Settings
-      arguments:
-        - name: --download
-          type: string
-          required: false
-          description: |
-            Download dataset. Possible values are a specific dataset name, "all", "prokaryota", "eukaryota", or "virus".
-        - name: --download_base_url
-          type: string
-          description: |
-            Set the url to the remote BUSCO dataset location.
-        - name: --download_path
-          type: string
-          description: |
-            Specify filepath for storing BUSCO dataset downloads. The default is a busco_downloads subdirectory in the current working directory.
-
     - name: Lineage Dataset Settings
       arguments:
         - name: --auto_lineage
