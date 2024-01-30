@@ -32,7 +32,7 @@ fi
 [[ "$par_verbose" == "false" ]] && unset par_verbose
 [[ "$par_version" == "false" ]] && unset par_version
 
-IFS="," read -ra input <<< $par_input
+IFS=";" read -ra input <<< $par_input
 
 featureCounts \
   ${par_format:+-F "${par_format}"} \
@@ -76,7 +76,6 @@ featureCounts \
   ${par_tmpdir:+--tmpDir "${par_tmpdir}"} \
   ${par_max_M_op:+--maxMOp "${par_max_M_op}"} \
   ${par_verbose:+--verbose} \
-  ${par_version:+-v} \
   ${meta_cpus:+-T "${meta_cpus}"} \
   -a "$par_annotation" \
   -o "$par_output" \

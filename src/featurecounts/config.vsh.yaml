@@ -20,16 +20,16 @@ functionality:
           alternatives: ["-a"]
           type: file
           description: | 
-            Name of an annotation file. GTF/GFF format by default. See -F option for more format information.
+            Name of an annotation file. GTF/GFF format by default. See '--format' option for more format information.
           required: true
           example: annotation.gtf
         - name: --input
           alternatives: ["-i"]
           type: file
           multiple: true
-          multiple_sep: ','
+          multiple_sep: ';'
           description: |
-            A comma-separated list of SAM or BAM format files. They can be either name or location sorted. Location-sorted paired-end reads are automatically sorted by read names.
+            A list of SAM or BAM format files separated by semi-colon (;). They can be either name or location sorted. Location-sorted paired-end reads are automatically sorted by read names.
           required: true
           example: input_file1.bam
     
@@ -54,7 +54,7 @@ functionality:
           type: file
           direction: output
           description: | 
-            Count of number of reads supporting each exon-exon junction. See -J for more information.
+            Count of number of reads supporting each exon-exon junction. See '--junctions' for more information.
           must_exist: false
           example: features.txt.jcounts
           must_exist: false
@@ -118,7 +118,7 @@ functionality:
           alternatives: ["-O"]
           type: boolean_true
           description: | 
-            Assign reads to all their overlapping meta-features (or features if -f is specified).
+            Assign reads to all their overlapping meta-features (or features if '--feature_level' is specified).
         - name: --min_overlap
           type: integer
           description: | 
@@ -185,7 +185,7 @@ functionality:
         - name: --fraction
           type: boolean_true
           description: | 
-            Assign fractional counts to features. This option must be used together with '-M' or '-O' or both. When '-M' is specified, each reported alignment from a multi-mapping read (identified via 'NH' tag) will carry a fractional count of 1/x, instead of 1 (one), where x is the total number of alignments reported for the same read. When '-O' is specified, each overlapping feature will receive a fractional count of 1/y, where y is the total number of features overlapping with the read. When both '-M' and '-O' are specified, each alignment will carry a fractional count of 1/(x*y).
+            Assign fractional counts to features. This option must be used together with '--multi_mapping' or '--overlapping' or both. When '--multi_mapping' is specified, each reported alignment from a multi-mapping read (identified via 'NH' tag) will carry a fractional count of 1/x, instead of 1 (one), where x is the total number of alignments reported for the same read. When '--overlapping' is specified, each overlapping feature will receive a fractional count of 1/y, where y is the total number of features overlapping with the read. When both '--multi_mapping' and '--overlapping' are specified, each alignment will carry a fractional count of 1/(x*y).
 
     - name: Read filtering
       arguments:
@@ -235,7 +235,7 @@ functionality:
           alternatives: ["-G"]
           type: file
           description: | 
-            Provide the name of a FASTA-format file that contains the reference sequences used in read mapping that produced the provided SAM/BAM files. This optional argument can be used with '-J' option to improve read counting for junctions.
+            Provide the name of a FASTA-format file that contains the reference sequences used in read mapping that produced the provided SAM/BAM files. This optional argument can be used with '--junctions' option to improve read counting for junctions.
           required: false
           example: reference.fasta
         
@@ -259,7 +259,7 @@ functionality:
           alternatives: ["-P"]
           type: boolean_true
           description: | 
-            Check validity of paired-end distance when counting read pairs. Use -d and -D to set thresholds.
+            Check validity of paired-end distance when counting read pairs. Use '--min_length' and '--max_length' to set thresholds.
         - name: --min_length
           alternatives: ["-d"]
           type: integer
@@ -313,7 +313,7 @@ functionality:
         - name: --tmpdir
           type: file
           description: | 
-            Directory under which intermediate files are saved (later removed). By default, intermediate files will be saved to the directory specified in '-o' argument.
+            Directory under which intermediate files are saved (later removed). By default, intermediate files will be saved to the directory specified in the '--output' argument.
           required: false
         - name: --max_M_op
           type: integer
