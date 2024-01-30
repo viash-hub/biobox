@@ -85,15 +85,6 @@ functionality:
           type: boolean_true
           description: |
             Force rewriting of existing files. Must be used when output files with the provided name already exist.
-        - name: --offline
-          type: boolean_true
-          description: |
-            In offline mode BUSCO will not attempt to download files. Ensure all required dataset files are already downloaded and available.
-        - name: --opt_out_run_stats
-          type: boolean_true
-          description: |
-            Opt out of data collection (from v5.6.0). Collected data is used to improve BUSCO.
-            All collected data is anonymised and includes the pipelines used, the datasets selected, options used and runtime statistics.
         - name: --quiet
           alternatives: ["-q"]
           type: boolean_true
