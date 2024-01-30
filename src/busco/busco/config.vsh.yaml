@@ -21,10 +21,14 @@ functionality:
         - name: --mode
           alternatives: ["-m"]
           type: string
-          choices: ["protein", "genome", "transcriptome"]
+          choices: [genome, geno, transcriptome, tran, proteins, prot]
           required: true
           description: |
-            Busco assesment mode
+            Specify which BUSCO analysis mode to run. There are three valid modes:
+            
+              - geno or genome, for genome assemblies (DNA)
+              - tran or transcriptome, for transcriptome assemblies (DNA)
+              - prot or proteins, for annotated gene sets (protein)
           example: protein
         - name: --lineage_dataset
           alternatives: ["-l"]
