@@ -4,7 +4,7 @@ echo "> Running busco"
 
 "$meta_executable" \
     --input $test_dir/protein.fasta \
-    --mode protein \
+    --mode proteins \
     --lineage_dataset stramenopiles_odb10 \
     --output_dir output 
 
