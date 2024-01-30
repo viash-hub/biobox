@@ -15,7 +15,7 @@ functionality:
           alternatives: ["-i"]
           type: file
           description: |
-            Input fasta file or directory containing input fasta files to analyse. Fasta files can either be a nucleotide or protein fasta file, depending on the BUSCO mode.
+            Input sequence file in FASTA format. Can be an assembled genome or transcriptome (DNA), or protein sequences from an annotated gene set. Also possible to use a path to a directory containing multiple input files.
           required: true
           example: file.fasta
         - name: --mode
