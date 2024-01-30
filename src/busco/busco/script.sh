@@ -16,7 +16,6 @@
 [[ "$par_scaffold_composition" == "false" ]] && unset par_scaffold_composition
 [[ "$par_miniprot" == "false" ]] && unset par_miniprot
 
-
 tmp_dir=$(mktemp -d -p "$meta_temp_dir" busco_XXXXXXXXX)
 prefix=$(openssl rand -hex 8)
 
@@ -25,6 +24,7 @@ busco \
     --mode "$par_mode" \
     --out "$prefix" \
     --out_path "$tmp_dir" \
+    --opt-out-run-stats \
     ${meta_cpus:+--cpu "${meta_cpus}"} \
     ${par_lineage_dataset:+--lineage_dataset "$par_lineage_dataset"} \
     ${par_augustus:+--augustus} \
@@ -42,7 +42,6 @@ busco \
     ${par_metaeuk_parameters:+--metaeuk_parameters "$par_metaeuk_parameters"} \
     ${par_metaeuk_rerun_parameters:+--metaeuk_rerun_parameters "$par_metaeuk_rerun_parameters"} \
     ${par_miniprot:+--miniprot} \
-    ${par_opt_out_run_stats:+--opt-out-run-stats} \
     ${par_quiet:+--quiet} \
     ${par_restart:+--restart} \
     ${par_scaffold_composition:+--scaffold_composition} \
