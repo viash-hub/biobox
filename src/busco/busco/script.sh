@@ -44,16 +44,11 @@ busco \
     ${par_metaeuk_parameters:+--metaeuk_parameters "$par_metaeuk_parameters"} \
     ${par_metaeuk_rerun_parameters:+--metaeuk_rerun_parameters "$par_metaeuk_rerun_parameters"} \
     ${par_miniprot:+--miniprot} \
-    ${par_offline:+--offline} \
     ${par_opt_out_run_stats:+--opt-out-run-stats} \
     ${par_quiet:+--quiet} \
     ${par_restart:+--restart} \
     ${par_scaffold_composition:+--scaffold_composition} \
     ${par_tar:+--tar} \
-    ${par_download_base_url:+--download_base_url "$par_download_base_url"} \
-    ${par_download_path:+--download_path "$par_download_path"} \
-    ${par_download:+--download "$par_download"} 
-
 
 
 out_dir=$(find "$tmp_dir/$prefix" -maxdepth 1 -name 'run_*')
