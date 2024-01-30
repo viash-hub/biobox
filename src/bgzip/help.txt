@@ -1,3 +1,6 @@
+```bash
+bgzip -h
+```
 
 Version: 1.19
 Usage:   bgzip [OPTIONS] [FILE] ...
