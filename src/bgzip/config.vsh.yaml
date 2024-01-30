@@ -120,5 +120,5 @@ platforms:
     setup:
       - type: docker
         run: |
-          bgzip -h | grep 'Version:' 2>&1 |  sed 's/Version:\s\(.*\)/arriba: "\1"/' > /var/software_versions.txt
+          bgzip -h | grep 'Version:' 2>&1 |  sed 's/Version:\s\(.*\)/bgzip: "\1"/' > /var/software_versions.txt
   - type: nextflow
