@@ -21,6 +21,8 @@ jobs:
           else
             echo "check=true" >> $GITHUB_OUTPUT
           fi
+        env:
+           GH_TOKEN: ${{ github.token }}
 
   # phase 1
   list:
