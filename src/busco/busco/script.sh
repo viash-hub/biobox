@@ -6,8 +6,6 @@
 
 [[ "$par_tar" == "false" ]] && unset par_tar
 [[ "$par_force" == "false" ]] && unset par_force
-[[ "$par_offline" == "false" ]] && unset par_offline
-[[ "$par_opt_out_run_stats" == "false" ]] && unset par_opt_out_run_stats
 [[ "$par_quiet" == "false" ]] && unset par_quiet
 [[ "$par_restart" == "false" ]] && unset par_restart
 [[ "$par_auto_lineage" == "false" ]] && unset par_auto_lineage
