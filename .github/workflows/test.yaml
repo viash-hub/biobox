@@ -34,7 +34,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-depth: 0 
+        fetch-depth: 0
+        
+    - name: Get head git commit message
+      id: get_head_commit_message
+      run: echo "HEAD_COMMIT_MESSAGE=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
 
     - uses: viash-io/viash-actions/setup@v5
 
@@ -69,7 +73,7 @@ jobs:
             "config": .info.config,
             "dir": .info.config | capture("^(?<dir>.*\/)").dir
           }
-        ]' ${{ contains(github.event.head_commit.message, 'ci force') && steps.ns_list.outputs.output_file || steps.ns_list_filtered.outputs.output_file }} )" >> $GITHUB_OUTPUT
+        ]' ${{ contains(steps.get_head_commit_message.outputs.HEAD_COMMIT_MESSAGE, 'ci force') && steps.ns_list.outputs.output_file || steps.ns_list_filtered.outputs.output_file }} )" >> $GITHUB_OUTPUT
 
   # phase 2
   viash_test:
