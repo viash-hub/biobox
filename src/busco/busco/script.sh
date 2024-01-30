@@ -18,16 +18,15 @@
 [[ "$par_scaffold_composition" == "false" ]] && unset par_scaffold_composition
 [[ "$par_miniprot" == "false" ]] && unset par_miniprot
 
-if [[ -n "$par_output_prefix" ]]; then 
-    prefix="$par_output_prefix"
-else 
-    prefix="$(basename -- $par_input)"
-fi
+
+tmp_dir=$(mktemp -d -p "$meta_temp_dir" busco_XXXXXXXXX)
+prefix=$(openssl rand -hex 8)
 
 busco \
     --in "$par_input" \
     --mode "$par_mode" \
     --out "$prefix" \
+    --out_path "$tmp_dir" \
     ${meta_cpus:+--cpu "${meta_cpus}"} \
     ${par_lineage_dataset:+--lineage_dataset "$par_lineage_dataset"} \
     ${par_augustus:+--augustus} \
@@ -55,6 +54,21 @@ busco \
     ${par_download_path:+--download_path "$par_download_path"} \
     ${par_download:+--download "$par_download"} 
 
-mkdir $par_output_dir
-mv $prefix/* $par_output_dir
+
+
+if [[ -n "$par_short_summary_json" ]]; then
+    find "$tmp_dir/$prefix" -maxdepth 1 -type d -name 'run_*' -exec cp {}/short_summary.json "$par_short_summary_json" \;
+fi
+if [[ -n "$par_short_summary_txt" ]]; then
+    find "$tmp_dir/$prefix" -maxdepth 1 -type d -name 'run_*' -exec cp {}/short_summary.txt "$par_short_summary_txt" \;
+fi
+if [[ -n "$par_full_table" ]]; then
+    find "$tmp_dir/$prefix" -maxdepth 1 -type d -name 'run_*' -exec cp {}/full_table.tsv "$par_full_table" \;
+fi
+if [[ -n "$par_missing_busco_list" ]]; then
+    find "$tmp_dir/$prefix" -maxdepth 1 -type d -name 'run_*' -exec cp {}/missing_busco_list.txt "$par_missing_busco_list" \;
+fi
+if [[ -n "$par_output_dir" ]]; then
+    cp -r $tmp_dir/$prefix/run_* $par_output_dir
+fi
 
