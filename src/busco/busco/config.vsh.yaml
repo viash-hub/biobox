@@ -153,12 +153,12 @@ functionality:
       arguments:
         - name: --contig_break
           type: integer
-          default: 10
+          required: false
           description: |
             Number of contiguous Ns to signify a break between contigs in BBTools analysis.
         - name: --limit
           type: integer
-          default: 3
+          required: false
           description: |
             Number of candidate regions (contig or transcript) from the BLAST output to consider per BUSCO.
             This option is only effective in pipelines using BLAST, i.e. the genome pipeline (see --augustus) or the prokaryota transcriptome pipeline.
@@ -171,7 +171,7 @@ functionality:
       arguments:
         - name: --e_value
           type: double
-          default: 0.001
+          required: false
           description: |
             E-value cutoff for BLAST searches.
 

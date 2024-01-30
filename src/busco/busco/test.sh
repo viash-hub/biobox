@@ -7,7 +7,6 @@ echo "> Running busco"
     --mode protein \
     --lineage_dataset stramenopiles_odb10 \
     --output_dir output 
-ls -la output/run_stramenopiles_odb10
 
 echo ">> Checking output"
 [ ! -f "output/full_table.tsv" ] && echo "full_table.tsv does not exist" && exit 1
