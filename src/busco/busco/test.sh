@@ -20,4 +20,23 @@ echo ">> Checking if output is empty"
 [ ! -s "output/short_summary.json" ] && echo "short_summary.json is empty" && exit 1
 [ ! -s "output/short_summary.txt" ] && echo "short_summary.txt is empty" && exit 1
 
+
+"$meta_executable" \
+    --input $test_dir/protein.fasta \
+    --mode proteins \
+    --auto_lineage \
+    --output_dir output 
+
+echo ">> Checking output"
+[ ! -f "output/full_table.tsv" ] && echo "full_table.tsv does not exist" && exit 1
+[ ! -f "output/missing_busco_list.tsv" ] && echo "missing_busco_list.tsv does not exist" && exit 1
+[ ! -f "output/short_summary.json" ] && echo "short_summary.json does not exist" && exit 1
+[ ! -f "output/short_summary.txt" ] && echo "short_summary.txt does not exist" && exit 1
+
+echo ">> Checking if output is empty"
+[ ! -s "output/full_table.tsv" ] && echo "full_table.tsv is empty" && exit 1
+[ ! -s "output/missing_busco_list.tsv" ] && echo "missing_busco_list.tsv is empty" && exit 1
+[ ! -s "output/short_summary.json" ] && echo "short_summary.json is empty" && exit 1
+[ ! -s "output/short_summary.txt" ] && echo "short_summary.txt is empty" && exit 1
+
 rm -r output/ 
