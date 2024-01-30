@@ -1,6 +1,6 @@
 functionality:
   name: busco
-  description: Assesment of genome assembly and annotation completeness with single copy orthologs
+  description: Assessment of genome assembly and annotation completeness with single copy orthologs
   info:
     keywords: [Genome assembly, quality control]
     homepage: https://busco.ezlab.org/
@@ -202,5 +202,9 @@ functionality:
       path: test_data
 platforms:
   - type: docker
-    image: ezlabgva/busco:v5.6.1_cv1
+    image: quay.io/biocontainers/busco:5.6.1--pyhdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          busco: "$(busco --version 2>&1 | sed -n 's/BUSCO \([0-9.]*\)/\1/p')" > /var/software_versions.txt
   - type: nextflow
