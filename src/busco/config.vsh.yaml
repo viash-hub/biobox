@@ -206,5 +206,5 @@ platforms:
     setup:
       - type: docker
         run: |
-          busco: "$(busco --version 2>&1 | sed -n 's/BUSCO \([0-9.]*\)/\1/p')" > /var/software_versions.txt
+          busco --version | sed 's/BUSCO\s\(.*\)/busco: "\1"/' > /var/software_versions.txt
   - type: nextflow
