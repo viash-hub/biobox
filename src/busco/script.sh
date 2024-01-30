@@ -18,16 +18,13 @@
 [[ "$par_scaffold_composition" == "false" ]] && unset par_scaffold_composition
 [[ "$par_miniprot" == "false" ]] && unset par_miniprot
 
-if [[ -n "$par_output_prefix" ]]; then 
-    prefix="$par_output_prefix"
-else 
-    prefix="$(basename -- $par_input)"
-fi
+tmp_dir=$(mktemp -d -p "$meta_temp_dir" busco_XXXXXXXXX)
 
 busco \
     --in "$par_input" \
     --mode "$par_mode" \
-    --out "$prefix" \
+    --out "" \
+    --out_dir "$tmp_dir" \
     ${meta_cpus:+--cpu "${meta_cpus}"} \
     ${par_lineage_dataset:+--lineage_dataset "$par_lineage_dataset"} \
     ${par_augustus:+--augustus} \
