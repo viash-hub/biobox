@@ -40,7 +40,7 @@ jobs:
         
     - name: Get head git commit message
       id: get_head_commit_message
-      run: echo "HEAD_COMMIT_MESSAGE=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
+      run: echo "HEAD_COMMIT_MESSAGE=$(git show -s --format=%s $GITHUB_SHA)" >> "$GITHUB_OUTPUT"
 
     - uses: viash-io/viash-actions/setup@v5
 
