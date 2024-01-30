@@ -8,7 +8,9 @@
 
 * `fastp`: An ultra-fast all-in-one FASTQ preprocessor (PR #3).
 
-* `featureCounts`: Assign sequence reads to genomic features. 
+* `bgzip`: Add bgzip functionality to compress and decompress files (PR #13).
+
+* `featureCounts`: Assign sequence reads to genomic features (PR #11). 
 
 ## MAJOR CHANGES
 
