@@ -10,7 +10,7 @@
 
 * `bgzip`: Add bgzip functionality to compress and decompress files (PR #13).
 
-* `featureCounts`: Assign sequence reads to genomic features (PR #11). 
+* `featureCounts`: Assign sequence reads to genomic features (PR #11) (PR #11). 
 
 ## MAJOR CHANGES
 
