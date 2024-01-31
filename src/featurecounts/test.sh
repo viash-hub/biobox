@@ -4,7 +4,7 @@ set -e
 
 dir_in="$meta_resources_dir/test_data"
 
-echo "> Run featurCounts"
+echo "> Run featureCounts"
 "$meta_executable" \
   --input "$dir_in/a.bam" \
   --annotation "$dir_in/annotation.gtf" \
