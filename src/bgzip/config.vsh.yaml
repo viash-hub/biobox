@@ -1,11 +1,11 @@
 functionality:
   name: bgzip
   description: Block compression/decompression utility
-  info:
+  links:
     homepage: https://www.htslib.org/
     documentation: https://www.htslib.org/doc/bgzip.html
     repository: https://github.com/samtools/htslib
-    licence: MIT
+  license: MIT
   requirements:
     commands: [ bgzip ]
   argument_groups:
@@ -115,11 +115,13 @@ functionality:
     - type: file
       path: test_data
 
-platforms:
+engines:
   - type: docker
     image: quay.io/biocontainers/htslib:1.19--h81da01d_0
     setup:
       - type: docker
         run: |
           bgzip -h | grep 'Version:' 2>&1 |  sed 's/Version:\s\(.*\)/bgzip: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
   - type: nextflow

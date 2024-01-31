@@ -1,13 +1,14 @@
 functionality:
   name: arriba
   description: Detect gene fusions from RNA-Seq data
-  info:
-    keywords: [Gene fusion, RNA-Seq]
+  keywords: [Gene fusion, RNA-Seq]
+  links:
     homepage: https://arriba.readthedocs.io/en/latest/
     documentation: https://arriba.readthedocs.io/en/latest/
     repository: https://github.com/suhrig/arriba
-    reference: "doi:10.1101/gr.257246.119"
-    licence: MIT
+  reference:
+    doi: 10.1101/gr.257246.119
+  license: MIT
   requirements:
     cpus: 1
     commands: [ arriba ]
@@ -376,11 +377,13 @@ functionality:
       path: test.sh
     - type: file
       path: test_data
-platforms:
+engines:
   - type: docker
     image: quay.io/biocontainers/arriba:2.4.0--h0033a41_2
     setup:
       - type: docker
         run: |
           arriba -h | grep 'Version:' 2>&1 |  sed 's/Version:\s\(.*\)/arriba: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
   - type: nextflow

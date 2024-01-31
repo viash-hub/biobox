@@ -2,13 +2,14 @@ functionality:
   name: featurecounts
   description: |
     featureCounts is a read summarization program for counting reads generated from either RNA or genomic DNA sequencing experiments by implementing highly efficient chromosome hashing and feature blocking techniques. It works with either single or paired-end reads and provides a wide range of options appropriate for different sequencing applications.
-  info:
-    keywords: ["Read counting", "Genomic features"]
+  keywords: ["Read counting", "Genomic features"]
+  links:
     homepage: https://subread.sourceforge.net/
     documentation: https://subread.sourceforge.net/SubreadUsersGuide.pdf
     repository: https://github.com/ShiLab-Bioinformatics/subread
-    reference: "doi:10.1093/bioinformatics/btt656"
-    licence: GPL-3.0 
+  reference:
+    doi: "10.1093/bioinformatics/btt656"
+  licence: GPL-3.0 
   requirements:
     commands: [ featureCounts ]
 
@@ -327,11 +328,13 @@ functionality:
     - type: file
       path: test_data
 
-platforms: 
+engines: 
   - type: docker
     image: quay.io/biocontainers/subread:2.0.6--he4a0461_0
     setup:
       - type: docker
         run: |
           featureCounts -v 2>&1 | sed 's/featureCounts v\([0-9.]*\)/featureCounts: \1/' > /var/software_versions.txt
+runners:
+  - type: executable
   - type: nextflow

@@ -20,12 +20,13 @@ functionality:
       - support reading from STDIN and writing to STDOUT
       - support interleaved input
       - support ultra-fast FASTQ-level deduplication
-  info:
-    keywords: [RNA-Seq, Trimming, Quality control]
+  keywords: [RNA-Seq, Trimming, Quality control]
+  links:
     repository: https://github.com/OpenGene/fastp
     documentation: https://github.com/OpenGene/fastp/blob/master/README.md
-    reference: "doi:10.1093/bioinformatics/bty560"
-    licence: MIT
+  reference:
+    doi: "10.1093/bioinformatics/bty560"
+  licence: MIT
   argument_groups:
     - name: Inputs
       description: |
@@ -564,11 +565,13 @@ functionality:
       path: test.sh
     - type: file
       path: test_data
-platforms:
+engines:
   - type: docker
     image: quay.io/biocontainers/fastp:0.23.4--hadf994f_2
     setup:
       - type: docker
         run: |
           fastp --version 2>&1 | sed 's# #: "#;s#$#"#' > /var/software_versions.txt
+runners:
+  - type: executable
   - type: nextflow

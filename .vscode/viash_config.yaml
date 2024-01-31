@@ -7,28 +7,50 @@ definitions:
       \ you choose.  \n"
     type: "object"
     properties:
-      functionality:
-        description: "The functionality describes the behaviour of the script in terms\
-          \ of arguments and resources.\nBy specifying a few restrictions (e.g. mandatory\
-          \ arguments) and adding some descriptions, Viash will automatically generate\
-          \ a stylish command-line interface for you.\n"
-        $ref: "#/definitions/Functionality"
+      project_config:
+        description: "The project config content used during build."
+        $ref: "#/definitions/ProjectConfig"
+      info:
+        $ref: "#/definitions/Info"
       platforms:
         description: "A list of platforms to generate target artifacts for.\n\n -\
           \ Native\n - Docker\n - Nextflow\n"
         type: "array"
         items:
           $ref: "#/definitions/Platform"
+      engines:
+        description: "A list of engine environments to execute target artifacts in.\n\
+          \n - NativeEngine\n - DockerEngine\n"
+        type: "array"
+        items:
+          $ref: "#/definitions/Engine"
+      functionality:
+        description: "The functionality describes the behaviour of the script in terms\
+          \ of arguments and resources.\nBy specifying a few restrictions (e.g. mandatory\
+          \ arguments) and adding some descriptions, Viash will automatically generate\
+          \ a stylish command-line interface for you.\n"
+        $ref: "#/definitions/Functionality"
+      runners:
+        description: "A list of runners to execute target artifacts.\n\n - ExecutableRunner\n\
+          \ - NextflowRunner\n"
+        type: "array"
+        items:
+          $ref: "#/definitions/Runner"
     required:
     - "functionality"
-    - "platforms"
     additionalProperties: false
-  Project:
+  ProjectConfig:
     description: "A Viash project configuration file. It's name should be `_viash.yaml`."
     type: "object"
     properties:
+      name:
+        description: "The name of the project."
+        type: "string"
       source:
         description: "Which source directory to use for the `viash ns` commands."
+        type: "string"
+      description:
+        description: "A description of the project."
         type: "string"
       viash_version:
         description: "Which version of Viash to use."
@@ -41,10 +63,89 @@ definitions:
           items:
             description: "Which config mods to apply."
             type: "string"
+      info:
+        description: "Structured information. Can be any shape: a string, vector,\
+          \ map or even nested map."
+        type: "object"
+      license:
+        description: "The license of the project."
+        type: "string"
+      authors:
+        description: "The authors of the project."
+        type: "array"
+        items:
+          $ref: "#/definitions/Author"
+      repositories:
+        description: "Common repository definitions for component dependencies."
+        type: "array"
+        items:
+          $ref: "#/definitions/RepositoryWithName"
+      keywords:
+        description: "The keywords of the project."
+        type: "array"
+        items:
+          type: "string"
       target:
         description: "Which target directory to use for `viash ns build`."
         type: "string"
+      reference:
+        description: "References to external resources related to the project."
+        $ref: "#/definitions/ProjectConfigReferences"
+      organization:
+        description: "The organization of the project."
+        type: "string"
+      version:
+        description: "The version of the project."
+        type: "string"
+      links:
+        description: "External links of the project."
+        $ref: "#/definitions/ProjectConfigLinks"
     required: []
+    additionalProperties: false
+  ProjectConfigLinks:
+    description: "Links to external resources related to the project."
+    type: "object"
+    properties:
+      repository:
+        description: "Source repository url."
+        type: "string"
+      documentation:
+        description: "Documentation website url."
+        type: "string"
+      docker_registry:
+        description: "Docker registry url."
+        type: "string"
+      homepage:
+        description: "Homepage website url."
+        type: "string"
+      issue_tracker:
+        description: "Issue tracker url."
+        type: "string"
+    required: []
+    additionalProperties: false
+  ProjectConfigReferences:
+    description: "References to external resources related to the project."
+    type: "object"
+    properties:
+      bibtex:
+        oneOf:
+        - description: "One or multiple BibTeX reference(s) of the project."
+          type: "string"
+        - type: "array"
+          items:
+            description: "One or multiple BibTeX reference(s) of the project."
+            type: "string"
+      doi:
+        oneOf:
+        - description: "One or multiple DOI reference(s) of the project."
+          type: "string"
+        - type: "array"
+          items:
+            description: "One or multiple DOI reference(s) of the project."
+            type: "string"
+    required:
+    - "bibtex"
+    - "doi"
     additionalProperties: false
   Info:
     description: "Meta information fields filled in by Viash during build."
@@ -59,14 +160,8 @@ definitions:
       viash_version:
         description: "The Viash version that was used to build the component."
         type: "string"
-      config:
-        description: "Path to the config used during build."
-        type: "string"
       output:
         description: "Folder path to the build artifacts."
-        type: "string"
-      platform:
-        description: "The platform id used during build."
         type: "string"
       git_commit:
         description: "Git commit hash."
@@ -74,26 +169,17 @@ definitions:
       executable:
         description: "Output folder with main executable path."
         type: "string"
+      engine:
+        description: "The engine id used during build."
+        type: "string"
+      runner:
+        description: "The runner id used during build."
+        type: "string"
+      config:
+        description: "Path to the config used during build."
+        type: "string"
     required:
     - "config"
-    additionalProperties: false
-  EnvironmentVariables:
-    description: "Viash checks several environment variables during operation."
-    type: "object"
-    properties:
-      VIASH_VERSION:
-        description: "A specific Viash version can be set to run the commands with.\
-          \ If so required, the specific Viash version will be downloaded.\nThis is\
-          \ useful when replicating older results or building Viash components that\
-          \ use outdated code.\n"
-        type: "string"
-      VIASH_HOME:
-        description: "If `VIASH_HOME` is not defined, the fallback `HOME`/.viash is\
-          \ used.\n\nLocation where specific downloaded versions of Viash will be\
-          \ cached and run from.\n"
-        type: "string"
-    required:
-    - "VIASH_HOME"
     additionalProperties: false
   Functionality:
     description: "The functionality-part of the config file describes the behaviour\
@@ -102,6 +188,9 @@ definitions:
       \ generate a stylish command-line interface for you.\n"
     type: "object"
     properties:
+      organization:
+        description: "The organization of the project."
+        type: "string"
       name:
         description: "Name of the component and the filename of the executable when\
           \ built with `viash build`."
@@ -110,6 +199,9 @@ definitions:
         description: "Structured information. Can be any shape: a string, vector,\
           \ map or even nested map."
         type: "object"
+      license:
+        description: "The license of the project."
+        type: "string"
       version:
         description: "Version of the component. This field will be used to version\
           \ the executable and the Docker container."
@@ -149,25 +241,6 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/RepositoryWithName"
-      resources:
-        description: "Resources are files that support the component. The first resource\
-          \ should be a script that will be executed when the functionality is run.\
-          \ Additional resources will be copied to the same directory.\n\nCommon properties:\n\
-          \n * type: `file` / `r_script` / `python_script` / `bash_script` / `javascript_script`\
-          \ / `scala_script` / `csharp_script`, specifies the type of the resource.\
-          \ The first resource cannot be of type `file`. When the type is not specified,\
-          \ the default type is simply `file`.\n * dest: filename, the resulting name\
-          \ of the resource.  From within a script, the file can be accessed at `meta[\"\
-          resources_dir\"] + \"/\" + dest`. If unspecified, `dest` will be set to\
-          \ the basename of the `path` parameter.\n * path: `path/to/file`, the path\
-          \ of the input file. Can be a relative or an absolute path, or a URI. Mutually\
-          \ exclusive with `text`.\n * text: ...multiline text..., the content of\
-          \ the resulting file specified as a string. Mutually exclusive with `path`.\n\
-          \ * is_executable: `true` / `false`, whether the resulting resource file\
-          \ should be made executable.\n"
-        type: "array"
-        items:
-          $ref: "#/definitions/Resource"
       test_resources:
         description: "One or more scripts to be used to test the component behaviour\
           \ when `viash test` is invoked. Additional files of type `file` will be\
@@ -200,6 +273,30 @@ definitions:
         description: "A description on how to use the component. This will be displayed\
           \ with `--help` under the 'Usage:' section."
         type: "string"
+      resources:
+        description: "Resources are files that support the component. The first resource\
+          \ should be a script that will be executed when the functionality is run.\
+          \ Additional resources will be copied to the same directory.\n\nCommon properties:\n\
+          \n * type: `file` / `r_script` / `python_script` / `bash_script` / `javascript_script`\
+          \ / `scala_script` / `csharp_script`, specifies the type of the resource.\
+          \ The first resource cannot be of type `file`. When the type is not specified,\
+          \ the default type is simply `file`.\n * dest: filename, the resulting name\
+          \ of the resource.  From within a script, the file can be accessed at `meta[\"\
+          resources_dir\"] + \"/\" + dest`. If unspecified, `dest` will be set to\
+          \ the basename of the `path` parameter.\n * path: `path/to/file`, the path\
+          \ of the input file. Can be a relative or an absolute path, or a URI. Mutually\
+          \ exclusive with `text`.\n * text: ...multiline text..., the content of\
+          \ the resulting file specified as a string. Mutually exclusive with `path`.\n\
+          \ * is_executable: `true` / `false`, whether the resulting resource file\
+          \ should be made executable.\n"
+        type: "array"
+        items:
+          $ref: "#/definitions/Resource"
+      keywords:
+        description: "The keywords of the components."
+        type: "array"
+        items:
+          type: "string"
       namespace:
         description: "Namespace this component is a part of. See the Namespaces guide\
           \ for more information on namespaces."
@@ -288,6 +385,253 @@ definitions:
     - "name"
     - "arguments"
     additionalProperties: false
+  Runner:
+    oneOf:
+    - $ref: "#/definitions/ExecutableRunner"
+    - $ref: "#/definitions/NextflowRunner"
+  ExecutableRunner:
+    description: "Run code as an executable.\n\nThis runner is the default runner.\
+      \ It will generate a bash script that can be run directly.\n\nThis runner is\
+      \ also used for the native engine.\n\nThis runner is also used for the docker\
+      \ engine.\n"
+    type: "object"
+    properties:
+      docker_setup_strategy:
+        description: "The Docker setup strategy to use when building a docker engine\
+          \ enrivonment.\n\n| Strategy | Description |\n|-----|----------|\n| `alwaysbuild`\
+          \ / `build` / `b` | Always build the image from the dockerfile. This is\
+          \ the default setup strategy.\n| `alwayscachedbuild` / `cachedbuild` / `cb`\
+          \ | Always build the image from the dockerfile, with caching enabled.\n\
+          | `ifneedbebuild` |  Build the image if it does not exist locally.\n| `ifneedbecachedbuild`\
+          \ | Build the image with caching enabled if it does not exist locally, with\
+          \ caching enabled.\n| `alwayspull` / `pull` / `p` |  Try to pull the container\
+          \ from [Docker Hub](https://hub.docker.com) or the specified docker registry.\n\
+          | `alwayspullelsebuild` / `pullelsebuild` |  Try to pull the image from\
+          \ a registry and build it if it doesn't exist.\n| `alwayspullelsecachedbuild`\
+          \ / `pullelsecachedbuild` |  Try to pull the image from a registry and build\
+          \ it with caching if it doesn't exist.\n| `ifneedbepull` |  If the image\
+          \ does not exist locally, pull the image.\n| `ifneedbepullelsebuild` | \
+          \ If the image does not exist locally, pull the image. If the image does\
+          \ exist, build it.\n| `ifneedbepullelsecachedbuild` | If the image does\
+          \ not exist locally, pull the image. If the image does exist, build it with\
+          \ caching enabled.\n| `push` | Push the container to [Docker Hub](https://hub.docker.com)\
+          \  or the specified docker registry.\n| `pushifnotpresent` | Push the container\
+          \ to [Docker Hub](https://hub.docker.com) or the specified docker registry\
+          \ if the tag does not exist yet.\n| `donothing` / `meh` | Do not build or\
+          \ pull anything.\n\n"
+        $ref: "#/definitions/DockerSetupStrategy"
+      workdir:
+        description: "The working directory when starting the engine. This doesn't\
+          \ change the Dockerfile but gets added as a command-line argument at runtime."
+        type: "string"
+      docker_run_args:
+        oneOf:
+        - description: "Provide runtime arguments to Docker. See the documentation\
+            \ on [`docker run`](https://docs.docker.com/engine/reference/run/) for\
+            \ more information."
+          type: "string"
+        - type: "array"
+          items:
+            description: "Provide runtime arguments to Docker. See the documentation\
+              \ on [`docker run`](https://docs.docker.com/engine/reference/run/) for\
+              \ more information."
+            type: "string"
+      id:
+        description: "Name of the runner. As with all runners, you can give an runner\
+          \ a different name. By specifying `id: foo`, you can target this executor\
+          \ (only) by specifying `...` in any of the Viash commands."
+        type: "string"
+      port:
+        oneOf:
+        - description: "A list of enabled ports. This doesn't change the Dockerfile\
+            \ but gets added as a command-line argument at runtime."
+          type: "integer"
+        - description: "A list of enabled ports. This doesn't change the Dockerfile\
+            \ but gets added as a command-line argument at runtime."
+          type: "string"
+        - description: "A list of enabled ports. This doesn't change the Dockerfile\
+            \ but gets added as a command-line argument at runtime."
+          type: "array"
+          items:
+            type: "integer"
+        - description: "A list of enabled ports. This doesn't change the Dockerfile\
+            \ but gets added as a command-line argument at runtime."
+          type: "array"
+          items:
+            type: "string"
+      type:
+        description: "Run code as an executable.\n\nThis runner is the default runner.\
+          \ It will generate a bash script that can be run directly.\n\nThis runner\
+          \ is also used for the native engine.\n\nThis runner is also used for the\
+          \ docker engine.\n"
+        const: "executable"
+    required:
+    - "type"
+    additionalProperties: false
+  NextflowRunner:
+    description: "Run a Viash component on a Nextflow backend engine.\n"
+    type: "object"
+    properties:
+      auto:
+        description: "Automated processing flags which can be toggled on or off:\n\
+          \n| Flag | Description | Default |\n|---|---------|----|\n| `simplifyInput`\
+          \ | If `true`, an input tuple only containing only a single File (e.g. `[\"\
+          foo\", file(\"in.h5ad\")]`) is automatically transformed to a map (i.e.\
+          \ `[\"foo\", [ input: file(\"in.h5ad\") ] ]`). | `true` |\n| `simplifyOutput`\
+          \ | If `true`, an output tuple containing a map with a File (e.g. `[\"foo\"\
+          , [ output: file(\"out.h5ad\") ] ]`) is automatically transformed to a map\
+          \ (i.e. `[\"foo\", file(\"out.h5ad\")]`). | `false` |\n| `transcript` |\
+          \ If `true`, the module's transcripts from `work/` are automatically published\
+          \ to `params.transcriptDir`. If not defined, `params.publishDir + \"/_transcripts\"\
+          ` will be used. Will throw an error if neither are defined. | `false` |\n\
+          | `publish` | If `true`, the module's outputs are automatically published\
+          \ to `params.publishDir`. If equal to \"state\", also a `.state.yaml` file\
+          \ will be published in the publish dir. Will throw an error if `params.publishDir`\
+          \ is not defined. | `false` |\n\n"
+        $ref: "#/definitions/NextflowAuto"
+      directives:
+        description: "Directives are optional settings that affect the execution of\
+          \ the process. These mostly match up with the Nextflow counterparts.  \n"
+        $ref: "#/definitions/NextflowDirectives"
+      container:
+        description: "Specifies the Docker engine id to be used to run Nextflow."
+        type: "string"
+      config:
+        description: "Allows tweaking how the Nextflow Config file is generated."
+        $ref: "#/definitions/NextflowConfig"
+      debug:
+        description: "Whether or not to print debug messages."
+        type: "boolean"
+      id:
+        description: "Name of the runner. As with all runners, you can give an runner\
+          \ a different name. By specifying `id: foo`, you can target this runner\
+          \ (only) by specifying `...` in any of the Viash commands."
+        type: "string"
+      type:
+        description: "Run a Viash component on a Nextflow backend engine.\n"
+        const: "nextflow"
+    required:
+    - "type"
+    additionalProperties: false
+  Engine:
+    oneOf:
+    - $ref: "#/definitions/DockerEngine"
+    - $ref: "#/definitions/NativeEngine"
+  NativeEngine:
+    description: "Running a Viash component on a native engine means that the script\
+      \ will be executed in your current environment.\nAny dependencies are assumed\
+      \ to have been installed by the user, so the native engine is meant for developers\
+      \ (who know what they're doing) or for simple bash scripts (which have no extra\
+      \ dependencies).\n"
+    type: "object"
+    properties:
+      id:
+        description: "Name of the engine. As with all engines, you can give an engine\
+          \ a different name. By specifying `id: foo`, you can target this engine\
+          \ (only) by specifying `...` in any of the Viash commands."
+        type: "string"
+      type:
+        description: "Running a Viash component on a native engine means that the\
+          \ script will be executed in your current environment.\nAny dependencies\
+          \ are assumed to have been installed by the user, so the native engine is\
+          \ meant for developers (who know what they're doing) or for simple bash\
+          \ scripts (which have no extra dependencies).\n"
+        const: "native"
+    required:
+    - "type"
+    additionalProperties: false
+  DockerEngine:
+    description: "Run a Viash component on a Docker backend engine.\nBy specifying\
+      \ which dependencies your component needs, users will be able to build a docker\
+      \ container from scratch using the setup flag, or pull it from a docker repository.\n"
+    type: "object"
+    properties:
+      organization:
+        description: "Name of a container's [organization](https://docs.docker.com/docker-hub/orgs/)."
+        type: "string"
+      registry:
+        description: "The URL to the a [custom Docker registry](https://docs.docker.com/registry/)"
+        type: "string"
+      image:
+        description: "The base container to start from. You can also add the tag here\
+          \ if you wish."
+        type: "string"
+      tag:
+        description: "Specify a Docker image based on its tag."
+        type: "string"
+      target_image:
+        description: "If anything is specified in the setup section, running the `---setup`\
+          \ will result in an image with the name of `<target_image>:<version>`. If\
+          \ nothing is specified in the `setup` section, simply `image` will be used.\
+          \ Advanced usage only."
+        type: "string"
+      target_tag:
+        description: "The tag the resulting image gets. Advanced usage only."
+        type: "string"
+      namespace_separator:
+        description: "The separator between the namespace and the name of the component,\
+          \ used for determining the image name. Default: \"/\"."
+        type: "string"
+      id:
+        description: "Name of the engine. As with all engines, you can give a engine\
+          \ a different name. By specifying `id: foo`, you can target this engine\
+          \ (only) by specifying `...` in any of the Viash commands."
+        type: "string"
+      target_registry:
+        description: "The URL where the resulting image will be pushed to. Advanced\
+          \ usage only."
+        type: "string"
+      type:
+        description: "Run a Viash component on a Docker backend engine.\nBy specifying\
+          \ which dependencies your component needs, users will be able to build a\
+          \ docker container from scratch using the setup flag, or pull it from a\
+          \ docker repository.\n"
+        const: "docker"
+      target_organization:
+        description: "The organization set in the resulting image. Advanced usage\
+          \ only."
+        type: "string"
+      setup:
+        description: "A list of requirements for installing the following types of\
+          \ packages:\n\n - apt\n - apk\n - Docker setup instructions\n - JavaScript\n\
+          \ - Python\n - R\n - Ruby\n - yum\n\nThe order in which these dependencies\
+          \ are specified determines the order in which they will be installed.\n"
+        type: "array"
+        items:
+          $ref: "#/definitions/Requirements"
+      cmd:
+        oneOf:
+        - description: "Set the default command being executed when running the Docker\
+            \ container."
+          type: "string"
+        - description: "Set the default command being executed when running the Docker\
+            \ container."
+          type: "array"
+          items:
+            type: "string"
+      target_image_source:
+        description: "The source of the target image. This is used for defining labels\
+          \ in the dockerfile."
+        type: "string"
+      test_setup:
+        description: "Additional requirements specific for running unit tests."
+        type: "array"
+        items:
+          $ref: "#/definitions/Requirements"
+      entrypoint:
+        oneOf:
+        - description: "Override the entrypoint of the base container. Default set\
+            \ `ENTRYPOINT []`."
+          type: "string"
+        - description: "Override the entrypoint of the base container. Default set\
+            \ `ENTRYPOINT []`."
+          type: "array"
+          items:
+            type: "string"
+    required:
+    - "image"
+    - "type"
+    additionalProperties: false
   Platform:
     oneOf:
     - $ref: "#/definitions/NativePlatform"
@@ -356,6 +700,16 @@ definitions:
         description: "Enables or disables automatic volume mapping. Enabled when set\
           \ to `Automatic` or disabled when set to `Manual`. Default: `Automatic`."
         $ref: "#/definitions/DockerResolveVolume"
+      cmd:
+        oneOf:
+        - description: "Set the default command being executed when running the Docker\
+            \ container."
+          type: "string"
+        - description: "Set the default command being executed when running the Docker\
+            \ container."
+          type: "array"
+          items:
+            type: "string"
       id:
         description: "As with all platforms, you can give a platform a different name.\
           \ By specifying `id: foo`, you can target this platform (only) by specifying\
@@ -366,19 +720,15 @@ definitions:
         - description: "A list of enabled ports. This doesn't change the Dockerfile\
             \ but gets added as a command-line argument at runtime."
           type: "string"
-        - description: "A list of enabled ports. This doesn't change the Dockerfile\
-            \ but gets added as a command-line argument at runtime."
-          type: "integer"
-        - description: "A list of enabled ports. This doesn't change the Dockerfile\
-            \ but gets added as a command-line argument at runtime."
-          type: "array"
+        - type: "array"
           items:
+            description: "A list of enabled ports. This doesn't change the Dockerfile\
+              \ but gets added as a command-line argument at runtime."
             type: "string"
-        - description: "A list of enabled ports. This doesn't change the Dockerfile\
-            \ but gets added as a command-line argument at runtime."
-          type: "array"
-          items:
-            type: "integer"
+      target_registry:
+        description: "The URL where the resulting image will be pushed to. Advanced\
+          \ usage only."
+        type: "string"
       setup:
         description: "A list of requirements for installing the following types of\
           \ packages:\n\n - apt\n - apk\n - Docker setup instructions\n - JavaScript\n\
@@ -397,16 +747,6 @@ definitions:
           \ nothing is specified in the `setup` section, simply `image` will be used.\
           \ Advanced usage only."
         type: "string"
-      cmd:
-        oneOf:
-        - description: "Set the default command being executed when running the Docker\
-            \ container."
-          type: "string"
-        - description: "Set the default command being executed when running the Docker\
-            \ container."
-          type: "array"
-          items:
-            type: "string"
       target_image_source:
         description: "The source of the target image. This is used for defining labels\
           \ in the dockerfile."
@@ -426,10 +766,6 @@ definitions:
           type: "array"
           items:
             type: "string"
-      target_registry:
-        description: "The URL where the resulting image will be pushed to. Advanced\
-          \ usage only."
-        type: "string"
       setup_strategy:
         description: "The Docker setup strategy to use when building a container.\n\
           \n| Strategy | Description |\n|-----|----------|\n| `alwaysbuild` / `build`\
@@ -464,13 +800,6 @@ definitions:
         description: "The organization set in the resulting image. Advanced usage\
           \ only."
         type: "string"
-      chown:
-        description: "In Linux, files created by a Docker container will be owned\
-          \ by `root`. With `chown: true`, Viash will automatically change the ownership\
-          \ of output files (arguments with `type: file` and `direction: output`)\
-          \ to the user running the Viash command after execution of the component.\
-          \ Default value: `true`."
-        type: "boolean"
     required:
     - "image"
     - "type"
@@ -969,6 +1298,8 @@ definitions:
           \ -t`\n  - `trim` is an argument, which can be passed with `executable_name\
           \ trim`  \n"
         type: "string"
+      direction:
+        $ref: "#/definitions/Direction"
       info:
         description: "Structured information. Can be any shape: a string, vector,\
           \ map or even nested map."
@@ -1040,6 +1371,8 @@ definitions:
           \ -s`\n  - `silent` is an argument, which can be passed with `executable_name\
           \ silent`  \n"
         type: "string"
+      direction:
+        $ref: "#/definitions/Direction"
       info:
         description: "Structured information. Can be any shape: a string, vector,\
           \ map or even nested map."
@@ -1078,6 +1411,8 @@ definitions:
           \ -n`\n  - `no-log` is an argument, which can be passed with `executable_name\
           \ no-log`  \n"
         type: "string"
+      direction:
+        $ref: "#/definitions/Direction"
       info:
         description: "Structured information. Can be any shape: a string, vector,\
           \ map or even nested map."
@@ -1155,6 +1490,8 @@ definitions:
           \ value is lower than the minimum, an error will be produced. Can be combined\
           \ with [`max`](#max) to clamp values."
         $ref: "#/definitions/DoubleWithInf"
+      direction:
+        $ref: "#/definitions/Direction"
       multiple:
         description: "Treat the argument value as an array. Arrays can be passed using\
           \ the delimiter `--foo=1:2:3` or by providing the same argument multiple\
@@ -1323,6 +1660,8 @@ definitions:
           \ value is lower than the minimum, an error will be produced. Can be combined\
           \ with [`max`](#max) to clamp values."
         type: "integer"
+      direction:
+        $ref: "#/definitions/Direction"
       multiple:
         description: "Treat the argument value as an array. Arrays can be passed using\
           \ the delimiter `--foo=1:2:3` or by providing the same argument multiple\
@@ -1409,6 +1748,8 @@ definitions:
           \ value is lower than the minimum, an error will be produced. Can be combined\
           \ with [`max`](#max) to clamp values."
         type: "integer"
+      direction:
+        $ref: "#/definitions/Direction"
       multiple:
         description: "Treat the argument value as an array. Arrays can be passed using\
           \ the delimiter `--foo=1:2:3` or by providing the same argument multiple\
@@ -1455,6 +1796,8 @@ definitions:
         type: "array"
         items:
           type: "string"
+      direction:
+        $ref: "#/definitions/Direction"
       info:
         description: "Structured information. Can be any shape: a string, vector,\
           \ map or even nested map."
