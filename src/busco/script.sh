@@ -50,9 +50,6 @@ busco \
 
 out_dir=$(find "$tmp_dir/$prefix" -maxdepth 1 -name 'run_*')
 
-echo "finished"
-sleep 10000
-
 if [[ -n "$par_short_summary_json" ]]; then
     cp "$out_dir/short_summary.json" "$par_short_summary_json"
 fi
