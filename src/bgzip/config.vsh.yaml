@@ -6,6 +6,8 @@ functionality:
     documentation: https://www.htslib.org/doc/bgzip.html
     repository: https://github.com/samtools/htslib
     licence: MIT
+    reference:
+      doi: 10.1093/gigascience/giab007
   requirements:
     commands: [ bgzip ]
   argument_groups:
@@ -30,7 +32,7 @@ functionality:
         description: name of BGZF index file [file.gz.gzi]
     - name: Arguments
       arguments:
-      - name: offset
+      - name: --offset
         alternatives: -b
         type: integer
         description: decompress at virtual file pointer (0-based uncompressed offset)
@@ -79,6 +81,7 @@ functionality:
         [[ "$par_binary" == "false" ]] && unset par_binary
         bgzip -c \
           ${meta_cpus:+--threads "${meta_cpus}"} \
+          ${par_offset:+-b "${par_offset}"} \
           ${par_decompress:+-d} \
           ${par_rebgzip:+-g} \
           ${par_index:+-i} \
@@ -87,6 +90,7 @@ functionality:
           ${par_reindex:+-r} \
           ${par_size:+-s "${par_size}"} \
           ${par_test:+-t} \
+          ${par_binary:+--binary} \
           "$par_input" > "$par_output"
   test_resources:
     - type: bash_script
