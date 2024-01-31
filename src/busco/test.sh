@@ -70,7 +70,7 @@ echo "> Running busco with genome data"
 "$meta_executable" \
     --input $test_dir/genome.fna \
     --mode genome \
-    --lineage_dataseg saccharomycetes_odb10 \
+    --lineage_dataset saccharomycetes_odb10 \
     --output_dir output 
 
 echo ">> Checking output"
