@@ -126,7 +126,7 @@ functionality:
         - name: --frac_overlap
           type: double
           description: | 
-            Minimum fraction of overlapping bases in a read that is required for read assignment. Value should be within range [0,1]. 0 by default. Number of overlapping bases is counted from both reads if paired end. Both this option and '--minOverlap' option need to be satisfied for read assignment.
+            Minimum fraction of overlapping bases in a read that is required for read assignment. Value should be within range [0,1]. 0 by default. Number of overlapping bases is counted from both reads if paired end. Both this option and '--min_overlap' option need to be satisfied for read assignment.
           required: false
           min: 0
           max: 1
