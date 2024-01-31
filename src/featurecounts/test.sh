@@ -8,7 +8,7 @@ echo "> Run featurCounts"
 "$meta_executable" \
   --input "$dir_in/a.bam" \
   --annotation "$dir_in/annotation.gtf" \
-  --output "features.txt" \
+  --output_counts "features.txt" \
   --output_summary "features.txt.summary" \
   --output_junctions "features.txt.jcounts" \
   --junctions \
