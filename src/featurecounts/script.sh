@@ -28,7 +28,6 @@ fi
 [[ "$par_by_read_group" == "false" ]] && unset par_by_read_group
 [[ "$par_long_reads" == "false" ]] && unset par_long_reads
 [[ "$par_verbose" == "false" ]] && unset par_verbose
-[[ "$par_version" == "false" ]] && unset par_version
 
 IFS=";" read -ra input <<< $par_input
 
@@ -71,13 +70,13 @@ featureCounts \
   ${par_long_reads:+-L} \
   ${par_r_path:+--r_path "${par_r_path}"} \
   ${par_detailed_results_format:+-R "${par_detailed_results_format}"} \
-  ${par_tmpdir:+--tmpDir "${par_tmpdir}"} \
   ${par_max_M_op:+--maxMOp "${par_max_M_op}"} \
   ${par_verbose:+--verbose} \
   ${meta_cpus:+-T "${meta_cpus}"} \
+  --tmpDir "$tmp_dir" \
   -a "$par_annotation" \
-  -o "$par_output" \
+  -o "$par_output_counts" \
   "${input[*]}"
 
-[[ ! -z "$par_output_summary" ]] && mv "$par_output.summary" "$par_output_summary"
-[[ ! -z "$par_output_junctions" ]] && mv "$par_output.jcounts" "$par_output_junctions"
+[[ ! -z "$par_output_summary" ]] && mv "$par_output_counts.summary" "$par_output_summary"
+[[ ! -z "$par_output_junctions" ]] && mv "$par_output_counts.jcounts" "$par_output_junctions"
