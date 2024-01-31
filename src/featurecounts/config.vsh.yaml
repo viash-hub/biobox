@@ -308,11 +308,6 @@ functionality:
         
     - name: Miscellaneous
       arguments:
-        - name: --tmpdir
-          type: file
-          description: | 
-            Directory under which intermediate files are saved (later removed). By default, intermediate files will be saved to the directory specified in the '--output' argument.
-          required: false
         - name: --max_M_op
           type: integer
           description: | 
