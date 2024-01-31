@@ -91,11 +91,14 @@ functionality:
             Specify attribute type in GTF annotation. 'gene_id' by default. Meta-features used for read counting will be extracted from annotation using the provided value.
           default: "gene_id"
           required: false
+
         - name: --extra_attributes
           type: string
           description: | 
             Extract extra attribute types from the provided GTF annotation and include them in the counting output. These attribute types will not be used to group features. If more than one attribute type is provided they should be separated by comma.
           required: false
+          multiple: true
+          multiple_sep: ","
         - name: --chrom_alias
           alternatives: ["-A"]
           type: file
