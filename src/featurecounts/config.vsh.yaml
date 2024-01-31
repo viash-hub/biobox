@@ -34,7 +34,7 @@ functionality:
     
     - name: Outputs
       arguments:
-        - name: --output_counts
+        - name: --counts
           alternatives: ["-o"]
           type: file
           direction: output
@@ -42,26 +42,19 @@ functionality:
             Name of output file including read counts in tab delimited format.
           required: true
           example: features.tsv
-        - name: --output_summary
+        - name: --summary
           type: file
           direction: output
           description: | 
             Summary statistics of counting results in tab delimited format.
           required: false
           example: summary.tsv
-        - name: --output_junctions
+        - name: --junctions
           type: file
           direction: output
           description: | 
             Count number of reads supporting each exon-exon junction. Junctions were identified from those exon-spanning reads in the input (containing 'N' in CIGAR string).
           example: junctions.txt
-          required: false
-        - name: --results_path
-          type: file
-          direction: output
-          description: | 
-            Directory to save the detailed assignment results. Use `--detailed_results_format` to determine the format of the detailed results.
-          example: detailed_results/
           required: false
 
     - name: Annotation
@@ -296,6 +289,13 @@ functionality:
     
     - name: Assignment results for each read
       arguments:
+        - name: --detailed_results
+          type: file
+          direction: output
+          description: | 
+            Directory to save the detailed assignment results. Use `--detailed_results_format` to determine the format of the detailed results.
+          example: detailed_results/
+          required: false
         - name: --detailed_results_format
           alternatives: ["-R"]
           type: string

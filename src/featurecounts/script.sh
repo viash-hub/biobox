@@ -1,12 +1,15 @@
 #!/bin/bash
 
+set -e
+
 ## VIASH START
 ## VIASH END
 
-tmp_dir=$(mktemp -d -p "$meta_temp_dir" "${meta_functionality_name}_XXXXXXXXX")
+tmp_dir=$(mktemp -d -p "$meta_temp_dir" "${meta_functionality_name}_XXXXXX")
+mkdir -p "$tmp_dir/temp"
 
-if [[ $par_results_path ]] && [[ ! -d "$par_results_path" ]]; then
-    mkdir -p "$par_results_path"
+if [[ $par_detailed_results ]] && [[ ! -d "$par_detailed_results" ]]; then
+  mkdir -p "$par_detailed_results"
 fi
 
 [[ "$par_feature_level" == "false" ]] && unset par_feature_level
@@ -55,7 +58,7 @@ featureCounts \
   ${par_primary:+--primary} \
   ${par_ignore_dup:+--ignoreDup} \
   ${par_strand:+-s "${par_strand}"} \
-  ${par_output_junctions:+-J} \
+  ${par_junctions:+-J} \
   ${par_ref_fasta:+-G "${par_ref_fasta}"} \
   ${par_paired:+-p} \
   ${par_count_read_pairs:+--countReadPairs} \
@@ -67,15 +70,16 @@ featureCounts \
   ${par_donotsort:+--donotsort} \
   ${par_by_read_group:+--byReadGroup} \
   ${par_long_reads:+-L} \
-  ${par_r_path:+--r_path "${par_r_path}"} \
+  ${par_detailed_results:+--Rpath "${par_detailed_results}"} \
   ${par_detailed_results_format:+-R "${par_detailed_results_format}"} \
   ${par_max_M_op:+--maxMOp "${par_max_M_op}"} \
   ${par_verbose:+--verbose} \
   ${meta_cpus:+-T "${meta_cpus}"} \
-  --tmpDir "$tmp_dir" \
+  --tmpDir "$tmp_dir/temp" \
   -a "$par_annotation" \
-  -o "$par_output_counts" \
+  -o "$tmp_dir/output.txt" \
   "${input[*]}"
 
-[[ ! -z "$par_output_summary" ]] && mv "$par_output_counts.summary" "$par_output_summary"
-[[ ! -z "$par_output_junctions" ]] && mv "$par_output_counts.jcounts" "$par_output_junctions"
+[[ ! -z "$par_counts" ]] && mv "$tmp_dir/output.txt" "$par_counts"
+[[ ! -z "$par_summary" ]] && mv "$tmp_dir/output.txt.summary" "$par_summary"
+[[ ! -z "$par_junctions" ]] && mv "$tmp_dir/output.txt.jcounts" "$par_junctions"
