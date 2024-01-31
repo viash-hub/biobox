@@ -11,7 +11,6 @@ echo "> Run featurCounts"
   --output_counts "features.tsv" \
   --output_summary "summary.tsv" \
   --output_junctions "junction_counts.txt" \
-  --junctions \
   --ref_fasta "$dir_in/genome.fasta" \
   --overlapping \
   --frac_overlap 0.2 \

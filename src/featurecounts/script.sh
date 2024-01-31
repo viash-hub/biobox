@@ -18,7 +18,6 @@ fi
 [[ "$par_non_split_only" == "false" ]] && unset par_non_split_only
 [[ "$par_primary" == "false" ]] && unset par_primary
 [[ "$par_ignore_dup" == "false" ]] && unset par_ignore_dup
-[[ "$par_junctions" == "false" ]] && unset par_junctions
 [[ "$par_paired" == "false" ]] && unset par_paired
 [[ "$par_count_read_pairs" == "false" ]] && unset par_count_read_pairs
 [[ "$par_both_aligned" == "false" ]] && unset par_both_aligned
@@ -56,7 +55,7 @@ featureCounts \
   ${par_primary:+--primary} \
   ${par_ignore_dup:+--ignoreDup} \
   ${par_strand:+-s "${par_strand}"} \
-  ${par_junctions:+-J} \
+  ${par_output_junctions:+-J} \
   ${par_ref_fasta:+-G "${par_ref_fasta}"} \
   ${par_paired:+-p} \
   ${par_count_read_pairs:+--countReadPairs} \

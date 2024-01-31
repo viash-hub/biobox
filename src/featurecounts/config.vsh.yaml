@@ -53,7 +53,7 @@ functionality:
           type: file
           direction: output
           description: | 
-            Count of number of reads supporting each exon-exon junction. This file is only created if `--junctions` is specified.
+            Count number of reads supporting each exon-exon junction. Junctions were identified from those exon-spanning reads in the input (containing 'N' in CIGAR string).
           example: junctions.txt
           required: false
         - name: --results_path
@@ -227,16 +227,11 @@ functionality:
 
     - name: Exon-exon junctions
       arguments:
-        - name: --junctions
-          alternatives: ["-J"]
-          type: boolean_true
-          description: | 
-            Count number of reads supporting each exon-exon junction. Junctions were identified from those exon-spanning reads in the input (containing 'N' in CIGAR string). Counting results are saved to a file named '<output>.jcounts'
         - name: --ref_fasta
           alternatives: ["-G"]
           type: file
           description: | 
-            Provide the name of a FASTA-format file that contains the reference sequences used in read mapping that produced the provided SAM/BAM files. This optional argument can be used with '--junctions' option to improve read counting for junctions.
+            Provide the name of a FASTA-format file that contains the reference sequences used in read mapping that produced the provided SAM/BAM files.
           required: false
           example: reference.fasta
         
