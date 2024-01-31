@@ -58,9 +58,8 @@ jobs:
     - id: ns_list
       uses: viash-io/viash-actions/ns-list@v5
       with:
-        platform: docker
+        # platform: docker
         format: json
-        query: ^(?!workflows)
 
     - id: ns_list_filtered
       uses: viash-io/viash-actions/project/detect-changed-components@v5
