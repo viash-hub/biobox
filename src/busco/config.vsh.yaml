@@ -25,11 +25,10 @@ functionality:
           required: true
           description: |
             Specify which BUSCO analysis mode to run. There are three valid modes:
-
               - geno or genome, for genome assemblies (DNA)
               - tran or transcriptome, for transcriptome assemblies (DNA)
-              - prot or protein, for annotated gene sets (protein)
-          example: protein
+              - prot or proteins, for annotated gene sets (protein)
+          example: proteins
         - name: --lineage_dataset
           alternatives: ["-l"]
           type: string
