@@ -28,9 +28,6 @@ echo "> Running busco with auto lineage"
     --auto_lineage \
     --output_dir output 
 
-echo "> Finished running busco with auto lineage"
-ls -l output
-
 echo ">> Checking output"
 [ ! -f "output/full_table.tsv" ] && echo "full_table.tsv does not exist" && exit 1
 [ ! -f "output/missing_busco_list.tsv" ] && echo "missing_busco_list.tsv does not exist" && exit 1

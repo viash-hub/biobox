@@ -66,6 +66,7 @@ if [[ -n "$par_output_dir" ]]; then
     if [[ -d "$par_output_dir" ]]; then
         rm -r "$par_output_dir"
     fi
+    mkdir "$par_output_dir"
     cp -r "$out_dir" "$par_output_dir"
 fi
 
