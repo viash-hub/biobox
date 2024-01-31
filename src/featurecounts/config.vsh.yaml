@@ -73,14 +73,14 @@ functionality:
           description: | 
             Specify format of the provided annotation file. Acceptable formats include 'GTF' (or compatible GFF format) and 'SAF'. 'GTF' by default. 
           choices: [GTF, GFF, SAF]
-          default: "GTF"
+          example: "GTF"
           required: false
         - name: --feature_type
           alternatives: ["-t"]
           type: string
           description: | 
             Specify feature type(s) in a GTF annotation. If multiple types are provided, they should be separated by ',' with no space in between. 'exon' by default. Rows in the annotation with a matched feature will be extracted and used for read mapping.
-          default: "exon"
+          example: "exon"
           required: false
           multiple: true
           multiple_sep: ","
@@ -89,7 +89,7 @@ functionality:
           type: string
           description: | 
             Specify attribute type in GTF annotation. 'gene_id' by default. Meta-features used for read counting will be extracted from annotation using the provided value.
-          default: "gene_id"
+          example: "gene_id"
           required: false
 
         - name: --extra_attributes
@@ -127,7 +127,7 @@ functionality:
           description: | 
             Minimum number of overlapping bases in a read that is required for read assignment. 1 by default. Number of overlapping bases is counted from both reads if paired end. If a negative value is provided, then a gap of up to specified size will be allowed between read and the feature that the read is assigned to.
           required: false
-          default: 1
+          example: 1
         - name: --frac_overlap
           type: double
           description: | 
@@ -135,7 +135,7 @@ functionality:
           required: false
           min: 0
           max: 1
-          default: 0
+          example: 0
         - name: --frac_overlap_feature
           type: double
           description: | 
@@ -143,7 +143,7 @@ functionality:
           required: false
           min: 0
           max: 1
-          default: 0
+          example: 0
         - name: --largest_overlap
           type: boolean_true
           description: | 
@@ -198,7 +198,7 @@ functionality:
           description: | 
             The minimum mapping quality score a read must satisfy in order to be counted. For paired-end reads, at least one end should satisfy this criteria. 0 by default.
           required: false
-          default: 0
+          example: 0
         - name: --split_only
           type: boolean_true
           description: | 
@@ -224,7 +224,7 @@ functionality:
           description: | 
             Perform strand-specific read counting. A single integer value (applied to all input files) should be provided. Possible values include: 0 (unstranded), 1 (stranded) and 2 (reversely stranded). Default value is 0 (ie. unstranded read counting carried out for all input files).
           choices: [0, 1, 2] 
-          default: 0
+          example: 0
           required: false
 
     - name: Exon-exon junctions
@@ -269,14 +269,14 @@ functionality:
           description: | 
             Minimum fragment/template length, 50 by default.
           required: false
-          default: 50
+          example: 50
         - name: --max_length
           alternatives: ["-D"]
           type: integer
           description: | 
             Maximum fragment/template length, 600 by default.
           required: false
-          default: 600
+          example: 600
         - name: --same_strand
           alternatives: ["-C"]
           type: boolean_true
@@ -318,7 +318,7 @@ functionality:
           description: | 
             Maximum number of 'M' operations allowed in a CIGAR string. 10 by default. Both 'X' and '=' are treated as 'M' and adjacent 'M' operations are merged in the CIGAR string.
           required: false
-          default: 10
+          example: 10
         - name: --verbose
           type: boolean_true
           description: | 
