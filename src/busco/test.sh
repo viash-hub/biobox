@@ -62,15 +62,15 @@ echo ">> Checking if output is empty"
 rm -r output/ 
 
 cd ..
-mkdir "run_geno_autolineage"
-cd "run_geno_autolineage"
+mkdir "run_genome"
+cd "run_genome"
 
-echo "> Running busco with auto lineage"
+echo "> Running busco with genome data"
 
 "$meta_executable" \
-    --input $test_dir/genome.fasta \
-    --mode proteins \
-    --auto_lineage \
+    --input $test_dir/genome.fna \
+    --mode genome \
+    --lineage_dataseg saccharomycetes_odb10 \
     --output_dir output 
 
 echo ">> Checking output"
