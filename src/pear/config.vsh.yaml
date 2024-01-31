@@ -10,7 +10,7 @@ functionality:
     repository: https://github.com/tseemann/PEAR
     documentation: https://cme.h-its.org/exelixis/web/software/pear/doc.html
     reference: doi:10.1093/bioinformatics/btt593
-    licence: "['Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported']"
+    licence: "CC-BY-NC-SA-3.0"
   requirements:
     commands: [ pear , gzip ]
   argument_groups:
@@ -161,5 +161,6 @@ platforms:
     setup:
       - type: docker
         run: |
-          pear -h | grep 'PEAR v' | sed 's/PEAR v//' | sed 's/ .*//' > /var/software_versions.txt
+          version=$(pear -h | grep 'PEAR v' | sed 's/PEAR v//' | sed 's/ .*//') && \
+          echo "pear: $version" > /var/software_versions.txt
   - type: nextflow
