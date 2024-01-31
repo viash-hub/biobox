@@ -5,8 +5,8 @@
 
 tmp_dir=$(mktemp -d -p "$meta_temp_dir" "${meta_functionality_name}_XXXXXXXXX")
 
-if [[ $par_r_path ]] && [[ ! -d "$par_r_path" ]]; then
-    mkdir -p "$par_r_path"
+if [[ $par_results_path ]] && [[ ! -d "$par_results_path" ]]; then
+    mkdir -p "$par_results_path"
 fi
 
 [[ "$par_feature_level" == "false" ]] && unset par_feature_level
