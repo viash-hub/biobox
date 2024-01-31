@@ -8,5 +8,5 @@ fi
 
 cp -r /tmp/snakemake-wrappers/bio/busco/test/protein.fasta src/busco/test_data
 
-# Test data from https://gitlab.com/ezlab/busco_protocol/-/raw/main/protocol1/Tglobosa_GCF_014133895.1_genome.fna
-wget -O src/busco/test_data/genome.fna https://gitlab.com/ezlab/busco_protocol/-/raw/main/protocol1/Tglobosa_GCF_014133895.1_genome.fna
+# Test data from busco test data at https://gitlab.com/ezlab/busco/-/tree/master/test_data?ref_type=heads
+wget -O src/busco/test_data/genome.fna "https://gitlab.com/ezlab/busco/-/raw/master/test_data/eukaryota/genome.fna?ref_type=heads&inline=false"
