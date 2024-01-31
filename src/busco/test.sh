@@ -1,5 +1,8 @@
 test_dir="$meta_resources_dir/test_data"
 
+mkdir "run_prot_stramenopiles"
+cd "run_prot_stramenopiles"
+
 echo "> Running busco with lineage dataset"
 
 "$meta_executable" \
