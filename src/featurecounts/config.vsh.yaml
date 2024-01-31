@@ -82,6 +82,8 @@ functionality:
             Specify feature type(s) in a GTF annotation. If multiple types are provided, they should be separated by ',' with no space in between. 'exon' by default. Rows in the annotation with a matched feature will be extracted and used for read mapping.
           default: "exon"
           required: false
+          multiple: true
+          multiple_sep: ","
         - name: --attribute_type
           alternatives: ["-g"]
           type: string
