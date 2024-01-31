@@ -20,6 +20,10 @@ echo ">> Checking if output is empty"
 [ ! -s "output/short_summary.json" ] && echo "short_summary.json is empty" && exit 1
 [ ! -s "output/short_summary.txt" ] && echo "short_summary.txt is empty" && exit 1
 
+cd ..
+mkdir "run_prot_autolineage"
+cd "run_prot_autolineage"
+
 echo "> Running busco with auto lineage"
 
 "$meta_executable" \
