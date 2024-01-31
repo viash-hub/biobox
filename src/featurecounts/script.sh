@@ -3,9 +3,7 @@
 ## VIASH START
 ## VIASH END
 
-if [[ $par_tmpdir ]] && [[ ! -d "$par_tmpdir" ]]; then
-    mkdir -p $tmpDir
-fi
+tmp_dir=$(mktemp -d -p "$meta_temp_dir" "${meta_functionality_name}_XXXXXXXXX")
 
 if [[ $par_r_path ]] && [[ ! -d "$par_r_path" ]]; then
     mkdir -p $par_r_path
