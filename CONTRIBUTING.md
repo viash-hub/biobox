@@ -218,6 +218,8 @@ engines:
     image: quay.io/biocontainers/xxx:0.1.0--py_0
 ```
 
+The container should have your tool installed, as well as `ps`.
+
 If you didn't find a suitable container in the previous step, you can create a custom container. For example:
 
 ```yaml
@@ -281,6 +283,18 @@ arriba \
 
 ### Step 11: Add a test script
 
+...
+
+
+If the unit test requires test resources, these should be provided in the `test_resources` section of the component.
+
+```yaml
+# ... todo
+```
+
+TODO: discuss hosting test resources
+
+
 ### Step 12: Create a `/var/software_versions.txt` file
 
 ```yaml
@@ -292,88 +306,6 @@ engines:
         run: |
           echo "xxx: \"0.1.0\"" > /var/software_versions.txt
 ```
-
-## Documentation of Functionality
-
-The purpose and functionality of each component should be adequately described.
-
-Example:
-
-```yaml
-functionality:
-  name: star_align
-  namespace: bioinformatics
-  description: |
-    Aligns reads to a reference genome using STAR.
-```
-
-## Documentation of Inputs and Outputs
-
-All input and output arguments should have a description and example (with extension).
-
-```yaml
-functionality:
-  # ...
-  arguments:
-    - name: --input
-      type: file
-      description: Input reads in FASTQ format. If the file is compressed, it must have the extension `.gz`.
-      example: input.fastq.gz
-      required: true
-    - name: --output
-      type: file
-      direction: output
-      description: Output BAM file.
-      example: output.bam
-      required: true
-```
-
-## Docker Image
-
-A Docker image (with optional additional dependencies) should be provided.
-
-```yaml
-functionality:
-  # ...
-platforms:
-  - type: docker
-    image: python:3.10
-    setup:
-      - type: python
-        packages: numpy
-```
-
-This container should also have `ps` installed.
-
-## Write unit tests
-
-A unit test with possibly test resources needs to be provided.
-
-```yaml
-functionality:
-  # ...
-  test_resources:
-    - type: python_script
-      path: script.py
-```
-
-With `script.py`:
-
-```python
-# ... todo
-```
-
-The bare minimum of the unit test is to run the component and check whether the output exists. Ideally, the unit test should also check whether the output is correct.
-
-## Provide test resources
-
-If the unit test requires test resources, these should be provided in the `test_resources` section of the component.
-
-```yaml
-# ... todo
-```
-
-TODO: discuss hosting test resources
 
 ## Versioning
 
