@@ -7,7 +7,7 @@ functionality:
       homepage: https://arriba.readthedocs.io/en/latest/
       documentation: https://arriba.readthedocs.io/en/latest/
       repository: https://github.com/suhrig/arriba
-    reference:
+    references:
       doi: 10.1101/gr.257246.119
   license: MIT
   requirements:

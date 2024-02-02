@@ -25,7 +25,7 @@ functionality:
     links:
       repository: https://github.com/OpenGene/fastp
       documentation: https://github.com/OpenGene/fastp/blob/master/README.md
-    reference:
+    references:
       doi: "10.1093/bioinformatics/bty560"
   license: MIT
   argument_groups:
