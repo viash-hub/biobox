@@ -4,13 +4,15 @@ functionality:
     PEAR is an ultrafast, memory-efficient and highly accurate pair-end read merger. It is fully parallelized and can run with as low as just a few kilobytes of memory.
     
     PEAR evaluates all possible paired-end read overlaps and without requiring the target fragment size as input. In addition, it implements a statistical test for minimizing false-positive results. Together with a highly optimized implementation, it can merge millions of paired end reads within a couple of minutes on a standard desktop computer.
+  keywords: [ "pair-end", "read", "merge" ]
   info:
-    keywords: [ "pair-end", "read", "merge" ]
-    homepage: https://cme.h-its.org/exelixis/web/software/pear
-    repository: https://github.com/tseemann/PEAR
-    documentation: https://cme.h-its.org/exelixis/web/software/pear/doc.html
-    reference: doi:10.1093/bioinformatics/btt593
-    licence: "CC-BY-NC-SA-3.0"
+    links:
+      homepage: https://cme.h-its.org/exelixis/web/software/pear
+      repository: https://github.com/tseemann/PEAR
+      documentation: https://cme.h-its.org/exelixis/web/software/pear/doc.html
+    references:
+      doi: 10.1093/bioinformatics/btt593
+  license: "CC-BY-NC-SA-3.0"
   requirements:
     commands: [ pear , gzip ]
   argument_groups:
@@ -148,7 +150,7 @@ functionality:
       path: test.sh
     - type: file
       path: test_data
-platforms:
+engines:
   - type: docker
     image: quay.io/biocontainers/pear:0.9.6--h9d449c0_10
     setup:
@@ -156,4 +158,6 @@ platforms:
         run: |
           version=$(pear -h | grep 'PEAR v' | sed 's/PEAR v//' | sed 's/ .*//') && \
           echo "pear: $version" > /var/software_versions.txt
+runners:
+  - type: executable
   - type: nextflow
