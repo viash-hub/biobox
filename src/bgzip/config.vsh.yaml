@@ -6,6 +6,8 @@ functionality:
       homepage: https://www.htslib.org/
       documentation: https://www.htslib.org/doc/bgzip.html
       repository: https://github.com/samtools/htslib
+    reference:
+      doi: 10.1093/gigascience/giab007
   license: MIT
   requirements:
     commands: [ bgzip ]
