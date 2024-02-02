@@ -12,8 +12,7 @@ echo "> Run PEAR"
   --unassembled_forward "test.unassembled.forward.fastq.gz" \
   --unassembled_reverse "test.unassembled.reverse.fastq.gz" \
   --discarded "test.discarded.fastq.gz" \
-  --p_value 0.01 \
-  --memory "4G"
+  --p_value 0.01
 
 echo ">> Checking output"
 [ ! -f "test.assembled.fastq.gz" ] && echo "Output file test.assembled.fastq.gz does not exist" && exit 1

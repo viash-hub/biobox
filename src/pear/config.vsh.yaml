@@ -128,13 +128,6 @@ functionality:
             Base PHRED quality score.
           required: false
           example: 33
-        - name: --memory
-          alternatives: -y
-          type: string
-          description: |
-            Specify the amount of memory to be used. The number may be followed by one of the letters K, M, or G denoting Kilobytes, Megabytes and Gigabytes, respectively. Bytes are assumed in case no letter is specified.
-          required: false
-          example: 4G
         - name: --cap
           alternatives: -c
           type: integer

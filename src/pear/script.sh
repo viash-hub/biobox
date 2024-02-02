@@ -31,7 +31,7 @@ pear \
   ${par_test_method:+-g "${par_test_method}"} \
   ${par_score_method:+-s "${par_score_method}"} \
   ${par_phred_base:+-b "${par_phred_base}"} \
-  ${par_memory:+-y "${par_memory}"} \
+  ${meta_memory_mb:+--memory "${meta_memory_mb}M"} \
   ${par_cap:+-c "${par_cap}"} \
   ${meta_cpus:+-j "${meta_cpus}"} \
   ${par_emperical_freqs:+-e} \
