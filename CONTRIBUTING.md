@@ -113,7 +113,27 @@ Notes:
   docker run quay.io/biocontainers/arriba:2.4.0--h0033a41_2 arriba -h
   ```
 
-### Step 6: Add arguments for the input files
+
+### Step 6: Fetch test data
+
+To help develop the component, it's interesting to have some test data available. In most cases, we can use the test data from the Snakemake wrappers. 
+
+To make sure we can reproduce the test data in the future, we store the command to fetch the test data in a file at `src/xxx/test_data/script.sh`.
+
+```bash
+cat <<EOF > src/xxx/test_data/script.sh
+
+# clone repo
+if [ ! -d /tmp/snakemake-wrappers ]; then
+  git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
+fi
+
+# copy test data
+cp -r /tmp/snakemake-wrappers/bio/xxx/test/* src/xxx/test_data
+EOF
+```
+
+### Step 7: Add arguments for the input files
 
 By looking at the help file, we add the input arguments to the config file. Here is an example of the input arguments of an existing component.
 
@@ -154,7 +174,7 @@ Several notes:
 
 
 
-### Step 7: Add arguments for the output files
+### Step 8: Add arguments for the output files
 
 By looking at the help file, we now also add output arguments to the config file.
 
@@ -199,7 +219,7 @@ Note:
 
 * Preferably, these outputs should not be directores but files. For example, if a tool outputs a directory `foo/` containing files `foo/bar.txt` and `foo/baz.txt`, there should be two output arguments `--bar` and `--baz` (as opposed to one output argument which outputs the whole `foo/` directory).
 
-### Step 8: Add arguments for the other arguments
+### Step 9: Add arguments for the other arguments
 
 Finally, add all other arguments to the config file. There are a few exceptions:
 
@@ -208,7 +228,7 @@ Finally, add all other arguments to the config file. There are a few exceptions:
 * Arguments related to printing the information such as printing the version (`-v`, `--version`) or printing the help (`-h`, `--help`) should not be added to the config file.
 
 
-### Step 9: Add a Docker engine
+### Step 10: Add a Docker engine
 
 To ensure reproducibility of components, we require that all components are run in a Docker container. 
 
@@ -242,7 +262,7 @@ Here is a list of base containers we can recommend:
 * R: [`eddelbuettel/r2u`](https://hub.docker.com/r/eddelbuettel/r2u), [`rocker/tidyverse`](https://hub.docker.com/r/rocker/tidyverse)
 * Scala: [`sbtscala/scala-sbt`](https://hub.docker.com/r/sbtscala/scala-sbt)
 
-### Step 10: Write a runner script
+### Step 11: Write a runner script
 
 Next, we need to write a runner script that runs the tool with the input arguments. Create a Bash script named `src/xxx/script.sh` which runs the tool with the input arguments.
 
@@ -281,21 +301,73 @@ arriba \
   $([ "$par_fill_gaps" = "true" ] && echo "-I")
 ```
 
-### Step 11: Add a test script
 
-...
+### Step 12: Create test script
 
 
-If the unit test requires test resources, these should be provided in the `test_resources` section of the component.
+If the unit test requires test resources, these should be provided in the `test_resources` section of the component. 
 
 ```yaml
-# ... todo
+functionality:
+  # ...
+  test_resources:
+    - type: bash_script
+      path: test.sh
+    - type: file
+      path: test_data
 ```
 
-TODO: discuss hosting test resources
+Create a test script at `src/xxx/test.sh` that runs the component with the test data. This script should run the component (available with `$meta_executable`) with the test data and check if the output is as expected. The script should exit with a non-zero exit code if the output is not as expected. For example:
 
+```bash
+#!/bin/bash
+
+## VIASH START
+## VIASH END
+
+echo "> Run xxx with test data"
+"$meta_executable" \
+  --input "$meta_resources_dir/test_data/input.txt" \
+  --output "output.txt" \
+  --option
+
+echo ">> Checking output"
+[ ! -f "output.txt" ] && echo "Output file output.txt does not exist" && exit 1
+```
+
+
+For example, this is what the test script for the `arriba` component looks like:
+
+```bash
+#!/bin/bash
+
+## VIASH START
+## VIASH END
+
+echo "> Run arriba with blacklist"
+"$meta_executable" \
+  --bam "$meta_resources_dir/test_data/A.bam" \
+  --genome "$meta_resources_dir/test_data/genome.fasta" \
+  --gene_annotation "$meta_resources_dir/test_data/annotation.gtf" \
+  --blacklist "$meta_resources_dir/test_data/blacklist.tsv" \
+  --fusions "fusions.tsv" \
+  --fusions_discarded "fusions_discarded.tsv" \
+  --interesting_contigs "1,2"
+
+echo ">> Checking output"
+[ ! -f "fusions.tsv" ] && echo "Output file fusions.tsv does not exist" && exit 1
+[ ! -f "fusions_discarded.tsv" ] && echo "Output file fusions_discarded.tsv does not exist" && exit 1
+
+echo ">> Check if output is empty"
+[ ! -s "fusions.tsv" ] && echo "Output file fusions.tsv is empty" && exit 1
+[ ! -s "fusions_discarded.tsv" ] && echo "Output file fusions_discarded.tsv is empty" && exit 1
+```
 
 ### Step 12: Create a `/var/software_versions.txt` file
+
+For the sake of transparency and reproducibility, we require that the versions of the software used in the component are documented.
+
+For now, this is managed by creating a file `/var/software_versions.txt` in the `setup` section of the Docker engine.
 
 ```yaml
 engines:
@@ -305,87 +377,4 @@ engines:
       - type: docker
         run: |
           echo "xxx: \"0.1.0\"" > /var/software_versions.txt
-```
-
-## Versioning
-
-If the component uses custom software (not installed via Apt, Apk, Yum, Pip, Conda, or R), a Bash script `version.sh` needs to be provided that outputs the version of the software. 
-
-The output of this script should be a yaml file with the version of each software as a string.
-
-```yaml
-functionality:
-  # ...
-  version:
-    type: bash
-    path: version.sh
-```
-
-With `version.sh`:
-
-```bash
-#!/bin/bash
-
-cat <<-END_VERSIONS
-star: "$(STAR --version | sed -e "s/STAR_//g")"
-samtools: "$(echo $(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*$//')"
-gawk: "$(echo $(gawk --version 2>&1) | sed 's/^.*GNU Awk //; s/, .*$//')"
-END_VERSIONS
-```
-
-## File format specifications
-
-If a component returns a directory or data structure such as AnnData or MuData, a specification of the file format should be provided.
-
-### Directory file format specification
-
-```yaml
-functionality:
-  # ...
-  arguments:
-    - name: --output
-      type: file
-      # ...
-      example: output/
-      info:
-        format:
-          - type: directory
-            contents:
-              - type: file
-                name: counts.csv
-                description: Normalised expression values
-                required: true
-              - type: file
-                name: size_factors.csv
-                description: The size factors created by the normalisation method, if any.
-                required: false
-```
-
-### AnnData file format specification
-
-```yaml
-functionality:
-  # ...
-  arguments:
-    - name: --output
-      type: file
-      # ...
-      example: output.h5ad
-      info:
-        format:
-          layers:
-            - type: double
-              name: normalized
-              description: Normalised expression values
-              required: true
-          obs:
-            - type: double
-              name: size_factors
-              description: The size factors created by the normalisation method, if any.
-              required: false
-          uns:
-            - type: string
-              name: normalization_id
-              description: "Which normalization was used"
-              required: true
 ```
