@@ -25,6 +25,12 @@ functionality:
             Input BAM file.
           required: true
           example: "normal.bam"
+        - name: --input_bai
+          type: file
+          description: |
+            Index file for the input BAM file.
+          required: true
+          example: "normal.bai"
         - name: --ref
           alternatives: -f
           type: file
@@ -225,6 +231,10 @@ functionality:
   resources:
     - type: bash_script
       path: script.sh
+  test_resources:
+    - type: bash_script
+      path: test.sh
+    - path: test_data
 platforms:
   - type: docker
     image: quay.io/biocontainers/lofreq:2.1.5--py38h794fc9e_10
