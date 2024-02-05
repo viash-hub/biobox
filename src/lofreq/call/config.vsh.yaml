@@ -25,6 +25,13 @@ functionality:
             Input BAM file.
           required: true
           example: "normal.bam"
+        - name: --ref
+          alternatives: -f
+          type: file
+          description: |
+            Indexed reference fasta file (gzip supported) [null].
+          required: true
+          example: "reference.fasta"
     - name: Outputs
       arguments:
         - name: --output
@@ -37,13 +44,6 @@ functionality:
           example: "output.vcf"
     - name: Arguments
       arguments:
-        - name: --ref
-          alternatives: -f
-          type: file
-          description: |
-            Indexed reference fasta file (gzip supported) [null].
-          required: false
-          example: "reference.fasta"
         - name: --region
           alternatives: -r
           type: string
@@ -157,8 +157,6 @@ functionality:
           description: |
             Ignore variants in this vcf file for source quality computation. Multiple files can be given separated by commas.
           required: false
-          multiple: true
-          separator: ","
           example: "variants.vcf"
         - name: --def_nm_q
           alternatives: -T
