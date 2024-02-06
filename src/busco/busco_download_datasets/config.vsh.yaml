@@ -1,0 +1,44 @@
+functionality:
+  name: busco
+  description: Downloads available busco datasets
+  info:
+    keywords: [lineage datasets]
+    homepage: https://busco.ezlab.org/
+    documentation: https://busco.ezlab.org/busco_userguide.html
+    repository: https://gitlab.com/ezlab/busco
+    reference: "10.1007/978-1-4939-9173-0_14"
+    licence: MIT
+  argument_groups:
+    - name: Inputs
+      arguments:
+        - name: --download
+          type: string
+          description: |
+            Download dataset. Possible values are a specific dataset name, "all", "prokaryota", "eukaryota", or "virus".
+            The full list of available datasets can be viewed [here](https://busco-data.ezlab.org/v5/data/lineages/) or by running the busco/busco_list_datasets component.
+          required: false
+          example: stramenopiles_odb10
+    - name: Outputs
+      arguments:
+        - name: --download_path
+          direction: output
+          type: file
+          description: |
+            Local filepath for storing BUSCO dataset downloads
+          required: true
+          default: busco_downloads
+          example: busco_downloads
+  resources:
+    - type: bash_script
+      path: script.sh
+  test_resources:
+    - type: bash_script
+      path: test.sh
+platforms:
+  - type: docker
+    image: quay.io/biocontainers/busco:5.6.1--pyhdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          busco --version | sed 's/BUSCO\s\(.*\)/busco: "\1"/' > /var/software_versions.txt
+  - type: nextflow
