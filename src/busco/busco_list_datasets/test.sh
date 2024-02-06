@@ -11,3 +11,5 @@ echo ">> Checking output"
 
 echo ">> Checking if output is empty"
 [ ! -s "datasets.txt" ] && echo "datasets.txt is empty" && exit 1
+
+rm datasets.txt
