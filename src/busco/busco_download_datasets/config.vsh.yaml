@@ -16,7 +16,7 @@ functionality:
           description: |
             Download dataset. Possible values are a specific dataset name, "all", "prokaryota", "eukaryota", or "virus".
             The full list of available datasets can be viewed [here](https://busco-data.ezlab.org/v5/data/lineages/) or by running the busco/busco_list_datasets component.
-          required: false
+          required: true
           example: stramenopiles_odb10
     - name: Outputs
       arguments:
@@ -25,7 +25,7 @@ functionality:
           type: file
           description: |
             Local filepath for storing BUSCO dataset downloads
-          required: true
+          required: false
           default: busco_downloads
           example: busco_downloads
   resources:
