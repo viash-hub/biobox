@@ -1,0 +1,80 @@
+functionality:
+  name: lofreq_indelqual
+  description: |
+    Insert indel qualities into BAM file (required for indel predictions).
+
+    The preferred way of inserting indel qualities should be via GATK's BQSR (>=2) If that's not possible, use this subcommand.
+    The command has two modes: 'uniform' and 'dindel':
+    - 'uniform' will assign a given value uniformly, whereas
+    - 'dindel' will insert indel qualities based on Dindel (PMID 20980555).
+    Both will overwrite any existing values.
+    Do not realign your BAM file afterwards!
+  info:
+    keywords: [ "bam", "indel", "qualities", "indelqual", "lofreq", "lofreq/indelqual"]
+    homepage: https://csb5.github.io/lofreq/
+    documentation: https://csb5.github.io/lofreq/commands/
+    reference: doi:10.1093/nar/gks918
+    license: "MIT"
+  requirements:
+    commands: [ lofreq ]
+  argument_groups:
+    - name: Inputs
+      arguments:
+        - name: --input
+          type: file
+          description: |
+            Input BAM file.
+          required: true
+          example: "normal.bam"
+        - name: --input_bai
+          type: file
+          description: |
+            Index file for the input BAM file.
+          required: true
+          example: "normal.bai"
+    - name: Outputs
+      arguments:
+        - name: --out
+          alternatives: -o
+          type: file
+          description: |
+            Output BAM file [- = stdout = default].
+          required: true
+          direction: output
+          example: "output.bam"
+    - name: Arguments
+      arguments:
+        - name: --uniform
+          alternatives: -u
+          type: string
+          description: |
+            Add this indel quality uniformly to all bases. Use two comma separated values to specify insertion and deletion quality separately. (clashes with --dindel).
+          required: false
+          example: "50,50"
+        - name: --dindel
+          type: boolean_true
+          description: |
+            Add Dindel's indel qualities (Illumina specific) (clashes with -u; needs --ref).
+        - name: --ref
+          alternatives: -f
+          type: file
+          description: |
+            Reference sequence used for mapping (Only required for --dindel).
+          required: false
+          example: "reference.fasta"
+        - name: --verbose
+          type: boolean_true
+          description: |
+            Be verbose.
+  resources:
+    - type: bash_script
+      path: script.sh
+platforms:
+  - type: docker
+    image: quay.io/biocontainers/lofreq:2.1.5--py38h794fc9e_10
+    setup:
+      - type: docker
+        run: |
+          version=$(lofreq version | grep 'version' | sed 's/version: //') && \
+          echo "lofreq: $version" > /var/software_versions.txt
+  - type: nextflow
