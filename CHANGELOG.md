@@ -10,6 +10,8 @@
 
 * `busco`: Assess genome assembly and annotation completeness with single copy orthologs (PR #6).
 
+* `busco_list_datasets`: Lists available busco datasets (PR #18)
+
 * `featurecounts`: Assign sequence reads to genomic features (PR #11).
 
 * `bgzip`: Add bgzip functionality to compress and decompress files (PR #13).
