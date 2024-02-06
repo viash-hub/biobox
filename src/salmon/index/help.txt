@@ -1,0 +1,4 @@
+```bash
+salmon index -h
+```
+

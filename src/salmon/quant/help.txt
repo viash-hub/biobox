@@ -1,0 +1,6 @@
+```bash
+salmon quant -h
+salmon quant --help-reads
+salmon quant --help-alignment
+```
+
