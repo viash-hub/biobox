@@ -14,7 +14,7 @@
 [[ "$par_src_qual" == "false" ]] && unset par_src_qual
 [[ "$par_illumina_13" == "false" ]] && unset par_illumina_13
 [[ "$par_use_orphan" == "false" ]] && unset par_use_orphan
-[[ "$_plp_summary_only" == "false" ]] && unset _plp_summary_only
+[[ "$par_plp_summary_only" == "false" ]] && unset par_plp_summary_only
 [[ "$par_no_default_filter" == "false" ]] && unset par_no_default_filter
 [[ "$par_force_overwrite" == "false" ]] && unset par_force_overwrite
 [[ "$par_verbose" == "false" ]] && unset par_verbose
@@ -55,4 +55,3 @@ lofreq call \
   ${par_verbose:+--verbose} \
   ${par_debug:+--debug} \
   "$par_input"
-

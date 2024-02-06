@@ -234,7 +234,8 @@ functionality:
   test_resources:
     - type: bash_script
       path: test.sh
-    - path: test_data
+    - type: file
+      path: test_data
 platforms:
   - type: docker
     image: quay.io/biocontainers/lofreq:2.1.5--py38h794fc9e_10
