@@ -14,4 +14,7 @@ echo "> Run lofreq call"
 echo ">> Checking output"
 [ ! -f "output.vcf" ] && echo "Output file output.vcf does not exist" && exit 1
 
+echo ">> Check if output is empty"
+[ ! -s "output.vcf" ] && echo "Output file output.vcf is empty" && exit 1
+
 echo "> Test successful"
