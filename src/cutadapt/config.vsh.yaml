@@ -53,7 +53,6 @@ functionality:
       arguments:
         - name: --adapter_fasta
           type: string
-          multiple: true
           description: |
             Fasta file containing sequences of an adapter ligated to the 3' end (paired data:
             of the first read). The adapter and subsequent bases are
@@ -62,7 +61,6 @@ functionality:
           required: false
         - name: --front_fasta
           type: string
-          multiple: true
           description: |
             Fasta file containing sequences of an adapter ligated to the 5' end (paired data:
             of the first read). The adapter and any preceding bases
@@ -72,7 +70,6 @@ functionality:
           required: false
         - name: --anywhere_fasta
           type: string
-          multiple: true
           description: |
             Fasta file containing sequences of an adapter that may be ligated to the 5' or 3'
             end (paired data: of the first read). Both types of
@@ -126,7 +123,6 @@ functionality:
       arguments:
         - name: --adapterR2_fasta
           type: string
-          multiple: true
           description: |
             Fasta file containing sequences of an adapter ligated to the 3' end (paired data:
             of the first read). The adapter and subsequent bases are
@@ -135,7 +131,6 @@ functionality:
           required: false
         - name: --frontR2_fasta
           type: string
-          multiple: true
           description: |
             Fasta file containing sequences of an adapter ligated to the 5' end (paired data:
             of the first read). The adapter and any preceding bases
@@ -145,7 +140,6 @@ functionality:
           required: false
         - name: --anywhereR2_fasta
           type: string
-          multiple: true
           description: |
             Fasta file containing sequences of an adapter that may be ligated to the 5' or 3'
             end (paired data: of the first read). Both types of
