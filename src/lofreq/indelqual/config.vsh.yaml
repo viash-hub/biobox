@@ -26,12 +26,13 @@ functionality:
             Input BAM file.
           required: true
           example: "normal.bam"
-        - name: --input_bai
+        - name: --ref
+          alternatives: -f
           type: file
           description: |
-            Index file for the input BAM file.
-          required: true
-          example: "normal.bai"
+            Reference sequence used for mapping (Only required for --dindel).
+          required: false
+          example: "reference.fasta"
     - name: Outputs
       arguments:
         - name: --out
@@ -55,13 +56,6 @@ functionality:
           type: boolean_true
           description: |
             Add Dindel's indel qualities (Illumina specific) (clashes with -u; needs --ref).
-        - name: --ref
-          alternatives: -f
-          type: file
-          description: |
-            Reference sequence used for mapping (Only required for --dindel).
-          required: false
-          example: "reference.fasta"
         - name: --verbose
           type: boolean_true
           description: |
@@ -69,6 +63,11 @@ functionality:
   resources:
     - type: bash_script
       path: script.sh
+  test_resources:
+    - type: bash_script
+      path: test.sh
+    - type: file
+      path: test_data
 platforms:
   - type: docker
     image: quay.io/biocontainers/lofreq:2.1.5--py38h794fc9e_10
