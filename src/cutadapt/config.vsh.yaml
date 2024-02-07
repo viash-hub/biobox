@@ -164,7 +164,6 @@ functionality:
           description: |
             Which of the reads in a paired-end read have to match the
             filtering criterion in order for the pair to be filtered.
-          default: any
         - name: --interleaved
           type: boolean_true
           description: |
@@ -173,6 +172,12 @@ functionality:
     ####################################################################
     - name: Input parameters
       arguments:
+        - name: --input
+          type: file
+          multiple: true
+          required: true
+          description: |
+            Input fastq files. Paired reads are delimited with a space.
         - name: --error_rate
           alternatives: [-E, --errors]
           type: double
@@ -329,7 +334,7 @@ functionality:
     - name: Filtering of processed reads
       description: |
         Filters are applied after above read modifications. Paired-end reads are
-        always discarded pairwise (see also --pair-filter).
+        always discarded pairwise (see also --pair_filter).
       arguments:
         - name: --minimum_length
           alternatives: [-m]
@@ -397,7 +402,7 @@ functionality:
             Write trimmed reads to this directory and name the files using {name}.
             FASTQ or FASTA format is chosen depending on input.
             Summary report is sent to standard output.
-          default: output/
+          default: output
           direction: output
           required: true
           must_exist: true

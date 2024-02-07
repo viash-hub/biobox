@@ -6,101 +6,20 @@ else
 	mkdir -p "$par_output"
 fi
 
-echo "par_pair_adapters: $par_pair_adapters"
-echo "par_pair_filter: $par_pair_filter"
-echo "par_interleaved: $par_interleaved"
-echo "par_error_rate: $par_error_rate"
-echo "par_no_indels: $par_no_indels"
-echo "par_times: $par_times"
-echo "par_overlap: $par_overlap"
-echo "par_match_read_wildcards: $par_match_read_wildcards"
-echo "no_match_adapter_wildcards: $no_match_adapter_wildcards"
-echo "par_action: $par_action"
-echo "par_revcomp: $par_revcomp"
-echo "par_cut: $par_cut"
-echo "par_cutR2: $par_cutR2"
-echo "par_nextseq_trim: $par_nextseq_trim"
-echo "par_quality_cutoff: $par_quality_cutoff"
-echo "par_quality_cutoffR2: $par_quality_cutoffR2"
-echo "par_quality_base: $par_quality_base"
-echo "par_poly_a: $par_poly_a"
-echo "par_length: $par_length"
-echo "par_trim_n: $par_trim_n"
-echo "par_length_tag: $par_length_tag"
-echo "par_strip_suffix: $par_strip_suffix"
-echo "par_prefix: $par_prefix"
-echo "par_suffix: $par_suffix"
-echo "par_rename: $par_rename"
-echo "par_zero_cap: $par_zero_cap"
-echo "par_minimum_length: $par_minimum_length"
-echo "par_maximum_length: $par_maximum_length"
-echo "par_max_n: $par_max_n"
-echo "par_max_expected_errors: $par_max_expected_errors"
-echo "par_max_average_error_rate: $par_max_average_error_rate"
-echo "par_discard_trimmed: $par_discard_trimmed"
-echo "par_discard_untrimmed: $par_discard_untrimmed"
-echo "par_discard_casava: $par_discard_casava"
-echo "par_report: $par_report"
-echo "par_json: $par_json"
-echo "par_output: $par_output"
-echo "par_fasta: $par_fasta"
-echo "par_info_file: $par_info_file"
 
-# Do we get explicit adapter sequences or a FASTA file?
-# Let the underlying tool deal with inconsistant states.
-adapter_mode_R1=""
-if [ ! -z "${par_adapter_fasta+set}" ]; then
-  adapter_mode_R1="fasta"
-else
-  adapter_mode_R1="plain"
-fi
-
-front_mode_R1=""
-if [ ! -z "${par_front_fasta+set}" ]; then
-  front_mode_R1="fasta"
-else
-  front_mode_R1="plain"
-fi
-
-anywhere_mode_R1=""
-if [ ! -z "${par_anywhere_fasta+set}" ]; then
-  anywhere_mode_R1="fasta"
-else
-  anywhere_mode_R1="plain"
-fi
-
-adapter_mode_R2=""
-if [ ! -z "${par_adapter_fastaR2+set}" ]; then
-  adapter_mode_R2="fasta"
-else
-  adapter_mode_R2="plain"
-fi
-
-front_mode_R2=""
-if [ ! -z "${par_front_fastaR2+set}" ]; then
-  front_mode_R2="fasta"
-else
-  front_mode_R2="plain"
-fi
-
-anywhere_mode_R2=""
-if [ ! -z "${par_anywhere_fastaR2+set}" ]; then
-  anywhere_mode_R2="fasta"
-else
-  anywhere_mode_R2="plain"
-fi
-
+# Init
+###########################################################
 echo "Running cutadapt"
 echo
-echo "Adapter settings"
-echo "----------------"
-echo "Adapter Mode  R1 : $adapter_mode_R1"
-echo "Front Mode    R1 : $front_mode_R1"
-echo "Anywhere Mode R1 : $anywhere_mode_R1"
-echo "Adapter Mode  R2 : $adapter_mode_R2"
-echo "Front Mode    R2 : $front_mode_R2"
-echo "Anywhere Mode R2 : $anywhere_mode_R2"
-echo
+echo ">> Paired-end data or not?"
+IFS=':' read -a inputs <<< "$par_input"
+input=$(echo $par_input | tr ':' ' ')
+
+nr_inputs="${#inputs[@]}"
+
+[[ $nr_inputs = 1 ]] && echo "  Single end" && mode="se"
+[[ $nr_inputs = 2 ]] && echo "  Paired end" && mode="pe"
+[[ $nr_inputs = 3 ]] && echo "  Too much input !!!" && exit 1
 
 # Adapter arguments
 #   - paired and single-end
@@ -134,8 +53,7 @@ echo ">> Parsing arguments for paired-end reads"
 paired_args=$(echo \
   ${par_pair_adapters:+--pair-adapters} \
   ${par_pair_filter:+--pair-filter "${par_pair_filter}"} \
-  ${par_interleaved:+--interleaved} \
-
+  ${par_interleaved:+--interleaved}
 )
 echo "Arguments to cutadapt:"
 echo $paired_args
@@ -150,7 +68,7 @@ echo ">> Parsing input arguments"
 [[ "$par_revcomp" == "false" ]] && unset par_revcomp
 
 input_args=$(echo \
-  ${par_error_rate:+-error-rate "${par_error_rate}"} \
+  ${par_error_rate:+--error-rate "${par_error_rate}"} \
   ${par_no_indels:+--no-indels} \
   ${par_times:+--times "${par_times}"} \
   ${par_overlap:+--overlap "${par_overlap}"} \
@@ -221,23 +139,31 @@ echo ">> Output arguments"
 [[ "$par_fasta" == "false" ]] && unset par_fasta
 [[ "$par_info_file" == "false" ]] && unset par_info_file
 
-# 	-o "$par_outputDir/{name}_R1_001.fastq" \
-# 	-p "$par_outputDir/{name}_R2_001.fastq" \
-
-output_args=$(echo \
-  ${par_report:+--report "${par_report}"} \
-  ${par_json:+--json} \
-  -o "$par_output/{name}_R1_001.fastq" \
-  -p "$par_output/{name}_R1_001.fastq" \
-  ${par_fasta:+--fasta} \
-  ${par_info_file:+--info-file} \
-)
+if [ $mode = "se" ]; then
+  output_args=$(echo \
+    ${par_report:+--report "${par_report}"} \
+    ${par_json:+--json} \
+    --output "$par_output/{name}_R1_001.fastq" \
+    ${par_fasta:+--fasta} \
+    ${par_info_file:+--info-file} \
+  )
+else
+  output_args=$(echo \
+    ${par_report:+--report "${par_report}"} \
+    ${par_json:+--json} \
+    --output "$par_output/{name}_R1_001.fastq" \
+    --paired-output "$par_output/{name}_R2_001.fastq" \
+    ${par_fasta:+--fasta} \
+    ${par_info_file:+--info-file} \
+  )
+fi
 echo "Arguments to cutadapt:"
 echo $output_args
 echo
 
 echo ">> Full CLI to be run:"
-cli=$(echo "cutadapt" \
+cli=$(echo \
+  $input \
   $adapter_args \
   $paired_args \
   $input_args \
@@ -246,6 +172,6 @@ cli=$(echo "cutadapt" \
   $output_args
 )
 
-echo $cli
+echo cutadapt $cli | sed -e 's/--/\r\n  --/g'
 
-# $( "$cli" ) > $par_output/report.txt
+cutadapt $cli | tee $par_output/report.txt
