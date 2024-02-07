@@ -52,7 +52,7 @@ functionality:
     - name: Specify Adapters using Fasta files for R1
       arguments:
         - name: --adapter_fasta
-          type: string
+          type: file
           description: |
             Fasta file containing sequences of an adapter ligated to the 3' end (paired data:
             of the first read). The adapter and subsequent bases are
@@ -60,7 +60,7 @@ functionality:
             adapter is only found if it is a suffix of the read.
           required: false
         - name: --front_fasta
-          type: string
+          type: file
           description: |
             Fasta file containing sequences of an adapter ligated to the 5' end (paired data:
             of the first read). The adapter and any preceding bases
@@ -69,7 +69,7 @@ functionality:
             only found if it is a prefix of the read.
           required: false
         - name: --anywhere_fasta
-          type: string
+          type: file
           description: |
             Fasta file containing sequences of an adapter that may be ligated to the 5' or 3'
             end (paired data: of the first read). Both types of
@@ -122,7 +122,7 @@ functionality:
     - name: Specify Adapters using Fasta files for R2
       arguments:
         - name: --adapterR2_fasta
-          type: string
+          type: file
           description: |
             Fasta file containing sequences of an adapter ligated to the 3' end (paired data:
             of the first read). The adapter and subsequent bases are
@@ -130,7 +130,7 @@ functionality:
             adapter is only found if it is a suffix of the read.
           required: false
         - name: --frontR2_fasta
-          type: string
+          type: file
           description: |
             Fasta file containing sequences of an adapter ligated to the 5' end (paired data:
             of the first read). The adapter and any preceding bases
@@ -139,7 +139,7 @@ functionality:
             only found if it is a prefix of the read.
           required: false
         - name: --anywhereR2_fasta
-          type: string
+          type: file
           description: |
             Fasta file containing sequences of an adapter that may be ligated to the 5' or 3'
             end (paired data: of the first read). Both types of
@@ -200,11 +200,11 @@ functionality:
             adapter to be found.
           default: 3
         - name: --match_read_wildcards
-          type: boolean_false
+          type: boolean_true
           description: |
             Interpret IUPAC wildcards in reads.
         - name: --no_match_adapter_wildcards
-          type: boolean_true
+          type: boolean_false
           description: |
             Do not interpret IUPAC wildcards in adapters.
         - name: --action
