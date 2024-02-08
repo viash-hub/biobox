@@ -16,6 +16,10 @@
 
 * `pear`: Paired-end read merger (PR #10).
 
+* `lofreq/call`: Call variants from a BAM file (PR #17)
+
+* `lofreq/indelqual`: Insert indel qualities into BAM file (PR #17)
+
 ## MAJOR CHANGES
 
 ## MINOR CHANGES
