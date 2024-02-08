@@ -82,4 +82,6 @@ featureCounts \
 
 [[ ! -z "$par_counts" ]] && mv "$tmp_dir/output.txt" "$par_counts"
 [[ ! -z "$par_summary" ]] && mv "$tmp_dir/output.txt.summary" "$par_summary"
-[[ ! -z "$par_junctions" ]] && mv "$tmp_dir/output.txt.jcounts" "$par_junctions"
+if [[ ! -z "$par_junctions" ]] && [[ -e "$tmp_dir/output.txt.jcounts" ]]; then 
+  mv "$tmp_dir/output.txt.jcounts" "$par_junctions"
+fi
