@@ -11,10 +11,10 @@ echo "> Run lofreq indelqual uniform"
   --out "uniform.bam" \
 
 echo ">> Checking output"
-[ ! -f "out.bam" ] && echo "Output file out.bam does not exist" && exit 1
+[ ! -f "uniform.bam" ] && echo "Output file uniform.bam does not exist" && exit 1
 
 echo ">> Check if output is empty"
-[ ! -s "out.bam" ] && echo "Output file out.bam is empty" && exit 1
+[ ! -s "uniform.bam" ] && echo "Output file uniform.bam is empty" && exit 1
 
 echo "> run lofreq indelqual dindel"
 "$meta_executable" \
