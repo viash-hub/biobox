@@ -8,9 +8,9 @@
 
 * `fastp`: An ultra-fast all-in-one FASTQ preprocessor (PR #3).
 
-* `busco`: Assess genome assembly and annotation completeness with single copy orthologs (PR #6).
-
-* `busco_list_datasets`: Lists available busco datasets (PR #18)
+* `busco`: 
+    - `busco/busco`: Assess genome assembly and annotation completeness with single copy orthologs (PR #6).
+    - `busco_list_datasets`: Lists available busco datasets (PR #18)
 
 * `featurecounts`: Assign sequence reads to genomic features (PR #11).
 
