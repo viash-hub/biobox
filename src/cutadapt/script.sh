@@ -142,7 +142,7 @@ echo ">> Output arguments"
 if [ $mode = "se" ]; then
   output_args=$(echo \
     ${par_report:+--report "${par_report}"} \
-    ${par_json:+--json} \
+    ${par_json:+--json "${par_output}/report.json"} \
     --output "$par_output/{name}_R1_001.fastq" \
     ${par_fasta:+--fasta} \
     ${par_info_file:+--info-file} \
@@ -150,7 +150,7 @@ if [ $mode = "se" ]; then
 else
   output_args=$(echo \
     ${par_report:+--report "${par_report}"} \
-    ${par_json:+--json} \
+    ${par_json:+--json "${par_output}/report.json"} \
     --output "$par_output/{name}_R1_001.fastq" \
     --paired-output "$par_output/{name}_R2_001.fastq" \
     ${par_fasta:+--fasta} \
