@@ -440,4 +440,7 @@ platforms:
       - type: python
         pip:
           - cutadapt
+      - type: docker
+        run: |
+          cutadapt --version | sed 's/\(.*\)/cutadapt: "\1"/' > /var/software_versions.txt
   - type: nextflow
