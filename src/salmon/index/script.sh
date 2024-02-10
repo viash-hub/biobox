@@ -31,7 +31,21 @@ else
     gentrome=$par_transcripts
     decoys=$par_decoys
 fi
-
+echo "salmon index \
+    -t "$gentrome" \
+    --tmpdir "$tmp_dir/temp" \
+    ${meta_cpus:+--threads "${meta_cpus}"} \
+    -i "$par_index" \
+    ${par_kmer_len:+-k "${par_kmer_len}"} \
+    ${par_gencode:+--gencode} \
+    ${par_features:+--features} \
+    ${par_keep_duplicates:+--keepDuplicates} \
+    ${par_keep_fixed_fasta:+--keepFixedFasta} \
+    ${par_filter_size:+-f "${par_filter_size}"} \
+    ${par_sparse:+--sparse} \
+    ${decoys:+-d "${decoys}"} \
+    ${par_no_clip:+--no-clip} \
+    ${par_type:+--type "${par_type}"}"
 salmon index \
     -t "$gentrome" \
     --tmpdir "$tmp_dir/temp" \

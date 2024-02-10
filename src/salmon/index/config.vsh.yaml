@@ -91,7 +91,7 @@ functionality:
           description: |
             Salmon index
           required: true
-          example: salmon_index
+          example: Salmon_index
 
   resources:
     - type: bash_script
