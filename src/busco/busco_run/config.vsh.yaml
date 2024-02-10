@@ -1,5 +1,5 @@
 functionality:
-  name: busco
+  name: busco_run
   description: Assessment of genome assembly and annotation completeness with single copy orthologs
   info:
     keywords: [Genome assembly, quality control]
