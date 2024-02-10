@@ -219,6 +219,7 @@ Note:
 
 * Preferably, these outputs should not be directores but files. For example, if a tool outputs a directory `foo/` containing files `foo/bar.txt` and `foo/baz.txt`, there should be two output arguments `--bar` and `--baz` (as opposed to one output argument which outputs the whole `foo/` directory).
 
+
 ### Step 9: Add arguments for the other arguments
 
 Finally, add all other arguments to the config file. There are a few exceptions:
@@ -227,6 +228,10 @@ Finally, add all other arguments to the config file. There are a few exceptions:
 
 * Arguments related to printing the information such as printing the version (`-v`, `--version`) or printing the help (`-h`, `--help`) should not be added to the config file.
 
+Note:
+
+* If the documentation mentions a default value for some of the arguments, please don't add them as default values in the Viash config, but instead as an example. This is because the documentation of the tool might be incorrect or outdated, and by adding a default value to the Viash config we might be changing the default behaviour of the tool. For example, do not write `name: --my_arg, description: My arg, default: 10`, but instead `name: --my_arg, description: "My arg. Default: 10.", example: 10`.
+  
 
 ### Step 10: Add a Docker engine
 
