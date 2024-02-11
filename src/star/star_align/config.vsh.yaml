@@ -12,9 +12,8 @@ functionality:
       doi: 10.1093/bioinformatics/bts635
     license: MIT
   requirements:
-    commands: [ STAR, python, ps ]
-  __merge__: [., argument_groups.yaml]
-  # manually taking care of the main input files
+    commands: [ STAR, python, ps, zcat, bzcat ]
+  # manually taking care of the main input and output arguments
   argument_groups:
     - name: Inputs
       arguments:
@@ -75,6 +74,8 @@ functionality:
           description: The output file containing the splice junctions.
           direction: output
           example: splice_junctions.tsv
+  # other arguments are defined in a separate file
+  __merge__: argument_groups.yaml
   resources:
     - type: python_script
       path: script.py
@@ -89,12 +90,13 @@ platforms:
       - type: apt
         packages:
           - procps
+          - gzip
+          - bzip2
       # setup derived from https://github.com/alexdobin/STAR/blob/master/extras/docker/Dockerfile
       - type: docker
         env: 
           - STAR_VERSION 2.7.11b
           - PACKAGES gcc g++ make wget zlib1g-dev unzip xxd
-      - type: docker
         run: |
           apt-get update && \
             apt-get install -y --no-install-recommends ${PACKAGES} && \
