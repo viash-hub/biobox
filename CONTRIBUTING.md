@@ -7,49 +7,243 @@ We encourage contributions from the community. To contribute:
 2. **Develop Your Component**: Create your Viash component, ensuring it aligns with our best practices (detailed below).
 3. **Submit a Pull Request**: After testing your component, submit a pull request for review.
 
-## Documentation of Functionality
+## Procedure of adding a component
 
-The purpose and functionality of each component should be adequately described.
+### Step 1: Find a component to contribute
 
-Example:
+* Find a tool to contribute to this repo.
+
+* Check whether it is already in the [Project board](https://github.com/orgs/viash-hub/projects/1).
+
+* Check whether there is a corresponding [Snakemake wrapper](https://github.com/snakemake/snakemake-wrappers/blob/master/bio) or [nf-core module](https://github.com/nf-core/modules/tree/master/modules/nf-core) which we can use as inspiration.
+
+* Create an issue to show that you are working on this component.
+
+
+### Step 2: Add config template
+
+Change all occurrences of `xxx` to the name of the component.
+
+Create a file at `src/xxx/config.vsh.yaml` with contents:
 
 ```yaml
 functionality:
-  name: star_align
-  namespace: bioinformatics
-  description: |
-    Aligns reads to a reference genome using STAR.
+  name: xxx
+  description: xxx
+  keywords: [tag1, tag2]
+  links:
+    homepage: yyy
+    documentation: yyy
+    repository: yyy
+  references: 
+    doi: 12345/12345678.yz
+  license: MIT/Apache-2.0/GPL-3.0/...
+  argument_groups:
+    - name: Inputs
+      arguments: <...>
+    - name: Outputs
+      arguments: <...>
+    - name: Arguments
+      arguments: <...>
+  resources:
+    - type: bash_script
+      path: script.sh
+  test_resources:
+    - type: bash_script
+      path: test.sh
+    - type: file
+      path: test_data
+engines:
+  - <...>
+runners:
+  - type: executable
+  - type: nextflow
 ```
 
-## Documentation of Inputs and Outputs
+### Step 3: Fill in the metadata
 
-All input and output arguments should have a description and example (with extension).
+Fill in the relevant metadata fields in the config. Here is an example of the metadata of an existing component.
 
 ```yaml
 functionality:
-  # ...
-  arguments:
-    - name: --input
-      type: file
-      description: Input reads in FASTQ format. If the file is compressed, it must have the extension `.gz`.
-      example: input.fastq.gz
-      required: true
-    - name: --output
-      type: file
-      direction: output
-      description: Output BAM file.
-      example: output.bam
-      required: true
+  name: arriba
+  description: Detect gene fusions from RNA-Seq data
+  keywords: [Gene fusion, RNA-Seq]
+  links:
+    homepage: https://arriba.readthedocs.io/en/latest/
+    documentation: https://arriba.readthedocs.io/en/latest/
+    repository: https://github.com/suhrig/arriba
+  references:
+    doi: 10.1101/gr.257246.119
+    bibtex: |
+      @article{
+        ... a bibtex entry in case the doi is not available ...
+      }
+  license: MIT
 ```
 
-## Docker Image
+### Step 4: Find a suitable container
 
-A Docker image (with optional additional dependencies) should be provided.
+Google `biocontainer <name of component>` and find the container that is most suitable. Typically the link will be `https://quay.io/repository/biocontainers/xxx?tab=tags`.
+
+If no such container is found, you can create a custom container in the next step. 
+
+
+### Step 5: Create help file
+
+To help develop the component, we store the `--help` output of the tool in a file at `src/xxx/help.txt`.
+
+````bash
+cat <<EOF > src/xxx/help.txt
+```sh
+xxx --help
+```
+EOF
+
+docker run quay.io/biocontainers/xxx:tag xxx --help >> src/xxx/help.txt
+````
+
+Notes:
+
+* This help file has no functional purpose, but it is useful for the developer to see the help output of the tool.
+
+* Some tools might not have a `--help` argument but instead have a `-h` argument. For example, for `arriba`, the help message is obtained by running `arriba -h`:
+  
+  ```bash
+  docker run quay.io/biocontainers/arriba:2.4.0--h0033a41_2 arriba -h
+  ```
+
+
+### Step 6: Fetch test data
+
+To help develop the component, it's interesting to have some test data available. In most cases, we can use the test data from the Snakemake wrappers. 
+
+To make sure we can reproduce the test data in the future, we store the command to fetch the test data in a file at `src/xxx/test_data/script.sh`.
+
+```bash
+cat <<EOF > src/xxx/test_data/script.sh
+
+# clone repo
+if [ ! -d /tmp/snakemake-wrappers ]; then
+  git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
+fi
+
+# copy test data
+cp -r /tmp/snakemake-wrappers/bio/xxx/test/* src/xxx/test_data
+EOF
+```
+
+### Step 7: Add arguments for the input files
+
+By looking at the help file, we add the input arguments to the config file. Here is an example of the input arguments of an existing component.
+
+For instance, in the [arriba help file](src/arriba/help.txt), we see the following:
+
+    Usage: arriba [-c Chimeric.out.sam] -x Aligned.out.bam \
+                  -g annotation.gtf -a assembly.fa [-b blacklists.tsv] [-k known_fusions.tsv] \
+                  [-t tags.tsv] [-p protein_domains.gff3] [-d structural_variants_from_WGS.tsv] \
+                  -o fusions.tsv [-O fusions.discarded.tsv] \
+                  [OPTIONS]
+
+    -x FILE  File in SAM/BAM/CRAM format with main alignments as generated by STAR 
+              (Aligned.out.sam). Arriba extracts candidate reads from this file. 
+
+Based on this information, we can add the following input arguments to the config file.
 
 ```yaml
-functionality:
-  # ...
-platforms:
+argument_groups:
+  - name: Inputs
+    arguments:
+    - name: --bam
+      alternatives: -x
+      type: file
+      description: |
+        File in SAM/BAM/CRAM format with main alignments as generated by STAR
+        (Aligned.out.sam). Arriba extracts candidate reads from this file.
+      required: true
+      example: Aligned.out.bam
+```
+
+Check the [documentation](https://viash.io/reference/config/functionality/arguments) for more information on the format of input arguments.
+
+Several notes:
+
+* Argument names should be formatted in `--snake_case`. This means arguments like `--foo-bar` should be formatted as `--foo_bar`, and short arguments like `-f` should receive a longer name like `--foo`.
+
+* Input arguments can have `multiple: true` to allow the user to specify multiple files.
+
+
+
+### Step 8: Add arguments for the output files
+
+By looking at the help file, we now also add output arguments to the config file.
+
+For example, in the [arriba help file](src/arriba/help.txt), we see the following:
+
+
+    Usage: arriba [-c Chimeric.out.sam] -x Aligned.out.bam \
+                  -g annotation.gtf -a assembly.fa [-b blacklists.tsv] [-k known_fusions.tsv] \
+                  [-t tags.tsv] [-p protein_domains.gff3] [-d structural_variants_from_WGS.tsv] \
+                  -o fusions.tsv [-O fusions.discarded.tsv] \
+                  [OPTIONS]
+
+     -o FILE  Output file with fusions that have passed all filters. 
+
+     -O FILE  Output file with fusions that were discarded due to filtering. 
+
+Based on this information, we can add the following output arguments to the config file.
+
+```yaml
+argument_groups:
+  - name: Outputs
+    arguments:
+      - name: --fusions
+        alternatives: -o
+        type: file
+        direction: output
+        description: |
+          Output file with fusions that have passed all filters.
+        required: true
+        example: fusions.tsv
+      - name: --fusions_discarded
+        alternatives: -O
+        type: file
+        direction: output
+        description: |
+          Output file with fusions that were discarded due to filtering. 
+        required: false
+        example: fusions.discarded.tsv
+```
+
+Note: 
+
+* Preferably, these outputs should not be directores but files. For example, if a tool outputs a directory `foo/` containing files `foo/bar.txt` and `foo/baz.txt`, there should be two output arguments `--bar` and `--baz` (as opposed to one output argument which outputs the whole `foo/` directory).
+
+### Step 9: Add arguments for the other arguments
+
+Finally, add all other arguments to the config file. There are a few exceptions:
+
+* Arguments related to specifying CPU and memory requirements are handled separately and should not be added to the config file.
+
+* Arguments related to printing the information such as printing the version (`-v`, `--version`) or printing the help (`-h`, `--help`) should not be added to the config file.
+
+
+### Step 10: Add a Docker engine
+
+To ensure reproducibility of components, we require that all components are run in a Docker container. 
+
+```yaml
+engines:
+  - type: docker
+    image: quay.io/biocontainers/xxx:0.1.0--py_0
+```
+
+The container should have your tool installed, as well as `ps`.
+
+If you didn't find a suitable container in the previous step, you can create a custom container. For example:
+
+```yaml
+engines:
   - type: docker
     image: python:3.10
     setup:
@@ -57,117 +251,130 @@ platforms:
         packages: numpy
 ```
 
-This container should also have `ps` installed.
+For more information on how to do this, see the [documentation](https://viash.io/guide/component/add-dependencies.html#steps-for-creating-a-custom-docker-platform).
 
-## Write unit tests
+Here is a list of base containers we can recommend:
 
-A unit test with possibly test resources needs to be provided.
+* Bash: [`bash`](https://hub.docker.com/_/bash), [`ubuntu`](https://hub.docker.com/_/ubuntu)
+* C#: [`ghcr.io/data-intuitive/dotnet-script`](https://github.com/data-intuitive/ghcr-dotnet-script/pkgs/container/dotnet-script)
+* JavaScript: [`node`](https://hub.docker.com/_/node)
+* Python: [`python`](https://hub.docker.com/_/python), [`nvcr.io/nvidia/pytorch`](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch)
+* R: [`eddelbuettel/r2u`](https://hub.docker.com/r/eddelbuettel/r2u), [`rocker/tidyverse`](https://hub.docker.com/r/rocker/tidyverse)
+* Scala: [`sbtscala/scala-sbt`](https://hub.docker.com/r/sbtscala/scala-sbt)
+
+### Step 11: Write a runner script
+
+Next, we need to write a runner script that runs the tool with the input arguments. Create a Bash script named `src/xxx/script.sh` which runs the tool with the input arguments.
+
+```bash
+#!/bin/bash
+
+## VIASH START
+## VIASH END
+
+xxx \
+  --input "$par_input" \
+  --output "$par_output" \
+  $([ "$par_option" = "true" ] && echo "--option")
+```
+
+When building a Viash component, Viash will automatically replace the `## VIASH START` and `## VIASH END` lines (and anything in between) with environment variables based on the arguments specified in the config.
+
+As an example, this is what the Bash script for the `arriba` component looks like:
+
+```bash
+#!/bin/bash
+
+## VIASH START
+## VIASH END
+
+arriba \
+  -x "$par_bam" \
+  -a "$par_genome" \
+  -g "$par_gene_annotation" \
+  -o "$par_fusions" \
+  ${par_known_fusions:+-k "${par_known_fusions}"} \
+  ${par_blacklist:+-b "${par_blacklist}"} \
+  ${par_structural_variants:+-d "${par_structural_variants}"} \
+  $([ "$par_skip_duplicate_marking" = "true" ] && echo "-u") \
+  $([ "$par_extra_information" = "true" ] && echo "-X") \
+  $([ "$par_fill_gaps" = "true" ] && echo "-I")
+```
+
+
+### Step 12: Create test script
+
+
+If the unit test requires test resources, these should be provided in the `test_resources` section of the component. 
 
 ```yaml
 functionality:
   # ...
   test_resources:
-    - type: python_script
-      path: script.py
+    - type: bash_script
+      path: test.sh
+    - type: file
+      path: test_data
 ```
 
-With `script.py`:
-
-```python
-# ... todo
-```
-
-The bare minimum of the unit test is to run the component and check whether the output exists. Ideally, the unit test should also check whether the output is correct.
-
-## Provide test resources
-
-If the unit test requires test resources, these should be provided in the `test_resources` section of the component.
-
-```yaml
-# ... todo
-```
-
-TODO: discuss hosting test resources
-
-## Versioning
-
-If the component uses custom software (not installed via Apt, Apk, Yum, Pip, Conda, or R), a Bash script `version.sh` needs to be provided that outputs the version of the software. 
-
-The output of this script should be a yaml file with the version of each software as a string.
-
-```yaml
-functionality:
-  # ...
-  version:
-    type: bash
-    path: version.sh
-```
-
-With `version.sh`:
+Create a test script at `src/xxx/test.sh` that runs the component with the test data. This script should run the component (available with `$meta_executable`) with the test data and check if the output is as expected. The script should exit with a non-zero exit code if the output is not as expected. For example:
 
 ```bash
 #!/bin/bash
 
-cat <<-END_VERSIONS
-star: "$(STAR --version | sed -e "s/STAR_//g")"
-samtools: "$(echo $(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*$//')"
-gawk: "$(echo $(gawk --version 2>&1) | sed 's/^.*GNU Awk //; s/, .*$//')"
-END_VERSIONS
+## VIASH START
+## VIASH END
+
+echo "> Run xxx with test data"
+"$meta_executable" \
+  --input "$meta_resources_dir/test_data/input.txt" \
+  --output "output.txt" \
+  --option
+
+echo ">> Checking output"
+[ ! -f "output.txt" ] && echo "Output file output.txt does not exist" && exit 1
 ```
 
-## File format specifications
 
-If a component returns a directory or data structure such as AnnData or MuData, a specification of the file format should be provided.
+For example, this is what the test script for the `arriba` component looks like:
 
-### Directory file format specification
+```bash
+#!/bin/bash
 
-```yaml
-functionality:
-  # ...
-  arguments:
-    - name: --output
-      type: file
-      # ...
-      example: output/
-      info:
-        format:
-          - type: directory
-            contents:
-              - type: file
-                name: counts.csv
-                description: Normalised expression values
-                required: true
-              - type: file
-                name: size_factors.csv
-                description: The size factors created by the normalisation method, if any.
-                required: false
+## VIASH START
+## VIASH END
+
+echo "> Run arriba with blacklist"
+"$meta_executable" \
+  --bam "$meta_resources_dir/test_data/A.bam" \
+  --genome "$meta_resources_dir/test_data/genome.fasta" \
+  --gene_annotation "$meta_resources_dir/test_data/annotation.gtf" \
+  --blacklist "$meta_resources_dir/test_data/blacklist.tsv" \
+  --fusions "fusions.tsv" \
+  --fusions_discarded "fusions_discarded.tsv" \
+  --interesting_contigs "1,2"
+
+echo ">> Checking output"
+[ ! -f "fusions.tsv" ] && echo "Output file fusions.tsv does not exist" && exit 1
+[ ! -f "fusions_discarded.tsv" ] && echo "Output file fusions_discarded.tsv does not exist" && exit 1
+
+echo ">> Check if output is empty"
+[ ! -s "fusions.tsv" ] && echo "Output file fusions.tsv is empty" && exit 1
+[ ! -s "fusions_discarded.tsv" ] && echo "Output file fusions_discarded.tsv is empty" && exit 1
 ```
 
-### AnnData file format specification
+### Step 12: Create a `/var/software_versions.txt` file
+
+For the sake of transparency and reproducibility, we require that the versions of the software used in the component are documented.
+
+For now, this is managed by creating a file `/var/software_versions.txt` in the `setup` section of the Docker engine.
 
 ```yaml
-functionality:
-  # ...
-  arguments:
-    - name: --output
-      type: file
-      # ...
-      example: output.h5ad
-      info:
-        format:
-          layers:
-            - type: double
-              name: normalized
-              description: Normalised expression values
-              required: true
-          obs:
-            - type: double
-              name: size_factors
-              description: The size factors created by the normalisation method, if any.
-              required: false
-          uns:
-            - type: string
-              name: normalization_id
-              description: "Which normalization was used"
-              required: true
+engines:
+  - type: docker
+    image: quay.io/biocontainers/xxx:0.1.0--py_0
+    setup:
+      - type: docker
+        run: |
+          echo "xxx: \"0.1.0\"" > /var/software_versions.txt
 ```
