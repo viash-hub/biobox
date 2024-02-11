@@ -8,6 +8,9 @@ yaml_file <- "src/star/star_align/argument_groups.yaml"
 
 param_txt <- readr::read_lines(local_file)
 
+# replace non-ascii characters with their ascii approximations
+param_txt <- iconv(param_txt, "UTF-8", "ASCII", sub = "byte")
+
 dev_begin <- grep("#####UnderDevelopment_begin", param_txt)
 dev_end <- grep("#####UnderDevelopment_end", param_txt)
 
