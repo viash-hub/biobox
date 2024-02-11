@@ -13,8 +13,8 @@ par = {
         "src/star/star_align/test_data/a_R2.1.fastq",
         "src/star/star_align/test_data/a_R2.2.fastq",
     ],
-    "genome_dir": "src/star/star_align/test_data/genome.fasta",
-    "output": "test_output"
+    "genomeDir": "src/star/star_align/test_data/genome.fasta",
+    "aligned_reads": "aligned_reads.sam"
 }
 meta = {
     "cpus": 8,
