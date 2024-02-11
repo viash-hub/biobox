@@ -9,7 +9,7 @@ functionality:
       documentation: https://busco.ezlab.org/busco_userguide.html
       repository: https://gitlab.com/ezlab/busco
     references:
-      doi: "10.1007/978-1-4939-9173-0_14"
+      doi: 10.1007/978-1-4939-9173-0_14
   license: MIT
   argument_groups:
     - name: Inputs
