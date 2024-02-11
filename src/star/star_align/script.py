@@ -22,6 +22,7 @@ meta = {
 }
 ## VIASH END
 
+##################################################
 # check and process SE / PE R1 input files
 fq1 = par["input"]
 input_str = ','.join(par["input"])
@@ -38,6 +39,8 @@ if fq2 is not None:
 # store readFilesIn
 par["readFilesIn"] = input_str
 
+##################################################
+
 # determine readFilesCommand
 if fq1[0].endswith(".gz"):
     print(">> Input files are gzipped, setting readFilesCommand to zcat", flush=True)
@@ -46,6 +49,7 @@ elif fq1[0].endswith(".bz2"):
     print(">> Input files are bzipped, setting readFilesCommand to bzcat", flush=True)
     par["readFilesCommand"] = "bzcat"
 
+##################################################
 # store output paths
 expected_outputs = {
     "aligned_reads": ["Aligned.out.sam", "Aligned.out.bam"],
@@ -60,16 +64,24 @@ output_paths = {name: par[name] for name in expected_outputs.keys()}
 for name in expected_outputs.keys():
     par[name] = None
 
+# TODO: Depending on the desired outputs,
+# additional parameters might need to be set.
+
+##################################################
+# process other args
+par["runMode"] = "alignReads"
+
+if 'cpus' in meta and meta['cpus']:
+    par["runThreadN"] = meta["cpus"]
+
+##################################################
+# run STAR and move output to final destination
 with tempfile.TemporaryDirectory(prefix="star-", dir=meta["temp_dir"], ignore_cleanup_errors=True) as temp_dir:
     print(">> Constructing command", flush=True)
 
-    par["runMode"] = "alignReads"
     par["outTmpDir"] = temp_dir + "/tempdir"
     par["outFileNamePrefix"] = temp_dir + "/out/"
     out_dir = Path(temp_dir) / "out"
-
-    if 'cpus' in meta and meta['cpus']:
-        par["runThreadN"] = meta["cpus"]
 
     cmd_args = [ "STAR" ]
     for name, value in par.items():
