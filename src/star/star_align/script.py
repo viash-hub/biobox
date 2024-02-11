@@ -5,27 +5,27 @@ from pathlib import Path
 
 ## VIASH START
 par = {
-    'input': [
-        'src/star/star_align/test_data/a_R1.1.fastq',
-        'src/star/star_align/test_data/a_R1.2.fastq',
+    "input": [
+        "src/star/star_align/test_data/a_R1.1.fastq",
+        "src/star/star_align/test_data/a_R1.2.fastq",
     ],
-    'input_r2': [
-        'src/star/star_align/test_data/a_R2.1.fastq',
-        'src/star/star_align/test_data/a_R2.2.fastq',
+    "input_r2": [
+        "src/star/star_align/test_data/a_R2.1.fastq",
+        "src/star/star_align/test_data/a_R2.2.fastq",
     ],
-    'genome_dir': 'src/star/star_align/test_data/genome.fasta',
-    'output': 'test_output'
+    "genome_dir": "src/star/star_align/test_data/genome.fasta",
+    "output": "test_output"
 }
 meta = {
-    'cpus': 8,
-    'temp_dir': '/tmp'
+    "cpus": 8,
+    "temp_dir": "/tmp"
 }
 ## VIASH END
 
 ##################################################
 # check and process SE / PE R1 input files
 input_r1 = par["input"]
-readFilesIn = ','.join(par["input"])
+readFilesIn = ",".join(par["input"])
 par["input"] = None
 
 # check and process PE R2 input files
@@ -33,7 +33,7 @@ input_r2 = par["input_r2"]
 if input_r2 is not None:
     if len(input_r1) != len(input_r2):
         raise ValueError("The number of R1 and R2 files do not match.")
-    readFilesIn = [readFilesIn, ','.join(par["input_r2"])]
+    readFilesIn = [readFilesIn, ",".join(par["input_r2"])]
     par["input_r2"] = None
 
 # store readFilesIn
@@ -71,7 +71,7 @@ for name in expected_outputs.keys():
 # process other args
 par["runMode"] = "alignReads"
 
-if 'cpus' in meta and meta['cpus']:
+if "cpus" in meta and meta["cpus"]:
     par["runThreadN"] = meta["cpus"]
 
 ##################################################
@@ -96,7 +96,7 @@ with tempfile.TemporaryDirectory(prefix="star-", dir=meta["temp_dir"], ignore_cl
 
     # run command
     print(">> Running STAR with command:", flush=True)
-    print("+ " + ' '.join([str(x) for x in cmd_args]), flush=True)
+    print("+ " + " ".join([str(x) for x in cmd_args]), flush=True)
     print("", flush=True)
     subprocess.run(
         cmd_args,
