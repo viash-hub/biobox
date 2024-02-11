@@ -24,28 +24,28 @@ meta = {
 
 ##################################################
 # check and process SE / PE R1 input files
-fq1 = par["input"]
-input_str = ','.join(par["input"])
+input_r1 = par["input"]
+readFilesIn = ','.join(par["input"])
 par["input"] = None
 
 # check and process PE R2 input files
-fq2 = par["input_r2"]
-if fq2 is not None:
-    if len(fq1) != len(fq2):
+input_r2 = par["input_r2"]
+if input_r2 is not None:
+    if len(input_r1) != len(input_r2):
         raise ValueError("The number of R1 and R2 files do not match.")
-    input_str = [input_str, ','.join(par["input_r2"])]
+    readFilesIn = [readFilesIn, ','.join(par["input_r2"])]
     par["input_r2"] = None
 
 # store readFilesIn
-par["readFilesIn"] = input_str
+par["readFilesIn"] = readFilesIn
 
 ##################################################
 
 # determine readFilesCommand
-if fq1[0].endswith(".gz"):
+if input_r1[0].endswith(".gz"):
     print(">> Input files are gzipped, setting readFilesCommand to zcat", flush=True)
     par["readFilesCommand"] = "zcat"
-elif fq1[0].endswith(".bz2"):
+elif input_r1[0].endswith(".bz2"):
     print(">> Input files are bzipped, setting readFilesCommand to bzcat", flush=True)
     par["readFilesCommand"] = "bzcat"
 
@@ -79,10 +79,12 @@ if 'cpus' in meta and meta['cpus']:
 with tempfile.TemporaryDirectory(prefix="star-", dir=meta["temp_dir"], ignore_cleanup_errors=True) as temp_dir:
     print(">> Constructing command", flush=True)
 
+    # set output paths
     par["outTmpDir"] = temp_dir + "/tempdir"
     par["outFileNamePrefix"] = temp_dir + "/out/"
     out_dir = Path(temp_dir) / "out"
 
+    # construct command
     cmd_args = [ "STAR" ]
     for name, value in par.items():
         if value is not None:
@@ -92,18 +94,18 @@ with tempfile.TemporaryDirectory(prefix="star-", dir=meta["temp_dir"], ignore_cl
                 cmd_args.extend(["--" + name, str(value)])
     print("", flush=True)
 
+    # run command
     print(">> Running STAR with command:", flush=True)
     print("+ " + ' '.join([str(x) for x in cmd_args]), flush=True)
     print("", flush=True)
-
     subprocess.run(
         cmd_args,
         check=True
     )
-
     print(">> STAR finished successfully", flush=True)
     print("", flush=True)
 
+    # move output to final destination
     print(">> Moving output to final destination", flush=True)
     for name, paths in expected_outputs.items():
         for expected_path in [paths] if isinstance(paths, str) else paths:
