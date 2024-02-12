@@ -3,7 +3,6 @@ functionality:
   namespace: busco
   description: Downloads available busco datasets
   info:
-    keywords: [lineage datasets]
     links:
       homepage: https://busco.ezlab.org/
       documentation: https://busco.ezlab.org/busco_userguide.html
