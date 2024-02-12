@@ -23,6 +23,8 @@
 
 ## MINOR CHANGES
 
+* Uniformize component metadata (PR #23).
+
 ## DOCUMENTATION
 
 ## BUG FIXES
