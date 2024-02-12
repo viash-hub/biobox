@@ -36,7 +36,7 @@ functionality:
           alternatives: -f
           type: file
           description: |
-            Indexed reference fasta file (gzip supported) [null].
+            Indexed reference fasta file (gzip supported). Default: none.
           required: true
           example: "reference.fasta"
     - name: Outputs
@@ -45,7 +45,7 @@ functionality:
           alternatives: -o
           type: file
           description: |
-            Vcf output file [- = stdout].
+            Vcf output file. Default: stdout.
           required: true
           direction: output
           example: "output.vcf"
@@ -55,55 +55,55 @@ functionality:
           alternatives: -r
           type: string
           description: |
-            Limit calls to this region (chrom:start-end) [null].
+            Limit calls to this region (chrom:start-end). Default: none.
           required: false
           example: "chr1:1000-2000"
         - name: --bed
           alternatives: -l
           type: file
           description: |
-            List of positions (chr pos) or regions (BED) [null].
+            List of positions (chr pos) or regions (BED). Default: none.
           required: false
           example: "regions.bed"
         - name: --min_bq
           alternatives: -q
           type: integer
           description: |
-            Skip any base with baseQ smaller than INT [6].
+            Skip any base with baseQ smaller than INT. Default: 6.
           required: false
           example: 6
         - name: --min_alt_bq
           alternatives: -Q
           type: integer
           description: |
-            Skip alternate bases with baseQ smaller than INT [6].
+            Skip alternate bases with baseQ smaller than INT. Default: 6.
           required: false
           example: 6
         - name: --def_alt_bq
           alternatives: -R
           type: integer
           description: |
-            Overwrite baseQs of alternate bases (that passed bq filter) with this value (-1: use median ref-bq; 0: keep) [0].
+            Overwrite baseQs of alternate bases (that passed bq filter) with this value (-1: use median ref-bq; 0: keep). Default: 0.
           required: false
           example: 0
         - name: --min_jq
           alternatives: -j
           type: integer
           description: |
-            Skip any base with joinedQ smaller than INT [0].
+            Skip any base with joinedQ smaller than INT. Default: 0.
           example: 0
         - name: --min_alt_jq
           alternatives: -J
           type: integer
           description: |
-            Skip alternate bases with joinedQ smaller than INT [0].
+            Skip alternate bases with joinedQ smaller than INT. Default: 0.
           required: false
           example: 0
         - name: --def_alt_jq
           alternatives: -K
           type: integer
           description: |
-            Overwrite joinedQs of alternate bases (that passed jq filter) with this value (-1: use median ref-bq; 0: keep) [0].
+            Overwrite joinedQs of alternate bases (that passed jq filter) with this value (-1: use median ref-bq; 0: keep). Default: 0.
           required: false
           example: 0
         - name: --no_baq
@@ -130,14 +130,14 @@ functionality:
           alternatives: -m
           type: integer
           description: |
-            Skip reads with mapping quality smaller than INT [0].
+            Skip reads with mapping quality smaller than INT. Default: 0.
           required: false
           example: 0
         - name: --max_mq
           alternatives: -M
           type: integer
           description: |
-            Cap mapping quality at INT [255].
+            Cap mapping quality at INT. Default: 255.
           required: false
           example: 255
         - name: --no_mq
@@ -169,28 +169,28 @@ functionality:
           alternatives: -T
           type: integer
           description: |
-            If >= 0, then replace non-match base qualities with this default value [-1].
+            If >= 0, then replace non-match base qualities with this default value. Default: -1.
           required: false
           example: -1
         - name: --sig
           alternatives: -a
           type: double
           description: |
-            P-Value cutoff / significance level [0.010000]
+            P-Value cutoff / significance level. Default: 0.010000.
           required: false
           example: 0.01
         - name: --bonf
           alternatives: -b
           type: string
           description: |
-            Bonferroni factor. 'dynamic' (increase per actually performed test) or INT ['dynamic']
+            Bonferroni factor. 'dynamic' (increase per actually performed test) or INT. Default: Dynamic.
           required: false
           example: "dynamic"
         - name: --min_cov
           alternatives: -C
           type: integer
           description: |
-            Test only positions having at least this coverage [1].
+            Test only positions having at least this coverage. Default: 1.
             (note: without --no-default-filter default filters (incl. coverage) kick in after predictions are done).
           required: false
           example: 1
@@ -198,7 +198,7 @@ functionality:
           alternatives: -d
           type: integer
           description: |
-            Cap coverage at this depth [1000000].
+            Cap coverage at this depth. Default: 1000000.
           required: false
           example: 1000000
         - name: --illumina_13

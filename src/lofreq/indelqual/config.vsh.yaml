@@ -40,7 +40,7 @@ functionality:
           alternatives: -o
           type: file
           description: |
-            Output BAM file [- = stdout = default].
+            Output BAM file. Default: stdout.
           required: true
           direction: output
           example: "output.bam"
