@@ -3,11 +3,13 @@ functionality:
   description: Detect gene fusions from RNA-Seq data
   info:
     keywords: [Gene fusion, RNA-Seq]
-    homepage: https://arriba.readthedocs.io/en/latest/
-    documentation: https://arriba.readthedocs.io/en/latest/
-    repository: https://github.com/suhrig/arriba
-    reference: "doi:10.1101/gr.257246.119"
-    licence: MIT
+    links:
+      homepage: https://arriba.readthedocs.io/en/latest/
+      documentation: https://arriba.readthedocs.io/en/latest/
+      repository: https://github.com/suhrig/arriba
+    references:
+      doi: 10.1101/gr.257246.119
+    license: MIT
   requirements:
     cpus: 1
     commands: [ arriba ]

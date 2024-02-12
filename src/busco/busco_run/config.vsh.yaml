@@ -1,13 +1,16 @@
 functionality:
-  name: busco
+  name: busco_run
+  namespace: busco
   description: Assessment of genome assembly and annotation completeness with single copy orthologs
   info:
     keywords: [Genome assembly, quality control]
-    homepage: https://busco.ezlab.org/
-    documentation: https://busco.ezlab.org/busco_userguide.html
-    repository: https://gitlab.com/ezlab/busco
-    reference: "10.1007/978-1-4939-9173-0_14"
-    licence: MIT
+    links:
+      homepage: https://busco.ezlab.org/
+      documentation: https://busco.ezlab.org/busco_userguide.html
+      repository: https://gitlab.com/ezlab/busco
+    references:
+      doi: 10.1007/978-1-4939-9173-0_14
+    license: MIT
   argument_groups:
     - name: Inputs
       arguments:
@@ -35,9 +38,11 @@ functionality:
           required: false
           description: |
             Specify a BUSCO lineage dataset that is most closely related to the assembly or gene set being assessed. 
-            The full list of available datasets can be viewed [here](https://busco-data.ezlab.org/v5/data/lineages/) or by running `busco --list-datasets` (which requires installing the tool).
+            The full list of available datasets can be viewed [here](https://busco-data.ezlab.org/v5/data/lineages/) or by running the busco/busco_list_datasets component.
             When unsure, the "--auto_lineage" flag can be set to automatically find the optimal lineage path.
-            Requested datasets will automatically be downloaded if not already present in the download folder.
+            BUSCO will automatically download the requested dataset if it is not already present in the download folder. 
+            You can optionally provide a path to a local dataset instead of a name, e.g. path/to/dataset.
+            Datasets can be downloaded using the busco/busco_download_dataset component.
           example: stramenopiles_odb10
 
     - name: Outputs

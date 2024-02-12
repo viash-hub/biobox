@@ -1,0 +1,38 @@
+functionality:
+  name: busco_list_datasets
+  namespace: busco
+  description: Lists the available busco datasets
+  info:
+    links:
+      homepage: https://busco.ezlab.org/
+      documentation: https://busco.ezlab.org/busco_userguide.html
+      repository: https://gitlab.com/ezlab/busco
+    references:
+      doi: 10.1007/978-1-4939-9173-0_14
+    license: MIT
+  argument_groups:
+    - name: Outputs
+      arguments:
+        - name: --output
+          alternatives: ["-o"]
+          direction: output
+          type: file
+          description: |
+            Output file of the available busco datasets
+          required: false
+          default: busco_dataset_list.txt
+          example: file.txt
+  resources:
+    - type: bash_script
+      path: script.sh
+  test_resources:
+    - type: bash_script
+      path: test.sh
+platforms:
+  - type: docker
+    image: quay.io/biocontainers/busco:5.6.1--pyhdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          busco --version | sed 's/BUSCO\s\(.*\)/busco: "\1"/' > /var/software_versions.txt
+  - type: nextflow
