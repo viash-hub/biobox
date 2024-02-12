@@ -41,7 +41,7 @@ functionality:
           example: "reference.fasta"
     - name: Outputs
       arguments:
-        - name: --output
+        - name: --out
           alternatives: -o
           type: file
           description: |

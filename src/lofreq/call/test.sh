@@ -9,7 +9,7 @@ echo "> Run lofreq call"
   --input "$dir_in/a.bam" \
   --input_bai "$dir_in/a.bai" \
   --ref "$dir_in/genome.fasta" \
-  --output "output.vcf" \
+  --out "output.vcf" \
 
 echo ">> Checking output"
 [ ! -f "output.vcf" ] && echo "Output file output.vcf does not exist" && exit 1

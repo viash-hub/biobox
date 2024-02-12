@@ -23,7 +23,7 @@
 # Run lofreq call
 lofreq call \
   -f "$par_ref" \
-  -o "$par_output" \
+  -o "$par_out" \
   ${par_region:+-r "${par_region}"} \
   ${par_bed:+-l "${par_bed}"} \
   ${par_min_bq:+-q "${par_min_bq}"} \
