@@ -11,9 +11,11 @@ functionality:
     LoFreq* is very sensitive; most notably, it is able to predict variants below the average base-call quality (i.e. sequencing error rate). Each variant call is assigned a p-value which allows for rigorous false positive control. Even though it uses no approximations or heuristics, it is very efficient due to several runtime optimizations and also provides a (pseudo-)parallel implementation. LoFreq* is generic and fast enough to be applied to high-coverage data and large genomes. On a single processor it takes a minute to analyze Dengue genome sequencing data with nearly 4000X coverage, roughly one hour to call SNVs on a 600X coverage E.coli genome and also roughly an hour to run on a 100X coverage human exome dataset.
   info:
     keywords: [ "variant calling", "low frequancy variant calling", "lofreq", "lofreq/call"]
-    homepage: https://csb5.github.io/lofreq/
-    documentation: https://csb5.github.io/lofreq/commands/
-    reference: doi:10.1093/nar/gks918
+    links:
+      homepage: https://csb5.github.io/lofreq/
+      documentation: https://csb5.github.io/lofreq/commands/
+    reference: 
+      doi: 10.1093/nar/gks918
     license: "MIT"
   requirements:
     commands: [ lofreq ]
