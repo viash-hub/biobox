@@ -191,12 +191,13 @@ functionality:
           type: boolean_false
           description: |
             Allow only mismatches in alignments.
+
         - name: --times
           type: integer
           alternatives: [-n]
           description: |
-            Remove up to COUNT adapters from each read.
-          default: 1
+            Remove up to COUNT adapters from each read. Default: 1.
+          example: 1
         - name: --overlap
           alternatives: [-O]
           type: integer
