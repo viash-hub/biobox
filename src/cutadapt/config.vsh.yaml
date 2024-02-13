@@ -174,10 +174,14 @@ functionality:
       arguments:
         - name: --input
           type: file
-          multiple: true
           required: true
           description: |
-            Input fastq files. Paired reads are delimited with a space.
+            Input fastq file for single-end reads or R1 for paired-end reads.
+        - name: --input_r2
+          type: file
+          required: false
+          description: |
+            Input fastq file for R2 in the case of paired-end reads.
         - name: --error_rate
           alternatives: [-E, --errors]
           type: double

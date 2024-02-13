@@ -12,14 +12,17 @@ fi
 echo "Running cutadapt"
 echo
 echo ">> Paired-end data or not?"
-IFS=':' read -a inputs <<< "$par_input"
-input=$(echo $par_input | tr ':' ' ')
 
-nr_inputs="${#inputs[@]}"
-
-[[ $nr_inputs = 1 ]] && echo "  Single end" && mode="se"
-[[ $nr_inputs = 2 ]] && echo "  Paired end" && mode="pe"
-[[ $nr_inputs = 3 ]] && echo "  Too much input !!!" && exit 1
+mode=""
+if [[ -z $par_input_r2 ]]; then
+  mode="se"
+  echo "  Single end"
+  input="$par_input"
+else
+  echo "  Paired end"
+  mode="pe"
+  input="$par_input $par_input_r2"
+fi
 
 # Adapter arguments
 #   - paired and single-end

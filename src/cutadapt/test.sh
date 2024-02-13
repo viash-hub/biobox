@@ -31,7 +31,7 @@ echo "> Run cutadapt on paired-end data"
   --output output-dir \
   --adapter AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC \
   --input $dir_in/pe/a.1.fastq \
-  --input $dir_in/pe/a.2.fastq \
+  --input_r2 $dir_in/pe/a.2.fastq \
   --quality_cutoff 20 \
   --json
 
