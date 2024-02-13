@@ -1,0 +1,24 @@
+functionality:
+  namespace: bowtie2
+  info:
+    links:
+      homepage: http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+      repository: https://github.com/BenLangmead/bowtie2
+      documentation: http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
+    references:
+      doi: 10.1038/nmeth.1923
+  resources:
+    - type: bash_script
+      path: script.sh
+  test_resources:
+    - type: bash_script
+      path: test.sh
+platforms:
+  - type: docker
+    image: quay.io/biocontainers/bowtie2:2.5.3--py310ha0a81b8_0
+    setup: 
+      - type: docker
+        run: |
+          version=$(bowtie2 --version | grep 'bowtie2-align-s version' | sed 's/.*version\s//') && \
+          echo "bowtie2: $version" > /var/software_versions.txt
+  - type: nextflow

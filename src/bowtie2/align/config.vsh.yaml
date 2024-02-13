@@ -1,0 +1,9 @@
+__merge__: ../config.vsh.yaml
+functionality:
+  name: bowtie2_align
+  description: |
+    Align reads to a reference genome using Bowtie2.
+
+    Bowtie 2 is an ultrafast and memory-efficient tool for aligning sequencing reads to long reference sequences.
+  info:
+    keywords: [ "align", "map", "fasta", "fastq", "genome", "reference" ]
