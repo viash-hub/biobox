@@ -33,12 +33,12 @@ adapter_args=$(echo \
   ${par_front_fasta:+--front "file:${par_front_fasta}"} \
   ${par_anywhere:+--anywhere "${par_anywhere}"} \
   ${par_anywhere_fasta:+--anywhere "file:${par_anywhere_fasta}"} \
-  ${par_adapterR2:+--adapterR2 "${par_adapterR2}"} \
-  ${par_adapterR2_fasta:+--adapterR2 "file:${par_adapterR2_fasta}"} \
-  ${par_frontR2:+--frontR2 "${par_frontR2}"} \
-  ${par_frontR2_fasta:+--frontR2 "file:${par_frontR2_fasta}"} \
-  ${par_anywhereR2:+--anywhereR2 "${par_anywhereR2}"} \
-  ${par_anywhereR2_fasta:+--anywhereR2 "file:${par_anywhereR2_fasta}"}
+  ${par_adapter_r2:+--adapter_r2 "${par_adapter_r2}"} \
+  ${par_adapter_r2_fasta:+--adapter_r2 "file:${par_adapter_r2_fasta}"} \
+  ${par_front_r2:+--front_r2 "${par_front_r2}"} \
+  ${par_front_r2_fasta:+--front_r2 "file:${par_front_r2_fasta}"} \
+  ${par_anywhere_r2:+--anywhere_r2 "${par_anywhere_r2}"} \
+  ${par_anywhere_r2_fasta:+--anywhere_r2 "file:${par_anywhere_r2_fasta}"}
 )
 echo "Arguments to cutadapt:"
 echo "$adapter_args"
@@ -90,10 +90,10 @@ echo ">> Parsing read modification arguments"
 
 mod_args=$(echo \
   ${par_cut:+--cut "${par_cut}"} \
-  ${par_cutR2:+--cutR2 "${par_cutR2}"} \
+  ${par_cut_r2:+--cut_r2 "${par_cut_r2}"} \
   ${par_nextseq_trim:+--nextseq-trim "${par_nextseq_trim}"} \
   ${par_quality_cutoff:+--quality-cutoff "${par_quality_cutoff}"} \
-  ${par_quality_cutoffR2:+--quality-cutoffR2 "${par_quality_cutoffR2}"} \
+  ${par_quality_cutoff_r2:+--quality-cutoff_r2 "${par_quality_cutoff_r2}"} \
   ${par_quality_base:+--quality-base "${par_quality_base}"} \
   ${par_poly_a:+--poly-a} \
   ${par_length:+--length "${par_length}"} \

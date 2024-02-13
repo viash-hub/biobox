@@ -83,7 +83,7 @@ functionality:
     ####################################################################
     - name: Specify Adapters for R2
       arguments:
-        - name: --adapterR2
+        - name: --adapter_r2
           alternatives: [-A]
           type: string
           multiple: true
@@ -93,7 +93,7 @@ functionality:
             trimmed. If a '$' character is appended ('anchoring'), the
             adapter is only found if it is a suffix of the read.
           required: false
-        - name: --frontR2
+        - name: --front_r2
           alternatives: [-G]
           type: string
           multiple: true
@@ -104,7 +104,7 @@ functionality:
             a '^' character is prepended ('anchoring'), the adapter is
             only found if it is a prefix of the read.
           required: false
-        - name: --anywhereR2
+        - name: --anywhere_r2
           alternatives: [-B]
           type: string
           multiple: true
@@ -121,7 +121,7 @@ functionality:
     ####################################################################
     - name: Specify Adapters using Fasta files for R2
       arguments:
-        - name: --adapterR2_fasta
+        - name: --adapter_r2_fasta
           type: file
           description: |
             Fasta file containing sequences of an adapter ligated to the 3' end (paired data:
@@ -129,7 +129,7 @@ functionality:
             trimmed. If a '$' character is appended ('anchoring'), the
             adapter is only found if it is a suffix of the read.
           required: false
-        - name: --frontR2_fasta
+        - name: --front_r2_fasta
           type: file
           description: |
             Fasta file containing sequences of an adapter ligated to the 5' end (paired data:
@@ -138,7 +138,7 @@ functionality:
             a '^' character is prepended ('anchoring'), the adapter is
             only found if it is a prefix of the read.
           required: false
-        - name: --anywhereR2_fasta
+        - name: --anywhere_r2_fasta
           type: file
           description: |
             Fasta file containing sequences of an adapter that may be ligated to the 5' or 3'
@@ -242,12 +242,12 @@ functionality:
           type: integer
           multiple: true
           description: |
-            Remove LEN bases from each read (or R1 if paired; use --cutR2
+            Remove LEN bases from each read (or R1 if paired; use --cut_r2
             option for R2). If LEN is positive, remove bases from the
             beginning. If LEN is negative, remove bases from the end.
             Can be used twice if LENs have different signs. Applied
             *before* adapter trimming.
-        - name: --cutR2
+        - name: --cut_r2
           type: integer
           multiple: true
           description: |
@@ -269,7 +269,7 @@ functionality:
             paired. If one value is given, only the 3' end is trimmed.
             If two comma-separated cutoffs are given, the 5' end is
             trimmed with the first cutoff, the 3' end with the second.
-        - name: --quality_cutoffR2
+        - name: --quality_cutoff_r2
           alternatives: [-Q]
           type: string
           description: |
