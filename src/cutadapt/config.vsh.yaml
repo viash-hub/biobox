@@ -435,7 +435,7 @@ functionality:
       path: test_data
 platforms:
   - type: docker
-    image: python:3.8
+    image: python:3.12
     setup:
       - type: python
         pip:
