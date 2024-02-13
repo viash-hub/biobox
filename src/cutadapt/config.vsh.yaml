@@ -185,8 +185,8 @@ functionality:
             Maximum allowed error rate (if 0 <= E < 1), or absolute
             number of errors for full-length adapter match (if E is an
             integer >= 1). Error rate = no. of errors divided by
-            length of matching region.
-          default: 0.1
+            length of matching region. Default: 0.1 (10%).
+          example: 0.1
         - name: --no_indels
           type: boolean_false
           description: |
