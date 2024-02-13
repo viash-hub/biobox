@@ -207,8 +207,8 @@ functionality:
           type: integer
           description: |
             Require MINLENGTH overlap between read and adapter for an
-            adapter to be found.
-          default: 3
+            adapter to be found. The default is 3.
+          example: 3
         - name: --match_read_wildcards
           type: boolean_true
           description: |
@@ -230,7 +230,8 @@ functionality:
             up- or downstream sequence; retain: trim, but retain
             adapter; mask: replace with 'N' characters; lowercase:
             convert to lowercase; none: leave unchanged.
-          default: trim
+            The default is trim.
+          example: trim
         - name: --revcomp
           alternatives: [--rc]
           type: boolean_true
@@ -284,8 +285,8 @@ functionality:
           description: |
             Assume that quality values in FASTQ are encoded as
             ascii(quality + N). This needs to be set to 64 for some
-            old Illumina FASTQ files.
-          default: 33
+            old Illumina FASTQ files. The default is 33.
+          example: 33
         - name: --poly_a
           type: boolean_true
           description: Trim poly-A tails
@@ -345,8 +346,8 @@ functionality:
           alternatives: [-m]
           type: string
           description: |
-            Discard reads shorter than LEN.
-          default: "0"
+            Discard reads shorter than LEN. Default is 0.
+          example: "0"
         - name: --maximum_length
           alternatives: [-M]
           type: string
@@ -394,8 +395,8 @@ functionality:
           type: string
           choices: [full, minimal]
           description: |
-            Which type of report to print: 'full' or 'minimal'.
-          default: full
+            Which type of report to print: 'full' (default) or 'minimal'.
+          example: full
         - name: --json
           type: boolean_true
           description: |
