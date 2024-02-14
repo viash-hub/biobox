@@ -230,7 +230,7 @@ Finally, add all other arguments to the config file. There are a few exceptions:
 
 Note:
 
-* If the documentation mentions a default value for some of the arguments, please don't add them as default values in the Viash config, but instead as an example. This is because the documentation of the tool might be incorrect or outdated, and by adding a default value to the Viash config we might be changing the default behaviour of the tool. For example, do not write `name: --my_arg, description: My arg, default: 10`, but instead `name: --my_arg, description: "My arg. Default: 10.", example: 10`.
+* If the documentation mentions a default value for some of the arguments, please don't add them as default values in the Viash config, but instead as an example. This is because the documentation of the tool might be incorrect or outdated, and by adding a default value to the Viash config we might be changing the default behaviour of the tool. For example, do not write `name: --my_arg, description: "<description>", default: 10`, but instead `name: --my_arg, description: "<description>. Default: 10.", example: 10`.
   
 
 ### Step 10: Add a Docker engine
