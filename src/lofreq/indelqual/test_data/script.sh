@@ -1,10 +1,44 @@
-# pear test data
+#!/bin/bash
 
-# Test data was obtained from https://github.com/snakemake/snakemake-wrappers/tree/master/bio/lofreq/indelqual/test/data
+set -e
 
-if [ ! -d /tmp/snakemake-wrappers ]; then
-  git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
-fi
+TMPDIR=$(mktemp -d)
+trap "rm -rf $TMPDIR" EXIT
 
-cp -r /tmp/snakemake-wrappers/bio/lofreq/indelqual/test/data/* src/lofreq/indelqual/test_data
+### Step 1: Generate Test Reference FASTA File (`test.fa`)
 
+cat > $TMPDIR/test.fa <<EOF
+>chr1
+AACTCTCCGTGCTGTCCGGGGTCACTGTGATGCCAGTGCCGTCGACGGACCACAGGAGCGCCGCCAATTACGATTTATA
+GGCGGCCCGGCCGATTATATCTTTGGCGGTCCCCTAGGCTCTCTAGGGGCCCGCACTGAAGAGGGCAACTCTGCAAGGA
+CACGAATCTGACTCCTTAATAAAGGTGTGAAATCTGTCCGGTCGTCTCCTAATATGGGGCTTCATCATCTCAGGCGAAA
+TCAGCGCCCGACGGGCCATAGTAAGCGGTGTTGTGGCATAGGTGCAGGTGGCCACCGATTATAACAGGATGACATACGC
+GGAATTCGGGGTATGATGCTCTCCCGACACTTTGAGACAATAAATAGTTTAGTGTCCTGATGGTCTAAACCGAAGTCAT
+TCAAAATAGCTAAGTGTAGTCTTCCCGTTCTAGGGATAGTCTAGGACATGCCCTATATTGGTTTTCTCTTACCGCGGAC
+TACTCCCGCGCCCTCGGAGGTGTCTCAATTCATCCATGTTGATCCTTCAAATCGGGGCAGCGACGGGGGCACGGAGGGG
+GTACGATAACCGCTAAATTGACCACCACCATCGATGATTCTACCATCTCTATCCATCCAACCCTTTTTTTGTTTATTTC
+CTCTATGGGTTACAGCTA
+EOF
+
+### Step 2: Index the Reference FASTA File
+
+samtools faidx $TMPDIR/test.fa
+
+### Step 3: Generate Test Reads with `wgsim`
+
+wgsim -N 100 -1 70 -2 70 $TMPDIR/test.fa $TMPDIR/reads1.fq $TMPDIR/reads2.fq
+
+### Step 4: Align Reads to Generate BAM File
+
+bwa index $TMPDIR/test.fa
+
+bwa mem $TMPDIR/test.fa $TMPDIR/reads1.fq $TMPDIR/reads2.fq > $TMPDIR/aligned_reads.sam
+
+### Step 5: Convert SAM to BAM, Sort, and Index
+
+samtools view -Sb $TMPDIR/aligned_reads.sam > $TMPDIR/test.bam
+
+### Step 6: Copy output
+
+cp $TMPDIR/test.bam src/lofreq/indelqual/test_data/test.bam
+cp $TMPDIR/test.fa src/lofreq/indelqual/test_data/test.fa
