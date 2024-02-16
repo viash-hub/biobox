@@ -13,3 +13,4 @@ cp -r /tmp/snakemake-wrappers/bio/cutadapt/se/test/reads/* src/cutadapt/test_dat
 cp -r /tmp/snakemake-wrappers/bio/cutadapt/pe/test/reads/* src/cutadapt/test_data/pe
 
 rm -rf /tmp/snakemake-wrappers
+

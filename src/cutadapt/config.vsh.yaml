@@ -53,6 +53,7 @@ functionality:
       arguments:
         - name: --adapter_fasta
           type: file
+          multiple: true
           description: |
             Fasta file containing sequences of an adapter ligated to the 3' end (paired data:
             of the first read). The adapter and subsequent bases are

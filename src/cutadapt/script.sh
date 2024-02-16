@@ -28,20 +28,82 @@ fi
 #   - paired and single-end
 #   - string and fasta
 ###########################################################
+
+multi_adapter=""
+for adapter in `echo $par_adapter | tr ':' ' '`; do
+  multi_adapter="$multi_adapter --adapter $adapter"
+done
+
+multi_adapter_fasta=""
+for adapter_fasta in `echo $par_adapter_fasta | tr ':' ' '`; do
+  multi_adapter_fasta="$multi_adapter_fasta --adapter file:$adapter_fasta"
+done
+
+multi_adapter_r2=""
+for adapter_r2 in `echo $par_adapter_r2 | tr ':' ' '`; do
+  multi_adapter_r2="$multi_adapter_r2 --adapter_r2 $adapter_r2"
+done
+
+multi_adapter_fasta_r2=""
+for adapter_fasta_r2 in `echo $par_adapter_fasta_r2 | tr ':' ' '`; do
+  multi_adapter_fasta_r2="$multi_adapter_fasta_r2 --adapter file:$adapter_fasta_r2"
+done
+
+multi_front=""
+for front in `echo $par_front | tr ':' ' '`; do
+  multi_front="$multi_front --front $front"
+done
+
+multi_front_fasta=""
+for front_fasta in `echo $par_front_fasta | tr ':' ' '`; do
+  multi_front_fasta="$multi_front_fasta --front file:$front_fasta"
+done
+
+multi_front_r2=""
+for front_r2 in `echo $par_front_r2 | tr ':' ' '`; do
+  multi_front_r2="$multi_front_r2 --front_r2 $front_r2"
+done
+
+multi_front_fasta_r2=""
+for front_fasta_r2 in `echo $par_front_fasta_r2 | tr ':' ' '`; do
+  multi_front_fasta_r2="$multi_front_fasta_r2 --front file:$front_fasta_r2"
+done
+
+multi_anywhere=""
+for anywhere in `echo $par_anywhere | tr ':' ' '`; do
+  multi_anywhere="$multi_anywhere --anywhere $anywhere"
+done
+
+multi_anywhere_fasta=""
+for anywhere_fasta in `echo $par_anywhere_fasta | tr ':' ' '`; do
+  multi_anywhere_fasta="$multi_anywhere_fasta --anywhere file:$anywhere_fasta"
+done
+
+multi_anywhere_r2=""
+for anywhere_r2 in `echo $par_anywhere_r2 | tr ':' ' '`; do
+  multi_anywhere_r2="$multi_anywhere_r2 --anywhere_r2 $anywhere_r2"
+done
+
+multi_anywhere_fasta_r2=""
+for anywhere_fasta_r2 in `echo $par_anywhere_fasta_r2 | tr ':' ' '`; do
+  multi_anywhere_fasta_r2="$multi_anywhere_fasta_r2 --anywhere file:$anywhere_fasta_r2"
+done
+
 echo ">> Parsing arguments dealing with adapters"
 adapter_args=$(echo \
-  ${par_adapter:+--adapter "${par_adapter}"} \
-  ${par_adapter_fasta:+--adapter "file:${par_adapter_fasta}"} \
-  ${par_front:+--front "${par_front}"} \
-  ${par_front_fasta:+--front "file:${par_front_fasta}"} \
-  ${par_anywhere:+--anywhere "${par_anywhere}"} \
-  ${par_anywhere_fasta:+--anywhere "file:${par_anywhere_fasta}"} \
-  ${par_adapter_r2:+--adapter_r2 "${par_adapter_r2}"} \
-  ${par_adapter_r2_fasta:+--adapter_r2 "file:${par_adapter_r2_fasta}"} \
-  ${par_front_r2:+--front_r2 "${par_front_r2}"} \
-  ${par_front_r2_fasta:+--front_r2 "file:${par_front_r2_fasta}"} \
-  ${par_anywhere_r2:+--anywhere_r2 "${par_anywhere_r2}"} \
-  ${par_anywhere_r2_fasta:+--anywhere_r2 "file:${par_anywhere_r2_fasta}"}
+  ${par_adapter:+${multi_adapter}} \
+  ${par_adapter_fasta:+${multi_adapter_fasta}} \
+  ${par_front:+${multi_front}} \
+  ${par_front_fasta:+${multi_front_fasta}} \
+  ${par_anywhere:+${multi_anywhere}} \
+  ${par_anywhere_fasta:+${multi_anywhere_fasta}} \
+
+  ${par_adapter_r2:+${multi_adapter_r2}} \
+  ${par_adapter_fasta_r2:+${multi_adapter_fasta_r2}} \
+  ${par_front_r2:+${multi_front_r2}} \
+  ${par_front_fasta_r2:+${multi_front_fasta_r2}} \
+  ${par_anywhere_r2:+${multi_anywhere_r2}} \
+  ${par_anywhere_fasta_r2:+${multi_anywhere_fasta_r2}} \
 )
 echo "Arguments to cutadapt:"
 echo "$adapter_args"
