@@ -347,12 +347,17 @@ functionality:
           type: string
           description: |
             Discard reads shorter than LEN. Default is 0.
+            When trimming paired-end reads, the minimum lengths for R1 and R2 can be specified separately by separating them with a colon (:).
+            If the colon syntax is not used, the same minimum length applies to both reads, as discussed above.
+            Also, one of the values can be omitted to impose no restrictions.
+            For example, with -m 17:, the length of R1 must be at least 17, but the length of R2 is ignored.
           example: "0"
         - name: --maximum_length
           alternatives: [-M]
           type: string
           description: |
-            Discard reads longer than LEN. Default: no limit
+            Discard reads longer than LEN. Default: no limit.
+            For paired reads, see the remark for --minimum_length
         - name: --max_n
           type: string
           description: |
