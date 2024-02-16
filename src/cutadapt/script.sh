@@ -119,6 +119,9 @@ echo ">> Filtering of processed reads arguments"
 [[ "$par_discard_untrimmed" == "false" ]] && unset par_discard_untrimmed
 [[ "$par_discard_casava" == "false" ]] && unset par_discard_casava
 
+# Parse and transform the minimum and maximum length arguments
+[[ -z $par_minimum_length   ]]
+
 filter_args=$(echo \
   ${par_minimum_length:+--minimum-length "${par_minimum_length}"} \
   ${par_maximum_length:+--maximum-length "${par_maximum_length}"} \
@@ -164,7 +167,14 @@ echo "Arguments to cutadapt:"
 echo $output_args
 echo
 
+# Full CLI
+# Set the --cores argument to 0 unless meta_cpus is set
+###########################################################
 echo ">> Full CLI to be run:"
+
+par_cpus=0
+[[ ! -z $meta_cpus ]] && par_cpus=$meta_cpus
+
 cli=$(echo \
   $input \
   $adapter_args \
@@ -172,7 +182,8 @@ cli=$(echo \
   $input_args \
   $mod_args \
   $filter_args \
-  $output_args
+  $output_args \
+  --cores $par_cpus
 )
 
 echo cutadapt $cli | sed -e 's/--/\r\n  --/g'

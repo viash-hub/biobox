@@ -33,7 +33,8 @@ echo "> Run cutadapt on paired-end data"
   --input $dir_in/pe/a.1.fastq \
   --input_r2 $dir_in/pe/a.2.fastq \
   --quality_cutoff 20 \
-  --json
+  --json \
+  ---cpus 1
 
 echo ">> Checking output"
 [ ! -f "output-dir/report.txt" ] && echo "report.txt does not exist" && exit 1
