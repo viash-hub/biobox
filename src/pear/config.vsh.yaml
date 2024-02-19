@@ -6,11 +6,13 @@ functionality:
     PEAR evaluates all possible paired-end read overlaps and without requiring the target fragment size as input. In addition, it implements a statistical test for minimizing false-positive results. Together with a highly optimized implementation, it can merge millions of paired end reads within a couple of minutes on a standard desktop computer.
   info:
     keywords: [ "pair-end", "read", "merge" ]
-    homepage: https://cme.h-its.org/exelixis/web/software/pear
-    repository: https://github.com/tseemann/PEAR
-    documentation: https://cme.h-its.org/exelixis/web/software/pear/doc.html
-    reference: doi:10.1093/bioinformatics/btt593
-    licence: "CC-BY-NC-SA-3.0"
+    links:
+      homepage: https://cme.h-its.org/exelixis/web/software/pear
+      repository: https://github.com/tseemann/PEAR
+      documentation: https://cme.h-its.org/exelixis/web/software/pear/doc.html
+    references:
+      doi: 10.1093/bioinformatics/btt593
+    license: "CC-BY-NC-SA-3.0"
   requirements:
     commands: [ pear , gzip ]
   argument_groups:
