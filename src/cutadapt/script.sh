@@ -68,13 +68,12 @@ adapter_args=$(echo \
   ${par_front_fasta:+$(add_flags "$par_front_fasta" "--front" "file:")} \
   ${par_anywhere:+$(add_flags "$par_anywhere" "--anywhere")} \
   ${par_anywhere_fasta:+$(add_flags "$par_anywhere_fasta" "--anywhere" "file:")} \
-
-  ${par_adapter_r2:+$(add_flags "$par_adapter_r2" "--adapter_r2")} \
-  ${par_adapter_fasta_r2:+$(add_flags "$par_adapter_fasta_r2" "--adapter_r2" "file:")} \
-  ${par_front_r2:+$(add_flags "$par_front_r2" "--front_r2")} \
-  ${par_front_fasta_r2:+$(add_flags "$par_front_fasta_r2" "--front_r2" "file:")} \
-  ${par_anywhere_r2:+$(add_flags "$par_anywhere_r2" "--anywhere_r2")} \
-  ${par_anywhere_fasta_r2:+$(add_flags "$par_anywhere_fasta_r2" "--anywhere_r2" "file:")} \
+  ${par_adapter_r2:+$(add_flags "$par_adapter_r2" "-A")} \
+  ${par_adapter_fasta_r2:+$(add_flags "$par_adapter_fasta_r2" "-A" "file:")} \
+  ${par_front_r2:+$(add_flags "$par_front_r2" "-G")} \
+  ${par_front_fasta_r2:+$(add_flags "$par_front_fasta_r2" "-G" "file:")} \
+  ${par_anywhere_r2:+$(add_flags "$par_anywhere_r2" "-B")} \
+  ${par_anywhere_fasta_r2:+$(add_flags "$par_anywhere_fasta_r2" "-B" "file:")} \
 )
 
 echo "Arguments to cutadapt:"
