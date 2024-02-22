@@ -178,11 +178,17 @@ echo ">> Output arguments"
 [[ "$par_fasta" == "false" ]] && unset par_fasta
 [[ "$par_info_file" == "false" ]] && unset par_info_file
 
+if [[ -z $par_fasta ]]; then
+  ext="fastq"
+else
+  ext="fa"
+fi
+
 if [ $mode = "se" ]; then
   output_args=$(echo \
     ${par_report:+--report "${par_report}"} \
     ${par_json:+--json "${par_output}/report.json"} \
-    --output "$par_output/{name}_R1_001.fastq" \
+    --output "$par_output/{name}_001.$ext" \
     ${par_fasta:+--fasta} \
     ${par_info_file:+--info-file} \
   )
@@ -190,8 +196,8 @@ else
   output_args=$(echo \
     ${par_report:+--report "${par_report}"} \
     ${par_json:+--json "${par_output}/report.json"} \
-    --output "$par_output/{name}_R1_001.fastq" \
-    --paired-output "$par_output/{name}_R2_001.fastq" \
+    --output "$par_output/{name}_R1_001.$ext" \
+    --paired-output "$par_output/{name}_R2_001.$ext" \
     ${par_fasta:+--fasta} \
     ${par_info_file:+--info-file} \
   )
