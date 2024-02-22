@@ -3,10 +3,17 @@
 ## VIASH START
 ## VIASH END
 
+# unset flags
 [[ "$par_skip_duplicate_marking" == "false" ]] && unset par_skip_duplicate_marking
 [[ "$par_extra_information" == "false" ]] && unset par_extra_information
 [[ "$par_fill_gaps" == "false" ]] && unset par_fill_gaps
 
+# replace ';' with ','
+par_interesting_contigs=$(echo $par_interesting_contigs | tr ';' ',')
+par_viral_contigs=$(echo $par_viral_contigs | tr ';' ',')
+par_disable_filters=$(echo $par_disable_filters | tr ';' ',')
+
+# run arriba
 arriba \
   -x "$par_bam" \
   -a "$par_genome" \

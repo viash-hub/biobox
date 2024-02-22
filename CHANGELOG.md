@@ -2,6 +2,10 @@
 
 ## BREAKING CHANGES
 
+* Change default `multiple_sep` to `;` (PR #25). This aligns with an upcoming breaking change in
+  Viash 0.9.0 in order to avoid issues with the current default separator `:` unintentionally
+  splitting up certain file paths.
+
 ## NEW FEATURES
 
 * `arriba`: Detect gene fusions from RNA-seq data (PR #1).
@@ -28,6 +32,8 @@
 ## MINOR CHANGES
 
 * Uniformize component metadata (PR #23).
+
+* Update to Viash 0.8.5 (PR #25).
 
 ## DOCUMENTATION
 
