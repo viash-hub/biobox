@@ -4,6 +4,11 @@ set -e
 
 dir_in="$meta_resources_dir/test_data"
 
+#############################################
+mkdir test_simple_single_end
+cd test_simple_single_end
+
+echo "#############################################"
 echo "> Run cutadapt on single-end data"
 "$meta_executable" \
   --report minimal \
@@ -23,8 +28,14 @@ echo ">> Check if output is empty"
 [ -s "output-dir/1_R1_001.fastq" ] && echo "1_R1_001.fastq should be empty" && exit 1
 [ ! -s "output-dir/unknown_R1_001.fastq" ] && echo "unkown_R1_001.fastq is empty" && exit 1
 
-rm -r output-dir
+cd ..
+echo
 
+#############################################
+mkdir test_multiple_single_end
+cd test_multiple_single_end
+
+echo "#############################################"
 echo "> Run with a combination of inputs"
 
 echo ">adapter1" > adapters1.fasta
@@ -54,9 +65,14 @@ echo ">> Check if output is empty"
 [ -s "output-dir/1_R1_001.fastq" ] && echo "1_R1_001.fastq should be empty" && exit 1
 [ ! -s "output-dir/unknown_R1_001.fastq" ] && echo "unkown_R1_001.fastq is empty" && exit 1
 
-rm -r output-dir
-rm adapters?.fasta
+cd ..
+echo
 
+#############################################
+mkdir test_simple_paired_end
+cd test_simple_paired_end
+
+echo "#############################################"
 echo "> Run cutadapt on paired-end data"
 "$meta_executable" \
   --report minimal \
@@ -83,7 +99,11 @@ echo ">> Check if output is empty"
 [ ! -s "output-dir/unknown_R1_001.fastq" ] && echo "unkown_R1_001.fastq is empty" && exit 1
 [ ! -s "output-dir/unknown_R2_001.fastq" ] && echo "unkown_R2_001.fastq is empty" && exit 1
 
-rm -r output-dir
+cd ..
+echo
 
+#############################################
+
+echo "#############################################"
 echo "> Test successful"
 
