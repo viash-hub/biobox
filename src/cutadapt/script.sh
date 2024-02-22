@@ -8,6 +8,7 @@ par_json='false'
 par_output='output'
 par_fasta='false'
 par_info_file='false'
+par_debug='true'
 ## VIASH END
 
 # TODO: change this?
@@ -17,11 +18,13 @@ else
 	mkdir -p "$par_output"
 fi
 
+function debug {
+  [[ "$par_debug" == "true" ]] && echo "DEBUG: $@"
+}
 
 # Init
 ###########################################################
-echo "Running cutadapt"
-echo
+
 echo ">> Paired-end data or not?"
 
 mode=""
@@ -60,7 +63,7 @@ function add_flags {
   echo $output
 }
 
-echo ">> Parsing arguments dealing with adapters"
+debug ">> Parsing arguments dealing with adapters"
 adapter_args=$(echo \
   ${par_adapter:+$(add_flags "$par_adapter" "--adapter")} \
   ${par_adapter_fasta:+$(add_flags "$par_adapter_fasta" "--adapter" "file:")} \
@@ -76,9 +79,9 @@ adapter_args=$(echo \
   ${par_anywhere_fasta_r2:+$(add_flags "$par_anywhere_fasta_r2" "-B" "file:")} \
 )
 
-echo "Arguments to cutadapt:"
-echo "$adapter_args"
-echo
+debug "Arguments to cutadapt:"
+debug "$adapter_args"
+debug
 
 # Paired-end options
 ###########################################################
@@ -91,9 +94,9 @@ paired_args=$(echo \
   ${par_pair_filter:+--pair-filter "${par_pair_filter}"} \
   ${par_interleaved:+--interleaved}
 )
-echo "Arguments to cutadapt:"
-echo $paired_args
-echo
+debug "Arguments to cutadapt:"
+debug $paired_args
+debug
 
 # Input arguments 
 ###########################################################
@@ -113,9 +116,9 @@ input_args=$(echo \
   ${par_action:+--action "${par_action}"} \
   ${par_revcomp:+--revcomp} \
 )
-echo "Arguments to cutadapt:"
-echo $input_args
-echo
+debug "Arguments to cutadapt:"
+debug $input_args
+debug
 
 # Read modifications
 ###########################################################
@@ -141,9 +144,9 @@ mod_args=$(echo \
   ${par_rename:+--rename "${par_rename}"} \
   ${par_zero_cap:+--zero-cap} \
 )
-echo "Arguments to cutadapt:"
-echo $mod_args
-echo
+debug "Arguments to cutadapt:"
+debug $mod_args
+debug
 
 # Filtering of processed reads arguments
 ###########################################################
@@ -165,9 +168,9 @@ filter_args=$(echo \
   ${par_discard_untrimmed:+--discard-untrimmed} \
   ${par_discard_casava:+--discard-casava} \
 )
-echo "Arguments to cutadapt:"
-echo $filter_args
-echo
+debug "Arguments to cutadapt:"
+debug $filter_args
+debug
 
 # Optional output arguments
 ###########################################################
@@ -183,9 +186,9 @@ optional_output_args=$(echo \
   ${par_info_file:+--info-file "$par_output/info.txt"} \
 )
 
-echo "Arguments to cutadapt:"
-echo $optional_output_args
-echo
+debug "Arguments to cutadapt:"
+debug $optional_output_args
+debug
 
 # Output arguments
 # We write the output to a directory rather than
@@ -209,15 +212,14 @@ else
   )
 fi
 
-echo "Arguments to cutadapt:"
-echo $output_args
-echo
+debug "Arguments to cutadapt:"
+debug $output_args
+debug
 
 # Full CLI
 # Set the --cores argument to 0 unless meta_cpus is set
 ###########################################################
-echo ">> Full CLI to be run:"
-
+echo ">> Running cutadapt"
 par_cpus=0
 [[ ! -z $meta_cpus ]] && par_cpus=$meta_cpus
 
@@ -233,6 +235,8 @@ cli=$(echo \
   --cores $par_cpus
 )
 
-echo cutadapt $cli | sed -e 's/--/\r\n  --/g'
+debug ">> Full CLI to be run:"
+debug cutadapt $cli | sed -e 's/--/\r\n  --/g'
+debug
 
 cutadapt $cli | tee $par_output/report.txt

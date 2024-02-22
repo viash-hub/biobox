@@ -437,6 +437,11 @@ functionality:
         # - name: --untrimmed_paired_output
         # - name: too_short_paired_output
         # - name: too_long_paired_output
+    - name: Debug
+      arguments:
+        - type: boolean_true
+          name: --debug
+          description: Print debug information
   resources:
     - type: bash_script
       path: script.sh
