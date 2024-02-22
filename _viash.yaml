@@ -1,4 +1,4 @@
-viash_version: 0.8.4
+viash_version: 0.8.5
 
 config_mods: |
   .functionality.arguments[.multiple == true].multiple_sep := ";"

@@ -33,6 +33,8 @@
 
 * Uniformize component metadata (PR #23).
 
+* Update to Viash 0.8.5 (PR #25).
+
 ## DOCUMENTATION
 
 ## BUG FIXES
