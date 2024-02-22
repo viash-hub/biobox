@@ -1,5 +1,15 @@
 #!/bin/bash
 
+## VIASH START
+par_adapter='AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC;GGATCGGAAGAGCACACGTCTGAACTCCAGTCAC'
+par_input='src/cutadapt/test_data/se/a.fastq'
+par_report='full'
+par_json='false'
+par_output='output'
+par_fasta='false'
+par_info_file='false'
+## VIASH END
+
 if [ -z $par_output ]; then
 	par_output=.
 else
