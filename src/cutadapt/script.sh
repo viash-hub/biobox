@@ -30,62 +30,62 @@ fi
 ###########################################################
 
 multi_adapter=""
-for adapter in `echo $par_adapter | tr ':' ' '`; do
+for adapter in `echo $par_adapter | tr ';' ' '`; do
   multi_adapter="$multi_adapter --adapter $adapter"
 done
 
 multi_adapter_fasta=""
-for adapter_fasta in `echo $par_adapter_fasta | tr ':' ' '`; do
+for adapter_fasta in `echo $par_adapter_fasta | tr ';' ' '`; do
   multi_adapter_fasta="$multi_adapter_fasta --adapter file:$adapter_fasta"
 done
 
 multi_adapter_r2=""
-for adapter_r2 in `echo $par_adapter_r2 | tr ':' ' '`; do
+for adapter_r2 in `echo $par_adapter_r2 | tr ';' ' '`; do
   multi_adapter_r2="$multi_adapter_r2 --adapter_r2 $adapter_r2"
 done
 
 multi_adapter_fasta_r2=""
-for adapter_fasta_r2 in `echo $par_adapter_fasta_r2 | tr ':' ' '`; do
+for adapter_fasta_r2 in `echo $par_adapter_fasta_r2 | tr ';' ' '`; do
   multi_adapter_fasta_r2="$multi_adapter_fasta_r2 --adapter file:$adapter_fasta_r2"
 done
 
 multi_front=""
-for front in `echo $par_front | tr ':' ' '`; do
+for front in `echo $par_front | tr ';' ' '`; do
   multi_front="$multi_front --front $front"
 done
 
 multi_front_fasta=""
-for front_fasta in `echo $par_front_fasta | tr ':' ' '`; do
+for front_fasta in `echo $par_front_fasta | tr ';' ' '`; do
   multi_front_fasta="$multi_front_fasta --front file:$front_fasta"
 done
 
 multi_front_r2=""
-for front_r2 in `echo $par_front_r2 | tr ':' ' '`; do
+for front_r2 in `echo $par_front_r2 | tr ';' ' '`; do
   multi_front_r2="$multi_front_r2 --front_r2 $front_r2"
 done
 
 multi_front_fasta_r2=""
-for front_fasta_r2 in `echo $par_front_fasta_r2 | tr ':' ' '`; do
+for front_fasta_r2 in `echo $par_front_fasta_r2 | tr ';' ' '`; do
   multi_front_fasta_r2="$multi_front_fasta_r2 --front file:$front_fasta_r2"
 done
 
 multi_anywhere=""
-for anywhere in `echo $par_anywhere | tr ':' ' '`; do
+for anywhere in `echo $par_anywhere | tr ';' ' '`; do
   multi_anywhere="$multi_anywhere --anywhere $anywhere"
 done
 
 multi_anywhere_fasta=""
-for anywhere_fasta in `echo $par_anywhere_fasta | tr ':' ' '`; do
+for anywhere_fasta in `echo $par_anywhere_fasta | tr ';' ' '`; do
   multi_anywhere_fasta="$multi_anywhere_fasta --anywhere file:$anywhere_fasta"
 done
 
 multi_anywhere_r2=""
-for anywhere_r2 in `echo $par_anywhere_r2 | tr ':' ' '`; do
+for anywhere_r2 in `echo $par_anywhere_r2 | tr ';' ' '`; do
   multi_anywhere_r2="$multi_anywhere_r2 --anywhere_r2 $anywhere_r2"
 done
 
 multi_anywhere_fasta_r2=""
-for anywhere_fasta_r2 in `echo $par_anywhere_fasta_r2 | tr ':' ' '`; do
+for anywhere_fasta_r2 in `echo $par_anywhere_fasta_r2 | tr ';' ' '`; do
   multi_anywhere_fasta_r2="$multi_anywhere_fasta_r2 --anywhere file:$anywhere_fasta_r2"
 done
 
