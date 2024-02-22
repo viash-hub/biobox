@@ -196,7 +196,7 @@ echo
 if [[ -z $par_fasta ]]; then
   ext="fastq"
 else
-  ext="fa"
+  ext="fasta"
 fi
 
 if [ $mode = "se" ]; then
