@@ -10,6 +10,7 @@ par_fasta='false'
 par_info_file='false'
 ## VIASH END
 
+# TODO: change this?
 if [ -z $par_output ]; then
 	par_output=.
 else
@@ -169,14 +170,28 @@ echo "Arguments to cutadapt:"
 echo $filter_args
 echo
 
+# Optional output arguments
+###########################################################
+echo ">> Optional arguments"
+[[ "$par_json" == "false" ]] && unset par_json
+[[ "$par_fasta" == "false" ]] && unset par_fasta
+[[ "$par_info_file" == "false" ]] && unset par_info_file
+
+optional_output_args=$(echo \
+  ${par_report:+--report "${par_report}"} \
+  ${par_json:+--json "${par_output}/report.json"} \
+  ${par_fasta:+--fasta} \
+  ${par_info_file:+--info-file "$par_output/info.txt"} \
+)
+
+echo "Arguments to cutadapt:"
+echo $optional_output_args
+echo
+
 # Output arguments
 # We write the output to a directory rather than
 # individual files.
 ###########################################################
-echo ">> Output arguments"
-[[ "$par_json" == "false" ]] && unset par_json
-[[ "$par_fasta" == "false" ]] && unset par_fasta
-[[ "$par_info_file" == "false" ]] && unset par_info_file
 
 if [[ -z $par_fasta ]]; then
   ext="fastq"
@@ -186,22 +201,15 @@ fi
 
 if [ $mode = "se" ]; then
   output_args=$(echo \
-    ${par_report:+--report "${par_report}"} \
-    ${par_json:+--json "${par_output}/report.json"} \
     --output "$par_output/{name}_001.$ext" \
-    ${par_fasta:+--fasta} \
-    ${par_info_file:+--info-file} \
   )
 else
   output_args=$(echo \
-    ${par_report:+--report "${par_report}"} \
-    ${par_json:+--json "${par_output}/report.json"} \
     --output "$par_output/{name}_R1_001.$ext" \
     --paired-output "$par_output/{name}_R2_001.$ext" \
-    ${par_fasta:+--fasta} \
-    ${par_info_file:+--info-file} \
   )
 fi
+
 echo "Arguments to cutadapt:"
 echo $output_args
 echo
@@ -221,6 +229,7 @@ cli=$(echo \
   $input_args \
   $mod_args \
   $filter_args \
+  $optional_output_args \
   $output_args \
   --cores $par_cpus
 )
