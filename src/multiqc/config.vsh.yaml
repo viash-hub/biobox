@@ -19,20 +19,35 @@ functionality:
         - name: "--input"
           type: file
           multiple: true
-          example: data/,data/*_sample.zip,/tmp/results
+          multiple_sep: ":"
+          example: data/results/
           description: |
             File paths to be searched for analysis results to be included in the report.
-        - name: "--input_file"
+
+    - name: "Ouput"
+      arguments:
+        - name: "--output_report"
           type: file
-          example: path/to/input_file.txt
+          direction: output
+          required: false
+          example: multiqc_report.html
           description: |
-            Supply a file containing a list of file paths to be searched, one per row
-        - name: "--multiqc_custom_config"
+           Filepath of the generated report.
+        - name: "--output_data"
           type: file
-          example: path/to/multiqc_config.yml
+          required: false
+          direction: output
+          example: multiqc_data
           description: |
-            Specific config file to load, after those in MultiQC dir / home dir / working dir
-    
+            Output directory for parsed data files.
+        - name: "--output_plots"
+          type: file
+          required: false
+          direction: output
+          example: multiqc_plots
+          description: |
+            Output directory for generated plots.
+
     - name: "Modules and analyses to run"
       arguments:
         - name: "--include_modules"
@@ -100,6 +115,12 @@ functionality:
           type: file
           description: Custom CSS file to add to the final report
           example: custom_style_sheet.css
+        - name: "--multiqc_custom_config"
+          type: file
+          example: path/to/multiqc_config.yml
+          description: |
+            Specific config file to load, after those in MultiQC dir / home dir / working dir
+    
 
     - name: "MultiQC behaviour"
       arguments:
@@ -127,21 +148,6 @@ functionality:
         - name: "--no_ansi"
           type: boolean_true
           description: Disable coloured log output.
-
-    - name: "Ouput"
-      arguments:
-        - name: "--output"
-          type: file
-          direction: output
-          default: path/to/multiqc_report.html
-        - name: "--data"
-          type: file
-          direction: output
-          default: multiqc_data
-        - name: "--plots"
-          type: file
-          direction: output
-          default: multiqc_plots
 
     - name: "Output format"
       arguments:
