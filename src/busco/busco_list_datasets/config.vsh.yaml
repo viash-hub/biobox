@@ -27,11 +27,13 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-platforms:
+engines:
   - type: docker
     image: quay.io/biocontainers/busco:5.6.1--pyhdfd78af_0
     setup:
       - type: docker
         run: |
           busco --version | sed 's/BUSCO\s\(.*\)/busco: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
   - type: nextflow

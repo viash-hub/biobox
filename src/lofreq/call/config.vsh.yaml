@@ -237,7 +237,7 @@ test_resources:
     path: test.sh
   - type: file
     path: test_data
-platforms:
+engines:
   - type: docker
     image: quay.io/biocontainers/lofreq:2.1.5--py38h794fc9e_10
     setup:
@@ -245,5 +245,6 @@ platforms:
         run: |
           version=$(lofreq version | grep 'version' | sed 's/version: //') && \
           echo "lofreq: $version" > /var/software_versions.txt
+runners:
+  - type: executable
   - type: nextflow
-      
