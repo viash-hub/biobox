@@ -76,7 +76,7 @@ jobs:
             "config": .info.config,
             "dir": .info.config | capture("^(?<dir>.*\/)").dir
           }
-        ]' ${{ contains(steps.get_head_commit_message.outputs.HEAD_COMMIT_MESSAGE, 'ci force') && steps.ns_list.outputs.output_file }} )" >> $GITHUB_OUTPUT
+        ]' ${{steps.ns_list.outputs.output_file}} )" >> $GITHUB_OUTPUT
 
   # phase 2
   viash_test:
