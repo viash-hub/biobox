@@ -28,7 +28,6 @@ functionality:
           alternatives: ["-i"]
           type: file
           multiple: true
-          multiple_sep: ';'
           description: |
             A list of SAM or BAM format files separated by semi-colon (;). They can be either name or location sorted. Location-sorted paired-end reads are automatically sorted by read names.
           required: true
@@ -73,11 +72,10 @@ functionality:
           alternatives: ["-t"]
           type: string
           description: | 
-            Specify feature type(s) in a GTF annotation. If multiple types are provided, they should be separated by ',' with no space in between. 'exon' by default. Rows in the annotation with a matched feature will be extracted and used for read mapping.
+            Specify feature type(s) in a GTF annotation. If multiple types are provided, they should be separated by ';' with no space in between. 'exon' by default. Rows in the annotation with a matched feature will be extracted and used for read mapping.
           example: "exon"
           required: false
           multiple: true
-          multiple_sep: ","
         - name: --attribute_type
           alternatives: ["-g"]
           type: string
@@ -88,10 +86,9 @@ functionality:
         - name: --extra_attributes
           type: string
           description: | 
-            Extract extra attribute types from the provided GTF annotation and include them in the counting output. These attribute types will not be used to group features. If more than one attribute type is provided they should be separated by comma.
+            Extract extra attribute types from the provided GTF annotation and include them in the counting output. These attribute types will not be used to group features. If more than one attribute type is provided they should be separated by semicolon (;).
           required: false
           multiple: true
-          multiple_sep: ","
         - name: --chrom_alias
           alternatives: ["-A"]
           type: file

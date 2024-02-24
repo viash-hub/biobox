@@ -134,29 +134,27 @@ functionality:
           type: string
           description: |
             List of interesting contigs. Fusions between genes 
-            on other contigs are ignored. Cfontigs can be specified with or without the 
+            on other contigs are ignored. Contigs can be specified with or without the 
             prefix "chr". Asterisks (*) are treated as wild-cards. 
             Default: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y AC_* NC_*
           required: false
           multiple: true
-          multiple_sep: ","
           example: ["1", "2", "AC_*", "NC_*"]
         - name: --viral_contigs
           alternatives: -v
           type: string
           description: |
-            Comma-/space-separated list of viral contigs. Asterisks (*) are treated as 
+            List of viral contigs. Asterisks (*) are treated as 
             wild-cards.
             Default: AC_* NC_*
           required: false
           multiple: true
-          multiple_sep: ","
           example: ["AC_*", "NC_*"]
         - name: --disable_filters
           alternatives: -f
           type: string
           description: |
-            Comma-/space-separated list of filters to disable. By default all filters are 
+            List of filters to disable. By default all filters are 
             enabled. 
           choices: [ homologs, low_entropy, isoforms, 
             top_expressed_viral_contigs, viral_contigs, uninteresting_contigs, 
@@ -170,7 +168,6 @@ functionality:
             homopolymer, many_spliced ]
           required: false
           multiple: true
-          multiple_sep: ","
         - name: --max_e_value
           alternatives: -E
           type: double
