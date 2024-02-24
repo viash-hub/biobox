@@ -83,8 +83,8 @@ jobs:
         echo "matrix=$(jq -c '[ .[] | 
           { 
             "name": (.namespace + "/" + .name),
-            "config": .info.config,
-            "dir": .info.config | capture("^(?<dir>.*\/)").dir
+            "config": .build_info.config,
+            "dir": .build_info.config | capture("^(?<dir>.*\/)").dir
           }
         ]' ns_list.json )" >> $GITHUB_OUTPUT
 
