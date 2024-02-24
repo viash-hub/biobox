@@ -62,7 +62,7 @@ jobs:
         format: json
 
     - id: ns_list_filtered
-      uses: viash-io/viash-actions/project/detect-changed-components@v5
+      uses: viash-io/viash-actions/project/detect-changed-components@viash-0.9
       with:
         input_file: "${{ steps.ns_list.outputs.output_file }}"
 
