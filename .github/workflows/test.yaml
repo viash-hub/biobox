@@ -56,27 +56,37 @@ jobs:
     #   with:
     #     separator: ";"
     #     diff_relative: true
-
-    - id: ns_list
-      uses: viash-io/viash-actions/ns-list@v5
-      with:
-        # platform: docker
-        format: json
-
+    # - id: ns_list
+    #   uses: viash-io/viash-actions/ns-list@v5
+    #   with:
+    #     platform: docker
+    #     format: json
+    #     query: ^(?!workflows)
     # - id: ns_list_filtered
-    #   uses: viash-io/viash-actions/project/detect-changed-components@viash-0.9
+    #   uses: viash-io/viash-actions/project/detect-changed-components@v5
     #   with:
     #     input_file: "${{ steps.ns_list.outputs.output_file }}"
+    # - id: set_matrix
+    #   run: |
+    #     echo "matrix=$(jq -c '[ .[] | 
+    #       { 
+    #         "name": (.functionality.namespace + "/" + .functionality.name),
+    #         "config": .info.config,
+    #         "dir": .info.config | capture("^(?<dir>.*\/)").dir
+    #       }
+    #     ]' ${{ contains(steps.get_head_commit_message.outputs.HEAD_COMMIT_MESSAGE, 'ci force') && steps.ns_list.outputs.output_file || steps.ns_list_filtered.outputs.output_file }} )" >> $GITHUB_OUTPUT
+
 
     - id: set_matrix
       run: |
+        viash ns list --format json > ns_list.json
         echo "matrix=$(jq -c '[ .[] | 
           { 
             "name": (.namespace + "/" + .name),
             "config": .info.config,
             "dir": .info.config | capture("^(?<dir>.*\/)").dir
           }
-        ]' ${{steps.ns_list.outputs.output_file}} )" >> $GITHUB_OUTPUT
+        ]' ns_list.json )" >> $GITHUB_OUTPUT
 
   # phase 2
   viash_test:
