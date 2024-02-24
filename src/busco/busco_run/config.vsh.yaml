@@ -2,13 +2,12 @@ name: busco_run
 namespace: busco
 description: Assessment of genome assembly and annotation completeness with single copy orthologs
 keywords: [Genome assembly, quality control]
-info:
-  links:
-    homepage: https://busco.ezlab.org/
-    documentation: https://busco.ezlab.org/busco_userguide.html
-    repository: https://gitlab.com/ezlab/busco
-  references:
-    doi: 10.1007/978-1-4939-9173-0_14
+links:
+  homepage: https://busco.ezlab.org/
+  documentation: https://busco.ezlab.org/busco_userguide.html
+  repository: https://gitlab.com/ezlab/busco
+references:
+  doi: 10.1007/978-1-4939-9173-0_14
 license: MIT
 argument_groups:
   - name: Inputs

@@ -9,14 +9,13 @@ description: |
   - 'dindel' will insert indel qualities based on Dindel (PMID 20980555).
   Both will overwrite any existing values.
   Do not realign your BAM file afterwards!
-info:
-  keywords: [ "bam", "indel", "qualities", "indelqual", "lofreq", "lofreq/indelqual"]
-  links: 
-    homepage: https://csb5.github.io/lofreq/
-    documentation: https://csb5.github.io/lofreq/commands/
-  reference: 
-    doi: 10.1093/nar/gks918
-  license: "MIT"
+keywords: [ "bam", "indel", "qualities", "indelqual", "lofreq", "lofreq/indelqual"]
+links: 
+  homepage: https://csb5.github.io/lofreq/
+  documentation: https://csb5.github.io/lofreq/commands/
+references: 
+  doi: 10.1093/nar/gks918
+license: "MIT"
 requirements:
   commands: [ lofreq ]
 argument_groups:

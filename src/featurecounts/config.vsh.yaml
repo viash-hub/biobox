@@ -2,13 +2,12 @@ name: featurecounts
 description: |
   featureCounts is a read summarization program for counting reads generated from either RNA or genomic DNA sequencing experiments by implementing highly efficient chromosome hashing and feature blocking techniques. It works with either single or paired-end reads and provides a wide range of options appropriate for different sequencing applications.
 keywords: ["Read counting", "Genomic features"]
-info:
-  links:
-    homepage: https://subread.sourceforge.net/
-    documentation: https://subread.sourceforge.net/SubreadUsersGuide.pdf
-    repository: https://github.com/ShiLab-Bioinformatics/subread
-  references:
-    doi: "10.1093/bioinformatics/btt656"
+links:
+  homepage: https://subread.sourceforge.net/
+  documentation: https://subread.sourceforge.net/SubreadUsersGuide.pdf
+  repository: https://github.com/ShiLab-Bioinformatics/subread
+references:
+  doi: "10.1093/bioinformatics/btt656"
 license: GPL-3.0 
 requirements:
   commands: [ featureCounts ]

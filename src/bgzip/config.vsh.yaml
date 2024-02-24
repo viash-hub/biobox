@@ -1,12 +1,11 @@
 name: bgzip
 description: Block compression/decompression utility
-info:
-  links:
-    homepage: https://www.htslib.org/
-    documentation: https://www.htslib.org/doc/bgzip.html
-    repository: https://github.com/samtools/htslib
-  references:
-    doi: 10.1093/gigascience/giab007
+links:
+  homepage: https://www.htslib.org/
+  documentation: https://www.htslib.org/doc/bgzip.html
+  repository: https://github.com/samtools/htslib
+references:
+  doi: 10.1093/gigascience/giab007
 license: MIT
 requirements:
   commands: [ bgzip ]
