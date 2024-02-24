@@ -22,10 +22,12 @@ functionality:
       - support ultra-fast FASTQ-level deduplication
   info:
     keywords: [RNA-Seq, Trimming, Quality control]
-    repository: https://github.com/OpenGene/fastp
-    documentation: https://github.com/OpenGene/fastp/blob/master/README.md
-    reference: "doi:10.1093/bioinformatics/bty560"
-    licence: MIT
+    links:
+      repository: https://github.com/OpenGene/fastp
+      documentation: https://github.com/OpenGene/fastp/blob/master/README.md
+    references:
+      doi: 10.1093/bioinformatics/bty560
+    license: MIT
   argument_groups:
     - name: Inputs
       description: |
