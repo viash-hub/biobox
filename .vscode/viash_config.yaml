@@ -7,23 +7,56 @@ definitions:
       \ you choose.  \n"
     type: "object"
     properties:
-      project_config:
-        description: "The project config content used during build."
-        $ref: "#/definitions/ProjectConfig"
-      info:
-        $ref: "#/definitions/Info"
-      platforms:
-        description: "A list of platforms to generate target artifacts for.\n\n -\
-          \ Native\n - Docker\n - Nextflow\n"
+      organization:
+        description: "The organization of the package."
+        type: "string"
+      license:
+        description: "The license of the package."
+        type: "string"
+      authors:
+        description: "A list of authors. An author must at least have a name, but\
+          \ can also have a list of roles, an e-mail address, and a map of custom\
+          \ properties.\n\nSuggested values for roles are:\n \n| Role | Abbrev. |\
+          \ Description |\n|------|---------|-------------|\n| maintainer | mnt |\
+          \ for the maintainer of the code. Ideally, exactly one maintainer is specified.\
+          \ |\n| author | aut | for persons who have made substantial contributions\
+          \ to the software. |\n| contributor | ctb| for persons who have made smaller\
+          \ contributions (such as code patches).\n| datacontributor | dtc | for persons\
+          \ or organisations that contributed data sets for the software\n| copyrightholder\
+          \ | cph | for all copyright holders. This is a legal concept so should use\
+          \ the legal name of an institution or corporate body.\n| funder | fnd |\
+          \ for persons or organizations that furnished financial support for the\
+          \ development of the software\n\nThe [full list of roles](https://www.loc.gov/marc/relators/relaterm.html)\
+          \ is extremely comprehensive.\n"
         type: "array"
         items:
-          $ref: "#/definitions/Platform"
-      engines:
-        description: "A list of engine environments to execute target artifacts in.\n\
-          \n - NativeEngine\n - DockerEngine\n"
+          $ref: "#/definitions/Author"
+      status:
+        description: "Allows setting a component to active, deprecated or disabled."
+        $ref: "#/definitions/Status"
+      requirements:
+        description: "Computational requirements related to running the component.\
+          \ \n`cpus` specifies the maximum number of (logical) cpus a component is\
+          \ allowed to use., whereas\n`memory` specifies the maximum amount of memory\
+          \ a component is allowed to allicate. Memory units must be\nin B, KB, MB,\
+          \ GB, TB or PB."
+        $ref: "#/definitions/ComputationalRequirements"
+      repositories:
+        description: "(Pre-)defines repositories that can be used as repository in\
+          \ dependencies.\nAllows reusing repository definitions in case it is used\
+          \ in multiple dependencies."
         type: "array"
         items:
-          $ref: "#/definitions/Engine"
+          $ref: "#/definitions/RepositoryWithName"
+      dependencies:
+        description: "Allows listing Viash components required by this Viash component"
+        type: "array"
+        items:
+          $ref: "#/definitions/Dependency"
+      namespace:
+        description: "Namespace this component is a part of. See the Namespaces guide\
+          \ for more information on namespaces."
+        type: "string"
       functionality:
         description: "The functionality describes the behaviour of the script in terms\
           \ of arguments and resources.\nBy specifying a few restrictions (e.g. mandatory\
@@ -36,21 +69,110 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Runner"
+      name:
+        description: "Name of the component and the filename of the executable when\
+          \ built with `viash build`."
+        type: "string"
+      build_info:
+        $ref: "#/definitions/BuildInfo"
+      argument_groups:
+        description: "A grouping of the arguments, used to display the help message.\n\
+          \n - `name: foo`, the name of the argument group. \n - `description: Description\
+          \ of foo`, a description of the argument group. Multiline descriptions are\
+          \ supported.\n - `arguments: [arg1, arg2, ...]`, list of the arguments.\n\
+          \n"
+        type: "array"
+        items:
+          $ref: "#/definitions/ArgumentGroup"
+      description:
+        description: "A description of the component. This will be displayed with\
+          \ `--help`."
+        type: "string"
+      usage:
+        description: "A description on how to use the component. This will be displayed\
+          \ with `--help` under the 'Usage:' section."
+        type: "string"
+      info:
+        description: "Structured information. Can be any shape: a string, vector,\
+          \ map or even nested map."
+        type: "object"
+      package_config:
+        description: "The package config content used during build."
+        $ref: "#/definitions/PackageConfig"
+      platforms:
+        description: "A list of platforms to generate target artifacts for.\n\n -\
+          \ Native\n - Docker\n - Nextflow\n"
+        type: "array"
+        items:
+          $ref: "#/definitions/Platform"
+      version:
+        description: "Version of the component. This field will be used to version\
+          \ the executable and the Docker container."
+        type: "string"
+      links:
+        description: "External links of the component."
+        $ref: "#/definitions/Links"
+      references:
+        description: "References to external resources related to the component."
+        $ref: "#/definitions/References"
+      engines:
+        description: "A list of engine environments to execute target artifacts in.\n\
+          \n - NativeEngine\n - DockerEngine\n"
+        type: "array"
+        items:
+          $ref: "#/definitions/Engine"
+      resources:
+        description: "Resources are files that support the component. The first resource\
+          \ should be a script that will be executed when the component is run. Additional\
+          \ resources will be copied to the same directory.\n\nCommon properties:\n\
+          \n * type: `file` / `r_script` / `python_script` / `bash_script` / `javascript_script`\
+          \ / `scala_script` / `csharp_script`, specifies the type of the resource.\
+          \ The first resource cannot be of type `file`. When the type is not specified,\
+          \ the default type is simply `file`.\n * dest: filename, the resulting name\
+          \ of the resource.  From within a script, the file can be accessed at `meta[\"\
+          resources_dir\"] + \"/\" + dest`. If unspecified, `dest` will be set to\
+          \ the basename of the `path` parameter.\n * path: `path/to/file`, the path\
+          \ of the input file. Can be a relative or an absolute path, or a URI. Mutually\
+          \ exclusive with `text`.\n * text: ...multiline text..., the content of\
+          \ the resulting file specified as a string. Mutually exclusive with `path`.\n\
+          \ * is_executable: `true` / `false`, whether the resulting resource file\
+          \ should be made executable.\n"
+        type: "array"
+        items:
+          $ref: "#/definitions/Resource"
+      keywords:
+        description: "The keywords of the components."
+        type: "array"
+        items:
+          type: "string"
+      test_resources:
+        description: "One or more scripts to be used to test the component behaviour\
+          \ when `viash test` is invoked. Additional files of type `file` will be\
+          \ made available only during testing. Each test script should expect no\
+          \ command-line inputs, be platform-independent, and return an exit code\
+          \ >0 when unexpected behaviour occurs during testing. See Unit Testing for\
+          \ more info."
+        type: "array"
+        items:
+          $ref: "#/definitions/Resource"
     required:
-    - "functionality"
+    - "name"
     additionalProperties: false
-  ProjectConfig:
-    description: "A Viash project configuration file. It's name should be `_viash.yaml`."
+  PackageConfig:
+    description: "A Viash package configuration file. It's name should be `_viash.yaml`."
     type: "object"
     properties:
+      organization:
+        description: "The organization of the package."
+        type: "string"
       name:
-        description: "The name of the project."
+        description: "The name of the package."
         type: "string"
       source:
         description: "Which source directory to use for the `viash ns` commands."
         type: "string"
       description:
-        description: "A description of the project."
+        description: "A description of the package."
         type: "string"
       viash_version:
         description: "Which version of Viash to use."
@@ -68,10 +190,13 @@ definitions:
           \ map or even nested map."
         type: "object"
       license:
-        description: "The license of the project."
+        description: "The license of the package."
         type: "string"
+      references:
+        description: "References to external resources related to the package."
+        $ref: "#/definitions/References"
       authors:
-        description: "The authors of the project."
+        description: "The authors of the package."
         type: "array"
         items:
           $ref: "#/definitions/Author"
@@ -81,73 +206,22 @@ definitions:
         items:
           $ref: "#/definitions/RepositoryWithName"
       keywords:
-        description: "The keywords of the project."
+        description: "The keywords of the package."
         type: "array"
         items:
           type: "string"
       target:
         description: "Which target directory to use for `viash ns build`."
         type: "string"
-      references:
-        description: "References to external resources related to the project."
-        $ref: "#/definitions/ProjectConfigReferences"
-      organization:
-        description: "The organization of the project."
-        type: "string"
       version:
-        description: "The version of the project."
+        description: "The version of the package."
         type: "string"
       links:
-        description: "External links of the project."
-        $ref: "#/definitions/ProjectConfigLinks"
+        description: "External links of the package."
+        $ref: "#/definitions/Links"
     required: []
     additionalProperties: false
-  ProjectConfigLinks:
-    description: "Links to external resources related to the project."
-    type: "object"
-    properties:
-      repository:
-        description: "Source repository url."
-        type: "string"
-      documentation:
-        description: "Documentation website url."
-        type: "string"
-      docker_registry:
-        description: "Docker registry url."
-        type: "string"
-      homepage:
-        description: "Homepage website url."
-        type: "string"
-      issue_tracker:
-        description: "Issue tracker url."
-        type: "string"
-    required: []
-    additionalProperties: false
-  ProjectConfigReferences:
-    description: "References to external resources related to the project."
-    type: "object"
-    properties:
-      bibtex:
-        oneOf:
-        - description: "One or multiple BibTeX reference(s) of the project."
-          type: "string"
-        - type: "array"
-          items:
-            description: "One or multiple BibTeX reference(s) of the project."
-            type: "string"
-      doi:
-        oneOf:
-        - description: "One or multiple DOI reference(s) of the project."
-          type: "string"
-        - type: "array"
-          items:
-            description: "One or multiple DOI reference(s) of the project."
-            type: "string"
-    required:
-    - "bibtex"
-    - "doi"
-    additionalProperties: false
-  Info:
+  BuildInfo:
     description: "Meta information fields filled in by Viash during build."
     type: "object"
     properties:
@@ -189,23 +263,31 @@ definitions:
     type: "object"
     properties:
       organization:
-        description: "The organization of the project."
+        description: "The organization of the package."
         type: "string"
       name:
         description: "Name of the component and the filename of the executable when\
           \ built with `viash build`."
         type: "string"
+      argument_groups:
+        description: "A grouping of the arguments, used to display the help message.\n\
+          \n - `name: foo`, the name of the argument group. \n - `description: Description\
+          \ of foo`, a description of the argument group. Multiline descriptions are\
+          \ supported.\n - `arguments: [arg1, arg2, ...]`, list of the arguments.\n\
+          \n"
+        type: "array"
+        items:
+          $ref: "#/definitions/ArgumentGroup"
       info:
         description: "Structured information. Can be any shape: a string, vector,\
           \ map or even nested map."
         type: "object"
       license:
-        description: "The license of the project."
+        description: "The license of the package."
         type: "string"
-      version:
-        description: "Version of the component. This field will be used to version\
-          \ the executable and the Docker container."
-        type: "string"
+      references:
+        description: "References to external resources related to the component."
+        $ref: "#/definitions/References"
       authors:
         description: "A list of authors. An author must at least have a name, but\
           \ can also have a list of roles, an e-mail address, and a map of custom\
@@ -256,15 +338,6 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Dependency"
-      argument_groups:
-        description: "A grouping of the arguments, used to display the help message.\n\
-          \n - `name: foo`, the name of the argument group. \n - `description: Description\
-          \ of foo`, a description of the argument group. Multiline descriptions are\
-          \ supported.\n - `arguments: [arg1, arg2, ...]`, list of the arguments.\n\
-          \n"
-        type: "array"
-        items:
-          $ref: "#/definitions/ArgumentGroup"
       description:
         description: "A description of the component. This will be displayed with\
           \ `--help`."
@@ -273,6 +346,13 @@ definitions:
         description: "A description on how to use the component. This will be displayed\
           \ with `--help` under the 'Usage:' section."
         type: "string"
+      version:
+        description: "Version of the component. This field will be used to version\
+          \ the executable and the Docker container."
+        type: "string"
+      links:
+        description: "External links of the component."
+        $ref: "#/definitions/Links"
       resources:
         description: "Resources are files that support the component. The first resource\
           \ should be a script that will be executed when the functionality is run.\
@@ -384,6 +464,48 @@ definitions:
     required:
     - "name"
     - "arguments"
+    additionalProperties: false
+  Links:
+    description: "Links to external resources related to the component."
+    type: "object"
+    properties:
+      repository:
+        description: "Source repository url."
+        type: "string"
+      documentation:
+        description: "Documentation website url."
+        type: "string"
+      docker_registry:
+        description: "Docker registry url."
+        type: "string"
+      homepage:
+        description: "Homepage website url."
+        type: "string"
+      issue_tracker:
+        description: "Issue tracker url."
+        type: "string"
+    required: []
+    additionalProperties: false
+  References:
+    description: "References to external resources related to the component."
+    type: "object"
+    properties:
+      bibtex:
+        oneOf:
+        - description: "One or multiple BibTeX reference(s) of the component."
+          type: "string"
+        - type: "array"
+          items:
+            description: "One or multiple BibTeX reference(s) of the component."
+            type: "string"
+      doi:
+        oneOf:
+        - description: "One or multiple DOI reference(s) of the component."
+          type: "string"
+        - type: "array"
+          items:
+            description: "One or multiple DOI reference(s) of the component."
+            type: "string"
     additionalProperties: false
   Runner:
     oneOf:
@@ -1859,10 +1981,10 @@ definitions:
     - $ref: "#/definitions/RScript"
     - $ref: "#/definitions/ScalaScript"
   BashScript:
-    description: "An executable Bash script.\nWhen defined in functionality.resources,\
-      \ only the first entry will be executed when running the built component or\
-      \ when running `viash run`.\nWhen defined in functionality.test_resources, all\
-      \ entries will be executed during `viash test`."
+    description: "An executable Bash script.\nWhen defined in resources, only the\
+      \ first entry will be executed when running the built component or when running\
+      \ `viash run`.\nWhen defined in test_resources, all entries will be executed\
+      \ during `viash test`."
     type: "object"
     properties:
       path:
@@ -1877,10 +1999,10 @@ definitions:
         description: "Whether the resulting resource file should be made executable."
         type: "boolean"
       type:
-        description: "An executable Bash script.\nWhen defined in functionality.resources,\
-          \ only the first entry will be executed when running the built component\
-          \ or when running `viash run`.\nWhen defined in functionality.test_resources,\
-          \ all entries will be executed during `viash test`."
+        description: "An executable Bash script.\nWhen defined in resources, only\
+          \ the first entry will be executed when running the built component or when\
+          \ running `viash run`.\nWhen defined in test_resources, all entries will\
+          \ be executed during `viash test`."
         const: "bash_script"
       dest:
         description: "Resulting filename of the resource. From within a script, the\
@@ -1891,10 +2013,10 @@ definitions:
     - "type"
     additionalProperties: false
   CSharpScript:
-    description: "An executable C# script.\nWhen defined in functionality.resources,\
-      \ only the first entry will be executed when running the built component or\
-      \ when running `viash run`.\nWhen defined in functionality.test_resources, all\
-      \ entries will be executed during `viash test`."
+    description: "An executable C# script.\nWhen defined in resources, only the first\
+      \ entry will be executed when running the built component or when running `viash\
+      \ run`.\nWhen defined in test_resources, all entries will be executed during\
+      \ `viash test`."
     type: "object"
     properties:
       path:
@@ -1909,10 +2031,10 @@ definitions:
         description: "Whether the resulting resource file should be made executable."
         type: "boolean"
       type:
-        description: "An executable C# script.\nWhen defined in functionality.resources,\
-          \ only the first entry will be executed when running the built component\
-          \ or when running `viash run`.\nWhen defined in functionality.test_resources,\
-          \ all entries will be executed during `viash test`."
+        description: "An executable C# script.\nWhen defined in resources, only the\
+          \ first entry will be executed when running the built component or when\
+          \ running `viash run`.\nWhen defined in test_resources, all entries will\
+          \ be executed during `viash test`."
         const: "csharp_script"
       dest:
         description: "Resulting filename of the resource. From within a script, the\
@@ -1949,10 +2071,10 @@ definitions:
     - "type"
     additionalProperties: false
   JavaScriptScript:
-    description: "An executable JavaScript script.\nWhen defined in functionality.resources,\
-      \ only the first entry will be executed when running the built component or\
-      \ when running `viash run`.\nWhen defined in functionality.test_resources, all\
-      \ entries will be executed during `viash test`."
+    description: "An executable JavaScript script.\nWhen defined in resources, only\
+      \ the first entry will be executed when running the built component or when\
+      \ running `viash run`.\nWhen defined in test_resources, all entries will be\
+      \ executed during `viash test`."
     type: "object"
     properties:
       path:
@@ -1967,10 +2089,10 @@ definitions:
         description: "Whether the resulting resource file should be made executable."
         type: "boolean"
       type:
-        description: "An executable JavaScript script.\nWhen defined in functionality.resources,\
+        description: "An executable JavaScript script.\nWhen defined in resources,\
           \ only the first entry will be executed when running the built component\
-          \ or when running `viash run`.\nWhen defined in functionality.test_resources,\
-          \ all entries will be executed during `viash test`."
+          \ or when running `viash run`.\nWhen defined in test_resources, all entries\
+          \ will be executed during `viash test`."
         const: "javascript_script"
       dest:
         description: "Resulting filename of the resource. From within a script, the\
@@ -2040,10 +2162,10 @@ definitions:
     required: []
     additionalProperties: false
   PythonScript:
-    description: "An executable Python script.\nWhen defined in functionality.resources,\
-      \ only the first entry will be executed when running the built component or\
-      \ when running `viash run`.\nWhen defined in functionality.test_resources, all\
-      \ entries will be executed during `viash test`."
+    description: "An executable Python script.\nWhen defined in resources, only the\
+      \ first entry will be executed when running the built component or when running\
+      \ `viash run`.\nWhen defined in test_resources, all entries will be executed\
+      \ during `viash test`."
     type: "object"
     properties:
       path:
@@ -2058,10 +2180,10 @@ definitions:
         description: "Whether the resulting resource file should be made executable."
         type: "boolean"
       type:
-        description: "An executable Python script.\nWhen defined in functionality.resources,\
-          \ only the first entry will be executed when running the built component\
-          \ or when running `viash run`.\nWhen defined in functionality.test_resources,\
-          \ all entries will be executed during `viash test`."
+        description: "An executable Python script.\nWhen defined in resources, only\
+          \ the first entry will be executed when running the built component or when\
+          \ running `viash run`.\nWhen defined in test_resources, all entries will\
+          \ be executed during `viash test`."
         const: "python_script"
       dest:
         description: "Resulting filename of the resource. From within a script, the\
@@ -2072,10 +2194,10 @@ definitions:
     - "type"
     additionalProperties: false
   RScript:
-    description: "An executable R script.\nWhen defined in functionality.resources,\
-      \ only the first entry will be executed when running the built component or\
-      \ when running `viash run`.\nWhen defined in functionality.test_resources, all\
-      \ entries will be executed during `viash test`."
+    description: "An executable R script.\nWhen defined in resources, only the first\
+      \ entry will be executed when running the built component or when running `viash\
+      \ run`.\nWhen defined in test_resources, all entries will be executed during\
+      \ `viash test`."
     type: "object"
     properties:
       path:
@@ -2090,10 +2212,10 @@ definitions:
         description: "Whether the resulting resource file should be made executable."
         type: "boolean"
       type:
-        description: "An executable R script.\nWhen defined in functionality.resources,\
-          \ only the first entry will be executed when running the built component\
-          \ or when running `viash run`.\nWhen defined in functionality.test_resources,\
-          \ all entries will be executed during `viash test`."
+        description: "An executable R script.\nWhen defined in resources, only the\
+          \ first entry will be executed when running the built component or when\
+          \ running `viash run`.\nWhen defined in test_resources, all entries will\
+          \ be executed during `viash test`."
         const: "r_script"
       dest:
         description: "Resulting filename of the resource. From within a script, the\
@@ -2104,10 +2226,10 @@ definitions:
     - "type"
     additionalProperties: false
   ScalaScript:
-    description: "An executable Scala script.\nWhen defined in functionality.resources,\
-      \ only the first entry will be executed when running the built component or\
-      \ when running `viash run`.\nWhen defined in functionality.test_resources, all\
-      \ entries will be executed during `viash test`."
+    description: "An executable Scala script.\nWhen defined in resources, only the\
+      \ first entry will be executed when running the built component or when running\
+      \ `viash run`.\nWhen defined in test_resources, all entries will be executed\
+      \ during `viash test`."
     type: "object"
     properties:
       path:
@@ -2122,10 +2244,10 @@ definitions:
         description: "Whether the resulting resource file should be made executable."
         type: "boolean"
       type:
-        description: "An executable Scala script.\nWhen defined in functionality.resources,\
-          \ only the first entry will be executed when running the built component\
-          \ or when running `viash run`.\nWhen defined in functionality.test_resources,\
-          \ all entries will be executed during `viash test`."
+        description: "An executable Scala script.\nWhen defined in resources, only\
+          \ the first entry will be executed when running the built component or when\
+          \ running `viash run`.\nWhen defined in test_resources, all entries will\
+          \ be executed during `viash test`."
         const: "scala_script"
       dest:
         description: "Resulting filename of the resource. From within a script, the\
@@ -2539,7 +2661,7 @@ definitions:
           \ and follows a semi logarithmic scale (1, 2, 5 per decade).\n\nConceptually\
           \ it is possible for a Viash Config to overwrite the full labels parameter,\
           \ however likely it is more efficient to add additional labels\nin the Viash\
-          \ Project with a config mod.\n"
+          \ Package with a config mod.\n"
         type: "object"
         additionalProperties:
           type: "string"
@@ -2559,9 +2681,8 @@ definitions:
     additionalProperties: false
   Dependency:
     description: "Specifies a Viash component (script or executable) that should be\
-      \ made available for the code defined in the functionality.\nThe dependency\
-      \ components are collected and copied to the output folder during the Viash\
-      \ build step.\n"
+      \ made available for the code defined in the component.\nThe dependency components\
+      \ are collected and copied to the output folder during the Viash build step.\n"
     type: "object"
     properties:
       name:
@@ -2570,19 +2691,21 @@ definitions:
         type: "string"
       repository:
         oneOf:
-        - description: "Specifies the location where the dependency component can\
-            \ be found.\nThis must either be a full definition of the repository or\
-            \ the name of a repository refenced as it is defined under functionality.repositories.\n\
+        - description: "Specifies the repository location where the dependency component\
+            \ can be found.\nThis must either be a full definition of the repository\
+            \ or the name of a repository referenced as it is defined under repositories.\n\
             Additionally, the full definition can be specified as a single string\
             \ where all parameters such as repository type, url, branch or tag are\
-            \ specified.\n"
+            \ specified.\nOmitting the value sets the dependency as a local dependency,\
+            \ ie. the dependency is available in the same namespace as the component.\n"
           type: "string"
-        - description: "Specifies the location where the dependency component can\
-            \ be found.\nThis must either be a full definition of the repository or\
-            \ the name of a repository refenced as it is defined under functionality.repositories.\n\
+        - description: "Specifies the repository location where the dependency component\
+            \ can be found.\nThis must either be a full definition of the repository\
+            \ or the name of a repository referenced as it is defined under repositories.\n\
             Additionally, the full definition can be specified as a single string\
             \ where all parameters such as repository type, url, branch or tag are\
-            \ specified.\n"
+            \ specified.\nOmitting the value sets the dependency as a local dependency,\
+            \ ie. the dependency is available in the same namespace as the component.\n"
           $ref: "#/definitions/Repository"
       alias:
         description: "An alternative name for the dependency component. This can include\
