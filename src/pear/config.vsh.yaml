@@ -1,155 +1,154 @@
-functionality:
-  name: pear
-  description: |
-    PEAR is an ultrafast, memory-efficient and highly accurate pair-end read merger. It is fully parallelized and can run with as low as just a few kilobytes of memory.
-    
-    PEAR evaluates all possible paired-end read overlaps and without requiring the target fragment size as input. In addition, it implements a statistical test for minimizing false-positive results. Together with a highly optimized implementation, it can merge millions of paired end reads within a couple of minutes on a standard desktop computer.
-  keywords: [ "pair-end", "read", "merge" ]
-  info:
-    links:
-      homepage: https://cme.h-its.org/exelixis/web/software/pear
-      repository: https://github.com/tseemann/PEAR
-      documentation: https://cme.h-its.org/exelixis/web/software/pear/doc.html
-    references:
-      doi: 10.1093/bioinformatics/btt593
-  license: "CC-BY-NC-SA-3.0"
-  requirements:
-    commands: [ pear , gzip ]
-  argument_groups:
-    - name: Inputs
-      arguments:
-        - name: --forward_fastq
-          alternatives: -f
-          type: file
-          description: Forward paired-end FASTQ file
-          required: true
-          example: "forward.fastq"
-        - name: --reverse_fastq
-          alternatives: -r
-          type: file
-          description: Reverse paired-end FASTQ file
-          required: true
-          example: "reverse.fastq"
-    - name: Outputs
-      arguments:
-        - name: --assembled
-          type: file
-          description: The output file containing assembled reads. Can be compressed with gzip.
-          required: true
-          direction: output
-        - name: --unassembled_forward
-          type: file
-          description: The output file containing forward reads that could not be assembled. Can be compressed with gzip.
-          required: true
-          direction: output
-        - name: --unassembled_reverse
-          type: file
-          description: The output file containing reverse reads that could not be assembled. Can be compressed with gzip.
-          required: true
-          direction: output
-        - name: --discarded
-          type: file
-          description: The output file containing reads that were discarded due to too low quality or too many uncalled bases. Can be compressed with gzip.
-          required: true
-          direction: output
-    - name: Arguments
-      arguments:
-        - name: --p_value
-          alternatives: -p
-          type: double
-          description: |
-            Specify a p-value for the statistical test. If the computed p-value of a possible assembly exceeds the specified p-value then paired-end read will not be assembled. Valid options are: 0.0001, 0.001, 0.01, 0.05 and 1.0. Setting 1.0 disables the test.
-          example: 0.01
-          required: false
-        - name: --min_overlap
-          alternatives: -v
-          type: integer
-          description: |
-            Specify the minimum overlap size. The minimum overlap may be set to 1 when the statistical test is used. However, further restricting the minimum overlap size to a proper value may reduce false-positive assembles.
-          required: false
-          example: 10
-        - name: --max_assembly_length
-          alternatives: -m
-          type: integer
-          description: |
-            Specify the maximum possible length of the assembled sequences. Setting this value to 0 disables the restriction and assembled sequences may be arbitrary long.
-          required: false
-          example: 0
-        - name: --min_assembly_length
-          alternatives: -n
-          type: integer
-          description: |
-            Specify the minimum possible length of the assembled sequences. Setting this value to 0 disables the restriction and assembled sequences may be arbitrary short.
-          required: false
-          example: 0
-        - name: --min_trim_length
-          alternatives: -t
-          type: integer
-          description: |
-            Specify  the  minimum length of reads after trimming the low quality part (see option -q)
-          required: false
-          example: 1
-        - name: --quality_threshold
-          alternatives: -q
-          type: integer
-          description: |
-            Specify the quality threshold for trimming the low quality part of a read. If the quality scores of two consecutive bases are strictly less than the specified threshold, the rest of the read will be trimmed.
-          required: false
-          example: 0
-        - name: --max_uncalled_base
-          alternatives: -u
-          type: double
-          description: |
-            Specify the maximal proportion of uncalled bases in a read. Setting this value to 0 will cause PEAR to discard all reads containing uncalled bases. The other extreme setting is 1 which causes PEAR to process all reads independent on the number of uncalled bases.
-          example: 1.0
-          required: false
-        - name: --test_method
-          alternatives: -g
-          type: integer
-          description: |
-            Specify the type of statistical test. Two options are available. 1: Given the minimum allowed overlap, test using the highest OES. Note that due to its discrete nature, this test usually yields a lower p-value for the assembled read than the cut- off (specified by -p). For example, setting the cut-off to 0.05 using this test, the assembled reads might have an actual p-value of 0.02.
-            2. Use the acceptance probability (m.a.p). This test methods computes the same probability as test method 1. However, it assumes that the minimal overlap is the observed overlap with the highest OES, instead of the one specified by -v. Therefore, this is not a valid statistical test and the 'p-value' is in fact the maximal probability for accepting the assembly. Nevertheless, we observed in practice that for the case the actual overlap sizes are relatively small, test 2 can correctly assemble more reads with only slightly higher false-positive rate.
-          required: false
-          example: 1
-        - name: --emperical_freqs
-          alternatives: -e
-          type: boolean_true
-          description: |
-            Disable empirical base frequencies.
-        - name: --score_method
-          alternatives: -s
-          type: integer
-          description: |
-            Specify the scoring method. 1. OES with +1 for match and -1 for mismatch. 2: Assembly score (AS). Use +1 for match and -1 for mismatch multiplied by base quality scores. 3: Ignore quality scores and use +1 for a match and -1 for a mismatch.
-          required: false
-          example: 2
-        - name: --phred_base
-          alternatives: -b
-          type: integer
-          description: |
-            Base PHRED quality score.
-          required: false
-          example: 33
-        - name: --cap
-          alternatives: -c
-          type: integer
-          description: |
-            Specify  the upper bound for the resulting quality score. If set to zero, capping is disabled.
-          required: false
-          example: 40
-        - name: --nbase
-          alternatives: -z
-          type: boolean_true
-          description: |
-            When merging a base-pair that consists of two non-equal bases out of which none is degenerate, set the merged base to N and use the highest quality score of the two bases
-  resources:
-    - type: bash_script
-      path: script.sh
-  test_resources:
-    - type: bash_script
-      path: test.sh
-    - type: file
-      path: test_data
+name: pear
+description: |
+  PEAR is an ultrafast, memory-efficient and highly accurate pair-end read merger. It is fully parallelized and can run with as low as just a few kilobytes of memory.
+  
+  PEAR evaluates all possible paired-end read overlaps and without requiring the target fragment size as input. In addition, it implements a statistical test for minimizing false-positive results. Together with a highly optimized implementation, it can merge millions of paired end reads within a couple of minutes on a standard desktop computer.
+keywords: [ "pair-end", "read", "merge" ]
+info:
+  links:
+    homepage: https://cme.h-its.org/exelixis/web/software/pear
+    repository: https://github.com/tseemann/PEAR
+    documentation: https://cme.h-its.org/exelixis/web/software/pear/doc.html
+  references:
+    doi: 10.1093/bioinformatics/btt593
+license: "CC-BY-NC-SA-3.0"
+requirements:
+  commands: [ pear , gzip ]
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --forward_fastq
+        alternatives: -f
+        type: file
+        description: Forward paired-end FASTQ file
+        required: true
+        example: "forward.fastq"
+      - name: --reverse_fastq
+        alternatives: -r
+        type: file
+        description: Reverse paired-end FASTQ file
+        required: true
+        example: "reverse.fastq"
+  - name: Outputs
+    arguments:
+      - name: --assembled
+        type: file
+        description: The output file containing assembled reads. Can be compressed with gzip.
+        required: true
+        direction: output
+      - name: --unassembled_forward
+        type: file
+        description: The output file containing forward reads that could not be assembled. Can be compressed with gzip.
+        required: true
+        direction: output
+      - name: --unassembled_reverse
+        type: file
+        description: The output file containing reverse reads that could not be assembled. Can be compressed with gzip.
+        required: true
+        direction: output
+      - name: --discarded
+        type: file
+        description: The output file containing reads that were discarded due to too low quality or too many uncalled bases. Can be compressed with gzip.
+        required: true
+        direction: output
+  - name: Arguments
+    arguments:
+      - name: --p_value
+        alternatives: -p
+        type: double
+        description: |
+          Specify a p-value for the statistical test. If the computed p-value of a possible assembly exceeds the specified p-value then paired-end read will not be assembled. Valid options are: 0.0001, 0.001, 0.01, 0.05 and 1.0. Setting 1.0 disables the test.
+        example: 0.01
+        required: false
+      - name: --min_overlap
+        alternatives: -v
+        type: integer
+        description: |
+          Specify the minimum overlap size. The minimum overlap may be set to 1 when the statistical test is used. However, further restricting the minimum overlap size to a proper value may reduce false-positive assembles.
+        required: false
+        example: 10
+      - name: --max_assembly_length
+        alternatives: -m
+        type: integer
+        description: |
+          Specify the maximum possible length of the assembled sequences. Setting this value to 0 disables the restriction and assembled sequences may be arbitrary long.
+        required: false
+        example: 0
+      - name: --min_assembly_length
+        alternatives: -n
+        type: integer
+        description: |
+          Specify the minimum possible length of the assembled sequences. Setting this value to 0 disables the restriction and assembled sequences may be arbitrary short.
+        required: false
+        example: 0
+      - name: --min_trim_length
+        alternatives: -t
+        type: integer
+        description: |
+          Specify  the  minimum length of reads after trimming the low quality part (see option -q)
+        required: false
+        example: 1
+      - name: --quality_threshold
+        alternatives: -q
+        type: integer
+        description: |
+          Specify the quality threshold for trimming the low quality part of a read. If the quality scores of two consecutive bases are strictly less than the specified threshold, the rest of the read will be trimmed.
+        required: false
+        example: 0
+      - name: --max_uncalled_base
+        alternatives: -u
+        type: double
+        description: |
+          Specify the maximal proportion of uncalled bases in a read. Setting this value to 0 will cause PEAR to discard all reads containing uncalled bases. The other extreme setting is 1 which causes PEAR to process all reads independent on the number of uncalled bases.
+        example: 1.0
+        required: false
+      - name: --test_method
+        alternatives: -g
+        type: integer
+        description: |
+          Specify the type of statistical test. Two options are available. 1: Given the minimum allowed overlap, test using the highest OES. Note that due to its discrete nature, this test usually yields a lower p-value for the assembled read than the cut- off (specified by -p). For example, setting the cut-off to 0.05 using this test, the assembled reads might have an actual p-value of 0.02.
+          2. Use the acceptance probability (m.a.p). This test methods computes the same probability as test method 1. However, it assumes that the minimal overlap is the observed overlap with the highest OES, instead of the one specified by -v. Therefore, this is not a valid statistical test and the 'p-value' is in fact the maximal probability for accepting the assembly. Nevertheless, we observed in practice that for the case the actual overlap sizes are relatively small, test 2 can correctly assemble more reads with only slightly higher false-positive rate.
+        required: false
+        example: 1
+      - name: --emperical_freqs
+        alternatives: -e
+        type: boolean_true
+        description: |
+          Disable empirical base frequencies.
+      - name: --score_method
+        alternatives: -s
+        type: integer
+        description: |
+          Specify the scoring method. 1. OES with +1 for match and -1 for mismatch. 2: Assembly score (AS). Use +1 for match and -1 for mismatch multiplied by base quality scores. 3: Ignore quality scores and use +1 for a match and -1 for a mismatch.
+        required: false
+        example: 2
+      - name: --phred_base
+        alternatives: -b
+        type: integer
+        description: |
+          Base PHRED quality score.
+        required: false
+        example: 33
+      - name: --cap
+        alternatives: -c
+        type: integer
+        description: |
+          Specify  the upper bound for the resulting quality score. If set to zero, capping is disabled.
+        required: false
+        example: 40
+      - name: --nbase
+        alternatives: -z
+        type: boolean_true
+        description: |
+          When merging a base-pair that consists of two non-equal bases out of which none is degenerate, set the merged base to N and use the highest quality score of the two bases
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
 engines:
   - type: docker
     image: quay.io/biocontainers/pear:0.9.6--h9d449c0_10
