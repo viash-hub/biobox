@@ -1,6 +1,5 @@
 viash_version: 0.8.5
 
-# these config mods will be added by PR #25
 config_mods: |
   .functionality.arguments[.multiple == true].multiple_sep := ";"
   .functionality.argument_groups[true].arguments[.multiple == true].multiple_sep := ";"
