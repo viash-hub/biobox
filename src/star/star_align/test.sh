@@ -80,4 +80,13 @@ echo ">> Check if output exists"
 cd ..
 #########################################################################################
 
+# TODO: check whether optional outputs work: 
+#   - quantMode "TranscriptomeSAM;GeneCounts"
+#   - reads_per_gene "reads_per_gene.tsv"
+#   - chimOutType "Junctions"
+#   - chimeric_junctions "chimeric_junctions.tsv"
+#   - outSJtype Standard
+#   - splice_junctions "splice_junctions.tsv"
+# TODO: check whether output contents are correct
+
 echo "> Test successful"
