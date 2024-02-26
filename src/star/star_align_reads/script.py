@@ -6,14 +6,14 @@ from pathlib import Path
 ## VIASH START
 par = {
     "input": [
-        "src/star/star_align/test_data/a_R1.1.fastq",
-        "src/star/star_align/test_data/a_R1.2.fastq",
+        "src/star/star_align_reads/test_data/a_R1.1.fastq",
+        "src/star/star_align_reads/test_data/a_R1.2.fastq",
     ],
     "input_r2": [
-        "src/star/star_align/test_data/a_R2.1.fastq",
-        "src/star/star_align/test_data/a_R2.2.fastq",
+        "src/star/star_align_reads/test_data/a_R2.1.fastq",
+        "src/star/star_align_reads/test_data/a_R2.2.fastq",
     ],
-    "genomeDir": "src/star/star_align/test_data/genome.fasta",
+    "genomeDir": "src/star/star_align_reads/test_data/genome.fasta",
     "aligned_reads": "aligned_reads.sam"
 }
 meta = {

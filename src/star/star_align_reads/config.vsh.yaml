@@ -1,4 +1,4 @@
-name: star_align
+name: star_align_reads
 namespace: star
 description: |
   Aligns reads to a reference genome using STAR.

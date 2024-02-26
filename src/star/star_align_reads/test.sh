@@ -3,8 +3,8 @@
 set -e
 
 ## VIASH START
-meta_executable="target/docker/star/star_align/star_align"
-meta_resources_dir="src/star/star_align"
+meta_executable="target/docker/star/star_align_reads/star_align_reads"
+meta_resources_dir="src/star/star_align_reads"
 ## VIASH END
 
 #########################################################################################
@@ -83,10 +83,10 @@ STAR \
   
 #########################################################################################
 
-mkdir star_align_se
-cd star_align_se
+mkdir star_align_reads_se
+cd star_align_reads_se
 
-echo "> Run star_align on SE"
+echo "> Run star_align_reads on SE"
 "$meta_executable" \
   --input "../reads_R1.fastq" \
   --genomeDir "../index/" \
@@ -134,10 +134,10 @@ cd ..
 
 #########################################################################################
 
-mkdir star_align_pe_minimal
-cd star_align_pe_minimal
+mkdir star_align_reads_pe_minimal
+cd star_align_reads_pe_minimal
 
-echo ">> Run star_align on PE"
+echo ">> Run star_align_reads on PE"
 "$meta_executable" \
   --input ../reads_R1.fastq \
   --input_r2 ../reads_R2.fastq \

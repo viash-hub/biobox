@@ -27,6 +27,8 @@
 
 * `lofreq/indelqual`: Insert indel qualities into BAM file (PR #17).
 
+* `star/star_align_reads`: Align reads to a reference genome (PR #22).
+
 ## MAJOR CHANGES
 
 ## MINOR CHANGES

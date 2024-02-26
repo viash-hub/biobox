@@ -3,8 +3,8 @@ library(tidyverse)
 # This script processes the STAR aligner's help file
 # to create a viash argument_groups.yaml file.
 
-local_file <- "src/star/star_align/help.txt"
-yaml_file <- "src/star/star_align/argument_groups.yaml"
+local_file <- "src/star/star_align_reads/help.txt"
+yaml_file <- "src/star/star_align_reads/argument_groups.yaml"
 
 param_txt <- readr::read_lines(local_file)
 
