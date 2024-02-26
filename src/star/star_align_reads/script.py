@@ -64,9 +64,6 @@ output_paths = {name: par[name] for name in expected_outputs.keys()}
 for name in expected_outputs.keys():
     par[name] = None
 
-# TODO: Depending on the desired outputs,
-# additional parameters might need to be set.
-
 ##################################################
 # process other args
 par["runMode"] = "alignReads"
