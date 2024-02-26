@@ -128,6 +128,7 @@ out2 <- out %>%
   # remove arguments that are related to a different runmode
   filter(!grepl("--runMode", description) | grepl("--runMode alignReads", description)) %>%
   filter(!grepl("--runMode", group_name) | grepl("--runMode alignReads", group_name)) %>%
+  filter(!grepl("STARsolo", group_name)) %>%
   mutate(
     viash_arg = paste0("--", name),
     type_step1 = type %>%
