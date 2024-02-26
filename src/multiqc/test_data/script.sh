@@ -1,7 +1,9 @@
 # multiqc test data
 
-# Test data was obtained from https://multiqc.info/example-reports/
+# Test data from https://github.com/snakemake/snakemake-wrappers/tree/master/bio/busco/test
 
-curl -O -J -L http://multiqc.info/examples/rna-seq/data.zip
-unzip -q "data.zip" -d "src/multiqc/test_data/rna-seq"
+if [ ! -d /tmp/snakemake-wrappers ]; then
+  git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
+fi
 
+cp -r /tmp/snakemake-wrappers/bio/multiqc/test/samtools_stats/* src/multiqc/test_data

@@ -6,11 +6,13 @@ if [[ -n "$par_input" ]]; then
 fi
 
 multiqc \
+    --filename "$par_output_report" \
+    --force \
     "${inputs[@]}"
 
-if [[ -n "$par_output_report" ]]; then
-    mv multiqc_report.html "$par_output_report"
-fi
+# if [[ -n "$par_output_report" ]]; then
+#     mv multiqc_report.html "$par_output_report"
+# fi
 
 # if [[ -n "$par_output_data" ]]; then
 #     mv "data" "$par_output_data"
