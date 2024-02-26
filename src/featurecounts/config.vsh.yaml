@@ -1,337 +1,336 @@
-functionality: 
-  name: featurecounts
-  description: |
-    featureCounts is a read summarization program for counting reads generated from either RNA or genomic DNA sequencing experiments by implementing highly efficient chromosome hashing and feature blocking techniques. It works with either single or paired-end reads and provides a wide range of options appropriate for different sequencing applications.
-  info:
-    keywords: ["Read counting", "Genomic features"]
-    homepage: https://subread.sourceforge.net/
-    documentation: https://subread.sourceforge.net/SubreadUsersGuide.pdf
-    repository: https://github.com/ShiLab-Bioinformatics/subread
-    reference: "doi:10.1093/bioinformatics/btt656"
-    licence: GPL-3.0 
-  requirements:
-    commands: [ featureCounts ]
+name: featurecounts
+description: |
+  featureCounts is a read summarization program for counting reads generated from either RNA or genomic DNA sequencing experiments by implementing highly efficient chromosome hashing and feature blocking techniques. It works with either single or paired-end reads and provides a wide range of options appropriate for different sequencing applications.
+keywords: ["Read counting", "Genomic features"]
+links:
+  homepage: https://subread.sourceforge.net/
+  documentation: https://subread.sourceforge.net/SubreadUsersGuide.pdf
+  repository: https://github.com/ShiLab-Bioinformatics/subread
+references:
+  doi: "10.1093/bioinformatics/btt656"
+license: GPL-3.0 
+requirements:
+  commands: [ featureCounts ]
 
-  argument_groups:
-    - name: Inputs
-      arguments:
-        - name: --annotation
-          alternatives: ["-a"]
-          type: file
-          description: | 
-            Name of an annotation file. GTF/GFF format by default. See '--format' option for more format information.
-          required: true
-          example: annotation.gtf
-        - name: --input
-          alternatives: ["-i"]
-          type: file
-          multiple: true
-          multiple_sep: ';'
-          description: |
-            A list of SAM or BAM format files separated by semi-colon (;). They can be either name or location sorted. Location-sorted paired-end reads are automatically sorted by read names.
-          required: true
-          example: input_file1.bam
-    
-    - name: Outputs
-      arguments:
-        - name: --counts
-          alternatives: ["-o"]
-          type: file
-          direction: output
-          description: | 
-            Name of output file including read counts in tab delimited format.
-          required: true
-          example: features.tsv
-        - name: --summary
-          type: file
-          direction: output
-          description: | 
-            Summary statistics of counting results in tab delimited format.
-          required: false
-          example: summary.tsv
-        - name: --junctions
-          type: file
-          direction: output
-          description: | 
-            Count number of reads supporting each exon-exon junction. Junctions were identified from those exon-spanning reads in the input (containing 'N' in CIGAR string).
-          example: junctions.txt
-          required: false
-
-    - name: Annotation
-      arguments:
-        - name: --format
-          alternatives: ["-F"]
-          type: string
-          description: | 
-            Specify format of the provided annotation file. Acceptable formats include 'GTF' (or compatible GFF format) and 'SAF'. 'GTF' by default. 
-          choices: [GTF, GFF, SAF]
-          example: "GTF"
-          required: false
-        - name: --feature_type
-          alternatives: ["-t"]
-          type: string
-          description: | 
-            Specify feature type(s) in a GTF annotation. If multiple types are provided, they should be separated by ',' with no space in between. 'exon' by default. Rows in the annotation with a matched feature will be extracted and used for read mapping.
-          example: "exon"
-          required: false
-          multiple: true
-          multiple_sep: ","
-        - name: --attribute_type
-          alternatives: ["-g"]
-          type: string
-          description: | 
-            Specify attribute type in GTF annotation. 'gene_id' by default. Meta-features used for read counting will be extracted from annotation using the provided value.
-          example: "gene_id"
-          required: false
-        - name: --extra_attributes
-          type: string
-          description: | 
-            Extract extra attribute types from the provided GTF annotation and include them in the counting output. These attribute types will not be used to group features. If more than one attribute type is provided they should be separated by comma.
-          required: false
-          multiple: true
-          multiple_sep: ","
-        - name: --chrom_alias
-          alternatives: ["-A"]
-          type: file
-          description: | 
-            Provide a chromosome name alias file to match chr names in annotation with those in the reads. This should be a two-column comma-delimited text file. Its first column should include chr names in the annotation and its second column should include chr names in the reads. Chr names are case sensitive. No column header should be included in the file.
-          required: false
-          example: chrom_alias.csv
-    
-    - name: Level of summarization
-      arguments:
-        - name: --feature_level
-          alternatives: ["-f"]
-          type: boolean_true
-          description: | 
-            Perform read counting at feature level (eg. counting reads for exons rather than genes).
-    
-    - name: Overlap between reads and features
-      arguments:
-        - name: --overlapping
-          alternatives: ["-O"]
-          type: boolean_true
-          description: | 
-            Assign reads to all their overlapping meta-features (or features if '--feature_level' is specified).
-        - name: --min_overlap
-          type: integer
-          description: | 
-            Minimum number of overlapping bases in a read that is required for read assignment. 1 by default. Number of overlapping bases is counted from both reads if paired end. If a negative value is provided, then a gap of up to specified size will be allowed between read and the feature that the read is assigned to.
-          required: false
-          example: 1
-        - name: --frac_overlap
-          type: double
-          description: | 
-            Minimum fraction of overlapping bases in a read that is required for read assignment. Value should be within range [0,1]. 0 by default. Number of overlapping bases is counted from both reads if paired end. Both this option and '--min_overlap' option need to be satisfied for read assignment.
-          required: false
-          min: 0
-          max: 1
-          example: 0
-        - name: --frac_overlap_feature
-          type: double
-          description: | 
-            Minimum fraction of overlapping bases in a feature that is required for read assignment. Value should be within range [0,1]. 0 by default.
-          required: false
-          min: 0
-          max: 1
-          example: 0
-        - name: --largest_overlap
-          type: boolean_true
-          description: | 
-            Assign reads to a meta-feature/feature that has the largest number of overlapping bases.
-        - name: --non_overlap
-          type: integer
-          description: | 
-            Maximum number of non-overlapping bases in a read (or a read pair) that is allowed when being assigned to a feature. No limit is set by default.
-          required: false
-        - name: --non_overlap_feature
-          type: integer
-          description: | 
-            Maximum number of non-overlapping bases in a feature that is allowed in read assignment. No limit is set by default.
-          required: false
-        - name: --read_extension5
-          type: integer
-          description: | 
-            Reads are extended upstream by <int> bases from their 5' end.
-          required: false
-        - name: --read_extension3
-          type: integer
-          description: | 
-            Reads are extended upstream by <int> bases from their 3' end.
-          required: false
-        - name: --read2pos
-          type: integer
-          description: | 
-            Reduce reads to their 5' most base or 3' most base. Read counting is then performed based on the single base the read is reduced to.
-          required: false
-          choices: [3, 5]
-    
-    - name: Multi-mapping reads
-      arguments:
-        - name: --multi_mapping
-          alternatives: ["-M"]
-          type: boolean_true
-          description: | 
-            Multi-mapping reads will also be counted. For a multi-mapping read, all its reported alignments will be counted. The 'NH' tag in BAM/SAM input is used to detect multi-mapping reads.
-    
-    - name: Fractional counting
-      arguments:
-        - name: --fraction
-          type: boolean_true
-          description: | 
-            Assign fractional counts to features. This option must be used together with '--multi_mapping' or '--overlapping' or both. When '--multi_mapping' is specified, each reported alignment from a multi-mapping read (identified via 'NH' tag) will carry a fractional count of 1/x, instead of 1 (one), where x is the total number of alignments reported for the same read. When '--overlapping' is specified, each overlapping feature will receive a fractional count of 1/y, where y is the total number of features overlapping with the read. When both '--multi_mapping' and '--overlapping' are specified, each alignment will carry a fractional count of 1/(x*y).
-
-    - name: Read filtering
-      arguments:
-        - name: --min_map_quality
-          alternatives: ["-Q"]
-          type: integer
-          description: | 
-            The minimum mapping quality score a read must satisfy in order to be counted. For paired-end reads, at least one end should satisfy this criteria. 0 by default.
-          required: false
-          example: 0
-        - name: --split_only
-          type: boolean_true
-          description: | 
-            Count split alignments only (ie. alignments with CIGAR string containing 'N'). An example of split alignments is exon-spanning reads in RNA-seq data.
-        - name: --non_split_only
-          type: boolean_true
-          description: | 
-            If specified, only non-split alignments (CIGAR strings do not contain letter 'N') will be counted. All the other alignments will be ignored.
-        - name: --primary
-          type: boolean_true
-          description: | 
-            Count primary alignments only. Primary alignments are identified using bit 0x100 in SAM/BAM FLAG field.
-        - name: --ignore_dup
-          type: boolean_true
-          description: | 
-            Ignore duplicate reads in read counting. Duplicate reads are identified using bit Ox400 in BAM/SAM FLAG field. The whole read pair is ignored if one of the reads is a duplicate read for paired end data.
-    
-    - name: Strandedness
-      arguments:
-        - name: --strand
-          alternatives: ["-s"]
-          type: integer
-          description: | 
-            Perform strand-specific read counting. A single integer value (applied to all input files) should be provided. Possible values include: 0 (unstranded), 1 (stranded) and 2 (reversely stranded). Default value is 0 (ie. unstranded read counting carried out for all input files).
-          choices: [0, 1, 2] 
-          example: 0
-          required: false
-
-    - name: Exon-exon junctions
-      arguments:
-        - name: --ref_fasta
-          alternatives: ["-G"]
-          type: file
-          description: | 
-            Provide the name of a FASTA-format file that contains the reference sequences used in read mapping that produced the provided SAM/BAM files.
-          required: false
-          example: reference.fasta
-        
-    - name: Parameters specific to paired end reads
-      arguments:
-        - name: --paired
-          alternatives: ["-p"]
-          type: boolean_true
-          description: | 
-            Specify that input data contain paired-end reads. To perform fragment counting (ie. counting read pairs), the '--countReadPairs' parameter should also be specified in addition to this parameter.
-        - name: --count_read_pairs
-          type: boolean_true
-          description: | 
-            Count read pairs (fragments) instead of reads. This option is only applicable for paired-end reads.
-        - name: --both_aligned
-          alternatives: ["-B"]
-          type: boolean_true
-          description: | 
-            Count read pairs (fragments) instead of reads. This option is only applicable for paired-end reads.
-        - name: --check_pe_dist
-          alternatives: ["-P"]
-          type: boolean_true
-          description: | 
-            Check validity of paired-end distance when counting read pairs. Use '--min_length' and '--max_length' to set thresholds.
-        - name: --min_length
-          alternatives: ["-d"]
-          type: integer
-          description: | 
-            Minimum fragment/template length, 50 by default.
-          required: false
-          example: 50
-        - name: --max_length
-          alternatives: ["-D"]
-          type: integer
-          description: | 
-            Maximum fragment/template length, 600 by default.
-          required: false
-          example: 600
-        - name: --same_strand
-          alternatives: ["-C"]
-          type: boolean_true
-          description: | 
-            Do not count read pairs that have their two ends mapping to different chromosomes or mapping to same chromosome but on different strands.
-        - name: --donotsort
-          type: boolean_true
-          description: | 
-            Do not sort reads in BAM/SAM input. Note that reads from the same pair are required to be located next to each other in the input.
-    
-    - name: Read groups
-      arguments:
-        - name: --by_read_group
-          type: boolean_true
-          description: | 
-            Assign reads by read group. "RG" tag is required to be present in the input BAM/SAM files.
-    
-    - name: Long reads
-      arguments:
-        - name: --long_reads
-          type: boolean_true
-          description: | 
-            Count long reads such as Nanopore and PacBio reads. Long read counting can only run in one thread and only reads (not read-pairs) can be counted. There is no limitation on the number of 'M' operations allowed in a CIGAR string in long read counting.
-    
-    - name: Assignment results for each read
-      arguments:
-        - name: --detailed_results
-          type: file
-          direction: output
-          description: | 
-            Directory to save the detailed assignment results. Use `--detailed_results_format` to determine the format of the detailed results.
-          example: detailed_results/
-          required: false
-        - name: --detailed_results_format
-          alternatives: ["-R"]
-          type: string
-          description: | 
-            Output detailed assignment results for each read or read-pair. Results are saved to a file that is in one of the following formats: CORE, SAM and BAM. See documentaiton for more info about these formats.
-          required: false
-          choices: [CORE, SAM, BAM]
-        
-    - name: Miscellaneous
-      arguments:
-        - name: --max_M_op
-          type: integer
-          description: | 
-            Maximum number of 'M' operations allowed in a CIGAR string. 10 by default. Both 'X' and '=' are treated as 'M' and adjacent 'M' operations are merged in the CIGAR string.
-          required: false
-          example: 10
-        - name: --verbose
-          type: boolean_true
-          description: | 
-            Output verbose information for debugging, such as un-matched chromosome/contig names.
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --annotation
+        alternatives: ["-a"]
+        type: file
+        description: | 
+          Name of an annotation file. GTF/GFF format by default. See '--format' option for more format information.
+        required: true
+        example: annotation.gtf
+      - name: --input
+        alternatives: ["-i"]
+        type: file
+        multiple: true
+        description: |
+          A list of SAM or BAM format files separated by semi-colon (;). They can be either name or location sorted. Location-sorted paired-end reads are automatically sorted by read names.
+        required: true
+        example: input_file1.bam
   
-  resources:
-    - type: bash_script
-      path: script.sh
+  - name: Outputs
+    arguments:
+      - name: --counts
+        alternatives: ["-o"]
+        type: file
+        direction: output
+        description: | 
+          Name of output file including read counts in tab delimited format.
+        required: true
+        example: features.tsv
+      - name: --summary
+        type: file
+        direction: output
+        description: | 
+          Summary statistics of counting results in tab delimited format.
+        required: false
+        example: summary.tsv
+      - name: --junctions
+        type: file
+        direction: output
+        description: | 
+          Count number of reads supporting each exon-exon junction. Junctions were identified from those exon-spanning reads in the input (containing 'N' in CIGAR string).
+        example: junctions.txt
+        required: false
 
-  test_resources:
-    - type: bash_script
-      path: test.sh
-    - type: file
-      path: test_data
+  - name: Annotation
+    arguments:
+      - name: --format
+        alternatives: ["-F"]
+        type: string
+        description: | 
+          Specify format of the provided annotation file. Acceptable formats include 'GTF' (or compatible GFF format) and 'SAF'. 'GTF' by default. 
+        choices: [GTF, GFF, SAF]
+        example: "GTF"
+        required: false
+      - name: --feature_type
+        alternatives: ["-t"]
+        type: string
+        description: | 
+          Specify feature type(s) in a GTF annotation. If multiple types are provided, they should be separated by ';' with no space in between. 'exon' by default. Rows in the annotation with a matched feature will be extracted and used for read mapping.
+        example: "exon"
+        required: false
+        multiple: true
+      - name: --attribute_type
+        alternatives: ["-g"]
+        type: string
+        description: | 
+          Specify attribute type in GTF annotation. 'gene_id' by default. Meta-features used for read counting will be extracted from annotation using the provided value.
+        example: "gene_id"
+        required: false
+      - name: --extra_attributes
+        type: string
+        description: | 
+          Extract extra attribute types from the provided GTF annotation and include them in the counting output. These attribute types will not be used to group features. If more than one attribute type is provided they should be separated by semicolon (;).
+        required: false
+        multiple: true
+      - name: --chrom_alias
+        alternatives: ["-A"]
+        type: file
+        description: | 
+          Provide a chromosome name alias file to match chr names in annotation with those in the reads. This should be a two-column comma-delimited text file. Its first column should include chr names in the annotation and its second column should include chr names in the reads. Chr names are case sensitive. No column header should be included in the file.
+        required: false
+        example: chrom_alias.csv
+  
+  - name: Level of summarization
+    arguments:
+      - name: --feature_level
+        alternatives: ["-f"]
+        type: boolean_true
+        description: | 
+          Perform read counting at feature level (eg. counting reads for exons rather than genes).
+  
+  - name: Overlap between reads and features
+    arguments:
+      - name: --overlapping
+        alternatives: ["-O"]
+        type: boolean_true
+        description: | 
+          Assign reads to all their overlapping meta-features (or features if '--feature_level' is specified).
+      - name: --min_overlap
+        type: integer
+        description: | 
+          Minimum number of overlapping bases in a read that is required for read assignment. 1 by default. Number of overlapping bases is counted from both reads if paired end. If a negative value is provided, then a gap of up to specified size will be allowed between read and the feature that the read is assigned to.
+        required: false
+        example: 1
+      - name: --frac_overlap
+        type: double
+        description: | 
+          Minimum fraction of overlapping bases in a read that is required for read assignment. Value should be within range [0,1]. 0 by default. Number of overlapping bases is counted from both reads if paired end. Both this option and '--min_overlap' option need to be satisfied for read assignment.
+        required: false
+        min: 0
+        max: 1
+        example: 0
+      - name: --frac_overlap_feature
+        type: double
+        description: | 
+          Minimum fraction of overlapping bases in a feature that is required for read assignment. Value should be within range [0,1]. 0 by default.
+        required: false
+        min: 0
+        max: 1
+        example: 0
+      - name: --largest_overlap
+        type: boolean_true
+        description: | 
+          Assign reads to a meta-feature/feature that has the largest number of overlapping bases.
+      - name: --non_overlap
+        type: integer
+        description: | 
+          Maximum number of non-overlapping bases in a read (or a read pair) that is allowed when being assigned to a feature. No limit is set by default.
+        required: false
+      - name: --non_overlap_feature
+        type: integer
+        description: | 
+          Maximum number of non-overlapping bases in a feature that is allowed in read assignment. No limit is set by default.
+        required: false
+      - name: --read_extension5
+        type: integer
+        description: | 
+          Reads are extended upstream by <int> bases from their 5' end.
+        required: false
+      - name: --read_extension3
+        type: integer
+        description: | 
+          Reads are extended upstream by <int> bases from their 3' end.
+        required: false
+      - name: --read2pos
+        type: integer
+        description: | 
+          Reduce reads to their 5' most base or 3' most base. Read counting is then performed based on the single base the read is reduced to.
+        required: false
+        choices: [3, 5]
+  
+  - name: Multi-mapping reads
+    arguments:
+      - name: --multi_mapping
+        alternatives: ["-M"]
+        type: boolean_true
+        description: | 
+          Multi-mapping reads will also be counted. For a multi-mapping read, all its reported alignments will be counted. The 'NH' tag in BAM/SAM input is used to detect multi-mapping reads.
+  
+  - name: Fractional counting
+    arguments:
+      - name: --fraction
+        type: boolean_true
+        description: | 
+          Assign fractional counts to features. This option must be used together with '--multi_mapping' or '--overlapping' or both. When '--multi_mapping' is specified, each reported alignment from a multi-mapping read (identified via 'NH' tag) will carry a fractional count of 1/x, instead of 1 (one), where x is the total number of alignments reported for the same read. When '--overlapping' is specified, each overlapping feature will receive a fractional count of 1/y, where y is the total number of features overlapping with the read. When both '--multi_mapping' and '--overlapping' are specified, each alignment will carry a fractional count of 1/(x*y).
 
-platforms: 
+  - name: Read filtering
+    arguments:
+      - name: --min_map_quality
+        alternatives: ["-Q"]
+        type: integer
+        description: | 
+          The minimum mapping quality score a read must satisfy in order to be counted. For paired-end reads, at least one end should satisfy this criteria. 0 by default.
+        required: false
+        example: 0
+      - name: --split_only
+        type: boolean_true
+        description: | 
+          Count split alignments only (ie. alignments with CIGAR string containing 'N'). An example of split alignments is exon-spanning reads in RNA-seq data.
+      - name: --non_split_only
+        type: boolean_true
+        description: | 
+          If specified, only non-split alignments (CIGAR strings do not contain letter 'N') will be counted. All the other alignments will be ignored.
+      - name: --primary
+        type: boolean_true
+        description: | 
+          Count primary alignments only. Primary alignments are identified using bit 0x100 in SAM/BAM FLAG field.
+      - name: --ignore_dup
+        type: boolean_true
+        description: | 
+          Ignore duplicate reads in read counting. Duplicate reads are identified using bit Ox400 in BAM/SAM FLAG field. The whole read pair is ignored if one of the reads is a duplicate read for paired end data.
+  
+  - name: Strandedness
+    arguments:
+      - name: --strand
+        alternatives: ["-s"]
+        type: integer
+        description: | 
+          Perform strand-specific read counting. A single integer value (applied to all input files) should be provided. Possible values include: 0 (unstranded), 1 (stranded) and 2 (reversely stranded). Default value is 0 (ie. unstranded read counting carried out for all input files).
+        choices: [0, 1, 2] 
+        example: 0
+        required: false
+
+  - name: Exon-exon junctions
+    arguments:
+      - name: --ref_fasta
+        alternatives: ["-G"]
+        type: file
+        description: | 
+          Provide the name of a FASTA-format file that contains the reference sequences used in read mapping that produced the provided SAM/BAM files.
+        required: false
+        example: reference.fasta
+      
+  - name: Parameters specific to paired end reads
+    arguments:
+      - name: --paired
+        alternatives: ["-p"]
+        type: boolean_true
+        description: | 
+          Specify that input data contain paired-end reads. To perform fragment counting (ie. counting read pairs), the '--countReadPairs' parameter should also be specified in addition to this parameter.
+      - name: --count_read_pairs
+        type: boolean_true
+        description: | 
+          Count read pairs (fragments) instead of reads. This option is only applicable for paired-end reads.
+      - name: --both_aligned
+        alternatives: ["-B"]
+        type: boolean_true
+        description: | 
+          Count read pairs (fragments) instead of reads. This option is only applicable for paired-end reads.
+      - name: --check_pe_dist
+        alternatives: ["-P"]
+        type: boolean_true
+        description: | 
+          Check validity of paired-end distance when counting read pairs. Use '--min_length' and '--max_length' to set thresholds.
+      - name: --min_length
+        alternatives: ["-d"]
+        type: integer
+        description: | 
+          Minimum fragment/template length, 50 by default.
+        required: false
+        example: 50
+      - name: --max_length
+        alternatives: ["-D"]
+        type: integer
+        description: | 
+          Maximum fragment/template length, 600 by default.
+        required: false
+        example: 600
+      - name: --same_strand
+        alternatives: ["-C"]
+        type: boolean_true
+        description: | 
+          Do not count read pairs that have their two ends mapping to different chromosomes or mapping to same chromosome but on different strands.
+      - name: --donotsort
+        type: boolean_true
+        description: | 
+          Do not sort reads in BAM/SAM input. Note that reads from the same pair are required to be located next to each other in the input.
+  
+  - name: Read groups
+    arguments:
+      - name: --by_read_group
+        type: boolean_true
+        description: | 
+          Assign reads by read group. "RG" tag is required to be present in the input BAM/SAM files.
+  
+  - name: Long reads
+    arguments:
+      - name: --long_reads
+        type: boolean_true
+        description: | 
+          Count long reads such as Nanopore and PacBio reads. Long read counting can only run in one thread and only reads (not read-pairs) can be counted. There is no limitation on the number of 'M' operations allowed in a CIGAR string in long read counting.
+  
+  - name: Assignment results for each read
+    arguments:
+      - name: --detailed_results
+        type: file
+        direction: output
+        description: | 
+          Directory to save the detailed assignment results. Use `--detailed_results_format` to determine the format of the detailed results.
+        example: detailed_results/
+        required: false
+      - name: --detailed_results_format
+        alternatives: ["-R"]
+        type: string
+        description: | 
+          Output detailed assignment results for each read or read-pair. Results are saved to a file that is in one of the following formats: CORE, SAM and BAM. See documentaiton for more info about these formats.
+        required: false
+        choices: [CORE, SAM, BAM]
+      
+  - name: Miscellaneous
+    arguments:
+      - name: --max_M_op
+        type: integer
+        description: | 
+          Maximum number of 'M' operations allowed in a CIGAR string. 10 by default. Both 'X' and '=' are treated as 'M' and adjacent 'M' operations are merged in the CIGAR string.
+        required: false
+        example: 10
+      - name: --verbose
+        type: boolean_true
+        description: | 
+          Output verbose information for debugging, such as un-matched chromosome/contig names.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+
+engines: 
   - type: docker
     image: quay.io/biocontainers/subread:2.0.6--he4a0461_0
     setup:
       - type: docker
         run: |
           featureCounts -v 2>&1 | sed 's/featureCounts v\([0-9.]*\)/featureCounts: \1/' > /var/software_versions.txt
+runners:
+  - type: executable
   - type: nextflow

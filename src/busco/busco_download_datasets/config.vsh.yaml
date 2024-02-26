@@ -1,6 +1,6 @@
-name: busco_list_datasets
+name: busco_download_datasets
 namespace: busco
-description: Lists the available busco datasets
+description: Downloads available busco datasets
 keywords: [lineage datasets]
 links:
   homepage: https://busco.ezlab.org/
@@ -10,17 +10,25 @@ references:
   doi: 10.1007/978-1-4939-9173-0_14
 license: MIT
 argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --download
+        type: string
+        description: |
+          Download dataset. Possible values are a specific dataset name, "all", "prokaryota", "eukaryota", or "virus".
+          The full list of available datasets can be viewed [here](https://busco-data.ezlab.org/v5/data/lineages/) or by running the busco/busco_list_datasets component.
+        required: true
+        example: stramenopiles_odb10
   - name: Outputs
     arguments:
-      - name: --output
-        alternatives: ["-o"]
+      - name: --download_path
         direction: output
         type: file
         description: |
-          Output file of the available busco datasets
+          Local filepath for storing BUSCO dataset downloads
         required: false
-        default: busco_dataset_list.txt
-        example: file.txt
+        default: busco_downloads
+        example: busco_downloads
 resources:
   - type: bash_script
     path: script.sh
