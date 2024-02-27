@@ -437,14 +437,17 @@ functionality:
         # - name: --untrimmed_paired_output
         # - name: too_short_paired_output
         # - name: too_long_paired_output
+    - name: Debug
+      arguments:
+        - type: boolean_true
+          name: --debug
+          description: Print debug information
   resources:
     - type: bash_script
       path: script.sh
   test_resources:
     - type: bash_script
       path: test.sh
-    - type: file
-      path: test_data
 platforms:
   - type: docker
     image: python:3.12

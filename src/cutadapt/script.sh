@@ -1,16 +1,30 @@
 #!/bin/bash
 
+## VIASH START
+par_adapter='AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC;GGATCGGAAGAGCACACGTCTGAACTCCAGTCAC'
+par_input='src/cutadapt/test_data/se/a.fastq'
+par_report='full'
+par_json='false'
+par_output='output'
+par_fasta='false'
+par_info_file='false'
+par_debug='true'
+## VIASH END
+
+# TODO: change this?
 if [ -z $par_output ]; then
 	par_output=.
 else
 	mkdir -p "$par_output"
 fi
 
+function debug {
+  [[ "$par_debug" == "true" ]] && echo "DEBUG: $@"
+}
 
 # Init
 ###########################################################
-echo "Running cutadapt"
-echo
+
 echo ">> Paired-end data or not?"
 
 mode=""
@@ -29,85 +43,45 @@ fi
 #   - string and fasta
 ###########################################################
 
-multi_adapter=""
-for adapter in `echo $par_adapter | tr ':' ' '`; do
-  multi_adapter="$multi_adapter --adapter $adapter"
-done
+function add_flags {
+  local arg=$1
+  local flag=$2
+  local prefix=$3
+  [[ -z $prefix ]] && prefix=""
 
-multi_adapter_fasta=""
-for adapter_fasta in `echo $par_adapter_fasta | tr ':' ' '`; do
-  multi_adapter_fasta="$multi_adapter_fasta --adapter file:$adapter_fasta"
-done
+  # This function should not be called if the input is empty
+  # but check for it just in case
+  if [[ -z $arg ]]; then
+    return
+  fi
 
-multi_adapter_r2=""
-for adapter_r2 in `echo $par_adapter_r2 | tr ':' ' '`; do
-  multi_adapter_r2="$multi_adapter_r2 --adapter_r2 $adapter_r2"
-done
+  local output=""
+  IFS=';' read -r -a array <<< "$arg"
+  for a in "${array[@]}"; do
+    output="$output $flag $prefix$a"
+  done
+  echo $output
+}
 
-multi_adapter_fasta_r2=""
-for adapter_fasta_r2 in `echo $par_adapter_fasta_r2 | tr ':' ' '`; do
-  multi_adapter_fasta_r2="$multi_adapter_fasta_r2 --adapter file:$adapter_fasta_r2"
-done
-
-multi_front=""
-for front in `echo $par_front | tr ':' ' '`; do
-  multi_front="$multi_front --front $front"
-done
-
-multi_front_fasta=""
-for front_fasta in `echo $par_front_fasta | tr ':' ' '`; do
-  multi_front_fasta="$multi_front_fasta --front file:$front_fasta"
-done
-
-multi_front_r2=""
-for front_r2 in `echo $par_front_r2 | tr ':' ' '`; do
-  multi_front_r2="$multi_front_r2 --front_r2 $front_r2"
-done
-
-multi_front_fasta_r2=""
-for front_fasta_r2 in `echo $par_front_fasta_r2 | tr ':' ' '`; do
-  multi_front_fasta_r2="$multi_front_fasta_r2 --front file:$front_fasta_r2"
-done
-
-multi_anywhere=""
-for anywhere in `echo $par_anywhere | tr ':' ' '`; do
-  multi_anywhere="$multi_anywhere --anywhere $anywhere"
-done
-
-multi_anywhere_fasta=""
-for anywhere_fasta in `echo $par_anywhere_fasta | tr ':' ' '`; do
-  multi_anywhere_fasta="$multi_anywhere_fasta --anywhere file:$anywhere_fasta"
-done
-
-multi_anywhere_r2=""
-for anywhere_r2 in `echo $par_anywhere_r2 | tr ':' ' '`; do
-  multi_anywhere_r2="$multi_anywhere_r2 --anywhere_r2 $anywhere_r2"
-done
-
-multi_anywhere_fasta_r2=""
-for anywhere_fasta_r2 in `echo $par_anywhere_fasta_r2 | tr ':' ' '`; do
-  multi_anywhere_fasta_r2="$multi_anywhere_fasta_r2 --anywhere file:$anywhere_fasta_r2"
-done
-
-echo ">> Parsing arguments dealing with adapters"
+debug ">> Parsing arguments dealing with adapters"
 adapter_args=$(echo \
-  ${par_adapter:+${multi_adapter}} \
-  ${par_adapter_fasta:+${multi_adapter_fasta}} \
-  ${par_front:+${multi_front}} \
-  ${par_front_fasta:+${multi_front_fasta}} \
-  ${par_anywhere:+${multi_anywhere}} \
-  ${par_anywhere_fasta:+${multi_anywhere_fasta}} \
-
-  ${par_adapter_r2:+${multi_adapter_r2}} \
-  ${par_adapter_fasta_r2:+${multi_adapter_fasta_r2}} \
-  ${par_front_r2:+${multi_front_r2}} \
-  ${par_front_fasta_r2:+${multi_front_fasta_r2}} \
-  ${par_anywhere_r2:+${multi_anywhere_r2}} \
-  ${par_anywhere_fasta_r2:+${multi_anywhere_fasta_r2}} \
+  ${par_adapter:+$(add_flags "$par_adapter" "--adapter")} \
+  ${par_adapter_fasta:+$(add_flags "$par_adapter_fasta" "--adapter" "file:")} \
+  ${par_front:+$(add_flags "$par_front" "--front")} \
+  ${par_front_fasta:+$(add_flags "$par_front_fasta" "--front" "file:")} \
+  ${par_anywhere:+$(add_flags "$par_anywhere" "--anywhere")} \
+  ${par_anywhere_fasta:+$(add_flags "$par_anywhere_fasta" "--anywhere" "file:")} \
+  ${par_adapter_r2:+$(add_flags "$par_adapter_r2" "-A")} \
+  ${par_adapter_fasta_r2:+$(add_flags "$par_adapter_fasta_r2" "-A" "file:")} \
+  ${par_front_r2:+$(add_flags "$par_front_r2" "-G")} \
+  ${par_front_fasta_r2:+$(add_flags "$par_front_fasta_r2" "-G" "file:")} \
+  ${par_anywhere_r2:+$(add_flags "$par_anywhere_r2" "-B")} \
+  ${par_anywhere_fasta_r2:+$(add_flags "$par_anywhere_fasta_r2" "-B" "file:")} \
 )
-echo "Arguments to cutadapt:"
-echo "$adapter_args"
-echo
+
+debug "Arguments to cutadapt:"
+debug "$adapter_args"
+debug
 
 # Paired-end options
 ###########################################################
@@ -120,9 +94,9 @@ paired_args=$(echo \
   ${par_pair_filter:+--pair-filter "${par_pair_filter}"} \
   ${par_interleaved:+--interleaved}
 )
-echo "Arguments to cutadapt:"
-echo $paired_args
-echo
+debug "Arguments to cutadapt:"
+debug $paired_args
+debug
 
 # Input arguments 
 ###########################################################
@@ -142,9 +116,9 @@ input_args=$(echo \
   ${par_action:+--action "${par_action}"} \
   ${par_revcomp:+--revcomp} \
 )
-echo "Arguments to cutadapt:"
-echo $input_args
-echo
+debug "Arguments to cutadapt:"
+debug $input_args
+debug
 
 # Read modifications
 ###########################################################
@@ -170,9 +144,9 @@ mod_args=$(echo \
   ${par_rename:+--rename "${par_rename}"} \
   ${par_zero_cap:+--zero-cap} \
 )
-echo "Arguments to cutadapt:"
-echo $mod_args
-echo
+debug "Arguments to cutadapt:"
+debug $mod_args
+debug
 
 # Filtering of processed reads arguments
 ###########################################################
@@ -194,46 +168,58 @@ filter_args=$(echo \
   ${par_discard_untrimmed:+--discard-untrimmed} \
   ${par_discard_casava:+--discard-casava} \
 )
-echo "Arguments to cutadapt:"
-echo $filter_args
-echo
+debug "Arguments to cutadapt:"
+debug $filter_args
+debug
+
+# Optional output arguments
+###########################################################
+echo ">> Optional arguments"
+[[ "$par_json" == "false" ]] && unset par_json
+[[ "$par_fasta" == "false" ]] && unset par_fasta
+[[ "$par_info_file" == "false" ]] && unset par_info_file
+
+optional_output_args=$(echo \
+  ${par_report:+--report "${par_report}"} \
+  ${par_json:+--json "${par_output}/report.json"} \
+  ${par_fasta:+--fasta} \
+  ${par_info_file:+--info-file "$par_output/info.txt"} \
+)
+
+debug "Arguments to cutadapt:"
+debug $optional_output_args
+debug
 
 # Output arguments
 # We write the output to a directory rather than
 # individual files.
 ###########################################################
-echo ">> Output arguments"
-[[ "$par_json" == "false" ]] && unset par_json
-[[ "$par_fasta" == "false" ]] && unset par_fasta
-[[ "$par_info_file" == "false" ]] && unset par_info_file
+
+if [[ -z $par_fasta ]]; then
+  ext="fastq"
+else
+  ext="fasta"
+fi
 
 if [ $mode = "se" ]; then
   output_args=$(echo \
-    ${par_report:+--report "${par_report}"} \
-    ${par_json:+--json "${par_output}/report.json"} \
-    --output "$par_output/{name}_R1_001.fastq" \
-    ${par_fasta:+--fasta} \
-    ${par_info_file:+--info-file} \
+    --output "$par_output/{name}_001.$ext" \
   )
 else
   output_args=$(echo \
-    ${par_report:+--report "${par_report}"} \
-    ${par_json:+--json "${par_output}/report.json"} \
-    --output "$par_output/{name}_R1_001.fastq" \
-    --paired-output "$par_output/{name}_R2_001.fastq" \
-    ${par_fasta:+--fasta} \
-    ${par_info_file:+--info-file} \
+    --output "$par_output/{name}_R1_001.$ext" \
+    --paired-output "$par_output/{name}_R2_001.$ext" \
   )
 fi
-echo "Arguments to cutadapt:"
-echo $output_args
-echo
+
+debug "Arguments to cutadapt:"
+debug $output_args
+debug
 
 # Full CLI
 # Set the --cores argument to 0 unless meta_cpus is set
 ###########################################################
-echo ">> Full CLI to be run:"
-
+echo ">> Running cutadapt"
 par_cpus=0
 [[ ! -z $meta_cpus ]] && par_cpus=$meta_cpus
 
@@ -244,10 +230,13 @@ cli=$(echo \
   $input_args \
   $mod_args \
   $filter_args \
+  $optional_output_args \
   $output_args \
   --cores $par_cpus
 )
 
-echo cutadapt $cli | sed -e 's/--/\r\n  --/g'
+debug ">> Full CLI to be run:"
+debug cutadapt $cli | sed -e 's/--/\r\n  --/g'
+debug
 
 cutadapt $cli | tee $par_output/report.txt
