@@ -80,7 +80,7 @@ with tempfile.TemporaryDirectory(prefix="star-", dir=meta["temp_dir"], ignore_cl
     temp_dir = Path(temp_dir)
     par["outTmpDir"] = temp_dir / "tempdir"
     out_dir = temp_dir / "out"
-    par["outFileNamePrefix"] = out_dir
+    par["outFileNamePrefix"] = f"{out_dir}/" # star needs this slash
 
     # construct command
     cmd_args = [ "STAR" ]
