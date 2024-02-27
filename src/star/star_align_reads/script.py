@@ -77,30 +77,27 @@ with tempfile.TemporaryDirectory(prefix="star-", dir=meta["temp_dir"], ignore_cl
     print(">> Constructing command", flush=True)
 
     # set output paths
-    par["outTmpDir"] = temp_dir + "/tempdir"
-    par["outFileNamePrefix"] = temp_dir + "/out/"
-    out_dir = Path(temp_dir) / "out"
+    temp_dir = Path(temp_dir)
+    par["outTmpDir"] = temp_dir / "tempdir"
+    out_dir = temp_dir / "out"
+    par["outFileNamePrefix"] = out_dir
 
     # construct command
     cmd_args = [ "STAR" ]
     for name, value in par.items():
         if value is not None:
-            if isinstance(value, list):
-                cmd_args.extend(["--" + name] + [str(x) for x in value])
-            else:
-                cmd_args.extend(["--" + name, str(value)])
+            val_to_add = value if isinstance(value, list) else [value]
+            cmd_args.extend([f"--{name}"] + [str(x) for x in val_to_add])
     print("", flush=True)
 
     # run command
     print(">> Running STAR with command:", flush=True)
-    print("+ " + " ".join([str(x) for x in cmd_args]), flush=True)
-    print("", flush=True)
+    print(f"+ {' '.join(cmd_args)}", end="\n\n", flush=True)
     subprocess.run(
         cmd_args,
         check=True
     )
-    print(">> STAR finished successfully", flush=True)
-    print("", flush=True)
+    print(">> STAR finished successfully", end="\n\n", flush=True)
 
     # move output to final destination
     print(">> Moving output to final destination", flush=True)
@@ -108,5 +105,5 @@ with tempfile.TemporaryDirectory(prefix="star-", dir=meta["temp_dir"], ignore_cl
         for expected_path in [paths] if isinstance(paths, str) else paths:
             expected_full_path = out_dir / expected_path
             if output_paths[name] and expected_full_path.is_file():
-                print(">> Moving " + expected_path + " to " + output_paths[name], flush=True)
+                print(f">> Moving {expected_path} to {output_paths[name]}", flush=True)
                 shutil.move(expected_full_path, output_paths[name])
