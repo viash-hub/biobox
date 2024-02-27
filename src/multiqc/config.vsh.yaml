@@ -19,7 +19,7 @@ functionality:
         - name: "--input"
           type: file
           multiple: true
-          multiple_sep: ":"
+          multiple_sep: ","
           example: data/results/
           description: |
             File paths to be searched for analysis results to be included in the report.
@@ -53,20 +53,24 @@ functionality:
         - name: "--include_modules"
           type: string
           multiple: true
+          multiple_sep: ","
           example: fastqc,cutadapt
           description: Use only these module
         - name: "--exclude_modules"
           type: string
           multiple: true
+          multiple_sep: ","
           example: fastqc,cutadapt
           description: Do not use only these modules
         - name: "--ignore_analysis"
           type: string
           multiple: true
+          multiple_sep: ","
           example: run_one/*,run_two/*
         - name: "--ignore_samples"
           type: string
           multiple: true
+          multiple_sep: ","
           example: sample_1*,sample_3*
         - name: "--ignore_symlinks"
           type: boolean_true
@@ -95,31 +99,32 @@ functionality:
       arguments:
         - name: "--title"
           type: string
-          description: Report title. Printed as page header, used for filename if not otherwise specified.
+          description: |
+            Report title. Printed as page header, used for filename if not otherwise specified.
         - name: "--comment"
           type: string
-          description: Custom comment, will be printed at the top of the report.
+          description: |
+            Custom comment, will be printed at the top of the report.
         - name: "--template"
           type: string
           choices: [default, gathered, geo, highcharts, sections, simple]
-          description: Report template to use.
+          description: |
+            Report template to use.
         - name: "--sample_names"
           type: file
-          description: TSV file containing alternative sample names for renaming buttons in the report.
+          description: |
+            TSV file containing alternative sample names for renaming buttons in the report.
           example: sample_names.tsv
         - name: "--sample_filters"
           type: file
-          description: TSV file containing show/hide patterns for the report
+          description: |
+            TSV file containing show/hide patterns for the report
           example: sample_filters.tsv
         - name: "--custom_css_file"
           type: file
-          description: Custom CSS file to add to the final report
-          example: custom_style_sheet.css
-        - name: "--multiqc_custom_config"
-          type: file
-          example: path/to/multiqc_config.yml
           description: |
-            Specific config file to load, after those in MultiQC dir / home dir / working dir
+            Custom CSS file to add to the final report
+          example: custom_style_sheet.css
         - name: "--profile_runtime"
           type: boolean_true
           description: |

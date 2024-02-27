@@ -27,39 +27,80 @@ out_dir=$(dirname "$par_output_report")
 output_report_file=$(basename "$par_output_report")
 report_name="${output_report_file%.*}"
 
-# echo ============
-# echo $out_dir
-# echo $output_report_file
-# echo $report_name
-# echo ============
-
 # handle outputs
 [[ -z "$par_output_report" ]] && no_report=true
 [[ -z "$par_output_data" ]] && no_data_dir=true
 [[ ! -z "$par_output_data" ]] && data_dir=true
 [[ ! -z "$par_output_plots" ]] && export=true
 
-# echo ===========
-# echo par_output_data: $par_output_data
-# echo data_dir: $data_dir
-# echo no_data_dir: $no_data_dir
-# echo par_output_report: $par_output_report
-# echo no_report: $no_report
-# echo ===========
-
-# allow for multiple inputs
+# handle multiples
 if [[ -n "$par_input" ]]; then
-    IFS=":" read -ra inputs <<< $par_input
+    IFS="," read -ra inputs <<< $par_input
     unset IFS
 fi
 
+if [[ -z "$par_include_modules" ]]; then
+    include_modules=""
+    IFS="," read -ra incl_modules <<< $par_include_modules
+    for i in "${incl_modules[@]}"; do
+        include_modules+="--include-modules $i "
+    done
+    unset IFS
+fi
+
+if [[ -z "$par_exclude_modules" ]]; then
+    exclude_modules=""
+    IFS="," read -ra excl_modules <<< $par_include_modules
+    for i in "${excl_modules[@]}"; do
+        exclude_modules+="--exclude-modules $i "
+    done
+    unset IFS
+fi
+
+if [[ -z "$par_ignore_analysis" ]]; then
+    ignore=""
+    IFS="," read -ra ignore_analysis <<< $par_ignore_analysis
+    for i in "${ignore_analysis[@]}"; do
+        ignore+="--ignore $i "
+    done
+    unset IFS
+fi
+
+if [[ -z "$par_ignore_samples" ]]; then
+    ignore_samples=""
+    IFS="," read -ra ign_samples <<< $par_ignore_samples
+    for i in "${ign_samples[@]}"; do
+        ignore_samples+="--ignore-samples $i "
+    done
+    unset IFS
+fi
 
 # run multiqc
 multiqc \
     ${par_output_report:+--filename "$report_name"} \
     ${out_dir:+--outdir "$out_dir"} \
     ${no_report:+--no-report} \
+    ${no_data_dir:+--no-data-dir} \
+    ${data_dir:+--data-dir} \
     ${export:+--export} \
+    ${par_title:+--title "$par_title"} \
+    ${par_comment:+--comment "$par_comment"} \
+    ${par_template:+--template "$par_template"} \
+    ${par_sample_names:+--sample-names "$par_sample_names"} \
+    ${par_sample_filters:+--sample-filters "$par_sample_filters"} \
+    ${par_custom_css_file:+--custom-css-file "$par_custom_css_file"} \
+    ${par_profile_runtime:+--profile-runtime} \
+    ${par_dirs:+--dirs} \
+    ${par_dirs_depth:+--dirs-depth "$par_dirs_depth"} \
+    ${par_full_names:+--full-names} \
+    ${par_fn_as_s_name:+--fn-as-s-name} \
+    ${par_ignore_names:+--ignore-names "$par_ignore_names"} \
+    ${par_ignore_symlinks:+--ignore-symlinks} \
+    ${ignore_samples:+"$ignore_samples"} \
+    ${ignore:+"$ignore"} \
+    ${exclude_modules:+"$exclude_modules"} \
+    ${include_modules:+"$include_modules"} \
+    ${par_include_modules:+--include-modules "$par_include_modules"} \
     ${par_data_format:+--data-format "$par_data_format"} \
     ${par_zip_data_dir:+--zip-data-dir} \
     ${par_pdf:+--pdf} \
