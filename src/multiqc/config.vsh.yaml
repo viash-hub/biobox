@@ -120,65 +120,73 @@ functionality:
           example: path/to/multiqc_config.yml
           description: |
             Specific config file to load, after those in MultiQC dir / home dir / working dir
-    
+        - name: "--profile_runtime"
+          type: boolean_true
+          description: |
+            Add analysis of how long MultiQC takes to run to the report
 
     - name: "MultiQC behaviour"
       arguments:
         - name: "--verbose"
           type: boolean_true
-          description: Increase output verbosity.
-        - name: "--force"
-          type: boolean_true
-          description: Overwrite any existing reports
+          description: |
+            Increase output verbosity.
         - name: "--quiet"
           type: boolean_true
-          description: Only show log warnings
+          description: |
+            Only show log warnings
         - name: "--strict"
           type: boolean_true
-          description: Don't catch exceptions, run additional code checks to help development. 
+          description: |
+            Don't catch exceptions, run additional code checks to help development. 
         - name: "--development"
           type: boolean_true
-          description: Development mode. Do not compress and minimise JS, export uncompressed plot data.
+          description: |
+            Development mode. Do not compress and minimise JS, export uncompressed plot data.
         - name: "--require_logs"
           type: boolean_true
-          description: Require all explicitly requested modules to have log files. If not, MultiQC will exit with an error.
+          description: |
+            Require all explicitly requested modules to have log files. If not, MultiQC will exit with an error.
         - name: "--no_megaqc_upload"
           type: boolean_true
-          description: Don't upload generated report to MegaQC, even if MegaQC options are found.
+          description: |
+            Don't upload generated report to MegaQC, even if MegaQC options are found.
         - name: "--no_ansi"
           type: boolean_true
-          description: Disable coloured log output.
+          description: |
+            Disable coloured log output.
 
     - name: "Output format"
       arguments:
       - name: "--flat"
         type: boolean_true
-        description: Use only flat plots (static images).
+        description: |
+          Use only flat plots (static images).
       - name: "--interactive"
         type: boolean_true
-        description: Use only interactive plots (in-browser Javascript).
-      - name: "--export"
-        type: boolean_true
-        description: Export plots as static images in addition to the report.
+        description: |
+          Use only interactive plots (in-browser Javascript).
       - name: "--data_dir"
         type: boolean_true
-        description: Force the parsed data directory to be created.
+        description: |
+          Force the parsed data directory to be created.
       - name: "--no_data_dir"
         type: boolean_true
-        description: Prevent the parsed data directory from being created.
+        description: |
+          Prevent the parsed data directory from being created.
       - name: "--zip_data_dir"
         type: boolean_true
-        description: Compress the data directory.
+        description: |
+          Compress the data directory.
       - name: "--data_format"
         type: string
         choices: [tsv, csv, json, yaml]
-        description: Output parsed data in a different format.
-      - name: "--no_report"
-        type: boolean_true
-        description: Do not generate a report, only export data and plots.
+        description: |
+          Output parsed data in a different format than the default 'txt'.
       - name: "--pdf"
         type: boolean_true
-        description: Creates PDF report with the 'simple' template. Requires Pandoc to be installed.
+        description: | 
+          Creates PDF report with the 'simple' template. Requires Pandoc to be installed.
 
   resources:
     - type: bash_script
@@ -192,7 +200,7 @@ functionality:
 
 platforms:
   - type: docker
-    image: quay.io/biocontainers/multiqc:1.20--pyhdfd78af_0
+    image: quay.io/biocontainers/multiqc:1.20--pyhdfd78af_2
     setup:
       - type: docker
         run: |
