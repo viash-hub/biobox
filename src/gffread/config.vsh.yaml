@@ -372,6 +372,10 @@ functionality:
 engines:
   - type: docker
     image: quay.io/biocontainers/gffread:0.12.7--hdcf5f25_3
+    setup:
+      - type: docker
+        run: |
+          echo "gffread: \"0.12.7\"" > /var/software_versions.txt
 runners:
   - type: executable
   - type: nextflow

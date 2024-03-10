@@ -12,7 +12,7 @@ echo "> Run gffread with a single genome"
 
 ################################################################################
 
-echo "> Test 1" 
+echo "> Test 1 - Read annotation file, output GFF" 
 
 "$meta_executable" \
     -E annotation.gff \
@@ -29,7 +29,7 @@ diff "$expected_output_dir/ann_simple.gff" "$test_output_dir/ann_simple.gff" || 
 
 ################################################################################
 
-echo "> Test 2"
+echo "> Test 2 - Read annotation file, output GTF"
 
 "$meta_executable" \
     annotation.gff \
@@ -47,7 +47,7 @@ diff "$expected_output_dir/annotation.gtf" "$test_output_dir/annotation.gtf" || 
 
 ################################################################################
 
-echo "> Test 3"
+echo "> Test 3 - Generate fasta file from annotation file"
 
 "$meta_executable" \
     -w "$test_output_dir/transcripts.fa" \
@@ -65,7 +65,7 @@ diff "$expected_output_dir/transcripts.fa" "$test_output_dir/transcripts.fa" || 
 
 ################################################################################
 
-echo "> Test 4"
+echo "> Test 4 - Generate table from GFF annotation file"
 
 "$meta_executable" \
     --table @id,@chr,@start,@end,@strand,@exons,Name,gene,product \
