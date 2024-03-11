@@ -8,15 +8,16 @@ set -e
 test_output_dir="$meta_resources_dir/test_data/test_output/"
 test_dir="$meta_resources_dir/test_data/"
 expected_output_dir="$meta_resources_dir/test_data/output/"
-echo "> Run gffread with a single genome"
+
 
 ################################################################################
 
 echo "> Test 1 - Read annotation file, output GFF" 
 
 "$meta_executable" \
-  --expose-dups "annotation.gff" \
-  --outfile "$test_output_dir/ann_simple.gff"
+  --expose_dups \
+  --outfile "$test_output_dir/ann_simple.gff" \
+  --input "$test_dir/annotation.gff" \
 
 echo ">> Check if output exists"
 [ ! -f "$test_output_dir/ann_simple.gff" ] \
@@ -35,9 +36,9 @@ diff "$expected_output_dir/ann_simple.gff" "$test_output_dir/ann_simple.gff" || 
 echo "> Test 2 - Read annotation file, output GTF"
 
 "$meta_executable" \
-  "annotation.gff" \
-  --gtf-output \
-  --outfile "$test_output_dir/annotation.gtf"
+  --gtf_output \
+  --outfile "$test_output_dir/annotation.gtf" \
+  --input "$test_dir/annotation.gff"
 
 echo ">> Check if output exists"
 [ ! -f "$test_output_dir/annotation.gtf" ] \
@@ -56,9 +57,9 @@ diff "$expected_output_dir/annotation.gtf" "$test_output_dir/annotation.gtf" || 
 echo "> Test 3 - Generate fasta file from annotation file"
 
 "$meta_executable" \
-  --spliced-exons "$test_output_dir/transcripts.fa" \
+  --spliced_exons "$test_output_dir/transcripts.fa" \
   --genome "genome.fa" \
-  "annotation.gff"
+  --input "annotation.gff"
 
 echo ">> Check if output exists"
 [ ! -f "$test_output_dir/transcripts.fa" ] \
@@ -79,7 +80,7 @@ echo "> Test 4 - Generate table from GFF annotation file"
 "$meta_executable" \
   --table @id,@chr,@start,@end,@strand,@exons,Name,gene,product \
   --outfile "$test_output_dir/annotation.tbl" \
-  "annotation.gff"
+  --input "annotation.gff"
 
 echo ">> Check if output exists"
 [ ! -f "$test_output_dir/annotation.tbl" ] \
