@@ -17,7 +17,7 @@ echo "> Test 1 - Read annotation file, output GFF"
 "$meta_executable" \
   --expose_dups \
   --outfile "$test_output_dir/ann_simple.gff" \
-  --input "$test_dir/annotation.gff" \
+  --input "$test_dir/annotation.gff"
 
 echo ">> Check if output exists"
 [ ! -f "$test_output_dir/ann_simple.gff" ] \
