@@ -85,10 +85,11 @@ argument_groups:
       - name: --spliced_exons
         alternatives: -w
         type: file
+        direction: output
         must_exist: false
-        example: exons.fa
         description: |
           Write a fasta file with spliced exons for each transcript.
+        example: exons.fa
       - name: --w_add
         type: integer
         description: |

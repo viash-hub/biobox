@@ -7,10 +7,12 @@
 [[ "$par_coding" == "false" ]] && unset par_coding
 [[ "$par_strict_range" == "false" ]] && unset par_strict_range
 [[ "$par_no_single_exon" == "false" ]] && unset par_no_single_exon
+[[ "$par_no_exon_attrs" == "false" ]] && unset par_no_exon_attrs
 [[ "$par_nc" == "false" ]] && unset par_nc
 [[ "$par_ignore_locus" == "false" ]] && unset par_ignore_locus
 [[ "$par_description" == "false" ]] && unset par_description
 [[ "$par_sort_alpha" == "false" ]] && unset par_sort_alpha
+[[ "$par_keep_genes" == "false" ]] && unset par_keep_genes
 [[ "$par_keep_attrs" == "false" ]] && unset par_keep_attrs
 [[ "$par_keep_exon_attrs" == "false" ]] && unset par_keep_exon_attrs
 [[ "$par_keep_comments" == "false" ]] && unset par_keep_comments
@@ -61,7 +63,7 @@ gffread \
     ${par_merge_exons:+-Z} \
     ${par_genome:+-g "$par_genome"} \
     ${par_junctions:+-j} \
-    ${par_spliced_exons:+-w "$par_spliced_exon"} \
+    ${par_spliced_exons:+-w "$par_spliced_exons"} \
     ${par_w_add:+--w-add "$par_w_add"} \
     ${par_w_nocds:+--w-nocds} \
     ${par_spliced_cds:+-x "$par_spliced_cds"} \
