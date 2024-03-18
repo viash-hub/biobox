@@ -92,6 +92,8 @@ diff "$expected_output_dir/transcripts.fa" "$test_output_dir/transcripts.fa" || 
 
 echo "> Test 4 - Generate table from GFF annotation file"
 
+# reference output annotation.tbl was created manually with gffread 0.12.7
+
 "$meta_executable" \
   --table @id,@chr,@start,@end,@strand,@exons,Name,gene,product \
   --outfile "$test_output_dir/annotation.tbl" \
@@ -109,12 +111,10 @@ echo ">> Compare output to expected output"
 diff "$expected_output_dir/annotation.tbl" "$test_output_dir/annotation.tbl" || \
     (echo "Output file annotation.tbl does not match expected output" && exit 1)
 
-# reference output annotation.tbl was created manually with gffread 0.12.7
-
 ################################################################################
 
-echo "> All tests successful"
-
 rm -r "$test_output_dir"
+
+echo "> All tests successful"
 
 exit 0

@@ -1,7 +1,7 @@
 name: gffread
 namespace: gffread
 description: Validate, filter, convert and perform various other operations on GFF files.
-keywords: [gff, conversion, validation]
+keywords: [gff, conversion, validation, filtering]
 links:
   homepage: https://ccb.jhu.edu/software/stringtie/gff.shtml#gffread
   documentation: https://ccb.jhu.edu/software/stringtie/gff.shtml#gffread
