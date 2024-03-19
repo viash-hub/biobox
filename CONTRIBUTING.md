@@ -114,7 +114,7 @@ Notes:
   ```
 
 
-### Step 6: Fetch test data
+### Step 6: Create or fetch test data
 
 To help develop the component, it's interesting to have some test data available. In most cases, we can use the test data from the Snakemake wrappers. 
 
@@ -132,6 +132,8 @@ fi
 cp -r /tmp/snakemake-wrappers/bio/xxx/test/* src/xxx/test_data
 EOF
 ```
+
+The test data should be suitable for testing this component. Ensure that the test data is small enough: ideally <1KB, preferably <10KB, if need be <100KB.
 
 ### Step 7: Add arguments for the input files
 
