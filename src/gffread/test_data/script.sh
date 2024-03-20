@@ -1,3 +1,4 @@
+#!/bin/bash
 
 # clone repo
 if [ ! -d /tmp/gffread_source ]; then

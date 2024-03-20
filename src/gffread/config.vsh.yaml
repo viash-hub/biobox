@@ -34,7 +34,7 @@ argument_groups:
         direction: input
         description: |
           <seq_info.fsize> is a tab-delimited file providing this info for each of the mapped 
-          sequences: <seq-name> <seq-length> <seq-description> (useful for -A option with 
+          sequences: <seq-name> <seq-length> <seq-description> (useful for --description option with 
           mRNA/EST/protein mappings).
       - name: --genome
         alternatives: -g
@@ -52,7 +52,8 @@ argument_groups:
         direction: output
         must_exist: false
         description: |
-          Write the output records into <outfile> instead of stdout.
+          Write the output records into <outfile>.
+        default: output.gff
       - name: --force_exons
         type: boolean_true
         description: |
@@ -93,12 +94,12 @@ argument_groups:
       - name: --w_add
         type: integer
         description: |
-          For the -w option, extract additional <N> bases both upstream and downstream of 
-          the transcript boundaries.
+          For the --spliced_exons option, extract additional <N> bases both upstream and 
+          downstream of the transcript boundaries.
       - name: --w_nocds
         type: boolean_true
         description: |
-          For -w, disable the output of CDS info in the FASTA file.
+          For --spliced_exons, disable the output of CDS info in the FASTA file.
       - name: --spliced_cds
         alternatives: -x
         type: file
@@ -117,13 +118,13 @@ argument_groups:
         alternatives: -W
         type: boolean_true
         description: |
-          For -w, -x and -y options, write in the FASTA defline all the exon coordinates 
-          projected onto the spliced sequence.
+          For --spliced_exons, --spliced_cds and -tr_cds options, write in the FASTA defline 
+          all the exon coordinates projected onto the spliced sequence.
       - name: --stop_dot
         alternatives: -S
         type: boolean_true
         description: |
-          For -y option, use '*' instead of '.' as stop codon translation.
+          For --tr_cds option, use '*' instead of '.' as stop codon translation.
       - name: --id_version
         alternatives: -L
         type: boolean_true
@@ -160,8 +161,9 @@ argument_groups:
           of GFF attributes given in <attrlist>; special pseudo-attributes (prefixed by @) are 
           recognized:
             @id, @geneid, @chr, @start, @end, @strand, @numexons, @exons, @cds, @covlen, @cdslen
-          If any of -w/-y/-x FASTA output files are enabled, the same fields (excluding @id) are 
-          appended to the definition line of corresponding FASTA records.
+          If any of --spliced_exons/--tr_cds/--spliced_cds FASTA output files are enabled, the 
+          same fields (excluding @id) are appended to the definition line of corresponding FASTA
+          records.
       - name: --expose_dups
         type: boolean_true
         alternatives: [-E, -v]
@@ -198,7 +200,7 @@ argument_groups:
         alternatives: -R
         type: boolean_true
         description: |
-          For -r option, discard all transcripts that are not fully contained within the given 
+          For --range option, discard all transcripts that are not fully contained within the given 
           range.
       - name: --jmatch
         type: string
@@ -279,25 +281,25 @@ argument_groups:
         alternatives: -V
         type: boolean_true
         description: |
-          Discard any mRNAs with CDS having in-frame stop codons (requires -g).
+          Discard any mRNAs with CDS having in-frame stop codons (requires --genome).
       - name: --adj_cds_start
         alternatives: -H
         type: boolean_true
         description: |
-          For -V option, check and adjust the starting CDS phase if the original phase leads to a 
-          translation with an in-frame stop codon.
+          For --rm_stop_codons option, check and adjust the starting CDS phase if the original phase
+          leads to a translation with an in-frame stop codon.
       - name: --opposite_strand
         alternatives: -B
         type: boolean_true
         description: |
           For -V option, single-exon transcripts are also checked on the opposite strand (requires 
-          -g).  
+          --genome).  
       - name: --coding_status
         alternatives: -P
         type: boolean_true
         description: |
           Add transcript level GFF attributes about the coding status of each transcript, including 
-          partialness or in-frame stop codons (requires -g).
+          partialness or in-frame stop codons (requires --genome).
       - name: --add_hasCDS
         type: boolean_true
         description: |
@@ -305,7 +307,7 @@ argument_groups:
       - name: --adj_stop
         type: boolean_true
         description: |
-          Stop codon adjustment: enables -P and performs automatic adjustment of the CDS stop 
+          Stop codon adjustment: enables --coding_status and performs automatic adjustment of the CDS stop 
           coordinate if premature or downstream.
       - name: --rm_noncanon
         alternatives: -N
@@ -350,31 +352,31 @@ argument_groups:
         alternatives: -d
         type: file
         description: |
-          For -M option, write duplication info to file <dupinfo>.
+          For --merge option, write duplication info to file <dupinfo>.
       - name: --cluster_only
         type: boolean_true
         description: |
-          Same as -M/--merge but without discarding any of the "duplicate" transcripts, only create 
+          Same as --merge but without discarding any of the "duplicate" transcripts, only create 
           "locus" features.
       - name: --rm_redundant
         alternatives: -K
         type: boolean_true
         description: |
-          For -M option: also discard as redundant the shorter, fully contained transcripts (intron 
+          For --merge option: also discard as redundant the shorter, fully contained transcripts (intron 
           chains matching a part of the container).
       - name: --no_boundary
         alternatives: -Q
         type: boolean_true
         description: |
-          For -M option, no longer require boundary containment when assessing redundancy (can be 
-          combined with -K); only introns have to match for multi-exon transcripts, and >=80% overlap 
-          for single-exon transcripts.
+          For --merge option, no longer require boundary containment when assessing redundancy (can be 
+          combined with --rm_redundant); only introns have to match for multi-exon transcripts, and >=80%
+          overlap for single-exon transcripts.
       - name: --no_overlap
         alternatives: -Y
         type: boolean_true
         description: |
-          For -M option, enforce -Q but also discard overlapping single-exon transcripts, even on 
-          the opposite strand (can be combined with -K).
+          For --merge option, enforce --no_boundary but also discard overlapping single-exon transcripts,
+          even on the opposite strand (can be combined with --rm_redudant).
 
 resources:
   - type: bash_script
@@ -390,7 +392,7 @@ engines:
   setup:
     - type: docker
       run: |
-        echo "gffread: \"0.12.7\"" > /var/software_versions.txt
+        echo "gffread: \"$(gffread --version 2>&1)\"" > /var/software_versions.txt
 runners:
 - type: executable
 - type: nextflow

@@ -29,7 +29,7 @@
 
 * `star/star_align_reads`: Align reads to a reference genome (PR #22).
 
-* `gffread`: Validate, filter, convert and perform other operations on GFF files (PR #25). 
+* `gffread`: Validate, filter, convert and perform other operations on GFF files (PR #29). 
 
 ## MAJOR CHANGES
 

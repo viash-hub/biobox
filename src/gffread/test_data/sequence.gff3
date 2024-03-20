@@ -1,0 +1,9 @@
+##gff-version 3
+#!gff-spec-version 1.21
+#!processor NCBI annotwriter
+##sequence-region NM_141699.3 1 933
+##species https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=7227
+NM_141699.3	RefSeq	region	1	933	.	+	.	ID=NM_141699.3:1..933;Dbxref=taxon:7227;Name=3R;chromosome=3R;gbkey=Src;genome=chromosome;genotype=y[1]%3B Gr22b[1] Gr22d[1] cn[1] CG33964[R4.2] bw[1] sp[1]%3B LysC[1] MstProx[1] GstD5[1] Rh6[1];mol_type=mRNA
+NM_141699.3	RefSeq	gene	1	933	.	+	.	ID=gene-Dmel_CG16905;Dbxref=FLYBASE:FBgn0037762,GeneID:41211;Name=eloF;cyt_map=85E10-85E10;description=elongase F;gbkey=Gene;gen_map=3-49 cM;gene=eloF;gene_synonym=CG16905,Dmel\CG16905,EloF;locus_tag=Dmel_CG16905
+NM_141699.3	RefSeq	CDS	22	795	.	+	0	ID=cds-NP_649956.1;Parent=gene-Dmel_CG16905;Dbxref=FLYBASE:FBpp0081622,GeneID:41211,GenBank:NP_649956.1,FLYBASE:FBgn0037762;Name=NP_649956.1;gbkey=CDS;gene=eloF;locus_tag=Dmel_CG16905;orig_transcript_id=gnl|FlyBase|CG16905-RA;product=elongase F;protein_id=NP_649956.1
+
