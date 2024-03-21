@@ -143,3 +143,9 @@ salmon quant \
     ${par_sample_unaligned:+--sampleUnaligned} \
     ${par_gencode:+--gencode} \
     ${par_mapping_cache_memory_limit:+--mappingCacheMemoryLimit "${par_mapping_cache_memory_limit}"}
+
+if [ -f "$par_output/quant.sf" ]; then
+    mv $par_output/quant.sf $par_quant_results
+else
+    echo "Quantification file not generated!"
+fi
