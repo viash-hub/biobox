@@ -66,6 +66,7 @@ echo "> Test 3 - Generate fasta file from annotation file"
 "$meta_executable" \
   --genome "$test_dir/sequence.fasta" \
   --spliced_exons "$test_output_dir/transcripts.fa" \
+  --outfile "$test_output_dir/output.gff" \
   --input "$test_dir/sequence.gff3"
 
 echo ">> Check if output exists"

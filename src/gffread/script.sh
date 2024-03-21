@@ -55,7 +55,7 @@ gffread \
     "$par_input" \
     ${par_chr_mapping:+-m "$par_chr_mapping"} \
     ${par_seq_info:+-s "$par_seq_info"} \
-    ${par_outfile:+-o "$par_outfile"} \
+    -o "$par_outfile" \
     ${par_force_exons:+--force-exons} \
     ${par_gene2exon:+--gene2exon} \
     ${par_t_adopt:+--t-adopt} \

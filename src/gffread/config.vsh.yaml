@@ -51,6 +51,7 @@ argument_groups:
         type: file
         direction: output
         must_exist: false
+        required: true
         description: |
           Write the output records into <outfile>.
         default: output.gff
