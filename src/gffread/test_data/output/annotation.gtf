@@ -1,0 +1,2 @@
+NM_141699.3	RefSeq	transcript	22	795	.	+	.	transcript_id "gene-Dmel_CG16905"; gene_id "gene-Dmel_CG16905"; gene_name "eloF"
+NM_141699.3	RefSeq	CDS	22	795	.	+	0	transcript_id "gene-Dmel_CG16905"; gene_name "eloF";
