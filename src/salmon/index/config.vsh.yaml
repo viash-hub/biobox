@@ -8,7 +8,7 @@ links:
   documentation: https://salmon.readthedocs.io/en/latest/salmon.html
   repository: https://github.com/COMBINE-lab/salmon
 references: 
-  doi: "doi:10.1038/nmeth.4197"
+  doi: 10.1038/nmeth.4197
 license: GPL-3.0 
 requirements:
   commands: [ salmon ]
