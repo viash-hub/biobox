@@ -27,6 +27,10 @@
 
 * `lofreq/indelqual`: Insert indel qualities into BAM file (PR #17).
 
+* `star/star_align_reads`: Align reads to a reference genome (PR #22).
+
+* `gffread`: Validate, filter, convert and perform other operations on GFF files (PR #29).  
+
 * `salmon`:
     - `salmon/salmon_index`: Create a salmon index for the transcriptome to use Salmon in the mapping-based mode (PR #24).
     - `salmon/salmon_quant`: Transcript quantification from RNA-seq data (PR #24).
