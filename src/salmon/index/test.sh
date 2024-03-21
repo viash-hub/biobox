@@ -12,6 +12,7 @@ echo ">>> Run salmon_index"
 echo ">>> Checking whether output exists"
 [ ! -d "index" ] && echo "'index' does not exist!" && exit 1
 [ -z "$(ls -A 'index')" ] && echo "'index' is empty!" && exit 1
+[ ! -f "index/info.json" ] && echo "Salmon index does not contain 'info.json'! Not all files were generated correctly!" && exit 1
 
 echo "All tests succeeded!"
 exit 0
