@@ -5,7 +5,9 @@
 
 set -e
 
+output_file="$par_output"
+
 samtools flagstat \
-    "$par_input_bam" \
-    > "$par_output_stats"
+    "$par_bam" \
+    > "$output_file"
     
