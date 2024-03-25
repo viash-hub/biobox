@@ -41,7 +41,6 @@ argument_groups:
           List of files containing unmated reads of (e.g. single-end reads).
         required: false
         multiple: true
-        multiple_sep: " "
         example: sample.fq.gz
       - name: --mates1
         alternatives: ["-m1"]
@@ -50,7 +49,6 @@ argument_groups:
           File containing the #1 mates.
         required: false
         multiple: true
-        multiple_sep: " "
         example: sample_1.fq.gz
       - name: --mates2
         alternatives: ["-m2"]
@@ -59,7 +57,6 @@ argument_groups:
           File containing the #2 mates.
         required: false
         multiple: true
-        multiple_sep: " "
         example: sample_2.fq.gz
       
   - name: Alignment input options
@@ -75,7 +72,6 @@ argument_groups:
           Input alignment (BAM) file(s).
         required: false
         multiple: true
-        multiple_sep: " "
         example: sample.fq.gz
       - name: --eqclasses
         alternatives: ["-e"]

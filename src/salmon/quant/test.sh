@@ -39,8 +39,8 @@ echo "> Run salmon quant for paired-end reads with technical replicates"
 "$meta_executable" \
   --lib_type "A" \
   --index "$dir_in/salmon/transcriptome_index" \
-  --mates1 $dir_in/reads/a_1.fq.gz $dir_in/reads/b_1.fq.gz \
-  --mates2 $dir_in/reads/a_2.fq.gz $dir_in/reads/b_2.fq.gz \
+  --mates1 "$dir_in/reads/a_1.fq.gz;$dir_in/reads/b_1.fq.gz" \
+  --mates2 "$dir_in/reads/a_2.fq.gz;$dir_in/reads/b_2.fq.gz" \
   --output "quant_pe_rep_results" \
   --quant_results "quant_pe_rep.sf"
 

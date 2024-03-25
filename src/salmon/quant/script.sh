@@ -47,18 +47,18 @@ set -e
 [[ "$par_sample_unaligned" == "false" ]] && unset par_sample_unaligned
 [[ "$par_gencode" == "false" ]] && unset par_gencode
 
-IFS=" " read -ra unmated_reads <<< $par_unmated_reads
-IFS=" " read -ra mates1 <<< $par_mates1
-IFS=" " read -ra mates2 <<< $par_mates2
-IFS=" " read -ra alignment <<< $par_alignment
+IFS=";" read -ra unmated_reads <<< $par_unmated_reads
+IFS=";" read -ra mates1 <<< $par_mates1
+IFS=";" read -ra mates2 <<< $par_mates2
+IFS=";" read -ra alignment <<< $par_alignment
 
 salmon quant \
     ${par_lib_type:+-l "${par_lib_type}"} \
     ${par_index:+-i "${par_index}"} \
-    ${par_unmated_reads:+-r "${unmated_reads[*]}"} \
-    ${par_mates1:+-1 "${mates1[*]}"} \
-    ${par_mates2:+-2 "${mates2[*]}"} \
-    ${par_alignment:+-a "${alignment[*]}"} \
+    ${par_unmated_reads:+-r ${unmated_reads[*]}} \
+    ${par_mates1:+-1 ${mates1[*]}} \
+    ${par_mates2:+-2 ${mates2[*]}} \
+    ${par_alignment:+-a ${alignment[*]}} \
     ${par_discard_orphans:+--discardOrphans} \
     ${par_eqclasses:+-e "${par_eqclasses}"} \
     ${par_targets:+-t "${par_targets}"} \
