@@ -12,7 +12,6 @@ echo "> Run salmon quant for single-end reads"
   --output "quant_se_results" \
   --quant_results "quant_se.sf"
 
-cat quant_se.sf
 echo ">> Checking output"
 [ ! -d "quant_se_results" ] && echo "Output directory quant_se_results does not exist" && exit 1
 [ ! -f "quant_se.sf" ] && echo "Output file quant_se.sf does not exist!" && exit 1
@@ -28,7 +27,6 @@ echo "> Run salmon quant for paired-end reads"
   --output "quant_pe_results" \
   --quant_results "quant_pe.sf"
 
-cat quant_pe.sf
 echo ">> Checking output"
 [ ! -d "quant_pe_results" ] && echo "Output directory quant_pe_results does not exist" && exit 
 [ ! -f "quant_pe.sf" ] && echo "Output file quant_pe.sf does not exist!" && exit 1
@@ -44,7 +42,6 @@ echo "> Run salmon quant for paired-end reads with technical replicates"
   --output "quant_pe_rep_results" \
   --quant_results "quant_pe_rep.sf"
 
-cat quant_pe_rep.sf
 echo ">> Checking output"
 [ ! -d "quant_pe_rep_results" ] && echo "Output directory quant_pe_rep_results does not exist" && exit 
 [ ! -f "quant_pe_rep.sf" ] && echo "Output file quant_pe_rep.sf does not exist!" && exit 1
