@@ -4,11 +4,14 @@ set -e
 
 dir_in="$meta_resources_dir/test_data"
 
+echo " > Generate salmon index"
+salmon index -t $dir_in/transcriptome.fasta -i transcriptome_index
+
 echo "> Run salmon quant for single-end reads"
 "$meta_executable" \
   --lib_type "A" \
-  --index "$dir_in/salmon/transcriptome_index" \
-  --unmated_reads "$dir_in/reads/a_se.fq.gz" \
+  --index "transcriptome_index" \
+  --unmated_reads "$dir_in/a_se.fq" \
   --output "quant_se_results" \
   --quant_results "quant_se.sf"
 
@@ -21,11 +24,11 @@ grep -q "Name	Length	EffectiveLength	TPM	NumReads" "quant_se.sf" || (echo "Outpu
 echo "> Run salmon quant for paired-end reads"
 "$meta_executable" \
   --lib_type "A" \
-  --index "$dir_in/salmon/transcriptome_index" \
-  --mates1 "$dir_in/reads/a_1.fq.gz" \
-  --mates2 "$dir_in/reads/a_2.fq.gz" \
+  --index "transcriptome_index" \
+  --mates1 "$dir_in/a_1.fq" \
+  --mates2 "$dir_in/a_2.fq" \
   --output "quant_pe_results" \
-  --quant_results "quant_pe.sf"
+  --quant_results "quant_pe.sf" 
 
 echo ">> Checking output"
 [ ! -d "quant_pe_results" ] && echo "Output directory quant_pe_results does not exist" && exit 
@@ -36,9 +39,9 @@ grep -q "Name	Length	EffectiveLength	TPM	NumReads" "quant_pe.sf" || (echo "Outpu
 echo "> Run salmon quant for paired-end reads with technical replicates"
 "$meta_executable" \
   --lib_type "A" \
-  --index "$dir_in/salmon/transcriptome_index" \
-  --mates1 "$dir_in/reads/a_1.fq.gz;$dir_in/reads/b_1.fq.gz" \
-  --mates2 "$dir_in/reads/a_2.fq.gz;$dir_in/reads/b_2.fq.gz" \
+  --index "transcriptome_index" \
+  --mates1 "$dir_in/a_1.fq;$dir_in/b_1.fq" \
+  --mates2 "$dir_in/a_2.fq;$dir_in/b_2.fq" \
   --output "quant_pe_rep_results" \
   --quant_results "quant_pe_rep.sf"
 

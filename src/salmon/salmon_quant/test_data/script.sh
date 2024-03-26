@@ -7,3 +7,7 @@ if [ ! -d /tmp/snakemake-wrappers ]; then
 fi
 
 cp -r /tmp/snakemake-wrappers/bio/salmon/quant/test/* src/salmon/quant/test_data
+
+# Subset fastq files to 1000 reads
+# Example: 
+seqtk sample -s100 a_se.fq.gz 1000 > a_se.fq
