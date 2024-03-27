@@ -50,7 +50,7 @@ set -e
 IFS=";" read -ra unmated_reads <<< $par_unmated_reads
 IFS=";" read -ra mates1 <<< $par_mates1
 IFS=";" read -ra mates2 <<< $par_mates2
-IFS=";" read -ra alignment <<< $par_alignment
+IFS=";" read -ra alignment <<< $par_alignments
 
 salmon quant \
     ${par_lib_type:+-l "${par_lib_type}"} \
@@ -58,7 +58,7 @@ salmon quant \
     ${par_unmated_reads:+-r ${unmated_reads[*]}} \
     ${par_mates1:+-1 ${mates1[*]}} \
     ${par_mates2:+-2 ${mates2[*]}} \
-    ${par_alignment:+-a ${alignment[*]}} \
+    ${par_alignments:+-a ${alignment[*]}} \
     ${par_discard_orphans:+--discardOrphans} \
     ${par_eqclasses:+-e "${par_eqclasses}"} \
     ${par_targets:+-t "${par_targets}"} \
