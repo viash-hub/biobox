@@ -21,10 +21,10 @@ argument_groups:
         type: string
         description: |
           Format string describing the library.
+        # todo: add details about the meaning of each option
         required: false
-        example: 'A'
-        choices: ['A', 'U,', 'SF', 'SR', 'IU', 'IS', 'ISF', 'ISR', 'OU', 'OS', 'OSF', 'OSR', 'MU', 'MS', 'MSF', 'MSR']
-  
+        default: 'A'
+        choices: ['A', 'U', 'SF', 'SR', 'IU', 'IS', 'ISF', 'ISR', 'OU', 'OS', 'OSF', 'OSR', 'MU', 'MS', 'MSF', 'MSR']
   - name: Mapping input options
     arguments:
       - name: --index
@@ -306,11 +306,7 @@ argument_groups:
       - name: --min_aln_prob
         type: double
         description: |
-          [selective-alignment mode only]
-          Any mapping whose alignment probability (as computed by P(aln) = exp(-score_exp * difference from best mapping score) is less than min_aln_prob will not be considered as a valid alignment for this read. The goal of this flag is to remove very low probability alignments that are unlikely to have any non-trivial effect on the final quantifications. Filtering such alignments reduces the number of variables that need to be considered and can result in slightly faster inference and 'cleaner' equivalence classes.
-        required: false
-        min: 0
-        max: 1
+CTTTACC
         example: 0.00001
       - name: --write_mappings
         alternatives: ["-z"]
