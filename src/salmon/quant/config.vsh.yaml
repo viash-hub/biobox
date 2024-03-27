@@ -65,7 +65,7 @@ argument_groups:
         type: boolean_true
         description: |
           Discard orphan alignments in the input [for alignment-based mode only]. If this flag is passed, then only paired alignments will be considered toward quantification estimates. The default behavior is to consider orphan alignments if no valid paired mappings exist.
-      - name: --alignment
+      - name: --alignments
         alternatives: ["-a"]
         type: file
         description: |
@@ -570,8 +570,6 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - type: file
-    path: test_data
 
 engines:
   - type: docker
