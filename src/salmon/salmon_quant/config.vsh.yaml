@@ -21,7 +21,17 @@ argument_groups:
         type: string
         description: |
           Format string describing the library.
-        # todo: add details about the meaning of each option
+          The library type string consists of three parts: 
+          1. Relative orientation of the reads: This part is only provided if the library is paired-end, THe possible options are
+            I = inward
+            O = outward
+            M = matching
+          2. Strandedness of the library: This part specifies whether the protocol is stranded or unstranded. The options are:
+            S = stranded
+            U = unstranded
+          3. Directionality of the reads: If the library is stranded, the final part of the library string is used to specify the strand from which the read originates. The possible values are
+            F = read 1 (or single-end read) comes from the forward strand
+            R = read 1 (or single-end read) comes from the reverse strand
         required: false
         default: 'A'
         choices: ['A', 'U', 'SF', 'SR', 'IU', 'IS', 'ISF', 'ISR', 'OU', 'OS', 'OSF', 'OSR', 'MU', 'MS', 'MSF', 'MSR']
@@ -306,7 +316,7 @@ argument_groups:
       - name: --min_aln_prob
         type: double
         description: |
-CTTTACC
+          The minimum number of fragments that must be assigned to the transcriptome for quantification to proceed.
         example: 0.00001
       - name: --write_mappings
         alternatives: ["-z"]
