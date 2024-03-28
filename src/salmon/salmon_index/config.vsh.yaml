@@ -1,0 +1,113 @@
+name: salmon_index
+namespace: salmon
+description: | 
+  Salmon is a tool for wicked-fast transcript quantification from RNA-seq data. It can either make use of pre-computed alignments (in the form of a SAM/BAM file) to the transcripts rather than the raw reads, or can be run in the mapping-based mode. This component creates a salmon index for the transcriptome to use Salmon in the mapping-based mode. It is generally recommend that you build a decoy-aware transcriptome file. This is done using the entire genome of the organism as the decoy sequence by concatenating the genome to the end of the transcriptome to be indexed and populating the decoys.txt file with the chromosome names.
+keywords: ["Transcriptome", "Index"]
+links:
+  homepage: https://salmon.readthedocs.io/en/latest/salmon.html
+  documentation: https://salmon.readthedocs.io/en/latest/salmon.html
+  repository: https://github.com/COMBINE-lab/salmon
+references: 
+  doi: 10.1038/nmeth.4197
+license: GPL-3.0 
+requirements:
+  commands: [ salmon ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --genome
+        type: file
+        description: | 
+          Genome of the organism to prepare the set of decoy sequences. Required to build decoy-aware transccriptome.
+        required: false
+        example: genome.fasta
+      - name: --transcripts
+        alternatives: ["-t"]
+        type: file
+        description: |
+          Transcript fasta file.
+        required: true
+        example: transcriptome.fasta
+      - name: --kmer_len
+        alternatives: ["-k"]
+        type: integer
+        description: |
+          The size of k-mers that should be used for the quasi index.
+        required: false
+        example: 31
+      - name: --gencode
+        type: boolean_true
+        description: |
+          This flag will expect the input transcript fasta to be in GENCODE format, and will split the transcript name at the first '|' character. These reduced names will be used in the output and when looking for these transcripts in a gene to transcript GTF.
+      - name: --features
+        type: boolean_true
+        description: |
+          This flag will expect the input reference to be in the tsv file format, and will split the feature name at the first 'tab' character. These reduced names will be used in the output and when looking for the sequence of the features.GTF.
+      - name: --keep_duplicates
+        type: boolean_true
+        description: |
+          This flag will disable the default indexing behavior of discarding sequence-identical duplicate transcripts. If this flag is passed, then duplicate transcripts that appear in the input will be retained and quantified separately.
+      - name: --keep_fixed_fasta
+        type: boolean_true
+        description: |
+          Retain the fixed fasta file (without short transcripts and duplicates, clipped, etc.) generated during indexing.
+      - name: --filter_size
+        alternatives: ["-f"]
+        type: integer
+        description: |
+          The size of the Bloom filter that will be used by TwoPaCo during indexing. The filter will be of size 2^{filter_size}. The default value of -1 means that the filter size will be automatically set based on the number of distinct k-mers in the input, as estimated by nthll.
+        required: false
+        example: -1
+      - name: --sparse
+        type: boolean_true
+        description: |
+          Build the index using a sparse sampling of k-mer positions This will require less memory (especially during quantification), but will take longer to construct and can slow down mapping / alignment.
+      - name: --decoys
+        alternatives: ["-d"]
+        type: file
+        description: |
+          Treat these sequences ids from the reference as the decoys that may have sequence homologous to some known transcript. For example in case of the genome, provide a list of chromosome names (one per line).
+        required: false
+        example: decoys.txt
+      - name: --no_clip
+        type: boolean_true
+        description: |
+          Don't clip poly-A tails from the ends of target sequences.
+      - name: --type
+        alternatives: ["-n"]
+        type: string
+        description: |
+          The type of index to build; the only option is "puff" in this version of salmon.
+        required: false
+        example: puff
+
+  - name: Output
+    arguments:
+      - name: --index
+        alternatives: ["-i"]
+        type: file
+        direction: output
+        description: |
+          Salmon index
+        required: true
+        example: Salmon_index
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+    
+engines:
+  - type: docker
+    image: quay.io/biocontainers/salmon:1.10.2--hecfa306_0
+    setup:
+      - type: docker
+        run: |
+          salmon index -v 2>&1 | sed 's/salmon \([0-9.]*\)/salmon: \1/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
