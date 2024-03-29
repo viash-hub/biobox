@@ -16,7 +16,7 @@ echo ">>> Checking whether output is non-empty"
 
 echo ">>> Checking whether output is correct"
 diff "$test_dir/a.flagstat" "$test_dir/a_ref.flagstat" || \
-    (echo "Output file chr19.flagstat does not match expected output" && exit 1)
+    (echo "Output file a.flagstat does not match expected output" && exit 1)
 
 rm "$test_dir/a.flagstat"
 
@@ -37,9 +37,10 @@ echo ">>> Checking whether output is non-empty"
 
 echo ">>> Checking whether output is correct"
 diff "$test_dir/test.paired_end.sorted.flagstat" "$test_dir/test_ref.paired_end.sorted.flagstat" || \
-    (echo "Output file chr19.flagstat does not match expected output" && exit 1)
+    (echo "Output file test.paired_end.sorted.flagstat does not match expected output" && exit 1)
 
 rm "$test_dir/test.paired_end.sorted.flagstat"
+
 
 
 echo "All tests succeeded!"
