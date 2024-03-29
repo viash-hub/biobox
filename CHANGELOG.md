@@ -29,6 +29,9 @@
 
 * `star/star_align_reads`: Align reads to a reference genome (PR #22).
 
+* `samtools`:
+    - `samtools/flagstat`: Counts the number of alignments in SAM/BAM/CRAM files for each FLAG type (PR #31).
+
 ## MAJOR CHANGES
 
 ## MINOR CHANGES

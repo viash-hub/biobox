@@ -1,6 +1,6 @@
 name: samtools_flagstat
 namespace: samtools
-description: Counts the number of alignments in SAM/BAM/CRAM files for each FLAG type..
+description: Counts the number of alignments in SAM/BAM/CRAM files for each FLAG type.
 keywords: [ stats, mapping, counts, bam, sam, cram]
 links:
   homepage: https://www.htslib.org/
