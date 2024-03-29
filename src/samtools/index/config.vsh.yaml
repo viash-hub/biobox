@@ -1,7 +1,7 @@
 name: samtools_index
 namespace: samtools
-description: Index BAM files
-keywords: [stats, mapping, counts, chromosome, bam, sam, cram]
+description: Index SAM/BAM/CRAM files
+keywords: [index, bam, sam, cram]
 links:
   homepage: https://www.htslib.org/
   documentation: https://www.htslib.org/doc/samtools-index.html
@@ -13,47 +13,46 @@ license: MIT/Expat
 argument_groups:
   - name: Inputs
     arguments:
-      - name: --bam
-        alternatives: -b
+      - name: --input
         type: file
-        description: BAM input file.
-      - name: "--bam_csi_index"
-        type: boolean
-        description: Create a CSI index for BAM files instead of the traditional BAI index. This will be required for genomes with larger chromosome sizes.
+        description: Input file name
+        required: true
+        must_exist: true
   - name: Outputs
     arguments:
-      - name: --output_bai
-        alternatives: [ -o, --output ]
+      - name: --output
+        alternatives: -o
         type: file
-        description: BAM index
-        direction: output
+        description: Output file name
         required: true
         must_exist: false
         example: out.bam.bai
-        must_exist: false
-      - name: --output_csi
-        alternatives: [ -c, --csi ]
-        type: file
-        description: CSI index
-        direction: output
-        default: out.bam.csi
-      - name: --min-shift
-        alternatives: -m
-        type: integer
-        description: Create a CSI index, with a minimum interval size of 2^INT.
-        default: 0
   - name: Options
     arguments:
-      - name: --individual
-        alternatives: -M
+      - name: --bai
+        alternatives: -b
+        type: boolean_true
+        description: Generate BAM index
+      - name: --csi
+        alternatives: -c
+        type: boolean_true
+        description: |
+          Create a CSI index for BAM files instead of the traditional BAI 
+          index. This will be required for genomes with larger chromosome 
+          sizes.
+      - name: --min_shift
+        alternatives: -m
         type: integer
+        description: |
+          Create a CSI index, with a minimum interval size of 2^INT.
+      - name: --multiple
+        alternatives: -M
+        type: boolean_true
         description: |
           Interpret all filename arguments as alignment files to
           be indexed individually. (Without -M, filename arguments
           are interpreted solely as per the second synopsis.)
 
-
-   
 resources:
   - type: bash_script
     path: script.sh
