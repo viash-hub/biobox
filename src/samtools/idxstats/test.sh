@@ -8,8 +8,6 @@ echo ">>> Testing $meta_functionality_name"
   --bai "$test_dir/a.sorted.bam.bai" \
   --output "$test_dir/a.sorted.idxstats"
 
-echo "$test_dir/a.sorted.idxstats"
-
 echo ">>> Checking whether output exists"
 [ ! -f "$test_dir/a.sorted.idxstats" ] && echo "File 'a.sorted.idxstats' does not exist!" && exit 1
 
