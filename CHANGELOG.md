@@ -35,6 +35,9 @@
     - `salmon/salmon_index`: Create a salmon index for the transcriptome to use Salmon in the mapping-based mode (PR #24).
     - `salmon/salmon_quant`: Transcript quantification from RNA-seq data (PR #24).
 
+* `samtools`:
+    - `samtools/idxstats`: Reports alignment summary statistics for a SAM/BAM/CRAM file (PR #32).
+
 ## MAJOR CHANGES
 
 ## MINOR CHANGES

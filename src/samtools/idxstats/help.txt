@@ -1,0 +1,5 @@
+```
+samtools idxstats
+```
+
+Usage: samtools idxstats <in.bam>
