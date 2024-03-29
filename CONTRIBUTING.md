@@ -27,32 +27,32 @@ Change all occurrences of `xxx` to the name of the component.
 Create a file at `src/xxx/config.vsh.yaml` with contents:
 
 ```yaml
-functionality:
-  name: xxx
-  description: xxx
-  keywords: [tag1, tag2]
-  links:
-    homepage: yyy
-    documentation: yyy
-    repository: yyy
-  references: 
-    doi: 12345/12345678.yz
-  license: MIT/Apache-2.0/GPL-3.0/...
-  argument_groups:
-    - name: Inputs
-      arguments: <...>
-    - name: Outputs
-      arguments: <...>
-    - name: Arguments
-      arguments: <...>
-  resources:
-    - type: bash_script
-      path: script.sh
-  test_resources:
-    - type: bash_script
-      path: test.sh
-    - type: file
-      path: test_data
+name: xxx
+description: xxx
+keywords: [tag1, tag2]
+links:
+  homepage: yyy
+  documentation: yyy
+  issue_tracker: yyy
+  repository: yyy
+references: 
+  doi: 12345/12345678.yz
+license: MIT/Apache-2.0/GPL-3.0/...
+argument_groups:
+  - name: Inputs
+    arguments: <...>
+  - name: Outputs
+    arguments: <...>
+  - name: Arguments
+    arguments: <...>
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
 engines:
   - <...>
 runners:
@@ -73,6 +73,7 @@ functionality:
     homepage: https://arriba.readthedocs.io/en/latest/
     documentation: https://arriba.readthedocs.io/en/latest/
     repository: https://github.com/suhrig/arriba
+    issue_tracker: https://github.com/suhrig/arriba/issues
   references:
     doi: 10.1101/gr.257246.119
     bibtex: |
@@ -114,7 +115,7 @@ Notes:
   ```
 
 
-### Step 6: Fetch test data
+### Step 6: Create or fetch test data
 
 To help develop the component, it's interesting to have some test data available. In most cases, we can use the test data from the Snakemake wrappers. 
 
@@ -132,6 +133,8 @@ fi
 cp -r /tmp/snakemake-wrappers/bio/xxx/test/* src/xxx/test_data
 EOF
 ```
+
+The test data should be suitable for testing this component. Ensure that the test data is small enough: ideally <1KB, preferably <10KB, if need be <100KB.
 
 ### Step 7: Add arguments for the input files
 
