@@ -67,8 +67,8 @@ engines:
     setup:
       - type: docker
         run: |
-        samtools --version 2>&1 | grep -E '^(samtools|Using htslib)' | \
-        sed 's#Using ##;s# \([0-9\.]*\)$#: \1#' > /var/software_versions.txt
+          samtools --version 2>&1 | grep -E '^(samtools|Using htslib)' | \
+          sed 's#Using ##;s# \([0-9\.]*\)$#: \1#' > /var/software_versions.txt
 runners:
 - type: executable
 - type: nextflow
