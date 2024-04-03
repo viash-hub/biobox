@@ -37,7 +37,7 @@
 
 * `samtools`: 
     - `samtools/flagstat`: Counts the number of alignments in SAM/BAM/CRAM files for each FLAG type (PR #31).
-    - `samtools/index`: Index SAM/BAM/CRAM files (PR #33).
+    - `samtools/index`: Index SAM/BAM/CRAM files (PR #35).
 
 ## MAJOR CHANGES
 

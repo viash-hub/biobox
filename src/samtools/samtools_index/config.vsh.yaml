@@ -50,7 +50,7 @@ argument_groups:
         type: boolean_true
         description: |
           Interpret all filename arguments as alignment files to
-          be indexed individually. (Without -M, filename arguments
+          be indexed individually. (Without --multiple, filename arguments
           are interpreted solely as per the second synopsis.)
 
 resources:
