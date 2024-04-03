@@ -1,0 +1,51 @@
+name: samtools_flagstat
+namespace: samtools
+description: Counts the number of alignments in SAM/BAM/CRAM files for each FLAG type.
+keywords: [ stats, mapping, counts, bam, sam, cram ]
+links:
+  homepage: https://www.htslib.org/
+  documentation: https://www.htslib.org/doc/samtools-flagstat.html
+  repository: https://github.com/samtools/samtools
+references: 
+  doi: [10.1093/bioinformatics/btp352, 10.1093/gigascience/giab008]
+license: MIT/Expat
+
+argument_groups:
+  - name: Inputs
+    arguments:
+    - name: --bam
+      type: file
+      description: |
+        BAM input files.
+    - name: --bai
+      type: file
+      description: |
+        BAM index file.
+  - name: Outputs 
+    arguments:
+    - name: --output
+      type: file 
+      description: |
+        File containing samtools stats output.
+      direction: output
+      example: output.flagstat
+   
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/samtools:1.19.2--h50ea8bc_1
+    setup:
+      - type: docker
+        run: |
+          samtools --version 2>&1 | grep -E '^(samtools|Using htslib)' | \
+          sed 's#Using ##;s# \([0-9\.]*\)$#: \1#' > /var/software_versions.txt
+runners:
+- type: executable
+- type: nextflow
