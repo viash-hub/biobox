@@ -36,6 +36,7 @@
     - `salmon/salmon_quant`: Transcript quantification from RNA-seq data (PR #24).
 
 * `samtools`:
+    - `samtools/flagstat`: Counts the number of alignments in SAM/BAM/CRAM files for each FLAG type (PR #31).
     - `samtools/idxstats`: Reports alignment summary statistics for a SAM/BAM/CRAM file (PR #32).
 
 ## MAJOR CHANGES
