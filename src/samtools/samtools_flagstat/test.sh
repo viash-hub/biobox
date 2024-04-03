@@ -1,6 +1,6 @@
 #!/bin/bash
 
-test_dir="${meta_resources_dir}test_data"
+test_dir="${meta_resources_dir}/test_data"
 echo ">>> Testing $meta_functionality_name"
 
 "$meta_executable" \

@@ -5,9 +5,9 @@
 
 set -e
 
-test_output_dir="${meta_resources_dir}test_data/test_output"
-test_dir="${meta_resources_dir}test_data"
-expected_output_dir="${meta_resources_dir}test_data/output"
+test_output_dir="${meta_resources_dir}/test_data/test_output"
+test_dir="${meta_resources_dir}/test_data"
+expected_output_dir="${meta_resources_dir}/test_data/output"
 
 mkdir -p "$test_output_dir"
 
