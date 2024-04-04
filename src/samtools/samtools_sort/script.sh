@@ -11,11 +11,12 @@ set -e
 [[ "$par_homopolymers" == "false" ]] && unset par_homopolymers
 [[ "$par_natural_sort" == "false" ]] && unset par_natural_sort
 [[ "$par_ascii_sort" == "false" ]] && unset par_ascii_sort
+[[ "$par_template_coordinate" == "false" ]] && unset par_template_coordinate
 [[ "$par_write_index" == "false" ]] && unset par_write_index
 [[ "$par_no_PG" == "false" ]] && unset par_no_PG
-[[ "$par_template_coordinate" == "false" ]] && unset par_template_coordinate
 
-samtools sort \
+
+$(which samtools) sort \
     ${par_compression:+-l "$par_compression"} \
     ${par_uncompressed:+-u} \
     ${par_minimiser:+-M} \
@@ -37,3 +38,6 @@ samtools sort \
     ${par_reference:+--reference "$par_reference"} \
     -o "$par_output" \
     "$par_input"
+
+# save text files containing the output of samtools view for later comparison
+$(which samtools) view "$par_output" -o "$par_output".txt

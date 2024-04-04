@@ -43,7 +43,7 @@ argument_groups:
         description: |
           Reference sequence FASTA FILE.
         example: ref.fa
-      - name: --write-index
+      - name: --write_index
         type: boolean_true
         description: |
           Automatically index the output files.
@@ -78,7 +78,6 @@ argument_groups:
         type: boolean_true
         description: |
           Output uncompressed data (equivalent to --compression 0).
-        default: false
       - name: --minimiser
         alternatives: -M
         type: boolean_true
@@ -139,7 +138,7 @@ test_resources:
     path: test_data
 engines:
   - type: docker
-    image: quay.io/biocontainers/samtools:1.3.1--h9071d68_10
+    image: quay.io/biocontainers/samtools:1.19.2--h50ea8bc_1
     setup:
       - type: docker
         run: |
