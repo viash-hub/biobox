@@ -25,7 +25,6 @@ argument_groups:
         description: |
           Write final output to file.
         required: true
-        must_exist: false
         example: out.bam
       - name: --output_fmt
         alternatives: -O
