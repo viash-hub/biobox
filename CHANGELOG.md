@@ -36,7 +36,7 @@
     - `salmon/salmon_quant`: Transcript quantification from RNA-seq data (PR #24).
 
 * `samtools`:
-    - `samtools/samtools_sort`: Sort SAM/BAM/CRAM files.
+    - `samtools/samtools_sort`: Sort SAM/BAM/CRAM files (PR #36).
 
 ## MAJOR CHANGES
 
