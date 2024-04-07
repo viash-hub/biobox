@@ -41,7 +41,7 @@ argument_groups:
         Exclude from statistics reads marked as duplicates.
     - name: --customized_index_file
       alternatives: -X 
-      type: file
+      type: boolean_true
       description: |
         Use a customized index file.
     - name: --required_flag

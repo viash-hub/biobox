@@ -13,7 +13,6 @@ set -e
 $(which samtools) stats \
     ${par_coverage:+-c "$par_coverage"} \
     ${par_remove_dups:+-d} \
-    ${par_customized_index_file:+-X "$par_bai"} \
     ${par_required_flag:+-f "$par_required_flag"} \
     ${par_filtering_flag:+-F "$par_filtering_flag"} \
     ${par_GC_depth:+--GC-depth "$par_GC_depth"} \
