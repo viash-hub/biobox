@@ -38,6 +38,7 @@
 * `samtools`:
     - `samtools/flagstat`: Counts the number of alignments in SAM/BAM/CRAM files for each FLAG type (PR #31).
     - `samtools/idxstats`: Reports alignment summary statistics for a SAM/BAM/CRAM file (PR #32).
+    - `samtools/samtools_stats`: Reports alignment summary statistics for a BAM file (PR #38).
 
 ## MAJOR CHANGES
 
