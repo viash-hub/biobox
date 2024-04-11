@@ -51,7 +51,7 @@
 [[ "$par_cluster_only" == "false" ]] && unset par_cluster_only
 
 
-gffread \
+$(which gffread) \
     "$par_input" \
     ${par_chr_mapping:+-m "$par_chr_mapping"} \
     ${par_seq_info:+-s "$par_seq_info"} \
