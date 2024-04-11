@@ -25,7 +25,7 @@ argument_groups:
         type: file
         description: Output file name
         required: true
-        must_exist: false
+        direction: output
         example: out.bam.bai
   - name: Options
     arguments:

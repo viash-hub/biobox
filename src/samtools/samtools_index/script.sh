@@ -9,7 +9,7 @@ set -e
 [[ "$par_csi" == "false" ]] && unset par_csi
 [[ "$par_multiple" == "false" ]] && unset par_multiple
 
-$(which samtools) index \
+samtools index \
     "$par_input" \
     ${par_csi:+-c} \
     ${par_bai:+-b} \
