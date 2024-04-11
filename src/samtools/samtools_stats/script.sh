@@ -10,7 +10,7 @@ set -e
 [[ "$par_sparse" == "false" ]] && unset par_sparse
 [[ "$par_remove_overlaps" == "false" ]] && unset par_remove_overlaps
 
-$(which samtools) stats \
+samtools stats \
     ${par_coverage:+-c "$par_coverage"} \
     ${par_remove_dups:+-d} \
     ${par_required_flag:+-f "$par_required_flag"} \

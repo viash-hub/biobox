@@ -143,7 +143,7 @@ argument_groups:
         Output file.
       default: "out.txt"
       required: true
-      must_exist: false
+      direction: output
 
 resources:
   - type: bash_script
