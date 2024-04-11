@@ -39,6 +39,9 @@
     - `samtools/flagstat`: Counts the number of alignments in SAM/BAM/CRAM files for each FLAG type (PR #31).
     - `samtools/idxstats`: Reports alignment summary statistics for a SAM/BAM/CRAM file (PR #32).
 
+* `umi_tools`:
+    - `umi_tools/umi_tools_dedup`: Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read (PR #).
+    
 ## MAJOR CHANGES
 
 ## MINOR CHANGES
