@@ -1,7 +1,7 @@
 #!/bin/bash
 
-test_dir="${meta_resources_dir}test_data"
-out_dir="${meta_resources_dir}test_data/text"
+test_dir="${meta_resources_dir}/test_data"
+out_dir="${meta_resources_dir}/test_data/text"
 
 # Files are compared using the "samtools view" output.
 ############################################################################################

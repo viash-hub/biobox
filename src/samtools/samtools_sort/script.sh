@@ -16,7 +16,7 @@ set -e
 [[ "$par_no_PG" == "false" ]] && unset par_no_PG
 
 
-$(which samtools) sort \
+samtools sort \
     ${par_compression:+-l "$par_compression"} \
     ${par_uncompressed:+-u} \
     ${par_minimiser:+-M} \
@@ -40,4 +40,4 @@ $(which samtools) sort \
     "$par_input"
 
 # save text files containing the output of samtools view for later comparison
-$(which samtools) view "$par_output" -o "$par_output".txt
+samtools view "$par_output" -o "$par_output".txt
