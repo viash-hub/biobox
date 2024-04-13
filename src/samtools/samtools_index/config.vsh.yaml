@@ -1,0 +1,67 @@
+name: samtools_index
+namespace: samtools
+description: Index SAM/BAM/CRAM files.
+keywords: [index, bam, sam, cram]
+links:
+  homepage: https://www.htslib.org/
+  documentation: https://www.htslib.org/doc/samtools-index.html
+  repository: https://github.com/samtools/samtools
+references: 
+  doi: [10.1093/bioinformatics/btp352, 10.1093/gigascience/giab008]
+license: MIT/Expat
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        type: file
+        description: Input file name
+        required: true
+        must_exist: true
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: -o
+        type: file
+        description: Output file name
+        required: true
+        direction: output
+        example: out.bam.bai
+  - name: Options
+    arguments:
+      - name: --bai
+        alternatives: -b
+        type: boolean_true
+        description: Generate BAM index
+      - name: --csi
+        alternatives: -c
+        type: boolean_true
+        description: |
+          Create a CSI index for BAM files instead of the traditional BAI 
+          index. This will be required for genomes with larger chromosome 
+          sizes.
+      - name: --min_shift
+        alternatives: -m
+        type: integer
+        description: |
+          Create a CSI index, with a minimum interval size of 2^INT.
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/samtools:1.19.2--h50ea8bc_1
+    setup:
+      - type: docker
+        run: |
+          samtools --version 2>&1 | grep -E '^(samtools|Using htslib)' | \
+          sed 's#Using ##;s# \([0-9\.]*\)$#: \1#' > /var/software_versions.txt
+runners:
+- type: executable
+- type: nextflow
