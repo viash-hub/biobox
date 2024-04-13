@@ -29,7 +29,7 @@ argument_groups:
         description: |
           File containing samtools stats output in tab-delimited format.
         required: true
-        must_exist: false
+        direction: output
         example: output.idxstats
    
 resources:

@@ -28,6 +28,7 @@ argument_groups:
       description: |
         File containing samtools stats output.
       direction: output
+      required: true
       example: output.flagstat
    
 resources:
