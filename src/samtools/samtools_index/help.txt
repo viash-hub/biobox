@@ -1,0 +1,13 @@
+```
+samtools index
+```
+
+Usage: samtools index -M [-bc] [-m INT] <in1.bam> <in2.bam>...
+   or: samtools index [-bc] [-m INT] <in.bam> [out.index]
+Options:
+  -b, --bai            Generate BAI-format index for BAM files [default]
+  -c, --csi            Generate CSI-format index for BAM files
+  -m, --min-shift INT  Set minimum interval size for CSI indices to 2^INT [14]
+  -M                   Interpret all filename arguments as files to be indexed
+  -o, --output FILE    Write index to FILE [alternative to <out.index> in args]
+  -@, --threads INT    Sets the number of threads [none]
