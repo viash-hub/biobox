@@ -10,7 +10,7 @@ set -eo pipefail
 
 echo ">> Fetching and preparing test data"
 data_src="https://cf.10xgenomics.com/supp/spatial-exp/demultiplexing/iseq-DI.tar.gz"
-sample_sheet_src=" https://cf.10xgenomics.com/supp/spatial-exp/demultiplexing/bcl_convert_samplesheet.csv"
+sample_sheet_src="https://cf.10xgenomics.com/supp/spatial-exp/demultiplexing/bcl_convert_samplesheet.csv"
 test_data_dir="test_data"
 
 mkdir $test_data_dir

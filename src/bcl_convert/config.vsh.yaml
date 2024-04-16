@@ -132,20 +132,23 @@ argument_groups:
 resources:
   - type: bash_script
     path: script.sh
+
 test_resources:
   - type: bash_script
     path: test.sh
+
 engines:
   - type: docker
-    image: oraclelinux:8.9
+    image: debian:trixie-slim
     # https://support.illumina.com/sequencing/sequencing_software/bcl-convert/downloads.html
     setup:
-      - type: yum
-        packages: [wget, gdb, which, hostname]
+      - type: apt
+        packages: [wget, gdb, which, hostname, alien]
       - type: docker
         run: |
           wget https://s3.amazonaws.com/webdata.illumina.com/downloads/software/bcl-convert/bcl-convert-4.2.7-2.el8.x86_64.rpm -O /tmp/bcl-convert.rpm && \
-          rpm -i /tmp/bcl-convert.rpm && \
+          alien -i /tmp/bcl-convert.rpm && \
+          rm -rf /var/lib/apt/lists/* && \
           rm /tmp/bcl-convert.rpm
       - type: docker
         run: |
