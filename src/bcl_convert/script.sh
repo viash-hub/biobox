@@ -3,7 +3,8 @@
 set -eo pipefail
 
 $(which bcl-convert) \
-  ${par_bcl_input_directory:+ --bcl-input-directory "$par_bcl_input_directory"} \
+ --bcl-input-directory "$par_bcl_input_directory" \
+ --output-directory "$par_output_directory" \
   ${par_sample_sheet:+ --sample-sheet "$par_sample_sheet"} \
   ${par_run_info:+ --run-info "$par_run_info"} \
   ${par_bcl_only_lane:+ --bcl-only-lane "$par_bcl_only_lane"} \
@@ -21,7 +22,6 @@ $(which bcl-convert) \
   ${par_bcl_validate_sample_sheet_only:+ --bcl-validate-sample-sheet-only "$par_bcl_validate_sample_sheet_only"} \
   ${par_strict_mode:+ --strict-mode "$par_strict_mode"} \
   ${par_sample_name_column_enabled:+ --sample-name-column-enabled "$par_sample_name_column_enabled"} \
-  ${par_output_directory:+ --output-directory "$par_output_directory"} \
   ${par_bcl_sampleproject_subdirectories:+ --bcl-sampleproject-subdirectories "$par_bcl_sampleproject_subdirectories"} \
   ${par_fastq_gzip_compression_level:+ --fastq-gzip-compression-level "$par_fastq_gzip_compression_level"}
 
