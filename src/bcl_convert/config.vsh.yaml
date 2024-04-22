@@ -1,0 +1,159 @@
+name: bcl_convert
+description: |
+  Convert bcl files to fastq files using bcl-convert.
+  Information about upgrading from bcl2fastq via
+  https://emea.support.illumina.com/bulletins/2020/10/upgrading-from-bcl2fastq-to-bcl-convert.html
+  and https://support.illumina.com/sequencing/sequencing_software/bcl-convert/compatibility.html
+argument_groups:
+  - name: Input arguments
+    arguments:
+      - name: "--bcl_input_directory"
+        alternatives: ["-i"]
+        type: file
+        required: true
+        description: Input run directory
+        example: bcl_dir
+      - name: "--sample_sheet"
+        alternatives: ["-s"]
+        type: file
+        description: Path to SampleSheet.csv file (default searched for in --bcl_input_directory)
+        example: bcl_dir/sample_sheet.csv
+      - name: --run_info
+        type: file
+        description: Path to RunInfo.xml file (default root of BCL input directory)
+        example: bcl_dir/RunInfo.xml
+
+  - name: Lane and tile settings
+    arguments:
+      - name: "--bcl_only_lane"
+        type: integer
+        description: Convert only specified lane number (default all lanes)
+        example: 1
+      - name: --first_tile_only
+        type: boolean
+        description: Only convert first tile of input (for testing & debugging)
+        example: true
+      - name: --tiles
+        type: string
+        description: Process only a subset of tiles by a regular expression
+        example: "s_[0-9]+_1"
+      - name: --exclude_tiles
+        type: string
+        description: Exclude set of tiles by a regular expression
+        example: "s_[0-9]+_1"
+
+  - name: Resource arguments
+    arguments:
+      - name: --shared_thread_odirect_output
+        type: boolean
+        description: Use linux native asynchronous io (io_submit) for file output (Default=false)
+        example: true
+      - name: --bcl_num_parallel_tiles
+        type: integer
+        description: "# of tiles to process in parallel (default 1)"
+        example: 1
+      - name: --bcl_num_conversion_threads
+        type: integer
+        description: "# of threads for conversion (per tile, default # cpu threads)"
+        example: 1
+      - name: --bcl_num_compression_threads
+        type: integer
+        description: "# of threads for fastq.gz output compression (per tile, default # cpu threads, or HW+12)"
+        example: 1
+      - name: --bcl_num_decompression_threads
+        type: integer
+        description:
+          "# of threads for bcl/cbcl input decompression (per tile, default half # cpu threads, or HW+8).
+          Only applies when preloading files"
+        example: 1
+
+  - name: Run arguments
+    arguments:
+      - name: --bcl_only_matched_reads
+        type: boolean
+        description: For pure BCL conversion, do not output files for 'Undetermined' [unmatched] reads (output by default)
+        example: true
+      - name: --no_lane_splitting
+        type: boolean
+        description: Do not split FASTQ file by lane (false by default)
+        example: true
+      - name: --num_unknown_barcodes_reported
+        type: integer
+        description: "# of Top Unknown Barcodes to output (1000 by default)"
+        example: 1000
+      - name: --bcl_validate_sample_sheet_only
+        type: boolean
+        description: Only validate RunInfo.xml & SampleSheet files (produce no FASTQ files)
+        example: true
+      - name: --strict_mode
+        type: boolean
+        description: Abort if any files are missing (false by default)
+        example: true
+      - name: --sample_name_column_enabled
+        type: boolean
+        description: Use sample sheet 'Sample_Name' column when naming fastq files & subdirectories
+        example: true
+
+  - name: Output arguments
+    arguments:
+      - name: "--output_directory"
+        alternatives: ["-o"]
+        type: file
+        direction: output
+        required: true
+        description: Output directory containig fastq files
+        example: fastq_dir
+      - name: --bcl_sampleproject_subdirectories
+        type: boolean
+        description: Output to subdirectories based upon sample sheet 'Sample_Project' column
+        example: true
+      - name: --fastq_gzip_compression_level
+        type: integer
+        description: Set fastq output compression level 0-9 (default 1)
+        example: 1
+      - name: "--reports"
+        type: file
+        direction: output
+        required: false
+        description: Reports directory
+        example: reports_dir
+      - name: "--logs"
+        type: file
+        direction: output
+        required: false
+        description: Reports directory
+        example: logs_dir
+
+# bcl-convert arguments not taken into account
+#   --force
+#   --output-legacy-stats arg              Also output stats in legacy (bcl2fastq2) format (false by default)
+#   --no-sample-sheet arg                  Enable legacy no-sample-sheet operation (No demux or trimming. No settings
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:trixie-slim
+    # https://support.illumina.com/sequencing/sequencing_software/bcl-convert/downloads.html
+    setup:
+      - type: apt
+        packages: [wget, gdb, which, hostname, alien]
+      - type: docker
+        run: |
+          wget https://s3.amazonaws.com/webdata.illumina.com/downloads/software/bcl-convert/bcl-convert-4.2.7-2.el8.x86_64.rpm -O /tmp/bcl-convert.rpm && \
+          alien -i /tmp/bcl-convert.rpm && \
+          rm -rf /var/lib/apt/lists/* && \
+          rm /tmp/bcl-convert.rpm
+      - type: docker
+        run: |
+          echo "bcl-convert: \"$(bcl-convert -V 2>&1 >/dev/null | sed -n '/Version/ s/^bcl-convert\ Version //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
