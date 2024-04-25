@@ -6,7 +6,8 @@ echo ">>> Testing input/output handling"
   --input "$meta_resources_dir/test_data/" \
   --output_report test1.html \
   --output_data data1 \
-  --output_plots plots1
+  --output_plots plots1 \
+  --quiet
 
 [ ! -f test1.html ] && echo "MultiQC report does not exist!" && exit 1
 [ ! -d data1 ] && echo "MultiQC data directory does not exist!" && exit 1
@@ -19,7 +20,8 @@ echo ">>> Testing module exclusion"
   --output_report test2.html \
   --output_data data2 \
   --output_plots plots2 \
-  --exclude_modules samtools
+  --exclude_modules samtools \
+  --quiet
 
 [ -f test2.html ] && echo "MultiQC report should not exist!" && exit 1
 [ -d data2 ] && echo "MultiQC data directory should not exist!" && exit 1
@@ -31,7 +33,8 @@ echo ">>> Testing sample exclusion"
   --input "$meta_resources_dir/test_data/" \
   --output_report test3.html \
   --output_data data3 \
-  --ignore_samples a
+  --ignore_samples a \
+  --quiet
 
 key_to_check=".report_general_stats_data[0].a"
 json_file="data3/multiqc_data.json"

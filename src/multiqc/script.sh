@@ -82,7 +82,6 @@ if [[ -n "$par_ignore_samples" ]]; then
     unset IFS
 fi
 
-
 # run multiqc
 multiqc \
     ${par_output_report:+--filename "$report_name"} \

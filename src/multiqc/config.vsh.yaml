@@ -206,14 +206,16 @@ test_resources:
 
 engines:
   - type: docker
-    image: quay.io/biocontainers/multiqc:1.20--pyhdfd78af_2
+    image: quay.io/biocontainers/multiqc:1.21--pyhdfd78af_0
     setup:
-      - type: apt
-        packages: 
-          - jq
       - type: docker
         run: |
           multiqc --version | sed 's/multiqc, version\s\(.*\)/multiqc: "\1"/' > /var/software_versions.txt
+    test_setup:
+      - type: apt
+        packages: 
+          - jq
+
 runners:
   - type: executable
   - type: nextflow
