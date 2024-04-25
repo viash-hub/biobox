@@ -42,6 +42,8 @@
     - `samtools/samtools_sort`: Sort SAM/BAM/CRAM files (PR #36).
     - `samtools/samtools_stats`: Reports alignment summary statistics for a BAM file (PR #39).
 
+* `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
+
 ## MAJOR CHANGES
 
 ## MINOR CHANGES
