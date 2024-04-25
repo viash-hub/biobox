@@ -1,0 +1,589 @@
+name: salmon_quant
+namespace: salmon
+description: | 
+  Salmon is a tool for wicked-fast transcript quantification from RNA-seq data. It can either make use of pre-computed alignments (in the form of a SAM/BAM file) to the transcripts rather than the raw reads, or can be run in the mapping-based mode. 
+keywords: ["Transcriptome", "Quantification"]
+links:
+  homepage: https://salmon.readthedocs.io/en/latest/salmon.html
+  documentation: https://salmon.readthedocs.io/en/latest/salmon.html
+  repository: https://github.com/COMBINE-lab/salmon
+references: 
+  doi: "10.1038/nmeth.4197"
+license: GPL-3.0 
+requirements:
+  commands: [ salmon ]
+
+argument_groups:
+  - name: Common input options
+    arguments:
+      - name: --lib_type
+        alternatives: ["-l"]
+        type: string
+        description: |
+          Format string describing the library.
+          The library type string consists of three parts: 
+          1. Relative orientation of the reads: This part is only provided if the library is paired-end, THe possible options are
+            I = inward
+            O = outward
+            M = matching
+          2. Strandedness of the library: This part specifies whether the protocol is stranded or unstranded. The options are:
+            S = stranded
+            U = unstranded
+          3. Directionality of the reads: If the library is stranded, the final part of the library string is used to specify the strand from which the read originates. The possible values are
+            F = read 1 (or single-end read) comes from the forward strand
+            R = read 1 (or single-end read) comes from the reverse strand
+        required: false
+        default: 'A'
+        choices: ['A', 'U', 'SF', 'SR', 'IU', 'IS', 'ISF', 'ISR', 'OU', 'OS', 'OSF', 'OSR', 'MU', 'MS', 'MSF', 'MSR']
+  - name: Mapping input options
+    arguments:
+      - name: --index
+        alternatives: ["-i"]
+        type: file
+        description: |
+          Salmon index.
+        required: true
+        example: transcriptome_index
+      - name: --unmated_reads
+        alternatives: ["-r"]
+        type: file
+        description: |
+          List of files containing unmated reads of (e.g. single-end reads).
+        required: false
+        multiple: true
+        example: sample.fq.gz
+      - name: --mates1
+        alternatives: ["-m1"]
+        type: file
+        description: |
+          File containing the #1 mates.
+        required: false
+        multiple: true
+        example: sample_1.fq.gz
+      - name: --mates2
+        alternatives: ["-m2"]
+        type: file
+        description: |
+          File containing the #2 mates.
+        required: false
+        multiple: true
+        example: sample_2.fq.gz
+      
+  - name: Alignment input options
+    arguments:
+      - name: --discard_orphans
+        type: boolean_true
+        description: |
+          Discard orphan alignments in the input [for alignment-based mode only]. If this flag is passed, then only paired alignments will be considered toward quantification estimates. The default behavior is to consider orphan alignments if no valid paired mappings exist.
+      - name: --alignments
+        alternatives: ["-a"]
+        type: file
+        description: |
+          Input alignment (BAM) file(s).
+        required: false
+        multiple: true
+        example: sample.fq.gz
+      - name: --eqclasses
+        alternatives: ["-e"]
+        type: file
+        description: |
+          input salmon weighted equivalence class file.
+        required: false
+      - name: --targets
+        alternatives: ["-t"]
+        type: file
+        description: |
+          FASTA format file containing target transcripts.
+        required: false
+        example: transcripts.fasta
+      - name: --ont
+        type: boolean_true
+        description: |
+          Use alignment model for Oxford Nanopore long reads
+
+  - name: Output
+    arguments:
+      - name: --output
+        alternatives: ["-o"]
+        type: file
+        direction: output
+        description: |
+          Output quantification directory.
+        required: true
+        example: quant_output
+      - name: --quant_results
+        type: file
+        direction: output
+        description: |
+          Salmon quantification file.
+        required: true
+        example: quant.sf
+
+  - name: Basic options
+    arguments:
+      - name: --seq_bias
+        type: boolean_true
+        description: |
+          Perform sequence-specific bias correction.
+      - name: --gc_bias
+        type: boolean_true
+        description: |
+          Perform fragment GC bias correction [beta for single-end reads].
+      - name: --pos_bias
+        type: boolean_true
+        description: |
+          Perform positional bias correction.
+      - name: --incompat_prior
+        type: double
+        description: |
+          Set the prior probability that an alignment that disagrees with the specified library type (--lib_type) results from the true fragment origin. Setting this to 0 specifies that alignments that disagree with the library type should be "impossible", while setting it to 1 says that alignments that disagree with the library type are no less likely than those that do.
+        required: false
+        min: 0
+        max: 1
+        example: 0
+      - name: --gene_map
+        alternatives: ["-g"]
+        type: file
+        description: |
+          File containing a mapping of transcripts to genes. If this file is provided salmon will output both quant.sf and quant.genes.sf files, where the latter contains aggregated gene-level abundance estimates.  The transcript to gene mapping should be provided as either a GTF file, or a in a simple tab-delimited format where each line contains the name of a transcript and the gene to which it belongs separated by a tab. The extension of the file is used to determine how the file should be parsed.  Files ending in '.gtf', '.gff' or '.gff3' are assumed to be in GTF format; files with any other extension are assumed to be in the simple format. In GTF / GFF format, the "transcript_id" is assumed to contain the transcript identifier and the "gene_id" is assumed to contain the corresponding gene identifier.
+        required: false
+        example: gene_map.gtf
+      - name: --aux_target_file
+        type: file
+        description: |
+          A file containing a list of "auxiliary" targets. These are valid targets (i.e., not decoys) to which fragments are allowed to map and be assigned, and which will be quantified, but for which auxiliary models like sequence-specific and fragment-GC bias correction should not be applied.
+        required: false
+        example: auxilary_targets.txt
+      - name: --meta
+        type: boolean_true
+        description: |
+          If you're using Salmon on a metagenomic dataset, consider setting this flag to disable parts of the abundance estimation model that make less sense for metagenomic data.
+      - name: --score_exp
+        type: double
+        description: |
+          The factor by which sub-optimal alignment scores are downweighted to produce a probability. If the best alignment score for the current read is S, and the score for a particular alignment is w, then the probability will be computed porportional to exp( - scoreExp * (S-w) ).
+        required: false
+        example: 1
+
+  - name: Options specific to mapping mode
+    arguments:
+      - name: --discard_orphans_quasi
+        type: boolean_true
+        description: |
+          [selective-alignment mode only] 
+          Discard orphan mappings in selective-alignment mode. If this flag is passed then only paired mappings will be considered toward quantification estimates. The default behavior is to consider orphan mappings if no valid paired mappings exist. This flag is independent of the option to write the orphaned mappings to file (--writeOrphanLinks).
+      - name: --consensus_slack
+        type: double
+        description: |
+          [selective-alignment mode only] 
+          The amount of slack allowed in the selective-alignment filtering mechanism. If this is set to a fraction, X, greater than 0 (and in [0,1)), then uniMEM chains with scores below (100 * X)% of the best chain score for a read, and read pairs with a sum of chain scores below (100 * X)% of the best chain score for a read pair will be discounted as a mapping candidates.  The default value of this option is 0.35.
+        required: false
+        min: 0
+        max: 0.999999999
+        example: 0.35
+      - name: --pre_merge_chain_sub_thresh
+        type: double
+        description: |
+          [selective-alignment mode only] 
+          The threshold of sub-optimal chains, compared to the best chain on a given target, that will be retained and passed to the next phase of mapping. Specifically, if the best chain for a read (or read-end in paired-end mode) to target t has score X_t, then all chains for this read with score >= X_t  * preMergeChainSubThresh will be retained and passed to subsequent mapping phases.  This value must be in the range [0, 1].
+        required: false
+        min: 0
+        max: 1
+        example: 0.75
+      - name: --post_merge_chain_sub_thresh
+        type: double
+        description: |
+          [selective-alignment mode only] 
+          The threshold of sub-optimal chains, compared to the best chain on a given target, that will be retained and passed to the next phase of mapping. This is different than post_merge_chain_sub_thresh, because this is applied to pairs of chains (from the ends of paired-end reads) after merging (i.e. after checking concordancy constraints etc.). Specifically, if the best chain pair to target t has score X_t, then all chain pairs for this read pair with score >= X_t * post_merge_chain_sub_thresh will be retained and passed to subsequent mapping phases. This value must be in the range [0, 1]. Note: This option is only meaningful for paired-end libraries, and is ignored for single-end libraries.
+        required: false
+        min: 0
+        max: 1
+        example: 0.9
+      - name: --orphan_chain_sub_thresh
+        type: double
+        description: |
+          [selective-alignment mode only]
+          This threshold sets a global sub-optimality threshold for chains corresponding to orphan mappings. That is, if the merging procedure results in no concordant mappings then only orphan mappings with a chain score >= orphan_chain_sub_thresh * bestChainScore will be retained and passed to subsequent mapping phases. This value must be in the range [0, 1]. Note: This option is only meaningful for paired-end libraries, and is ignored for single-end libraries.
+        required: false
+        min: 0
+        max: 1
+        example: 0.95
+      - name: --min_score_fraction
+        type: double
+        description: |
+          [selective-alignment mode only]
+          The fraction of the optimal possible alignment score that a mapping must achieve in order to be considered "valid" --- should be in (0,1]. Default 0.65
+        required: false
+        min: 0.000000001
+        max: 1
+        example: 0.65
+      - name: --mismatch_seed_skip
+        type: integer
+        description: |
+          [selective-alignment mode only]
+          After a k-mer hit is extended to a uni-MEM, the uni-MEM extension can terminate for one of 3 reasons; the end of the read, the end of the unitig, or a mismatch. If the extension ends because of a mismatch, this is likely the result of a sequencing error. To avoid looking up many k-mers that will likely fail to be located in the index, the search procedure skips by a factor of mismatch_seed_skip until it either (1) finds another match or (2) is k-bases past the mismatch position. This value controls that skip length. A smaller value can increase sensitivity, while a larger value can speed up seeding.
+        required: false
+        example: 3
+      - name: --disable_chaining_heuristic
+        type: boolean_true
+        description: |
+          [selective-alignment mode only] 
+          By default, the heuristic of (Li 2018) is implemented, which terminates the chaining DP once a given number of valid backpointers are found. This speeds up the seed (MEM) chaining step, but may result in sub-optimal chains in complex situations (e.g. sequences with many repeats and overlapping repeats). Passing this flag will disable the chaining heuristic, and perform the full chaining dynamic program, guaranteeing the optimal chain is found in this step.
+      - name: --decoy_threshold
+        type: double
+        description: |
+          [selective-alignment mode only]
+          For an alignemnt to an annotated transcript to be considered invalid, it must have an alignment score < (decoy_threshold * bestDecoyScore). A value of 1.0 means that any alignment strictly worse than the best decoy alignment will be discarded. A smaller value will allow reads to be allocated to transcripts even if they strictly align better to the decoy sequence.
+        required: false
+        min: 0
+        max: 1
+        example: 1 
+      - name: --ma
+        type: integer
+        description: |
+          [selective-alignment mode only]
+          The value given to a match between read and reference nucleotides in an alignment.
+        required: false
+        example: 2
+      - name: --mp
+        type: integer
+        description: |
+          [selective-alignment mode only]
+          The value given to a mis-match between read and reference nucleotides in an alignment.
+        required: false
+        example: -4
+      - name: --go
+        type: integer
+        description: |
+          [selective-alignment mode only]
+          The value given to a gap opening in an alignment.
+        required: false
+        example: 6
+      - name: --ge
+        type: integer
+        description: |
+          [selective-alignment mode only]
+          The value given to a gap extension in an alignment.
+        required: false
+        example: 2
+      - name: --bandwidth
+        type: integer
+        description: |
+          [selective-alignment mode only]
+          The value used for the bandwidth passed to ksw2. A smaller bandwidth can make the alignment verification run more quickly, but could possibly miss valid alignments.
+        required: false
+        example: 15
+      - name: --allow_dovetail
+        type: boolean_true
+        description: |
+          [selective-alignment mode only] 
+          Allow dovetailing mappings.
+      - name: --recover_orphans
+        type: boolean_true
+        description: |
+          [selective-alignment mode only] 
+          Attempt to recover the mates of orphaned reads. This uses edlib for orphan recovery, and so introduces some computational overhead, but it can improve sensitivity.
+      - name: --mimicBT2
+        type: boolean_true
+        description: |
+          [selective-alignment mode only] 
+          Set flags to mimic parameters similar to Bowtie2 with --no-discordant and --no-mixed flags. This increases disallows dovetailing reads, and discards orphans. Note, this does not impose the very strict parameters assumed by RSEM+Bowtie2, like gapless alignments. For that behavior, use the --mimic_strictBT2 flag below.
+      - name: --mimic_strictBT2
+        type: boolean_true
+        description: |
+          [selective-alignment mode only] 
+          Set flags to mimic the very strict parameters used by RSEM+Bowtie2. This increases --min_score_fraction to 0.8, disallows dovetailing reads, discards orphans, and disallows gaps in alignments.
+      - name: --softclip
+        type: boolean_true
+        description: |
+          [selective-alignment mode only] 
+          Allos soft-clipping of reads during selective-alignment. If this option is provided, then regions at the beginning or end of the read can be withheld from alignment without any effect on the resulting score (i.e. neither adding nor removing from the score). This will drastically reduce the penalty if there are mismatches at the beginning or end of the read due to e.g. low-quality bases or adapters. NOTE: Even with soft-clipping enabled, the read must still achieve a score of at least min_score_fraction * maximum achievable score, where the maximum achievable score is computed based on the full (un-clipped) read length.
+      - name: --softclip_overhangs
+        type: boolean_true
+        description: |
+          [selective-alignment mode only] 
+          Allow soft-clipping of reads that overhang the beginning or ends of the transcript. In this case, the overhaning section of the read will simply be unaligned, and will not contribute or detract from the alignment score. The default policy is to force an end-to-end alignment of the entire read, so that overhanings will result in some deletion of nucleotides from the read.
+      - name: --full_length_alignment
+        type: boolean_true
+        description: |
+          [selective-alignment mode only] 
+          Perform selective alignment over the full length of the read, beginning from the (approximate) initial mapping location and using extension alignment. This is in contrast with the default behavior which is to only perform alignment between the MEMs in the optimal chain (and before the first and after the last MEM if applicable). The default strategy forces the MEMs to belong to the alignment, but has the benefit that it can discover indels prior to the first hit shared between the read and reference. Except in very rare circumstances, the default mode should be more accurate.
+      - name: --hard_filter
+        type: boolean_true
+        description: |
+          [selective-alignment mode only] 
+          Instead of weighting mappings by their alignment score, this flag will discard any mappings with sub-optimal alignment score.  The default option of soft-filtering (i.e. weighting mappings by their alignment score) usually yields slightly more accurate abundance estimates but this flag may be desirable if you want more accurate 'naive' equivalence classes, rather than range factorized equivalence classes.
+      - name: --min_aln_prob
+        type: double
+        description: |
+          The minimum number of fragments that must be assigned to the transcriptome for quantification to proceed.
+        example: 0.00001
+      - name: --write_mappings
+        alternatives: ["-z"]
+        type: file
+        direction: output
+        description: |
+          If this option is provided, then the selective-alignment results will be written out in SAM-compatible format. By default, output will be directed to stdout, but an alternative file name can be provided instead.
+        required: false
+        example: mappings.sam 
+      - name: --write_qualities
+        type: boolean_true
+        description: |
+          This flag only has meaning if mappings are being written (with --write_mappings/-z). If this flag is provided, then the output SAM file will contain quality strings as well as read sequences. Note that this can greatly increase the size of the output file.
+      - name: --hit_filter_policy
+        type: string
+        description: |
+          [selective-alignment mode only]
+          Determines the policy by which hits are filtered in selective alignment. Filtering hits after chaining (the default) is more sensitive, but more computationally intensive, because it performs the chaining dynamic program for all hits. Filtering before chaining is faster, but some true hits may be missed. The options are BEFORE, AFTER, BOTH and NONE.
+        required: false
+        choices: [BEFORE, AFTER, BOTH, NONE]
+        example: AFTER 
+  
+  - name: Advance options
+    arguments: 
+      - name: --alternative_init_mode
+        type: boolean_true
+        description: |
+          Use an alternative strategy (rather than simple interpolation between) the online and uniform abundance estimates to initialize the EM / VBEM algorithm.
+      - name: --aux_dir
+        type: file
+        direction: output
+        description: |
+          The sub-directory of the quantification directory where auxiliary information e.g. bootstraps, bias parameters, etc. will be written.
+        required: false
+        example: aux_info  
+      - name: --skip_quant
+        type: boolean_true
+        description: |
+          Skip performing the actual transcript quantification (including any Gibbs sampling or bootstrapping).
+      - name: --dump_eq
+        type: boolean_true
+        description: | 
+          Dump the simple equivalence class counts that were computed during mapping or alignment.
+      - name: --dump_eq_weights
+        alternatives: ["-d"]
+        type: boolean_true
+        description: | 
+          Dump conditional probabilities associated with transcripts when equivalence class information is being dumped to file. Note, this will dump the factorization that is actually used by salmon's offline phase for inference. If you are using range-factorized equivalence classes (the default) then the same transcript set may appear multiple times with different associated conditional probabilities.
+      - name: --min_assigned_frags
+        type: integer
+        description: |
+          The minimum number of fragments that must be assigned to the transcriptome for quantification to proceed.
+        required: false
+        example: 10
+      - name: --reduce_GC_memory 
+        type: boolean_true
+        description: |
+          If this option is selected, a more memory efficient (but slightly slower) representation is used to compute fragment GC content. Enabling this will reduce memory usage, but can also reduce speed. However, the results themselves will remain the same.
+      - name: --bias_speed_samp
+        type: integer
+        description: | 
+          The value at which the fragment length PMF is down-sampled when evaluating sequence-specific & GC fragment bias. Larger values speed up effective length correction, but may decrease the fidelity of bias modeling results.
+        required: false
+        example: 5
+      - name: --fld_max
+        type: integer
+        description: | 
+          The maximum fragment length to consider when building the empirical distribution
+        required: false
+        example: 1000
+      - name: --fld_mean
+        type: integer
+        description: | 
+          The mean used in the fragment length distribution prior
+        required: false
+        example: 250 
+      - name: --fld_SD
+        type: integer
+        description: | 
+          The standard deviation used in the fragment length distribution prior
+        required: false
+        example: 25
+      - name: --forgetting_factor
+        alternatives: ["-f"]
+        type: double
+        description: | 
+          The forgetting factor used in the online learning schedule. A smallervalue results in quicker learning, but higher variance and may be unstable. A larger value results in slower learning but may be more stable.  Value should be in the interval (0.5, 1.0].
+        required: false
+        min: 0.500000001
+        max: 1
+        example: 0.65
+      - name: --init_uniform 
+        type: boolean_true
+        description: |
+          Initialize the offline inference with uniform parameters, rather than seeding with online parameters.
+      - name: --max_occs_per_hit
+        type: integer
+        description: | 
+          When collecting "hits" (MEMs), hits having more than max_occs_per_hit occurrences won't be considered.
+        required: false
+        example: 1000
+      - name: --max_read_occ
+        type: integer
+        description: | 
+          Reads "mapping" to more than this many places won't be considered.
+        required: false
+        example: 200
+      - name: --no_length_correction
+        type: boolean_true
+        description: | 
+          Entirely disables length correction when estimating the abundance of transcripts. This option can be used with protocols where one expects that fragments derive from their underlying targets without regard to that target's length (e.g. QuantSeq)
+      - name: --no_effective_length_correction
+        type: boolean_true
+        description: | 
+          Disables effective length correction when computing the probability that a fragment was generated from a transcript. If this flag is passed in,the fragment length distribution is not taken into account when computing this probability.
+      - name: --no_single_frag_prob
+        type: boolean_true
+        description: | 
+          Disables the estimation of an associated fragment length probability for single-end reads or for orphaned mappings in paired-end libraries. The default behavior is to consider the  probability of all possible fragment lengths associated with the retained mapping. Enabling this flag (i.e. turning this default behavior off) will simply not attempt to estimate a fragment length probability in such cases.
+      - name: --no_frag_length_dist
+        type: boolean_true
+        description: | 
+          Don't consider concordance with the learned fragment length distribution when trying to determine the probability that a fragment has originated from a specified location. Normally, Fragments with unlikely lengths will be assigned a smaller relative probability than those with more likely lengths. When this flag is passed in, the observed fragment length has no effect on that fragment's a priori probability.
+      - name: --no_bias_length_threshold
+        type: boolean_true
+        description: | 
+          If this option is enabled, then no (lower) threshold will be set on how short bias correction can make effective lengths. This can increase the precision of bias correction, but harm robustness. The default correction applies a threshold.
+      - name: --num_bias_samples
+        type: integer
+        description: | 
+          Number of fragment mappings to use when learning the sequence-specific bias model.
+        required: false
+        example: 2000000
+      - name: --num_aux_model_samples
+        type: integer
+        description: | 
+          The first <num_aux_model_samples> are used to train the auxiliary model parameters (e.g. fragment length distribution, bias, etc.). After ther first <num_aux_model_samples> observations the auxiliary model parameters will be assumed to have converged and will be fixed.
+        required: false
+        example: 5000000
+      - name: --num_pre_aux_model_samples
+        type: integer
+        description: | 
+          The first <numPreAuxModelSamples> will have their assignment likelihoods and contributions to the transcript abundances computed without applying any auxiliary models. The purpose of ignoring the auxiliary models for the first <num_pre_aux_model_samples> observations is to avoid applying these models before their parameters have been learned sufficiently well.
+        required: false
+        example: 5000
+      - name: --useEM
+        type: boolean_true
+        description: | 
+          Use the traditional EM algorithm for optimization in the batch passes.
+      - name: --useVBOpt
+        type: boolean_true
+        description: | 
+          Use the Variational Bayesian EM [default]
+      - name: --range_factorization_bins
+        type: integer
+        description: | 
+          Factorizes the likelihood used in quantification by adopting a new notion of equivalence classes based on the conditional probabilities with which fragments are generated from different transcripts. This is a more fine-grained factorization than the normal rich equivalence classes. The default value (4) corresponds to the default used in Zakeri et al. 2017 (doi: 10.1093/bioinformatics/btx262), and larger values imply a more fine-grained factorization. If range factorization is enabled, a common value to select for this parameter is 4. A value of 0 signifies the use of basic rich equivalence classes.
+        required: false
+        example: 4
+      - name: --num_Gibbs_samples
+        type: integer
+        description: | 
+          Number of Gibbs sampling rounds to perform.
+        required: false
+        example: 0
+      - name: --no_Gamma_draw
+        type: boolean_true
+        description: | 
+          This switch will disable drawing transcript fractions from a Gamma distribution during Gibbs sampling. In this case the sampler does not account for shot-noise, but only assignment ambiguity
+      - name: --num_bootstraps
+        type: integer
+        description: | 
+          Number of bootstrap samples to generate. Note: This is mutually exclusive with Gibbs sampling.
+        required: false
+        example: 0
+      - name: --bootstrap_reproject
+        type: boolean_true
+        description: | 
+          This switch will learn the parameter distribution from the bootstrapped counts for each sample, but will reproject those parameters onto the original equivalence class counts.
+      - name: --thinning_factor
+        type: integer
+        description: | 
+          Number of steps to discard for every sample kept from the Gibbs chain. The larger this number, the less chance that subsequent samples are auto-correlated, but the slower sampling becomes.
+        required: false
+        example: 16
+      - name: --quiet
+        alternatives: ["-q"]
+        type: boolean_true
+        description: | 
+          Be quiet while doing quantification (don't write informative output to the console unless something goes wrong).
+      - name: --per_transcript_prior
+        type: boolean_true
+        description: | 
+          The prior (either the default or the argument provided via --vb_prior) will be interpreted as a transcript-level prior (i.e. each transcript will be given a prior read count of this value)
+      - name: --per_nucleotide_prior
+        type: boolean_true
+        description: | 
+          The prior (either the default or the argument provided via --vb_prior) will be interpreted as a nucleotide-level prior (i.e. each nucleotide will be given a prior read count of this value)
+      - name: --sig_digits
+        type: integer
+        description: | 
+          The number of significant digits to write when outputting the EffectiveLength and NumReads columns
+        required: false
+        example: 3
+      - name: --vb_prior
+        type: double
+        description: | 
+          The prior that will be used in the VBEM algorithm. This is interpreted as a per-transcript prior, unless the --per_nucleotide_prior flag is also given. If the --per_nucleotide_prior flag is given, this is used as a nucleotide-level prior. If the default is used, it will be divided by 1000 before being used as a nucleotide-level prior, i.e. the default per-nucleotide prior will be 1e-5.
+        required: false
+        example: 0.01
+      - name: --write_orphan_links
+        type: boolean_true
+        description: | 
+          Write the transcripts that are linked by orphaned reads.
+      - name: --write_unmapped_names
+        type: boolean_true
+        description: | 
+          Write the names of un-mapped reads to the file unmapped_names.txt in the auxiliary directory.
+  
+  - name: Alignment-specific options
+    arguments:
+      - name: --no_error_model
+        type: boolean_true
+        description: |
+          Turn off the alignment error model, which takes into account the the observed frequency of different types of mismatches / indels when computing the likelihood of a given alignment. Turning this off can speed up alignment-based salmon, but can harm quantification accuracy.
+      - name: --num_error_bins
+        type: integer
+        description: | 
+          The number of bins into which to divide each read when learning and applying the error model.  For example, a value of 10 would mean that effectively, a separate error model is leared and applied to each 10th of the read, while a value of 3 would mean that a separate error model is applied to the read beginning (first third), middle (second third) and end (final third).
+        required: false
+        example: 6
+      - name: --sample_out
+        alternatives: ["-s"]
+        type: boolean_true
+        description: |
+          Write a "postSample.bam" file in the output directory that will sample the input alignments according to the estimated transcript abundances. If you're going to perform downstream analysis of the alignments with tools which don't, themselves, take fragment assignment ambiguity into account, you should use this output.
+      - name: --sample_unaligned
+        alternatives: ["-u"]
+        type: boolean_true
+        description: |
+          In addition to sampling the aligned reads, also write the un-aligned reads to "postSample.bam".
+      - name: --gencode
+        type: boolean_true
+        description: |
+          This flag will expect the input transcript fasta to be in GENCODE format, and will split the transcript name at the first '|' character. These reduced names will be used in the output and when looking for these transcripts in a gene to transcript GTF.
+      - name: --mapping_cache_memory_limit
+        type: integer
+        description: | 
+          If the file contained fewer than this many mapped reads, then just keep the data in memory for subsequent rounds of inference. Obviously, this value should not be too large if you wish to keep a low memory usage, but setting it large enough to accommodate all of the mapped read can substantially speed up inference on "small" files that contain only a few million reads.
+        required: false
+        example: 2000000
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/salmon:1.10.2--hecfa306_0
+    setup:
+      - type: docker
+        run: |
+          salmon index -v 2>&1 | sed 's/salmon \([0-9.]*\)/salmon: \1/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow

@@ -1,0 +1,115 @@
+name: star_align_reads
+namespace: star
+description: |
+  Aligns reads to a reference genome using STAR.
+keywords: [align, fasta, genome]
+links:
+  repository: https://github.com/alexdobin/STAR
+  documentation: https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf
+references:
+  doi: 10.1093/bioinformatics/bts635
+license: MIT
+requirements:
+  commands: [ STAR, python, ps, zcat, bzcat ]
+# manually taking care of the main input and output arguments
+argument_groups:
+  - name: Inputs
+    arguments:
+      - type: file
+        name: --input
+        alternatives: --readFilesIn
+        required: true
+        description: The single-end or paired-end R1 FastQ files to be processed.
+        example: [ mysample_S1_L001_R1_001.fastq.gz ]
+        multiple: true
+      - type: file
+        name: --input_r2
+        required: false
+        description: The paired-end R2 FastQ files to be processed. Only required if --input is a paired-end R1 file.
+        example: [ mysample_S1_L001_R2_001.fastq.gz ]
+        multiple: true
+  - name: Outputs
+    arguments:
+      - type: file
+        name: --aligned_reads
+        required: true
+        description: The output file containing the aligned reads.
+        direction: output
+        example: aligned_reads.bam
+      - type: file
+        name: --reads_per_gene
+        required: false
+        description: The output file containing the number of reads per gene.
+        direction: output
+        example: reads_per_gene.tsv
+      - type: file
+        name: --unmapped
+        required: false
+        description: The output file containing the unmapped reads.
+        direction: output
+        example: unmapped.fastq
+      - type: file
+        name: --unmapped_r2
+        required: false
+        description: The output file containing the unmapped R2 reads.
+        direction: output
+        example: unmapped_r2.fastq
+      - type: file
+        name: --chimeric_junctions
+        required: false
+        description: The output file containing the chimeric junctions.
+        direction: output
+        example: chimeric_junctions.tsv
+      - type: file
+        name: --log
+        required: false
+        description: The output file containing the log of the alignment process.
+        direction: output
+        example: log.txt
+      - type: file
+        name: --splice_junctions
+        required: false
+        description: The output file containing the splice junctions.
+        direction: output
+        example: splice_junctions.tsv
+# other arguments are defined in a separate file
+__merge__: argument_groups.yaml
+resources:
+  - type: python_script
+    path: script.py
+test_resources:
+  - type: bash_script
+    path: test.sh
+engines:
+  - type: docker
+    image: python:3.12-slim
+    setup:
+      - type: apt
+        packages:
+          - procps
+          - gzip
+          - bzip2
+      # setup derived from https://github.com/alexdobin/STAR/blob/master/extras/docker/Dockerfile
+      - type: docker
+        env: 
+          - STAR_VERSION 2.7.11b
+          - PACKAGES gcc g++ make wget zlib1g-dev unzip xxd
+        run: |
+          apt-get update && \
+            apt-get install -y --no-install-recommends ${PACKAGES} && \
+            cd /tmp && \
+            wget --no-check-certificate https://github.com/alexdobin/STAR/archive/refs/tags/${STAR_VERSION}.zip && \
+            unzip ${STAR_VERSION}.zip && \
+            cd STAR-${STAR_VERSION}/source && \
+            make STARstatic CXXFLAGS_SIMD=-std=c++11 && \
+            cp STAR /usr/local/bin && \
+            cd / && \
+            rm -rf /tmp/STAR-${STAR_VERSION} /tmp/${STAR_VERSION}.zip && \
+            apt-get --purge autoremove -y ${PACKAGES} && \
+            apt-get clean
+      - type: docker
+        run: |
+          STAR --version | sed 's#\(.*\)#star: "\1"#' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
