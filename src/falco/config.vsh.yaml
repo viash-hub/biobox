@@ -1,0 +1,36 @@
+name: falco
+description: A C++ drop-in replacement of FastQC to assess the quality of sequence read data
+keywords: [qc, fastqc, sequencing]
+links:
+  documentation: https://falco.readthedocs.io/en/latest/
+  repository: https://github.com/smithlabcode/falco
+references:
+  doi: xxx
+license: GPL-3.0
+requirements:
+  commands: [falco]
+
+engines:
+  - type: docker
+    image: debian:trixie-slim
+    setup:
+      - type: apt
+        packages: [wget, build-essential, g++, zlib1g-dev]
+      - type: docker
+        run: |
+          wget https://github.com/smithlabcode/falco/releases/download/v1.2.2/falco-1.2.2.tar.gz -O /tmp/falco.tar.gz && \
+          cd /tmp && \
+          tar xvf falco.tar.gz && \
+          cd falco-1.2.2 && \
+          ./configure && \
+          make all && \
+          make install && \
+          cd /tmp && \
+          rm -rf falco.tar.gz falco-1.2.2
+      - type: docker
+        run: |
+          echo "falco: \"$(falco -v | sed -n 's/^falco //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
