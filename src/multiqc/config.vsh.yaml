@@ -203,11 +203,13 @@ functionality:
     - type: file
       path: test_data
 
-platforms:
+engines:
   - type: docker
     image: quay.io/biocontainers/multiqc:1.20--pyhdfd78af_2
     setup:
       - type: docker
         run: |
           multiqc --version | sed 's/multiqc, version\s\(.*\)/multiqc: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
   - type: nextflow
