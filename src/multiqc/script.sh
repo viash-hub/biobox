@@ -125,11 +125,6 @@ multiqc \
     "${inputs[@]}"
 
 # handle output files
-
-echo "${out_dir}"
-echo "${out_dir}/${report_name}_data"
-echo "$par_output_data"
-
 if [[ -n "$par_output_data" ]]; then
     mv "${out_dir}/${report_name}_data" "$par_output_data"
 fi
