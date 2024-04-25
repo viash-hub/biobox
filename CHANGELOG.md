@@ -27,6 +27,8 @@
 
 * `lofreq/indelqual`: Insert indel qualities into BAM file (PR #17).
 
+* `multiqc`: Aggregate results from bioinformatics analyses across many samples into a single report (PR #42).
+
 * `star/star_align_reads`: Align reads to a reference genome (PR #22).
 
 * `gffread`: Validate, filter, convert and perform other operations on GFF files (PR #29).  
