@@ -27,8 +27,8 @@ argument_groups:
     arguments:
       - name: "--output_report"
         type: file
-        required: true
         direction: output
+        must_exist: false
         example: multiqc_report.html
         description: |
           Filepath of the generated report.
