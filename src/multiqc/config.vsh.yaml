@@ -27,8 +27,8 @@ argument_groups:
     arguments:
       - name: "--output_report"
         type: file
+        required: true
         direction: output
-        required: false
         example: multiqc_report.html
         description: |
           Filepath of the generated report.
@@ -37,15 +37,17 @@ argument_groups:
         required: false
         direction: output
         example: multiqc_data
+        must_exist: false
         description: |
-          Output directory for parsed data files.
+          Output directory for parsed data files. If not provided, parsed data will not be published.
       - name: "--output_plots"
         type: file
         required: false
         direction: output
+        must_exist: false
         example: multiqc_plots
         description: |
-          Output directory for generated plots.
+          Output directory for generated plots. If not provided, plots will not be published.
 
   - name: "Modules and analyses to run"
     arguments:
@@ -206,6 +208,9 @@ engines:
   - type: docker
     image: quay.io/biocontainers/multiqc:1.20--pyhdfd78af_2
     setup:
+      - type: apt
+        packages: 
+          - jq
       - type: docker
         run: |
           multiqc --version | sed 's/multiqc, version\s\(.*\)/multiqc: "\1"/' > /var/software_versions.txt

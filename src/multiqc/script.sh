@@ -46,25 +46,25 @@ if [[ -n "$par_input" ]]; then
     unset IFS
 fi
 
-if [[ -z "$par_include_modules" ]]; then
+if [[ -n "$par_include_modules" ]]; then
     include_modules=""
     IFS="," read -ra incl_modules <<< $par_include_modules
     for i in "${incl_modules[@]}"; do
-        include_modules+="--include-modules $i "
+        include_modules+="--include $i "
     done
     unset IFS
 fi
 
-if [[ -z "$par_exclude_modules" ]]; then
+if [[ -n "$par_exclude_modules" ]]; then
     exclude_modules=""
-    IFS="," read -ra excl_modules <<< $par_include_modules
+    IFS="," read -ra excl_modules <<< $par_exclude_modules
     for i in "${excl_modules[@]}"; do
-        exclude_modules+="--exclude-modules $i "
+        exclude_modules+="--exclude $i"
     done
     unset IFS
 fi
 
-if [[ -z "$par_ignore_analysis" ]]; then
+if [[ -n "$par_ignore_analysis" ]]; then
     ignore=""
     IFS="," read -ra ignore_analysis <<< $par_ignore_analysis
     for i in "${ignore_analysis[@]}"; do
@@ -73,14 +73,15 @@ if [[ -z "$par_ignore_analysis" ]]; then
     unset IFS
 fi
 
-if [[ -z "$par_ignore_samples" ]]; then
+if [[ -n "$par_ignore_samples" ]]; then
     ignore_samples=""
     IFS="," read -ra ign_samples <<< $par_ignore_samples
     for i in "${ign_samples[@]}"; do
-        ignore_samples+="--ignore-samples $i "
+        ignore_samples+="--ignore-samples $i"
     done
     unset IFS
 fi
+
 
 # run multiqc
 multiqc \
@@ -103,10 +104,10 @@ multiqc \
     ${par_fn_as_s_name:+--fn-as-s-name} \
     ${par_ignore_names:+--ignore-names "$par_ignore_names"} \
     ${par_ignore_symlinks:+--ignore-symlinks} \
-    ${ignore_samples:+"$ignore_samples"} \
-    ${ignore:+"$ignore"} \
-    ${exclude_modules:+"$exclude_modules"} \
-    ${include_modules:+"$include_modules"} \
+    ${ignore_samples} \
+    ${ignore} \
+    ${exclude_modules} \
+    ${include_modules} \
     ${par_include_modules:+--include-modules "$par_include_modules"} \
     ${par_data_format:+--data-format "$par_data_format"} \
     ${par_zip_data_dir:+--zip-data-dir} \
@@ -122,7 +123,7 @@ multiqc \
     ${par_require_logs:+--require-logs} \
     ${par_development:+--development} \
     --force \
-    "${inputs[@]}"
+    "${inputs[@]}" 
 
 # handle output files
 if [[ -n "$par_output_data" ]]; then
