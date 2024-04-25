@@ -1,5 +1,12 @@
 #!/bin/bash
 
+## VIASH START
+
+par_input=src/multiqc/test_data/
+par_output_report=woowoo.html
+
+## VIASH END
+
 # disable flags
 [[ "$par_ignore_symlinks" == "false" ]] && unset ignore_symlinks
 [[ "$par_dirs" == "false" ]] && unset par_dirs
@@ -118,6 +125,10 @@ multiqc \
     "${inputs[@]}"
 
 # handle output files
+
+echo "${out_dir}"
+echo "${out_dir}/${report_name}_data"
+echo "$par_output_data"
 
 if [[ -n "$par_output_data" ]]; then
     mv "${out_dir}/${report_name}_data" "$par_output_data"
