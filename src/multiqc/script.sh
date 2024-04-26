@@ -1,12 +1,5 @@
 #!/bin/bash
 
-## VIASH START
-
-par_input=src/multiqc/test_data/
-par_output_report=woowoo.html
-
-## VIASH END
-
 # disable flags
 [[ "$par_ignore_symlinks" == "false" ]] && unset ignore_symlinks
 [[ "$par_dirs" == "false" ]] && unset par_dirs
@@ -41,10 +34,7 @@ report_name="${output_report_file%.*}"
 [[ ! -z "$par_output_plots" ]] && export=true
 
 # handle multiples
-if [[ -n "$par_input" ]]; then
-    IFS="," read -ra inputs <<< $par_input
-    unset IFS
-fi
+IFS=";" read -ra inputs <<< $par_input
 
 if [[ -n "$par_include_modules" ]]; then
     include_modules=""
