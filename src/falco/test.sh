@@ -4,8 +4,6 @@ set -e
 
 echo "> Prepare test data"
 
-set -eo pipefail
-
 # We use data from this repo: https://github.com/hartwigmedical/testData
 echo ">> Fetching and preparing test data"
 fastq1="https://github.com/hartwigmedical/testdata/raw/master/100k_reads_hiseq/TESTX/TESTX_H7YRLADXX_S1_L001_R1_001.fastq.gz"
@@ -41,8 +39,7 @@ $meta_executable \
   --input "$test_data_dir/R1.fastq.gz" \
   --data_filename out/data.txt \
   --report_filename out/report.html \
-  --summary_filename out/summary.txt \
-  --outdir out/
+  --summary_filename out/summary.txt
 
 echo ">>> Checking whether output exists"
 [ ! -d "out" ] && echo "Output directory not created" && exit 1
@@ -50,6 +47,25 @@ echo ">>> Checking whether output exists"
 [ ! -f "out/summary.txt" ] && echo "Summary not created" && exit 1
 [ ! -f "out/data.txt" ] && echo "fastqc_data not created" && exit 1
 
-echo "All tests succeeded!"
-exit 0
+echo ">>> cleanup"
+rm -rf out/
 
+echo ">> Run falco on test data, subsample"
+echo ">>> Run falco"
+$meta_executable \
+  --input "$test_data_dir/R1.fastq.gz" \
+  --data_filename out/data.txt \
+  --report_filename out/report.html \
+  --summary_filename out/summary.txt \
+  --subsample 100
+
+echo ">>> Checking whether output exists"
+[ ! -d "out" ] && echo "Output directory not created" && exit 1
+[ ! -f "out/report.html" ] && echo "Report not created" && exit 1
+[ ! -f "out/summary.txt" ] && echo "Summary not created" && exit 1
+[ ! -f "out/data.txt" ] && echo "fastqc_data not created" && exit 1
+
+echo ">>> cleanup"
+rm -rf out/
+
+echo "All tests succeeded!"

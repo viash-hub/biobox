@@ -3,7 +3,6 @@
 set -eo pipefail
 
 [[ "$par_nogroup" == "false" ]] && unset par_nogroup
-[[ "$par_subsample" == "false" ]] && unset par_subsample
 [[ "$par_bisulfite" == "false" ]] && unset par_bisulfite
 [[ "$par_reverse_compliment" == "false" ]] && unset par_reverse_compliment
 
@@ -14,9 +13,9 @@ $(which falco) \
   ${par_contaminants:+--contaminants "$par_contaminants"} \
   ${par_adapters:+--adapters "$par_adapters"} \
   ${par_limits:+--limits "$par_limits"} \
-  ${par_subsample:+-subsample} \
+  ${par_subsample:+-subsample $par_subsample} \
   ${par_bisulfite:+-bisulfite} \
-  ${par_reverse_compliment:+--reverse-compliment} \
+  ${par_reverse_compliment:+-reverse-compliment} \
   ${par_outdir:+--outdir "$par_outdir"} \
   ${par_format:+--format "$par_format"} \
   ${par_data_filename:+-data-filename "$par_data_filename"} \

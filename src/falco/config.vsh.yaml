@@ -66,15 +66,16 @@ argument_groups:
           mirror the default limits.txt file found in 
           the Configuration folder. Default: 
           /tmp/falco-1.2.2/Configuration/limits.txt
-      - name: -subsample
+      - name: --subsample
         alternatives: [-s]
-        type: boolean_true
+        type: integer
+        example: 10
         description: |
           [Falco only] makes falco faster (but 
           possibly less accurate) by only processing 
           reads that are multiple of this value (using 
           0-based indexing to number reads).
-      - name: -bisulfite
+      - name: --bisulfite
         alternatives: [-b]
         type: boolean_true
         description: |
@@ -82,7 +83,7 @@ argument_groups:
           bisulfite sequencing, and more Ts and fewer 
           Cs are therefore expected and will be 
           accounted for in base content.
-      - name: -reverse_complliment
+      - name: --reverse_complliment
         alternatives: [-r]
         type: boolean_true
         description: |
