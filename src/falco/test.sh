@@ -39,7 +39,8 @@ $meta_executable \
   --input "$test_data_dir/R1.fastq.gz" \
   --data_filename out/data.txt \
   --report_filename out/report.html \
-  --summary_filename out/summary.txt
+  --summary_filename out/summary.txt \
+  --outdir out/
 
 echo ">>> Checking whether output exists"
 [ ! -d "out" ] && echo "Output directory not created" && exit 1
@@ -57,7 +58,8 @@ $meta_executable \
   --data_filename out/data.txt \
   --report_filename out/report.html \
   --summary_filename out/summary.txt \
-  --subsample 100
+  --subsample 100 \
+  --outdir out
 
 echo ">>> Checking whether output exists"
 [ ! -d "out" ] && echo "Output directory not created" && exit 1

@@ -43,7 +43,7 @@ argument_groups:
           must contain sets of named contaminants in 
           the form name[tab]sequence. Lines prefixed 
           with a hash will be ignored. Default: 
-          /tmp/falco-1.2.2/Configuration/contaminant_list.txt
+          https://github.com/smithlabcode/falco/blob/v1.2.2/Configuration/contaminant_list.txt
       - name: --adapters
         type: file
         description: |
@@ -52,8 +52,8 @@ argument_groups:
           explicity searched against the library. The 
           file must contain sets of named adapters in 
           the form name[tab]sequence. Lines prefixed 
-          with a hash will be ignored. Default: 
-          /tmp/falco-1.2.2/Configuration/adapter_list.txt
+          with a hash will be ignored. Default:
+          https://github.com/smithlabcode/falco/blob/v1.2.2/Configuration/adapter_list.txt
       - name: --limits
         type: file
         description: |
@@ -65,7 +65,7 @@ argument_groups:
           output all together. The format needs to 
           mirror the default limits.txt file found in 
           the Configuration folder. Default: 
-          /tmp/falco-1.2.2/Configuration/limits.txt
+          https://github.com/smithlabcode/falco/blob/v1.2.2/Configuration/limits.txt
       - name: --subsample
         alternatives: [-s]
         type: integer
@@ -95,16 +95,14 @@ argument_groups:
     arguments:
       - name: --outdir
         alternatives: [-o]
+        required: true
         type: file
         direction: output
         description: |
           Create all output files in the specified 
           output directory. FALCO-SPECIFIC: If the 
           directory does not exists, the program will 
-          create it. If this option is not set then 
-          the output file for each sequence file is 
-          created in the same directory as the 
-          sequence file which was processed.
+          create it.
         example: output
       - name: --format
         type: string
