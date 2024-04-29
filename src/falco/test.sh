@@ -8,7 +8,13 @@ echo "> Prepare test data"
 echo ">> Fetching and preparing test data"
 fastq1="https://github.com/hartwigmedical/testdata/raw/master/100k_reads_hiseq/TESTX/TESTX_H7YRLADXX_S1_L001_R1_001.fastq.gz"
 fastq2="https://github.com/hartwigmedical/testdata/raw/master/100k_reads_hiseq/TESTX/TESTX_H7YRLADXX_S1_L001_R2_001.fastq.gz"
-test_data_dir="test_data"
+TMPDIR=$(mktemp -d "$meta_temp_dir/$meta_functionality_name-XXXXXX")
+function clean_up {
+  [[ -d "$TMPDIR" ]] && rm -r "$TMPDIR"
+}
+trap clean_up EXIT
+
+test_data_dir="$TMPDIR/test_data"
 
 mkdir $test_data_dir
 wget -q $fastq1 -O $test_data_dir/R1.fastq.gz
