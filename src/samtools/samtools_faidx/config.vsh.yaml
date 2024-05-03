@@ -1,0 +1,95 @@
+name: samtools_faidx
+namespace: samtools
+description: Indexes FASTA files to enable random access to fasta and fastq files.
+keywords: [ idex, fasta, faidx ]
+links:
+  homepage: https://www.htslib.org/
+  documentation: https://www.htslib.org/doc/samtools-faidx.html
+  repository: https://github.com/samtools/samtools
+references: 
+  doi: [10.1093/bioinformatics/btp352, 10.1093/gigascience/giab008]
+license: MIT/Expat
+
+argument_groups:
+  - name: Inputs
+    arguments:
+    - name: --input
+      type: file
+      description: |
+        FASTA input file.
+    - name: --length 
+      alternatives: -n
+      type: integer
+      description: |
+        Length for FASTA sequence line wrapping. If zero, this means do not
+        line wrap. Defaults to the line length in the input file.
+      default: 60
+    - name: --region_file
+      alternatives: -r
+      type: file
+      description: |
+        File of regions. Format is chr:from-to. One per line.
+        Must be used with --output to avoid sending output to stdout.
+  - name: Options
+    arguments:
+    - name: --continue
+      type: boolean_true
+      description: |
+        Continue working if a non-existent region is requested.
+    - name: --reverse_complement
+      alternatives: -i
+      type: boolean_true
+      description: |
+        Reverse complement sequences.
+  - name: Outputs 
+    arguments:
+    - name: --output
+      alternatives: -o
+      type: file 
+      description: |
+        Write output to file.
+      direction: output
+      required: true
+      example: output.fasta
+    - name: --mark_strand
+      type: string
+      description: |
+        Add strand indicator to sequence name. Options are:
+        [ rc, no, sign, custom,<pos>,<neg> ]
+      default: rc
+    - name: --fai_idx
+      type: file
+      description: |
+        Read/Write to specified index file (default file.fa.fai).
+      direction: output
+      example: file.fa.fai
+    - name: --gzi_idx
+      type: file
+      description: |
+        Read/Write to specified compressed file index (used with .gz files, default file.fa.gz.gzi).
+      direction: output
+      example: file.fa.gz.gzi
+    - name: --fastq
+      type: boolean_true
+      description: |
+        Read FASTQ files and output extracted sequences in FASTQ format. Same as using samtools fqidx.
+   
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/samtools:1.19.2--h50ea8bc_1
+    setup:
+      - type: docker
+        run: |
+          samtools --version 2>&1 | grep -E '^(samtools|Using htslib)' | \
+          sed 's#Using ##;s# \([0-9\.]*\)$#: \1#' > /var/software_versions.txt
+runners:
+- type: executable
+- type: nextflow
