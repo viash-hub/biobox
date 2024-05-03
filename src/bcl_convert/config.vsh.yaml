@@ -143,7 +143,7 @@ engines:
     # https://support.illumina.com/sequencing/sequencing_software/bcl-convert/downloads.html
     setup:
       - type: apt
-        packages: [wget, gdb, which, hostname, alien]
+        packages: [wget, gdb, which, hostname, alien, procps]
       - type: docker
         run: |
           wget https://s3.amazonaws.com/webdata.illumina.com/downloads/software/bcl-convert/bcl-convert-4.2.7-2.el8.x86_64.rpm -O /tmp/bcl-convert.rpm && \
