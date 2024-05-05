@@ -27,6 +27,8 @@
 
 * `lofreq/indelqual`: Insert indel qualities into BAM file (PR #17).
 
+* `multiqc`: Aggregate results from bioinformatics analyses across many samples into a single report (PR #42).
+
 * `star/star_align_reads`: Align reads to a reference genome (PR #22).
 
 * `gffread`: Validate, filter, convert and perform other operations on GFF files (PR #29).  
@@ -36,11 +38,14 @@
     - `salmon/salmon_quant`: Transcript quantification from RNA-seq data (PR #24).
 
 * `samtools`:
-    - `samtools/flagstat`: Counts the number of alignments in SAM/BAM/CRAM files for each FLAG type (PR #31).
-    - `samtools/idxstats`: Reports alignment summary statistics for a SAM/BAM/CRAM file (PR #32).
+    - `samtools/samtools_flagstat`: Counts the number of alignments in SAM/BAM/CRAM files for each FLAG type (PR #31).
+    - `samtools/samtools_idxstats`: Reports alignment summary statistics for a SAM/BAM/CRAM file (PR #32).
     - `samtools/samtools_index`: Index SAM/BAM/CRAM files (PR #35).
     - `samtools/samtools_sort`: Sort SAM/BAM/CRAM files (PR #36).
     - `samtools/samtools_stats`: Reports alignment summary statistics for a BAM file (PR #39).
+    - `samtools/samtools_stats`: Indexes FASTA files to enable random access to fasta and fastq files (PR #41).
+
+* `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
 ## MAJOR CHANGES
 
