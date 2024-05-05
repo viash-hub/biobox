@@ -63,6 +63,25 @@ diff "$temp_dir/a.count" "$test_dir/a.count" || \
 
 ############################################################################################
 
-echo ">>> All test passed successfully"
+echo ">>> Test 4: ${meta_functionality_name} including only the forward reads from read pairs"
 
+"$meta_executable" \
+   --output "$temp_dir/a.forward" \
+   --excl_flags "147" \
+    --input "$test_dir/a.sam"
+
+echo ">>> Checking whether output exists"
+[ ! -f "$temp_dir/a.forward" ] && echo "File 'a.forward' does not exist!" && exit 1
+
+echo ">>> Checking whether output is non-empty"
+[ ! -s "$temp_dir/a.forward" ] && echo "File 'a.forward' is empty!" && exit 1
+
+echo ">>> Checking whether output is correct"
+diff "$temp_dir/a.forward" "$test_dir/a.forward" || \
+    (echo "Output file a.forward does not match expected output" && exit 1)
+
+############################################################################################
+
+echo ">>> All test passed successfully"
+rm -rf "${temp_dir}"
 exit 0

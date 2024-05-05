@@ -176,18 +176,19 @@ argument_groups:
       alternatives: -q
       type: integer
       description: |
-        Skip alignments with MAPQ smaller than INT [0].
+        Skip alignments with MAPQ smaller than INT.
       default: 0
     - name: --library
       alternatives: -l
       type: string
       description: |
-        Only output alignments in library STR [null].
+        Only output alignments in library STR.
+      default: null
     - name: --min_qlen
       alternatives: -m
       type: integer
       description: |
-        Only output alignments with number of CIGAR bases consuming query sequence ≥ INT [0]
+        Only output alignments with number of CIGAR bases consuming query sequence ≥ INT.
       default: 0
     - name: --expr
       alternatives: -e
