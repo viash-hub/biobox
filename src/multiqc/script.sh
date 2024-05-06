@@ -99,6 +99,7 @@ multiqc \
     ${include_modules} \
     ${par_include_modules:+--include-modules "$par_include_modules"} \
     ${par_data_format:+--data-format "$par_data_format"} \
+    ${par_cl_config:+--cl-config "$par_cl_config"} \
     ${par_zip_data_dir:+--zip-data-dir} \
     ${par_pdf:+--pdf} \
     ${par_interactive:+--interactive} \
