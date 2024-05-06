@@ -177,7 +177,7 @@ engines:
     image: debian:trixie-slim
     setup:
       - type: apt
-        packages: [wget, build-essential, g++, zlib1g-dev]
+        packages: [wget, build-essential, g++, zlib1g-dev, procps]
       - type: docker
         run: |
           wget https://github.com/smithlabcode/falco/releases/download/v1.2.2/falco-1.2.2.tar.gz -O /tmp/falco.tar.gz && \
