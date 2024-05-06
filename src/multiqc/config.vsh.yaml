@@ -162,7 +162,7 @@ argument_groups:
         description: |
           Disable coloured log output.
       - name: "--cl_config"
-        type: file
+        type: string
         required: false
         description: |
           YAML formatted string that allows to customize MultiQC behaviour like input file detection.
