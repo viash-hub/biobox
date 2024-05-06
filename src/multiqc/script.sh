@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # disable flags
-[[ "$par_ignore_symlinks" == "false" ]] && unset ignore_symlinks
+[[ "$par_ignore_symlinks" == "false" ]] && unset par_ignore_symlinks
 [[ "$par_dirs" == "false" ]] && unset par_dirs
 [[ "$par_full_names" == "false" ]] && unset par_full_names
 [[ "$par_fn_as_s_name" == "false" ]] && unset par_fn_as_s_name
