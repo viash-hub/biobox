@@ -24,7 +24,7 @@ set -e
 samtools view \
     ${par_bam:+-b} \
     ${par_cram:+-C} \
-    ${par_fast:+-1} \
+    ${par_fast:+--fast} \
     ${par_uncompressed:+-u} \
     ${par_with_header:+--with-header} \
     ${par_header_only:+-H} \
