@@ -18,7 +18,8 @@ set -e
 [[ "$par_fetch_pairs" == "false" ]] && unset par_fetch_pairs
 [[ "$par_customized_index" == "false" ]] && unset par_customized_index
 [[ "$par_no_PG" == "false" ]] && unset par_no_PG
-
+[[ "$par_write_index" == "false" ]] && unset par_write_index
+[[ "$par_remove_B" == "false" ]] && unset par_remove_B
 
 samtools view \
     ${par_bam:+-b} \
@@ -48,8 +49,8 @@ samtools view \
     ${par_min_qlen:+-m "$par_min_qlen"} \
     ${par_expr:+-e "$par_expr"} \
     ${par_require_flags:+-f "$par_require_flags"} \
-    ${par_exclude_flags:+-F "$par_exclude_flags"} \
-    ${par_incl_flags:+--rf "$par_include_flags"} \
+    ${par_excl_flags:+-F "$par_excl_flags"} \
+    ${par_incl_flags:+--rf "$par_incl_flags"} \
     ${par_excl_all_flags:+-G "$par_excl_all_flags"} \
     ${par_subsample:+--subsample "$par_subsample"} \
     ${par_subsample_seed:+--subsample-seed "$par_subsample_seed"} \

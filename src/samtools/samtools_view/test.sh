@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_dir="${meta_resources_dir}/test_data"
-temp_dir="${meta_resources_dir}/tmp"
+temp_dir="${meta_resources_dir}/out"
 
 ############################################################################################
 
@@ -24,7 +24,7 @@ diff <(samtools view "$temp_dir/a.bam") <(samtools view "$test_dir/a.bam") || \
 
 ############################################################################################
 
-echo ">>> Test 2: ${meta_functionality_name} with --output_format CRAM"
+echo ">>> Test 2: ${meta_functionality_name} with CRAM format output"
 
 "$meta_executable" \
    --cram \
@@ -67,8 +67,8 @@ echo ">>> Test 4: ${meta_functionality_name} including only the forward reads fr
 
 "$meta_executable" \
    --output "$temp_dir/a.forward" \
-   --excl_flags "147" \
-    --input "$test_dir/a.sam"
+   --excl_flags "0x80" \
+   --input "$test_dir/a.sam"
 
 echo ">>> Checking whether output exists"
 [ ! -f "$temp_dir/a.forward" ] && echo "File 'a.forward' does not exist!" && exit 1
