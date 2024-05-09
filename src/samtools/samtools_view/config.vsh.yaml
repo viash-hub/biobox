@@ -17,8 +17,7 @@ argument_groups:
       type: file
       description: Input SAM, BAM, or CRAM file.
       required: true
-      direction: input
-      example: input.bam
+      must_exist: true
     - name: --fai_reference
       alternatives: -t
       type: file
