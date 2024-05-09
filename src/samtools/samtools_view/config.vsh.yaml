@@ -1,4 +1,4 @@
-name: samtools_stats
+name: samtools_view
 namespace: samtools
 description: Views and converts SAM/BAM/CRAM files.
 keywords: [view, convert, bam, sam, cram]
