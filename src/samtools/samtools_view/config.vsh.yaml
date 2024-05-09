@@ -180,7 +180,6 @@ argument_groups:
       type: string
       description: |
         Only output alignments in library STR.
-      default: null
     - name: --min_qlen
       alternatives: -m
       type: integer
