@@ -1,6 +1,6 @@
 name: samtools_fastq
 namespace: samtools
-description: convert a SAM/BAM/CRAM file to FASTQ.
+description: Converts a SAM, BAM or CRAM to FASTQ format.
 keywords: [fastq, bam, sam, cram]
 links:
   homepage: https://www.htslib.org/
@@ -23,6 +23,7 @@ argument_groups:
         type: file
         description: output FASTQ file
         required: true
+        direction: output
   - name: Options
     arguments:
       - name: --no_suffix
@@ -58,29 +59,33 @@ argument_groups:
           TAGLIST can be blank or * to indicate all tags should be copied to the output. If using *, 
           be careful to quote it to avoid unwanted shell expansion.
       - name: --read1
-        alternatives: "-1"
+        alternatives: -1
         type: file
         description: |
           Write reads with the READ1 FLAG set (and READ2 not set) to FILE instead of outputting them. 
           If the -s option is used, only paired reads will be written to this file.
+        direction: output
       - name: --read2
-        alternatives: "-2"
+        alternatives: -2
         type: file
         description: |
           Write reads with the READ2 FLAG set (and READ1 not set) to FILE instead of outputting them. 
           If the -s option is used, only paired reads will be written to this file.
+        direction: output
       - name: --output_reads
         alternatives: -o
         type: file
         description: |
           Write reads with either READ1 FLAG or READ2 flag set to FILE instead of outputting them to stdout. 
           This is equivalent to -1 FILE -2 FILE.
+        direction: output
       - name: --output_reads_both
         alternatives: -0
         type: file
         description: |
           Write reads where the READ1 and READ2 FLAG bits set are either both set or both unset to FILE 
           instead of outputting them.
+        direction: output
       - name: --filter_flags
         alternatives: -f
         type: integer
@@ -90,8 +95,8 @@ argument_groups:
           (i.e. /^0[0-7]+/).
         default: 0
       - name: --excl_flags
-        alternatives: "-F"
-        type: integer
+        alternatives: -F
+        type: string
         description: |
           Do not output alignments with any bits set in INT present in the FLAG field. INT can be specified 
           in hex by beginning with `0x' (i.e. /^0x[0-9A-F]+/) or in octal by beginning with `0' 
@@ -99,8 +104,8 @@ argument_groups:
           supplementary alignments.
         default: 0x900
       - name: --incl_flags
-        alternatives: "--rf"
-        type: integer
+        alternatives: --rf
+        type: string
         description: |
           Only output alignments with any bits set in INT present in the FLAG field. INT can be specified 
           in hex by beginning with `0x' (i.e. /^0x[0-9A-F]+/), in octal by beginning with `0' 
