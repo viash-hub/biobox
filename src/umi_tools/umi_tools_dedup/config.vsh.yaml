@@ -1,12 +1,11 @@
-name: umi_tool_dedup
+name: umi_tools_dedup
 namespace: umi_tools
 description: |
   Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read.
 keywords: [umi_tools, deduplication, dedup]
 links:
   homepage: https://umi-tools.readthedocs.io/en/latest/
-  documentation: [ https://umi-tools.readthedocs.io/en/latest/reference/dedup.html,
-                   https://umi-tools.readthedocs.io/en/latest/common_options.html#common-options ]
+  documentation: https://umi-tools.readthedocs.io/en/latest/reference/dedup.html
   repository: https://github.com/CGATOxford/UMI-tools
 references: 
   doi: 10.1101/gr.209601.116
@@ -16,7 +15,7 @@ argument_groups:
   - name: Inputs
     arguments:
       - name: --input
-        alternatives: -I
+        alternatives: --stdin
         type: file
         description: Input BAM or SAM file. Use --in_sam to specify SAM format.
         required: true
@@ -29,13 +28,12 @@ argument_groups:
         type: file
         description: BAM index
       - name: --get_output_stats
-        type: boolean
-        description: Whether or not to generate output stats. 
+        type: boolean_true
+        description: Generate output stats. 
       - name: --random_seed
         type: integer
         description: |
           Random seed to initialize number generator with.
-        default: none
 
   - name: Outputs
     arguments:
@@ -215,7 +213,7 @@ argument_groups:
           "output":  Output chimeric pairs without UMI grouping/deduplication. 
                      Only available in umi_tools group.
         default: use
-      - name: --unapired_reads
+      - name: --unpaired_reads
         type: string
         description: |
           How unpaired reads should be handled. 
@@ -246,7 +244,7 @@ argument_groups:
         type: boolean_true
         description: |
           By default, output is sorted. This involves the use of a temporary unsorted
-          file (saved in --temp-dir). Use this option to turn off sorting.
+          file (saved in --temp_dir). Use this option to turn off sorting.
       - name: --buffer_whole_contig
         type: boolean_true
         description: |
@@ -257,7 +255,44 @@ argument_groups:
           which the reads are sorted. However, by default, dedup reads for another
           1000bp before outputting read groups which will avoid any reads being missed
           with short read sequencing (<1000bp).
-
+  
+  - name: Common UMI-tools Options
+    arguments:
+      - name: --log
+        alternatives: -L
+        type: file
+        description: File with logging information.
+      - name: --log2stderr
+        type: boolean_true
+        description: Send logging information to stderr.
+      - name: --verbose
+        alternatives: -v
+        type: integer
+        description: Log level. The higher, the more output.
+        default: 1
+      - name: --error
+        alternatives: -E
+        type: file
+        description: File with error information.
+      - name: --temp_dir
+        type: string
+        description: |
+          Directory for temporary files. If not set, the bash environmental variable TMPDIR is used.
+      - name: --compresslevel
+        type: integer
+        description: |
+          Level of Gzip compression to use. Default=6 matches GNU gzip rather than python gzip default.
+        default: 6
+      - name: --timeit
+        type: file
+        description: Store timing information in file.
+      - name: --timeit_name
+        type: string
+        description: Name in timing file for this class of jobs.
+        default: "all"
+      - name: --timeit_header
+        type: string
+        description: Add header for timing information.
 
 resources:
   - type: bash_script

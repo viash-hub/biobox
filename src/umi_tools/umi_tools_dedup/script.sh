@@ -18,14 +18,14 @@ test_dir="${metal_executable}/test_data"
 [[ "$par_buffer_whole_contig" == "false" ]] && unset par_buffer_whole_contig
 [[ "$par_ignore_umi" == "false" ]] && unset par_ignore_umi
 [[ "$par_subset" == "false" ]] && unset par_subset
+[[ "$par_log2stderr" == "false" ]] && unset par_log2stderr
+[[ "$par_get_output_stats" == "false" ]] && unset par_get_output_stats
 
 
-$(which umi_tools) dedup \
-    -I "$par_input" \
+umi_tools dedup \
+    --stdin "$par_input" \
     ${par_in_sam:+--in-sam} \
-    ${par_bai:+--bai "$par_bai"} \
     ${par_get_output_stats:+--get-output-stats} \
-    ${par_random_seed:+--random-seed "$par_random_seed"} \
     -S "$par_output" \
     ${par_out_sam:+--out-sam} \
     ${par_paired:+--paired} \
@@ -48,7 +48,7 @@ $(which umi_tools) dedup \
     ${par_gene_tag:+--gene-tag "$par_gene_tag"} \
     ${par_assigned_status_tag:+--assigned-status-tag "$par_assigned_status_tag"} \
     ${par_skip_tags_regex:+--skip-tags-regex "$par_skip_tags_regex"} \
-    ${par_per_contig:+--per-contig}
+    ${par_per_contig:+--per-contig} \
     ${par_gene_transcript_map:+--gene-transcript-map "$par_gene_transcript_map"} \
     ${par_per_cell:+--per-cell} \
     ${par_mapping_quality:+--mapping-quality "$par_mapping_quality"} \
@@ -59,7 +59,16 @@ $(which umi_tools) dedup \
     ${par_subset:+--subset} \
     ${par_chrom:+--chrom "$par_chrom"} \
     ${par_no_sort_output:+--no-sort-output} \
-    ${par_buffer_whole_contig:+--buffer-whole-contig}
-
+    ${par_buffer_whole_contig:+--buffer-whole-contig} \
+    ${par_log:+-L "$par_log"} \
+    ${par_log2stderr:+--log2stderr} \
+    ${par_verbose:+-v "$par_verbose"} \
+    ${par_error:+-E "$par_error"} \
+    ${par_temp_dir:+--temp-dir "$par_temp_dir"} \
+    ${par_compresslevel:+--compresslevel "$par_compresslevel"} \
+    ${par_timeit:+--timeit "$par_timeit"} \
+    ${par_timeit_name:+--timeit-name "$par_timeit_name"} \
+    ${par_timeit_header:+--timeit-header "$par_timeit_header"} \
+    ${par_random_seed:+--random-seed "$par_random_seed"}
 
 exit 0
