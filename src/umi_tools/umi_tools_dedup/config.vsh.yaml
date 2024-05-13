@@ -134,7 +134,7 @@ argument_groups:
           tags are “NH”, “X0” and “XT”. If not specified, the read with the highest
           mapping quality will be selected.
       - name: --read_length
-        type: integer
+        type: boolean_true
         description: |
           Use the read length as a criteria when deduping, for e.g sRNA-Seq.
   
