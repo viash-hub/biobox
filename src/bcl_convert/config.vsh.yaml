@@ -50,20 +50,20 @@ argument_groups:
         example: true
       - name: --bcl_num_parallel_tiles
         type: integer
-        description: "# of tiles to process in parallel (default 1)"
+        description: "\# of tiles to process in parallel (default 1)"
         example: 1
       - name: --bcl_num_conversion_threads
         type: integer
-        description: "# of threads for conversion (per tile, default # cpu threads)"
+        description: "\# of threads for conversion (per tile, default # cpu threads)"
         example: 1
       - name: --bcl_num_compression_threads
         type: integer
-        description: "# of threads for fastq.gz output compression (per tile, default # cpu threads, or HW+12)"
+        description: "\# of threads for fastq.gz output compression (per tile, default # cpu threads, or HW+12)"
         example: 1
       - name: --bcl_num_decompression_threads
         type: integer
         description:
-          "# of threads for bcl/cbcl input decompression (per tile, default half # cpu threads, or HW+8).
+          "\# of threads for bcl/cbcl input decompression (per tile, default half # cpu threads, or HW+8).
           Only applies when preloading files"
         example: 1
 
@@ -79,7 +79,7 @@ argument_groups:
         example: true
       - name: --num_unknown_barcodes_reported
         type: integer
-        description: "# of Top Unknown Barcodes to output (1000 by default)"
+        description: "\# of Top Unknown Barcodes to output (1000 by default)"
         example: 1000
       - name: --bcl_validate_sample_sheet_only
         type: boolean
