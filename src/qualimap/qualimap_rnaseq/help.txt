@@ -1,0 +1,54 @@
+
+OpenJDK 64-Bit Server VM warning: ignoring option MaxPermSize=1024m; support was removed in 8.0
+QualiMap v.2.3
+Built on 2023-05-19 16:57
+
+usage: qualimap <tool> [options]
+
+To launch GUI leave <tool> empty.
+
+Available tools:
+
+    bamqc            Evaluate NGS mapping to a reference genome
+    rnaseq           Evaluate RNA-seq alignment data
+    counts           Counts data analysis (further RNA-seq data evaluation)
+    multi-bamqc      Compare QC reports from multiple NGS mappings
+    clustering       Cluster epigenomic signals
+    comp-counts      Compute feature counts
+
+Special arguments: 
+
+    --java-mem-size  Use this argument to set Java memory heap size. Example:
+                     qualimap bamqc -bam very_large_alignment.bam --java-mem-size=4G
+                     
+usage: qualimap rnaseq [-a <arg>] -bam <arg> -gtf <arg> [-npb <arg>] [-ntb
+       <arg>] [-oc <arg>] [-outdir <arg>] [-outfile <arg>] [-outformat <arg>]
+       [-p <arg>] [-pe] [-s]
+ -a,--algorithm <arg>             Counting algorithm:
+                                  uniquely-mapped-reads(default) or
+                                  proportional.
+ -bam <arg>                       Input mapping file in BAM format.
+ -gtf <arg>                       Annotations file in Ensembl GTF format.
+ -npb,--num-pr-bases <arg>        Number of upstream/downstream nucleotide bases
+                                  to compute 5'-3' bias (default is 100).
+ -ntb,--num-tr-bias <arg>         Number of top highly expressed transcripts to
+                                  compute 5'-3' bias (default is 1000).
+ -oc <arg>                        Output file for computed counts. If only name
+                                  of the file is provided, then the file will be
+                                  saved in the output folder.
+ -outdir <arg>                    Output folder for HTML report and raw data.
+ -outfile <arg>                   Output file for PDF report (default value is
+                                  report.pdf).
+ -outformat <arg>                 Format of the output report (PDF, HTML or both
+                                  PDF:HTML, default is HTML).
+ -p,--sequencing-protocol <arg>   Sequencing library protocol:
+                                  strand-specific-forward,
+                                  strand-specific-reverse or non-strand-specific
+                                  (default)
+ -pe,--paired                     Setting this flag for paired-end experiments
+                                  will result in counting fragments instead of
+                                  reads
+ -s,--sorted                      This flag indicates that the input file is
+                                  already sorted by name. If not set, additional
+                                  sorting by name will be performed. Only
+                                  required for paired-end analysis.
