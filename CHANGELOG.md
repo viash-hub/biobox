@@ -58,3 +58,5 @@
 ## DOCUMENTATION
 
 ## BUG FIXES
+
+* Add escaping character before leading hashtag in the description field of the config file (PR #50).
