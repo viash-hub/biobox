@@ -26,33 +26,18 @@ We encourage contributions from the community. To contribute:
 
 ## Contribution Guidelines
 
-- **Documentation of Functionality**: The purpose and functionality of
-  each component should be adequately described.
-- **Documentation of Inputs and Outputs**: All input and output
-  arguments should have a description and example (with extension).
-- **Docker Image**: A Docker image (with optional additional
-  dependencies) should be provided.
-- **Write unit tests**: A unit test with possibly test resources needs
-  to be provided.
-- **Provide test resources**: If the unit test requires test resources,
-  these should be provided in the `test_resources` section of the
-  component.
-- **Versioning**: If the component uses custom software (not installed
-  via Apt, Apk, Yum, Pip, Conda, or R), a Bash script `version.sh` needs
-  to be provided that outputs the version of the software.
-- **File format specifications**: If a component returns a directory or
-  data structure such as AnnData or MuData, a specification of the file
-  format should be provided.
+- **Procedure of adding a component**: \### Step 1: Find a component to
+  contribute
+- **VIASH START**:
+- **VIASH END**: xxx  
+- **VIASH START**:
+- **VIASH END**: arriba  
+- **VIASH START**:
+- **VIASH END**: echo “\> Run xxx with test data”
+- **VIASH START**:
+- **VIASH END**: echo “\> Run arriba with blacklist”
 
 See the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
-
-## Repository Structure
-
-…
-
-## Installation and Usage
-
-…
 
 ## Support and Community
 

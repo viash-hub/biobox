@@ -37,13 +37,6 @@ knitr::asis_output(
 
 See the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
 
-## Repository Structure
-
-...
-
-## Installation and Usage
-
-...
 
 ## Support and Community
 
