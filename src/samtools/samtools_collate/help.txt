@@ -1,0 +1,31 @@
+```
+samtools collate
+```
+Usage: samtools collate [options...] <in.bam> [<prefix>]
+
+Options:
+      -O       Output to stdout
+      -o       Output file name (use prefix if not set)
+      -u       Uncompressed BAM output
+      -f       Fast (only primary alignments)
+      -r       Working reads stored (with -f) [10000]
+      -l INT   Compression level [1]
+      -n INT   Number of temporary files [64]
+      -T PREFIX
+               Write temporary files to PREFIX.nnnn.bam
+      --no-PG  do not add a PG line
+      --input-fmt-option OPT[=VAL]
+               Specify a single input file format option in the form
+               of OPTION or OPTION=VALUE
+      --output-fmt FORMAT[,OPT[=VAL]]...
+               Specify output format (SAM, BAM, CRAM)
+      --output-fmt-option OPT[=VAL]
+               Specify a single output file format option in the form
+               of OPTION or OPTION=VALUE
+      --reference FILE
+               Reference sequence FASTA FILE [null]
+  -@, --threads INT
+               Number of additional threads to use [0]
+      --verbosity INT
+               Set level of verbosity
+  <prefix> is required unless the -o or -O options are used.
