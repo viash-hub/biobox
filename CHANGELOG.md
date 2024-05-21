@@ -56,7 +56,7 @@
 
 * Update to Viash 0.8.5 (PR #25).
 
-* Update to Viash 0.9.0-RC3 (PR #xxx).
+* Update to Viash 0.9.0-RC3 (PR #51).
 
 ## DOCUMENTATION
 
