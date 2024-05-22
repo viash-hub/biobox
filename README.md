@@ -26,40 +26,22 @@ We encourage contributions from the community. To contribute:
 
 ## Contribution Guidelines
 
-- **\### Step 1: Find a component to contribute**: \* Find a tool to
-  contribute to this repo.
-- **\### Step 2: Add config template**: Change all occurrences of `xxx`
-  to the name of the component.
-- **\### Step 3: Fill in the metadata**: Fill in the relevant metadata
-  fields in the config. Here is an example of the metadata of an
-  existing component.
-- **\### Step 4: Find a suitable container**: Google
-  `biocontainer <name of component>` and find the container that is most
-  suitable. Typically the link will be
-  `https://quay.io/repository/biocontainers/xxx?tab=tags`.
-- **\### Step 5: Create help file**: To help develop the component, we
-  store the `--help` output of the tool in a file at `src/xxx/help.txt`.
-- **\### Step 6: Create or fetch test data**: To help develop the
-  component, it’s interesting to have some test data available. In most
-  cases, we can use the test data from the Snakemake wrappers.
-- **\### Step 7: Add arguments for the input files**: By looking at the
-  help file, we add the input arguments to the config file. Here is an
-  example of the input arguments of an existing component.
-- **\### Step 8: Add arguments for the output files**: By looking at the
-  help file, we now also add output arguments to the config file.
-- **\### Step 9: Add arguments for the other arguments**: Finally, add
-  all other arguments to the config file. There are a few exceptions:
-- **\### Step 10: Add a Docker engine**: To ensure reproducibility of
-  components, we require that all components are run in a Docker
-  container.
-- **\### Step 11: Write a runner script**: Next, we need to write a
-  runner script that runs the tool with the input arguments. Create a
-  Bash script named `src/xxx/script.sh` which runs the tool with the
-  input arguments.
-- **\### Step 12: Create test script**:
-- **\### Step 12: Create a `/var/software_versions.txt` file**: For the
-  sake of transparency and reproducibility, we require that the versions
-  of the software used in the component are documented.
+The contribution guidelines describes which steps you should follow to
+contribute a component to this repository.
+
+1.  Find a component to contribute
+2.  Add config template
+3.  Fill in the metadata
+4.  Find a suitable container
+5.  Create help file
+6.  Create or fetch test data
+7.  Add arguments for the input files
+8.  Add arguments for the output files
+9.  Add arguments for the other arguments
+10. Add a Docker engine
+11. Write a runner script
+12. Create test script
+13. Create a `/var/software_versions.txt` file
 
 See the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
 

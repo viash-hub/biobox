@@ -21,18 +21,19 @@ We encourage contributions from the community. To contribute:
 
 ## Contribution Guidelines
 
+The contribution guidelines describes which steps you should follow to contribute a component to this repository.
+
 ```{r echo=FALSE}
 lines <- readr::read_lines("CONTRIBUTING.md")
 
-index_start <- grep("^### ", lines)
+index_start <- grep("^### Step [0-9]*:", lines)
 
 index_end <- c(index_start[-1] - 1, length(lines))
 
-name <- gsub("^## ", "", lines[index_start])
-description <- lines[index_start + 2]
+name <- gsub("^### Step [0-9]*: *", "", lines[index_start])
 
 knitr::asis_output(
-  paste(paste0(" * **", name, "**: ", description, "\n"), collapse = "")
+  paste(paste0(" 1. ", name, "\n"), collapse = "")
 )
 ```
 
