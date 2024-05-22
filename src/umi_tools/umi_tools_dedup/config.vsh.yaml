@@ -27,9 +27,6 @@ argument_groups:
       - name: --bai
         type: file
         description: BAM index
-      - name: --get_output_stats
-        type: boolean_true
-        description: Generate output stats. 
       - name: --random_seed
         type: integer
         description: |
@@ -55,9 +52,10 @@ argument_groups:
           use of the template length to determine reads with the same mapping
           coordinates.
       - name: --output_stats
-        type: file
-        description: Directory containing UMI based deduplication statistics files
-        direction: output
+        type: string
+        description: |
+          Generate files containing UMI based deduplication statistics files with this prefix
+          in the file names.
       - name: --extract_umi_method
         type: string
         description: |
@@ -228,7 +226,7 @@ argument_groups:
         description: |
           Ignore the UMI and group reads using mapping coordinates only.
       - name: --subset
-        type: boolean_true
+        type: double
         description: |
           Only consider a fraction of the reads, chosen at random. This is useful
           for doing saturation analyses.
@@ -269,7 +267,7 @@ argument_groups:
         alternatives: -v
         type: integer
         description: Log level. The higher, the more output.
-        default: 1
+        default: 0
       - name: --error
         alternatives: -E
         type: file

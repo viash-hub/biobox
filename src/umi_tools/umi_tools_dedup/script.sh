@@ -19,13 +19,11 @@ test_dir="${metal_executable}/test_data"
 [[ "$par_ignore_umi" == "false" ]] && unset par_ignore_umi
 [[ "$par_subset" == "false" ]] && unset par_subset
 [[ "$par_log2stderr" == "false" ]] && unset par_log2stderr
-[[ "$par_get_output_stats" == "false" ]] && unset par_get_output_stats
 [[ "$par_read_length" == "false" ]] && unset par_read_length
 
 umi_tools dedup \
     --stdin "$par_input" \
     ${par_in_sam:+--in-sam} \
-    ${par_get_output_stats:+--get-output-stats} \
     -S "$par_output" \
     ${par_out_sam:+--out-sam} \
     ${par_paired:+--paired} \
@@ -56,7 +54,7 @@ umi_tools dedup \
     ${par_chimeric_pairs:+--chimeric-pairs "$par_chimeric_pairs"} \
     ${par_unapired_reads:+--unapired-reads "$par_unapired_reads"} \
     ${par_ignore_umi:+--ignore-umi} \
-    ${par_subset:+--subset} \
+    ${par_subset:+--subset "$par_subset"} \
     ${par_chrom:+--chrom "$par_chrom"} \
     ${par_no_sort_output:+--no-sort-output} \
     ${par_buffer_whole_contig:+--buffer-whole-contig} \
