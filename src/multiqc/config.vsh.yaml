@@ -161,6 +161,12 @@ argument_groups:
         type: boolean_true
         description: |
           Disable coloured log output.
+      - name: "--cl_config"
+        type: string
+        required: false
+        description: |
+          YAML formatted string that allows to customize MultiQC behaviour like input file detection.
+        example: "qualimap_config: { general_stats_coverage: [20,40,200] }"
 
   - name: "Output format"
     arguments:

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # disable flags
-[[ "$par_ignore_symlinks" == "false" ]] && unset ignore_symlinks
+[[ "$par_ignore_symlinks" == "false" ]] && unset par_ignore_symlinks
 [[ "$par_dirs" == "false" ]] && unset par_dirs
 [[ "$par_full_names" == "false" ]] && unset par_full_names
 [[ "$par_fn_as_s_name" == "false" ]] && unset par_fn_as_s_name
@@ -99,6 +99,7 @@ multiqc \
     ${include_modules} \
     ${par_include_modules:+--include-modules "$par_include_modules"} \
     ${par_data_format:+--data-format "$par_data_format"} \
+    ${par_cl_config:+--cl-config "$par_cl_config"} \
     ${par_zip_data_dir:+--zip-data-dir} \
     ${par_pdf:+--pdf} \
     ${par_interactive:+--interactive} \
