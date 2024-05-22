@@ -24,10 +24,7 @@ We encourage contributions from the community. To contribute:
 ```{r echo=FALSE}
 lines <- readr::read_lines("CONTRIBUTING.md")
 
-index_start <- setdiff(
-  grep("^## ", lines),
-  grep("^## VIASH", lines)
-)
+index_start <- grep("^### ", lines)
 
 index_end <- c(index_start[-1] - 1, length(lines))
 
