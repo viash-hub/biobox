@@ -28,14 +28,6 @@ We encourage contributions from the community. To contribute:
 
 - **Procedure of adding a component**: \### Step 1: Find a component to
   contribute
-- **VIASH START**:
-- **VIASH END**: xxx  
-- **VIASH START**:
-- **VIASH END**: arriba  
-- **VIASH START**:
-- **VIASH END**: echo “\> Run xxx with test data”
-- **VIASH START**:
-- **VIASH END**: echo “\> Run arriba with blacklist”
 
 See the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
 
