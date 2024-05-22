@@ -184,7 +184,7 @@ argument_groups:
       alternatives: -m
       type: integer
       description: |
-        Only output alignments with number of CIGAR bases consuming query sequence ≥ INT.
+        Only output alignments with number of CIGAR bases consuming query sequence >= INT.
       default: 0
     - name: --expr
       alternatives: -e
@@ -254,7 +254,7 @@ argument_groups:
     - name: --subsample
       type: double
       description: |
-        Output only a proportion of the input alignments, as specified by 0.0 ≤ FLOAT ≤ 1.0, which gives the fraction
+        Output only a proportion of the input alignments, as specified by 0.0 <= FLOAT <= 1.0, which gives the fraction
         of templates/pairs to be kept. This subsampling acts in the same way on all of the alignment records in the same
         template or read pair, so it never keeps a read but not its mate.
     - name: --subsample_seed
