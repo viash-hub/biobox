@@ -43,9 +43,13 @@
     - `samtools/samtools_index`: Index SAM/BAM/CRAM files (PR #35).
     - `samtools/samtools_sort`: Sort SAM/BAM/CRAM files (PR #36).
     - `samtools/samtools_stats`: Reports alignment summary statistics for a BAM file (PR #39).
-    - `samtools/samtools_stats`: Indexes FASTA files to enable random access to fasta and fastq files (PR #41).
+    - `samtools/samtools_faidx`: Indexes FASTA files to enable random access to fasta and fastq files (PR #41).
+    - `samtools/samtools_collate`: Shuffles and groups reads in SAM/BAM/CRAM files together by their names (PR #42).
+    - `samtools/samtools_view`: Views and converts SAM/BAM/CRAM files (PR #48).
+    - `samtools/samtools_fastq`: Converts a SAM/BAM/CRAM file to FASTQ (PR #52).
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
+
 
 ## MAJOR CHANGES
 
@@ -55,6 +59,10 @@
 
 * Update to Viash 0.8.5 (PR #25).
 
+* Update to Viash 0.9.0-RC3 (PR #51).
+
 ## DOCUMENTATION
 
 ## BUG FIXES
+
+* Add escaping character before leading hashtag in the description field of the config file (PR #50).
