@@ -24,7 +24,7 @@ test_dir="${metal_executable}/test_data"
 umi_tools dedup \
     --stdin "$par_input" \
     ${par_in_sam:+--in-sam} \
-    -S "$par_output" \
+    --stdout "$par_output" \
     ${par_out_sam:+--out-sam} \
     ${par_paired:+--paired} \
     ${par_output_stats:+--output-stats "$par_output_stats"} \
@@ -52,7 +52,7 @@ umi_tools dedup \
     ${par_mapping_quality:+--mapping-quality "$par_mapping_quality"} \
     ${par_unmapped_reads:+--unmapped-reads "$par_unmapped_reads"} \
     ${par_chimeric_pairs:+--chimeric-pairs "$par_chimeric_pairs"} \
-    ${par_unapired_reads:+--unapired-reads "$par_unapired_reads"} \
+    ${par_unpaired_reads:+--unapired-reads "$par_unapired_reads"} \
     ${par_ignore_umi:+--ignore-umi} \
     ${par_subset:+--subset "$par_subset"} \
     ${par_chrom:+--chrom "$par_chrom"} \

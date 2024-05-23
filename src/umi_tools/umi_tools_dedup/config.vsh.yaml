@@ -35,7 +35,7 @@ argument_groups:
   - name: Outputs
     arguments:
       - name: --output
-        alternatives: -S
+        alternatives: --stdout
         type: file
         description: Deduplicated BAM file
         required: true

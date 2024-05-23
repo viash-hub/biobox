@@ -43,7 +43,7 @@
     - `samtools/samtools_stats`: Reports alignment summary statistics for a BAM file (PR #39).
 
 * `umitools`:
-    - `umitools_dedup`: Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read (PR #XXX).
+    - `umitools_dedup`: Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read (PR #54).
 
 ## MAJOR CHANGES
 

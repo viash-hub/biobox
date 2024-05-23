@@ -58,6 +58,29 @@ diff "$out_dir/deduped_fraction.sam" "$test_dir/deduped_fraction.sam" || \
 
 ############################################################################################
 
+echo ">>> Test 3: $meta_functionality_name with --method unique"
+
+"$meta_executable" \
+  --paired \
+  --input "$test_dir/sample.bam" \
+  --bai "$test_dir/sample.bam.bai" \
+  --output "$out_dir/deduped_unique.sam" \
+  --out_sam \
+  --method "unique" \
+  --random_seed 1
+
+echo ">>> Checking whether output exists"
+[ ! -f "$out_dir/deduped_unique.sam" ] && echo "File 'deduped_unique.sam' does not exist!" && exit 1
+
+echo ">>> Checking whether output is non-empty"
+[ ! -s "$out_dir/deduped_unique.sam" ] && echo "File 'deduped_unique.sam' is empty!" && exit 1
+
+echo ">>> Checking whether output is correct"
+diff "$out_dir/deduped_unique.sam" "$test_dir/deduped_unique.sam" || \
+    (echo "Output file deduped_unique.sam does not match expected output" && exit 1)
+
+############################################################################################
+
 rm -rf "$out_dir"
 
 echo "All tests succeeded!"
