@@ -4,7 +4,7 @@ description: Sort SAM/BAM/CRAM file.
 keywords: [sort, bam, sam, cram]
 links:
   homepage: https://www.htslib.org/
-  documentation: https://www.htslib.org/doc/samtools-idxstats.html
+  documentation: https://www.htslib.org/doc/samtools-sort.html
   repository: https://github.com/samtools/samtools
 references: 
   doi: [10.1093/bioinformatics/btp352, 10.1093/gigascience/giab008]
