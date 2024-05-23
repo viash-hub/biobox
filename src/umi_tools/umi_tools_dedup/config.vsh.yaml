@@ -115,21 +115,21 @@ argument_groups:
         description: |
           Causes two reads that start in the same position on the same strand
           and having the same UMI to be considered unique if one is spliced 
-          and the other is not. (Uses the ‘N’ cigar operation to test for splicing).
+          and the other is not. (Uses the 'N' cigar operation to test for splicing).
       - name: --soft_clip_threshold
         type: integer
         description: |
           Mappers that soft clip will sometimes do so rather than mapping a
           spliced read if there is only a small overhang over the exon junction.
           By setting this option, you can treat reads with at least this many
-          bases soft-clipped at the 3’ end as spliced.
+          bases soft-clipped at the 3' end as spliced.
         default: 4
       - name: --multimapping_detection_method
         type: string
         description: |
           If the sam/bam contains tags to identify multimapping reads, you can
           specify for use when selecting the best read at a given loci. Supported
-          tags are “NH”, “X0” and “XT”. If not specified, the read with the highest
+          tags are "NH", "X0" and "XT". If not specified, the read with the highest
           mapping quality will be selected.
       - name: --read_length
         type: boolean_true
@@ -161,7 +161,7 @@ argument_groups:
         description: |
           Use in conjunction with the --assigned_status_tag option to skip any reads
           where the tag matches this regex. Default ("^[__|Unassigned]") matches
-          anything which starts with “__” or “Unassigned”.
+          anything which starts with "__" or "Unassigned".
       - name: --per_contig
         type: boolean_true
         description: |
