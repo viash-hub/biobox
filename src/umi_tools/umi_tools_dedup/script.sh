@@ -52,7 +52,7 @@ umi_tools dedup \
     ${par_mapping_quality:+--mapping-quality "$par_mapping_quality"} \
     ${par_unmapped_reads:+--unmapped-reads "$par_unmapped_reads"} \
     ${par_chimeric_pairs:+--chimeric-pairs "$par_chimeric_pairs"} \
-    ${par_unpaired_reads:+--unapired-reads "$par_unapired_reads"} \
+    ${par_unpaired_reads:+--unpaired-reads "$par_unpaired_reads"} \
     ${par_ignore_umi:+--ignore-umi} \
     ${par_subset:+--subset "$par_subset"} \
     ${par_chrom:+--chrom "$par_chrom"} \
