@@ -1,0 +1,164 @@
+
+name: umi_tools_extract
+namespace: umi_tools
+description: |
+  Flexible removal of UMI sequences from fastq reads.
+  UMIs are removed and appended to the read name. Any other barcode, for example a library barcode,
+  is left on the read. Can also filter reads by quality or against a whitelist.
+keywords: [ extract, umi, fastq ]
+links:
+  homepage: https://umi-tools.readthedocs.io/en/stable/#
+  documentation: https://umi-tools.readthedocs.io/en/stable/reference/extract.html
+  repository: https://github.com/CGATOxford/UMI-tools
+references: 
+  doi: 10.1101/gr.209601.116
+license: MIT
+
+argument_groups:
+  - name: Common Options
+    arguments:
+    - name: --stdout
+      type: file
+      description: |
+        File where output is to go.
+      direction: output
+    - name: --log
+      type: file
+      description: |
+        File with logging information.
+    - name: --log2stderr
+      type: boolean_true
+      description: |
+        Send logging information to stderr.
+    - name: --verbose
+      type: integer
+      description: |
+        Log level. The higher, the more output.
+    - name: --error
+      type: file
+      description: |
+        File with error information.
+    - name: --temp-dir
+      type: directory
+      description: |
+        Directory for temporary files. If not set, the bash environmental variable TMPDIR is used.
+    - name: --compresslevel
+      type: integer
+      description: |
+        Level of Gzip compression to use. Default=6 matches GNU gzip rather than python gzip default (which is 9)
+      default: 6
+    - name: --timeit
+      type: file
+      description: |
+        Store timing information in file.
+    - name: --timeit_name
+      type: string
+      description: |
+        Name in timing file for this class of jobs.
+      default: all
+    - name: --timeit_header
+      type: boolean_true
+      description: |
+        Add header for timing information.
+    - name: --random_seed
+      type: string
+      description: |
+        Random seed to initialize number generator with.
+
+  - name: Extract Options
+    arguments:
+    - name: --stdin
+      type: file
+      description: |
+        File containing the input data.
+    - name: --error_correct_cell
+      type: boolean_true
+      description: |
+        Error correct cell barcodes to the whitelist.
+    - name: --whitelist
+      type: file
+      description: |
+        Whitelist of accepted cell barcodes tab-separated format, where column 1 is the whitelisted
+        cell barcodes and column 2 is the list (comma-separated) of other cell barcodes which should 
+        be corrected to the barcode in column 1. If the --error-correct-cell option is not used, this
+        column will be ignored.
+    - name: --blacklist
+      type: file
+      description: |
+        BlackWhitelist of cell barcodes to discard
+    - name: --subset_reads
+      type: integer
+      description: |
+        Only parse the first N reads
+    - name: --quality_filter_threshold
+      type: integer
+      description: |
+        Remove reads where any UMI base quality score falls below this threshold
+    - name: --quality_filter_mask
+      type: string
+      description: |
+        If a UMI base has a quality below this threshold, replace the base with 'N'
+    - name: --quality_encoding
+      type: string
+      description: |
+        Quality score encoding. Choose from:
+        - phred33 [33-77]
+        - phred64 [64-106]
+        - solexa [59-106]
+    - name: --reconcile_pairs
+      type: boolean_true
+      description: |
+        Allow read 2 infile to contain reads not in read 1 infile. This enables support for upstream protocols
+        where read one contains cell barcodes, and the read pairs have been filtered and corrected without regard
+        to the read2.
+
+  - name: Experimental options
+    arguments:
+    - name: --bc_pattern
+      type: string
+      description: |
+        Pattern for barcode(s) on read 1. See --extract_method
+    - name: --bc_pattern2
+      type: string
+      description: |
+        Pattern for barcode(s) on read 2. See --extract_method
+    - name: --extract_method
+      type: string
+      description: |
+        There are two methods enabled to extract the umi barcode (+/- cell barcode). For both methods,
+        the patterns should be provided using the --bc_pattern and --bc_pattern2 options.
+        - string: 
+          This should be used where the barcodes are always in the same place in the read.
+          N = UMI position (required)
+          C = cell barcode position (optional)
+          X = sample position (optional)
+        - regex:
+          Allows for more flexible barcode extraction and should be used where the cell barcodes are variable in
+          length. Can also be used to filter out reads which do not contain an expected adapter sequence.
+          The expected groups in the regex are:
+          - umi_n = UMI positions, where n can be any value (required) 
+          - cell_n = cell barcode positions, where n can be any value (optional) 
+          - discard_n = positions to discard, where n can be any value (optional)
+    - name: --3prime
+      type: boolean_true
+      description: |
+        By default the barcode is assumed to be on the 5' end of the read, but use this option to sepecify that it is
+        on the 3' end instead. This option only works with --extract_method=string since 3' encoding can be specified
+        explicitly with a regex, e.g .*(?P<umi_1>.{5})$
+    - name: --read2_in
+      type: file
+      description: |
+        Filename for read pairs
+    - name: --filtered_out
+      type: file
+      description: |
+        Write out reads not matching regex pattern or cell barcode whitelist to this file
+    - name: --filtered_out2
+      type: file
+      description: |
+        Write out read pairs not matching regex pattern or cell barcode whitelist to this file
+    - name: --ignore_read_pair_suffixes
+      type: boolean_true
+      description: |
+        Ignore SOH and STX read name suffixes. Note that this options is required if the suffixes are not whitespace
+        separated from the rest of the read name
