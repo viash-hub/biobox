@@ -7,8 +7,9 @@ description: |
   is left on the read. Can also filter reads by quality or against a whitelist.
 keywords: [ extract, umi, fastq ]
 links:
-  homepage: https://umi-tools.readthedocs.io/en/stable/#
-  documentation: https://umi-tools.readthedocs.io/en/stable/reference/extract.html
+  homepage: https://umi-tools.readthedocs.io/en/latest/
+  documentation: [ https://umi-tools.readthedocs.io/en/latest/reference/extract.html,
+                   https://umi-tools.readthedocs.io/en/latest/common_options.html#common-options ]
   repository: https://github.com/CGATOxford/UMI-tools
 references: 
   doi: 10.1101/gr.209601.116
