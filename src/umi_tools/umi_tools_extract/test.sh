@@ -1,58 +1,56 @@
 #!/bin/bash
 
-Usage:
-
-   Single-end:
-      umi_tools extract [OPTIONS] -p PATTERN [-I IN_FASTQ[.gz]] [-S OUT_FASTQ[.gz]]
-
-   Paired end:
-      umi_tools extract [OPTIONS] -p PATTERN [-I IN_FASTQ[.gz]] [-S OUT_FASTQ[.gz]] --read2-in=IN2_FASTQ[.gz] --read2-out=OUT2_FASTQ[.gz]
-
-
 test_dir="${meta_resources_dir}/test_data"
-echo ">>> Testing $meta_functionality_name"
+out_dir="${meta_resources_dir}/out"
+
+mkdir -p "$out_dir"
+
+#############################################################################################
+
+echo ">>> Test 1: Testing for paired-end reads"
 
 "$meta_executable" \
-  --bam "$test_dir/a.sorted.bam" \
-  --bai "$test_dir/a.sorted.bam.bai" \
-  --output "$test_dir/a.sorted.idxstats"
+    --input "$test_dir/scrb_seq_fastq.1.subsample.fastq" \
+    --read2_in "$test_dir/scrb_seq_fastq.2.subsample.fastq" \
+    --bc_pattern CCCCCCNNNNNNNNNN \
+    --bc_pattern2 CCCCCCNNNNNNNNNN \
+    --extract_method string \
+    --output "$out_dir/scrb_seq_fastq.1.umi_extract.fastq"
 
-echo ">>> Checking whether output exists"
-[ ! -f "$test_dir/a.sorted.idxstats" ] && echo "File 'a.sorted.idxstats' does not exist!" && exit 1
+echo ">> Checking if the correct files are present"
+[[ ! -f "$out_dir/scrb_seq_fastq.1.umi_extract.fastq" ]] && echo "Reads file missing" && exit 1
+[ ! -s "$out_dir/scrb_seq_fastq.1.umi_extract.fastq" ] && echo "Read 1 file is empty" && exit 1
 
-echo ">>> Checking whether output is non-empty"
-[ ! -s "$test_dir/a.sorted.idxstats" ] && echo "File 'a.sorted.idxstats' is empty!" && exit 1
+rm "$out_dir/scrb_seq_fastq.1.umi_extract.fastq"
 
-echo ">>> Checking whether output is correct"
-diff "$test_dir/a.sorted.idxstats" "$test_dir/a_ref.sorted.idxstats" || \
-    (echo "Output file a.sorted.idxstats does not match expected output" && exit 1)
+#############################################################################################
 
-rm "$test_dir/a.sorted.idxstats"
-
-############################################################################################
-
-echo ">>> Testing $meta_functionality_name with singletons in the input"
-
+echo ">>> Test 2: Testing for paired-end reads with umi_discard_reads option"
 "$meta_executable" \
-  --bam "$test_dir/test.paired_end.sorted.bam" \
-  --bai "$test_dir/test.paired_end.sorted.bam.bai" \
-  --output "$test_dir/test.paired_end.sorted.idxstats"
+    --input "$test_dir/scrb_seq_fastq.1.subsample.fastq" \
+    --read2_in "$test_dir/scrb_seq_fastq.2.subsample.fastq" \
+    --bc_pattern CCCCCCNNNNNNNNNN \
+    --bc_pattern2 CCCCCCNNNNNNNNNN \
+    --extract_method string \
+    --output "$out_dir/scrb_seq_fastq.1.umi_extract.fastq"
 
-echo ">>> Checking whether output exists"
-[ ! -f "$test_dir/test.paired_end.sorted.idxstats" ] && \
-    echo "File 'test.paired_end.sorted.idxstats' does not exist!" && exit 1
+echo ">> Checking if the correct files are present"
+[ ! -f "$out_dir/scrb_seq_fastq.1.umi_extract.fastq" ] && echo "Read 1 file is missing" && exit 1
+[ ! -s "$out_dir/scrb_seq_fastq.1.umi_extract.fastq" ] && echo "Read 1 file is empty" && exit 1
 
-echo ">>> Checking whether output is non-empty"
-[ ! -s "$test_dir/test.paired_end.sorted.idxstats" ] && \
-    echo "File 'test.paired_end.sorted.idxstats' is empty!" && exit 1
+#############################################################################################
 
-echo ">>> Checking whether output is correct"
-diff "$test_dir/test.paired_end.sorted.idxstats" "$test_dir/test_ref.paired_end.sorted.idxstats" || \
-    (echo "Output file test.paired_end.sorted.idxstats does not match expected output" && exit 1)
+echo ">>> Test 3: Testing for single-end reads"
+"$meta_executable" \
+    --input "$test_dir/slim.subsample.fastq" \
+    --bc_pattern  "^(?P<umi_1>.{3}).{4}(?P<umi_2>.{2})" \
+    --extract_method regex \
+    --output "$out_dir/slim.umi_extract.fastq"
 
-rm "$test_dir/test.paired_end.sorted.idxstats"
+echo ">> Checking if the correct files are present"
+[ ! -f "$out_dir/slim.umi_extract.fastq" ] && echo "Trimmed reads file missing" && exit 1
+[ ! -s "$out_dir/slim.umi_extract.fastq" ] && echo "Trimmed reads file is empty" && exit 1
 
-############################################################################################
 
-echo "All tests succeeded!"
+echo ">>> Test finished successfully"
 exit 0
