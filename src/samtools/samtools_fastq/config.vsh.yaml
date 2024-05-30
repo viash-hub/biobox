@@ -26,6 +26,11 @@ argument_groups:
         direction: output
   - name: Options
     arguments:
+      - name: --command
+        type: string
+        description: |
+          This is a dummy argument to use the same script for multiple samtools commands.
+        default: fastq
       - name: --no_suffix
         alternatives: -n
         type: boolean_true

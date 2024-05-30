@@ -11,7 +11,7 @@ set -e
 [[ "$par_copy_tags" == "false" ]] && unset par_copy_tags
 [[ "$par_casava" == "false" ]] && unset par_casava
 
-samtools fastq \
+samtools "$par_command" \
     ${par_no_suffix:+-n} \
     ${par_suffix:+-N} \
     ${par_use_oq:+-O} \
