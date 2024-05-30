@@ -26,6 +26,11 @@ argument_groups:
         direction: output
   - name: Options
     arguments:
+      - name: --command
+        type: string
+        description: |
+          This is a dummy argument to use the same script for multiple samtools commands.
+        default: fasta
       - name: --no_suffix
         alternatives: -n
         type: boolean_true
@@ -170,7 +175,7 @@ argument_groups:
 
 resources:
   - type: bash_script
-    path: script.sh
+    path: ../samtools_fasta/script.sh
 test_resources:
   - type: bash_script
     path: test.sh
