@@ -175,7 +175,7 @@ argument_groups:
 
 resources:
   - type: bash_script
-    path: ../samtools_fasta/script.sh
+    path: ../samtools_fastq/script.sh
 test_resources:
   - type: bash_script
     path: test.sh
