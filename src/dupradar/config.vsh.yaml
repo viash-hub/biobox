@@ -1,0 +1,117 @@
+name: dupradar
+description: Assessment of duplication rates in RNA-Seq datasets
+keywords: [ rnaseq, duplication, genomics ]
+links:
+  homepage: https://bioconductor.org/packages/release/bioc/html/dupRadar.html
+  documentation: https://bioconductor.org/packages/release/bioc/vignettes/dupRadar/inst/doc/dupRadar.html
+  repository: https://github.com/ssayols/dupRadar
+references: 
+  doi: "10.1186/s12859-016-1276-2"
+license: GPL-3.0
+
+argument_groups:
+- name: "Input"
+  arguments: 
+  - name: "--id"
+    type: string
+    description: Sample ID
+    
+  - name: "--input"
+    type: file 
+    required: true
+    description: path to input alignment file in BAM format
+
+  - name: "--gtf_annotation"
+    type: file 
+    required: true
+    description: path to GTF annotation file.
+
+  - name: "--paired"
+    type: boolean
+    description: add flag if input alignment file consists of paired reads
+
+  - name: "--strandedness"
+    type: string
+    required: false
+    choices: ["forward", "reverse", "unstranded"]
+    description: strandedness of input bam file reads (forward, reverse or unstranded (default, applicable to paired reads))
+
+  - name: "--versions"
+    type: file
+    must_exist: false
+    
+- name: "Output"
+  arguments: 
+  - name: "--output_dupmatrix"
+    type: file
+    direction: output
+    required: false
+    must_exist: true
+    default: $id.dup_matrix.txt
+    description: path to output file (txt) of duplicate tag counts
+  
+  - name: "--output_dup_intercept_mqc"
+    type: file
+    direction: output
+    required: false
+    must_exist: true
+    default: $id.dup_intercept_mqc.txt
+    description: path to output file (txt) of multiqc intercept value DupRadar
+
+  - name: "--output_duprate_exp_boxplot"
+    type: file
+    direction: output
+    required: false
+    must_exist: true
+    default: $id.duprate_exp_boxplot.pdf
+    description: path to output file (pdf) of distribution of expression box plot
+  
+  - name: "--output_duprate_exp_densplot"
+    type: file
+    direction: output
+    required: false
+    must_exist: true
+    default: $id.duprate_exp_densityplot.pdf
+    description: path to output file (pdf) of 2D density scatter plot of duplicate tag counts
+  
+  - name: "--output_duprate_exp_denscurve_mqc"
+    type: file
+    direction: output
+    required: false
+    must_exist: true
+    default: $id.duprate_exp_density_curve_mqc.txt
+    description: path to output file (pdf) of density curve of gene duplication multiqc
+  
+  - name: "--output_expression_histogram"
+    type: file
+    direction: output
+    required: false
+    must_exist: true
+    default: $id.expression_hist.pdf
+    description: path to output file (pdf) of distribution of RPK values per gene histogram
+  
+  - name: "--output_intercept_slope"
+    type: file
+    direction: output
+    required: false
+    must_exist: true
+    default: $id.intercept_slope.txt
+    description: output file (txt) with progression of duplication rate values
+
+resources:
+  - type: bash_script
+    path: script.sh
+  # Copied from https://github.com/nf-core/rnaseq/blob/3.12.0/bin/dupradar.r
+  - type: R_script
+    path: script.R
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bioconductor-dupradar:1.32.0--r43hdfd78af_0
+runners:
+  - type: executable  
+  - type: nextflow
