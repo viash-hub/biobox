@@ -66,3 +66,5 @@
 ## BUG FIXES
 
 * Add escaping character before leading hashtag in the description field of the config file (PR #50).
+
+* Format URL in biobase/bcl_convert description (PR #55).
