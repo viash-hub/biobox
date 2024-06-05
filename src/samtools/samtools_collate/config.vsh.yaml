@@ -1,0 +1,94 @@
+name: samtools_collate
+namespace: samtools
+description: Shuffles and groups reads in SAM/BAM/CRAM files together by their names.
+keywords: [collate, counts, bam, sam, cram]
+links:
+  homepage: https://www.htslib.org/
+  documentation: https://www.htslib.org/doc/samtools-icollate.html
+  repository: https://github.com/samtools/samtools
+references: 
+  doi: [10.1093/bioinformatics/btp352, 10.1093/gigascience/giab008]
+license: MIT/Expat
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        type: file
+        description: The input BAM file.
+        required: true
+      - name: --reference
+        type: file
+        description: Reference sequence FASTA FILE.
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: -o
+        type: file
+        description: The output filename.
+        required: true
+        direction: output
+
+  - name: Options
+    arguments:
+      - name: --uncompressed
+        alternatives: -u
+        type: boolean_true
+        description: Output uncompressed BAM.
+      - name: --fast
+        alternatives: -f
+        type: boolean_true
+        description: Fast mode, only primary alignments.
+      - name: --working_reads
+        alternatives: -r
+        type: integer
+        description: Working reads stored (for use with -f).
+        default: 10000
+      - name: --compression
+        alternatives: -l
+        type: integer
+        description: Compression level.
+        default: 1
+      - name: --nb_tmp_files
+        alternatives: -n
+        type: integer
+        description: Number of temporary files.
+        default: 64
+      - name: --tmp_prefix
+        alternatives: -T
+        type: string
+        description: Write temporary files to PREFIX.nnnn.bam.
+      - name: --no_pg
+        type: boolean_true
+        description: Do not add a PG line.
+      - name: --input_fmt_option
+        type: string
+        description: Specify a single input file format option in the form of OPTION or OPTION=VALUE.
+      - name: --output_fmt
+        type: string
+        description: Specify output format (SAM, BAM, CRAM).
+      - name: --output_fmt_option
+        type: string
+        description: Specify a single output file format option in the form of OPTION or OPTION=VALUE.
+
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/samtools:1.19.2--h50ea8bc_1
+    setup:
+      - type: docker
+        run: |
+          samtools --version 2>&1 | grep -E '^(samtools|Using htslib)' | \
+          sed 's#Using ##;s# \([0-9\.]*\)$#: \1#' > /var/software_versions.txt
+runners:
+- type: executable
+- type: nextflow
