@@ -11,11 +11,10 @@ par_info_file='false'
 par_debug='true'
 ## VIASH END
 
-# TODO: change this?
-if [ -z $par_output ]; then
-	par_output=.
+if [ -z $par_output_dir ]; then
+	par_output_dir=.
 else
-	mkdir -p "$par_output"
+	mkdir -p "$par_output_dir"
 fi
 
 function debug {
@@ -181,9 +180,9 @@ echo ">> Optional arguments"
 
 optional_output_args=$(echo \
   ${par_report:+--report "${par_report}"} \
-  ${par_json:+--json "${par_output}/report.json"} \
+  ${par_json:+--json "report.json"} \
   ${par_fasta:+--fasta} \
-  ${par_info_file:+--info-file "$par_output/info.txt"} \
+  ${par_info_file:+--info-file "info.txt"} \
 )
 
 debug "Arguments to cutadapt:"
@@ -203,12 +202,12 @@ fi
 
 if [ $mode = "se" ]; then
   output_args=$(echo \
-    --output "$par_output/{name}_001.$ext" \
+    --output "$par_output_dir/{name}_001.$ext" \
   )
 else
   output_args=$(echo \
-    --output "$par_output/{name}_R1_001.$ext" \
-    --paired-output "$par_output/{name}_R2_001.$ext" \
+    --output "$par_output_dir/{name}_R1_001.$ext" \
+    --paired-output "$par_output_dir/{name}_R2_001.$ext" \
   )
 fi
 
@@ -239,4 +238,4 @@ debug ">> Full CLI to be run:"
 debug cutadapt $cli | sed -e 's/--/\r\n  --/g'
 debug
 
-cutadapt $cli | tee $par_output/report.txt
+cutadapt $cli

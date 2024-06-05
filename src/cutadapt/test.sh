@@ -24,6 +24,52 @@ assert_file_not_contains() {
 }
 
 #############################################
+mkdir test_multiple_output
+cd test_multiple_output
+
+echo "#############################################"
+echo "> Run cutadapt with multiple outputs"
+
+cat > example.fa <<'EOF'
+>read1
+MYSEQUENCEADAPTER
+>read2
+MYSEQUENCEADAP
+>read3
+MYSEQUENCEADAPTERSOMETHINGELSE
+>read4
+MYSEQUENCEADABTER
+>read5
+MYSEQUENCEADAPTR
+>read6
+MYSEQUENCEADAPPTER
+>read7
+ADAPTERMYSEQUENCE
+>read8
+PTERMYSEQUENCE
+>read9
+SOMETHINGADAPTERMYSEQUENCE
+EOF
+
+"$meta_executable" \
+  --report minimal \
+  --output_dir out_test \
+  --output "out_test/*.fasta" \
+  --adapter ADAPTER \
+  --input example.fa \
+  --fasta \
+  --no_match_adapter_wildcards \
+  --json
+
+echo ">> Checking output"
+assert_file_exists "report.json"
+assert_file_exists "out_test/1_001.fasta"
+assert_file_exists "out_test/unknown_001.fasta"
+
+cd ..
+echo
+
+#############################################
 mkdir test_simple_single_end
 cd test_simple_single_end
 
@@ -53,7 +99,8 @@ EOF
 
 "$meta_executable" \
   --report minimal \
-  --output out_test1 \
+  --output_dir out_test1 \
+  --output "out_test1/*.fasta" \
   --adapter ADAPTER \
   --input example.fa \
   --fasta \
@@ -61,14 +108,12 @@ EOF
   --json
 
 echo ">> Checking output"
-assert_file_exists "out_test1/report.txt"
-assert_file_exists "out_test1/report.json"
+assert_file_exists "report.json"
 assert_file_exists "out_test1/1_001.fasta"
 assert_file_exists "out_test1/unknown_001.fasta"
 
 echo ">> Check if output is empty"
-assert_file_not_empty "out_test1/report.txt"
-assert_file_not_empty "out_test1/report.json"
+assert_file_not_empty "report.json"
 assert_file_not_empty "out_test1/1_001.fasta"
 assert_file_not_empty "out_test1/unknown_001.fasta"
 
@@ -113,7 +158,8 @@ EOF
 
 "$meta_executable" \
   --report minimal \
-  --output out_test2 \
+  --output_dir out_test2 \
+  --output "out_test2/*.fasta" \
   --adapter AAAAA \
   --adapter_fasta adapters1.fasta \
   --adapter_fasta adapters2.fasta \
@@ -122,16 +168,14 @@ EOF
   --json
 
 echo ">> Checking output"
-assert_file_exists "out_test2/report.txt"
-assert_file_exists "out_test2/report.json"
+assert_file_exists "report.json"
 assert_file_exists "out_test2/1_001.fasta"
 assert_file_exists "out_test2/adapter1_001.fasta"
 assert_file_exists "out_test2/adapter2_001.fasta"
 assert_file_exists "out_test2/unknown_001.fasta"
 
 echo ">> Check if output is empty"
-assert_file_not_empty "out_test2/report.txt"
-assert_file_not_empty "out_test2/report.json"
+assert_file_not_empty "report.json"
 assert_file_not_empty "out_test2/1_001.fasta"
 assert_file_not_empty "out_test2/adapter1_001.fasta"
 assert_file_not_empty "out_test2/adapter2_001.fasta"
@@ -177,7 +221,8 @@ EOF
 
 "$meta_executable" \
   --report minimal \
-  --output out_test3 \
+  --output_dir out_test3 \
+  --output "out_test3/*.fastq" \
   --adapter AAAAA \
   --adapter_r2 GGGGG \
   --input example_R1.fastq \
@@ -187,16 +232,14 @@ EOF
   ---cpus 1
 
 echo ">> Checking output"
-assert_file_exists "out_test3/report.txt"
-assert_file_exists "out_test3/report.json"
+assert_file_exists "report.json"
 assert_file_exists "out_test3/1_R1_001.fastq"
 assert_file_exists "out_test3/1_R2_001.fastq"
 assert_file_exists "out_test3/unknown_R1_001.fastq"
 assert_file_exists "out_test3/unknown_R2_001.fastq"
 
 echo ">> Check if output is empty"
-assert_file_not_empty "out_test3/report.txt"
-assert_file_not_empty "out_test3/report.json"
+assert_file_not_empty "report.json"
 assert_file_not_empty "out_test3/1_R1_001.fastq"
 assert_file_not_empty "out_test3/1_R2_001.fastq"
 assert_file_not_empty "out_test3/unknown_R1_001.fastq"
