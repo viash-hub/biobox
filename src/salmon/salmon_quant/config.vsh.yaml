@@ -42,7 +42,7 @@ argument_groups:
         type: file
         description: |
           Salmon index.
-        required: true
+        required: false
         example: transcriptome_index
       - name: --unmated_reads
         alternatives: ["-r"]
