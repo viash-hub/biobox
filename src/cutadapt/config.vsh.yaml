@@ -406,21 +406,12 @@ argument_groups:
         type: boolean_true
         description: |
           Write report in JSON format to this file.
-      - name: --output_dir
-        type: file
-        description: |
-          Write trimmed reads to this directory and name the files using {name}.
-          FASTQ or FASTA format is chosen depending on input.
-          Summary report is sent to standard output.
-        default: ./
-        direction: output
-        must_exist: true
       - name: --output
         type: file
         description: |
           Glob pattern for matching the expected output files.
           Should include `$output_dir`.
-        example: "*.fast[a,q]"
+        example: "fastq/*_001.fast[a,q]"
         direction: output
         required: true
         must_exist: true

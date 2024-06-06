@@ -53,7 +53,6 @@ EOF
 
 "$meta_executable" \
   --report minimal \
-  --output_dir out_test \
   --output "out_test/*.fasta" \
   --adapter ADAPTER \
   --input example.fa \
@@ -99,7 +98,6 @@ EOF
 
 "$meta_executable" \
   --report minimal \
-  --output_dir out_test1 \
   --output "out_test1/*.fasta" \
   --adapter ADAPTER \
   --input example.fa \
@@ -158,7 +156,6 @@ EOF
 
 "$meta_executable" \
   --report minimal \
-  --output_dir out_test2 \
   --output "out_test2/*.fasta" \
   --adapter AAAAA \
   --adapter_fasta adapters1.fasta \
@@ -221,7 +218,6 @@ EOF
 
 "$meta_executable" \
   --report minimal \
-  --output_dir out_test3 \
   --output "out_test3/*.fastq" \
   --adapter AAAAA \
   --adapter_r2 GGGGG \

@@ -5,21 +5,17 @@ par_adapter='AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC;GGATCGGAAGAGCACACGTCTGAACTCCAGTC
 par_input='src/cutadapt/test_data/se/a.fastq'
 par_report='full'
 par_json='false'
-par_output='output'
 par_fasta='false'
 par_info_file='false'
 par_debug='true'
 ## VIASH END
 
-if [ -z $par_output_dir ]; then
-	par_output_dir=.
-else
-	mkdir -p "$par_output_dir"
-fi
-
 function debug {
   [[ "$par_debug" == "true" ]] && echo "DEBUG: $@"
 }
+
+output_dir=$(dirname $par_output)
+[[ ! -d $output_dir ]] && mkdir -p $output_dir
 
 # Init
 ###########################################################
@@ -202,12 +198,12 @@ fi
 
 if [ $mode = "se" ]; then
   output_args=$(echo \
-    --output "$par_output_dir/{name}_001.$ext" \
+    --output "$output_dir/{name}_001.$ext" \
   )
 else
   output_args=$(echo \
-    --output "$par_output_dir/{name}_R1_001.$ext" \
-    --paired-output "$par_output_dir/{name}_R2_001.$ext" \
+    --output "$output_dir/{name}_R1_001.$ext" \
+    --paired-output "$output_dir/{name}_R2_001.$ext" \
   )
 fi
 
