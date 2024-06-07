@@ -23,8 +23,6 @@ EOF
 
 #########################################################################################
 
-mkdir star_index
-
 echo "> Generate index"
 "$meta_executable" \
   ${meta_cpus:+---cpus $meta_cpus} \
