@@ -1,0 +1,32 @@
+name: agat_convertspgff2gtf
+namespace: agat
+description: AGAT is a toolkit for manipulation and getting information from GFF/GTF files
+keywords: [tag1, tag2]
+links:
+  homepage: https://github.com/NBISweden/AGAT
+  documentation: https://agat.readthedocs.io/
+  issue_tracker: https://github.com/NBISweden/AGAT/issues
+  repository: https://github.com/NBISweden/AGAT
+references: 
+  doi: 10.5281/zenodo.3552717
+license: GPL v3
+argument_groups:
+  - name: Inputs
+    arguments: <...>
+  - name: Outputs
+    arguments: <...>
+  - name: Arguments
+    arguments: <...>
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - <...>
+runners:
+  - type: executable
+  - type: nextflow
