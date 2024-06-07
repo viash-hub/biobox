@@ -1,4 +1,4 @@
-name: star_genomegenerate
+name: star_genome_generate
 namespace: star
 description: | 
   Create index for STAR
@@ -98,6 +98,7 @@ argument_groups:
     direction: output
     description: STAR index directory.
     default: STAR_index
+    required: true
 
 resources:
   - type: bash_script
