@@ -1,0 +1,166 @@
+name: samtools_stats
+namespace: samtools
+description: Reports alignment summary statistics for a BAM file.
+keywords: [statistics, counts, bam, sam, cram]
+links:
+  homepage: https://www.htslib.org/
+  documentation: https://www.htslib.org/doc/samtools-stats.html
+  repository: https://github.com/samtools/samtools
+references: 
+  doi: [10.1093/bioinformatics/btp352, 10.1093/gigascience/giab008]
+license: MIT/Expat
+
+argument_groups:
+  - name: Inputs
+    arguments:
+    - name: --input
+      type: file
+      description: |
+        Input file.
+      required: true
+      must_exist: true
+    - name: --bai
+      type: file
+      description: |
+        Index file.
+    - name: --fasta
+      type: file
+      description: |
+        Reference file the CRAM was created with.
+    - name: --coverage
+      alternatives: -c
+      type: integer
+      description: |
+        Coverage distribution min,max,step [1,1000,1].
+      multiple: true
+      multiple_sep: ','
+    - name: --remove_dups
+      alternatives: -d
+      type: boolean_true
+      description: |
+        Exclude from statistics reads marked as duplicates.
+    - name: --customized_index_file
+      alternatives: -X 
+      type: boolean_true
+      description: |
+        Use a customized index file.
+    - name: --required_flag
+      alternatives: -f
+      type: string
+      description: |
+        Required flag, 0 for unset. See also `samtools flags`.
+      default: "0"
+    - name: --filtering_flag
+      alternatives: -F
+      type: string
+      description: |
+        Filtering flag, 0 for unset. See also `samtools flags`.
+      default: "0"
+    - name: --GC_depth
+      type: double
+      description: |
+        The size of GC-depth bins (decreasing bin size increases memory requirement).
+      default: 20000.0
+    - name: --insert_size
+      alternatives: -i
+      type: integer
+      description: |
+        Maximum insert size.
+      default: 8000
+    - name: --id
+      alternatives: -I
+      type: string
+      description: |
+        Include only listed read group or sample name.
+    - name: --read_length
+      alternatives: -l
+      type: integer
+      description: |
+        Include in the statistics only reads with the given read length.
+      default: -1
+    - name: --most_inserts
+      alternatives: -m
+      type: double
+      description: |
+        Report only the main part of inserts.
+      default: 0.99
+    - name: --split_prefix
+      alternatives: -P
+      type: string
+      description: |
+        Path or string prefix for filepaths output by --split (default is input filename).
+    - name: --trim_quality
+      alternatives: -q
+      type: integer
+      description: |
+        The BWA trimming parameter.
+      default: 0
+    - name: --ref_seq
+      alternatives: -r
+      type: file
+      description: |
+        Reference sequence (required for GC-depth and mismatches-per-cycle calculation).
+    - name: --split
+      alternatives: -S
+      type: string
+      description: |
+        Also write statistics to separate files split by tagged field.
+    - name: --target_regions
+      alternatives: -t
+      type: file
+      description: |
+        Do stats in these regions only. Tab-delimited file chr,from,to, 1-based, inclusive.
+    - name: --sparse
+      alternatives: -x
+      type: boolean_true
+      description: |
+        Suppress outputting IS rows where there are no insertions.
+    - name: --remove_overlaps
+      alternatives: -p
+      type: boolean_true
+      description: |
+        Remove overlaps of paired-end reads from coverage and base count computations.
+    - name: --cov_threshold
+      alternatives: -g
+      type: integer
+      description: |
+        Only bases with coverage above this value will be included in the target percentage computation.
+      default: 0
+    - name: --input_fmt_option
+      type: string
+      description: |
+        Specify a single input file format option in the form of OPTION or OPTION=VALUE.
+    - name: --reference
+      type: file
+      description: |
+        Reference sequence FASTA FILE.
+  - name: Outputs
+    arguments:
+    - name: --output
+      alternatives: -o
+      type: file
+      description: |
+        Output file.
+      default: "out.txt"
+      required: true
+      direction: output
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/samtools:1.19.2--h50ea8bc_1
+    setup:
+      - type: docker
+        run: |
+          samtools --version 2>&1 | grep -E '^(samtools|Using htslib)' | \
+          sed 's#Using ##;s# \([0-9\.]*\)$#: \1#' > /var/software_versions.txt
+runners:
+- type: executable
+- type: nextflow

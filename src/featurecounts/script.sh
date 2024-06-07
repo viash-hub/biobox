@@ -5,13 +5,20 @@ set -e
 ## VIASH START
 ## VIASH END
 
+# create temporary directory
 tmp_dir=$(mktemp -d -p "$meta_temp_dir" "${meta_functionality_name}_XXXXXX")
 mkdir -p "$tmp_dir/temp"
 
-if [[ $par_detailed_results ]] && [[ ! -d "$par_detailed_results" ]]; then
+# create detailed_results directory if variable is set and directory does not exist
+if [[ ! -z "$par_detailed_results" ]] && [[ ! -d "$par_detailed_results" ]]; then
   mkdir -p "$par_detailed_results"
 fi
 
+# replace comma with semicolon
+par_feature_type=$(echo $par_feature_type | tr ',' ';')
+par_extra_attributes=$(echo $par_extra_attributes | tr ',' ';')
+
+# unset flag variables
 [[ "$par_feature_level" == "false" ]] && unset par_feature_level
 [[ "$par_overlapping" == "false" ]] && unset par_overlapping
 [[ "$par_largest_overlap" == "false" ]] && unset par_largest_overlap

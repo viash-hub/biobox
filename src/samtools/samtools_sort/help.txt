@@ -1,0 +1,40 @@
+```
+samtools sort
+```
+
+Usage: samtools sort [options...] [in.bam]
+Options:
+  -l INT     Set compression level, from 0 (uncompressed) to 9 (best)
+  -u         Output uncompressed data (equivalent to -l 0)
+  -m INT     Set maximum memory per thread; suffix K/M/G recognized [768M]
+  -M         Use minimiser for clustering unaligned/unplaced reads
+  -R         Do not use reverse strand (only compatible with -M)
+  -K INT     Kmer size to use for minimiser [20]
+  -I FILE    Order minimisers by their position in FILE FASTA
+  -w INT     Window size for minimiser indexing via -I ref.fa [100]
+  -H         Squash homopolymers when computing minimiser
+  -n         Sort by read name (natural): cannot be used with samtools index
+  -N         Sort by read name (ASCII): cannot be used with samtools index
+  -t TAG     Sort by value of TAG. Uses position as secondary index (or read name if -n is set)
+  -o FILE    Write final output to FILE rather than standard output
+  -T PREFIX  Write temporary files to PREFIX.nnnn.bam
+      --no-PG
+               Do not add a PG line
+      --template-coordinate
+               Sort by template-coordinate
+      --input-fmt-option OPT[=VAL]
+               Specify a single input file format option in the form
+               of OPTION or OPTION=VALUE
+  -O, --output-fmt FORMAT[,OPT[=VAL]]...
+               Specify output format (SAM, BAM, CRAM)
+      --output-fmt-option OPT[=VAL]
+               Specify a single output file format option in the form
+               of OPTION or OPTION=VALUE
+      --reference FILE
+               Reference sequence FASTA FILE [null]
+  -@, --threads INT
+               Number of additional threads to use [0]
+      --write-index
+               Automatically index the output files [off]
+      --verbosity INT
+               Set level of verbosity

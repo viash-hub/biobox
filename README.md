@@ -26,33 +26,24 @@ We encourage contributions from the community. To contribute:
 
 ## Contribution Guidelines
 
-- **Documentation of Functionality**: The purpose and functionality of
-  each component should be adequately described.
-- **Documentation of Inputs and Outputs**: All input and output
-  arguments should have a description and example (with extension).
-- **Docker Image**: A Docker image (with optional additional
-  dependencies) should be provided.
-- **Write unit tests**: A unit test with possibly test resources needs
-  to be provided.
-- **Provide test resources**: If the unit test requires test resources,
-  these should be provided in the `test_resources` section of the
-  component.
-- **Versioning**: If the component uses custom software (not installed
-  via Apt, Apk, Yum, Pip, Conda, or R), a Bash script `version.sh` needs
-  to be provided that outputs the version of the software.
-- **File format specifications**: If a component returns a directory or
-  data structure such as AnnData or MuData, a specification of the file
-  format should be provided.
+The contribution guidelines describes which steps you should follow to
+contribute a component to this repository.
+
+1.  Find a component to contribute
+2.  Add config template
+3.  Fill in the metadata
+4.  Find a suitable container
+5.  Create help file
+6.  Create or fetch test data
+7.  Add arguments for the input files
+8.  Add arguments for the output files
+9.  Add arguments for the other arguments
+10. Add a Docker engine
+11. Write a runner script
+12. Create test script
+13. Create a `/var/software_versions.txt` file
 
 See the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
-
-## Repository Structure
-
-…
-
-## Installation and Usage
-
-…
 
 ## Support and Community
 

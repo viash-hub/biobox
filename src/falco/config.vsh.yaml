@@ -1,0 +1,196 @@
+name: falco
+description: A C++ drop-in replacement of FastQC to assess the quality of sequence read data
+keywords: [qc, fastqc, sequencing]
+links:
+  documentation: https://falco.readthedocs.io/en/latest/
+  repository: https://github.com/smithlabcode/falco
+references:
+  doi: 10.12688/f1000research.21142.2
+license: GPL-3.0
+requirements:
+  commands: [falco]
+
+# Notes:
+# - falco as arguments similar to -subsample and we update those to --subsample
+# - The outdir argument is not required
+# - The input argument in falco is positional but we changed this to --input
+argument_groups:
+  - name: Input arguments
+    arguments:
+      - name: --input
+        required: true
+        type: file
+        multiple: true
+        description: input fastq files
+        example: input1.fastq;input2.fastq
+
+  - name: Run arguments
+    arguments:
+      - name: --nogroup
+        type: boolean_true
+        description: |
+          Disable grouping of bases for reads >50bp. 
+          All reports will show data for every base in 
+          the read. WARNING: When using this option, 
+          your plots may end up a ridiculous size. You 
+          have been warned!
+      - name: --contaminents
+        type: file
+        description: |
+          Specifies a non-default file which contains 
+          the list of contaminants to screen 
+          overrepresented sequences against. The file 
+          must contain sets of named contaminants in 
+          the form name[tab]sequence. Lines prefixed 
+          with a hash will be ignored. Default: 
+          https://github.com/smithlabcode/falco/blob/v1.2.2/Configuration/contaminant_list.txt
+      - name: --adapters
+        type: file
+        description: |
+          Specifies a non-default file which contains 
+          the list of adapter sequences which will be 
+          explicity searched against the library. The 
+          file must contain sets of named adapters in 
+          the form name[tab]sequence. Lines prefixed 
+          with a hash will be ignored. Default:
+          https://github.com/smithlabcode/falco/blob/v1.2.2/Configuration/adapter_list.txt
+      - name: --limits
+        type: file
+        description: |
+          Specifies a non-default file which contains 
+          a set of criteria which will be used to 
+          determine the warn/error limits for the 
+          various modules. This file can also be used 
+          to selectively remove some modules from the 
+          output all together. The format needs to 
+          mirror the default limits.txt file found in 
+          the Configuration folder. Default: 
+          https://github.com/smithlabcode/falco/blob/v1.2.2/Configuration/limits.txt
+      - name: --subsample
+        alternatives: [-s]
+        type: integer
+        example: 10
+        description: |
+          [Falco only] makes falco faster (but 
+          possibly less accurate) by only processing 
+          reads that are a multiple of this value (using 
+          0-based indexing to number reads).
+      - name: --bisulfite
+        alternatives: [-b]
+        type: boolean_true
+        description: |
+          [Falco only] reads are whole genome 
+          bisulfite sequencing, and more Ts and fewer 
+          Cs are therefore expected and will be 
+          accounted for in base content.
+      - name: --reverse_complliment
+        alternatives: [-r]
+        type: boolean_true
+        description: |
+          [Falco only] The input is a 
+          reverse-complement. All modules will be 
+          tested by swapping A/T and C/G
+
+  - name: Output arguments
+    arguments:
+      - name: --outdir
+        alternatives: [-o]
+        required: true
+        type: file
+        direction: output
+        description: |
+          Create all output files in the specified 
+          output directory. FALCO-SPECIFIC: If the 
+          directory does not exists, the program will 
+          create it.
+        example: output
+      - name: --format
+        type: string
+        choices: [bam, sam, bam_mapped, sam_mapped, fastq, fq, fastq.gz, fq.gz]
+        alternatives: ["-f"]
+        description: |
+          Bypasses the normal sequence file format 
+          detection and forces the program to use the 
+          specified format. Validformats are bam, sam, 
+          bam_mapped, sam_mapped, fastq, fq, fastq.gz 
+          or fq.gz.
+      - name: --data_filename
+        alternatives: [-D]
+        type: file
+        direction: output
+        description: |
+          [Falco only] Specify filename for FastQC 
+          data output (TXT). If not specified, it will 
+          be called fastq_data.txt in either the input 
+          file's directory or the one specified in the 
+          --output flag. Only available when running 
+          falco with a single input.
+      - name: --report_filename
+        alternatives: [-R]
+        type: file
+        direction: output
+        description: |
+          [Falco only] Specify filename for FastQC 
+          report output (HTML). If not specified, it 
+          will be called fastq_report.html in either 
+          the input file's directory or the one 
+          specified in the --output flag. Only 
+          available when running falco with a single 
+          input.
+      - name: --summary_filename
+        alternatives: [-S]
+        type: file
+        direction: output
+        description: |
+          [Falco only] Specify filename for the short 
+          summary output (TXT). If not specified, it 
+          will be called fastq_report.html in either 
+          the input file's directory or the one 
+          specified in the --output flag. Only 
+          available when running falco with a single 
+          input.
+
+# Arguments not taken into account:
+#
+#       -skip-data           [Falco only] Do not create FastQC data text
+#                            file.
+#       -skip-report         [Falco only] Do not create FastQC report
+#                            HTML file.
+#       -skip-summary        [Falco only] Do not create FastQC summary
+#                            file
+#       -K, -add-call        [Falco only] add the command call call to
+#                            FastQC data output and FastQC report HTML
+#                            (this may break the parse of fastqc_data.txt
+#                            in programs that are very strict about the
+#                            FastQC output format).
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:trixie-slim
+    setup:
+      - type: apt
+        packages: [wget, build-essential, g++, zlib1g-dev, procps]
+      - type: docker
+        run: |
+          wget https://github.com/smithlabcode/falco/releases/download/v1.2.2/falco-1.2.2.tar.gz -O /tmp/falco.tar.gz && \
+          cd /tmp && \
+          tar xvf falco.tar.gz && \
+          cd falco-1.2.2 && \
+          ./configure && \
+          make all && \
+          make install
+      - type: docker
+        run: |
+          echo "falco: \"$(falco -v | sed -n 's/^falco //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
