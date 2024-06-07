@@ -50,6 +50,9 @@
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
+* `bedtools`:
+    - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
+                           intervals defined in a BED/GFF/VCF file.
 
 ## MAJOR CHANGES
 
