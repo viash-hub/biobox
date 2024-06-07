@@ -52,7 +52,7 @@
 
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
-                           intervals defined in a BED/GFF/VCF file.
+                           intervals defined in a BED/GFF/VCF file (PR #59).
 
 ## MAJOR CHANGES
 
