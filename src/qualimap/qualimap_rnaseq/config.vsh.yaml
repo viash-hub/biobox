@@ -21,32 +21,22 @@ argument_groups:
 
 - name: "Output"
   arguments: 
-  - name: "--output_dir"
+  - name: "--output"
     direction: output
     type: file
-    required: false
-    default: $id.qualimap_output
-    description: path to output directory for raw data and report.
-  - name: "--output_pdf"
-    type: file
-    direction: output
-    required: false
-    must_exist: false
-    default: $id.report.pdf
-    description: path to output file for pdf report.
-  - name: "--output_format"
-    type: string
-    required: false
-    default: html
-    description: Format of the output report (PDF or HTML, default is HTML)
+    required: true
+    example: rnaseq_qc_results.txt
+    description: Text file containing the RNAseq QC results.
   - name: "--output_counts"
     type: file
     required: false
-    description: Output file for computed counts. If only name of the file is provided, then the file will be saved in the output folder.
-  - name: "--output_file"
+    direction: output
+    description: Output file for computed counts.
+  - name: "--output_report"
     type: file
+    direction: output
     required: false
-    description: Output file for PDF report (default value is report.pdf).
+    description: PDF report output file.
 
 - name: "Optional"
   arguments: 
@@ -85,6 +75,7 @@ argument_groups:
     required: false
     default: 4G 
     description: maximum Java heap memory size, default = 4G.
+
 
 resources:
   - type: bash_script
