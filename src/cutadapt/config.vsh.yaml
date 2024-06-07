@@ -6,6 +6,7 @@ links:
   homepage: https://cutadapt.readthedocs.io
   documentation: https://cutadapt.readthedocs.io
   repository: https://github.com/marcelm/cutadapt
+info:
   reference: http://dx.doi.org/10.14806/ej.17.1.200
 license: MIT
 argument_groups:
