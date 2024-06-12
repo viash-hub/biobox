@@ -50,6 +50,7 @@
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
+* `csv2fasta`: Convert two columns from a CSV file to FASTA entries (PR #61).
 
 ## MAJOR CHANGES
 
