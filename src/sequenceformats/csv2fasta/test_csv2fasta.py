@@ -1,13 +1,14 @@
 import pytest
+import re
+import sys
 from uuid import uuid4
 from textwrap import dedent
 from subprocess import CalledProcessError
-import sys
 
 ## VIASH START
 meta = {
-    'config': 'src/sequenceformats/csvtofasta/config.vsh.yaml',
-    'executable': 'target/executable/sequenceformats/csvtofasta'
+    'config': 'src/sequenceformats/csv2fasta/config.vsh.yaml',
+    'executable': 'target/executable/sequenceformats/csv2fasta'
 }
 ## VIASH END
 
@@ -231,7 +232,74 @@ def test_csvtofasta_2_columns(run_component, random_path):
         output_contents = open_output.read()
     assert output_contents == expected
 
+def test_csvtofasta_2_columns_but_still_swap(run_component, random_path):
+    csv_contents = dedent("""\
+    ACGT,barcode1
+    TTTA,barcode2
+    """)
 
+    expected= dedent("""\
+    >barcode1
+    ACGT
+    >barcode2
+    TTTA
+    """)
+    input_path = random_path("csv")
+    with input_path.open('w') as open_input:
+        open_input.write(csv_contents)
+    output_path = random_path("csv")
+    run_component([
+        "--input", input_path,
+        "--output", output_path,
+        "--sequence_column_index", "0",
+        "--name_column_index", "1"]
+    )
+    assert output_path.is_file()
+    with output_path.open('r') as open_output:
+        output_contents = open_output.read()
+    assert output_contents == expected
+
+def test_csvtofasta_2_columns_but_not_valid_sequence(run_component, random_path):
+    csv_contents = dedent("""\
+    barcodes,sequences
+    barcode1,ACGT
+    barcode2,TTTA
+    """)
+
+    input_path = random_path("csv")
+    with input_path.open('w') as open_input:
+        open_input.write(csv_contents)
+    output_path = random_path("csv")
+    with pytest.raises(CalledProcessError) as err:
+        run_component([
+            "--input", input_path,
+            "--output", output_path]
+        )
+    assert re.search(r"ValueError: The sequence \('sequences'\) found on line "
+                     r"1 contains characters \(.+\) which are not valid "
+                     r"IUPAC identifiers for nucleotides\.", 
+                     err.value.stdout.decode('utf-8'))
+
+    csv_contents = dedent("""\
+    barcodes,sequences
+    barcode1,ACGT
+    barcode2,TTEA
+    """)
+
+    input_path = random_path("csv")
+    with input_path.open('w') as open_input:
+        open_input.write(csv_contents)
+    output_path = random_path("csv")
+    with pytest.raises(CalledProcessError) as err:
+        run_component([
+            "--input", input_path,
+            "--output", output_path,
+            "--header"]
+        )
+    assert re.search(r"ValueError: The sequence \('TTEA'\) found on line "
+                     r"3 contains characters \(E\) which are not valid "
+                     r"IUPAC identifiers for nucleotides\.", 
+                     err.value.stdout.decode('utf-8'))
 
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__]))

@@ -8,6 +8,8 @@ par = {
 }
 ## VIASH END
 
+iupac = frozenset("ABCDGHKMNRSTUVWXY")
+
 def resolve_header_name_to_index(header_entries, column_name):
     try:
         return header_entries.index(column_name)
@@ -56,7 +58,13 @@ def csv_records(csv_file, delimiter, quote_character,
                 raise ValueError(f"Number of columns ({len(line)}) found on line {linenum+1} "
                                  "is different compared to number of columns found "
                                  f"previously ({num_columns}).")
-            yield line[name_column_index], line[sequence_column_index]
+            sequence_name, sequence = line[name_column_index], line[sequence_column_index]
+            invalid_characters = set(sequence.upper()) - iupac 
+            if set(sequence.upper()) - iupac:
+                raise ValueError(f"The sequence ('{sequence}') found on line {linenum+1} "
+                                 f"contains characters ({','.join(invalid_characters)}) "
+                                 "which are not valid IUPAC identifiers for nucleotides.")
+            yield sequence_name, sequence
                 
 
 def main(par):

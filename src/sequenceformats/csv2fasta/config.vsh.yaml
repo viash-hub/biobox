@@ -1,5 +1,11 @@
 name: csv2fasta
-description: Convert two columns from a CSV file to FASTA entries.
+description: |
+  Convert two columns from a CSV file to FASTA entries. The CSV file can
+  contain an optional header and each row (other than the header) becomes
+  a single FASTA record. One of the two columns will be used as the names
+  for the FASTA entries, while the other become the sequences. The sequences
+  column must only contain characters that are valid IUPAC notation for 
+  nucleotides or a group thereof (wildcard characters).
 argument_groups:
   - name: Inputs
     arguments:
@@ -28,7 +34,10 @@ argument_groups:
   - name: "CSV column arguments"
     description: |
       Parameters for the selection of columns from the CSV file.
-      Only required when your CSV file contains more than 2 columns.
+      Only required when your CSV file contains more than 2 columns,
+      otherwise the first column will be used for the FASTA header
+      and the second for the FASTA nucleotide sequences. This default
+      can still be overwritten by using the options below.
     arguments:
       - name: --sequence_column
         type: string
