@@ -22,9 +22,15 @@ def csv_records(csv_file, delimiter, quote_character,
                 header, sequence_column, name_column,
                 sequence_column_index, name_column_index):
     with open(csv_file, newline='') as csvfile:
-        csv_reader = csv.reader(csvfile,
-                                delimiter=delimiter,
-                                quotechar=quote_character)
+        # Deduce CSV dialect based on first 5 lines.
+        hint = "\n".join([csvfile.readline() for _ in range(5)])
+        csvfile.seek(0)
+        dialect = csv.Sniffer().sniff(hint)
+        reader_args = {"dialect": dialect}
+        delimiter_arg = {"delimiter": delimiter} if delimiter else {}
+        quotechar_arg = {"quotechar": quote_character} if delimiter else {}
+        all_args = reader_args | delimiter_arg | quotechar_arg
+        csv_reader = csv.reader(csvfile, **all_args)
         for linenum, line in enumerate(csv_reader):
             if not linenum: # First row
                 num_columns = len(line)

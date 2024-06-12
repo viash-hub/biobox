@@ -15,22 +15,23 @@ argument_groups:
       example: barcodes.csv
       description: CSV file to be processed.
       required: true
-  - name: "CSV Format arguments"
+    - name: --header
+      type: boolean_true
+      description: |
+        Parse the first line of the CSV file as a header.
+  - name: "CSV dialect options"
+    description: |
+      Options that can be used to override the automatically detected
+      dialect of the CSV file.
     arguments:
-      - name: --header
-        type: boolean_true
-        description: |
-          Parse the first line of the CSV file as a header.
       - name: --delimiter
         type: string
         description: |
-          Column delimiter
-        default: ","
+          Overwrite the column delimiter character.
       - name: --quote_character
         type: string
         description: |
-          Character used to denote the start and end of a quoted item.
-        default: '"'
+          Overwrite the character used to denote the start and end of a quoted item.
   - name: "CSV column arguments"
     description: |
       Parameters for the selection of columns from the CSV file.

@@ -149,6 +149,65 @@ def test_csvtofasta_header_select_column_by_both_name_and_index(run_component, r
         output_contents = open_output.read()
     assert output_contents == expected
 
+def test_csvtofasta_autodetect_dialect(run_component, random_path):
+    csv_contents = dedent("""\
+    barcode_name\tsome_other_column\tsequence
+    barcode1\tfoo\tACGT
+    barcode2\tbar\tTTTA
+    """)
+
+    expected= dedent("""\
+    >barcode1
+    ACGT
+    >barcode2
+    TTTA
+    """)
+    input_path = random_path("csv")
+    with input_path.open('w') as open_input:
+        open_input.write(csv_contents)
+    output_path = random_path("csv")
+    run_component([
+        "--input", input_path,
+        "--output", output_path,
+        "--header", 
+        "--name_column", "barcode_name",
+        "--sequence_column_index", "2",
+        ]
+    )
+    assert output_path.is_file()
+    with output_path.open('r') as open_output:
+        output_contents = open_output.read()
+    assert output_contents == expected
+
+    csv_contents = dedent("""\
+    "barcode_name"\t"some_other_column"\t"sequence"
+    "barcode1"\t"foo"\t"ACGT"
+    "barcode2"\t"bar"\t"TTTA"
+    """)
+
+    expected= dedent("""\
+    >barcode1
+    ACGT
+    >barcode2
+    TTTA
+    """)
+    input_path = random_path("csv")
+    with input_path.open('w') as open_input:
+        open_input.write(csv_contents)
+    output_path = random_path("csv")
+    run_component([
+        "--input", input_path,
+        "--output", output_path,
+        "--header", 
+        "--name_column", "barcode_name",
+        "--sequence_column_index", "2",
+        ]
+    )
+    assert output_path.is_file()
+    with output_path.open('r') as open_output:
+        output_contents = open_output.read()
+    assert output_contents == expected
+
 def test_csvtofasta_header_select_column_by_name(run_component, random_path):
     csv_contents = dedent("""\
     barcode_name,some_other_column,sequence
@@ -300,6 +359,8 @@ def test_csvtofasta_2_columns_but_not_valid_sequence(run_component, random_path)
                      r"3 contains characters \(E\) which are not valid "
                      r"IUPAC identifiers for nucleotides\.", 
                      err.value.stdout.decode('utf-8'))
+
+
 
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__]))
