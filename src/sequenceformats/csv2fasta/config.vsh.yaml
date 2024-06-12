@@ -69,7 +69,7 @@ resources:
     path: script.py
 test_resources:
   - type: python_script
-    path: test_csvtofasta.py
+    path: test_csv2fasta.py
 
 engines:
   - type: docker
