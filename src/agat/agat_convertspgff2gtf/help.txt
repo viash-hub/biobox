@@ -1,0 +1,7 @@
+cat <<EOF > src/agat/agat_convertspgff2gtf/help.txt
+```sh
+agat/agat_convertspgff2gtf --help
+```
+EOF
+
+docker run quay.io/biocontainers/agat/agat_convertspgff2gtf:1.4.0--pl5321hdfd78af_0 agat/agat_convertspgff2gtf --help >> src/agat/agat_convertspgff2gtf/help.txt
