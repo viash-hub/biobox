@@ -21,6 +21,7 @@ set -e
 [[ "$par_softclip_overhangs" == "false" ]] && unset par_softclip_overhangs
 [[ "$par_full_length_alignment" == "false" ]] && unset par_full_length_alignment
 [[ "$par_hard_filter" == "false" ]] && unset par_hard_filter
+[[ "$par_write_mappings" == "false" ]] && unset par_write_mappings
 [[ "$par_write_qualities" == "false" ]] && unset par_write_qualities
 [[ "$par_alternative_init_mode" == "false" ]] && unset par_alternative_init_mode
 [[ "$par_skip_quant" == "false" ]] && unset par_skip_quant
@@ -96,7 +97,7 @@ salmon quant \
     ${par_full_length_alignment:+--fullLengthAlignment} \
     ${par_hard_filter:+--hardFilter} \
     ${par_min_aln_prob:+--minAlnProb "${par_min_aln_prob}"} \
-    ${par_write_mappings:+-z "${par_write_mappings}"} \
+    ${par_write_mappings:+--write_mappings="${par_mappings_sam}"} \
     ${par_write_qualities:+--writeQualities} \
     ${par_hit_filter_policy:+--hitFilterPolicy "${par_hit_filter_policy}"} \
     ${par_alternative_init_mode:+--alternativeInitMode} \
