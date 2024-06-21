@@ -2,7 +2,7 @@ name: biobox
 description: |
   A collection of bioinformatics tools for working with sequence data.
 license: MIT
-keywords: [bioinformatics, sequence, alignment, variant calling, dna, rna]
+keywords: [bioinformatics, modules, sequencing]
 links:
   issue_tracker: https://github.com/viash-hub/biobox/issues
   repository: https://github.com/viash-hub/biobbox
