@@ -17,6 +17,8 @@
     - `busco/busco_list_datasets`: Lists available busco datasets (PR #18).
     - `busco/busco_download_datasets`: Download busco datasets (PR #19).
 
+* `cutadapt`: Remove adapter sequences from high-throughput sequencing reads (PR #7).
+
 * `featurecounts`: Assign sequence reads to genomic features (PR #11).
 
 * `bgzip`: Add bgzip functionality to compress and decompress files (PR #13).
