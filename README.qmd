@@ -6,7 +6,7 @@ project <- yaml::read_yaml("_viash.yaml")
 license <- paste0(project$links$repository, "/blob/main/LICENSE")
 contributing <- paste0(project$links$repository, "/blob/main/CONTRIBUTING.md")
 ```
-# `r project$name`
+# 🌱📦 `r project$name`
 
 [![ViashHub](https://img.shields.io/badge/ViashHub-`r project$name`-7a4baa)](https://web.viash-hub.com/packages/`r project$name`) 
 [![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2F`r project$name`-blue)](`r project$links$repository`) 
