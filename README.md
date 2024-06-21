@@ -9,7 +9,7 @@ License](https://img.shields.io/github/license/viash-hub/biobox.png)](https://gi
 [![GitHub
 Issues](https://img.shields.io/github/issues/viash-hub/biobox.png)](https://github.com/viash-hub/biobox/issues)
 [![Viash
-version](https://img.shields.io/badge/Viash-v0.9.0--RC3-blue)](https://viash.io)
+version](https://img.shields.io/badge/Viash-v0.9.0--RC6-blue)](https://viash.io)
 
 A collection of bioinformatics tools for working with sequence data.
 
