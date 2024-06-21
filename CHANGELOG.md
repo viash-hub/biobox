@@ -1,4 +1,4 @@
-# base unreleased
+# biobox unreleased
 
 ## BREAKING CHANGES
 
@@ -51,8 +51,6 @@
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
 
-## MAJOR CHANGES
-
 ## MINOR CHANGES
 
 * Uniformize component metadata (PR #23).
@@ -61,7 +59,13 @@
 
 * Update to Viash 0.9.0-RC3 (PR #51).
 
+* Update to Viash 0.9.0-RC6 (PR #63).
+
+* Switch to viash-hub/toolbox actions (PR #64).
+
 ## DOCUMENTATION
+
+* Update README (PR #64).
 
 ## BUG FIXES
 
