@@ -1,6 +1,6 @@
 
 
-# biobox
+# 🌱📦 biobox
 
 [![ViashHub](https://img.shields.io/badge/ViashHub-biobox-7a4baa.png)](https://web.viash-hub.com/packages/biobox)
 [![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2Fbiobox-blue.png)](https://github.com/viash-hub/biobbox)
