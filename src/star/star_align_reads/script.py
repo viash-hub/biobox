@@ -59,7 +59,7 @@ expected_outputs = {
     "splice_junctions": "SJ.out.tab",
     "unmapped": "Unmapped.out.mate1",
     "unmapped_r2": "Unmapped.out.mate2", 
-    "transcriptome": "Aligned.toTranscriptome.out.bam"
+    "reads_aligned_to_transcriptome": "Aligned.toTranscriptome.out.bam"
 }
 output_paths = {name: par[name] for name in expected_outputs.keys()}
 for name in expected_outputs.keys():

@@ -73,11 +73,11 @@ argument_groups:
         direction: output
         example: splice_junctions.tsv
       - type: file
-        name: --transcriptome
+        name: --reads_aligned_to_transcriptome
         required: false
-        description: The output file containing the alignments to transcriptome in BAM formats.
+        description: The output file containing the alignments to transcriptome in BAM formats. This file is generated when --quantMode is set to TranscriptomeSAM.
         direction: output
-        example: transcriptome.bam
+        example: transcriptome_aligned.bam
 # other arguments are defined in a separate file
 __merge__: argument_groups.yaml
 resources:

@@ -98,7 +98,7 @@ echo "> Run star_align_reads on SE"
   --reads_per_gene "reads_per_gene.tsv" \
   --outSJtype Standard \
   --splice_junctions "splice_junctions.tsv" \
-  --transcriptome "transcriptome.bam" \
+  --reads_aligned_to_transcriptome "transcriptome_aligned.bam" \
   ${meta_cpus:+---cpus $meta_cpus}
 
 # TODO: Test data doesn't contain any chimeric reads yet
@@ -112,7 +112,7 @@ assert_file_exists "reads_per_gene.tsv"
 # assert_file_exists "chimeric_junctions.tsv"
 assert_file_exists "splice_junctions.tsv"
 assert_file_exists "unmapped.sam"
-assert_file_exists "transcriptome.bam"
+assert_file_exists "transcriptome_aligned.bam"
 
 echo ">> Check if output contents are not empty"
 assert_file_not_empty "output.sam"
@@ -121,7 +121,7 @@ assert_file_not_empty "reads_per_gene.tsv"
 # assert_file_not_empty "chimeric_junctions.tsv"
 # assert_file_not_empty "splice_junctions.tsv" # TODO: test data doesn't contain any splice junctions yet
 assert_file_not_empty "unmapped.sam"
-assert_file_not_empty "transcriptome.bam"
+assert_file_not_empty "transcriptome_aligned.bam"
 
 echo ">> Check if output contents are correct"
 assert_file_contains "log.txt" "Number of input reads \\|	2"
