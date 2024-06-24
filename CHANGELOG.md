@@ -1,4 +1,4 @@
-# base unreleased
+# biobox unreleased
 
 ## BREAKING CHANGES
 
@@ -17,6 +17,8 @@
     - `busco/busco_list_datasets`: Lists available busco datasets (PR #18).
     - `busco/busco_download_datasets`: Download busco datasets (PR #19).
 
+* `cutadapt`: Remove adapter sequences from high-throughput sequencing reads (PR #7).
+
 * `featurecounts`: Assign sequence reads to genomic features (PR #11).
 
 * `bgzip`: Add bgzip functionality to compress and decompress files (PR #13).
@@ -29,7 +31,9 @@
 
 * `multiqc`: Aggregate results from bioinformatics analyses across many samples into a single report (PR #42).
 
-* `star/star_align_reads`: Align reads to a reference genome (PR #22).
+* `star`:
+    - `star/star_align_reads`: Align reads to a reference genome (PR #22).
+    - `star/star_genome_generate`: Generate a genome index for STAR alignment (PR #58).
 
 * `gffread`: Validate, filter, convert and perform other operations on GFF files (PR #29).  
 
@@ -50,8 +54,9 @@
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
-
-## MAJOR CHANGES
+* `bedtools`:
+    - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
+                           intervals defined in a BED/GFF/VCF file (PR #59).
 
 ## MINOR CHANGES
 
@@ -61,8 +66,16 @@
 
 * Update to Viash 0.9.0-RC3 (PR #51).
 
+* Update to Viash 0.9.0-RC6 (PR #63).
+
+* Switch to viash-hub/toolbox actions (PR #64).
+
 ## DOCUMENTATION
+
+* Update README (PR #64).
 
 ## BUG FIXES
 
 * Add escaping character before leading hashtag in the description field of the config file (PR #50).
+
+* Format URL in biobase/bcl_convert description (PR #55).
