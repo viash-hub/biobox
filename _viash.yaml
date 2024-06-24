@@ -1,4 +1,5 @@
 name: biobox
+version: v0.1.0
 description: |
   A collection of bioinformatics tools for working with sequence data.
 license: MIT
