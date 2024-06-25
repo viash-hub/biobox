@@ -1,4 +1,11 @@
-# biobox unreleased
+# biobox x.x.x (unreleased)
+
+# BUG FIXES
+
+* `cutadapt`: fix nucleotide quality cutoff argument needed their values specified as 
+  strings instead of integers (PR #66).
+
+# biobox 0.1.0
 
 ## BREAKING CHANGES
 
