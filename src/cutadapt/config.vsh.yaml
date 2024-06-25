@@ -269,7 +269,7 @@ argument_groups:
           dark cycles appearing as high-quality G bases.
       - name: --quality_cutoff
         alternatives: [-q]
-        type: string
+        type: integer
         description: |
           Trim low-quality bases from 5' and/or 3' ends of each read
           before adapter removal. Applied to both reads if data is
@@ -278,7 +278,7 @@ argument_groups:
           trimmed with the first cutoff, the 3' end with the second.
       - name: --quality_cutoff_r2
         alternatives: [-Q]
-        type: string
+        type: integer
         description: |
           Quality-trimming cutoff for R2. Default: same as for R1
       - name: --quality_base
