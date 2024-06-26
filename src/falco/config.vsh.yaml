@@ -194,3 +194,5 @@ engines:
 runners:
   - type: executable
   - type: nextflow
+    config: 
+      script: 'docker.fixOwnership = true'
