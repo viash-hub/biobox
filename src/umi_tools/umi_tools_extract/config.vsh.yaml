@@ -18,6 +18,12 @@ license: MIT
 argument_groups:
   - name: Extract Options
     arguments:
+    - name: --umitools_extract_method
+      alternatives: --extract_method
+      type: "string"
+      description: UMI pattern to use.
+      default: string
+      choices: [ string, regex ]
     - name: --error_correct_cell
       type: boolean_true
       description: Error correct cell barcodes to the whitelist.
@@ -55,19 +61,53 @@ argument_groups:
         Allow read 2 infile to contain reads not in read 1 infile. This enables support for upstream protocols
         where read one contains cell barcodes, and the read pairs have been filtered and corrected without regard
         to the read2.
-  
-  - name: Experimental options
-    arguments:
     - name: --three_prime
-      alternatives: "--3prime"
+      alternatives: --3prime
       type: boolean_true
       description: |
         By default the barcode is assumed to be on the 5' end of the read, but use this option to sepecify that it is
         on the 3' end instead. This option only works with --extract_method=string since 3' encoding can be specified
         explicitly with a regex, e.g .*(?P<umi_1>.{5})$
+    - name: --ignore_read_pair_suffixes
+      type: boolean_true
+      description: |
+        Ignore SOH and STX read name suffixes. Note that this options is required if the suffixes are not whitespace
+        separated from the rest of the read name
+  - name: Input
+    arguments: 
+    - name: --paired
+      type: boolean
+      description: Paired fastq files or not? If option is set, two input files are expected.
+    - name: --input
+      type: file
+      required: true
+      description: Input fastq files, either one or two (paired)
+      example: sample.fastq
     - name: --read2_in
       type: file
       description: Filename for read pairs
+    - name: --bc_pattern
+      type: string
+      description: |
+        The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides 
+        of the read are from the UMI.
+    - name: --bc_pattern2
+      type: string
+      description: The UMI barcode pattern to use for read 2.
+    
+  - name: "Output"
+    arguments:  
+    - name: "--read1_out"
+      type: file
+      required: true
+      description: Output file for read 1.
+      direction: output
+    - name: "--read2_out"
+      type: file
+      description: Output file for read 2.
+      must_exist: false
+      direction: output
+      default: "read2_out.fastq"
     - name: --filtered_out
       type: file
       description: |
@@ -76,12 +116,26 @@ argument_groups:
       type: file
       description: |
         Write out read pairs not matching regex pattern or cell barcode whitelist to this file
-    - name: --ignore_read_pair_suffixes
-      type: boolean_true
-      description: |
-        Ignore SOH and STX read name suffixes. Note that this options is required if the suffixes are not whitespace
-        separated from the rest of the read name
-     
+
+
+  - name: Additional arguments
+    arguments:
+    - name: --umitools_umi_separator
+      alternatives: --umi_separator
+      type: string
+      default: "_"
+      description: The character that separates the UMI in the read name. Most likely a colon if you skipped the extraction with UMI-tools and used other software.
+    - name: --umitools_grouping_method
+      type: string
+      description: Method to use to determine read groups by subsuming those with similar UMIs. All methods start by identifying the reads with the same mapping position, but treat similar yet nonidentical UMIs differently.
+      default: "directional"
+      choices: ["unique", "percentile", "cluster", "adjacency", "directional"]
+    - name: --umi_discard_read
+      type: integer
+      description: After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively.
+      choices: [0, 1, 2]
+      default: 0
+
   - name: Common Options
     arguments:
     - name: --log
@@ -123,62 +177,6 @@ argument_groups:
       type: integer
       description: Random seed to initialize number generator with.
   
-  - name: "Input"
-    arguments: 
-    - name: "--paired"
-      type: boolean_true
-      description: Paired fastq files or not? If option is set, two input files are expected.
-    - name: "--input"
-      type: file
-      required: true
-      multiple: true
-      multiple_sep: ","
-      description: Input fastq files, either one or two (paired)
-      example: sample.fastq
-    - name: "--bc_pattern"
-      type: string
-      description: "The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides of the read are from the UMI."
-      multiple: true
-      multiple_sep: ","
-    
-  - name: "Output"
-    arguments:  
-    - name: "--fastq_1"
-      type: file
-      required: true
-      description: Output file for read 1.
-      direction: output
-    - name: "--fastq_2"
-      type: file
-      required: false
-      must_exist: false
-      description: Output file for read 2.
-      direction: output
-
-  - name: "Optional arguments"
-    arguments:
-    - name: "--umitools_extract_method"
-      alternatives: "--extract_method"
-      type: "string"
-      description: UMI pattern to use.
-      default: string
-      choices: [ string, regex ]
-    - name: "--umitools_umi_separator"
-      alternatives: "--umi_separator"
-      type: string
-      default: "_"
-      description: The character that separates the UMI in the read name. Most likely a colon if you skipped the extraction with UMI-tools and used other software.
-    - name: "--umitools_grouping_method"
-      type: string
-      description: Method to use to determine read groups by subsuming those with similar UMIs. All methods start by identifying the reads with the same mapping position, but treat similar yet nonidentical UMIs differently.
-      default: "directional"
-      choices: ["unique", "percentile", "cluster", "adjacency", "directional"]
-    - name: "--umi_discard_read"
-      type: integer
-      description: After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively.
-      choices: [0, 1, 2]
-      default: 0
-
 resources:
   - type: bash_script
     path: script.sh
