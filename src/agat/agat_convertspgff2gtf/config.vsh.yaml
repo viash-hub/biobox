@@ -19,7 +19,7 @@ description:  |
     transcript_id is a unique identifier for the predicted transcript, which
     is used to group features into transcripts.
 
-keywords: [tag1, tag2]
+keywords: [gene annotations, GTF conversion]
 links:
   homepage: https://github.com/NBISweden/AGAT
   documentation: https://agat.readthedocs.io/
