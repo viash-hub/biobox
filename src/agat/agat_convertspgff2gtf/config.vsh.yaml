@@ -32,7 +32,7 @@ argument_groups:
       - name: --gtf_version
         description: Version of the GTF output (1,2,2.1,2.2,2.5,3 or relax). Default value from AGAT config file (relax for the default config). The script option has the higher priority.
         type: string
-        choices: [relax, GTF3, GTF2.5, GTF2.2, GTF2.1, GTF2, GTF1]
+        choices: [relax, "1", "2", "2.1", "2.2", "2.5", "3"]
         required: false
         default: relax
         example: GTF3
