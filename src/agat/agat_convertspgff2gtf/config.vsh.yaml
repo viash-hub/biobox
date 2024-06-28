@@ -18,7 +18,6 @@ description:  |
     the transcript, which is used to group transcripts into genes. The
     transcript_id is a unique identifier for the predicted transcript, which
     is used to group features into transcripts.
-
 keywords: [gene annotations, GTF conversion]
 links:
   homepage: https://github.com/NBISweden/AGAT
