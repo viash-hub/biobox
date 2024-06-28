@@ -37,9 +37,10 @@ argument_groups:
         default: relax
         example: GTF3
       - name: --config
+        alternatives: [-c]
         description: |
           Input agat config file. By default AGAT takes as input agat_config.yaml file from the working directory if any, otherwise it takes the orignal agat_config.yaml shipped with AGAT. To get the agat_config.yaml locally type: "agat config --expose". The --config option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
-        type: string
+        type: file
         required: false
         default: agat_config.yaml
         example: custom_agat_config.yaml
