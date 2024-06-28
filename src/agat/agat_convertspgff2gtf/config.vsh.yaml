@@ -72,6 +72,10 @@ test_resources:
 engines:
   - type: docker
     image: quay.io/biocontainers/agat:1.4.0--pl5321hdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          agat --version | sed 's/AGAT\s\(.*\)/agat: "\1"/' > /var/software_versions.txt
 runners:
   - type: executable
   - type: nextflow
