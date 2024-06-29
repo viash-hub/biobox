@@ -31,7 +31,7 @@ argument_groups:
   - name: Inputs
     arguments:
       - name: --gff
-        alternatives: [--gtf, -i]
+        alternatives: [-i]
         description: Input GFF/GTF file that will be read
         type: file
         required: true
