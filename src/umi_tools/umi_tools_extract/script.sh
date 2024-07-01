@@ -10,15 +10,14 @@ test_dir="${metal_executable}/test_data"
 [[ "$par_paired" == "false" ]] && unset par_paired
 [[ "$par_error_correct_cell" == "false" ]] && unset par_error_correct_cell
 [[ "$par_reconcile_pairs" == "false" ]] && unset par_reconcile_pairs
-[[ "$par_3prime" == "false" ]] && unset par_3prime
+[[ "$par_three_prime" == "false" ]] && unset par_three_prime
 [[ "$par_ignore_read_pair_suffixes" == "false" ]] && unset par_ignore_read_pair_suffixes
 [[ "$par_timeit_header" == "false" ]] && unset par_timeit_header
 [[ "$par_log2stderr" == "false" ]] && unset par_log2stderr
 
-echo "$par_paired"
-if [ "$par_paired" == "true" ]; then
-    echo "Paired"
-    # check that we have two read files, two patterns, and 2 output files
+
+if [ -n "$par_paired" ]; then
+    # For paired-end rendscheck that we have two read files, two patterns
     if [ -z "$par_input" ] || [ -z "$par_read2_in" ] ||
        [ -z "$par_bc_pattern" ] || [ -z "$par_bc_pattern2" ]; 
         then
@@ -26,7 +25,7 @@ if [ "$par_paired" == "true" ]; then
         exit 1
     fi
 else 
-    echo "Not Paired"
+    # For single-end reads, check that we have only one read file, one pattern
     if [ -n "$par_read2_in" ] || [ -n "$par_bc_pattern2" ]; then
         echo "Single end input requires one read file and one UMI pattern"
         exit 1
@@ -35,7 +34,7 @@ else
         exit 1
     fi
 fi
- 
+
 umi_tools extract \
     -I "$par_input" \
     ${par_read2_in:+ --read2-in "$par_read2_in"} \
@@ -69,11 +68,11 @@ umi_tools extract \
     ${par_verbose:+--verbose "$par_verbose"} \
     ${par_error:+--error "$par_error"}
 
+
 if [ $par_umi_discard_read == 1 ]; then
     # discard read 1
     rm "$par_read1_out"
 elif [ $par_umi_discard_read == 2 ]; then
-    # discard read 2
-    # rm "$par_read2_out"
-    .
+    # discard read 2 (-f to bypass file existence check)
+    rm -f "$par_read2_out"
 fi

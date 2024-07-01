@@ -73,10 +73,11 @@ argument_groups:
       description: |
         Ignore SOH and STX read name suffixes. Note that this options is required if the suffixes are not whitespace
         separated from the rest of the read name
+        
   - name: Input
     arguments: 
     - name: --paired
-      type: boolean
+      type: boolean_true
       description: Paired fastq files or not? If option is set, two input files are expected.
     - name: --input
       type: file
@@ -107,7 +108,6 @@ argument_groups:
       description: Output file for read 2.
       must_exist: false
       direction: output
-      default: "read2_out.fastq"
     - name: --filtered_out
       type: file
       description: |
