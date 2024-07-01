@@ -39,7 +39,7 @@ busco \
     ${par_force:+--force} \
     ${par_limit:+--limit "$par_limit"} \
     ${par_long:+--long} \
-    ${pat_metaeuk:+--metaeuk} \
+    ${par_metaeuk:+--metaeuk} \
     ${par_metaeuk_parameters:+--metaeuk_parameters "$par_metaeuk_parameters"} \
     ${par_metaeuk_rerun_parameters:+--metaeuk_rerun_parameters "$par_metaeuk_rerun_parameters"} \
     ${par_miniprot:+--miniprot} \
