@@ -11,7 +11,14 @@ set -e
 [[ "$par_copy_tags" == "false" ]] && unset par_copy_tags
 [[ "$par_casava" == "false" ]] && unset par_casava
 
-samtools "$par_command" \
+if [[ "$meta_name" == "samtools_fasta" ]]; then
+  subcommand=fasta
+elif [[ "$meta_name" == "samtools_fastq" ]]; then
+  subcommand=fastq
+else
+  echo "Unrecognized component name" && exit 1
+fi
+samtools "$subcommand" \
     ${par_no_suffix:+-n} \
     ${par_suffix:+-N} \
     ${par_use_oq:+-O} \
