@@ -1,4 +1,10 @@
-# biobox unreleased
+# biobox x.x.x
+
+## BUG FIXES
+
+* `pear`: fix component not exiting with the correct exitcode when PEAR fails.
+
+# biobox 0.1.0
 
 ## BREAKING CHANGES
 
