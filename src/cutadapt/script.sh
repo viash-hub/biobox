@@ -127,7 +127,7 @@ mod_args=$(echo \
   ${par_cut_r2:+--cut_r2 "${par_cut_r2}"} \
   ${par_nextseq_trim:+--nextseq-trim "${par_nextseq_trim}"} \
   ${par_quality_cutoff:+--quality-cutoff "${par_quality_cutoff}"} \
-  ${par_quality_cutoff_r2:+--quality-cutoff_r2 "${par_quality_cutoff_r2}"} \
+  ${par_quality_cutoff_r2:+-Q "${par_quality_cutoff_r2}"} \
   ${par_quality_base:+--quality-base "${par_quality_base}"} \
   ${par_poly_a:+--poly-a} \
   ${par_length:+--length "${par_length}"} \
@@ -196,14 +196,35 @@ else
   ext="fasta"
 fi
 
-if [ $mode = "se" ]; then
+demultiplex_mode="$par_demultiplex_mode"
+if [[ $mode == "se" ]]; then
+  if [[ "$demultiplex_mode" == "unique_dual" ]] || [[ "$demultiplex_mode" == "combinatorial_dual" ]]; then
+    echo "Demultiplexing dual indexes is not possible with single-end data."
+    exit 1
+  fi
+  prefix="trimmed_"
+  if [[ ! -z "$demultiplex_mode" ]]; then
+    prefix="{name}_"
+  fi
   output_args=$(echo \
-    --output "$output_dir/{name}_001.$ext" \
+    --output "$output_dir/${prefix}001.$ext" \
   )
 else
+  demultiplex_indicator_r1='{name}_'
+  demultiplex_indicator_r2=$demultiplex_indicator_r1
+  if [[ "$demultiplex_mode" == "combinatorial_dual" ]]; then
+    demultiplex_indicator_r1='{name1}_{name2}_'
+    demultiplex_indicator_r2='{name1}_{name2}_'
+  fi
+  prefix_r1="trimmed_"
+  prefix_r2="trimmed_"
+  if [[ ! -z "$demultiplex_mode" ]]; then
+    prefix_r1=$demultiplex_indicator_r1
+    prefix_r2=$demultiplex_indicator_r2
+  fi
   output_args=$(echo \
-    --output "$output_dir/{name}_R1_001.$ext" \
-    --paired-output "$output_dir/{name}_R2_001.$ext" \
+    --output "$output_dir/${prefix_r1}R1_001.$ext" \
+    --paired-output "$output_dir/${prefix_r2}R2_001.$ext" \
   )
 fi
 
