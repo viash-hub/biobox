@@ -58,7 +58,7 @@ argument_groups:
           in the file names.
       - name: --extract_umi_method
         type: string
-        choices: ["read_id", "tag", "umis"]
+        choices: [read_id, tag, umis]
         description: |
           Specify the method by which the barcodes were encoded in the read.
           The options are:
@@ -75,7 +75,7 @@ argument_groups:
         type: string
         description: |
           The separator used to separate the UMI from the read sequence. 
-          This is only required if the extract_umi_method is set to id_read. ['_']
+          This is only required if the extract_umi_method is set to id_read. [_]
         example: '_'
       - name: --umi_tag_split
         type: string
@@ -103,7 +103,7 @@ argument_groups:
     arguments:    
       - name: --method
         type: string
-        choices: ["unique", "percentile", "cluster", "adjacency", "directional"]
+        choices: [unique, percentile, cluster, adjacency, directional]
         description: |
           The method to use for grouping reads. 
           The options are: 
@@ -211,7 +211,7 @@ argument_groups:
         example: "discard"
       - name: --chimeric_pairs
         type: string
-        choices: ["discard", "use", "output"]
+        choices: [discard, use, output]
         description: |
           How chimeric pairs should be handled. 
           The options are:
@@ -221,7 +221,7 @@ argument_groups:
         example: "use"
       - name: --unpaired_reads
         type: string
-        choices: ["discard", "use", "output"]
+        choices: [discard, use, output]
         description: |
           How unpaired reads should be handled. 
           The options are: 
