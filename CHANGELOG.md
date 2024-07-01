@@ -4,6 +4,10 @@
 
 * `pear`: fix component not exiting with the correct exitcode when PEAR fails.
 
+* `cutadapt`: fix `--par_quality_cutoff_r2` argument.
+
+* `cutadapt`: demultiplexing is now disabled by default. It can be re-enabled by using `demultiplex_mode`.
+
 # biobox 0.1.0
 
 ## BREAKING CHANGES
@@ -12,7 +16,6 @@
   Viash 0.9.0 in order to avoid issues with the current default separator `:` unintentionally
   splitting up certain file paths.
 
-* `cutadapt`: demultiplexing is now disabled by default. It can be re-enabled by using `demultiplex_mode`.
 
 ## NEW FEATURES
 

@@ -127,7 +127,7 @@ mod_args=$(echo \
   ${par_cut_r2:+--cut_r2 "${par_cut_r2}"} \
   ${par_nextseq_trim:+--nextseq-trim "${par_nextseq_trim}"} \
   ${par_quality_cutoff:+--quality-cutoff "${par_quality_cutoff}"} \
-  ${par_quality_cutoff_r2:+--quality-cutoff_r2 "${par_quality_cutoff_r2}"} \
+  ${par_quality_cutoff_r2:+-Q "${par_quality_cutoff_r2}"} \
   ${par_quality_base:+--quality-base "${par_quality_base}"} \
   ${par_poly_a:+--poly-a} \
   ${par_length:+--length "${par_length}"} \
