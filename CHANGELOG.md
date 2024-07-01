@@ -6,6 +6,8 @@
   Viash 0.9.0 in order to avoid issues with the current default separator `:` unintentionally
   splitting up certain file paths.
 
+* `cutadapt`: demultiplexing is now disabled by default. It can be re-enabled by using `demultiplex_mode`.
+
 ## NEW FEATURES
 
 * `arriba`: Detect gene fusions from RNA-seq data (PR #1).

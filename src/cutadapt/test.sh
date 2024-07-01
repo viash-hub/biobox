@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -eo pipefail
 
 #############################################
 # helper functions
@@ -57,6 +58,7 @@ EOF
   --adapter ADAPTER \
   --input example.fa \
   --fasta \
+  --demultiplex_mode single \
   --no_match_adapter_wildcards \
   --json
 
@@ -101,6 +103,7 @@ EOF
   --output "out_test1/*.fasta" \
   --adapter ADAPTER \
   --input example.fa \
+  --demultiplex_mode single \
   --fasta \
   --no_match_adapter_wildcards \
   --json
@@ -160,6 +163,7 @@ EOF
   --adapter AAAAA \
   --adapter_fasta adapters1.fasta \
   --adapter_fasta adapters2.fasta \
+  --demultiplex_mode single \
   --input example.fa \
   --fasta \
   --json
@@ -224,6 +228,7 @@ EOF
   --input example_R1.fastq \
   --input_r2 example_R2.fastq \
   --quality_cutoff 20 \
+  --demultiplex_mode unique_dual \
   --json \
   ---cpus 1
 
