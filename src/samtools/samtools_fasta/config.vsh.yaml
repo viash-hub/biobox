@@ -101,7 +101,7 @@ argument_groups:
           Do not output alignments with any bits set in INT present in the FLAG field. INT can be specified 
           in hex by beginning with `0x' (i.e. /^0x[0-9A-F]+/) or in octal by beginning with `0' 
           (i.e. /^0[0-7]+/). This defaults to 0x900 representing filtering of secondary and 
-          supplementary alignments. ["0x900"]
+          supplementary alignments. [0x900]
         example: "0x900"
       - name: --incl_flags
         alternatives: --rf
@@ -153,12 +153,12 @@ argument_groups:
         description: write second index reads to FILE.
       - name: --barcode_tag
         type: string
-        description: Auxiliary tag to find index reads in.
-        default: BC
+        description: Auxiliary tag to find index reads in. [BC]
+        example: "BC"
       - name: --quality_tag
         type: string
-        description: Auxiliary tag to find index quality in.
-        default: QT
+        description: Auxiliary tag to find index quality in. [QT]
+        example: "QT"
       - name: --index_format
         type: string
         description: |
