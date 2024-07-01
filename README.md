@@ -1,15 +1,24 @@
-# Base repository for reusable Viash components
 
 
-This repository is a collection of reproducible and reusable Viash
-components.
+# 🌱📦 biobox
+
+[![ViashHub](https://img.shields.io/badge/ViashHub-biobox-7a4baa.png)](https://web.viash-hub.com/packages/biobox)
+[![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2Fbiobox-blue.png)](https://github.com/viash-hub/biobox)
+[![GitHub
+License](https://img.shields.io/github/license/viash-hub/biobox.png)](https://github.com/viash-hub/biobox/blob/main/LICENSE)
+[![GitHub
+Issues](https://img.shields.io/github/issues/viash-hub/biobox.png)](https://github.com/viash-hub/biobox/issues)
+[![Viash
+version](https://img.shields.io/badge/Viash-v0.9.0--RC6-blue)](https://viash.io)
+
+A collection of bioinformatics tools for working with sequence data.
 
 ## Objectives
 
 - **Reusability**: Facilitating the use of components across various
   projects and contexts.
-- **Reproducibility**: Guaranteeing that bioinformatics analyses can be
-  reliably replicated.
+- **Reproducibility**: Ensuring that components are reproducible and can
+  be easily shared.
 - **Best Practices**: Adhering to established standards in software
   development and bioinformatics.
 
@@ -26,44 +35,38 @@ We encourage contributions from the community. To contribute:
 
 ## Contribution Guidelines
 
-- **Documentation of Functionality**: The purpose and functionality of
-  each component should be adequately described.
-- **Documentation of Inputs and Outputs**: All input and output
-  arguments should have a description and example (with extension).
-- **Docker Image**: A Docker image (with optional additional
-  dependencies) should be provided.
-- **Write unit tests**: A unit test with possibly test resources needs
-  to be provided.
-- **Provide test resources**: If the unit test requires test resources,
-  these should be provided in the `test_resources` section of the
-  component.
-- **Versioning**: If the component uses custom software (not installed
-  via Apt, Apk, Yum, Pip, Conda, or R), a Bash script `version.sh` needs
-  to be provided that outputs the version of the software.
-- **File format specifications**: If a component returns a directory or
-  data structure such as AnnData or MuData, a specification of the file
-  format should be provided.
+The contribution guidelines describes which steps you should follow to
+contribute a component to this repository.
 
-See the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
+1.  Find a component to contribute
+2.  Add config template
+3.  Fill in the metadata
+4.  Find a suitable container
+5.  Create help file
+6.  Create or fetch test data
+7.  Add arguments for the input files
+8.  Add arguments for the output files
+9.  Add arguments for the other arguments
+10. Add a Docker engine
+11. Write a runner script
+12. Create test script
+13. Create a `/var/software_versions.txt` file
 
-## Repository Structure
-
-…
-
-## Installation and Usage
-
-…
+See the
+[CONTRIBUTING](https://github.com/viash-hub/biobox/blob/main/CONTRIBUTING.md)
+file for more details.
 
 ## Support and Community
 
 For support, questions, or to join our community:
 
 - **Issues**: Submit questions or issues via the [GitHub issue
-  tracker](https://github.com/viash-hub/base/issues).
+  tracker](https://github.com/viash-hub/biobox/issues).
 - **Discussions**: Join our discussions via [GitHub
-  Discussions](https://github.com/viash-hub/base/discussions).
+  Discussions](https://github.com/viash-hub/biobox/discussions).
 
 ## License
 
 This repository is licensed under an MIT license. See the
-[LICENSE](LICENSE) file for details.
+[LICENSE](https://github.com/viash-hub/biobox/blob/main/LICENSE) file
+for details.

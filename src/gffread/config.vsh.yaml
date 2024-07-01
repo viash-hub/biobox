@@ -1,5 +1,4 @@
 name: gffread
-namespace: gffread
 description: Validate, filter, convert and perform various other operations on GFF files.
 keywords: [gff, conversion, validation, filtering]
 links:
