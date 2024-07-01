@@ -1,0 +1,113 @@
+'''
+Generated from the following UMI-tools documentation:
+      https://umi-tools.readthedocs.io/en/latest/common_options.html#common-options
+      https://umi-tools.readthedocs.io/en/latest/reference/dedup.html
+'''
+
+
+dedup - Deduplicate reads using UMI and mapping coordinates
+
+Usage: umi_tools dedup [OPTIONS] [--stdin=IN_BAM] [--stdout=OUT_BAM]
+
+       note: If --stdout is ommited, standard out is output. To
+             generate a valid BAM file on standard out, please
+             redirect log with --log=LOGFILE or --log2stderr 
+
+Common UMI-tools Options:
+
+      -S, --stdout                  File where output is to go [default = stdout].
+      -L, --log                     File with logging information [default = stdout].
+      --log2stderr                  Send logging information to stderr [default = False].
+      -v, --verbose                 Log level. The higher, the more output [default = 1].
+      -E, --error                   File with error information [default = stderr].
+      --temp-dir                    Directory for temporary files. If not set, the bash environmental variable TMPDIR is used[default = None].
+      --compresslevel               Level of Gzip compression to use. Default=6 matches GNU gzip rather than python gzip default (which is 9)
+
+      profiling and debugging options:
+      --timeit                      Store timing information in file [default=none].
+      --timeit-name                 Name in timing file for this class of jobs [default=all].
+      --timeit-header               Add header for timing information [default=none].
+      --random-seed                 Random seed to initialize number generator with [default=none].
+
+Dedup Options:
+      --output-stats=<prefix>             One can use the edit distance between UMIs at the same position as an quality control for the 
+                                          deduplication process by comparing with a null expectation of random sampling. For the random
+                                          sampling, the observed frequency of UMIs is used to more reasonably model the null expectation.
+                                          Use this option to generate a stats outfiles called: 
+                                                [PREFIX]_stats_edit_distance.tsv   
+                                                      Reports the (binned) average edit distance between the UMIs at each position.
+                                          In addition, this option will trigger reporting of further summary statistics for the UMIs which
+                                          may be informative for selecting the optimal deduplication method or debugging.
+                                          Each unique UMI sequence may be observed [0-many] times at multiple positions in the BAM. The
+                                          following files report the distribution for the frequencies of each UMI.
+                                                [PREFIX]_stats_per_umi_per_position.tsv
+                                                      Tabulates the counts for unique combinations of UMI and position.
+                                                [PREFIX]_stats_per_umi_per.tsv
+                                                      The _stats_per_umi_per.tsv table provides UMI-level summary statistics. 
+      --extract-umi-method=<method>       How are the barcodes encoded in the read?
+                                          Options are: read_id (default), tag, umis
+      --umi-separator=<separator>         Separator between read id and UMI. See --extract-umi-method above. Default=_
+      --umi-tag=<tag>                     Tag which contains UMI. See --extract-umi-method above
+      --umi-tag-split=<split>             Separate the UMI in tag by SPLIT and take the first element
+      --umi-tag-delimiter=<delimiter>     Separate the UMI in by DELIMITER and concatenate the elements
+      --cell-tag=<tag>                    Tag which contains cell barcode. See --extract-umi-method above
+      --cell-tag-split=<split>            Separate the cell barcode in tag by SPLIT and take the first element
+      --cell-tag-delimiter=<delimiter>    Separate the cell barcode in by DELIMITER and concatenate the elements
+      --method=<method>                   What method to use to identify group of reads with the same (or similar) UMI(s)?
+                                          All methods start by identifying the reads with the same mapping position.
+                                          The simplest methods, unique and percentile, group reads with the exact same UMI.
+                                          The network-based methods, cluster, adjacency and directional, build networks where
+                                          nodes are UMIs and edges connect UMIs with an edit distance <= threshold (usually 1).
+                                          The groups of reads are then defined from the network in a method-specific manner.
+                                          For all the network-based methods, each read group is equivalent to one read count for the gene.
+      --edit-distance-threshold=<threshold>     For the adjacency and cluster methods the threshold for the edit distance to connect
+                                                two UMIs in the network can be increased. The default value of 1 works best unless
+                                                the UMI is very long (>14bp).
+      --spliced-is-unique           Causes two reads that start in the same position on the same strand and having the
+                                    same UMI to be considered unique if one is spliced and the other is not.
+                                    (Uses the 'N' cigar operation to test for splicing).
+      --soft-clip-threshold=<threshold>    Mappers that soft clip will sometimes do so rather than mapping a spliced read if
+                                          there is only a small overhang over the exon junction. By setting this option, you
+                                          can treat reads with at least this many bases soft-clipped at the 3' end as spliced.
+                                          Default=4.
+      --multimapping-detection-method=<method>  If the sam/bam contains tags to identify multimapping reads, you can specify
+                                                for use when selecting the best read at a given loci. Supported tags are "NH",
+                                                "X0" and "XT". If not specified, the read with the highest mapping quality will be selected.
+      --read-length                              Use the read length as a criteria when deduping, for e.g sRNA-Seq.
+      --per-gene                    Reads will be grouped together if they have the same gene. This is useful if your
+                                    library prep generates PCR duplicates with non identical alignment positions such as CEL-Seq.
+                                    Note this option is hardcoded to be on with the count command. I.e counting is always
+                                    performed per-gene. Must be combined with either --gene-tag or --per-contig option.
+      --gene-tag=<tag>              Deduplicate per gene. The gene information is encoded in the bam read tag specified
+      --assigned-status-tag=<tag>   BAM tag which describes whether a read is assigned to a gene. Defaults to the same value
+                                    as given for --gene-tag
+      --skip-tags-regex=<regex>     Use in conjunction with the --assigned-status-tag option to skip any reads where the
+                                    tag matches this regex. Default ("^[__|Unassigned]") matches anything which starts with "__"
+                                    or "Unassigned":
+      --per-contig                  Deduplicate per contig (field 3 in BAM; RNAME). All reads with the same contig will be
+                                    considered to have the same alignment position. This is useful if you have aligned to a
+                                    reference transcriptome with one transcript per gene. If you have aligned to a transcriptome
+                                    with more than one transcript per gene, you can supply a map between transcripts and gene
+                                    using the --gene-transcript-map option
+      --gene-transcript-map=<file>  File mapping genes to transcripts (tab separated)
+      --per-cell                    Reads will only be grouped together if they have the same cell barcode. Can be combined with --per-gene.
+      --mapping-quality=<quality>   Minimium mapping quality (MAPQ) for a read to be retained. Default is 0.
+      --unmapped-reads=<option>     How should unmapped reads be handled.
+      --chimeric-pairs=<option>     How should chimeric read pairs be handled.
+      --unpaired-reads=<option>     How should unpaired reads be handled.
+      --ignore-umi                  Ignore the UMI and group reads using mapping coordinates only
+      --subset=<fraction>           Only consider a fraction of the reads, chosen at random. This is useful for doing saturation analyses.
+      --chrom=<chromosome>          Only consider a single chromosome. This is useful for debugging/testing purposes
+      --in-sam                      Input is in SAM format
+      --out-sam                     Output is in SAM format
+      --paired                      BAM is paired end - output both read pairs. This will also force the use of the template
+                                    length to determine reads with the same mapping coordinates.
+      --no-sort-output              By default, output is sorted. This involves the use of a temporary unsorted file since
+                                    reads are considered in the order of their start position which may not be the same as
+                                    their alignment coordinate due to soft-clipping and reverse alignments. The temp file
+                                    will be saved (in --temp-dir) and deleted when it has been sorted to the outfile. Use
+                                    this option to turn off sorting.
+      --buffer-whole-contig         Forces dedup to parse an entire contig before yielding any reads for deduplication.
+                                    This is the only way to absolutely guarantee that all reads with the same start position
+                                    are grouped together for deduplication since dedup uses the start position of the read,
+                                    not the alignment coordinate on which the reads are
