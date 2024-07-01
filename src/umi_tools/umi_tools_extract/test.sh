@@ -19,7 +19,6 @@ echo ">>> Test 1: Testing for paired-end reads"
     --umi_discard_read 0 \
     --read1_out scrb_seq_fastq.1.umi_extract.fastq.gz \
     --read2_out scrb_seq_fastq.2.umi_extract.fastq.gz \
-    --log log.out \
     --random_seed 1
 
 echo ">> Checking if the correct files are present"
@@ -50,7 +49,6 @@ echo ">>> Test 2: Testing for paired-end reads with umi_discard_reads option"
     --umitools_grouping_method directional \
     --umi_discard_read 2 \
     --read1_out scrb_seq_fastq.1.umi_extract.fastq.gz \
-    --log log.out \
     --random_seed 1
 
 echo ">> Checking if the correct files are present"
@@ -74,7 +72,6 @@ echo ">>> Test 3: Testing for single-end reads"
     --umitools_umi_separator '_' \
     --umitools_grouping_method directional \
     --read1_out slim.umi_extract.fastq.gz \
-    --log log.out \
     --random_seed 1 
 
 echo ">> Checking if the correct files are present"

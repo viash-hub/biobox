@@ -16,16 +16,17 @@ test_dir="${metal_executable}/test_data"
 [[ "$par_log2stderr" == "false" ]] && unset par_log2stderr
 
 
+# Check if we have the correct number of input files and patterns for paired-end or single-end reads
+
+# For paired-end rends, check that we have two read files, two patterns
 if [ -n "$par_paired" ]; then
-    # For paired-end rendscheck that we have two read files, two patterns
     if [ -z "$par_input" ] || [ -z "$par_read2_in" ] ||
        [ -z "$par_bc_pattern" ] || [ -z "$par_bc_pattern2" ]; 
         then
         echo "Paired end input requires two read files, two UMI patterns, and two output files"
         exit 1
     fi
-else 
-    # For single-end reads, check that we have only one read file, one pattern
+else # For single-end reads, check that we have only one read file, one pattern
     if [ -n "$par_read2_in" ] || [ -n "$par_bc_pattern2" ]; then
         echo "Single end input requires one read file and one UMI pattern"
         exit 1
@@ -34,6 +35,7 @@ else
         exit 1
     fi
 fi
+
 
 umi_tools extract \
     -I "$par_input" \

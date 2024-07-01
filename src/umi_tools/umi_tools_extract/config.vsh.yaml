@@ -32,7 +32,7 @@ argument_groups:
       description: |
         Whitelist of accepted cell barcodes tab-separated format, where column 1 is the whitelisted
         cell barcodes and column 2 is the list (comma-separated) of other cell barcodes which should 
-        be corrected to the barcode in column 1. If the --error-correct-cell option is not used, this
+        be corrected to the barcode in column 1. If the --error_correct_cell option is not used, this
         column will be ignored.
     - name: --blacklist
       type: file
@@ -71,9 +71,9 @@ argument_groups:
     - name: --ignore_read_pair_suffixes
       type: boolean_true
       description: |
-        Ignore SOH and STX read name suffixes. Note that this options is required if the suffixes are not whitespace
+        Ignore "/1" and "/2" read name suffixes. Note that this options is required if the suffixes are not whitespace
         separated from the rest of the read name
-        
+
   - name: Input
     arguments: 
     - name: --paired
