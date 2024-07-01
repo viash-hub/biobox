@@ -20,10 +20,10 @@ argument_groups:
     arguments:
     - name: --umitools_extract_method
       alternatives: --extract_method
-      type: "string"
-      description: UMI pattern to use.
-      default: string
-      choices: [ string, regex ]
+      type: string
+      choices: [string, regex]
+      description: UMI pattern to use. [string]
+      example: "string"
     - name: --error_correct_cell
       type: boolean_true
       description: Error correct cell barcodes to the whitelist.
@@ -50,11 +50,12 @@ argument_groups:
         If a UMI base has a quality below this threshold, replace the base with 'N'
     - name: --quality_encoding
       type: string
+      choices: [phred33, phred64, solexa]
       description: |
         Quality score encoding. Choose from:
-        - phred33 [33-77]
-        - phred64 [64-106]
-        - solexa [59-106]
+          * phred33 [33-77]
+          * phred64 [64-106]
+          * solexa [59-106]
     - name: --reconcile_pairs
       type: boolean_true
       description: |
@@ -78,11 +79,11 @@ argument_groups:
     arguments: 
     - name: --paired
       type: boolean_true
-      description: Paired fastq files or not? If option is set, two input files are expected.
+      description: Paired fastq files. If option is set, two input files are expected.
     - name: --input
       type: file
       required: true
-      description: Input fastq files, either one or two (paired)
+      description: Input fastq files, either one or two (paired).
       example: sample.fastq
     - name: --read2_in
       type: file
@@ -98,15 +99,14 @@ argument_groups:
     
   - name: "Output"
     arguments:  
-    - name: "--read1_out"
+    - name: --read1_out
       type: file
       required: true
       description: Output file for read 1.
       direction: output
-    - name: "--read2_out"
+    - name: --read2_out
       type: file
       description: Output file for read 2.
-      must_exist: false
       direction: output
     - name: --filtered_out
       type: file
@@ -124,17 +124,21 @@ argument_groups:
       alternatives: --umi_separator
       type: string
       default: "_"
-      description: The character that separates the UMI in the read name. Most likely a colon if you skipped the extraction with UMI-tools and used other software.
+      description: |
+        The character that separates the UMI in the read name. Most likely a colon if you skipped the extraction with
+        UMI-tools and used other software.
     - name: --umitools_grouping_method
       type: string
-      description: Method to use to determine read groups by subsuming those with similar UMIs. All methods start by identifying the reads with the same mapping position, but treat similar yet nonidentical UMIs differently.
-      default: "directional"
-      choices: ["unique", "percentile", "cluster", "adjacency", "directional"]
+      choices: [unique, percentile, cluster, adjacency, directional]
+      description: |
+        Method to use to determine read groups by subsuming those with similar UMIs. All methods start by identifying
+        the reads with the same mapping position, but treat similar yet nonidentical UMIs differently. [directional]
+      example: "directional"
     - name: --umi_discard_read
       type: integer
-      description: After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively.
       choices: [0, 1, 2]
-      default: 0
+      description: After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively. [0]
+      example: 0
 
   - name: Common Options
     arguments:
@@ -160,8 +164,8 @@ argument_groups:
     - name: --compresslevel
       type: integer
       description: |
-        Level of Gzip compression to use. Default=6 matches GNU gzip rather than python gzip default (which is 9)
-      default: 6
+        Level of Gzip compression to use. Default=6 matches GNU gzip rather than python gzip default (which is 9). [6]
+      example: 6
     - name: --timeit
       type: file
       description: Store timing information in file.
