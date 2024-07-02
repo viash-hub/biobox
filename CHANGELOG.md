@@ -4,6 +4,14 @@
 
 * `pear`: fix component not exiting with the correct exitcode when PEAR fails.
 
+* `cutadapt`: fix `--par_quality_cutoff_r2` argument.
+
+* `cutadapt`: demultiplexing is now disabled by default. It can be re-enabled by using `demultiplex_mode`.
+
+## MINOR CHANGES
+
+* `busco` components: update BUSCO to `5.7.1`.
+
 # biobox 0.1.0
 
 ## BREAKING CHANGES
@@ -11,6 +19,7 @@
 * Change default `multiple_sep` to `;` (PR #25). This aligns with an upcoming breaking change in
   Viash 0.9.0 in order to avoid issues with the current default separator `:` unintentionally
   splitting up certain file paths.
+
 
 ## NEW FEATURES
 
