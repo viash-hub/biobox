@@ -1,5 +1,10 @@
 # biobox x.x.x
 
+## NEW FEATURES
+
+* `bd_rhapsody`:
+  - `bd_rhapsody/bd_rhapsody_make_reference`: Create a reference for the BD Rhapsody pipeline (PR #xx).
+
 ## BUG FIXES
 
 * `pear`: fix component not exiting with the correct exitcode when PEAR fails.
