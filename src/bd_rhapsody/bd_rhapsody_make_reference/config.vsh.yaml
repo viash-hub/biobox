@@ -9,6 +9,13 @@ description: |
   
   - STAR index
   - Filtered GTF file
+keywords: [genome, reference, index, align]
+links:
+  repository: https://bitbucket.org/CRSwDev/cwl/src/master/v2.2.1/Extra_Utilities/
+  documentation: https://bd-rhapsody-bioinfo-docs.genomics.bd.com/resources/extra_utilities.html#make-rhapsody-reference
+license: Unknown
+requirements:
+  commands: [ "cwl-runner" ]
 argument_groups:
   - name: Inputs
     arguments:
@@ -101,14 +108,17 @@ argument_groups:
         example: --limitGenomeGenerateRAM 48000 --genomeSAindexNbases 11
         info:
           config_key: Extra_STAR_params
+
 resources:
   - type: python_script
     path: script.py
   - path: make_rhap_reference_2.2.1_nodocker.cwl
+
 test_resources:
   - type: bash_script
     path: test.sh
   - path: test_data
+
 engines:
   - type: docker
     image: bdgenomics/rhapsody:2.2.1
@@ -117,6 +127,10 @@ engines:
         packages: [procps]
       - type: python
         packages: [cwlref-runner, cwl-runner]
+      - type: docker
+        run: |
+          echo "bdgenomics/rhapsody: 2.2.1" > /var/software_versions.txt
+
 runners:
   - type: executable
   - type: nextflow
