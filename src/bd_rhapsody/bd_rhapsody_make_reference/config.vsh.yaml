@@ -2,7 +2,7 @@ name: bd_rhapsody_make_reference
 namespace: bd_rhapsody
 description: |
   The Reference Files Generator creates an archive containing Genome Index
-  and Transcriptome annotation files needed for the BD Rhapsody™ Sequencing
+  and Transcriptome annotation files needed for the BD Rhapsody Sequencing
   Analysis Pipeline. The app takes as input one or more FASTA and GTF files
   and produces a compressed archive in the form of a tar.gz file. The 
   archive contains:
