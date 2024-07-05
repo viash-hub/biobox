@@ -1,4 +1,7 @@
 #!/bin/bash
+## VIASH START
+## VIASH END
+
 
 set -eo pipefail 
 
@@ -30,3 +33,5 @@ mv "$par_id"_intercept_slope.txt $par_output_intercept_slope
 dupradar_ver=$(Rscript -e "library(dupRadar); cat(as.character(packageVersion('dupRadar')))")
 text="bioconductor-dupradar: ${dupradar_ver}"
 echo "$text"
+
+exit 0
