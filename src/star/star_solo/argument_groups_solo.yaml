@@ -11,7 +11,6 @@ argument_groups:
       - CB_samTagOut    ... output Cell Barcode as CR and/or CB SAm tag. No UMI counting. --readFilesIn cDNA_read1 [cDNA_read2 if paired-end] CellBarcode_read . Requires --outSAMtype BAM Unsorted [and/or SortedByCoordinate]
       - SmartSeq        ... Smart-seq: each cell in a separate FASTQ (paired- or single-end), barcodes are corresponding read-groups, no UMI sequences, alignments deduplicated according to alignment start and end (after extending soft-clipped bases)
     multiple: true
-    multiple_sep: ;
   - name: --solo_cb_type
     type: string
     description: |-
@@ -27,7 +26,6 @@ argument_groups:
 
       - None            ... no whitelist: all cell barcodes are allowed
     multiple: true
-    multiple_sep: ;
   - name: --solo_cb_start
     type: integer
     description: cell barcode start base
@@ -74,7 +72,6 @@ argument_groups:
       Example: inDrop (Zilionis et al, Nat. Protocols, 2017):
       --solo_cb_position  0_0_2_-1  3_1_3_8
     multiple: true
-    multiple_sep: ;
   - name: --solo_umi_position
     type: string
     description: |-
@@ -111,7 +108,6 @@ argument_groups:
       For instance, for 10X CellRanger or STARsolo BAMs, use --solo_input_sam_attr_barcode_seq CR UR .
       This parameter is required when running STARsolo with input from SAM.
     multiple: true
-    multiple_sep: ;
   - name: --solo_input_sam_attr_barcode_qual
     type: string
     description: |-
@@ -120,7 +116,6 @@ argument_groups:
       For instance, for 10X CellRanger or STARsolo BAMs, use --solo_input_sam_attr_barcode_qual CY UY .
       If this parameter is '-' (default), the quality 'H' will be assigned to all bases.
     multiple: true
-    multiple_sep: ;
   - name: --solo_strand
     type: string
     description: |-
@@ -142,7 +137,6 @@ argument_groups:
       - GeneFull_Ex50pAS        ... full gene (pre-RNA): count all reads overlapping genes' exons and introns: prioritize >50% overlap with exons. Do not count reads with 100% exonic overlap in the antisense direction.
     example: Gene
     multiple: true
-    multiple_sep: ;
   - name: --solo_multi_mappers
     type: string
     description: |-
@@ -155,7 +149,6 @@ argument_groups:
       - EM         ... multi-gene UMIs are distributed using Expectation Maximization algorithm
     example: Unique
     multiple: true
-    multiple_sep: ;
   - name: --solo_umi_dedup
     type: string
     description: |-
@@ -169,7 +162,6 @@ argument_groups:
       - 1MM_CR                      ... CellRanger2-4 algorithm for 1MM UMI collapsing.
     example: 1MM_All
     multiple: true
-    multiple_sep: ;
   - name: --solo_umi_filtering
     type: string
     description: |-
@@ -181,7 +173,6 @@ argument_groups:
       - MultiGeneUMI_CR    ... basic + remove lower-count UMIs that map to more than one gene, matching CellRanger > 3.0.0 .
       Only works with --solo_umi_dedup 1MM_CR
     multiple: true
-    multiple_sep: ;
   - name: --solo_out_file_names
     type: string
     description: |-
@@ -194,7 +185,6 @@ argument_groups:
     - barcodes.tsv
     - matrix.mtx
     multiple: true
-    multiple_sep: ;
   - name: --solo_cell_filter
     type: string
     description: |-
@@ -214,14 +204,12 @@ argument_groups:
     - '0.99'
     - '10'
     multiple: true
-    multiple_sep: ;
   - name: --solo_out_format_features_gene_field3
     type: string
     description: field 3 in the Gene features.tsv file. If "-", then no 3rd field
       is output.
     example: Gene Expression
     multiple: true
-    multiple_sep: ;
   - name: --solo_cell_read_stats
     type: string
     description: |-

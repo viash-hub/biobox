@@ -198,7 +198,6 @@ argument_groups <- map(unique(out3$group_name), function(group_name) {
       }
       if (!is.na(multiple) && multiple) {
         li$multiple <- multiple
-        li$multiple_sep <- ";"
       }
       if (!is.na(required) && required) {
         li$required <- required

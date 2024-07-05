@@ -39,7 +39,6 @@ argument_groups:
     info:
       orig_name: --genomeFastaFiles
     multiple: true
-    multiple_sep: ;
   - name: --genome_file_sizes
     type: integer
     description: genome files exact sizes in bytes. Typically, this should not be
@@ -48,7 +47,6 @@ argument_groups:
       orig_name: --genomeFileSizes
     example: 0
     multiple: true
-    multiple_sep: ;
   - name: --genome_transform_output
     type: string
     description: |-
@@ -61,7 +59,6 @@ argument_groups:
     info:
       orig_name: --genomeTransformOutput
     multiple: true
-    multiple_sep: ;
   - name: --genome_chr_set_mitochondrial
     type: string
     description: names of the mitochondrial chromosomes. Presently only used for STARsolo
@@ -73,7 +70,6 @@ argument_groups:
     - M
     - MT
     multiple: true
-    multiple_sep: ;
 - name: Splice Junctions Database
   arguments:
   - name: --sjdb_file_chr_start_end
@@ -84,7 +80,6 @@ argument_groups:
     info:
       orig_name: --sjdbFileChrStartEnd
     multiple: true
-    multiple_sep: ;
   - name: --sjdb_gtf_file
     type: file
     description: path to the GTF file with annotations
@@ -123,7 +118,6 @@ argument_groups:
       orig_name: --sjdbGTFtagExonParentGeneName
     example: gene_name
     multiple: true
-    multiple_sep: ;
   - name: --sjdb_gtf_tag_exon_parent_gene_type
     type: string
     description: GTF attribute name for parent gene type
@@ -133,7 +127,6 @@ argument_groups:
     - gene_type
     - gene_biotype
     multiple: true
-    multiple_sep: ;
   - name: --sjdb_overhang
     type: integer
     description: length of the donor/acceptor sequence on each side of the junctions,
@@ -189,7 +182,6 @@ argument_groups:
       orig_name: --readFilesSAMattrKeep
     example: All
     multiple: true
-    multiple_sep: ;
   - name: --read_files_manifest
     type: file
     description: |-
@@ -217,7 +209,6 @@ argument_groups:
     info:
       orig_name: --readFilesCommand
     multiple: true
-    multiple_sep: ;
   - name: --read_map_number
     type: integer
     description: |-
@@ -242,7 +233,6 @@ argument_groups:
       orig_name: --readNameSeparator
     example: /
     multiple: true
-    multiple_sep: ;
   - name: --read_quality_score_base
     type: integer
     description: number to be subtracted from the ASCII code to get Phred quality
@@ -271,7 +261,6 @@ argument_groups:
       orig_name: --clip3pNbases
     example: 0
     multiple: true
-    multiple_sep: ;
   - name: --clip3p_adapter_seq
     type: string
     description: |-
@@ -281,7 +270,6 @@ argument_groups:
     info:
       orig_name: --clip3pAdapterSeq
     multiple: true
-    multiple_sep: ;
   - name: --clip3p_adapter_mm_p
     type: double
     description: max proportion of mismatches for 3p adapter clipping for each mate.  If
@@ -290,7 +278,6 @@ argument_groups:
       orig_name: --clip3pAdapterMMp
     example: 0.1
     multiple: true
-    multiple_sep: ;
   - name: --clip3p_after_adapter_nbases
     type: integer
     description: number of bases to clip from 3p of each mate after the adapter clipping.
@@ -299,7 +286,6 @@ argument_groups:
       orig_name: --clip3pAfterAdapterNbases
     example: 0
     multiple: true
-    multiple_sep: ;
   - name: --clip5p_nbases
     type: integer
     description: number(s) of bases to clip from 5p of each mate. If one value is
@@ -308,7 +294,6 @@ argument_groups:
       orig_name: --clip5pNbases
     example: 0
     multiple: true
-    multiple_sep: ;
 - name: Limits
   arguments:
   - name: --limit_genome_generate_ram
@@ -326,7 +311,6 @@ argument_groups:
     - 30000000
     - 50000000
     multiple: true
-    multiple_sep: ;
   - name: --limit_out_sam_one_read_bytes
     type: long
     description: 'max size of the SAM record (bytes) for one read. Recommended value:
@@ -436,7 +420,6 @@ argument_groups:
       orig_name: --outSAMtype
     example: SAM
     multiple: true
-    multiple_sep: ;
   - name: --out_sam_mode
     type: string
     description: |-
@@ -500,7 +483,6 @@ argument_groups:
       orig_name: --outSAMattributes
     example: Standard
     multiple: true
-    multiple_sep: ;
   - name: --out_sam_attr_ih_start
     type: integer
     description: start value for the IH attribute. 0 may be required by some downstream
@@ -521,7 +503,6 @@ argument_groups:
     info:
       orig_name: --outSAMunmapped
     multiple: true
-    multiple_sep: ;
   - name: --out_sam_order
     type: string
     description: |-
@@ -586,21 +567,18 @@ argument_groups:
     info:
       orig_name: --outSAMattrRGline
     multiple: true
-    multiple_sep: ;
   - name: --out_sam_header_hd
     type: string
     description: '@HD (header) line of the SAM header'
     info:
       orig_name: --outSAMheaderHD
     multiple: true
-    multiple_sep: ;
   - name: --out_sam_header_pg
     type: string
     description: extra @PG (software) line of the SAM header (in addition to STAR)
     info:
       orig_name: --outSAMheaderPG
     multiple: true
-    multiple_sep: ;
   - name: --out_sam_header_comment_file
     type: string
     description: path to the file with @CO (comment) lines of the SAM header
@@ -616,7 +594,6 @@ argument_groups:
     info:
       orig_name: --outSAMfilter
     multiple: true
-    multiple_sep: ;
   - name: --out_sam_mult_nmax
     type: integer
     description: |-
@@ -691,7 +668,6 @@ argument_groups:
     info:
       orig_name: --outWigType
     multiple: true
-    multiple_sep: ;
   - name: --out_wig_strand
     type: string
     description: |-
@@ -852,7 +828,6 @@ argument_groups:
     - 12
     - 12
     multiple: true
-    multiple_sep: ;
   - name: --out_sj_filter_count_unique_min
     type: integer
     description: |-
@@ -868,7 +843,6 @@ argument_groups:
     - 1
     - 1
     multiple: true
-    multiple_sep: ;
   - name: --out_sj_filter_count_total_min
     type: integer
     description: |-
@@ -884,7 +858,6 @@ argument_groups:
     - 1
     - 1
     multiple: true
-    multiple_sep: ;
   - name: --out_sj_filter_dist_to_other_sj_min
     type: integer
     description: |-
@@ -899,7 +872,6 @@ argument_groups:
     - 5
     - 10
     multiple: true
-    multiple_sep: ;
   - name: --out_sj_filter_intron_max_vs_read_n
     type: integer
     description: |-
@@ -914,7 +886,6 @@ argument_groups:
     - 100000
     - 200000
     multiple: true
-    multiple_sep: ;
 - name: Scoring
   arguments:
   - name: --score_gap
@@ -1080,7 +1051,6 @@ argument_groups:
     - 0
     - 0
     multiple: true
-    multiple_sep: ;
   - name: --align_sjdb_overhang_min
     type: integer
     description: minimum overhang (i.e. block size) for annotated (sjdb) spliced alignments
@@ -1235,7 +1205,6 @@ argument_groups:
       orig_name: --chimOutType
     example: Junctions
     multiple: true
-    multiple_sep: ;
   - name: --chim_segment_min
     type: integer
     description: minimum length of chimeric segment length, if ==0, no chimeric output
@@ -1291,7 +1260,6 @@ argument_groups:
       orig_name: --chimFilter
     example: banGenomicN
     multiple: true
-    multiple_sep: ;
   - name: --chim_main_segment_mult_nmax
     type: integer
     description: maximum number of multi-alignments for the main chimeric segment.
@@ -1346,7 +1314,6 @@ argument_groups:
     info:
       orig_name: --quantMode
     multiple: true
-    multiple_sep: ;
   - name: --quant_transcriptome_bam_compression
     type: integer
     description: |-

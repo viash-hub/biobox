@@ -21,7 +21,6 @@ argument_groups:
       Path(s) to the fasta files with the genome sequences, separated by spaces. These files should be plain text FASTA files, they *cannot* be zipped.
     required: true
     multiple: true
-    multiple_sep: ;  
   - name: "--sjdb_gtf_file"
     type: file
     description: Path to the GTF file with annotations
@@ -49,7 +48,6 @@ argument_groups:
     description: GTF attribute name for parent gene name
     example: gene_name
     multiple: true
-    multiple_sep: ;
   - name: --sjdb_gtf_tag_exon_parent_gene_type
     type: string
     description: GTF attribute name for parent gene type
@@ -57,7 +55,6 @@ argument_groups:
     - gene_type
     - gene_biotype
     multiple: true
-    multiple_sep: ;
   - name: --limit_genome_generate_ram
     type: long
     description: Maximum available RAM (bytes) for genome generation
