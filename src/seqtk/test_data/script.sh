@@ -4,6 +4,6 @@ if [ ! -d /tmp/snakemake-wrappers ]; then
 fi
 
 # copy test data
-cp -r /tmp/snakemake-wrappers/bio/seqtk/test/* src/seqtk/seqtk_sample/test_data
+cp -r /tmp/snakemake-wrappers/bio/seqtk/test/* src/seqtk/test_data
 
-rm src/seqtk/seqtk_sample/test_data/Snakefile
+rm src/seqtk/test_data/Snakefile

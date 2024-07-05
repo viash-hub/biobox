@@ -4,7 +4,7 @@
 ## VIASH END
 
 seqtk sample \
-    ${par_2_pass_mode:+-2} \
+    ${par_two_pass_mode:+-2} \
     ${par_seed:+-s "$par_seed"} \
     "$par_input" \
     "$par_fraction_number" \

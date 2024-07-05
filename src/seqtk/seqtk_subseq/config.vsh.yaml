@@ -1,6 +1,6 @@
-name: seqtk_sample
+name: seqtk_subseq
 namespace: seqtk
-description: Subsamples sequences from FASTA/Q files.
+description: 
 keywords: [tag1, tag2]
 links:
   repository: https://github.com/lh3/seqtk/tree/v1.4
@@ -13,6 +13,12 @@ argument_groups:
         type: file
         description: The input FASTA/Q file.
         required: true
+      - name: "--regions_file"
+        type: file
+        description: |
+          File with regions to extract. Can be either a list file 
+          with one sequence name per line or a bed file.
+        required: true
 
   - name: Outputs
     arguments:
@@ -24,18 +30,18 @@ argument_groups:
 
   - name: Options
     arguments:
-      - name: --seed
-        type: integer
-        description: Seed for random generator.
-        default: 42
-      - name: --fraction_number
-        type: double
-        description: Fraction or number of sequences to sample.
-        default: 0.1
-      - name: --two_pass_mode
+      - name: "--tab"
         type: boolean
-        description: twice as slow but with much reduced memory
+        description: Output in tab-delimited format.
         default: false
+      - name: "--strand_aware"
+        type: boolean
+        description: Strand-aware mode.
+        default: false
+      - name: "--line_length"
+        type: integer
+        description: Number of bases per line.
+        default: 60
 
 resources:
   - type: bash_script
