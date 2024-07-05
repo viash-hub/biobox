@@ -66,6 +66,8 @@
     - `samtools/samtools_collate`: Shuffles and groups reads in SAM/BAM/CRAM files together by their names (PR #42).
     - `samtools/samtools_view`: Views and converts SAM/BAM/CRAM files (PR #48).
     - `samtools/samtools_fastq`: Converts a SAM/BAM/CRAM file to FASTQ (PR #52).
+    - `samtools/samtools_fastq`: Converts a SAM/BAM/CRAM file to FASTA (PR #53).
+
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
