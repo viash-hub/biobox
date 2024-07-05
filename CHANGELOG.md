@@ -1,10 +1,25 @@
-# base unreleased
+# biobox x.x.x
+
+## BUG FIXES
+
+* `pear`: fix component not exiting with the correct exitcode when PEAR fails.
+
+* `cutadapt`: fix `--par_quality_cutoff_r2` argument.
+
+* `cutadapt`: demultiplexing is now disabled by default. It can be re-enabled by using `demultiplex_mode`.
+
+## MINOR CHANGES
+
+* `busco` components: update BUSCO to `5.7.1`.
+
+# biobox 0.1.0
 
 ## BREAKING CHANGES
 
 * Change default `multiple_sep` to `;` (PR #25). This aligns with an upcoming breaking change in
   Viash 0.9.0 in order to avoid issues with the current default separator `:` unintentionally
   splitting up certain file paths.
+
 
 ## NEW FEATURES
 
@@ -16,6 +31,8 @@
     - `busco/busco_run`: Assess genome assembly and annotation completeness with single copy orthologs (PR #6).
     - `busco/busco_list_datasets`: Lists available busco datasets (PR #18).
     - `busco/busco_download_datasets`: Download busco datasets (PR #19).
+
+* `cutadapt`: Remove adapter sequences from high-throughput sequencing reads (PR #7).
 
 * `featurecounts`: Assign sequence reads to genomic features (PR #11).
 
@@ -29,7 +46,9 @@
 
 * `multiqc`: Aggregate results from bioinformatics analyses across many samples into a single report (PR #42).
 
-* `star/star_align_reads`: Align reads to a reference genome (PR #22).
+* `star`:
+    - `star/star_align_reads`: Align reads to a reference genome (PR #22).
+    - `star/star_genome_generate`: Generate a genome index for STAR alignment (PR #58).
 
 * `gffread`: Validate, filter, convert and perform other operations on GFF files (PR #29).  
 
@@ -50,8 +69,9 @@
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
-
-## MAJOR CHANGES
+* `bedtools`:
+    - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
+                           intervals defined in a BED/GFF/VCF file (PR #59).
 
 ## MINOR CHANGES
 
@@ -61,7 +81,13 @@
 
 * Update to Viash 0.9.0-RC3 (PR #51).
 
+* Update to Viash 0.9.0-RC6 (PR #63).
+
+* Switch to viash-hub/toolbox actions (PR #64).
+
 ## DOCUMENTATION
+
+* Update README (PR #64).
 
 ## BUG FIXES
 

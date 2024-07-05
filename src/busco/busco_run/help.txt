@@ -2,7 +2,9 @@
 busco -h
 ```
 
-Welcome to BUSCO 5.6.1: the Benchmarking Universal Single-Copy Ortholog assessment tool.
+usage: busco -i [SEQUENCE_FILE] -l [LINEAGE] -o [OUTPUT_NAME] -m [MODE] [OTHER OPTIONS]
+
+Welcome to BUSCO 5.7.1: the Benchmarking Universal Single-Copy Ortholog assessment tool.
 For more detailed usage information, please review the README file provided with this distribution and the BUSCO user guide. Visit this page https://gitlab.com/ezlab/busco#how-to-cite-busco to see how to cite BUSCO
 
 optional arguments:
@@ -18,7 +20,7 @@ optional arguments:
   -l LINEAGE, --lineage_dataset LINEAGE
                         Specify the name of the BUSCO lineage to be used.
   --augustus            Use augustus gene predictor for eukaryote runs
-  --augustus_parameters --PARAM1=VALUE1,--PARAM2=VALUE2
+  --augustus_parameters "--PARAM1=VALUE1,--PARAM2=VALUE2"
                         Pass additional arguments to Augustus. All arguments should be contained within a single string with no white space, with each argument separated by a comma.
   --augustus_species AUGUSTUS_SPECIES
                         Specify a species for Augustus training.
@@ -42,11 +44,12 @@ optional arguments:
   --limit N             How many candidate regions (contig or transcript) to consider per BUSCO (default: 3)
   --list-datasets       Print the list of available BUSCO datasets
   --long                Optimization Augustus self-training mode (Default: Off); adds considerably to the run time, but can improve results for some non-model organisms
+  --metaeuk             Use Metaeuk gene predictor
   --metaeuk_parameters "--PARAM1=VALUE1,--PARAM2=VALUE2"
                         Pass additional arguments to Metaeuk for the first run. All arguments should be contained within a single string with no white space, with each argument separated by a comma.
   --metaeuk_rerun_parameters "--PARAM1=VALUE1,--PARAM2=VALUE2"
                         Pass additional arguments to Metaeuk for the second run. All arguments should be contained within a single string with no white space, with each argument separated by a comma.
-  --miniprot            Use miniprot gene predictor
+  --miniprot            Use Miniprot gene predictor
   --skip_bbtools        Skip BBTools for assembly statistics
   --offline             To indicate that BUSCO cannot attempt to download files
   --opt-out-run-stats   Opt out of data collection. Information on the data collected is available in the user guide.

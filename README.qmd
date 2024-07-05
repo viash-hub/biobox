@@ -1,14 +1,25 @@
 ---
-title: Base repository for reusable Viash components
 format: gfm
 ---
+```{r setup, include=FALSE}
+project <- yaml::read_yaml("_viash.yaml")
+license <- paste0(project$links$repository, "/blob/main/LICENSE")
+contributing <- paste0(project$links$repository, "/blob/main/CONTRIBUTING.md")
+```
+# 🌱📦 `r project$name`
 
-This repository is a collection of reproducible and reusable Viash components.
+[![ViashHub](https://img.shields.io/badge/ViashHub-`r project$name`-7a4baa)](https://web.viash-hub.com/packages/`r project$name`) 
+[![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2F`r project$name`-blue)](`r project$links$repository`) 
+[![GitHub License](https://img.shields.io/github/license/viash-hub/`r project$name`)](`r license`) 
+[![GitHub Issues](https://img.shields.io/github/issues/viash-hub/`r project$name`)](`r project$links$issue_tracker`) 
+[![Viash version](https://img.shields.io/badge/Viash-v`r gsub("-", "--", project$viash_version)`-blue)](https://viash.io)
+
+`r project$description`
 
 ## Objectives
 
 - **Reusability**: Facilitating the use of components across various projects and contexts.
-- **Reproducibility**: Guaranteeing that bioinformatics analyses can be reliably replicated.
+- **Reproducibility**: Ensuring that components are reproducible and can be easily shared.
 - **Best Practices**: Adhering to established standards in software development and bioinformatics.
 
 ## Contributing
@@ -37,15 +48,15 @@ knitr::asis_output(
 )
 ```
 
-See the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
+See the [CONTRIBUTING](`r contributing`) file for more details.
 
 
 ## Support and Community
 
 For support, questions, or to join our community:
 
-- **Issues**: Submit questions or issues via the [GitHub issue tracker](https://github.com/viash-hub/base/issues).
-- **Discussions**: Join our discussions via [GitHub Discussions](https://github.com/viash-hub/base/discussions).
+- **Issues**: Submit questions or issues via the [GitHub issue tracker](`r project$links$issue_tracker`).
+- **Discussions**: Join our discussions via [GitHub Discussions](`r project$links$repository`/discussions).
 
 ## License
-This repository is licensed under an MIT license. See the [LICENSE](LICENSE) file for details.
+This repository is licensed under an MIT license. See the [LICENSE](`r license`) file for details.
