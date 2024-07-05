@@ -71,6 +71,9 @@
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
+* `umitools`:
+    - `umitools_dedup`: Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read (PR #54).
+
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
