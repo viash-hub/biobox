@@ -35,6 +35,7 @@ argument_groups:
         description: Input GFF/GTF file that will be read
         type: file
         required: true
+        direction: input
         example: input.gff
   - name: Outputs
     arguments:       
@@ -42,7 +43,8 @@ argument_groups:
         alternatives: [-o, --out, --outfile, --gtf]
         description: Output GTF file. If no output file is specified, the output will be written to STDOUT.
         type: file
-        required: false
+        direction: output
+        required: true
         example: output.gtf
   - name: Arguments
     arguments:
@@ -59,7 +61,6 @@ argument_groups:
           Input agat config file. By default AGAT takes as input agat_config.yaml file from the working directory if any, otherwise it takes the orignal agat_config.yaml shipped with AGAT. To get the agat_config.yaml locally type: "agat config --expose". The --config option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
         type: file
         required: false
-        default: agat_config.yaml
         example: custom_agat_config.yaml
 resources:
   - type: bash_script
