@@ -113,6 +113,8 @@ engines:
             rm -rf /tmp/STAR-${STAR_VERSION} /tmp/${STAR_VERSION}.zip && \
             apt-get --purge autoremove -y ${PACKAGES} && \
             apt-get clean
+      - type: python
+        packages: [ pyyaml ]
       - type: docker
         run: |
           STAR --version | sed 's#\(.*\)#star: "\1"#' > /var/software_versions.txt

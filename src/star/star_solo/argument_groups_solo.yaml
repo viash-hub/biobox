@@ -1,7 +1,7 @@
 argument_groups:
 - name: STARsolo (single cell RNA-seq) parameters
   arguments:
-  - name: --soloType
+  - name: --solo_type
     type: string
     description: |-
       type of single-cell RNA-seq
@@ -10,9 +10,9 @@ argument_groups:
       - CB_UMI_Complex  ... multiple Cell Barcodes of varying length, one UMI of fixed length and one adapter sequence of fixed length are allowed in read2 only (e.g. inDrop, ddSeq).
       - CB_samTagOut    ... output Cell Barcode as CR and/or CB SAm tag. No UMI counting. --readFilesIn cDNA_read1 [cDNA_read2 if paired-end] CellBarcode_read . Requires --outSAMtype BAM Unsorted [and/or SortedByCoordinate]
       - SmartSeq        ... Smart-seq: each cell in a separate FASTQ (paired- or single-end), barcodes are corresponding read-groups, no UMI sequences, alignments deduplicated according to alignment start and end (after extending soft-clipped bases)
-    multiple: yes
+    multiple: true
     multiple_sep: ;
-  - name: --soloCBtype
+  - name: --solo_cb_type
     type: string
     description: |-
       cell barcode type
@@ -20,31 +20,31 @@ argument_groups:
       Sequence: cell barcode is a sequence (standard option)
       String: cell barcode is an arbitrary string
     example: Sequence
-  - name: --soloCBwhitelist
+  - name: --solo_cb_whitelist
     type: string
     description: |-
-      file(s) with whitelist(s) of cell barcodes. Only --soloType CB_UMI_Complex allows more than one whitelist file.
+      file(s) with whitelist(s) of cell barcodes. Only --solo_type CB_UMI_Complex allows more than one whitelist file.
 
       - None            ... no whitelist: all cell barcodes are allowed
-    multiple: yes
+    multiple: true
     multiple_sep: ;
-  - name: --soloCBstart
+  - name: --solo_cb_start
     type: integer
     description: cell barcode start base
     example: 1
-  - name: --soloCBlen
+  - name: --solo_cb_len
     type: integer
     description: cell barcode length
     example: 16
-  - name: --soloUMIstart
+  - name: --solo_umi_start
     type: integer
     description: UMI start base
     example: 17
-  - name: --soloUMIlen
+  - name: --solo_umi_len
     type: integer
     description: UMI length
     example: 10
-  - name: --soloBarcodeReadLength
+  - name: --solo_barcode_read_length
     type: integer
     description: |-
       length of the barcode read
@@ -52,7 +52,7 @@ argument_groups:
       - 1   ... equal to sum of soloCBlen+soloUMIlen
       - 0   ... not defined, do not check
     example: 1
-  - name: --soloBarcodeMate
+  - name: --solo_barcode_mate
     type: integer
     description: |-
       identifies which read mate contains the barcode (CB+UMI) sequence
@@ -61,36 +61,36 @@ argument_groups:
       - 1   ... barcode sequence is a part of mate 1
       - 2   ... barcode sequence is a part of mate 2
     example: 0
-  - name: --soloCBposition
+  - name: --solo_cb_position
     type: string
     description: |-
       position of Cell Barcode(s) on the barcode read.
 
-      Presently only works with --soloType CB_UMI_Complex, and barcodes are assumed to be on Read2.
+      Presently only works with --solo_type CB_UMI_Complex, and barcodes are assumed to be on Read2.
       Format for each barcode: startAnchor_startPosition_endAnchor_endPosition
       start(end)Anchor defines the Anchor Base for the CB: 0: read start; 1: read end; 2: adapter start; 3: adapter end
       start(end)Position is the 0-based position with of the CB start(end) with respect to the Anchor Base
       String for different barcodes are separated by space.
       Example: inDrop (Zilionis et al, Nat. Protocols, 2017):
-      --soloCBposition  0_0_2_-1  3_1_3_8
-    multiple: yes
+      --solo_cb_position  0_0_2_-1  3_1_3_8
+    multiple: true
     multiple_sep: ;
-  - name: --soloUMIposition
+  - name: --solo_umi_position
     type: string
     description: |-
       position of the UMI on the barcode read, same as soloCBposition
 
       Example: inDrop (Zilionis et al, Nat. Protocols, 2017):
-      --soloCBposition  3_9_3_14
-  - name: --soloAdapterSequence
+      --solo_cb_position  3_9_3_14
+  - name: --solo_adapter_sequence
     type: string
     description: adapter sequence to anchor barcodes. Only one adapter sequence is
       allowed.
-  - name: --soloAdapterMismatchesNmax
+  - name: --solo_adapter_mismatches_nmax
     type: integer
     description: maximum number of mismatches allowed in adapter sequence.
     example: 1
-  - name: --soloCBmatchWLtype
+  - name: --solo_cb_match_wl_type
     type: string
     description: |-
       matching the Cell Barcodes to the WhiteList
@@ -101,27 +101,27 @@ argument_groups:
       Allowed CBs have to have at least one read with exact match. This option matches best with CellRanger 2.2.0
       - 1MM_multi_pseudocounts          ... same as 1MM_Multi, but pseudocounts of 1 are added to all whitelist barcodes.
       - 1MM_multi_Nbase_pseudocounts    ... same as 1MM_multi_pseudocounts, multimatching to WL is allowed for CBs with N-bases. This option matches best with CellRanger >= 3.0.0
-      - EditDist_2                    ... allow up to edit distance of 3 fpr each of the barcodes. May include one deletion + one insertion. Only works with --soloType CB_UMI_Complex. Matches to multiple passlist barcdoes are not allowed. Similar to ParseBio Split-seq pipeline.
+      - EditDist_2                    ... allow up to edit distance of 3 fpr each of the barcodes. May include one deletion + one insertion. Only works with --solo_type CB_UMI_Complex. Matches to multiple passlist barcdoes are not allowed. Similar to ParseBio Split-seq pipeline.
     example: 1MM_multi
-  - name: --soloInputSAMattrBarcodeSeq
+  - name: --solo_input_sam_attr_barcode_seq
     type: string
     description: |-
       when inputting reads from a SAM file (--readsFileType SAM SE/PE), these SAM attributes mark the barcode sequence (in proper order).
 
-      For instance, for 10X CellRanger or STARsolo BAMs, use --soloInputSAMattrBarcodeSeq CR UR .
+      For instance, for 10X CellRanger or STARsolo BAMs, use --solo_input_sam_attr_barcode_seq CR UR .
       This parameter is required when running STARsolo with input from SAM.
-    multiple: yes
+    multiple: true
     multiple_sep: ;
-  - name: --soloInputSAMattrBarcodeQual
+  - name: --solo_input_sam_attr_barcode_qual
     type: string
     description: |-
       when inputting reads from a SAM file (--readsFileType SAM SE/PE), these SAM attributes mark the barcode qualities (in proper order).
 
-      For instance, for 10X CellRanger or STARsolo BAMs, use --soloInputSAMattrBarcodeQual CY UY .
+      For instance, for 10X CellRanger or STARsolo BAMs, use --solo_input_sam_attr_barcode_qual CY UY .
       If this parameter is '-' (default), the quality 'H' will be assigned to all bases.
-    multiple: yes
+    multiple: true
     multiple_sep: ;
-  - name: --soloStrand
+  - name: --solo_strand
     type: string
     description: |-
       strandedness of the solo libraries:
@@ -130,7 +130,7 @@ argument_groups:
       - Forward     ... read strand same as the original RNA molecule
       - Reverse     ... read strand opposite to the original RNA molecule
     example: Forward
-  - name: --soloFeatures
+  - name: --solo_features
     type: string
     description: |-
       genomic features for which the UMI counts per Cell Barcode are collected
@@ -141,9 +141,9 @@ argument_groups:
       - GeneFull_ExonOverIntron ... full gene (pre-mRNA): count all reads overlapping genes' exons and introns: prioritize 100% overlap with exons
       - GeneFull_Ex50pAS        ... full gene (pre-RNA): count all reads overlapping genes' exons and introns: prioritize >50% overlap with exons. Do not count reads with 100% exonic overlap in the antisense direction.
     example: Gene
-    multiple: yes
+    multiple: true
     multiple_sep: ;
-  - name: --soloMultiMappers
+  - name: --solo_multi_mappers
     type: string
     description: |-
       counting method for reads mapping to multiple genes
@@ -154,9 +154,9 @@ argument_groups:
       - PropUnique ... distribute UMIs proportionally to unique mappers, if present, and uniformly if not.
       - EM         ... multi-gene UMIs are distributed using Expectation Maximization algorithm
     example: Unique
-    multiple: yes
+    multiple: true
     multiple_sep: ;
-  - name: --soloUMIdedup
+  - name: --solo_umi_dedup
     type: string
     description: |-
       type of UMI deduplication (collapsing) algorithm
@@ -168,9 +168,9 @@ argument_groups:
       - NoDedup                     ... no deduplication of UMIs, count all reads.
       - 1MM_CR                      ... CellRanger2-4 algorithm for 1MM UMI collapsing.
     example: 1MM_All
-    multiple: yes
+    multiple: true
     multiple_sep: ;
-  - name: --soloUMIfiltering
+  - name: --solo_umi_filtering
     type: string
     description: |-
       type of UMI filtering (for reads uniquely mapping to genes)
@@ -179,10 +179,10 @@ argument_groups:
       - MultiGeneUMI       ... basic + remove lower-count UMIs that map to more than one gene.
       - MultiGeneUMI_All   ... basic + remove all UMIs that map to more than one gene.
       - MultiGeneUMI_CR    ... basic + remove lower-count UMIs that map to more than one gene, matching CellRanger > 3.0.0 .
-      Only works with --soloUMIdedup 1MM_CR
-    multiple: yes
+      Only works with --solo_umi_dedup 1MM_CR
+    multiple: true
     multiple_sep: ;
-  - name: --soloOutFileNames
+  - name: --solo_out_file_names
     type: string
     description: |-
       file names for STARsolo output:
@@ -193,9 +193,9 @@ argument_groups:
     - features.tsv
     - barcodes.tsv
     - matrix.mtx
-    multiple: yes
+    multiple: true
     multiple_sep: ;
-  - name: --soloCellFilter
+  - name: --solo_cell_filter
     type: string
     description: |-
       cell filtering type and parameters
@@ -213,16 +213,16 @@ argument_groups:
     - '3000'
     - '0.99'
     - '10'
-    multiple: yes
+    multiple: true
     multiple_sep: ;
-  - name: --soloOutFormatFeaturesGeneField3
+  - name: --solo_out_format_features_gene_field3
     type: string
     description: field 3 in the Gene features.tsv file. If "-", then no 3rd field
       is output.
     example: Gene Expression
-    multiple: yes
+    multiple: true
     multiple_sep: ;
-  - name: --soloCellReadStats
+  - name: --solo_cell_read_stats
     type: string
     description: |-
       Output reads statistics for each CB

@@ -1,5 +1,15 @@
 # biobox x.x.x
 
+## BREAKING CHANGES
+
+* `star/star_align_reads`: Change all arguments from `--camelCase` to `--snake_case`.
+
+* `star/star_genome_generate`: Change all arguments from `--camelCase` to `--snake_case`.
+
+## NEW FUNCTIONALITY
+
+* `star/star_solo`: Align single-cell reads to a reference genome using STAR SOLO.
+
 ## BUG FIXES
 
 * `pear`: fix component not exiting with the correct exitcode when PEAR fails.
