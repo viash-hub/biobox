@@ -10,6 +10,9 @@ set -e
 [[ "$par_sparse" == "false" ]] && unset par_sparse
 [[ "$par_remove_overlaps" == "false" ]] && unset par_remove_overlaps
 
+# change the coverage input from X;X;X to X,X,X
+par_coverage=$(echo "$par_coverage" | tr ';' ',')
+
 samtools stats \
     ${par_coverage:+-c "$par_coverage"} \
     ${par_remove_dups:+-d} \
