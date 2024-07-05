@@ -10,105 +10,81 @@ references:
 license: GPL-3.0
 
 argument_groups:
-- name: "Input"
+- name: Input
   arguments: 
-  - name: "--id"
+  - name: --id
     type: string
     description: Sample ID
-    
-  - name: "--input"
+  - name: --input
     type: file 
     required: true
-    description: path to input alignment file in BAM format
-
-  - name: "--gtf_annotation"
+    description: Path to input alignment file in BAM format
+  - name: --gtf_annotation
     type: file 
     required: true
-    description: path to GTF annotation file.
-
-  - name: "--paired"
+    description: Path to GTF annotation file.
+  - name: --paired
     type: boolean
-    description: add flag if input alignment file consists of paired reads
-
-  - name: "--strandedness"
+    description: Add flag if input alignment file consists of paired reads
+  - name: --strandedness
     type: string
-    required: false
-    choices: ["forward", "reverse", "unstranded"]
-    description: strandedness of input bam file reads (forward, reverse or unstranded (default, applicable to paired reads))
-
-  - name: "--versions"
-    type: file
-    must_exist: false
+    choices: [forward, reverse, unstranded]
+    description: |
+      Strandedness of input bam file reads (forward, reverse or unstranded (default, applicable to paired reads))
     
-- name: "Output"
+- name: Output
   arguments: 
-  - name: "--output_dupmatrix"
+  - name: --output_dupmatrix
     type: file
     direction: output
-    required: false
-    must_exist: true
-    default: $id.dup_matrix.txt
     description: path to output file (txt) of duplicate tag counts
-  
-  - name: "--output_dup_intercept_mqc"
+    example: $id.dup_matrix.txt
+  - name: --output_dup_intercept_mqc
     type: file
     direction: output
-    required: false
-    must_exist: true
-    default: $id.dup_intercept_mqc.txt
     description: path to output file (txt) of multiqc intercept value DupRadar
-
-  - name: "--output_duprate_exp_boxplot"
+    example: $id.dup_intercept_mqc.txt
+  - name: --output_duprate_exp_boxplot
     type: file
     direction: output
     required: false
     must_exist: true
     default: $id.duprate_exp_boxplot.pdf
-    description: path to output file (pdf) of distribution of expression box plot
-  
-  - name: "--output_duprate_exp_densplot"
+    description: |
+      Path to output file (pdf) of distribution of expression box plot
+  - name: --output_duprate_exp_densplot
     type: file
     direction: output
-    required: false
-    must_exist: true
-    default: $id.duprate_exp_densityplot.pdf
-    description: path to output file (pdf) of 2D density scatter plot of duplicate tag counts
-  
-  - name: "--output_duprate_exp_denscurve_mqc"
+    description: |
+      Path to output file (pdf) of 2D density scatter plot of duplicate tag counts
+    example: $id.duprate_exp_densityplot.pdf
+  - name: --output_duprate_exp_denscurve_mqc
     type: file
     direction: output
-    required: false
-    must_exist: true
-    default: $id.duprate_exp_density_curve_mqc.txt
-    description: path to output file (pdf) of density curve of gene duplication multiqc
-  
-  - name: "--output_expression_histogram"
+    description: |
+      Path to output file (pdf) of density curve of gene duplication multiqc
+    example: $id.duprate_exp_density_curve_mqc.txt
+  - name: --output_expression_histogram
     type: file
     direction: output
-    required: false
-    must_exist: true
-    default: $id.expression_hist.pdf
-    description: path to output file (pdf) of distribution of RPK values per gene histogram
-  
-  - name: "--output_intercept_slope"
+    description: |
+      Path to output file (pdf) of distribution of RPK values per gene histogram
+    example: $id.expression_hist.pdf
+  - name: --output_intercept_slope
     type: file
     direction: output
-    required: false
-    must_exist: true
-    default: $id.intercept_slope.txt
     description: output file (txt) with progression of duplication rate values
+    example: $id.intercept_slope.txt
 
 resources:
   - type: bash_script
     path: script.sh
   # Copied from https://github.com/nf-core/rnaseq/blob/3.12.0/bin/dupradar.r
-  - type: R_script
+  - type: r_script
     path: script.R
-
 test_resources:
   - type: bash_script
     path: test.sh
-  
 engines:
   - type: docker
     image: quay.io/biocontainers/bioconductor-dupradar:1.32.0--r43hdfd78af_0
