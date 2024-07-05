@@ -16,64 +16,6 @@ references:
 license: MIT
 
 argument_groups:
-  - name: Extract Options
-    arguments:
-    - name: --umitools_extract_method
-      alternatives: --extract_method
-      type: string
-      choices: [string, regex]
-      description: UMI pattern to use. [string]
-      example: "string"
-    - name: --error_correct_cell
-      type: boolean_true
-      description: Error correct cell barcodes to the whitelist.
-    - name: --whitelist
-      type: file
-      description: |
-        Whitelist of accepted cell barcodes tab-separated format, where column 1 is the whitelisted
-        cell barcodes and column 2 is the list (comma-separated) of other cell barcodes which should 
-        be corrected to the barcode in column 1. If the --error_correct_cell option is not used, this
-        column will be ignored.
-    - name: --blacklist
-      type: file
-      description: BlackWhitelist of cell barcodes to discard
-    - name: --subset_reads
-      type: integer
-      description: Only parse the first N reads
-    - name: --quality_filter_threshold
-      type: integer
-      description: |
-        Remove reads where any UMI base quality score falls below this threshold
-    - name: --quality_filter_mask
-      type: string
-      description: |
-        If a UMI base has a quality below this threshold, replace the base with 'N'
-    - name: --quality_encoding
-      type: string
-      choices: [phred33, phred64, solexa]
-      description: |
-        Quality score encoding. Choose from:
-          * phred33 [33-77]
-          * phred64 [64-106]
-          * solexa [59-106]
-    - name: --reconcile_pairs
-      type: boolean_true
-      description: |
-        Allow read 2 infile to contain reads not in read 1 infile. This enables support for upstream protocols
-        where read one contains cell barcodes, and the read pairs have been filtered and corrected without regard
-        to the read2.
-    - name: --three_prime
-      alternatives: --3prime
-      type: boolean_true
-      description: |
-        By default the barcode is assumed to be on the 5' end of the read, but use this option to sepecify that it is
-        on the 3' end instead. This option only works with --extract_method=string since 3' encoding can be specified
-        explicitly with a regex, e.g .*(?P<umi_1>.{5})$
-    - name: --ignore_read_pair_suffixes
-      type: boolean_true
-      description: |
-        Ignore "/1" and "/2" read name suffixes. Note that this options is required if the suffixes are not whitespace
-        separated from the rest of the read name
 
   - name: Input
     arguments: 
@@ -87,7 +29,7 @@ argument_groups:
       example: sample.fastq
     - name: --read2_in
       type: file
-      description: Filename for read pairs
+      description: Filename for read pairs.
     - name: --bc_pattern
       type: string
       description: |
@@ -111,34 +53,70 @@ argument_groups:
     - name: --filtered_out
       type: file
       description: |
-        Write out reads not matching regex pattern or cell barcode whitelist to this file
+        Write out reads not matching regex pattern or cell barcode whitelist to this file.
     - name: --filtered_out2
       type: file
       description: |
-        Write out read pairs not matching regex pattern or cell barcode whitelist to this file
+        Write out read pairs not matching regex pattern or cell barcode whitelist to this file.
 
-
-  - name: Additional arguments
+    - name: Extract Options
     arguments:
-    - name: --umitools_umi_separator
-      alternatives: --umi_separator
+    - name: --umitools_extract_method
+      alternatives: --extract_method
       type: string
-      default: "_"
+      choices: [string, regex]
       description: |
-        The character that separates the UMI in the read name. Most likely a colon if you skipped the extraction with
-        UMI-tools and used other software.
-    - name: --umitools_grouping_method
-      type: string
-      choices: [unique, percentile, cluster, adjacency, directional]
+        UMI pattern to use. Default: `string`.
+      example: "string"
+    - name: --error_correct_cell
+      type: boolean_true
+      description: Error correct cell barcodes to the whitelist.
+    - name: --whitelist
+      type: file
       description: |
-        Method to use to determine read groups by subsuming those with similar UMIs. All methods start by identifying
-        the reads with the same mapping position, but treat similar yet nonidentical UMIs differently. [directional]
-      example: "directional"
-    - name: --umi_discard_read
+        Whitelist of accepted cell barcodes tab-separated format, where column 1 is the whitelisted
+        cell barcodes and column 2 is the list (comma-separated) of other cell barcodes which should 
+        be corrected to the barcode in column 1. If the --error_correct_cell option is not used, this
+        column will be ignored.
+    - name: --blacklist
+      type: file
+      description: BlackWhitelist of cell barcodes to discard.
+    - name: --subset_reads
       type: integer
-      choices: [0, 1, 2]
-      description: After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively. [0]
-      example: 0
+      description: Only parse the first N reads.
+    - name: --quality_filter_threshold
+      type: integer
+      description: Remove reads where any UMI base quality score falls below this threshold.
+    - name: --quality_filter_mask
+      type: string
+      description: |
+        If a UMI base has a quality below this threshold, replace the base with 'N'.
+    - name: --quality_encoding
+      type: string
+      choices: [phred33, phred64, solexa]
+      description: |
+        Quality score encoding. Choose from:
+          * phred33 [33-77]
+          * phred64 [64-106]
+          * solexa [59-106]
+    - name: --reconcile_pairs
+      type: boolean_true
+      description: |
+        Allow read 2 infile to contain reads not in read 1 infile. This enables support for upstream protocols
+        where read one contains cell barcodes, and the read pairs have been filtered and corrected without regard
+        to the read2.
+    - name: --three_prime
+      alternatives: --3prime
+      type: boolean_true
+      description: |
+        By default the barcode is assumed to be on the 5' end of the read, but use this option to sepecify that it is
+        on the 3' end instead. This option only works with --extract_method=string since 3' encoding can be specified
+        explicitly with a regex, e.g `.*(?P<umi_1>.{5})$`.
+    - name: --ignore_read_pair_suffixes
+      type: boolean_true
+      description: |
+        Ignore "/1" and "/2" read name suffixes. Note that this options is required if the suffixes are not whitespace
+        separated from the rest of the read name.
 
   - name: Common Options
     arguments:
@@ -164,7 +142,8 @@ argument_groups:
     - name: --compresslevel
       type: integer
       description: |
-        Level of Gzip compression to use. Default=6 matches GNU gzip rather than python gzip default (which is 9). [6]
+        Level of Gzip compression to use. Default=6 matches GNU gzip rather than python gzip default (which is 9).
+        Default `6`.
       example: 6
     - name: --timeit
       type: file
