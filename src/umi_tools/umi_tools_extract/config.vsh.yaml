@@ -8,8 +8,7 @@ description: |
 keywords: [ extract, umi-tools, umi, fastq ]
 links:
   homepage: https://umi-tools.readthedocs.io/en/latest/
-  documentation: https://umi-tools.readthedocs.io/en/latest/reference/extract.html,
-                 https://umi-tools.readthedocs.io/en/latest/common_options.html#common-options
+  documentation: https://umi-tools.readthedocs.io/en/latest/reference/extract.html
   repository: https://github.com/CGATOxford/UMI-tools
 references: 
   doi: 10.1101/gr.209601.116
