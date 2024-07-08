@@ -5,8 +5,7 @@
 
 test_dir="${meta_resources_dir}/test_data"
 
-
-echo "> Run agat_convert_sp_gff2gtf with test data"
+echo "> Run $meta_name with test data"
 "$meta_executable" \
   --gff "$test_dir/0_test.gff" \
   --output "output.gtf" 
