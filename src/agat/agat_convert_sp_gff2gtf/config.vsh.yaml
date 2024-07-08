@@ -26,7 +26,7 @@ links:
   repository: https://github.com/NBISweden/AGAT
 references: 
   doi: 10.5281/zenodo.3552717
-license: GPL v3
+license: GPL-3.0
 argument_groups:
   - name: Inputs
     arguments:
