@@ -49,12 +49,19 @@ argument_groups:
   - name: Arguments
     arguments:
       - name: --gtf_version
-        description: Version of the GTF output (1,2,2.1,2.2,2.5,3 or relax). Default value from AGAT config file (relax for the default config). The script option has the higher priority.
+        description: |
+                  Version of the GTF output (1,2,2.1,2.2,2.5,3 or relax). Default value from AGAT config file (relax for the default config). The script option has the higher priority.
+                    * relax: all feature types are accepted.
+                    * GTF3 (9 feature types accepted): gene, transcript, exon, CDS, Selenocysteine, start_codon, stop_codon, three_prime_utr and five_prime_utr
+                    * GTF2.5 (8 feature types accepted): gene, transcript, exon, CDS, UTR, start_codon, stop_codon, Selenocysteine
+                    * GTF2.2 (9 feature types accepted): CDS, start_codon, stop_codon, 5UTR, 3UTR, inter, inter_CNS, intron_CNS and exon
+                    * GTF2.1 (6 feature types accepted): CDS, start_codon, stop_codon, exon, 5UTR, 3UTR
+                    * GTF2 (4 feature types accepted): CDS, start_codon, stop_codon, exon
+                    * GTF1 (5 feature types accepted): CDS, start_codon, stop_codon, exon, intron        
         type: string
         choices: [relax, "1", "2", "2.1", "2.2", "2.5", "3"]
         required: false
-        default: relax
-        example: GTF3
+        example: "3"
       - name: --config
         alternatives: [-c]
         description: |
