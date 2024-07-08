@@ -1,0 +1,5 @@
+unique	unique_null	directional	directional_null	edit_distance
+3	3	4	4	Single_UMI
+0	1	0	0	0
+1	0	0	0	1
+0	0	0	0	2
