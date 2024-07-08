@@ -1,4 +1,4 @@
-name: agat_convertspgff2gtf
+name: agat_convert_sp_gff2gtf
 namespace: agat
 description:  |
     The script aims to convert any GTF/GFF file into a proper GTF file. Full

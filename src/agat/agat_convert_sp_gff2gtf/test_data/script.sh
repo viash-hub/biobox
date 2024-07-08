@@ -6,7 +6,7 @@ if [ ! -d /tmp/agat_source ]; then
 fi
 
 # copy test data
-cp -r /tmp/agat_source/t/gff_syntax/in/0_test.gff src/agat/agat_convertspgff2gtf/test_data
+cp -r /tmp/agat_source/t/gff_syntax/in/0_test.gff src/agat/agat_convert_sp_gff2gtf/test_data
 
 
 
