@@ -16,6 +16,10 @@ echo ">> Checking output"
 echo ">> Check if output is empty"
 [ ! -s "output.gtf" ] && echo "Output file output.gtf is empty" && exit 1
 
-rm output.gtf
+echo ">> Check if the conversion resulted in the right GTF format"
+idGFF=$(head -n 2 "$test_dir/0_test.gff" | grep -o 'ID=[^;]*' | cut -d '=' -f 2-)
+expectedGTF="gene_id \"$idGFF\"; ID \"$idGFF\";"
+extractedGTF=$(head -n 3 "output.gtf" | grep -o 'gene_id "[^"]*"; ID "[^"]*";')
+[ "$extractedGTF" != "$expectedGTF" ] && echo "Output file output.gtf does not have the right format!" && exit 1
 
 echo "> Test successful"
