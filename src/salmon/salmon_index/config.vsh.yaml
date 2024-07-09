@@ -19,7 +19,7 @@ argument_groups:
       - name: --genome
         type: file
         description: | 
-          Genome of the organism to prepare the set of decoy sequences. Required to build decoy-aware transccriptome.
+          Genome of the organism to prepare the set of decoy sequences. Required to build decoy-aware transcriptome.
         required: false
         example: genome.fasta
       - name: --transcripts
