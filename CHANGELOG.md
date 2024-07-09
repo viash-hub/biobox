@@ -73,6 +73,9 @@
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
 
+* `agat`:
+    - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
+
 ## MINOR CHANGES
 
 * Uniformize component metadata (PR #23).
