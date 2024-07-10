@@ -35,10 +35,12 @@ message("R package loc. (Arg 7): ", ifelse(length(args) > 4, args[5], "Not speci
 
 # Load / install packages
 if (length(args) > 5) { .libPaths( c( args[6], .libPaths() ) ) }
-if (!require("dupRadar")){
-    source("http://bioconductor.org/biocLite.R")
-    biocLite("dupRadar", suppressUpdates=TRUE)
-    library("dupRadar")
+if (!require("dupRadar")) {
+  if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager")
+  }
+  BiocManager::install("dupRadar", update = TRUE, ask=FALSE)
+  library("dupRadar")
 }
 if (!require("parallel")) {
     install.packages("parallel", dependencies=TRUE, repos='http://cloud.r-project.org/')

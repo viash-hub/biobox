@@ -38,18 +38,16 @@ argument_groups:
     type: file
     direction: output
     description: path to output file (txt) of duplicate tag counts
-    example: $id.dup_matrix.txt
+    example: dup_matrix.txt
   - name: --output_dup_intercept_mqc
     type: file
     direction: output
     description: path to output file (txt) of multiqc intercept value DupRadar
-    example: $id.dup_intercept_mqc.txt
+    example: dup_intercept_mqc.txt
   - name: --output_duprate_exp_boxplot
     type: file
     direction: output
-    required: false
-    must_exist: true
-    default: $id.duprate_exp_boxplot.pdf
+    default: duprate_exp_boxplot.pdf
     description: |
       Path to output file (pdf) of distribution of expression box plot
   - name: --output_duprate_exp_densplot
@@ -57,24 +55,24 @@ argument_groups:
     direction: output
     description: |
       Path to output file (pdf) of 2D density scatter plot of duplicate tag counts
-    example: $id.duprate_exp_densityplot.pdf
+    example: duprate_exp_densityplot.pdf
   - name: --output_duprate_exp_denscurve_mqc
     type: file
     direction: output
     description: |
       Path to output file (pdf) of density curve of gene duplication multiqc
-    example: $id.duprate_exp_density_curve_mqc.txt
+    example: duprate_exp_density_curve_mqc.txt
   - name: --output_expression_histogram
     type: file
     direction: output
     description: |
       Path to output file (pdf) of distribution of RPK values per gene histogram
-    example: $id.expression_hist.pdf
+    example: expression_hist.pdf
   - name: --output_intercept_slope
     type: file
     direction: output
     description: output file (txt) with progression of duplication rate values
-    example: $id.intercept_slope.txt
+    example: intercept_slope.txt
 
 resources:
   - type: bash_script
@@ -85,6 +83,8 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - type: file
+    path: test_data
 engines:
   - type: docker
     image: quay.io/biocontainers/bioconductor-dupradar:1.32.0--r43hdfd78af_0

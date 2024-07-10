@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # define input and output for script
-input_bam="$meta_resources_dir/sample.bam"
-input_gtf="$meta_resources_dir/genes.gtf"
+input_bam="${meta_resources_dir}/test_data/sample.bam"
+input_gtf="${meta_resources_dir}/test_data/genes.gtf"
 
 output_dupmatrix="dup_matrix.txt"
 output_dup_intercept_mqc="dup_intercept_mqc.txt"
@@ -48,4 +48,24 @@ echo ">> asserting output has been created for paired read input"
 [ ! -f "$output_intercept_slope" ] && echo "$output_intercept_slope was not created" && exit 1
 [ ! -s "$output_intercept_slope" ] && echo "$output_intercept_slope is empty" && exit 1
 
+
+echo ">> Check if output is empty"
+[ ! -s "$output_dupmatrix" ] \
+    && echo "Output file $output_dupmatrix is empty" && exit 1
+[ ! -s "$output_dup_intercept_mqc" ] \
+    && echo "Output file $output_dup_intercept_mqc is empty" && exit 1
+[ ! -s "$output_intercept_slope" ] \
+    && echo "Output file $output_intercept_slope is empty" && exit 1
+
+echo ">> Check if output is correct"
+cat "$output_dupmatrix"
+cat "$output_dup_intercept_mqc"
+cat "$output_intercept_slope"
+# diff ignoring white spaces
+diff -B -b "test_dupMatrix.pdf" "${meta_resources_dir}/test_data/test_dupMatrix.txt" || 
+    (echo "Output file $output_dupmatrix is not correct" && exit 1)
+diff -B -b "$output_dup_intercept_mqc" "${meta_resources_dir}/test_data/test_duprateExpDensCurve_mqc.txt" || \
+    (echo "Output file $output_dup_intercept_mqc is not correct" && exit 1)
+diff -B -b "$output_intercept_slope" "${meta_resources_dir}/test_data/test_intercept_slope.txt" || \
+    (echo "Output file $output_intercept_slope is not correct" && exit 1)
 exit 0

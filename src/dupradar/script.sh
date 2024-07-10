@@ -19,7 +19,8 @@ Rscript "$meta_resources_dir/script.R" \
     $par_id \
     $par_gtf_annotation \
     $(num_strandness) \
-    $par_paired
+    $par_paired \
+    ${meta_cpus:-1}
 
 mv "$par_id"_dupMatrix.txt $par_output_dupmatrix
 mv "$par_id"_dup_intercept_mqc.txt $par_output_dup_intercept_mqc

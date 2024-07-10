@@ -1,0 +1,39 @@
+#id: DupInt
+#plot_type: 'generalstats'
+#pconfig:
+#    dupRadar_intercept:
+#        title: 'dupInt'
+#        namespace: 'DupRadar'
+#        description: 'Intercept value from DupRadar'
+#        max: 100
+#        min: 0
+#        scale: 'RdYlGn-rev'
+#        format: '{:.2f}%'
+Sample dupRadar_intercept
+test 5.8262146393079e-11
+#id: DupInt
+#plot_type: 'generalstats'
+#pconfig:
+#    dupRadar_intercept:
+#        title: 'dupInt'
+#        namespace: 'DupRadar'
+#        description: 'Intercept value from DupRadar'
+#        max: 100
+#        min: 0
+#        scale: 'RdYlGn-rev'
+#        format: '{:.2f}%'
+Sample dupRadar_intercept
+test 5.8262146393079e-11
+#id: DupInt
+#plot_type: 'generalstats'
+#pconfig:
+#    dupRadar_intercept:
+#        title: 'dupInt'
+#        namespace: 'DupRadar'
+#        description: 'Intercept value from DupRadar'
+#        max: 100
+#        min: 0
+#        scale: 'RdYlGn-rev'
+#        format: '{:.2f}%'
+Sample dupRadar_intercept
+test 5.8262146393079e-11
