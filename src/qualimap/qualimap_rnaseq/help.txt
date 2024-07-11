@@ -1,5 +1,3 @@
-
-OpenJDK 64-Bit Server VM warning: ignoring option MaxPermSize=1024m; support was removed in 8.0
 QualiMap v.2.3
 Built on 2023-05-19 16:57
 
