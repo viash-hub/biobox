@@ -3,7 +3,7 @@
 ## VIASH START
 ## VIASH END
 
-set -eo pipefail
+set -exo pipefail
 
 test_dir="${metal_executable}/test_data"
 
@@ -28,9 +28,10 @@ if [ -n "$par_paired" ]; then
     fi
 else # For single-end reads, check that we have only one read file, one pattern
     if [ -n "$par_read2_in" ] || [ -n "$par_bc_pattern2" ]; then
-        echo "Single end input requires one read file and one UMI pattern"
+        echo "Single end input requires only one read file and one UMI pattern"
         exit 1
-    elif [ "$par_umi_discard_read" != 0 ]; then
+    # if par_umi_discard_read is not empty or not 0:
+    elif [ -n "$par_umi_discard_read" ] && [ "$par_umi_discard_read" != 0 ]; then
         echo "umi_discard_read is only valid when processing paired end reads."
         exit 1
     fi
@@ -71,10 +72,10 @@ umi_tools extract \
     ${par_error:+--error "$par_error"}
 
 
-if [ $par_umi_discard_read == 1 ]; then
+if [ "$par_umi_discard_read" == 1 ]; then
     # discard read 1
     rm "$par_read1_out"
-elif [ $par_umi_discard_read == 2 ]; then
+elif [ "$par_umi_discard_read" == 2 ]; then
     # discard read 2 (-f to bypass file existence check)
     rm -f "$par_read2_out"
 fi
