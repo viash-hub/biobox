@@ -64,7 +64,7 @@ argument_groups:
       - name: "--ignore_analysis"
         type: string
         multiple: true
-        example: run_one/*;run_two/*
+        example: [run_one/*, run_two/*]
       - name: "--ignore_samples"
         type: string
         multiple: true
