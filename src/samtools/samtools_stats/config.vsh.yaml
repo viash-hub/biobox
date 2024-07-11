@@ -29,10 +29,11 @@ argument_groups:
         Reference file the CRAM was created with.
     - name: --coverage
       alternatives: -c
-      type: string
+      type: integer
+      multiple: true
       description: |
-        Coverage distribution min;max;step. Default: `1;1000;1`.
-      example: '1;1000;1'
+        Coverage distribution min;max;step. Default: [1, 1000, 1].
+      example: [1, 1000, 1]
     - name: --remove_dups
       alternatives: -d
       type: boolean_true
