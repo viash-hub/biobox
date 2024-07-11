@@ -16,7 +16,7 @@
 
 ## NEW FEATURES
 
-* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using the qualimap (PR #74). 
+* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74). 
 
 # biobox 0.1.0
 
