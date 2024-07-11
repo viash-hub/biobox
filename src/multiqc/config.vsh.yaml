@@ -68,7 +68,7 @@ argument_groups:
       - name: "--ignore_samples"
         type: string
         multiple: true
-        example: sample_1*;sample_3*
+        example: [sample_1*, sample_3*]
       - name: "--ignore_symlinks"
         type: boolean_true
         description: Ignore symlinked directories and files
