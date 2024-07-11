@@ -54,7 +54,7 @@ argument_groups:
       - name: "--include_modules"
         type: string
         multiple: true
-        example: fastqc;cutadapt
+        example: [fastqc, cutadapt]
         description: Use only these module
       - name: "--exclude_modules"
         type: string
