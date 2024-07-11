@@ -36,7 +36,8 @@ argument_groups:
     type: file
     direction: output
     required: false
-    description: PDF report output file.
+    example: report.html
+    description: Report output file. Supported formats are PDF or HTML.
 
 - name: "Optional"
   arguments: 
@@ -76,17 +77,14 @@ argument_groups:
     default: 4G 
     description: maximum Java heap memory size, default = 4G.
 
-
 resources:
   - type: bash_script
     path: script.sh
 test_resources:
   - type: bash_script
     path: test.sh
-  - path: /testData/unit_test_resources/qualimap_test.bam
-  - path: /testData/unit_test_resources/qualimap_test.bam.bai
-  - path: /testData/unit_test_resources/qualimap_test_annot.gtf
-  
+  - path: test_data/
+
 engines:
 - type: docker
   image: ubuntu:22.04
