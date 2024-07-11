@@ -35,7 +35,6 @@ qualimap rnaseq \
     ${par_output_report:+-outfile "$outfile"} \
     ${par_output_counts:+-oc "$counts"}
 
-
 # Move output files
 mv "$tmp_dir/rnaseq_qc_results.txt" "$par_output"
 

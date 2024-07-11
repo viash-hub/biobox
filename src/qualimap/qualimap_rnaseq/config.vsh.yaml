@@ -5,7 +5,9 @@ info:
     paths: [modules/nf-core/qualimap/rnaseq/main.nf]
     last_sha: 54721c6946daf6d602d7069dc127deef9cbe6b33
 description: |
-  RNA-seq QC analysis using the qualimap 
+  Qualimap RNA-seq QC RNA-seq QC reports quality control metrics and bias estimations 
+  which are specific for whole transcriptome sequencing, including reads genomic 
+  origin, junction analysis, transcript coverage and 5’-3’ bias computation.
 
 argument_groups:
 - name: "Input"
@@ -13,11 +15,13 @@ argument_groups:
   - name: "--input"
     type: file
     required: true
-    description: path to input mapping file in BAM format.
+    example: alignment.bam
+    description: Path to the sequence alignment file in BAM format, produced by a splicing-aware aligner.
   - name: "--gtf"
     type: file
     required: true
-    description: path to annotations file in Ensembl GTF format.
+    example: annotations.gtf
+    description: Path to genomic annotations in Ensembl GTF format.
 
 - name: "Output"
   arguments: 
