@@ -59,7 +59,7 @@ argument_groups:
       - name: "--exclude_modules"
         type: string
         multiple: true
-        example: fastqc;cutadapt
+        example: [fastqc, cutadapt]
         description: Do not use only these modules
       - name: "--ignore_analysis"
         type: string
