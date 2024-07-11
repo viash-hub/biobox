@@ -14,6 +14,10 @@
 
 * `busco` components: update BUSCO to `5.7.1`.
 
+## NEW FEATURES
+
+* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using the qualimap (PR #74). 
+
 # biobox 0.1.0
 
 ## BREAKING CHANGES
