@@ -4,7 +4,7 @@ set -e
 
 ## VIASH START
 meta_executable="target/executable/seqtk/seqtk_sample"
-meta_resources_dir="src/seqtk/seqtk_sample"
+meta_resources_dir="src/seqtk"
 ## VIASH END
 
 #########################################################################################
