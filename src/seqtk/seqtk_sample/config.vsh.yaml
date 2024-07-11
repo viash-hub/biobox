@@ -1,7 +1,7 @@
 name: seqtk_sample
 namespace: seqtk
 description: Subsamples sequences from FASTA/Q files.
-keywords: [tag1, tag2]
+keywords: [sample, FASTA, FASTQ]
 links:
   repository: https://github.com/lh3/seqtk/tree/v1.4
 license: MIT
@@ -27,14 +27,15 @@ argument_groups:
       - name: --seed
         type: integer
         description: Seed for random generator.
-        default: 42
+        example: 42
       - name: --fraction_number
         type: double
         description: Fraction or number of sequences to sample.
-        default: 0.1
+        required: true
+        example: 0.1
       - name: --two_pass_mode
         type: boolean
-        description: twice as slow but with much reduced memory
+        description: Twice as slow but with much reduced memory
         default: false
 
 resources:

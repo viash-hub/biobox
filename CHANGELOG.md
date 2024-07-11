@@ -50,8 +50,7 @@
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
-* `seqtk/seqtk_sample`: Sample sequences from FASTA/Q(.gz) files 
-to FASTA/Q (PR #68).
+* `seqtk/seqtk_sample`: Sample sequences from FASTA/Q(.gz) files to FASTA/Q (PR #68).
 
 
 ## MAJOR CHANGES

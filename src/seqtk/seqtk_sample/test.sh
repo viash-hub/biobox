@@ -13,14 +13,21 @@ cd seqtk_sample_se
 
 echo "> Run seqtk_sample on fastq SE"
 "$meta_executable" \
-  --input "$meta_resources_dir/test_data/reads/a.fastq" \
+  --input "$meta_resources_dir/test_data/reads/a.1.fastq.gz" \
   --seed 42 \
   --fraction_number 3 \
   --output "sampled.fastq"
 
 echo ">> Check if output exists"
 if [ ! -f "sampled.fastq" ]; then
-    echo ">> sampled.fastq.gz does not exist"
+    echo ">> sampled.fastq does not exist"
+    exit 1
+fi
+
+echo ">> Count number of samples"
+num_samples=$(grep -c '^@' sampled.fastq)
+if [ "$num_samples" -ne 3 ]; then
+    echo ">> sampled.fastq does not contain 3 samples"
     exit 1
 fi
 
@@ -55,6 +62,13 @@ headers2=$(grep '^@' sampled_2.fastq | sed -e 's/ 2$//' | sort)
 
 # Compare headers
 diff <(echo "$headers1") <(echo "$headers2") || { echo "Mismatch detected"; exit 1; }
+
+echo ">> Count number of samples"
+num_headers=$(echo "$headers1" | wc -l)
+if [ "$num_headers" -ne 3 ]; then
+    echo ">> sampled_1.fastq does not contain 3 headers"
+    exit 1
+fi
 
 #########################################################################################
 cd ..
