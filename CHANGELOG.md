@@ -8,6 +8,8 @@
 
 * `cutadapt`: demultiplexing is now disabled by default. It can be re-enabled by using `demultiplex_mode`.
 
+* `multiqc`: update multiple separator to `;` (PR #81).
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1`.
