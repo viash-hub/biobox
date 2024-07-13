@@ -1,0 +1,31 @@
+name: seqtk
+description: |
+  Seqtk is a fast and lightweight tool for processing sequences in the FASTA or FASTQ format. 
+  It seamlessly parses both FASTA and FASTQ files which 
+  can also be optionally compressed by gzip. 
+  "Sample"
+keywords: [tag1, tag2]
+links:
+  repository: https://github.com/lh3/seqtk/tree/master
+license: MIT
+argument_groups:
+  - name: Inputs
+    arguments: <...>
+  - name: Outputs
+    arguments: <...>
+  - name: Arguments
+    arguments: <...>
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/seqtk:1.4--he4a0461_2
+runners:
+  - type: executable
+  - type: nextflow

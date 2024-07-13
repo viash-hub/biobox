@@ -1,0 +1,4 @@
+Usage:   seqtk sample [-2] [-s seed=11] <in.fa> <frac>|<number>
+
+Options: -s INT       RNG seed [11]
+         -2           2-pass mode: twice as slow but with much reduced memory
