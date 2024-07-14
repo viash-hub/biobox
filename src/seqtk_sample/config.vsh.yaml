@@ -10,11 +10,37 @@ links:
 license: MIT
 argument_groups:
   - name: Inputs
-    arguments: <...>
+    arguments:
+      - name: --input
+        type: file
+        description: The input FASTA/Q file.
+        required: true
+        example: read.fq
   - name: Outputs
-    arguments: <...>
-  - name: Arguments
-    arguments: <...>
+    arguments:
+      - name: --output
+        type: file
+        description: The output FASTA/Q file.
+        required: true
+        direction: output
+        example: sub.fq
+  - name: Options
+    arguments:
+      - name: --seed
+        alternatives: -s
+        type: integer
+        description: Seed for random generator.
+        example: 42
+      - name: --fraction_number
+        type: double
+        description: Fraction or number of sequences to sample.
+        required: true
+        example: 0.1
+      - name: --two_pass_mode
+        alternatives: -2
+        type: boolean
+        description: Twice as slow but with much reduced memory
+        default: false
 resources:
   - type: bash_script
     path: script.sh
@@ -26,6 +52,16 @@ test_resources:
 engines:
   - type: docker
     image: quay.io/biocontainers/seqtk:1.4--he4a0461_2
+    setup:
+      - type: docker
+        run: |
+          # Ensure the file exists and create it if it doesn't
+          touch /var/software_versions.txt
+          # Grant write permission to the file for all users
+          chmod a+w /var/software_versions.txt
+          output=$(docker run quay.io/biocontainers/seqtk:1.4--he4a0461_2 seqtk 2>&1)
+          version=$(echo "$output" | grep "Version:" | awk '{print $2}')
+          echo "seqtk: $version" > /var/software_versions.txt
 runners:
   - type: executable
   - type: nextflow
