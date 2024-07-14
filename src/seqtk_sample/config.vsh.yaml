@@ -55,13 +55,14 @@ engines:
     setup:
       - type: docker
         run: |
-          # Ensure the file exists and create it if it doesn't
-          touch /var/software_versions.txt
-          # Grant write permission to the file for all users
-          chmod a+w /var/software_versions.txt
-          output=$(docker run quay.io/biocontainers/seqtk:1.4--he4a0461_2 seqtk 2>&1)
-          version=$(echo "$output" | grep "Version:" | awk '{print $2}')
-          echo "seqtk: $version" > /var/software_versions.txt
+          # # Ensure the file exists and create it if it doesn't
+          # touch /var/software_versions.txt
+          # # Grant write permission to the file for all users
+          # chmod a+w /var/software_versions.txt
+          # output=$(docker run quay.io/biocontainers/seqtk:1.4--he4a0461_2 seqtk 2>&1)
+          # version=$(echo "$output" | grep "Version:" | awk '{print $2}')
+          # echo "seqtk: $version" > /var/software_versions.txt
+          echo "seqtk: 1.4-r122" > /var/software_versions.txt
 runners:
   - type: executable
   - type: nextflow

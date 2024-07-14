@@ -4,7 +4,7 @@ set -e
 
 ## VIASH START
 meta_executable="/mnt/d/biobox/target/seqtk"
-meta_resources_dir="src/seqtk_sample"
+meta_resources_dir="/mnt/d/biobox/src/seqtk_sample"
 ## VIASH END
 
 #########################################################################################
@@ -37,7 +37,7 @@ fi
 
 #########################################################################################
 cd ..
-mkdir seqtk_sample_pe_number
+mkdir -p seqtk_sample_pe_number
 cd seqtk_sample_pe_number
 
 echo ">> Run seqtk_sample on fastq.gz PE with number of reads"
@@ -76,7 +76,7 @@ fi
 
 #########################################################################################
 cd ..
-mkdir seqtk_sample_pe_fraction
+mkdir -p seqtk_sample_pe_fraction
 cd seqtk_sample_pe_fraction
 
 echo ">> Run seqtk_sample on fastq.gz PE with fraction of reads"
