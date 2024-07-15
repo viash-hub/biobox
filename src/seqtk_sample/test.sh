@@ -3,8 +3,8 @@
 set -e
 
 ## VIASH START
-meta_executable="/mnt/d/biobox/target/seqtk"
-meta_resources_dir="/mnt/d/biobox/src/seqtk_sample"
+meta_executable="$PWD/target/seqtk"
+meta_resources_dir="$PWD/src/seqtk_sample"
 ## VIASH END
 
 #########################################################################################
