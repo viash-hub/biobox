@@ -34,6 +34,7 @@ fi
 
 #########################################################################################
 # ... add more tests here ...
+#
 # test fq file
 
 # TODO: Figure out how the test fq file should look like and how the reg.bed file should look like
