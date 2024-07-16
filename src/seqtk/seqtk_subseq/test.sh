@@ -9,12 +9,12 @@ meta_resources_dir="src/seqtk"
 ## VIASH END
 
 #########################################################################################
-mkdir seqtk_subseq_test
-cd seqtk_subseq_test
+mkdir test1
+cd test1
 
-echo "> Run seqtk_subseq on FASTA file"
+echo "> Run seqtk_subseq on FASTA/Q file"
 "$meta_executable" \
-  --input "$meta_resources_dir/test_data/a.1.fastq.gz" \
+  --input "$meta_resources_dir/test_data/a.1.fastq" \
   --name_list "$meta_resources_dir/test_data/id.list" \
   --output "sub_sample.fq"
 
@@ -43,30 +43,112 @@ else
 fi
 
 #########################################################################################
-# test tab option
-# echo "> Run seqtk_subseq with TAB option"
-# "$meta_executable" \
-#   --tab \
-#   --input "$meta_resources_dir/test_data/input.fa" \
-#   --name_list "$meta_resources_dir/test_data/list.lst" \
-#   --output "sub_sampled.fa"
+# -- tab option --
+cd ..
+mkdir test2
+cd test2
+
+echo "> Run seqtk_subseq with TAB option"
+"$meta_executable" \
+  --tab \
+  --input "$meta_resources_dir/test_data/a.1.fastq" \
+  --name_list "$meta_resources_dir/test_data/id.list" \
+  --output "sub_sample.fq"
+
+echo ">> Check if output exists"
+if [ ! -f "sub_sample.fq" ]; then
+    echo ">> sub_sample.fq does not exist"
+    exit 1
+fi
+
+echo ">> Check number of lines in output"
+n_lines=$(wc -l < sub_sample.fq)  
+n_lines=$(echo "$n_lines" | awk '{print $1}')
+
+if [ "$n_lines" -ne 2 ]; then
+    echo ">> sub_sample.fq does not contain exactly two lines"
+    exit 1
+fi
+
+echo ">> Check content in output"
+result=$(sed -n '2p' sub_sample.fq)
+expected=$(sed -n '2p' "$meta_resources_dir/test_data/a.1.fastq")
+if [ "$result" == "$expected" ]; then
+    echo "--> content are equal"
+else
+    echo "--> content are not equal"
+fi
 
 #########################################################################################
-# test strand aware option
-# echo "> Run seqtk_subseq with Strand Aware option"
-# "$meta_executable" \
-#   --strand_aware \
-#   --input "$meta_resources_dir/test_data/input.fa" \
-#   --name_list "$meta_resources_dir/test_data/list.lst" \
-#   --output "sub_sampled.fa"
+# -- strand aware option --
+cd ..
+mkdir test3
+cd test3
+echo "> Run seqtk_subseq with Strand Aware option"
+
+"$meta_executable" \
+  --strand_aware \
+  --input "$meta_resources_dir/test_data/a.1.fastq" \
+  --name_list "$meta_resources_dir/test_data/id.list" \
+  --output "sub_sample.fq"
+
+echo ">> Check if output exists"
+if [ ! -f "sub_sample.fq" ]; then
+    echo ">> sub_sample.fq does not exist"
+    exit 1
+fi
+
+echo ">> Check number of lines in output"
+n_lines=$(wc -l < sub_sample.fq)  
+n_lines=$(echo "$n_lines" | awk '{print $1}')
+
+if [ "$n_lines" -ne 2 ]; then
+    echo ">> sub_sample.fq does not contain exactly two lines"
+    exit 1
+fi
+
+echo ">> Check content in output"
+result=$(sed -n '2p' sub_sample.fq)
+expected=$(sed -n '2p' "$meta_resources_dir/test_data/a.1.fastq")
+if [ "$result" == "$expected" ]; then
+    echo "--> content are equal"
+else
+    echo "--> content are not equal"
+fi
 
 #########################################################################################
-# test sequence line length option
-# echo "> Run seqtk_subseq with line length option"
-# "$meta_executable" \
-#   --sequence_line_length 16 \
-#   --input "$meta_resources_dir/test_data/input.fa" \
-#   --name_list "$meta_resources_dir/test_data/list.lst" \
-#   --output "sub_sampled.fa"
+# -- sequence line length option --
+cd ..
+mkdir test4
+cd test4
 
+echo "> Run seqtk_subseq with line length option"
+"$meta_executable" \
+  --sequence_line_length 10 \
+  --input "$meta_resources_dir/test_data/a.1.fastq" \
+  --name_list "$meta_resources_dir/test_data/id.list" \
+  --output "sub_sample.fq"
 
+echo ">> Check if output exists"
+if [ ! -f "sub_sample.fq" ]; then
+    echo ">> sub_sample.fq does not exist"
+    exit 1
+fi
+
+echo ">> Check number of lines in output"
+n_lines=$(wc -l < sub_sample.fq)  
+n_lines=$(echo "$n_lines" | awk '{print $1}')
+
+if [ "$n_lines" -ne 2 ]; then
+    echo ">> sub_sample.fq does not contain exactly two lines"
+    exit 1
+fi
+
+echo ">> Check content in output"
+result=$(sed -n '2p' sub_sample.fq)
+expected=$(sed -n '2p' "$meta_resources_dir/test_data/a.1.fastq")
+if [ "$result" == "$expected" ]; then
+    echo "--> content are equal"
+else
+    echo "--> content are not equal"
+fi
