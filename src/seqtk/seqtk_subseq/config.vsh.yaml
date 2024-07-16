@@ -41,18 +41,18 @@ argument_groups:
         alternatives: -t
         type: boolean_true
         description: TAB delimited output.
-        required: false
+        
       - name: "--strand_aware"
         alternatives: -s
         type: boolean_true
         description: Strand aware.
-        required: false
+        
       - name: "--sequence_line_length"
         alternatives: -l
         type: integer
         description: Sequence line length of input fasta file.
         example: 16
-        required: false
+        
 
 resources:
   - type: bash_script
@@ -61,7 +61,7 @@ test_resources:
   - type: bash_script
     path: test.sh
   - type: file
-    path: ../test_data
+    path: test_data
 
 engines:
   - type: docker
