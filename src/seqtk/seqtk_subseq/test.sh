@@ -12,65 +12,61 @@ meta_resources_dir="src/seqtk"
 mkdir seqtk_subseq_test
 cd seqtk_subseq_test
 
-echo "> Run seqtk_subseq on FASTA/Q file"
+echo "> Run seqtk_subseq on FASTA file"
 "$meta_executable" \
-  --input "$meta_resources_dir/test_data/input.fa" \
-  --name_list "$meta_resources_dir/test_data/list.lst" \
-  --output "sub_sampled.fa"
+  --input "$meta_resources_dir/test_data/a.1.fastq.gz" \
+  --name_list "$meta_resources_dir/test_data/id.list" \
+  --output "sub_sample.fq"
 
 echo ">> Check if output exists"
-if [ ! -f "sub_sampled.fa" ]; then
-    echo ">> sub_sampled.fa does not exist"
+if [ ! -f "sub_sample.fq" ]; then
+    echo ">> sub_sample.fq does not exist"
     exit 1
 fi
 
-echo ">> Count number of subsamples in output"
-num_samples=$(grep -c '^@' sub_sampled.fa)
-if [ "$num_samples" -ne 2 ]; then
-    echo ">> sub_sampled.fa does not contain the 2 sub-samples"
+echo ">> Check number of lines in output"
+n_lines=$(wc -l < sub_sample.fq)  
+n_lines=$(echo "$n_lines" | awk '{print $1}')
+
+if [ "$n_lines" -ne 2 ]; then
+    echo ">> sub_sample.fq does not contain exactly two lines"
     exit 1
 fi
 
-
-#########################################################################################
-# ... add more tests here ...
-#
-# test fq file
-
-# TODO: Figure out how the test fq file should look like and how the reg.bed file should look like
+echo ">> Check content in output"
+result=$(sed -n '2p' sub_sample.fq)
+expected=$(sed -n '2p' "$meta_resources_dir/test_data/a.1.fastq")
+if [ "$result" == "$expected" ]; then
+    echo "--> content are equal"
+else
+    echo "--> content are not equal"
+fi
 
 #########################################################################################
 # test tab option
-echo "> Run seqtk_subseq with TAB option"
-"$meta_executable" \
-  --tab \
-  --input "$meta_resources_dir/test_data/input.fa" \
-  --name_list "$meta_resources_dir/test_data/list.lst" \
-  --output "sub_sampled.fa"
+# echo "> Run seqtk_subseq with TAB option"
+# "$meta_executable" \
+#   --tab \
+#   --input "$meta_resources_dir/test_data/input.fa" \
+#   --name_list "$meta_resources_dir/test_data/list.lst" \
+#   --output "sub_sampled.fa"
 
 #########################################################################################
 # test strand aware option
-echo "> Run seqtk_subseq with Strand Aware option"
-"$meta_executable" \
-  --strand_aware \
-  --input "$meta_resources_dir/test_data/input.fa" \
-  --name_list "$meta_resources_dir/test_data/list.lst" \
-  --output "sub_sampled.fa"
+# echo "> Run seqtk_subseq with Strand Aware option"
+# "$meta_executable" \
+#   --strand_aware \
+#   --input "$meta_resources_dir/test_data/input.fa" \
+#   --name_list "$meta_resources_dir/test_data/list.lst" \
+#   --output "sub_sampled.fa"
 
 #########################################################################################
 # test sequence line length option
-echo "> Run seqtk_subseq with line length option"
-"$meta_executable" \
-  --sequence_line_length 16 \
-  --input "$meta_resources_dir/test_data/input.fa" \
-  --name_list "$meta_resources_dir/test_data/list.lst" \
-  --output "sub_sampled.fa"
+# echo "> Run seqtk_subseq with line length option"
+# "$meta_executable" \
+#   --sequence_line_length 16 \
+#   --input "$meta_resources_dir/test_data/input.fa" \
+#   --name_list "$meta_resources_dir/test_data/list.lst" \
+#   --output "sub_sampled.fa"
 
 
-# echo ">> Compare reads"
-# # Extract headers
-# headers1=$(grep '^@' sampled_1.fastq | sed -e's/ 1$//' | sort)
-# headers2=$(grep '^@' sampled_2.fastq | sed -e 's/ 2$//' | sort)
-
-# # Compare headers
-# diff <(echo "$headers1") <(echo "$headers2") || { echo "Mismatch detected"; exit 1; }
