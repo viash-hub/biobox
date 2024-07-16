@@ -31,13 +31,7 @@ if [ "$num_samples" -ne 2 ]; then
     exit 1
 fi
 
-# echo ">> Compare reads"
-# # Extract headers
-# headers1=$(grep '^@' sampled_1.fastq | sed -e's/ 1$//' | sort)
-# headers2=$(grep '^@' sampled_2.fastq | sed -e 's/ 2$//' | sort)
 
-# # Compare headers
-# diff <(echo "$headers1") <(echo "$headers2") || { echo "Mismatch detected"; exit 1; }
 
 #########################################################################################
 # ... add more tests here ...
@@ -71,3 +65,12 @@ echo "> Run seqtk_subseq with line length option"
   --input "$meta_resources_dir/test_data/input.fa" \
   --name_list "$meta_resources_dir/test_data/list.lst" \
   --output "sub_sampled.fa"
+
+
+# echo ">> Compare reads"
+# # Extract headers
+# headers1=$(grep '^@' sampled_1.fastq | sed -e's/ 1$//' | sort)
+# headers2=$(grep '^@' sampled_2.fastq | sed -e 's/ 2$//' | sort)
+
+# # Compare headers
+# diff <(echo "$headers1") <(echo "$headers2") || { echo "Mismatch detected"; exit 1; }
