@@ -43,9 +43,6 @@ KU562861.1$(echo -e "\t")10$(echo -e "\t")20$(echo -e "\t")region$(echo -e "\t")
 MH150936.1$(echo -e "\t")10$(echo -e "\t")20$(echo -e "\t")region$(echo -e "\t")0$(echo -e "\t")-
 EOL
 
-cd test_data
-cat reg.bed
-cd ..
 #########################################################################################
 # Run basic test
 mkdir test1

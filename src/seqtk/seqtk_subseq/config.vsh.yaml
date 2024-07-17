@@ -6,6 +6,9 @@ keywords: [subseq, FASTA, FASTQ]
 links:
   repository: https://github.com/lh3/seqtk/tree/v1.4
 license: MIT
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
 
 argument_groups:
   - name: Inputs
