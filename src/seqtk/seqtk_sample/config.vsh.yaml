@@ -5,6 +5,9 @@ keywords: [sample, FASTA, FASTQ]
 links:
   repository: https://github.com/lh3/seqtk/tree/v1.4
 license: MIT
+authors:
+  - __merge__: /src/_authors/jakub_majercik.yaml
+    roles: [ author, maintainer ]
 
 argument_groups:
   - name: Inputs
@@ -36,7 +39,6 @@ argument_groups:
       - name: --two_pass_mode
         type: boolean_true
         description: Twice as slow but with much reduced memory
-        default: false
 
 resources:
   - type: bash_script
