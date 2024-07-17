@@ -42,8 +42,8 @@ else
     echo "--> content are not equal"
 fi
 
-#########################################################################################
-# -- tab option --
+########################################################################################
+#-- tab option --
 cd ..
 mkdir test2
 cd test2
@@ -51,8 +51,8 @@ cd test2
 echo "> Run seqtk_subseq with TAB option"
 "$meta_executable" \
   --tab \
-  --input "$meta_resources_dir/test_data/a.1.fastq" \
-  --name_list "$meta_resources_dir/test_data/id.list" \
+  --input "$meta_resources_dir/test_data/input.fasta" \
+  --name_list "$meta_resources_dir/test_data/ids.txt" \
   --output "sub_sample.fq"
 
 echo ">> Check if output exists"
@@ -79,8 +79,10 @@ else
     echo "--> content are not equal"
 fi
 
-#########################################################################################
-# -- strand aware option --
+cat sub_sample.fq
+
+########################################################################################
+-- strand aware option --
 cd ..
 mkdir test3
 cd test3
@@ -116,8 +118,8 @@ else
     echo "--> content are not equal"
 fi
 
-#########################################################################################
-# -- sequence line length option --
+########################################################################################
+-- sequence line length option --
 cd ..
 mkdir test4
 cd test4

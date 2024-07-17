@@ -59,13 +59,17 @@ resources:
     path: script.sh
 test_resources:
   - type: bash_script
-    path: test.sh
+    path: test1.sh
   - type: file
     path: test_data
 
 engines:
   - type: docker
     image: quay.io/biocontainers/seqtk:1.4--he4a0461_2
+    setup:
+      - type: docker
+        run: |
+          echo "xxx: \"0.1.0\"" > /var/software_versions.txt
 runners:
   - type: executable
   - type: nextflow
