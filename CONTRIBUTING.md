@@ -276,10 +276,13 @@ Next, we need to write a runner script that runs the tool with the input argumen
 ## VIASH START
 ## VIASH END
 
+# unset flags
+[[ "$par_option" == "false" ]] && unset par_option
+
 xxx \
   --input "$par_input" \
   --output "$par_output" \
-  $([ "$par_option" = "true" ] && echo "--option")
+  ${par_option:+--option}
 ```
 
 When building a Viash component, Viash will automatically replace the `## VIASH START` and `## VIASH END` lines (and anything in between) with environment variables based on the arguments specified in the config.
@@ -292,6 +295,11 @@ As an example, this is what the Bash script for the `arriba` component looks lik
 ## VIASH START
 ## VIASH END
 
+# unset flags
+[[ "$par_skip_duplicate_marking" == "false" ]] && unset par_skip_duplicate_marking
+[[ "$par_extra_information" == "false" ]] && unset par_extra_information
+[[ "$par_fill_gaps" == "false" ]] && unset par_fill_gaps
+
 arriba \
   -x "$par_bam" \
   -a "$par_genome" \
@@ -299,10 +307,9 @@ arriba \
   -o "$par_fusions" \
   ${par_known_fusions:+-k "${par_known_fusions}"} \
   ${par_blacklist:+-b "${par_blacklist}"} \
-  ${par_structural_variants:+-d "${par_structural_variants}"} \
-  $([ "$par_skip_duplicate_marking" = "true" ] && echo "-u") \
-  $([ "$par_extra_information" = "true" ] && echo "-X") \
-  $([ "$par_fill_gaps" = "true" ] && echo "-I")
+  # ...
+  ${par_extra_information:+-X} \
+  ${par_fill_gaps:+-I}
 ```
 
 Notes:
@@ -315,7 +322,6 @@ Notes:
 
 
 ### Step 12: Create test script
-
 
 If the unit test requires test resources, these should be provided in the `test_resources` section of the component. 
 
@@ -332,46 +338,62 @@ Create a test script at `src/xxx/test.sh` that runs the component with the test 
 ```bash
 #!/bin/bash
 
+set -e
+
 ## VIASH START
 ## VIASH END
 
-echo "> Run xxx with test data"
+#############################################
+# helper functions
+assert_file_exists() {
+  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
+}
+assert_file_doesnt_exist() {
+  [ ! -f "$1" ] || { echo "File '$1' exists but shouldn't" && exit 1; }
+}
+assert_file_empty() {
+  [ ! -s "$1" ] || { echo "File '$1' is not empty but should be" && exit 1; }
+}
+assert_file_not_empty() {
+  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
+}
+assert_file_contains() {
+  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
+}
+assert_file_not_contains() {
+  grep -q "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
+}
+assert_file_contains_regex() {
+  grep -q -E "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
+}
+assert_file_not_contains_regex() {
+  grep -q -E "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
+}
+#############################################
+
+echo "> Run $meta_name with test data"
 "$meta_executable" \
-  --input "$meta_resources_dir/test_data/input.txt" \
+  --input "$meta_resources_dir/test_data/reads_R1.fastq" \
   --output "output.txt" \
   --option
 
-echo ">> Checking output"
-[ ! -f "output.txt" ] && echo "Output file output.txt does not exist" && exit 1
-```
-
-
-For example, this is what the test script for the `arriba` component looks like:
-
-```bash
-#!/bin/bash
-
-## VIASH START
-## VIASH END
-
-echo "> Run arriba with blacklist"
-"$meta_executable" \
-  --bam "$meta_resources_dir/test_data/A.bam" \
-  --genome "$meta_resources_dir/test_data/genome.fasta" \
-  --gene_annotation "$meta_resources_dir/test_data/annotation.gtf" \
-  --blacklist "$meta_resources_dir/test_data/blacklist.tsv" \
-  --fusions "fusions.tsv" \
-  --fusions_discarded "fusions_discarded.tsv" \
-  --interesting_contigs "1,2"
-
-echo ">> Checking output"
-[ ! -f "fusions.tsv" ] && echo "Output file fusions.tsv does not exist" && exit 1
-[ ! -f "fusions_discarded.tsv" ] && echo "Output file fusions_discarded.tsv does not exist" && exit 1
+echo ">> Check if output exists"
+assert_file_exists "output.txt"
 
 echo ">> Check if output is empty"
-[ ! -s "fusions.tsv" ] && echo "Output file fusions.tsv is empty" && exit 1
-[ ! -s "fusions_discarded.tsv" ] && echo "Output file fusions_discarded.tsv is empty" && exit 1
+assert_file_not_empty "output.txt"
+
+echo ">> Check if output is correct"
+assert_file_contains "output.txt" "some expected output"
+
+echo "> All tests succeeded!"
 ```
+
+Notes:
+
+* Do always check the contents of the output file. If the output is not deterministic, you can use regular expressions to check the output.
+
+* If possible, generate your own test data instead of copying it from an external resource.
 
 ### Step 13: Create a `/var/software_versions.txt` file
 
@@ -390,6 +412,3 @@ engines:
         run: |
           echo "xxx: \"0.1.0\"" > /var/software_versions.txt
 ```
-
-
-## Differences
