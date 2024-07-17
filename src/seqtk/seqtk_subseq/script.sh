@@ -2,6 +2,8 @@
 
 ## VIASH START
 ## VIASH END
+[[ "$par_tab" == "false" ]] && unset par_tab
+[[ "$par_strand_aware" == "false" ]] && unset par_strand_aware
 
 seqtk subseq \
     ${par_tab:+-t} \
