@@ -14,8 +14,12 @@ links:
   repository: https://bitbucket.org/CRSwDev/cwl/src/master/v2.2.1/Extra_Utilities/
   documentation: https://bd-rhapsody-bioinfo-docs.genomics.bd.com/resources/extra_utilities.html#make-rhapsody-reference
 license: Unknown
-requirements:
-  commands: [ "cwl-runner" ]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [ author, maintainer ]
+  - __merge__: /src/_authors/weiwei_schultz.yaml
+    roles: [ author ]
+
 argument_groups:
   - name: Inputs
     arguments:
