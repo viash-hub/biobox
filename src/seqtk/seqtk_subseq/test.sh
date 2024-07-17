@@ -30,9 +30,9 @@ TAGAAGCTAATGAAAACTTTTCCTTTACTAAAAACCGTCAAACACGGTAAGAAACGCTTTTAATCATTTCAAAAGCAATC
 output_basic=$(cat sub_sample.fq)
 
 if [ "$output_basic" == "$expected_output_basic" ]; then
-  echo "Basic test passed"
+  echo "Test passed"
 else
-  echo "Basic test failed"
+  echo "Test failed"
   echo "Expected:"
   echo "$expected_output_basic"
   echo "Got:"
@@ -58,9 +58,9 @@ TGAAAACTTT"
 output_basic=$(cat sub_sample.fq)
 
 if [ "$output_basic" == "$expected_output_basic" ]; then
-  echo "Test passed!"
+  echo "Test passed"
 else
-  echo "Test failed!"
+  echo "Test failed"
   echo "Expected:"
   echo "$expected_output_basic"
   echo "Got:"
@@ -80,14 +80,13 @@ echo "> Run seqtk_subseq with TAB option"
   --name_list "$meta_resources_dir/test_data/reg.bed" \
   --output "sub_sample.fq"
 
-expected_output_tabular=$(echo "KU562861.1\t11\tAGTGTTCGAG
-MH150936.1\t11\tTGAAAACTTT")
+expected_output_tabular=$'KU562861.1\t11\tAGTGTTCGAG\nMH150936.1\t11\tTGAAAACTTT'
 output_tabular=$(cat sub_sample.fq)
 
 if [ "$output_tabular" == "$expected_output_tabular" ]; then
-  echo "Tabular output test passed"
+  echo "Test passed"
 else
-  echo "Tabular output test failed"
+  echo "Test failed"
   echo "Expected:"
   echo "$expected_output_tabular"
   echo "Got:"
@@ -116,11 +115,42 @@ ACTTT"
 output_wrapped=$(cat sub_sample.fq)
 
 if [ "$output_wrapped" == "$expected_output_wrapped" ]; then
-  echo "Line-wrapped output test passed"
+  echo "Test passed"
 else
-  echo "Line-wrapped output test failed"
+  echo "Test failed"
   echo "Expected:"
   echo "$expected_output_wrapped"
   echo "Got:"
   echo "$output_wrapped"
 fi
+
+#########################################################################################
+# Run Strand Aware option output test
+cd ..
+mkdir test5
+cd test5
+
+echo "> Run seqtk_subseq with strand aware option"
+"$meta_executable" \
+  --strand_aware \
+  --input "$meta_resources_dir/test_data/input.fasta" \
+  --name_list "$meta_resources_dir/test_data/reg.bed" \
+  --output "sub_sample.fq"
+
+# expected_output_wrapped=">KU562861.1:11-20
+# AGTGT
+# TCGAG
+# >MH150936.1:11-20
+# TGAAA
+# ACTTT"
+# output_wrapped=$(cat sub_sample.fq)
+
+# if [ "$output_wrapped" == "$expected_output_wrapped" ]; then
+#   echo "Line-wrapped output test passed"
+# else
+#   echo "Line-wrapped output test failed"
+#   echo "Expected:"
+#   echo "$expected_output_wrapped"
+#   echo "Got:"
+#   echo "$output_wrapped"
+# fi

@@ -67,9 +67,10 @@ engines:
   - type: docker
     image: quay.io/biocontainers/seqtk:1.4--he4a0461_2
     setup:
-+      - type: docker
-+        run: |
-+          echo "seqtk version: 1.4 (r122)" > /var/software_versions.txt
+      - type: docker
+        run: |
+          echo "seqtk version: 1.4 (r122)" > /var/software_versions.txt
+
 runners:
   - type: executable
   - type: nextflow
