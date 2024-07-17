@@ -17,7 +17,7 @@ echo ">>> Checking whether output is non-empty"
 [ ! -s "$test_dir/test.paired_end.sorted.txt" ] && echo "File 'test.paired_end.sorted.txt' is empty!" && exit 1
 
 echo ">>> Checking whether output is correct"
-# compare using diff,  ignoring the line stating the command that was passed.
+# compare using diff, ignoring the line stating the command that was passed.
 diff <(grep -v "^# The command" "$test_dir/test.paired_end.sorted.txt") \
     <(grep -v "^# The command" "$test_dir/ref.paired_end.sorted.txt") || \
     (echo "Output file ref.paired_end.sorted.txt does not match expected output" && exit 1)
