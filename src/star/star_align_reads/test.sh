@@ -7,35 +7,34 @@ meta_executable="target/docker/star/star_align_reads/star_align_reads"
 meta_resources_dir="src/star/star_align_reads"
 ## VIASH END
 
-#########################################################################################
-
+#############################################
 # helper functions
 assert_file_exists() {
-  [ -f "$1" ] || (echo "File '$1' does not exist" && exit 1)
+  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
 }
 assert_file_doesnt_exist() {
-  [ ! -f "$1" ] || (echo "File '$1' exists but shouldn't" && exit 1)
+  [ ! -f "$1" ] || { echo "File '$1' exists but shouldn't" && exit 1; }
 }
 assert_file_empty() {
-  [ ! -s "$1" ] || (echo "File '$1' is not empty but should be" && exit 1)
+  [ ! -s "$1" ] || { echo "File '$1' is not empty but should be" && exit 1; }
 }
 assert_file_not_empty() {
-  [ -s "$1" ] || (echo "File '$1' is empty but shouldn't be" && exit 1)
+  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
 }
 assert_file_contains() {
-  grep -q "$2" "$1" || (echo "File '$1' does not contain '$2'" && exit 1)
+  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
 }
 assert_file_not_contains() {
-  grep -q "$2" "$1" && (echo "File '$1' contains '$2' but shouldn't" && exit 1)
+  grep -q "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
 }
 assert_file_contains_regex() {
-  grep -q -E "$2" "$1" || (echo "File '$1' does not contain '$2'" && exit 1)
+  grep -q -E "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
 }
 assert_file_not_contains_regex() {
-  grep -q -E "$2" "$1" && (echo "File '$1' contains '$2' but shouldn't" && exit 1)
+  grep -q -E "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
 }
+#############################################
 
-#########################################################################################
 echo "> Prepare test data"
 
 cat > reads_R1.fastq <<'EOF'
@@ -98,6 +97,7 @@ echo "> Run star_align_reads on SE"
   --reads_per_gene "reads_per_gene.tsv" \
   --outSJtype Standard \
   --splice_junctions "splice_junctions.tsv" \
+  --reads_aligned_to_transcriptome "transcriptome_aligned.bam" \
   ${meta_cpus:+---cpus $meta_cpus}
 
 # TODO: Test data doesn't contain any chimeric reads yet
@@ -111,6 +111,7 @@ assert_file_exists "reads_per_gene.tsv"
 # assert_file_exists "chimeric_junctions.tsv"
 assert_file_exists "splice_junctions.tsv"
 assert_file_exists "unmapped.sam"
+assert_file_exists "transcriptome_aligned.bam"
 
 echo ">> Check if output contents are not empty"
 assert_file_not_empty "output.sam"
@@ -119,6 +120,7 @@ assert_file_not_empty "reads_per_gene.tsv"
 # assert_file_not_empty "chimeric_junctions.tsv"
 # assert_file_not_empty "splice_junctions.tsv" # TODO: test data doesn't contain any splice junctions yet
 assert_file_not_empty "unmapped.sam"
+assert_file_not_empty "transcriptome_aligned.bam"
 
 echo ">> Check if output contents are correct"
 assert_file_contains "log.txt" "Number of input reads \\|	2"
