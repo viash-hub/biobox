@@ -80,7 +80,9 @@
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
 
-* `seqtk subseq`: (PR #)
+* `seqtk`:
+    - `subseq`: extract the sequences (complete or subsequence) from the FASTA/FASTQ files
+                based on provided sequence IDs or region coordinates file (PR #85).
 
 ## MINOR CHANGES
 
