@@ -93,6 +93,8 @@
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
+* `seqtk/seqtk_sample`: Sample sequences from FASTA/Q(.gz) files to FASTA/Q (PR #68).
+
 * `umitools`:
     - `umitools_dedup`: Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read (PR #54).
 
