@@ -12,8 +12,6 @@
 
 * Update CI to reusable workflow in `viash-io/viash-actions` (PR #86).
 
-* Add authorship to existing components (PR #88).
-
 ## DOCUMENTATION
 
 * Extend the contributing guidelines (PR #82):
@@ -27,6 +25,8 @@
   - Explain parameter expansion.
 
   - Mention that the contents of the output of components in tests should be checked.
+
+* Add authorship to existing components (PR #88).
 
 ## BUG FIXES
 
