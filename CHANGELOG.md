@@ -12,6 +12,8 @@
 
 * Update CI to reusable workflow in `viash-io/viash-actions` (PR #86).
 
+* Add authorship to existing components (PR #88).
+
 ## DOCUMENTATION
 
 * Extend the contributing guidelines (PR #82):
