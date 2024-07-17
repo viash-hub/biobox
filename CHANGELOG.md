@@ -3,7 +3,8 @@
 ## NEW FEATURES
 
 * `bd_rhapsody`:
-  - `bd_rhapsody/bd_rhapsody_make_reference`: Create a reference for the BD Rhapsody pipeline (PR #xx).
+
+  - `bd_rhapsody/bd_rhapsody_make_reference`: Create a reference for the BD Rhapsody pipeline (PR #75).
 
 ## BUG FIXES
 

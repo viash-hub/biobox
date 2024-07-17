@@ -3,6 +3,12 @@
 TMP_DIR=/tmp/bd_rhapsody_make_reference
 OUT_DIR=src/bd_rhapsody/bd_rhapsody_make_reference/test_data
 
+# check if seqkit is installed
+if ! command -v seqkit &> /dev/null; then
+  echo "seqkit could not be found"
+  exit 1
+fi
+
 # create temporary directory and clean up on exit
 mkdir -p $TMP_DIR
 function clean_up {
