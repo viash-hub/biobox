@@ -11,21 +11,18 @@ assert_file_doesnt_exist() {
   [ ! -f "$1" ] || { echo "File '$1' exists but shouldn't" && exit 1; }
 }
 assert_file_empty() {
-  #  () will execute in a shubshell, could you use {;}?
   [ ! -s "$1" ] || { echo "File '$1' is not empty but should be" && exit 1; }
 }
 assert_file_not_empty() {
-  # [ -s "$1" ] || (echo "File '$1' is empty but shouldn't be" && exit 1)
   [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
 }
 assert_file_contains() {
-  # grep -q "$2" "$1" || (echo "File '$1' does not contain '$2'" && exit 1)
   grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
 }
 assert_file_not_contains() {
-  # grep -q "$2" "$1" && (echo "File '$1' contains '$2' but shouldn't" && exit 1)
   grep -q "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
 }
+#############################################
 
 in_fa="$meta_resources_dir/test_data/reference_small.fa"
 in_gtf="$meta_resources_dir/test_data/reference_small.gtf"
