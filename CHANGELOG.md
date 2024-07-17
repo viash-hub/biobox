@@ -22,6 +22,7 @@
 
   - Explain parameter expansion.
 
+  - Mention that the contents of the output of components in tests should be checked.
 
 ## BUG FIXES
 
