@@ -26,6 +26,8 @@
 
   - Mention that the contents of the output of components in tests should be checked.
 
+* Add authorship to existing components (PR #88).
+
 ## BUG FIXES
 
 * `pear`: fix component not exiting with the correct exitcode when PEAR fails (PR #70).

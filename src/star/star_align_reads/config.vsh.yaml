@@ -11,6 +11,11 @@ references:
 license: MIT
 requirements:
   commands: [ STAR, python, ps, zcat, bzcat ]
+authors:
+  - __merge__: /src/_authors/angela_o_pisco.yaml
+    roles: [ author ]
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [ author, maintainer ]
 # manually taking care of the main input and output arguments
 argument_groups:
   - name: Inputs

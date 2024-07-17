@@ -10,6 +10,9 @@ references:
 license: GPL-2.0
 requirements:
   commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/dries_schaumont.yaml
+    roles: [ author, maintainer ]
 
 argument_groups:
   - name: Input arguments
