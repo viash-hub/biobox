@@ -18,7 +18,7 @@ authors:
   - __merge__: /src/_authors/robrecht_cannoodt.yaml
     roles: [ author, maintainer ]
   - __merge__: /src/_authors/weiwei_schultz.yaml
-    roles: [ author ]
+    roles: [ contributor ]
 
 argument_groups:
   - name: Inputs
@@ -78,7 +78,7 @@ argument_groups:
         name: --filtering_off
         description: |
           By default the input Transcript Annotation files are filtered based on the gene_type/gene_biotype attribute. Only features 
-          having the following attribute values are are kept:
+          having the following attribute values are kept:
 
             - protein_coding
             - lncRNA (lincRNA and antisense for Gencode < v31/M22/Ensembl97)
