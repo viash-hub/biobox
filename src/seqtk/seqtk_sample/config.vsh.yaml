@@ -34,7 +34,7 @@ argument_groups:
         required: true
         example: 0.1
       - name: --two_pass_mode
-        type: boolean
+        type: boolean_true
         description: Twice as slow but with much reduced memory
         default: false
 
