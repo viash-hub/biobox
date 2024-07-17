@@ -81,8 +81,8 @@
                            intervals defined in a BED/GFF/VCF file (PR #59).
 
 * `seqtk`:
-    - `subseq`: extract the sequences (complete or subsequence) from the FASTA/FASTQ files
-                based on provided sequence IDs or region coordinates file (PR #85).
+    - `subseq`: Extract the sequences (complete or subsequence) from the FASTA/FASTQ files
+                based on a provided sequence IDs or region coordinates file (PR #85).
 
 ## MINOR CHANGES
 

@@ -5,6 +5,8 @@
 [[ "$par_tab" == "false" ]] && unset par_tab
 [[ "$par_strand_aware" == "false" ]] && unset par_strand_aware
 
+# Todo: if a bed file is given, check if format is valid! + - should be in six column
+
 seqtk subseq \
     ${par_tab:+-t} \
     ${par_strand_aware:+-s} \

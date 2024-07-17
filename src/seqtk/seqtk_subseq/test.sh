@@ -137,20 +137,18 @@ echo "> Run seqtk_subseq with strand aware option"
   --name_list "$meta_resources_dir/test_data/reg.bed" \
   --output "sub_sample.fq"
 
-# expected_output_wrapped=">KU562861.1:11-20
-# AGTGT
-# TCGAG
-# >MH150936.1:11-20
-# TGAAA
-# ACTTT"
-# output_wrapped=$(cat sub_sample.fq)
+expected_output_wrapped=">KU562861.1:11-20
+AGTGTTCGAG
+>MH150936.1:11-20
+AAAGTTTTCA"
+output_wrapped=$(cat sub_sample.fq)
 
-# if [ "$output_wrapped" == "$expected_output_wrapped" ]; then
-#   echo "Line-wrapped output test passed"
-# else
-#   echo "Line-wrapped output test failed"
-#   echo "Expected:"
-#   echo "$expected_output_wrapped"
-#   echo "Got:"
-#   echo "$output_wrapped"
-# fi
+if [ "$output_wrapped" == "$expected_output_wrapped" ]; then
+  echo "Test passed"
+else
+  echo "Test failed"
+  echo "Expected:"
+  echo "$expected_output_wrapped"
+  echo "Got:"
+  echo "$output_wrapped"
+fi
