@@ -60,8 +60,6 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - type: file
-    path: test_data
 
 engines:
   - type: docker
