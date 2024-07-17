@@ -6,19 +6,33 @@
 
   - `bd_rhapsody/bd_rhapsody_make_reference`: Create a reference for the BD Rhapsody pipeline (PR #75).
 
-## BUG FIXES
-
-* `pear`: fix component not exiting with the correct exitcode when PEAR fails.
-
-* `cutadapt`: fix `--par_quality_cutoff_r2` argument.
-
-* `cutadapt`: demultiplexing is now disabled by default. It can be re-enabled by using `demultiplex_mode`.
-
-* `multiqc`: update multiple separator to `;` (PR #81).
-
 ## MINOR CHANGES
 
-* `busco` components: update BUSCO to `5.7.1`.
+* `busco` components: update BUSCO to `5.7.1` (PR #72).
+
+## DOCUMENTATION
+
+* Extend the contributing guidelines (PR #82):
+
+  - Update format to Viash 0.9.
+
+  - Descriptions should be formatted in markdown.
+
+  - Add defaults to descriptions, not as a default of the argument.
+
+  - Explain parameter expansion.
+
+  - Mention that the contents of the output of components in tests should be checked.
+
+## BUG FIXES
+
+* `pear`: fix component not exiting with the correct exitcode when PEAR fails (PR #70).
+
+* `cutadapt`: fix `--par_quality_cutoff_r2` argument (PR #69).
+
+* `cutadapt`: demultiplexing is now disabled by default. It can be re-enabled by using `demultiplex_mode` (PR #69).
+
+* `multiqc`: update multiple separator to `;` (PR #81).
 
 # biobox 0.1.0
 
