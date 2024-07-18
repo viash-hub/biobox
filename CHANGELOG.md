@@ -2,9 +2,16 @@
 
 ## NEW FEATURES
 
-* `bd_rhapsody`:
+* `bd_rhapsody/bd_rhapsody_make_reference`: Create a reference for the BD Rhapsody pipeline (PR #75).
 
-  - `bd_rhapsody/bd_rhapsody_make_reference`: Create a reference for the BD Rhapsody pipeline (PR #75).
+* `umitools/umitools_dedup`: Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read (PR #54).
+
+* `seqtk`:
+  - `seqtk/seqtk_sample`: Subsamples sequences from FASTA/Q files (PR #68).
+  - `seqtk/seqtk_subseq`: Extract the sequences (complete or subsequence) from the FASTA/FASTQ files
+                based on a provided sequence IDs or region coordinates file (PR #85).
+
+* `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
 
 ## MINOR CHANGES
 
@@ -38,14 +45,8 @@
 
 * `multiqc`: update multiple separator to `;` (PR #81).
 
+
 # biobox 0.1.0
-
-## BREAKING CHANGES
-
-* Change default `multiple_sep` to `;` (PR #25). This aligns with an upcoming breaking change in
-  Viash 0.9.0 in order to avoid issues with the current default separator `:` unintentionally
-  splitting up certain file paths.
-
 
 ## NEW FEATURES
 
@@ -94,20 +95,11 @@
     - `samtools/samtools_fastq`: Converts a SAM/BAM/CRAM file to FASTQ (PR #52).
     - `samtools/samtools_fastq`: Converts a SAM/BAM/CRAM file to FASTA (PR #53).
 
-
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
-
-* `seqtk/seqtk_sample`: Sample sequences from FASTA/Q(.gz) files to FASTA/Q (PR #68).
-
-* `umitools`:
-    - `umitools_dedup`: Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read (PR #54).
 
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
-
-* `agat`:
-    - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
 
 ## MINOR CHANGES
 
