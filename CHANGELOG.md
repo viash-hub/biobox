@@ -95,10 +95,7 @@
     - `samtools/samtools_fastq`: Converts a SAM/BAM/CRAM file to FASTQ (PR #52).
     - `samtools/samtools_fastq`: Converts a SAM/BAM/CRAM file to FASTA (PR #53).
 
-
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
-
-* `seqtk/seqtk_sample`: Sample sequences from FASTA/Q(.gz) files to FASTA/Q (PR #68).
 
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
