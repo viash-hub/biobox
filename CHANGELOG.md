@@ -1,27 +1,52 @@
 # biobox x.x.x
 
-## BUG FIXES
+## NEW FEATURES
 
-* `pear`: fix component not exiting with the correct exitcode when PEAR fails.
+* `bd_rhapsody/bd_rhapsody_make_reference`: Create a reference for the BD Rhapsody pipeline (PR #75).
 
-* `cutadapt`: fix `--par_quality_cutoff_r2` argument.
+* `umitools/umitools_dedup`: Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read (PR #54).
 
-* `cutadapt`: demultiplexing is now disabled by default. It can be re-enabled by using `demultiplex_mode`.
+* `seqtk`:
+  - `seqtk/seqtk_sample`: Subsamples sequences from FASTA/Q files (PR #68).
+  - `seqtk/seqtk_subseq`: Extract the sequences (complete or subsequence) from the FASTA/FASTQ files
+                based on a provided sequence IDs or region coordinates file (PR #85).
 
-* `multiqc`: update multiple separator to `;` (PR #81).
+* `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
 
 ## MINOR CHANGES
 
-* `busco` components: update BUSCO to `5.7.1`.
+* `busco` components: update BUSCO to `5.7.1` (PR #72).
+
+* Update CI to reusable workflow in `viash-io/viash-actions` (PR #86).
+
+## DOCUMENTATION
+
+* Extend the contributing guidelines (PR #82):
+
+  - Update format to Viash 0.9.
+
+  - Descriptions should be formatted in markdown.
+
+  - Add defaults to descriptions, not as a default of the argument.
+
+  - Explain parameter expansion.
+
+  - Mention that the contents of the output of components in tests should be checked.
+
+* Add authorship to existing components (PR #88).
+
+## BUG FIXES
+
+* `pear`: fix component not exiting with the correct exitcode when PEAR fails (PR #70).
+
+* `cutadapt`: fix `--par_quality_cutoff_r2` argument (PR #69).
+
+* `cutadapt`: demultiplexing is now disabled by default. It can be re-enabled by using `demultiplex_mode` (PR #69).
+
+* `multiqc`: update multiple separator to `;` (PR #81).
+
 
 # biobox 0.1.0
-
-## BREAKING CHANGES
-
-* Change default `multiple_sep` to `;` (PR #25). This aligns with an upcoming breaking change in
-  Viash 0.9.0 in order to avoid issues with the current default separator `:` unintentionally
-  splitting up certain file paths.
-
 
 ## NEW FEATURES
 
@@ -73,16 +98,11 @@
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
-* `umitools`:
-    - `umitools_dedup`: Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read (PR #54).
+* `seqtk/seqtk_sample`: Sample sequences from FASTA/Q(.gz) files to FASTA/Q (PR #68).
 
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
-
-* `seqtk`:
-    - `subseq`: Extract the sequences (complete or subsequence) from the FASTA/FASTQ files
-                based on a provided sequence IDs or region coordinates file (PR #85).
 
 ## MINOR CHANGES
 

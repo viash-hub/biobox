@@ -50,6 +50,8 @@
 [[ "$par_expose_dups" == "false" ]] && unset par_expose_dups
 [[ "$par_cluster_only" == "false" ]] && unset par_cluster_only
 
+# if par_table is not empty, replace ";" with ","
+par_table=$(echo "$par_table" | tr ';' ',')
 
 $(which gffread) \
     "$par_input" \
