@@ -13,9 +13,9 @@ echo ">>> Test 1: Testing for paired-end reads"
     --read2_in "$test_dir/scrb_seq_fastq.2_30" \
     --bc_pattern "CCCCCCNNNNNNNNNN"\
     --bc_pattern2 "CCCCCCNNNNNNNNNN" \
-    --umitools_extract_method string \
-    --umitools_umi_separator '_' \
-    --umitools_grouping_method directional \
+    --extract_method string \
+    --umi_separator '_' \
+    --grouping_method directional \
     --umi_discard_read 0 \
     --read1_out scrb_seq_fastq.1_30.extract \
     --read2_out scrb_seq_fastq.2_30.extract \
@@ -44,9 +44,9 @@ echo ">>> Test 2: Testing for paired-end reads with umi_discard_reads option"
     --read2_in "$test_dir/scrb_seq_fastq.2_30" \
     --bc_pattern CCCCCCNNNNNNNNNN \
     --bc_pattern2 CCCCCCNNNNNNNNNN \
-    --umitools_extract_method string \
-    --umitools_umi_separator '_' \
-    --umitools_grouping_method directional \
+    --extract_method string \
+    --umi_separator '_' \
+    --grouping_method directional \
     --umi_discard_read 2 \
     --read1_out scrb_seq_fastq.1_30.extract \
     --random_seed 1
@@ -68,9 +68,9 @@ echo ">>> Test 3: Testing for single-end reads"
 "$meta_executable" \
     --input "$test_dir/slim_30.fastq" \
     --bc_pattern "^(?P<umi_1>.{3}).{4}(?P<umi_2>.{2})" \
-    --umitools_extract_method regex \
-    --umitools_umi_separator '_' \
-    --umitools_grouping_method directional \
+    --extract_method regex \
+    --umi_separator '_' \
+    --grouping_method directional \
     --read1_out slim_30.extract \
     --random_seed 1 
 

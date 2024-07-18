@@ -43,10 +43,10 @@ umi_tools extract \
     ${par_read2_in:+ --read2-in "$par_read2_in"} \
     -S "$par_read1_out" \
     ${par_read2_out:+--read2-out "$par_read2_out"} \
-    ${par_umitools_extract_method:+--extract-method "$par_umitools_extract_method"} \
+    ${par_extract_method:+--extract-method "$par_extract_method"} \
     --bc-pattern "$par_bc_pattern" \
     ${par_bc_pattern2:+ --bc-pattern2 "$par_bc_pattern2"} \
-    ${par_umitools_umi_separator:+--umi-separator "$par_umitools_umi_separator"} \
+    ${par_umi_separator:+--umi-separator "$par_umi_separator"} \
     ${par_output_stats:+--output-stats "$par_output_stats"} \
     ${par_error_correct_cell:+--error-correct-cell} \
     ${par_whitelist:+--whitelist "$par_whitelist"} \

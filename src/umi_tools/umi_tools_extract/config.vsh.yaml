@@ -59,8 +59,7 @@ argument_groups:
 
   - name: Extract Options
     arguments:
-    - name: --umitools_extract_method
-      alternatives: --extract_method
+    - name: --extract_method
       type: string
       choices: [string, regex]
       description: |
@@ -116,14 +115,13 @@ argument_groups:
         Ignore "/1" and "/2" read name suffixes. Note that this options is required if the suffixes are not whitespace
         separated from the rest of the read name.
         arguments:
-    - name: --umitools_umi_separator
-      alternatives: --umi_separator
+    - name: --umi_separator
       type: string
       description: |
         The character that separates the UMI in the read name. Most likely a colon if you skipped the extraction with
         UMI-tools and used other software. Default: `_`
       example: "_"
-    - name: --umitools_grouping_method
+    - name: --grouping_method
       type: string
       choices: [unique, percentile, cluster, adjacency, directional]
       description: |
