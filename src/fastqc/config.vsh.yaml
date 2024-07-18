@@ -1,0 +1,147 @@
+name: fastqc
+namespace: fastqc
+description: FastQC - A high throughput sequence QC analysis tool.
+keywords: [Quality control, BAM, SAM, FASTQ]
+links:
+  repository: https://github.com/s-andrews/FastQC
+license: GPL-3.0, Apache-2.0
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: "--input"
+        type: file
+        direction: input
+        description: 
+        required: true
+        example: input.fq
+        
+  - name: Outputs
+    arguments:
+      - name: "--outdir"
+        alternatives: -o
+        type: file
+        direction: output
+        description: |
+          Create all output files in the specified output directory.
+          Please note that this directory must exist as the program
+          will not create it.  If this option is not set then the 
+          output file for each sequence file is created in the same
+          directory as the sequence file which was processed.
+        default: output
+
+  - name: Options
+    arguments:
+      - name: "--help"
+        alternatives: -h
+        type: boolean_true
+        description: Print this help file and exit.
+        
+      - name: "--version"
+        alternatives: -v
+        type: boolean_true
+        description: Print the version of the program and exit.
+        
+      - name: "--casava"
+        type: 
+        description: 
+        example: 
+      
+      - name: "--nano"
+        type: 
+        description: 
+        example: 
+      
+      - name: "--nofilter"
+        type: 
+        description: 
+        example: 
+      
+      - name: "--extract"
+        type: 
+        description: 
+        example: 
+
+      - name: "--java"
+        alternatives: -j
+        type: 
+        description: 
+        example: 
+
+      - name: "--noextract"
+        type: 
+        description: 
+        example: 
+
+      - name: "--nogroup"
+        type: 
+        description: 
+        example: 
+
+      - name: "--min_length"
+        type: 
+        description: 
+        example: 
+
+      - name: "--format"
+        type: 
+        description: 
+        example: 
+
+      - name: "--threads"
+        type: 
+        description: 
+        example: 
+      
+      - name: "--contaminants"
+        type: 
+        description: 
+        example: 
+      
+      - name: "--adapters"
+        type: 
+        description: 
+        example: 
+
+      - name: "--limits"
+        type: 
+        description: 
+        example: 
+
+      - name: "--kmers"
+        type: 
+        description: 
+        example: 
+      
+      - name: "--quiet"
+        type: 
+        description: 
+        example: 
+
+      - name: "--dir"
+        type: 
+        description: 
+        example: 
+        
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: biocontainers/fastqc:v0.11.9_cv8
+    setup:
+      - type: docker
+        run: |
+          fastqc --version > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
