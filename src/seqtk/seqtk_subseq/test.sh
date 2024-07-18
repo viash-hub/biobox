@@ -13,7 +13,7 @@ echo "Creating Test Data..."
 mkdir test_data
 
 # Create and populate input.fasta
-cat <<EOL > "test_data/input.fasta"
+cat > "test_data/input.fasta" <<EOL
 >KU562861.1
 GGAGCAGGAGAGTGTTCGAGTTCAGAGATGTCCATGGCGCCGTACGAGAAGGTGATGGATGACCTGGCCA
 AGGGGCAGCAGTTCGCGACGCAGCTGCAGGGCCTCCTCCGGGACTCCCCCAAGGCCGGCCACATCATGGA
@@ -32,13 +32,13 @@ AAAAGCAATCCCAATAGTGGTTACATCCAAACAAAACCCATTTCTTATATTTTCTCAAAAACAGTGAGAG
 EOL
 
 # Update id.list with new entries
-cat <<EOL > "test_data/id.list"
+cat > "test_data/id.list" <<EOL
 KU562861.1
 MH150936.1
 EOL
 
 # Create and populate reg.bed
-cat <<EOL > "test_data/reg.bed"
+cat > "test_data/reg.bed" <<EOL
 KU562861.1$(echo -e "\t")10$(echo -e "\t")20$(echo -e "\t")region$(echo -e "\t")0$(echo -e "\t")+$(echo -e "\n")
 MH150936.1$(echo -e "\t")10$(echo -e "\t")20$(echo -e "\t")region$(echo -e "\t")0$(echo -e "\t")-
 EOL
@@ -60,14 +60,13 @@ GGAGCAGGAGAGTGTTCGAGTTCAGAGATGTCCATGGCGCCGTACGAGAAGGTGATGGATGACCTGGCCAAGGGGCAGCA
 TAGAAGCTAATGAAAACTTTTCCTTTACTAAAAACCGTCAAACACGGTAAGAAACGCTTTTAATCATTTCAAAAGCAATCCCAATAGTGGTTACATCCAAACAAAACCCATTTCTTATATTTTCTCAAAAACAGTGAGAG"
 output_basic=$(cat sub_sample.fq)
 
-if [ "$output_basic" == "$expected_output_basic" ]; then
-  echo "Test passed"
-else
+if [ "$output_basic" != "$expected_output_basic" ]; then
   echo "Test failed"
   echo "Expected:"
   echo "$expected_output_basic"
   echo "Got:"
   echo "$output_basic"
+  exit 1
 fi
 
 #########################################################################################
@@ -88,14 +87,13 @@ AGTGTTCGAG
 TGAAAACTTT"
 output_basic=$(cat sub_sample.fq)
 
-if [ "$output_basic" == "$expected_output_basic" ]; then
-  echo "Test passed"
-else
+if [ "$output_basic" != "$expected_output_basic" ]; then
   echo "Test failed"
   echo "Expected:"
   echo "$expected_output_basic"
   echo "Got:"
   echo "$output_basic"
+  exit 1
 fi
 
 #########################################################################################
@@ -114,14 +112,13 @@ echo "> Run seqtk_subseq with TAB option"
 expected_output_tabular=$'KU562861.1\t11\tAGTGTTCGAG\nMH150936.1\t11\tTGAAAACTTT'
 output_tabular=$(cat sub_sample.fq)
 
-if [ "$output_tabular" == "$expected_output_tabular" ]; then
-  echo "Test passed"
-else
+if [ "$output_tabular" != "$expected_output_tabular" ]; then
   echo "Test failed"
   echo "Expected:"
   echo "$expected_output_tabular"
   echo "Got:"
   echo "$output_tabular"
+  exit 1
 fi
 
 #########################################################################################
@@ -145,14 +142,13 @@ TGAAA
 ACTTT"
 output_wrapped=$(cat sub_sample.fq)
 
-if [ "$output_wrapped" == "$expected_output_wrapped" ]; then
-  echo "Test passed"
-else
+if [ "$output_wrapped" != "$expected_output_wrapped" ]; then
   echo "Test failed"
   echo "Expected:"
   echo "$expected_output_wrapped"
   echo "Got:"
   echo "$output_wrapped"
+  exit 1
 fi
 
 #########################################################################################
@@ -174,12 +170,13 @@ AGTGTTCGAG
 AAAGTTTTCA"
 output_wrapped=$(cat sub_sample.fq)
 
-if [ "$output_wrapped" == "$expected_output_wrapped" ]; then
-  echo "Test passed"
-else
+if [ "$output_wrapped" != "$expected_output_wrapped" ]; then
   echo "Test failed"
   echo "Expected:"
   echo "$expected_output_wrapped"
   echo "Got:"
   echo "$output_wrapped"
+  exit 1
 fi
+
+echo "All tests succeeded!"
