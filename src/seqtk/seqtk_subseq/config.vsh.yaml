@@ -70,7 +70,7 @@ engines:
     setup:
       - type: docker
         run: |
-          echo "seqtk version: 1.4 (r122)" > /var/software_versions.txt
+          echo $(echo $(seqtk 2>&1) | sed -n 's/.*\(Version: [^ ]*\).*/\1/p') > /var/software_versions.txt
 
 runners:
   - type: executable
