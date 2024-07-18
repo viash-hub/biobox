@@ -53,8 +53,8 @@ argument_groups:
       - name: "--sequence_line_length"
         alternatives: -l
         type: integer
-        description: Sequence line length of input fasta file.
-        example: 16
+        description: Sequence line length of input fasta file. Default: 0.
+        example: 0
         
 
 resources:
