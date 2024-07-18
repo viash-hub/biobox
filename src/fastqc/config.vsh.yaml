@@ -12,7 +12,7 @@ authors:
 argument_groups:
   - name: Inputs
     arguments:
-      - name: "--input"
+      - name: --input
         type: file
         direction: input
         description: 
@@ -21,7 +21,7 @@ argument_groups:
         
   - name: Outputs
     arguments:
-      - name: "--outdir"
+      - name: --outdir
         alternatives: -o
         type: file
         direction: output
@@ -35,94 +35,102 @@ argument_groups:
 
   - name: Options
     arguments:
-      - name: "--help"
+      - name: --help
         alternatives: -h
         type: boolean_true
         description: Print this help file and exit.
         
-      - name: "--version"
+      - name: --version
         alternatives: -v
         type: boolean_true
         description: Print the version of the program and exit.
         
-      - name: "--casava"
+      - name: --casava
         type: 
         description: 
         example: 
       
-      - name: "--nano"
+      - name: --nano
         type: 
         description: 
         example: 
       
-      - name: "--nofilter"
-        type: 
+      - name: --nofilter
+        type: boolean_true
         description: 
         example: 
       
-      - name: "--extract"
-        type: 
+      - name: --extract
+        type: boolean_true
         description: 
         example: 
 
-      - name: "--java"
+      - name: --java
         alternatives: -j
         type: 
         description: 
         example: 
 
-      - name: "--noextract"
-        type: 
+      - name: --noextract
+        type: boolean_true
         description: 
         example: 
 
-      - name: "--nogroup"
-        type: 
+      - name: --nogroup
+        type: boolean_true
         description: 
         example: 
 
-      - name: "--min_length"
-        type: 
+      - name: --min_length
+        type: integer
         description: 
         example: 
 
-      - name: "--format"
-        type: 
+      - name: --format
+        alternatives: -f
+        type: string
         description: 
         example: 
 
-      - name: "--threads"
-        type: 
+      - name: --threads
+        alternatives: -t
+        type: integer
         description: 
         example: 
       
-      - name: "--contaminants"
-        type: 
+      - name: --contaminants
+        alternatives: -c
+        type: file
         description: 
         example: 
       
-      - name: "--adapters"
-        type: 
+      - name: --adapters
+        alternatives: -a
+        type: file
         description: 
         example: 
 
-      - name: "--limits"
-        type: 
+      - name: --limits
+        alternatives: -l
+        type: file
         description: 
         example: 
 
-      - name: "--kmers"
-        type: 
+      - name: --kmers
+        alternatives: -k
+        type: integer
         description: 
         example: 
       
-      - name: "--quiet"
-        type: 
+      - name: --quiet
+        alternatives: -q
+        type: boolean_true
         description: 
         example: 
 
-      - name: "--dir"
-        type: 
+      - name: --dir
+        alternatives: -d
+        type: file
         description: 
         example: 
         
