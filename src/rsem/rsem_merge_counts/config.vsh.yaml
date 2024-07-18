@@ -1,0 +1,68 @@
+name: "rsem_merge_counts"
+namespace: "rsem"
+info:
+  migration_info:
+    git_repo: https://github.com/nf-core/rnaseq.git
+    paths: [modules/local/rsem_merge_counts/main.nf]
+    last_sha: 311279532694ce7520164ce4d65a388c0cd11f60
+
+description: | 
+  Merge the transcript quantification results obtained from rsem calculate-expression across all samples.
+
+argument_groups:
+- name: "Input"
+  arguments:
+  - name: "--counts_gene"
+    type: file
+    description: Expression counts on gene level (genes)
+  - name: "--counts_transcripts"
+    type: file
+    description: Expression counts on transcript level (isoforms)
+  - name: "--versions"
+    type: file
+    must_exist: false
+
+- name: "Output"
+  arguments: 
+  - name: "--merged_gene_counts"
+    type: file
+    description: File containing gene counts across all samples.
+    default: rsem.merged.gene_counts.tsv
+    direction: output
+  - name: "--merged_gene_tpm"
+    type: file
+    description: File containing gene TPM across all samples.
+    default: rsem.merged.gene_tpm.tsv
+    direction: output
+  - name: "--merged_transcript_counts"
+    type: file
+    description: File containing transcript counts across all samples.
+    default: rsem.merged.transcript_counts.tsv
+    direction: output
+  - name: "--merged_transcript_tpm"
+    type: file
+    description: File containing transcript TPM across all samples.
+    default: rsem.merged.transcript_tpm.tsv
+    direction: output
+  - name: "--updated_versions"
+    type: file
+    default: versions.yml
+    direction: output
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  # - path: /testData/minimal_test/input_fastq/SRR6357070_1.fastq.gz
+  # - path: /testData/minimal_test/input_fastq/SRR6357070_2.fastq.gz
+
+engines:
+  - type: docker
+    image: ubuntu:22.04
+    
+runners:
+  - type: executable
+  - type: nextflow
