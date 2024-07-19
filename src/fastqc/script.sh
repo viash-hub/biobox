@@ -46,6 +46,8 @@ fastqc \
 # Retrives the directory of the input file
 input_dir=$(dirname "$par_input")
 
+#echo "input is: $par_input"
+
 # Both outputs args passed
 if [[ -n "$par_html" ]] && [[ -n "$par_zip" ]]; then
   mv "$input_dir"/*.html "$par_html"

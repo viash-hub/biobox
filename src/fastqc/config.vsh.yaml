@@ -16,7 +16,8 @@ argument_groups:
         type: file
         direction: input
         multiple: true
-        description: 
+        multiple_sep: ","
+        description: FASTQ file(s) to be analyzed.
         required: true
         example: input.fq
         
@@ -25,6 +26,7 @@ argument_groups:
       - name: --html
         type: file
         direction: output
+        multiple: true
         description: |
           Create an HTML report of the results.
         example: report_fastqc.html
@@ -32,6 +34,7 @@ argument_groups:
       - name: --zip
         type: file
         direction: output
+        multiple: true
         description: |
           Create an zip file with: html report, data, images, icons etc.
         example: report_fastqc.html
