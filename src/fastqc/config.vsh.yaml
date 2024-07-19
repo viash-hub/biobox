@@ -15,32 +15,29 @@ argument_groups:
       - name: --input
         type: file
         direction: input
+        multiple: true
         description: 
         required: true
         example: input.fq
         
   - name: Outputs
     arguments:
-      - name: --outdir
-        alternatives: -o
+      - name: --html
         type: file
         direction: output
         description: |
-          Create all output files in the specified output directory.
-        default: output_dir
+          Create an HTML report of the results.
+        example: report_fastqc.html
+      
+      - name: --zip
+        type: file
+        direction: output
+        description: |
+          Create an zip file with: html report, data, images, icons etc.
+        example: report_fastqc.html
 
   - name: Options
-    arguments:
-      - name: --help
-        alternatives: -h
-        type: boolean_true
-        description: Print this help file and exit.
-        
-      - name: --version
-        alternatives: -v
-        type: boolean_true
-        description: Print the version of the program and exit.
-        
+    arguments:  
       - name: --casava
         type: boolean_true
         description: Files come from raw casava output.

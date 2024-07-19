@@ -8,18 +8,18 @@
 [[ "$par_nano" == "false" ]] && unset par_nano
 [[ "$par_nofilter" == "false" ]] && unset par_nofilter
 [[ "$par_extract" == "false" ]] && unset par_extract
-[[ "$par_java" == "false" ]] && unset par_java
+#[[ -z "$par_java" ]] && unset par_java
 [[ "$par_noextract" == "false" ]] && unset par_noextract
 [[ "$par_nogroup" == "false" ]] && unset par_nogroup
-[[ "$par_min_length" == "false" ]] && unset par_min_length
-[[ "$par_format" == "false" ]] && unset par_format
-[[ "$par_threads" == "false" ]] && unset par_threads
-[[ "$par_contaminants" == "false" ]] && unset par_contaminants
-[[ "$par_adapters" == "false" ]] && unset par_adapters
-[[ "$par_limits" == "false" ]] && unset par_limits
-[[ "$par_kmers" == "false" ]] && unset par_kmers
+#[[ "$par_min_length" == "false" ]] && unset par_min_length
+#[[ "$par_format" == "false" ]] && unset par_format
+#[[ "$par_threads" == "false" ]] && unset par_threads
+#[[ "$par_contaminants" == "false" ]] && unset par_contaminants
+#[[ "$par_adapters" == "false" ]] && unset par_adapters
+#[[ "$par_limits" == "false" ]] && unset par_limits
+#[[ "$par_kmers" == "false" ]] && unset par_kmers
 [[ "$par_quiet" == "false" ]] && unset par_quiet
-[[ "$par_dir" == "false" ]] && unset par_dir
+#[[ "$par_dir" == "false" ]] && unset par_dir
 
 # run fastqc
 fastqc \
@@ -41,4 +41,30 @@ fastqc \
   ${par_quiet:+--quiet} \
   ${par_dir:+--dir "$par_dir"} \
   $par_input
+
+
+# Retrives the directory of the input file
+input_dir=$(dirname "$par_input")
+
+# Both outputs args passed
+if [[ -n "$par_html" ]] && [[ -n "$par_zip" ]]; then
+  mv "$input_dir"/*.html "$par_html"
+  mv "$input_dir"/*.zip "$par_zip"
+# Only html output arg passed
+elif [[ -n "$par_html" ]]; then
+  mv "$input_dir"/*.html "$par_html"
+  rm "$input_dir"/*.zip
+# Only zip output arg passed
+elif [[ -n "$par_zip" ]]; then
+  mv "$input_dir"/*.zip "$par_zip"
+  rm "$input_dir"/*.html
+fi
+
+
+# Questions:
+# Should I unzip the zip file and make multiple other outputs for the viash component?
+# TODO: handle the output args if multiple files are passed
+
+
+
   
