@@ -4,10 +4,10 @@
 ## VIASH END
 
 # unset flags
-[[ "$par_" == "false" ]] && unset par_
+[[ "$par_casava" == "false" ]] && unset par_
 
 # run fastqc
 fastqc \
-  ${par_:+ "${par_}"} \
+  ${par_casava:+--casava} \
   $par_input
   
