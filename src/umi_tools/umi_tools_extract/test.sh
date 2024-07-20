@@ -8,7 +8,6 @@ echo ">>> Testing $meta_functionality_name"
 
 echo ">>> Test 1: Testing for paired-end reads"
 "$meta_executable" \
-    --paired \
     --input "$test_dir/scrb_seq_fastq.1_30"\
     --read2_in "$test_dir/scrb_seq_fastq.2_30" \
     --bc_pattern "CCCCCCNNNNNNNNNN"\
@@ -17,7 +16,7 @@ echo ">>> Test 1: Testing for paired-end reads"
     --umi_separator '_' \
     --grouping_method directional \
     --umi_discard_read 0 \
-    --read1_out scrb_seq_fastq.1_30.extract \
+    --output scrb_seq_fastq.1_30.extract \
     --read2_out scrb_seq_fastq.2_30.extract \
     --random_seed 1
 
@@ -39,7 +38,6 @@ rm scrb_seq_fastq.1_30.extract scrb_seq_fastq.2_30.extract
 
 echo ">>> Test 2: Testing for paired-end reads with umi_discard_reads option"
 "$meta_executable" \
-    --paired \
     --input "$test_dir/scrb_seq_fastq.1_30" \
     --read2_in "$test_dir/scrb_seq_fastq.2_30" \
     --bc_pattern CCCCCCNNNNNNNNNN \
@@ -48,7 +46,7 @@ echo ">>> Test 2: Testing for paired-end reads with umi_discard_reads option"
     --umi_separator '_' \
     --grouping_method directional \
     --umi_discard_read 2 \
-    --read1_out scrb_seq_fastq.1_30.extract \
+    --output scrb_seq_fastq.1_30.extract \
     --random_seed 1
 
 echo ">> Checking if the correct files are present"
@@ -71,7 +69,7 @@ echo ">>> Test 3: Testing for single-end reads"
     --extract_method regex \
     --umi_separator '_' \
     --grouping_method directional \
-    --read1_out slim_30.extract \
+    --output slim_30.extract \
     --random_seed 1 
 
 echo ">> Checking if the correct files are present"

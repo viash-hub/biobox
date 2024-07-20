@@ -28,6 +28,7 @@ argument_groups:
       description: File containing the input data for the R2 reads (if paired). If provided, a <list of other required arguments> need to be provided.
       example: sample_R2.fastq
     - name: --bc_pattern
+      alternatives: -p
       type: string
       description: |
         The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides 
@@ -38,7 +39,7 @@ argument_groups:
     
   - name: "Output"
     arguments:  
-    - name: --read1_out
+    - name: --output
       type: file
       required: true
       description: Output file for read 1.

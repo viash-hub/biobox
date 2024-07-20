@@ -7,7 +7,6 @@ set -exo pipefail
 
 test_dir="${metal_executable}/test_data"
 
-[[ "$par_paired" == "false" ]] && unset par_paired
 [[ "$par_error_correct_cell" == "false" ]] && unset par_error_correct_cell
 [[ "$par_reconcile_pairs" == "false" ]] && unset par_reconcile_pairs
 [[ "$par_three_prime" == "false" ]] && unset par_three_prime
@@ -19,29 +18,37 @@ test_dir="${metal_executable}/test_data"
 # Check if we have the correct number of input files and patterns for paired-end or single-end reads
 
 # For paired-end rends, check that we have two read files, two patterns
-if [ -n "$par_paired" ]; then
-    if [ -z "$par_input" ] || [ -z "$par_read2_in" ] ||
-       [ -z "$par_bc_pattern" ] || [ -z "$par_bc_pattern2" ]; 
-        then
-        echo "Paired end input requires two read files, two UMI patterns, and two output files"
+# Check for paired-end inputs
+if [ -n "$par_input" ] && [ -n "$par_read2_in" ]; then
+    # Paired-end checks: Ensure both UMI patterns are provided
+    if [ -z "$par_bc_pattern" ] || [ -z "$par_bc_pattern2" ]; then
+        echo "Paired end input requires two UMI patterns."
         exit 1
     fi
-else # For single-end reads, check that we have only one read file, one pattern
-    if [ -n "$par_read2_in" ] || [ -n "$par_bc_pattern2" ]; then
-        echo "Single end input requires only one read file and one UMI pattern"
+elif [ -n "$par_input" ]; then
+    # Single-end checks: Ensure no second read or UMI pattern for the second read is provided
+    if [ -n "$par_bc_pattern2" ]; then
+        echo "Single end input requires only one read file and one UMI pattern."
         exit 1
-    # if par_umi_discard_read is not empty or not 0:
-    elif [ -n "$par_umi_discard_read" ] && [ "$par_umi_discard_read" != 0 ]; then
+    fi
+    # Check that discard_read is not set or set to 0 for single-end reads
+    if [ -n "$par_umi_discard_read" ] && [ "$par_umi_discard_read" != 0 ]; then
         echo "umi_discard_read is only valid when processing paired end reads."
         exit 1
     fi
+else
+    # No inputs provided
+    echo "No input files provided."
+    exit 1
 fi
+
+
 
 
 umi_tools extract \
     -I "$par_input" \
     ${par_read2_in:+ --read2-in "$par_read2_in"} \
-    -S "$par_read1_out" \
+    -S "$par_output" \
     ${par_read2_out:+--read2-out "$par_read2_out"} \
     ${par_extract_method:+--extract-method "$par_extract_method"} \
     --bc-pattern "$par_bc_pattern" \
