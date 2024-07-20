@@ -17,17 +17,16 @@ argument_groups:
 
   - name: Input
     arguments: 
-    - name: --paired
-      type: boolean_true
-      description: Paired fastq files. If option is set, two input files are expected.
     - name: --input
       type: file
       required: true
-      description: Input fastq files, either one or two (paired).
+      description: File containing the input data.
       example: sample.fastq
     - name: --read2_in
       type: file
-      description: Filename for read pairs.
+      required: false
+      description: File containing the input data for the R2 reads (if paired). If provided, a <list of other required arguments> need to be provided.
+      example: sample_R2.fastq
     - name: --bc_pattern
       type: string
       description: |
