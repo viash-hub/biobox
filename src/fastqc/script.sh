@@ -94,4 +94,3 @@ fi
 #[[ "$par_adapters" == "false" ]] && unset par_adapters
 #[[ "$par_limits" == "false" ]] && unset par_limits
 #[[ "$par_kmers" == "false" ]] && unset par_kmers
-#[[ "$par_dir" == "false" ]] && unset par_dir

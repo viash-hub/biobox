@@ -40,6 +40,14 @@ argument_groups:
         description: |
           Create the zip file(s) containing: html report, data, images, icons etc.
         example: input_fastqc.zip
+      
+      - name: --outdir
+        alternatives: -o
+        type: file
+        direction: output
+        description: |
+          Create the output files in the specified directory.
+        example: output_dir
 
   - name: Options
     arguments:  
