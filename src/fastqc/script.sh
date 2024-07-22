@@ -36,41 +36,41 @@ fastqc \
   ${par_dir:+--dir "$par_dir"} \
   ${par_input:+ ${input[*]}}
 
-input_dir=$(dirname ${input[1]})
-# Both outputs args passed
-if [[ -n "$par_html" ]] && [[ -n "$par_zip" ]]; then
-  IFS=',' read -r -a html_files <<< "$par_html"
-  IFS=',' read -r -a zip_files <<< "$par_zip"
-  for i in "${!input[@]}"; do
-    sample_name=$(basename ${input[$i]} .fq)
-    input_zip="$input_dir/${sample_name}_fastqc.zip"
-    input_html="$input_dir/${sample_name}_fastqc.html"
-    zip_file=${zip_files[$i]}
-    html_file=${html_files[$i]}
-    mv "$input_zip" "$zip_file"
-    mv "$input_html" "$html_file"
-  done
-# Only html output arg passed
-elif [[ -n "$par_html" ]]; then
-  IFS=',' read -r -a html_files <<< "$par_html"
-  for i in "${!input[@]}"; do
-    sample_name=$(basename ${input[$i]} .fq)
-    input_html="$input_dir/${sample_name}_fastqc.html"
-    html_file=${html_files[$i]}
-    mv "$input_html" "$html_file"
-  done
-  rm "$input_dir"/*.zip
-# Only zip output arg passed
-elif [[ -n "$par_zip" ]]; then
-  IFS=',' read -r -a zip_files <<< "$par_zip"
-  for i in "${!input[@]}"; do
-    sample_name=$(basename ${input[$i]} .fq)
-    input_zip="$input_dir/${sample_name}_fastqc.zip"
-    zip_file=${zip_files[$i]}
-    mv "$input_zip" "$zip_file"
-  done
-  rm "$input_dir"/*.html
-fi
+# input_dir=$(dirname ${input[1]})
+# # Both outputs args passed
+# if [[ -n "$par_html" ]] && [[ -n "$par_zip" ]]; then
+#   IFS=',' read -r -a html_files <<< "$par_html"
+#   IFS=',' read -r -a zip_files <<< "$par_zip"
+#   for i in "${!input[@]}"; do
+#     sample_name=$(basename ${input[$i]} .fq)
+#     input_zip="$input_dir/${sample_name}_fastqc.zip"
+#     input_html="$input_dir/${sample_name}_fastqc.html"
+#     zip_file=${zip_files[$i]}
+#     html_file=${html_files[$i]}
+#     mv "$input_zip" "$zip_file"
+#     mv "$input_html" "$html_file"
+#   done
+# # Only html output arg passed
+# elif [[ -n "$par_html" ]]; then
+#   IFS=',' read -r -a html_files <<< "$par_html"
+#   for i in "${!input[@]}"; do
+#     sample_name=$(basename ${input[$i]} .fq)
+#     input_html="$input_dir/${sample_name}_fastqc.html"
+#     html_file=${html_files[$i]}
+#     mv "$input_html" "$html_file"
+#   done
+#   rm "$input_dir"/*.zip
+# # Only zip output arg passed
+# elif [[ -n "$par_zip" ]]; then
+#   IFS=',' read -r -a zip_files <<< "$par_zip"
+#   for i in "${!input[@]}"; do
+#     sample_name=$(basename ${input[$i]} .fq)
+#     input_zip="$input_dir/${sample_name}_fastqc.zip"
+#     zip_file=${zip_files[$i]}
+#     mv "$input_zip" "$zip_file"
+#   done
+#   rm "$input_dir"/*.html
+# fi
 
 
 # Questions:
@@ -83,7 +83,6 @@ fi
 # because this is very similar to the -outdir flag of fastqc!
 
 # Do I create a code for the multiple files case where I also rename the files to the output args?
-
 
 
 #[[ -z "$par_java" ]] && unset par_java
