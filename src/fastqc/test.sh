@@ -27,6 +27,32 @@ CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNNNNNNANNNCGAGGCCCTGGGGTAGAGGGNN
 @?@DDDDDDHHH?GH:?FCBGGB@C?DBEGIIIIAEF;FCGGI#########################################################
 EOL
 
+cat > "test_data/expected_summary.txt" <<EOL
+PASS	Basic Statistics	input_1.fq
+PASS	Per base sequence quality	input_1.fq
+FAIL	Per sequence quality scores	input_1.fq
+FAIL	Per base sequence content	input_1.fq
+FAIL	Per sequence GC content	input_1.fq
+FAIL	Per base N content	input_1.fq
+PASS	Sequence Length Distribution	input_1.fq
+PASS	Sequence Duplication Levels	input_1.fq
+FAIL	Overrepresented sequences	input_1.fq
+PASS	Adapter Content	input_1.fq
+EOL
+
+cat > "test_data/expected_summary2.txt" <<EOL
+PASS	Basic Statistics	input_2.fq
+PASS	Per base sequence quality	input_2.fq
+FAIL	Per sequence quality scores	input_2.fq
+FAIL	Per base sequence content	input_2.fq
+FAIL	Per sequence GC content	input_2.fq
+FAIL	Per base N content	input_2.fq
+PASS	Sequence Length Distribution	input_2.fq
+PASS	Sequence Duplication Levels	input_2.fq
+FAIL	Overrepresented sequences	input_2.fq
+PASS	Adapter Content	input_2.fq
+EOL
+
 # Test 1: Run fastqc with default parameters
 mkdir test1
 cd test1
@@ -48,6 +74,16 @@ echo "-> Run Test without options"
 
 [ ! -s "../test_data/input_1_fastqc.zip" ] \
     && echo "Output ZIP file is empty." && exit 1
+
+# Unzip the zip file
+unzip "../test_data/input_1_fastqc.zip" -d "../test_data/test1/"
+
+# Check if the summary.txt was extracted
+[ ! -f "../test_data/test1/input_1_fastqc/summary.txt" ] && echo "Extracted files not found." && exit 1
+
+# Check if the summary.txt is correct
+diff -a "../test_data/expected_summary.txt" "../test_data/test1/input_1_fastqc/summary.txt" \
+    || (echo "Output summary file does not match expected output" && exit 1)
 
 echo "- test succeeded -"
 cd ..
@@ -73,6 +109,20 @@ echo "-> Run Test with multiple inputs"
 
 [ ! -s "../test_data/input_1_fastqc.zip" ] && [ ! -s "../test_data/input_2_fastqc.zip" ] \
     && echo "Output ZIP files are empty." && exit 1
+
+# Unzip the zip files
+unzip "../test_data/input_1_fastqc.zip" -d "../test_data/test2/"
+unzip "../test_data/input_2_fastqc.zip" -d "../test_data/test2/"
+
+# Check if the summary.txt was extracted
+[ ! -f "../test_data/test2/input_1_fastqc/summary.txt" ] && echo "Extracted files not found." && exit 1
+[ ! -f "../test_data/test2/input_2_fastqc/summary.txt" ] && echo "Extracted files not found." && exit 1
+
+# Check if the summary.txt is correct
+diff -a "../test_data/expected_summary.txt" "../test_data/test2/input_1_fastqc/summary.txt" \
+    || (echo "Output summary file does not match expected output" && exit 1)
+diff -a "../test_data/expected_summary2.txt" "../test_data/test2/input_2_fastqc/summary.txt" \
+    || (echo "Output summary file does not match expected output" && exit 1)
 
 echo "- test succeeded -"
 cd ..
