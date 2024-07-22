@@ -27,17 +27,19 @@ argument_groups:
         type: file
         direction: output
         multiple: true
+        multiple_sep: ","
         description: |
           Create an HTML report of the results.
-        example: report_fastqc.html
+        example: input_fastqc.html
       
       - name: --zip
         type: file
         direction: output
         multiple: true
+        multiple_sep: ","
         description: |
-          Create an zip file with: html report, data, images, icons etc.
-        example: report_fastqc.html
+          Create the zip file(s) containing: html report, data, images, icons etc.
+        example: input_fastqc.zip
 
   - name: Options
     arguments:  

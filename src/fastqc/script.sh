@@ -12,21 +12,8 @@
 [[ "$par_nogroup" == "false" ]] && unset par_nogroup
 [[ "$par_quiet" == "false" ]] && unset par_quiet
 
-# if more than one file is passed
-if [[ "$par_input" == *","* ]]; then
-  
-  # Retrieve the first path from the comma-separated input
-  par_input1=$(echo "$par_input" | cut -d',' -f1)
-  # Retrieve the directory of the input file
-  input_dir=$(dirname "$par_input1")
-  # Convert comma to space separated
-  par_input=$(echo $par_input | tr ',' ' ')
-
-else # if only one file is passed
-  # Retrives the directory of the input file
-  input_dir=$(dirname "$par_input")
-fi
-echo "input_dir: $input_dir"
+# Create input array 
+IFS="," read -ra input <<< $par_input
 
 run fastqc
 fastqc \
@@ -47,20 +34,41 @@ fastqc \
   ${par_kmers:+--kmers "$par_kmers"} \
   ${par_quiet:+--quiet} \
   ${par_dir:+--dir "$par_dir"} \
-  $par_input
+  ${par_input:+ ${input[*]}}
 
-
+input_dir=$(dirname ${input[1]})
 # Both outputs args passed
 if [[ -n "$par_html" ]] && [[ -n "$par_zip" ]]; then
-  mv "$input_dir"/*.html "$par_html"
-  mv "$input_dir"/*.zip "$par_zip"
+  IFS=',' read -r -a html_files <<< "$par_html"
+  IFS=',' read -r -a zip_files <<< "$par_zip"
+  for i in "${!input[@]}"; do
+    sample_name=$(basename ${input[$i]} .fq)
+    input_zip="$input_dir/${sample_name}_fastqc.zip"
+    input_html="$input_dir/${sample_name}_fastqc.html"
+    zip_file=${zip_files[$i]}
+    html_file=${html_files[$i]}
+    mv "$input_zip" "$zip_file"
+    mv "$input_html" "$html_file"
+  done
 # Only html output arg passed
 elif [[ -n "$par_html" ]]; then
-  mv "$input_dir"/*.html "$par_html"
+  IFS=',' read -r -a html_files <<< "$par_html"
+  for i in "${!input[@]}"; do
+    sample_name=$(basename ${input[$i]} .fq)
+    input_html="$input_dir/${sample_name}_fastqc.html"
+    html_file=${html_files[$i]}
+    mv "$input_html" "$html_file"
+  done
   rm "$input_dir"/*.zip
 # Only zip output arg passed
 elif [[ -n "$par_zip" ]]; then
-  mv "$input_dir"/*.zip "$par_zip"
+  IFS=',' read -r -a zip_files <<< "$par_zip"
+  for i in "${!input[@]}"; do
+    sample_name=$(basename ${input[$i]} .fq)
+    input_zip="$input_dir/${sample_name}_fastqc.zip"
+    zip_file=${zip_files[$i]}
+    mv "$input_zip" "$zip_file"
+  done
   rm "$input_dir"/*.html
 fi
 
@@ -72,7 +80,8 @@ fi
 # and pass just a dir as argument and mv the files to this dir, 
 # and would also work as well in the case of just one file passed (rename would be possible).
 # i guess I can discuss this with jakub and see what he thinks is best
-# because this is very similar to the -outdir flag!
+# because this is very similar to the -outdir flag of fastqc!
+
 # Do I create a code for the multiple files case where I also rename the files to the output args?
 
 
