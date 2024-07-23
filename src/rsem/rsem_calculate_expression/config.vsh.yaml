@@ -31,6 +31,7 @@ argument_groups:
     multiple: true
   - name: "--index"
     type: file
+    must_exist: false
     description: RSEM index.  
   - name: "--extra_args"
     type: string
@@ -81,29 +82,59 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - path: /testData/minimal_test/input_fastq/SRR6357070_1.fastq.gz
-  - path: /testData/minimal_test/input_fastq/SRR6357070_2.fastq.gz
-  - path: /testData/minimal_test/reference/rsem.tar.gz
-
-# TODO: Install bowtie/bowtie2 
+  - path: test_data
+ 
 engines:
   - type: docker
     image: ubuntu:22.04
     setup:
-      - type: docker
-        run: |
-          apt-get update && \
-          apt-get install -y --no-install-recommends build-essential gcc g++ make wget zlib1g-dev unzip && \
-          apt-get clean && \
-          wget --no-check-certificate https://github.com/alexdobin/STAR/archive/refs/tags/2.7.11a.zip && \
-          unzip 2.7.11a.zip && \
-          cp STAR-2.7.11a/bin/Linux_x86_64_static/STAR /usr/local/bin  && \
-          cd && \
-          wget --no-check-certificate https://github.com/deweylab/RSEM/archive/refs/tags/v1.3.3.zip && \
-          unzip v1.3.3.zip && \
-          cd RSEM-1.3.3 && \
-          make && \
-          make install
+    - type: apt
+      packages: 
+        - build-essential 
+        - gcc 
+        - g++ 
+        - make 
+        - wget 
+        - zlib1g-dev 
+        - unzip 
+        - xxd 
+        - perl 
+        - r-base
+        - bowtie2
+        - python3-pip 
+        - git
+    - type: docker
+      env: 
+        - STAR_VERSION=2.7.11b
+        - RSEM_VERSION=1.3.3
+        - TZ=Europe/Brussels
+      run: |
+        ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
+        cd /tmp && \
+        wget --no-check-certificate https://github.com/alexdobin/STAR/archive/refs/tags/${STAR_VERSION}.zip && \
+        unzip ${STAR_VERSION}.zip && \
+        cd STAR-${STAR_VERSION}/source && \
+        make STARstatic CXXFLAGS_SIMD=-std=c++11 && \
+        cp STAR /usr/local/bin && \
+        cd /tmp && \
+        wget --no-check-certificate https://github.com/deweylab/RSEM/archive/refs/tags/v${RSEM_VERSION}.zip && \
+        unzip v${RSEM_VERSION}.zip && \
+        cd RSEM-${RSEM_VERSION} && \
+        make && \
+        make install && \
+        rm -rf /tmp/STAR-${STAR_VERSION} /tmp/${STAR_VERSION}.zip && \
+        rm -rf /tmp/RSEM-${RSEM_VERSION} /tmp/v${RSEM_VERSION}.zip && \
+        cd && \
+        apt-get clean && \
+        echo 'export PATH=$PATH:/usr/local/bin' >> /etc/profile && \
+        echo 'export PATH=$PATH:/usr/local/bin' >> ~/.bashrc && \
+        /bin/bash -c "source /etc/profile && source ~/.bashrc && echo $PATH && which STAR"
+
+    - type: docker
+      run: |
+        echo "RSEM: `rsem-calculate-expression --version | sed -e 's/Current version: RSEM v//g'`" > /var/software_versions.txt && \
+        echo "STAR: `STAR --version | sed -e 's/STAR_//g'`" >> /var/software_versions.txt >> /var/software_versions.txt
+
 runners:
   - type: executable
   - type: nextflow

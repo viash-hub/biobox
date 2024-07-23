@@ -1,19 +1,20 @@
 #!/bin/bash
 
-echo ">>> Testing $meta_functionality_name"
+echo ">>> Testing $meta_executable"
 
-tar -xavf $meta_resources_dir/rsem.tar.gz
+gunzip "${meta_resources_dir}/test_data/rsem.tar.gz"
+tar -xf "${meta_resources_dir}/test_data/rsem.tar"
 
 echo ">>> Calculating expression"
 "$meta_executable" \
   --id WT_REP1 \
   --strandedness reverse \
   --paired true \
-  --input "$meta_resources_dir/SRR6357070_1.fastq.gz,$meta_resources_dir/SRR6357070_2.fastq.gz" \
+  --input "${meta_resources_dir}/test_data/SRR6357070_1.fastq.gz;${meta_resources_dir}/test_data/SRR6357070_2.fastq.gz" \
   --index rsem \
   --extra_args "--star --star-output-genome-bam --star-gzipped-read-file --estimate-rspd --seed 1" \
   --counts_gene WT_REP1.genes.results \
-  --counts_transctips WT_REP1.isoforms.results \
+  --counts_transcripts WT_REP1.isoforms.results \
   --stat WT_REP1.stat \
   --logs WT_REP1.log \
   --bam_star WT_REP1.STAR.genome.bam \
