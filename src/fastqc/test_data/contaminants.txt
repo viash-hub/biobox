@@ -1,0 +1,2 @@
+contaminant_sequence1	CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGA
+contaminant_sequence2	GATCTTGG

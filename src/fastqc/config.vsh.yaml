@@ -35,7 +35,6 @@ argument_groups:
       - name: --zip
         type: file
         direction: output
-        multiple: true
         multiple_sep: ","
         description: |
           Create the zip file(s) containing: html report, data, images, icons etc.
