@@ -2,13 +2,13 @@
 
 ## BREAKING CHANGES
 
-* `star/star_align_reads`: Change all arguments from `--camelCase` to `--snake_case`.
+* `star/star_align_reads`: Change all arguments from `--camelCase` to `--snake_case` (PR #62).
 
-* `star/star_genome_generate`: Change all arguments from `--camelCase` to `--snake_case`.
+* `star/star_genome_generate`: Change all arguments from `--camelCase` to `--snake_case` (PR #62).
 
 ## NEW FUNCTIONALITY
 
-* `star/star_solo`: Align single-cell reads to a reference genome using STAR SOLO.
+* `star/star_align_reads`: Add star solo related arguments (PR #62).
 
 * `bd_rhapsody/bd_rhapsody_make_reference`: Create a reference for the BD Rhapsody pipeline (PR #75).
 
