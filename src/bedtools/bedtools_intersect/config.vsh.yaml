@@ -20,14 +20,83 @@ authors:
 argument_groups:
   - name: Inputs
     arguments:
+      - name: --input_a
+        alternatives: -a
+        type: file
+        direction: input
+        description: |
+          The input file (BED/GFF/VCF/BAM) to be used as the -a file.
+        required: true
+        example: input_a.bed
+        
+      - name: --input_b
+        alternatives: -b
+        type: file
+        direction: input
+        multiple: true
+        description: | 
+          The input file (BED/GFF/VCF/BAM) to be used as the -b file.
+          Note: -b may be followed with multiple databases and/or wildcard (*) character(s).
+        required: true
+        example: input_b.bed
     
   - name: Outputs
     arguments:
+      - name: 
   
   - name: Options
     arguments:
-        
-                         
+      - name: --write_a
+        alternatives: -wa
+        type: boolean_true
+        description: Write the original A entry for each overlap.      
+      
+      - name: --write_b
+        alternatives: -wb
+        type: boolean_true
+        description: | 
+          Write the original B entry for each overlap. 
+          Useful for knowing _what_ A overlaps. Restricted by -f and -r.
+      
+      - name: --left_outer_join
+        alternatives: -loj
+        type: boolean_true
+        description: |
+          Perform a "left outer join". That is, for each feature in A report each overlap with B. 
+          If no overlaps are found, report a NULL feature for B.
+      
+      - name: --write_A_and_B
+        alternatives: -w0
+        type: boolean_true
+        description: | 
+          Write the original A and B entries plus the number of base pairs of overlap between the two features.
+          - Overlaps restricted by -f and -r. 
+            Only A features with overlap are reported.
+      
+      - name: --write_A_and_B_plus
+        alternatives: -wao
+        type: boolean_true
+        description: | 
+          Write the original A and B entries plus the number of base pairs of overlap between the two features.
+          - Overlaps restricted by -f and -r. 
+            However, A features w/o overlap are also reported with a NULL B feature and overlap = 0.
+
+      - name: --u
+        alternatives: -u
+        type: boolean_true
+        description: | 
+          Write the original A entry _if_ no overlap is found. 
+          - In other words, just report the fact >=1 hit was found.
+          - Overlaps restricted by -f and -r. 
+      
+      - name: --c
+        alternatives: -c
+        type: boolean_true
+        description: | 
+          For each entry in A, report the number of overlaps with B.
+          - Reports 0 for A entries that have no overlap with B.
+          - Overlaps restricted by -f and -r.
+
 resources:
   - type: bash_script
     path: script.sh
