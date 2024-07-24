@@ -13,7 +13,7 @@
 [[ "$par_quiet" == "false" ]] && unset par_quiet
 
 # Create input array 
-IFS="," read -ra input <<< $par_input
+IFS=";" read -ra input <<< $par_input
 
 run fastqc
 fastqc \
@@ -36,59 +36,43 @@ fastqc \
   ${par_dir:+--dir "$par_dir"} \
   ${par_input:+ ${input[*]}}
 
+# Get input directory
 input_dir=$(dirname ${input[0]})
 
 # Both outputs args passed
 if [[ -n "$par_html" ]] && [[ -n "$par_zip" ]]; then
-  IFS=',' read -r -a html_files <<< "$par_html"
-  IFS=',' read -r -a zip_files <<< "$par_zip"
   for i in "${!input[@]}"; do
-    sample_name=$(basename ${input[$i]} .fq)
+    # Substitute .bam, .sam, .bam_mapped, .sam_mapped, and .fastq to .fq
+    input_html=$(echo ${input[$i]} | sed 's/\(\.bam\|\.sam\|\.bam_mapped\|\.sam_mapped\|\.fastq\)/.fq/g') 
+    sample_name=$(basename $input_html .fq)
     input_zip="$input_dir/${sample_name}_fastqc.zip"
     input_html="$input_dir/${sample_name}_fastqc.html"
-    zip_file=${zip_files[$i]}
-    html_file=${html_files[$i]}
+    zip_file="${par_zip//\*/$sample_name}"
+    html_file="${par_html//\*/$sample_name}"
     mv "$input_zip" "$zip_file"
     mv "$input_html" "$html_file"
   done
 # Only html output arg passed
 elif [[ -n "$par_html" ]]; then
-  IFS=',' read -r -a html_files <<< "$par_html"
   for i in "${!input[@]}"; do
-    sample_name=$(basename ${input[$i]} .fq)
+    # Substitute .bam, .sam, .bam_mapped, .sam_mapped, and .fastq to .fq
+    input_html=$(echo ${input[$i]} | sed 's/\(\.bam\|\.sam\|\.bam_mapped\|\.sam_mapped\|\.fastq\)/.fq/g') 
+    sample_name=$(basename $input_html .fq)
     input_html="$input_dir/${sample_name}_fastqc.html"
-    html_file=${html_files[$i]}
+    html_file="${par_html//\*/$sample_name}" # Substitute * with sample name
     mv "$input_html" "$html_file"
   done
   rm "$input_dir"/*.zip
 # Only zip output arg passed
 elif [[ -n "$par_zip" ]]; then
-  IFS=',' read -r -a zip_files <<< "$par_zip"
   for i in "${!input[@]}"; do
-    sample_name=$(basename ${input[$i]} .fq)
+    # Substitute .bam, .sam, .bam_mapped, .sam_mapped, and .fastq to .fq
+    input_zip=$(echo ${input[$i]} | sed 's/\(\.bam\|\.sam\|\.bam_mapped\|\.sam_mapped\|\.fastq\)/.fq/g') 
+    sample_name=$(basename $input_zip .fq)
     input_zip="$input_dir/${sample_name}_fastqc.zip"
-    zip_file=${zip_files[$i]}
+    zip_file="${par_zip//\*/$sample_name}" # Substitute * with sample name
     mv "$input_zip" "$zip_file"
   done
   rm "$input_dir"/*.html
 fi
 
-
-# Questions:
-# multiple = true does not allow for output without a * in the name. In the output.
-# Do I create output args for the unzip files?
-
-
-
-
-# echo "zip files: ${zip_files[*]}"
-# echo "input files: ${input[*]}"
-# pwd
-#[[ -z "$par_java" ]] && unset par_java
-#[[ "$par_min_length" == "false" ]] && unset par_min_length
-#[[ "$par_format" == "false" ]] && unset par_format
-#[[ "$par_threads" == "false" ]] && unset par_threads
-#[[ "$par_contaminants" == "false" ]] && unset par_contaminants
-#[[ "$par_adapters" == "false" ]] && unset par_adapters
-#[[ "$par_limits" == "false" ]] && unset par_limits
-#[[ "$par_kmers" == "false" ]] && unset par_kmers

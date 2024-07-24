@@ -16,7 +16,6 @@ argument_groups:
         type: file
         direction: input
         multiple: true
-        multiple_sep: ","
         description: FASTQ file(s) to be analyzed.
         required: true
         example: input.fq
@@ -27,31 +26,17 @@ argument_groups:
         type: file
         direction: output
         multiple: true
-        multiple_sep: ","
         description: |
-          Create an HTML report of the results.
+          Create the HTML report of the results.
         example: input_fastqc.html
       
       - name: --zip
         type: file
         direction: output
         multiple: true
-        multiple_sep: ","
         description: |
-          Create the zip file(s) containing: html report, data, images, icons etc.
-        example: input_fastqc.zip
-      
-      - name: --outdir
-        alternatives: -o
-        type: file
-        direction: output
-        description: |
-          Create all output files in the specified output directory.
-          Please note that this directory must exist as the program
-          will not create it.  If this option is not set then the 
-          output file for each sequence file is created in the same
-          directory as the sequence file which was processed.
-        example: output_dir
+          Create the zip file(s) containing: html report, data, images, icons, summary, etc.
+        example: input_fastqc.zip     
 
   - name: Options
     arguments:  

@@ -117,7 +117,8 @@ echo "- test succeeded -"
 echo "-> Run Test: two inputs"
 "$meta_executable" \
  --extract \
- --input "test_data/input_1.fq,test_data/input_2.fq"
+ --input "test_data/input_1.fq" \
+ --input "test_data/input_2.fq" 
 
 # Check if the html files was generated
 [ ! -f "test_data/input_1_fastqc.html" ] && [ ! -f "test_data/input_2_fastqc.html" ] \
@@ -288,8 +289,6 @@ rm "test_data/input_1_fastqc.zip"
 
 echo "- test succeeded -"
 
-
-# Add more tests here
 
 echo "All tests succeeded!"
 exit 0
