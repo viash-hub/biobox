@@ -11,7 +11,9 @@ info:
   references:
     doi: 10.1093/bioinformatics/btw354
   licence: GPL v3 or later
-
+authors:
+  - __merge__: /src/_authors/dorien_roosen.yaml
+    roles: [ author, maintainer ]
 argument_groups:
   - name: "Input"
     arguments:
@@ -54,25 +56,21 @@ argument_groups:
       - name: "--include_modules"
         type: string
         multiple: true
-        multiple_sep: ","
-        example: fastqc,cutadapt
+        example: [fastqc, cutadapt]
         description: Use only these module
       - name: "--exclude_modules"
         type: string
         multiple: true
-        multiple_sep: ","
-        example: fastqc,cutadapt
+        example: [fastqc, cutadapt]
         description: Do not use only these modules
       - name: "--ignore_analysis"
         type: string
         multiple: true
-        multiple_sep: ","
-        example: run_one/*,run_two/*
+        example: [run_one/*, run_two/*]
       - name: "--ignore_samples"
         type: string
         multiple: true
-        multiple_sep: ","
-        example: sample_1*,sample_3*
+        example: [sample_1*, sample_3*]
       - name: "--ignore_symlinks"
         type: boolean_true
         description: Ignore symlinked directories and files

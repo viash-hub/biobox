@@ -12,7 +12,9 @@ references:
 license: GPL-3.0 
 requirements:
   commands: [ salmon ]
-
+authors:
+  - __merge__: /src/_authors/sai_nirmayi_yasa.yaml
+    roles: [ author, maintainer ]
 argument_groups:
   - name: Common input options
     arguments:
@@ -42,7 +44,7 @@ argument_groups:
         type: file
         description: |
           Salmon index.
-        required: true
+        required: false
         example: transcriptome_index
       - name: --unmated_reads
         alternatives: ["-r"]
@@ -320,12 +322,15 @@ argument_groups:
         example: 0.00001
       - name: --write_mappings
         alternatives: ["-z"]
-        type: file
-        direction: output
+        type: boolean_true
         description: |
           If this option is provided, then the selective-alignment results will be written out in SAM-compatible format. By default, output will be directed to stdout, but an alternative file name can be provided instead.
+      - name: --mapping_sam
+        type: file
+        description: Path to file that should output the selective-alignment results in SAM-compatible format. THis option must be provided while using --write_mappings
         required: false
-        example: mappings.sam 
+        direction: output
+        example: mappings.sam
       - name: --write_qualities
         type: boolean_true
         description: |

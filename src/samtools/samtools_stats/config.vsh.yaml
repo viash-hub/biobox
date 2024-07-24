@@ -9,7 +9,9 @@ links:
 references: 
   doi: [10.1093/bioinformatics/btp352, 10.1093/gigascience/giab008]
 license: MIT/Expat
-
+authors:
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author, maintainer ]
 argument_groups:
   - name: Inputs
     arguments:
@@ -30,10 +32,10 @@ argument_groups:
     - name: --coverage
       alternatives: -c
       type: integer
-      description: |
-        Coverage distribution min,max,step [1,1000,1].
       multiple: true
-      multiple_sep: ','
+      description: |
+        Coverage distribution min;max;step. Default: [1, 1000, 1].
+      example: [1, 1000, 1]
     - name: --remove_dups
       alternatives: -d
       type: boolean_true
@@ -48,25 +50,25 @@ argument_groups:
       alternatives: -f
       type: string
       description: |
-        Required flag, 0 for unset. See also `samtools flags`.
-      default: "0"
+        Required flag, 0 for unset. See also `samtools flags`. Default: `"0"`.
+      example: "0"
     - name: --filtering_flag
       alternatives: -F
       type: string
       description: |
-        Filtering flag, 0 for unset. See also `samtools flags`.
-      default: "0"
+        Filtering flag, 0 for unset. See also `samtools flags`. Default: `0`.
+      example: "0"
     - name: --GC_depth
       type: double
       description: |
-        The size of GC-depth bins (decreasing bin size increases memory requirement).
-      default: 20000.0
+        The size of GC-depth bins (decreasing bin size increases memory requirement). Default: `20000`.
+      example: 20000.0
     - name: --insert_size
       alternatives: -i
       type: integer
       description: |
-        Maximum insert size.
-      default: 8000
+        Maximum insert size. Default: `8000`.
+      example: 8000
     - name: --id
       alternatives: -I
       type: string
@@ -76,14 +78,14 @@ argument_groups:
       alternatives: -l
       type: integer
       description: |
-        Include in the statistics only reads with the given read length.
-      default: -1
+        Include in the statistics only reads with the given read length. Default: `-1`.
+      example: -1
     - name: --most_inserts
       alternatives: -m
       type: double
       description: |
-        Report only the main part of inserts.
-      default: 0.99
+        Report only the main part of inserts. Default: `0.99`.
+      example: 0.99
     - name: --split_prefix
       alternatives: -P
       type: string
@@ -93,8 +95,8 @@ argument_groups:
       alternatives: -q
       type: integer
       description: |
-        The BWA trimming parameter.
-      default: 0
+        The BWA trimming parameter. Default: `0`.
+      example: 0
     - name: --ref_seq
       alternatives: -r
       type: file
@@ -124,8 +126,8 @@ argument_groups:
       alternatives: -g
       type: integer
       description: |
-        Only bases with coverage above this value will be included in the target percentage computation.
-      default: 0
+        Only bases with coverage above this value will be included in the target percentage computation. Default: `0`.
+      example: 0
     - name: --input_fmt_option
       type: string
       description: |
@@ -141,7 +143,7 @@ argument_groups:
       type: file
       description: |
         Output file.
-      default: "out.txt"
+      example: "out.txt"
       required: true
       direction: output
 

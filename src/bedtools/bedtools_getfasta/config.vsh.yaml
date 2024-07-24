@@ -1,0 +1,106 @@
+name: bedtools_getfasta
+namespace: bedtools
+description: Extract sequences from a FASTA file for each of the intervals defined in a BED/GFF/VCF file.
+keywords: [sequencing, fasta, BED, GFF, VCF]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/getfasta.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: GPL-2.0
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/dries_schaumont.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Input arguments
+    arguments:
+      - name: --input_fasta
+        type: file
+        description: |
+          FASTA file containing sequences for each interval specified in the input BED file.
+          The headers in the input FASTA file must exactly match the chromosome column in the BED file.
+      - name: "--input_bed"
+        type: file
+        description: |
+          BED file containing intervals to extract from the FASTA file.
+          BED files containing a single region require a newline character
+          at the end of the line, otherwise a blank output file is produced.
+      - name: --rna
+        type: boolean_true
+        description: |
+          The FASTA is RNA not DNA. Reverse complementation handled accordingly.
+    
+  - name: Run arguments
+    arguments:
+        - name: "--strandedness"
+          type: boolean_true
+          alternatives: ["-s"]
+          description: |
+            Force strandedness. If the feature occupies the antisense strand, the output sequence will
+            be reverse complemented. By default strandedness is not taken into account.
+
+  - name: Output arguments
+    arguments:
+      - name: --output
+        alternatives: [-o]
+        required: true
+        type: file
+        direction: output
+        description: |
+          Output file where the output from the 'bedtools getfasta' commend will
+          be written to.
+      - name: --tab
+        type: boolean_true
+        description: |
+          Report extract sequences in a tab-delimited format instead of in FASTA format.
+      - name: --bed_out
+        type: boolean_true
+        description: |
+          Report extract sequences in a tab-delimited BED format instead of in FASTA format.
+      - name: "--name"
+        type: boolean_true
+        description: |
+          Set the FASTA header for each extracted sequence to be the "name" and coordinate columns from the BED feature.
+      - name: "--name_only"
+        type: boolean_true
+        description: |
+          Set the FASTA header for each extracted sequence to be the "name" columns from the BED feature.
+      - name: "--split"
+        type: boolean_true
+        description: |
+          When --input is in BED12 format, create a separate fasta entry for each block in a BED12 record,
+          blocks being described in the 11th and 12th column of the BED.
+      - name: "--full_header"
+        type: boolean_true
+        description: |
+          Use full fasta header. By default, only the word before the first space or tab is used.
+        
+# Arguments not taken into account:
+#
+#       -fo           [Specify an output file name. By default, output goes to stdout.
+#                            
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bedtools, procps]
+      - type: docker
+        run: |
+          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
