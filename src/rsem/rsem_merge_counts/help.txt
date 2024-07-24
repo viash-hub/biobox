@@ -1,3 +1,0 @@
-```bash
-rsem-merge-counts --help
-```

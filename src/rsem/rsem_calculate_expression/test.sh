@@ -2,15 +2,17 @@
 
 echo ">>> Testing $meta_executable"
 
-gunzip "${meta_resources_dir}/test_data/rsem.tar.gz"
-tar -xf "${meta_resources_dir}/test_data/rsem.tar"
+test_dir="${meta_resources_dir}/test_data"
+
+gunzip "${test_dir}/rsem.tar.gz"
+tar -xf "${test_dir}/rsem.tar"
 
 echo ">>> Calculating expression"
 "$meta_executable" \
   --id WT_REP1 \
   --strandedness reverse \
   --paired true \
-  --input "${meta_resources_dir}/test_data/SRR6357070_1.fastq.gz;${meta_resources_dir}/test_data/SRR6357070_2.fastq.gz" \
+  --input "${test_dir}/SRR6357070_1.fastq.gz;${test_dir}/SRR6357070_2.fastq.gz" \
   --index rsem \
   --extra_args "--star --star-output-genome-bam --star-gzipped-read-file --estimate-rspd --seed 1" \
   --counts_gene WT_REP1.genes.results \

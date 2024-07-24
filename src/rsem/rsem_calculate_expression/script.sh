@@ -22,7 +22,7 @@ fi
 
 IFS=";" read -ra input <<< $par_input
 
-INDEX=$(find -L "${meta_resources_dir}/${par_index}/" -name "*.grp" | sed 's/\.grp$//')
+INDEX=$(find -L $meta_resources_dir/$par_index -name "*.grp" | sed 's/\.grp$//')
 
 rsem-calculate-expression \
     $strandedness \
