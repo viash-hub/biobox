@@ -30,7 +30,7 @@ argument_groups:
           Create the HTML report of the results. 
           '*' wild card must be provided in the output file name. 
           Wild card will be replaced by the input basename.
-        example: input_fastqc.html
+        example: example_*.html
       
       - name: --zip
         type: file
@@ -40,7 +40,7 @@ argument_groups:
           Create the zip file(s) containing: html report, data, images, icons, summary, etc.
           '*' wild card must be provided in the output file name.
           Wild card will be replaced by the input basename.
-        example: input_fastqc.zip     
+        example: example_*.zip     
 
   - name: Options
     arguments:  
@@ -76,15 +76,6 @@ argument_groups:
           the same directory after it has been created.  By default
           this option will be set if fastqc is run in non-interactive
           mode.
-
-      - name: --java
-        alternatives: -j
-        type: file
-        description: |
-          Provides the full path to the java binary you want to use to
-          launch fastqc. If not supplied then java is assumed to be in
-          your path.
-        example: file
      
       - name: --noextract
         type: boolean_true
@@ -122,16 +113,6 @@ argument_groups:
           forces the program to use the specified format. 
           Valid formats are bam, sam, bam_mapped, sam_mapped, and fastq.
         example: bam
-
-      - name: --threads
-        alternatives: -t
-        type: integer
-        description: |
-          Specifies the number of files which can be processed simultaneously. 
-          Each thread will be allocated 250MB of memory so you shouldn't 
-          run more threads than your available memory will cope with, 
-          and not more than 6 threads on a 32-bit machine.
-        example: 4
         
       - name: --contaminants
         alternatives: -c
@@ -180,17 +161,7 @@ argument_groups:
         type: boolean_true
         description: |
           Suppress all progress messages on stdout and only report errors.
-
-      - name: --dir
-        alternatives: -d
-        type: file
-        description: |
-          Selects a directory to be used for temporary 
-          files written when generating report images. 
-          Defaults to system temp directory if not specified.
-        example: temp_dir
         
-
 resources:
   - type: bash_script
     path: script.sh

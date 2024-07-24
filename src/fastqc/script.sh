@@ -27,13 +27,13 @@ fastqc \
   ${par_nogroup:+--nogroup} \
   ${par_min_length:+--min_length "$par_min_length"} \
   ${par_format:+--format "$par_format"} \
-  ${par_threads:+--threads "$par_threads"} \
   ${par_contaminants:+--contaminants "$par_contaminants"} \
   ${par_adapters:+--adapters "$par_adapters"} \
   ${par_limits:+--limits "$par_limits"} \
   ${par_kmers:+--kmers "$par_kmers"} \
   ${par_quiet:+--quiet} \
-  ${par_dir:+--dir "$par_dir"} \
+  ${meta_cpus:+--threads "$meta_cpus"} \
+  ${meta_temp_dir:+--dir "$meta_temp_dir"} \
   ${par_input:+ ${input[*]}}
 
 # Get input directory
