@@ -269,6 +269,19 @@ echo "-> Run Test: multiple options"
 diff -a "test_data/expected_summary.txt" "test_data/input_1_fastqc/summary.txt" \
     || (echo "Output summary file does not match expected output" && exit 1)
 
+# Checking for contaminants in fastqc_data.txt
+echo "Checking for contaminants in fastqc_data.txt"
+result=$(cat test_data/input_1_fastqc/fastqc_data.txt | grep "contaminant" )
+expecte_result=$(printf "CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNN\t1\t100.0\tcontaminant_sequence1 (100%% over 44bp)\n")
+
+[ -z "$result" ] && echo "Contaminants not found in fastqc_data.txt" && exit 1
+
+[ "$result" != "$expecte_result" ] \
+ && echo "Contaminants do not match expected output" \
+ && echo "Result: $result" \
+ && echo "Expected: $expecte_result" \
+ && exit 1
+
 rm -r "test_data/input_1_fastqc"
 rm "test_data/input_1_fastqc.html"
 rm "test_data/input_1_fastqc.zip"
