@@ -1,0 +1,49 @@
+name: bedtools_getfasta
+namespace: bedtools
+description: |
+  bedtools intersect allows one to screen for overlaps between two sets of genomic features. 
+  Moreover, it allows one to have fine control as to how the intersections are reported. 
+  bedtools intersect works with both BED/GFF/VCF and BAM files as input.
+keywords: [feature intersection, BAM, BED, GFF, VCF]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: GPL-2.0, MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+    
+  - name: Outputs
+    arguments:
+  
+  - name: Options
+    arguments:
+        
+                         
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: biocontainers/bedtools:v2.27.1dfsg-4-deb_cv1
+    setup:
+      - type: docker
+        run: |
+          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
