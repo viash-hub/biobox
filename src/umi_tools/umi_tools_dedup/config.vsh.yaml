@@ -1,0 +1,305 @@
+name: umi_tools_dedup
+namespace: umi_tools
+description: |
+  Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read.
+keywords: [umi_tools, deduplication, dedup]
+links:
+  homepage: https://umi-tools.readthedocs.io/en/latest/
+  documentation: https://umi-tools.readthedocs.io/en/latest/reference/dedup.html
+  repository: https://github.com/CGATOxford/UMI-tools
+references: 
+  doi: 10.1101/gr.209601.116
+license: MIT
+authors:
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author, maintainer ]
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: --stdin
+        type: file
+        description: Input BAM or SAM file. Use --in_sam to specify SAM format.
+        required: true
+      - name: --in_sam
+        type: boolean_true
+        description: |
+          By default, inputs are assumed to be in BAM format. Use this options to specify the use of SAM
+          format for input.
+      - name: --bai
+        type: file
+        description: BAM index
+      - name: --random_seed
+        type: integer
+        description: Random seed to initialize number generator with.
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: --stdout
+        type: file
+        description: Deduplicated BAM file.
+        required: true
+        direction: output
+      - name: --out_sam
+        type: boolean_true
+        description: |
+          By default, outputa are written in BAM format. Use this options to specify the use of SAM format
+          for output.
+      - name: --paired
+        type: boolean_true
+        description: |
+          BAM is paired end - output both read pairs. This will also force the use of the template length
+          to determine reads with the same mapping coordinates.
+      - name: --output_stats
+        type: string
+        description: |
+          Generate files containing UMI based deduplication statistics files with this prefix in the file names.
+      - name: --extract_umi_method
+        type: string
+        choices: [read_id, tag, umis]
+        description: |
+          Specify the method by which the barcodes were encoded in the read.
+          The options are:
+            * read_id (default) 
+            * tag
+            * umis
+        example: "read_id"
+      - name: --umi_tag
+        type: string
+        description: |
+          The tag containing the UMI sequence. This is only required if the extract_umi_method is set to tag.
+      - name: --umi_separator
+        type: string
+        description: |
+          The separator used to separate the UMI from the read sequence. This is only required if the
+          extract_umi_method is set to id_read. Default: `_`.
+        example: '_'
+      - name: --umi_tag_split
+        type: string
+        description: Separate the UMI in tag by <SPLIT> and take the first element.
+      - name: --umi_tag_delimiter
+        type: string
+        description: Separate the UMI in by <DELIMITER> and concatenate the elements.
+      - name: --cell_tag
+        type: string
+        description: |
+          The tag containing the cell barcode sequence. This is only required if the extract_umi_method
+          is set to tag.
+      - name: --cell_tag_split
+        type: string
+        description: Separate the cell barcode in tag by <SPLIT> and take the first element.
+      - name: --cell_tag_delimiter
+        type: string
+        description: Separate the cell barcode in by <DELIMITER> and concatenate the elements.
+  
+  - name: Grouping Options
+    arguments:    
+      - name: --method
+        type: string
+        choices: [unique, percentile, cluster, adjacency, directional]
+        description: |
+          The method to use for grouping reads. 
+          The options are: 
+            * unique
+            * percentile
+            * cluster
+            * adjacency
+            * directional (default)
+        example: "directional"
+      - name: --edit_distance_threshold
+        type: integer
+        description: |
+          For the adjacency and cluster methods the threshold for the edit distance to connect two
+          UMIs in the network can be increased. The default value of 1 works best unless the UMI is
+          very long (>14bp). Default: `1`.
+        example: 1
+      - name: --spliced_is_unique
+        type: boolean_true
+        description: |
+          Causes two reads that start in the same position on the same strand and having the same UMI
+          to be considered unique if one is spliced and the other is not. (Uses the 'N' cigar operation
+          to test for splicing).
+      - name: --soft_clip_threshold
+        type: integer
+        description: |
+          Mappers that soft clip will sometimes do so rather than mapping a spliced read if there is only
+          a small overhang over the exon junction. By setting this option, you can treat reads with at
+          least this many bases soft-clipped at the 3' end as spliced. Default: `4`.
+        example: 4
+      - name: --multimapping_detection_method
+        type: string
+        description: |
+          If the sam/bam contains tags to identify multimapping reads, you can specify for use when selecting
+          the best read at a given loci. Supported tags are `NH`, `X0` and `XT`. If not specified, the read
+          with the highest mapping quality will be selected.
+      - name: --read_length
+        type: boolean_true
+        description: Use the read length as a criteria when deduping, for e.g. sRNA-Seq.
+  
+  - name: Single-cell RNA-Seq Options
+    arguments:
+      - name: --per_gene
+        type: boolean_true
+        description: |
+          Reads will be grouped together if they have the same gene. This is useful if your library prep
+          generates PCR duplicates with non identical alignment positions such as CEL-Seq. Note this option
+          is hardcoded to be on with the count command. I.e. counting is always performed per-gene. Must be
+          combined with either --gene_tag or --per_contig option.
+      - name: --gene_tag
+        type: string
+        description: |
+          Deduplicate per gene. The gene information is encoded in the bam read tag specified.
+      - name: --assigned_status_tag
+        type: string
+        description: |
+          BAM tag which describes whether a read is assigned to a gene. Defaults to the same value as given
+          for --gene_tag.
+      - name: --skip_tags_regex
+        type: string
+        description: |
+          Use in conjunction with the --assigned_status_tag option to skip any reads where the tag matches
+          this regex. Default ("^[__|Unassigned]") matches anything which starts with "__" or "Unassigned".
+      - name: --per_contig
+        type: boolean_true
+        description: |
+          Deduplicate per contig (field 3 in BAM; RNAME). All reads with the sam contig will be considered to
+          have the same alignment position. This is useful if you have aligned to a reference transcriptome
+          with one transcript per gene. If you have aligned to a transcriptome with more than one transcript
+          per gene, you can supply a map between transcripts and gene using the --gene_transcript_map option.
+      - name: --gene_transcript_map
+        type: file
+        description: |
+          A file containing a mapping between gene names and transcript names. The file should be tab
+          separated with the gene name in the first column and the transcript name in the second column.
+      - name: --per_cell
+        type: boolean_true
+        description: |
+          Reads will only be grouped together if they have the same cell barcode. Can be combined with
+          --per_gene.
+  
+  - name: SAM/BAM Options
+    arguments:
+      - name: --mapping_quality
+        type: integer
+        description: |
+          Minimium mapping quality (MAPQ) for a read to be retained. Default: `0`.
+        example: 0
+      - name: --unmapped_reads
+        type: string
+        description: |
+          How unmapped reads should be handled. 
+          The options are:
+            * "discard": Discard all unmapped reads. (default)
+            * "use":     If read2 is unmapped, deduplicate using read1 only. Requires --paired.
+            * "output":  Output unmapped reads/read pairs without UMI grouping/deduplication. Only available in umi_tools group.
+        example: "discard"
+      - name: --chimeric_pairs
+        type: string
+        choices: [discard, use, output]
+        description: |
+          How chimeric pairs should be handled. 
+          The options are:
+            * "discard": Discard all chimeric read pairs.
+            * "use":     Deduplicate using read1 only. (default)
+            * "output":  Output chimeric pairs without UMI grouping/deduplication. Only available in
+                         umi_tools group.
+        example: "use"
+      - name: --unpaired_reads
+        type: string
+        choices: [discard, use, output]
+        description: |
+          How unpaired reads should be handled. 
+          The options are: 
+            * "discard": Discard all unmapped reads.
+            * "use": If read2 is unmapped, deduplicate using read1 only. Requires --paired. (default)
+            * "output":  Output unmapped reads/read pairs without UMI grouping/deduplication. Only available
+                         in umi_tools group.
+        example: "use"
+      - name: --ignore_umi
+        type: boolean_true
+        description: Ignore the UMI and group reads using mapping coordinates only.
+      - name: --subset
+        type: double
+        description: |
+          Only consider a fraction of the reads, chosen at random. This is useful for doing saturation
+          analyses.
+      - name: --chrom
+        type: string
+        description: Only consider a single chromosome. This is useful for debugging/testing purposes.
+  
+  - name: Group/Dedup Options
+    arguments:
+      - name: --no_sort_output
+        type: boolean_true
+        description: |
+          By default, output is sorted. This involves the use of a temporary unsorted file (saved in
+          --temp_dir). Use this option to turn off sorting.
+      - name: --buffer_whole_contig
+        type: boolean_true
+        description: |
+          Forces dedup to parse an entire contig before yielding any reads for deduplication. This is the
+          only way to absolutely guarantee that all reads with the same start position are grouped together
+          for deduplication since dedup uses the start position of the read, not the alignment coordinate on
+          which the reads are sorted. However, by default, dedup reads for another 1000bp before outputting
+          read groups which will avoid any reads being missed with short read sequencing (<1000bp).
+  
+  - name: Common Options
+    arguments:
+      - name: --log
+        alternatives: -L
+        type: file
+        description: File with logging information.
+      - name: --log2stderr
+        type: boolean_true
+        description: Send logging information to stderr.
+      - name: --verbose
+        alternatives: -v
+        type: integer
+        description: |
+          Log level. The higher, the more output. Default: `0`.
+        example: 0
+      - name: --error
+        alternatives: -E
+        type: file
+        description: File with error information.
+      - name: --temp_dir
+        type: string
+        description: |
+          Directory for temporary files. If not set, the bash environmental variable TMPDIR is used.
+      - name: --compresslevel
+        type: integer
+        description: |
+          Level of Gzip compression to use. Default=6 matches GNU gzip rather than python gzip default.
+          Default: `6`.
+        example: 6
+      - name: --timeit
+        type: file
+        description: Store timing information in file.
+      - name: --timeit_name
+        type: string
+        description: |
+          Name in timing file for this class of jobs. Default: `all`.
+        example: "all"
+      - name: --timeit_header
+        type: string
+        description: Add header for timing information.
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/umi_tools:1.1.5--py39hf95cd2a_1
+    setup:
+      - type: docker
+        run: |
+            umi_tools -v | sed 's/ version//g' > /var/software_versions.txt
+runners:
+- type: executable
+- type: nextflow

@@ -38,7 +38,7 @@ IFS=";" read -ra inputs <<< $par_input
 
 if [[ -n "$par_include_modules" ]]; then
     include_modules=""
-    IFS="," read -ra incl_modules <<< $par_include_modules
+    IFS=";" read -ra incl_modules <<< $par_include_modules
     for i in "${incl_modules[@]}"; do
         include_modules+="--include $i "
     done
@@ -47,7 +47,7 @@ fi
 
 if [[ -n "$par_exclude_modules" ]]; then
     exclude_modules=""
-    IFS="," read -ra excl_modules <<< $par_exclude_modules
+    IFS=";" read -ra excl_modules <<< $par_exclude_modules
     for i in "${excl_modules[@]}"; do
         exclude_modules+="--exclude $i"
     done
@@ -56,7 +56,7 @@ fi
 
 if [[ -n "$par_ignore_analysis" ]]; then
     ignore=""
-    IFS="," read -ra ignore_analysis <<< $par_ignore_analysis
+    IFS=";" read -ra ignore_analysis <<< $par_ignore_analysis
     for i in "${ignore_analysis[@]}"; do
         ignore+="--ignore $i "
     done
@@ -65,7 +65,7 @@ fi
 
 if [[ -n "$par_ignore_samples" ]]; then
     ignore_samples=""
-    IFS="," read -ra ign_samples <<< $par_ignore_samples
+    IFS=";" read -ra ign_samples <<< $par_ignore_samples
     for i in "${ign_samples[@]}"; do
         ignore_samples+="--ignore-samples $i"
     done
