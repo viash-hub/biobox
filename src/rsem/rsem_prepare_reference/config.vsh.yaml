@@ -45,7 +45,7 @@ argument_groups:
         example: annotations.gtf
       - name: --gff3
         type: file
-        description: GFF3 annotation file. Converted t GTF format with the file name 'reference_name.gtf'. Please make sure that 'reference_name.gtf' does not exist. 
+        description: GFF3 annotation file. Converted to GTF format with the file name 'reference_name.gtf'. Please make sure that 'reference_name.gtf' does not exist. 
         example: annotations.gff
       - name: --gff3_rna_patterns
         type: string
@@ -88,21 +88,12 @@ argument_groups:
       - name: --bowtie
         type: boolean_true
         description: Build Bowtie indices. 
-      - name: --bowtie_path 
-        type: string
-        description: The path to the Bowtie executables. (By default the path to Bowtie executables is assumed to be in the user's PATH environment variable)
       - name: --bowtie2
         type: boolean_true
         description: Build Bowtie 2 indices.
-      - name: --bowtie2_path 
-        type: string
-        description: The path to the Bowtie 2 executables. (By default the path to Bowtie 2 executables is assumed to be in the user's PATH environment variable)
       - name: --star
         type: boolean_true
         description: Build STAR indices.
-      - name: --star_path 
-        type: string
-        description: The path to STAR's executable. (By default the path to Bowtie 2 executables is assumed to be in the user's PATH environment variable)
       - name: --star_sjdboverhang
         type: integer
         description: Length of the genomic sequence around annotated junction. It is only used for STAR to build splice junctions database and not needed for Bowtie or Bowtie2. It will be passed as the --sjdbOverhang option to STAR. According to STAR's manual, its ideal value is max(ReadLength)-1, e.g. for 2x101 paired-end reads, the ideal value is 101-1=100. In most cases, the default value of 100 will work as well as the ideal value. (Default is 100)
@@ -110,15 +101,12 @@ argument_groups:
       - name: --hisat2_hca
         type: boolean_true
         description: Build HISAT2 indices on the transcriptome according to Human Cell Atlas (HCA) SMART-Seq2 pipeline.
-      - name: --hisat2_path 
-        type: string
-        description: The path to the HISAT2 executables. (By default the path to HISAT2 executables is assumed to be in the user's PATH environment variable)
       - name: --quiet
         alternatives: -q
         type: boolean_true
         description: Suppress the output of logging information. 
   
-  - name: PRIOR-ENHANCED RSEM OPTIONS
+  - name: Prior-enhanced RSEM options
     arguments: 
       - name: --prep_pRSEM
         type: boolean_true
