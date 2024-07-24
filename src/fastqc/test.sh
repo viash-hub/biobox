@@ -289,6 +289,33 @@ rm "test_data/input_1_fastqc.zip"
 
 echo "- test succeeded -"
 
+# Test 6: Run fastqc with output options
+echo "-> Run Test: output options"
+"$meta_executable" \
+ --input "test_data/input_1.fq" \
+ --html "test_data/output_*_.html" \
+ --zip "test_data/output_*_.zip"
+
+# Check if the html file was generated
+[ ! -f "test_data/output_input_1_.html" ] \
+    && echo "Output HTML file not found." && exit 1
+
+# Check if the zip file was generated
+[ ! -f "test_data/output_input_1_.zip" ] \
+    && echo "Output ZIP file not found." && exit 1
+
+# Check if the files are empty
+[ ! -s "test_data/output_input_1_.html" ] \
+    && echo "Output HTML file is empty." && exit 1
+
+[ ! -s "test_data/output_input_1_.zip" ] \
+    && echo "Output ZIP file is empty." && exit 1
+
+rm "test_data/output_input_1_.html"
+rm "test_data/output_input_1_.zip"
+
+echo "- test succeeded -"
+
 
 echo "All tests succeeded!"
 exit 0
