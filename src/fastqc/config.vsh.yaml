@@ -35,6 +35,7 @@ argument_groups:
       - name: --zip
         type: file
         direction: output
+        multiple: true
         multiple_sep: ","
         description: |
           Create the zip file(s) containing: html report, data, images, icons etc.
@@ -45,18 +46,33 @@ argument_groups:
         type: file
         direction: output
         description: |
-          Create the output files in the specified directory.
+          Create all output files in the specified output directory.
+          Please note that this directory must exist as the program
+          will not create it.  If this option is not set then the 
+          output file for each sequence file is created in the same
+          directory as the sequence file which was processed.
         example: output_dir
 
   - name: Options
     arguments:  
       - name: --casava
         type: boolean_true
-        description: Files come from raw casava output.
+        description: | 
+          Files come from raw casava output. Files in the same sample
+          group (differing only by the group number) will be analysed
+          as a set rather than individually. Sequences with the filter
+          flag set in the header will be excluded from the analysis.
+          Files must have the same names given to them by casava
+          (including being gzipped and ending with .gz) otherwise they
+          won't be grouped together correctly.
       
       - name: --nano
         type: boolean_true
-        description: Files come from nanopore sequences and are in fast5 format.
+        description: |
+          Files come from nanopore sequences and are in fast5 format. In
+          this mode you can pass in directories to process and the program
+          will take in all fast5 files within those directories and produce
+          a single output file from the sequences found in all files.
       
       - name: --nofilter
         type: boolean_true
@@ -184,7 +200,6 @@ argument_groups:
           files written when generating report images. 
           Defaults to system temp directory if not specified.
         example: temp_dir
-
         
 
 resources:

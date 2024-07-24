@@ -37,8 +37,6 @@ fastqc \
   ${par_input:+ ${input[*]}}
 
 input_dir=$(dirname ${input[0]})
-# echo "input dir: $input_dir"
-# echo "input: ${input[*]}"
 
 # Both outputs args passed
 if [[ -n "$par_html" ]] && [[ -n "$par_zip" ]]; then
@@ -77,17 +75,15 @@ fi
 
 
 # Questions:
-# Should I unzip the zip file output and make multiple other outputs options for the viash component?
-# TODO: handle the output args if multiple files are passed
-# - if multiple files are passed, for the output args I can either change the config to multiple=false 
-# and pass just a dir as argument and mv the files to this dir, 
-# and would also work as well in the case of just one file passed (rename would be possible).
-# i guess I can discuss this with jakub and see what he thinks is best
-# because this is very similar to the -outdir flag of fastqc!
-
-# Do I create a code for the multiple files case where I also rename the files to the output args?
+# multiple = true does not allow for output without a * in the name. In the output.
+# Do I create output args for the unzip files?
 
 
+
+
+# echo "zip files: ${zip_files[*]}"
+# echo "input files: ${input[*]}"
+# pwd
 #[[ -z "$par_java" ]] && unset par_java
 #[[ "$par_min_length" == "false" ]] && unset par_min_length
 #[[ "$par_format" == "false" ]] && unset par_format
