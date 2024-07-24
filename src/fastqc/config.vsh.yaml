@@ -28,7 +28,8 @@ argument_groups:
         multiple: true
         description: |
           Create the HTML report of the results. 
-          '*' wild card must be provided in the output file name.
+          '*' wild card must be provided in the output file name. 
+          Wild card will be replaced by the input basename.
         example: input_fastqc.html
       
       - name: --zip
@@ -38,6 +39,7 @@ argument_groups:
         description: |
           Create the zip file(s) containing: html report, data, images, icons, summary, etc.
           '*' wild card must be provided in the output file name.
+          Wild card will be replaced by the input basename.
         example: input_fastqc.zip     
 
   - name: Options
