@@ -241,15 +241,6 @@ test_resources:
   - type: bash_script
     path: test.sh
 
-# engines:
-#   - type: docker
-#     image: biocontainers/bedtools:v2.27.1dfsg-4-deb_cv1
-#     setup:
-#       - type: apt
-#       - type: docker
-#         run: |
-#           bedtools --version > /var/software_versions.txt
-
 engines:
   - type: docker
     image: debian:stable-slim
@@ -260,6 +251,14 @@ engines:
         run: |
           echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
 
+# engines:
+#   - type: docker
+#     image: biocontainers/bedtools:v2.27.1dfsg-4-deb_cv1
+#     setup:
+#       - type: apt
+#       - type: docker
+#         run: |
+#           bedtools --version > /var/software_versions.txt
 
 runners:
   - type: executable

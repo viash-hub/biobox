@@ -55,4 +55,4 @@ bedtools intersect \
     -a "$par_input_a" \
     -b "$par_input_b" \
     > "$par_output"
-
+    

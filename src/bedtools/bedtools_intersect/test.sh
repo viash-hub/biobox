@@ -255,3 +255,8 @@ assert_identical_content "output.bed" "../test_data/expected_r.bed"
 echo "- test11 succeeded -"
 
 cd ..
+
+# TODO: 
+# - test for diferent file formats (eg. BAM, VCF, GFF, etc.)
+# - test for multiple file comparison
+# - test for different options combinations
