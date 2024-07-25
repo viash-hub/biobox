@@ -1,4 +1,4 @@
-name: bedtools_getfasta
+name: bedtools_intersect
 namespace: bedtools
 description: |
   bedtools intersect allows one to screen for overlaps between two sets of genomic features. 
@@ -173,7 +173,6 @@ argument_groups:
       - name: --genome
         alternatives: -g
         type: file
-        direction: input
         description: | 
           Provide a genome file to enforce consistent chromosome 
           sort order across input files. Only applies when used 
@@ -242,13 +241,25 @@ test_resources:
   - type: bash_script
     path: test.sh
 
+# engines:
+#   - type: docker
+#     image: biocontainers/bedtools:v2.27.1dfsg-4-deb_cv1
+#     setup:
+#       - type: apt
+#       - type: docker
+#         run: |
+#           bedtools --version > /var/software_versions.txt
+
 engines:
   - type: docker
-    image: biocontainers/bedtools:v2.27.1dfsg-4-deb_cv1
+    image: debian:stable-slim
     setup:
+      - type: apt
+        packages: [bedtools, procps]
       - type: docker
         run: |
           echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+
 
 runners:
   - type: executable
