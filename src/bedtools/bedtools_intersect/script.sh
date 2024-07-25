@@ -54,5 +54,5 @@ bedtools intersect \
     ${par_io_buffer_size:+-iobuf "$par_io_buffer_size"} \
     -a "$par_input_a" \
     -b "$par_input_b" \
+    > "$par_output"
 
-# TODO: mv output to path provide in --output

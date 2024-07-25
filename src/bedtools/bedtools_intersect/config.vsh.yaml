@@ -42,7 +42,13 @@ argument_groups:
     
   - name: Outputs
     arguments:
-      - name: 
+      - name: --output
+        type: file
+        direction: output
+        description: | 
+          The output BED file. 
+        required: true
+        example: output.bed
   
   - name: Options
     arguments:
@@ -172,7 +178,7 @@ argument_groups:
           Provide a genome file to enforce consistent chromosome 
           sort order across input files. Only applies when used 
           with -sorted option.
-        example:
+        example: genome.txt
 
       - name: --nonamecheck
         type: boolean_true
