@@ -6,8 +6,8 @@
 [[ "$par_write_a" == "false" ]] && unset par_write_a
 [[ "$par_write_b" == "false" ]] && unset par_write_b
 [[ "$par_left_outer_join" == "false" ]] && unset par_left_outer_join
-[[ "$par_write_A_and_B" == "false" ]] && unset par_write_A_and_B
-[[ "$par_write_A_and_B_plus" == "false" ]] && unset par_write_A_and_B_plus
+[[ "$par_write_overlap" == "false" ]] && unset par_write_overlap
+[[ "$par_write_overlap_plus" == "false" ]] && unset par_write_overlap_plus
 [[ "$par_report_A_if_no_overlap" == "false" ]] && unset par_report_A_if_no_overlap
 [[ "$par_number_of_overlaps_A" == "false" ]] && unset par_number_of_overlaps_A
 [[ "$par_report_no_overlaps_A" == "false" ]] && unset par_report_no_overlaps_A
@@ -25,12 +25,15 @@
 [[ "$par_header" == "false" ]] && unset par_header
 [[ "$par_no_buffer_output" == "false" ]] && unset par_no_buffer_output
 
+# Create input array 
+IFS=";" read -ra input <<< $par_input_b
+
 bedtools intersect \
     ${par_write_a:+-wa} \
     ${par_write_b:+-wb} \
     ${par_left_outer_join:+-loj} \
-    ${par_write_A_and_B:+-wo} \
-    ${par_write_A_and_B_plus:+-wao} \
+    ${par_write_overlap:+-wo} \
+    ${par_write_overlap_plus:+-wao} \
     ${par_report_A_if_no_overlap:+-u} \
     ${par_number_of_overlaps_A:+-c} \
     ${par_report_no_overlaps_A:+-v} \
@@ -53,6 +56,6 @@ bedtools intersect \
     ${par_no_buffer_output:+-nobuf} \
     ${par_io_buffer_size:+-iobuf "$par_io_buffer_size"} \
     -a "$par_input_a" \
-    -b "$par_input_b" \
+    ${par_input_b:+ -b ${input[*]}} \
     > "$par_output"
     

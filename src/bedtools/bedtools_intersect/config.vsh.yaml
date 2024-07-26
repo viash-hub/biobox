@@ -71,15 +71,15 @@ argument_groups:
           Perform a "left outer join". That is, for each feature in A report each overlap with B. 
           If no overlaps are found, report a NULL feature for B.
       
-      - name: --write_A_and_B
-        alternatives: -w0
+      - name: --write_overlap
+        alternatives: -wo
         type: boolean_true
         description: | 
           Write the original A and B entries plus the number of base pairs of overlap between the two features.
           - Overlaps restricted by -f and -r. 
             Only A features with overlap are reported.
       
-      - name: --write_A_and_B_plus
+      - name: --write_overlap_plus
         alternatives: -wao
         type: boolean_true
         description: | 

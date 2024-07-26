@@ -35,6 +35,27 @@ printf "chr1\t100\t200\nchr1\t150\t250\nchr1\t300\t400\n" > "test_data/featuresA
 # Create and populate featuresB.bed
 printf "chr1\t180\t280\nchr1\t290\t390\nchr1\t500\t600\n" > "test_data/featuresB.bed"
 
+# Create and populate featuresC.bed
+printf "chr1\t120\t220\nchr1\t250\t350\nchr1\t500\t580\n" > "test_data/featuresC.bed"
+
+# Create and populate examples gff files
+# example1.gff
+printf "##gff-version 3\n" > "test_data/example1.gff"
+printf "chr1\t.\tgene\t1000\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/example1.gff"
+printf "chr1\t.\tmRNA\t1000\t2000\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "test_data/example1.gff"
+printf "chr1\t.\texon\t1000\t1200\t.\t+\t.\tID=exon1;Parent=transcript1\n" >> "test_data/example1.gff"
+printf "chr1\t.\texon\t1500\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "test_data/example1.gff"
+printf "chr1\t.\tCDS\t1000\t1200\t.\t+\t0\tID=cds1;Parent=transcript1\n" >> "test_data/example1.gff"
+printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/example1.gff"
+# example2.gff
+printf "##gff-version 3\n" > "test_data/example2.gff"
+printf "chr1\t.\tgene\t1200\t1800\t.\t-\t.\tID=gene2;Name=Gene2\n" >> "test_data/example2.gff"
+printf "chr1\t.\tmRNA\t1400\t2000\t.\t-\t.\tID=transcript2;Parent=gene2\n" >> "test_data/example2.gff"
+printf "chr1\t.\texon\t1400\t2000\t.\t-\t.\tID=exon3;Parent=transcript2\n" >> "test_data/example2.gff"
+printf "chr1\t.\texon\t1600\t2000\t.\t-\t.\tID=exon4;Parent=transcript2\n" >> "test_data/example2.gff"
+printf "chr1\t.\tCDS\t3000\t3200\t.\t-\t1\tID=cds3;Parent=transcript2\n" >> "test_data/example2.gff"
+printf "chr1\t.\tCDS\t3500\t3700\t.\t-\t0\tID=cds4;Parent=transcript2\n" >> "test_data/example2.gff"
+
 # Create and populate expected output files for different tests
 printf "chr1\t180\t200\nchr1\t180\t250\nchr1\t300\t390\n" > "test_data/expected_default.bed"
 printf "chr1\t100\t200\nchr1\t150\t250\nchr1\t300\t400\n" > "test_data/expected_wa.bed"
@@ -47,6 +68,26 @@ printf "chr1\t180\t250\nchr1\t300\t390\n" > "test_data/expected_f50.bed"
 printf "chr1\t180\t250\nchr1\t300\t390\n" > "test_data/expected_f30.bed"
 printf "chr1\t180\t200\nchr1\t180\t250\nchr1\t300\t390\n" > "test_data/expected_f10.bed"
 printf "chr1\t180\t200\nchr1\t180\t250\nchr1\t300\t390\n" > "test_data/expected_r.bed"
+printf "chr1\t180\t200\nchr1\t120\t200\nchr1\t180\t250\nchr1\t150\t220\nchr1\t300\t390\nchr1\t300\t350\n" > "test_data/expected_multiple.bed"
+# expected gff file
+printf "chr1\t.\tgene\t1200\t1800\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tgene\t1400\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tgene\t1400\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tgene\t1600\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tmRNA\t1200\t1800\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tmRNA\t1400\t2000\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tmRNA\t1400\t2000\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tmRNA\t1600\t2000\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "test_data/expected.gff"
+printf "chr1\t.\texon\t1200\t1200\t.\t+\t.\tID=exon1;Parent=transcript1\n" >> "test_data/expected.gff"
+printf "chr1\t.\texon\t1500\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "test_data/expected.gff"
+printf "chr1\t.\texon\t1500\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "test_data/expected.gff"
+printf "chr1\t.\texon\t1500\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "test_data/expected.gff"
+printf "chr1\t.\texon\t1600\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tCDS\t1200\t1200\t.\t+\t0\tID=cds1;Parent=transcript1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/expected.gff"
+printf "chr1\t.\tCDS\t1600\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/expected.gff"
 
 # Test 1: -wa option
 mkdir test1
@@ -75,7 +116,7 @@ echo "> Run bedtools_intersect on BED files with -wa option"
   --input_a "../test_data/featuresA.bed" \
   --input_b "../test_data/featuresB.bed" \
   --output "output.bed" \
-  --write_a true
+  --write_a
 
 # checks
 assert_file_exists "output.bed"
@@ -94,7 +135,7 @@ echo "> Run bedtools_intersect on BED files with -wb option"
   --input_a "../test_data/featuresA.bed" \
   --input_b "../test_data/featuresB.bed" \
   --output "output.bed" \
-  --write_b true
+  --write_b 
 
 # checks
 assert_file_exists "output.bed"
@@ -113,7 +154,7 @@ echo "> Run bedtools_intersect on BED files with -loj option"
   --input_a "../test_data/featuresA.bed" \
   --input_b "../test_data/featuresB.bed" \
   --output "output.bed" \
-  --left_outer_join true
+  --left_outer_join
 
 # checks
 assert_file_exists "output.bed"
@@ -132,7 +173,8 @@ echo "> Run bedtools_intersect on BED files with -wo option"
   --input_a "../test_data/featuresA.bed" \
   --input_b "../test_data/featuresB.bed" \
   --output "output.bed" \
-  --write_A_and_B true
+  --write_overlap 
+  
 
 # checks
 assert_file_exists "output.bed"
@@ -256,7 +298,46 @@ echo "- test11 succeeded -"
 
 cd ..
 
+
+# Test 12: Multiple files
+mkdir test12
+cd test12
+
+echo "> Run bedtools_intersect on multiple BED files"
+"$meta_executable" \
+  --input_a "../test_data/featuresA.bed" \
+  --input_b "../test_data/featuresB.bed" \
+  --input_b "../test_data/featuresC.bed" \
+  --output "output.bed"
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_multiple.bed"
+echo "- test12 succeeded -"
+
+cd ..
+
+# Test 13: VCF file format
+mkdir test13
+cd test13
+
+echo "> Run bedtools_intersect on GFF files"
+"$meta_executable" \
+  --input_a "../test_data/example1.gff" \
+  --input_b "../test_data/example2.gff" \
+  --output "output.bed"
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected.gff"
+echo "- test13 succeeded -"
+
+cd ..
+
 # TODO: 
-# - test for diferent file formats (eg. BAM, VCF, GFF, etc.)
-# - test for multiple file comparison
 # - test for different options combinations
+
+echo "---- All tests succeeded! ----"
+exit 0
