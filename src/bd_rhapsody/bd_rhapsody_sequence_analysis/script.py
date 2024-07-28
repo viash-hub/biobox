@@ -159,7 +159,8 @@ def main(par: dict[str, Any], meta: dict[str, Any]):
         os.makedirs(par["output"])
 
     ## Process parameters
-    proc_pars = [
+    cmd = [
+        "cwl-runner",
         "--no-container",
         "--preserve-entire-environment",
         "--outdir",
@@ -167,16 +168,10 @@ def main(par: dict[str, Any], meta: dict[str, Any]):
     ]
 
     if par["parallel"]:
-        proc_pars.append("--parallel")
+        cmd.append("--parallel")
 
     if par["timestamps"]:
-        proc_pars.append("--timestamps")
-
-    # Create params file
-    config_file = os.path.join(par["output"], "config.yml")
-    config_content = generate_config(par, config)
-    with open(config_file, "w") as f:
-        f.write(config_content)
+        cmd.append("--timestamps")
 
     # Create cwl file (if need be)
     cwl_file = generate_cwl_file(par, meta)
@@ -184,8 +179,16 @@ def main(par: dict[str, Any], meta: dict[str, Any]):
     ## Run pipeline
     if not par["dryrun"]:
         with tempfile.TemporaryDirectory(prefix="cwl-bd_rhapsody_wta-", dir=meta["temp_dir"]) as temp_dir:
-            cmd = ["cwl-runner"] + proc_pars + [cwl_file, config_file]
-
+            # Create params file
+            config_file = os.path.join(temp_dir, "config.yml")
+            config_content = generate_config(par, config)
+            with open(config_file, "w") as f:
+                f.write(config_content)
+            
+            # add cwl and params file to the cmd
+            cmd.extend[[cwl_file, config_file]]
+            
+            # keep environment variables but set TMPDIR to temp_dir
             env = dict(os.environ)
             env["TMPDIR"] = temp_dir
 

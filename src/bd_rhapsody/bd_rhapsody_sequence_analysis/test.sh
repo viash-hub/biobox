@@ -33,6 +33,35 @@ assert_file_contains_regex() {
 assert_file_not_contains_regex() {
   grep -q -E "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
 }
+
+#########################################################################################
+
+# generate index. this is not part of the unit test, but data we need to run
+# the bd rhapsody pipeline.
+echo "> Generate index"
+CWL_FILE="$meta_resources_dir/bd_rhapsody_make_reference.cwl"
+CONFIG_FILE="reference_config.yml"
+REFERENCE_FILE="index/Rhap_reference.tar.gz"
+
+cat > $CONFIG_FILE <<EOF
+Genome_fasta:
+  - class: File
+    location: $meta_resources_dir/test_data/reference_small.fa
+Gtf:
+  - class: File
+    location: $meta_resources_dir/test_data/reference_small.gtf
+EOF
+
+cwl-runner \
+  --no-container \
+  --preserve-entire-environment \
+  --outdir $(dirname "$REFERENCE_FILE") \
+  "$CWL_FILE" \
+  --Genome_fasta "$meta_resources_dir/test_data/reference_small.fa" \
+  --Gtf "$meta_resources_dir/test_data/reference_small.gtf" \
+  --Extra_STAR_params "--genomeSAindexNbases 4"
+
+
 #############################################
 
 echo "> Prepare test data"
@@ -49,7 +78,6 @@ echo "> Prepare test data"
 # CLS1       Link CLS2      Link CLS3       UMI
 # AAAATCCTGT GTGA AACCAAAGT GACA GATAGAGGAG CGCATGTTTATAAC
 
-
 cat > reads_R1.fastq <<'EOF'
 @A00226:970:H5FGVDMXY:1:1101:2645:1000 1:N:0:CAGAGAGG
 AAAATCCTGTGTGAAACCAAAGTGACAGATAGAGGAGCGCATGTTTATAAC
@@ -61,6 +89,7 @@ AATAAGTGCGTGAAGAATGGAGGACAACAACTAGAATATTATGTTTGTAAA
 :FFFF:F:FF,,FFFFF:F:F,:FFFF:FFFFF:,:,FF,FFFFFF:,FFF
 EOF
 
+# ENST00000607096:
 # GGATGCCCAGCTAGTTTGAATTTTAGATAAACAACGAATAATTTCGTAGCATAAATATGTCCCAAGCTTAGTTTGGGACATACTTATGCTAAAAAACATTATTGGTTGTTTATCTGAGATTCAGAATTAAGCATTTTAT
 
 # note: probably need to reverse it
@@ -75,39 +104,24 @@ AATAATTTCGTAGCATAAATATGTCCCAAGCTTAGTTTGGGACATACTTATGCTAAAAAACATTATTGGTT
 F:FFFF:F,:FFFF,F:FF:F:FFFFFFFF,FF,:FFFFFFFF:FF,,F::FF::FFFFF:F:FFFFF:,F
 EOF
 
+# gzip
+gzip -c reads_R1.fastq > reads_R1.fq.gz
+gzip -c reads_R2.fastq > reads_R2.fq.gz
 
-
-echo "> Generate index"
-CWL_FILE="$meta_resources_dir/bd_rhapsody_make_reference.cwl"
-CONFIG_FILE="reference_config.yml"
-
-cat > $CONFIG_FILE <<EOF
-Genome_fasta:
-  - class: File
-    location: $meta_resources_dir/test_data/reference_small.fa
-Gtf:
-  - class: File
-    location: $meta_resources_dir/test_data/reference_small.gtf
-EOF
-
-cwl-runner \
-  --no-container \
-  --preserve-entire-environment \
-  --outdir index \
-  $CWL_FILE \
-  --Genome_fasta "$meta_resources_dir/test_data/reference_small.fa" \
-  --Gtf "$meta_resources_dir/test_data/reference_small.gtf"
-  
 #########################################################################################
 
 echo ">> Run $meta_name"
 "$meta_executable" \
-  --reads reads_R1.fastq \
-  --reads reads_R2.fastq \
-  --reference_archive "$meta_resources_dir/test_data/reference_small.tar.gz" \
+  --reads reads_R1.fq.gz \
+  --reads reads_R2.fq.gz \
+  --reference_archive "$REFERENCE_FILE" \
   --output output \
   ${meta_cpus:+---cpus $meta_cpus} \
-  ${meta_memory_mb:+---memory ${meta_memory_mb}MB}
+  ${meta_memory_mb:+---memory ${meta_memory_mb}MB} \
+  --cell_calling_data mRNA \
+  --exact_cell_count 2 \
+  --expected_cell_count 2 \
+  --exclude_intronic_reads false
 
 # echo ">> Check if output exists"
 # assert_file_exists "output.bam"
@@ -127,5 +141,7 @@ echo ">> Run $meta_name"
 # assert_file_contains "log.txt" "Uniquely mapped reads number \\|	1"
 
 #########################################################################################
+
+# TODO: add test with ABC, VDJ, SMK, and ATAC
 
 echo "> Test successful"

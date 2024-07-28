@@ -117,6 +117,12 @@ argument_groups:
           config_key: Supplemental_Reference
   - name: Outputs
     arguments:
+      # TODO: split up into different outputs
+      # - ${run_name}_Bioproduct_Stats.csv
+      # - ${run_name}_Metrics_Summary.csv
+      # - ${run_name}_RSEC_MolsPerCell_Unfiltered_MEX.zip
+      # - ${run_name}_Logs/
+      # TODO: determine additional outputs for ABC, ATAC, VDJ, SMK
       - name: "--output"
         type: file
         direction: output
@@ -195,10 +201,11 @@ argument_groups:
       - name: "--sample_tags_version"
         type: string
         description: |
-          If Sample Tag Multiplexing was done, specify the appropriate version: human, mouse, flex, nuclei_includes_mrna, nuclei_atac_only
+          Specify the version of the Sample Tags used in the run:
 
-          If this is an SMK + Nuclei mRNA run or an SMK + Multiomic ATAC-Seq (WTA+ATAC-Seq) run (and not an SMK + ATAC-Seq only run), choose the "nuclei_includes_mrna" option.
-          If this is an SMK + ATAC-Seq only run (and not SMK + Multiomic ATAC-Seq (WTA+ATAC-Seq)), choose the "nuclei_atac_only" option.
+          * If Sample Tag Multiplexing was done, specify the appropriate version: human, mouse, flex, nuclei_includes_mrna, nuclei_atac_only
+          * If this is an SMK + Nuclei mRNA run or an SMK + Multiomic ATAC-Seq (WTA+ATAC-Seq) run (and not an SMK + ATAC-Seq only run), choose the "nuclei_includes_mrna" option.
+          * If this is an SMK + ATAC-Seq only run (and not SMK + Multiomic ATAC-Seq (WTA+ATAC-Seq)), choose the "nuclei_atac_only" option.
         choices: [human, mouse, flex, nuclei_includes_mrna, nuclei_atac_only]
         example: human
         info:
@@ -236,9 +243,9 @@ argument_groups:
         type: string
         description: |
           Specify a run name to use as the output file base name. Use only letters, numbers, or hyphens. Do not use special characters or spaces.
-        # default: sample
-        # info:
-        #   config_key: Run_Name
+        default: sample
+        info:
+          config_key: Run_Name
       - name: "--generate_bam"
         type: boolean
         description: |
