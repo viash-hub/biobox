@@ -166,26 +166,36 @@ EOF
 
 #########################################################################################
 
+
+  # --reads ABCreads_R1.fq.gz \
+  # --reads ABCreads_R2.fq.gz \
+  # --abseq_reference bdabseq_smallpanel.fasta \
+
+  # --reads SMKreads_R1.fq.gz \
+  # --reads SMKreads_R2.fq.gz \
+  # --tag_names 1-Jurkat \
+  # --tag_names 2-Ramos \
+  # --tag_names 3-THP1 \
+
+
+  # --cell_calling_data mRNA \
+  # --target_analysis true \
+  # --write_filtered_reads true
+  # --expected_cell_count 2 \
+
 echo ">> Run $meta_name"
 "$meta_executable" \
   --reads WTAreads_R1.fq.gz \
   --reads WTAreads_R2.fq.gz \
-  --reads ABCreads_R1.fq.gz \
-  --reads ABCreads_R2.fq.gz \
-  --reads SMKreads_R1.fq.gz \
-  --reads SMKreads_R2.fq.gz \
   --reference_archive "$REFERENCE_FILE" \
-  --abseq_reference bdabseq_smallpanel.fasta \
-  --output output \
+  --output_dir output \
   ${meta_cpus:+---cpus $meta_cpus} \
   ${meta_memory_mb:+---memory ${meta_memory_mb}MB} \
-  --cell_calling_data mRNA \
+  --reads ABCreads_R1.fq.gz \
+  --reads ABCreads_R2.fq.gz \
+  --abseq_reference bdabseq_smallpanel.fasta \
   --exact_cell_count 2 \
-  --expected_cell_count 2 \
-  --exclude_intronic_reads false \
-  --tag_names 1-Jurkat \
-  --tag_names 2-Ramos \
-  --tag_names 3-THP1
+  --exclude_intronic_reads false
 
 # echo ">> Check if output exists"
 # assert_file_exists "output.bam"

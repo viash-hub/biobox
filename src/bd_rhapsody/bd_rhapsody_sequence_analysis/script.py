@@ -4,6 +4,8 @@ import subprocess
 import tempfile
 from typing import Any
 import yaml
+import shutil
+import glob
 
 ## VIASH START
 par = {
@@ -60,19 +62,20 @@ def read_config(path: str) -> dict[str, Any]:
     
     return config
 
-def logger(msg: str):
-    print(msg, flush=True)
-
 def strip_margin(text: str) -> str:
     return re.sub('(\n?)[ \t]*\|', '\\1', text)
 
-def process_params(par: dict[str, Any], config) -> str:
+def process_params(par: dict[str, Any], config, temp_dir: str) -> str:
     # check input parameters
     assert par["reads"] or par["reads_atac"], "Pass at least one set of inputs to --reads or --reads_atac."
 
+    # output to temp dir if output_dir was not passed
+    if not par["output_dir"]:
+        par["output_dir"] = os.path.join(temp_dir, "output")
+
     # checking sample prefix
     if par["run_name"] and re.match("[^A-Za-z0-9]", par["run_name"]):
-        logger("--run_name should only consist of letters, numbers or hyphens. Replacing all '[^A-Za-z0-9]' with '-'.")
+        print("--run_name should only consist of letters, numbers or hyphens. Replacing all '[^A-Za-z0-9]' with '-'.", flush=True)
         par["run_name"] = re.sub("[^A-Za-z0-9\\-]", "-", par["run_name"])
 
     # make paths absolute
@@ -121,13 +124,20 @@ def generate_config(par: dict[str, Any], config) -> str:
     ## Write config to file
     return ''.join(content_list)
 
-def generate_cwl_file(par: dict[str, Any], meta: dict[str, Any]) -> str:
+def generate_config_file(par: dict[str, Any], config: dict[str, Any], temp_dir: str) -> str:
+    config_file = os.path.join(temp_dir, "config.yml")
+    config_content = generate_config(par, config)
+    with open(config_file, "w") as f:
+        f.write(config_content)
+    return config_file
+
+def generate_cwl_file(meta: dict[str, Any], dir: str) -> str:
     # create cwl file (if need be)
     orig_cwl_file=os.path.join(meta["resources_dir"], "rhapsody_pipeline_2.2.1_nodocker.cwl")
 
     # Inject computational requirements into pipeline
     if meta["memory_mb"] or meta["cpus"]:
-        cwl_file = os.path.join(par["output"], "pipeline.cwl")
+        cwl_file = os.path.join(dir, "pipeline.cwl")
 
         # Read in the file
         with open(orig_cwl_file, 'r') as file :
@@ -148,23 +158,43 @@ def generate_cwl_file(par: dict[str, Any], meta: dict[str, Any]) -> str:
 
     return cwl_file
 
-def main(par: dict[str, Any], meta: dict[str, Any]):
-    config = read_config(meta["config"])
-        
-    # Preprocess params
-    par = process_params(par, config)
+def copy_outputs(par: dict[str, Any], config: dict[str, Any]):
+    for arg in config["arguments"]:
+        par_value = par[arg["clean_name"]]
+        if par_value and arg["type"] == "file" and par["direction"] == "output":
+            # example template: '[sample_name]_(assay)_cell_type_experimental.csv'
+            template = arg.get("info", {}).get("template")
+            if template:
+                template_glob = template\
+                    .replace("[sample_name]", par["run_name"])\
+                    .replace("(assay)", "*")\
+                    .replace("[number]", "*")
+                files = glob.glob(os.path.join(par["output_dir"], template_glob))
+                if len(files) == 0 and arg["required"]:
+                    raise ValueError(f"Expected output file '{template_glob}' not found.")
+                elif len(files) > 1 and not arg["multiple"]:
+                    raise ValueError(f"Expected single output file '{template_glob}', but found multiple.")
+                
+                if not arg["multiple"]:
+                    shutil.copy(files[0], par_value)
+                else:
+                    # replace '*' in par_value with index
+                    for i, file in enumerate(files):
+                        shutil.copy(file, par_value.replace("*", str(i)))
 
-    # Create output dir if not exists
-    if not os.path.exists(par["output"]):
-        os.makedirs(par["output"])
+
+def main(par: dict[str, Any], meta: dict[str, Any], temp_dir: str):
+    config = read_config(meta["config"])
+    
+    # Preprocess params
+    par = process_params(par, config, temp_dir)
 
     ## Process parameters
     cmd = [
         "cwl-runner",
         "--no-container",
         "--preserve-entire-environment",
-        "--outdir",
-        par["output"]
+        "--outdir", par["output_dir"],
     ]
 
     if par["parallel"]:
@@ -174,56 +204,32 @@ def main(par: dict[str, Any], meta: dict[str, Any]):
         cmd.append("--timestamps")
 
     # Create cwl file (if need be)
-    cwl_file = generate_cwl_file(par, meta)
+    cwl_file = generate_cwl_file(meta, temp_dir)
+    cmd.append(cwl_file)
 
-    ## Run pipeline
-    if not par["dryrun"]:
-        with tempfile.TemporaryDirectory(prefix="cwl-bd_rhapsody_wta-", dir=meta["temp_dir"]) as temp_dir:
-            # Create params file
-            config_file = os.path.join(temp_dir, "config.yml")
-            config_content = generate_config(par, config)
-            with open(config_file, "w") as f:
-                f.write(config_content)
-            
-            # add cwl and params file to the cmd
-            cmd.extend([cwl_file, config_file])
-            
-            # keep environment variables but set TMPDIR to temp_dir
-            env = dict(os.environ)
-            env["TMPDIR"] = temp_dir
+    # Create params file
+    config_file = generate_config_file(par, config, temp_dir)
+    cmd.append(config_file)
+    
+    # keep environment variables but set TMPDIR to temp_dir
+    env = dict(os.environ)
+    env["TMPDIR"] = temp_dir
 
-            logger("> " + ' '.join(cmd))
-            _ = subprocess.check_call(
-                cmd,
-                cwd=os.path.dirname(config_file),
-                env=env
-            )
+    # Create output dir if not exists
+    if not os.path.exists(par["output_dir"]):
+        os.makedirs(par["output_dir"])
 
-    # maybe this won't be necessary anymore
-    # # extracting feature ids from references
-    # # extract info from reference files (while they still exist)
-    # feature_df = extract_feature_types(par)
-    # feature_types_file = os.path.join(par["output"], "feature_types.tsv")
-    # feature_df.to_csv(feature_types_file, sep="\t", index=False)
+    # Run command
+    print("> " + ' '.join(cmd), flush=True)
+    _ = subprocess.check_call(
+        cmd,
+        cwd=os.path.dirname(config_file),
+        env=env
+    )
 
-    # if not par["dryrun"]:
-    #     # look for counts file
-    #     if not par["run_name"]:
-    #         par["run_name"] = "sample"
-    #     counts_filename = par["run_name"] + "_RSEC_MolsPerCell.csv"
-        
-    #     if par["sample_tags_version"]:
-    #         counts_filename = "Combined_" + counts_filename
-    #     counts_file = os.path.join(par["output"], counts_filename)
-        
-    #     if not os.path.exists(counts_file):
-    #         raise ValueError(f"Could not find output counts file '{counts_filename}'")
-
-    #     # look for metrics file
-    #     metrics_filename = par["run_name"] + "_Metrics_Summary.csv"
-    #     metrics_file = os.path.join(par["output"], metrics_filename)
-    #     if not os.path.exists(metrics_file):
-    #         raise ValueError(f"Could not find output metrics file '{metrics_filename}'")
+    # Copy outputs
+    copy_outputs(par, config)
 
 if __name__ == "__main__":
-    main(par, meta)
+    with tempfile.TemporaryDirectory(prefix="cwl-bd_rhapsody-", dir=meta["temp_dir"]) as temp_dir:
+        main(par, meta, temp_dir)
