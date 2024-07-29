@@ -1,4 +1,6 @@
-
+```bash
+bedtools sort
+```
 
 Tool:    bedtools sort (aka sortBed)
 Version: v2.27.1
