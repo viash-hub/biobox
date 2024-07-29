@@ -32,7 +32,7 @@ mkdir -p test_data
 # Create and populate example files
 printf "chr1\t300\t400\nchr1\t150\t250\nchr1\t100\t200" > "test_data/featureA.bed"
 printf "chr2\t290\t400\nchr2\t180\t220\nchr1\t500\t600" > "test_data/featureB.bed"
-printf "chr3\t120\t220\nchr1\t250\t350\nchr2\t500\t580" > "test_data/featureC.bed"
+printf "chr1\t100\t200\tfeature1\t960\nchr1\t150\t250\tfeature2\t850\nchr1\t300\t400\tfeature3\t740\nchr2\t290\t390\tfeature4\t630\nchr2\t180\t280\tfeature5\t920\nchr3\t120\t220\tfeature6\t410\n" > "test_data/featureC.bed"
 
 # Create and populate example.gff file
 printf "##gff-version 3\n" > "test_data/example.gff"
@@ -49,6 +49,9 @@ printf "chr2\t180\t220\nchr1\t500\t600\nchr2\t290\t400\n" > "test_data/expected_
 printf "chr2\t290\t400\nchr1\t500\t600\nchr2\t180\t220\n" > "test_data/expected_sizeD.bed"
 printf "chr1\t500\t600\nchr2\t180\t220\nchr2\t290\t400\n" > "test_data/expected_chrThenSizeA.bed"
 printf "chr1\t500\t600\nchr2\t290\t400\nchr2\t180\t220\n" > "test_data/expected_chrThenSizeD.bed"
+printf "chr1\t300\t400\tfeature3\t740\nchr1\t150\t250\tfeature2\t850\nchr1\t100\t200\tfeature1\t960\nchr2\t290\t390\tfeature4\t630\nchr2\t180\t280\tfeature5\t920\nchr3\t120\t220\tfeature6\t410\n" > "test_data/expected_chrThenScoreA.bed"
+printf "chr1\t100\t200\tfeature1\t960\nchr1\t150\t250\tfeature2\t850\nchr1\t300\t400\tfeature3\t740\nchr2\t180\t280\tfeature5\t920\nchr2\t290\t390\tfeature4\t630\nchr3\t120\t220\tfeature6\t410\n" > "test_data/expected_chrThenScoreD.bed"
+
 
 # expected_sorted.gff
 printf "chr1\t.\tgene\t1000\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/expected_sorted.gff"
@@ -166,41 +169,41 @@ echo "- test6 succeeded -"
 
 cd ..
 
-# # Test 7: Sort on chrThenScoreA
-# mkdir test7
-# cd test7
+# Test 7: Sort on chrThenScoreA
+mkdir test7
+cd test7
 
-# echo "> Run bedtools_sort on BED file with chrThenScoreA"
-# "$meta_executable" \
-#     --input "../test_data/featureB.bed" \
-#     --output "output.bed" \
-#     --chrThenScoreA
+echo "> Run bedtools_sort on BED file with chrThenScoreA"
+"$meta_executable" \
+    --input "../test_data/featureC.bed" \
+    --output "output.bed" \
+    --chrThenScoreA
 
-# # checks
-# assert_file_exists "output.bed"
-# assert_file_not_empty "output.bed"
-# assert_identical_content "output.bed" "../test_data/expected_sorted_A.bed"
-# echo "- test7 succeeded -"
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_chrThenScoreA.bed"
+echo "- test7 succeeded -"
 
-# cd ..
+cd ..
 
-# # Test 8: Sort on chrThenScoreD
-# mkdir test8
-# cd test8
+# Test 8: Sort on chrThenScoreD
+mkdir test8
+cd test8
 
-# echo "> Run bedtools_sort on BED file with chrThenScoreD"
-# "$meta_executable" \
-#     --input "../test_data/featureB.bed" \
-#     --output "output.bed" \
-#     --chrThenScoreD
+echo "> Run bedtools_sort on BED file with chrThenScoreD"
+"$meta_executable" \
+    --input "../test_data/featureC.bed" \
+    --output "output.bed" \
+    --chrThenScoreD
 
-# # checks
-# assert_file_exists "output.bed"
-# assert_file_not_empty "output.bed"
-# assert_identical_content "output.bed" "../test_data/expected_sizeD.bed"
-# echo "- test8 succeeded -"
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_chrThenScoreD.bed"
+echo "- test8 succeeded -"
 
-# cd ..
+cd ..
 
 # # Test 9: Sort according to genome file
 # mkdir test9
