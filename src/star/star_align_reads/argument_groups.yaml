@@ -1,19 +1,23 @@
 argument_groups:
 - name: Run Parameters
   arguments:
-  - name: --runRNGseed
+  - name: --run_rng_seed
     type: integer
     description: random number generator seed.
+    info:
+      orig_name: --runRNGseed
     example: 777
 - name: Genome Parameters
   arguments:
-  - name: --genomeDir
+  - name: --genome_dir
     type: file
     description: path to the directory where genome files are stored (for --runMode
       alignReads) or will be generated (for --runMode generateGenome)
+    info:
+      orig_name: --genomeDir
     example: ./GenomeDir/
-    required: yes
-  - name: --genomeLoad
+    required: true
+  - name: --genome_load
     type: string
     description: |-
       mode of shared memory usage for the genome files. Only used with --runMode alignReads.
@@ -23,132 +27,162 @@ argument_groups:
       - LoadAndExit     ... load genome into shared memory and exit, keeping the genome in memory for future runs
       - Remove          ... do not map anything, just remove loaded genome from memory
       - NoSharedMemory  ... do not use shared memory, each job will have its own private copy of the genome
+    info:
+      orig_name: --genomeLoad
     example: NoSharedMemory
-  - name: --genomeFastaFiles
+  - name: --genome_fasta_files
     type: file
     description: |-
       path(s) to the fasta files with the genome sequences, separated by spaces. These files should be plain text FASTA files, they *cannot* be zipped.
 
       Required for the genome generation (--runMode genomeGenerate). Can also be used in the mapping (--runMode alignReads) to add extra (new) sequences to the genome (e.g. spike-ins).
-    multiple: yes
-    multiple_sep: ;
-  - name: --genomeFileSizes
+    info:
+      orig_name: --genomeFastaFiles
+    multiple: true
+  - name: --genome_file_sizes
     type: integer
     description: genome files exact sizes in bytes. Typically, this should not be
       defined by the user.
+    info:
+      orig_name: --genomeFileSizes
     example: 0
-    multiple: yes
-    multiple_sep: ;
-  - name: --genomeTransformOutput
+    multiple: true
+  - name: --genome_transform_output
     type: string
     description: |-
       which output to transform back to original genome
 
       - SAM     ... SAM/BAM alignments
       - SJ      ... splice junctions (SJ.out.tab)
-      - Quant   ... quantifications (from --quantMode option)
+      - Quant   ... quantifications (from --quant_mode option)
       - None    ... no transformation of the output
-    multiple: yes
-    multiple_sep: ;
-  - name: --genomeChrSetMitochondrial
+    info:
+      orig_name: --genomeTransformOutput
+    multiple: true
+  - name: --genome_chr_set_mitochondrial
     type: string
     description: names of the mitochondrial chromosomes. Presently only used for STARsolo
       statistics output/
+    info:
+      orig_name: --genomeChrSetMitochondrial
     example:
     - chrM
     - M
     - MT
-    multiple: yes
-    multiple_sep: ;
+    multiple: true
 - name: Splice Junctions Database
   arguments:
-  - name: --sjdbFileChrStartEnd
+  - name: --sjdb_file_chr_start_end
     type: string
     description: path to the files with genomic coordinates (chr <tab> start <tab>
       end <tab> strand) for the splice junction introns. Multiple files can be supplied
       and will be concatenated.
-    multiple: yes
-    multiple_sep: ;
-  - name: --sjdbGTFfile
+    info:
+      orig_name: --sjdbFileChrStartEnd
+    multiple: true
+  - name: --sjdb_gtf_file
     type: file
     description: path to the GTF file with annotations
-  - name: --sjdbGTFchrPrefix
+    info:
+      orig_name: --sjdbGTFfile
+  - name: --sjdb_gtf_chr_prefix
     type: string
     description: prefix for chromosome names in a GTF file (e.g. 'chr' for using ENSMEBL
       annotations with UCSC genomes)
-  - name: --sjdbGTFfeatureExon
+    info:
+      orig_name: --sjdbGTFchrPrefix
+  - name: --sjdb_gtf_feature_exon
     type: string
     description: feature type in GTF file to be used as exons for building transcripts
+    info:
+      orig_name: --sjdbGTFfeatureExon
     example: exon
-  - name: --sjdbGTFtagExonParentTranscript
+  - name: --sjdb_gtf_tag_exon_parent_transcript
     type: string
     description: GTF attribute name for parent transcript ID (default "transcript_id"
       works for GTF files)
+    info:
+      orig_name: --sjdbGTFtagExonParentTranscript
     example: transcript_id
-  - name: --sjdbGTFtagExonParentGene
+  - name: --sjdb_gtf_tag_exon_parent_gene
     type: string
     description: GTF attribute name for parent gene ID (default "gene_id" works for
       GTF files)
+    info:
+      orig_name: --sjdbGTFtagExonParentGene
     example: gene_id
-  - name: --sjdbGTFtagExonParentGeneName
+  - name: --sjdb_gtf_tag_exon_parent_gene_name
     type: string
     description: GTF attribute name for parent gene name
+    info:
+      orig_name: --sjdbGTFtagExonParentGeneName
     example: gene_name
-    multiple: yes
-    multiple_sep: ;
-  - name: --sjdbGTFtagExonParentGeneType
+    multiple: true
+  - name: --sjdb_gtf_tag_exon_parent_gene_type
     type: string
     description: GTF attribute name for parent gene type
+    info:
+      orig_name: --sjdbGTFtagExonParentGeneType
     example:
     - gene_type
     - gene_biotype
-    multiple: yes
-    multiple_sep: ;
-  - name: --sjdbOverhang
+    multiple: true
+  - name: --sjdb_overhang
     type: integer
     description: length of the donor/acceptor sequence on each side of the junctions,
       ideally = (mate_length - 1)
+    info:
+      orig_name: --sjdbOverhang
     example: 100
-  - name: --sjdbScore
+  - name: --sjdb_score
     type: integer
     description: extra alignment score for alignments that cross database junctions
+    info:
+      orig_name: --sjdbScore
     example: 2
-  - name: --sjdbInsertSave
+  - name: --sjdb_insert_save
     type: string
     description: |-
       which files to save when sjdb junctions are inserted on the fly at the mapping step
 
       - Basic ... only small junction / transcript files
       - All   ... all files including big Genome, SA and SAindex - this will create a complete genome directory
+    info:
+      orig_name: --sjdbInsertSave
     example: Basic
 - name: Variation parameters
   arguments:
-  - name: --varVCFfile
+  - name: --var_vcf_file
     type: string
     description: path to the VCF file that contains variation data. The 10th column
       should contain the genotype information, e.g. 0/1
+    info:
+      orig_name: --varVCFfile
 - name: Read Parameters
   arguments:
-  - name: --readFilesType
+  - name: --read_files_type
     type: string
     description: |-
       format of input read files
 
       - Fastx       ... FASTA or FASTQ
-      - SAM SE      ... SAM or BAM single-end reads; for BAM use --readFilesCommand samtools view
-      - SAM PE      ... SAM or BAM paired-end reads; for BAM use --readFilesCommand samtools view
+      - SAM SE      ... SAM or BAM single-end reads; for BAM use --read_files_command samtools view
+      - SAM PE      ... SAM or BAM paired-end reads; for BAM use --read_files_command samtools view
+    info:
+      orig_name: --readFilesType
     example: Fastx
-  - name: --readFilesSAMattrKeep
+  - name: --read_files_sam_attr_keep
     type: string
     description: |-
-      for --readFilesType SAM SE/PE, which SAM tags to keep in the output BAM, e.g.: --readFilesSAMtagsKeep RG PL
+      for --read_files_type SAM SE/PE, which SAM tags to keep in the output BAM, e.g.: --readFilesSAMtagsKeep RG PL
 
       - All     ... keep all tags
       - None    ... do not keep any tags
+    info:
+      orig_name: --readFilesSAMattrKeep
     example: All
-    multiple: yes
-    multiple_sep: ;
-  - name: --readFilesManifest
+    multiple: true
+  - name: --read_files_manifest
     type: file
     description: |-
       path to the "manifest" file with the names of read files. The manifest file should contain 3 tab-separated columns:
@@ -158,45 +192,57 @@ argument_groups:
       Spaces, but not tabs are allowed in file names.
       If read_group_line does not start with ID:, it can only contain one ID field, and ID: will be added to it.
       If read_group_line starts with ID:, it can contain several fields separated by $tab$, and all fields will be be copied verbatim into SAM @RG header line.
-  - name: --readFilesPrefix
+    info:
+      orig_name: --readFilesManifest
+  - name: --read_files_prefix
     type: string
     description: prefix for the read files names, i.e. it will be added in front of
       the strings in --readFilesIn
-  - name: --readFilesCommand
+    info:
+      orig_name: --readFilesPrefix
+  - name: --read_files_command
     type: string
     description: |-
       command line to execute for each of the input file. This command should generate FASTA or FASTQ text and send it to stdout
 
       For example: zcat - to uncompress .gz files, bzcat - to uncompress .bz2 files, etc.
-    multiple: yes
-    multiple_sep: ;
-  - name: --readMapNumber
+    info:
+      orig_name: --readFilesCommand
+    multiple: true
+  - name: --read_map_number
     type: integer
     description: |-
       number of reads to map from the beginning of the file
 
       -1: map all reads
+    info:
+      orig_name: --readMapNumber
     example: -1
-  - name: --readMatesLengthsIn
+  - name: --read_mates_lengths_in
     type: string
     description: Equal/NotEqual - lengths of names,sequences,qualities for both mates
       are the same  / not the same. NotEqual is safe in all situations.
+    info:
+      orig_name: --readMatesLengthsIn
     example: NotEqual
-  - name: --readNameSeparator
+  - name: --read_name_separator
     type: string
     description: character(s) separating the part of the read names that will be trimmed
       in output (read name after space is always trimmed)
+    info:
+      orig_name: --readNameSeparator
     example: /
-    multiple: yes
-    multiple_sep: ;
-  - name: --readQualityScoreBase
+    multiple: true
+  - name: --read_quality_score_base
     type: integer
     description: number to be subtracted from the ASCII code to get Phred quality
       score
+    info:
+      orig_name: --readQualityScoreBase
     example: 33
 - name: Read Clipping
   arguments:
-  - name: --clipAdapterType
+  - name: --clip_adapter_type
     type: string
     description: |-
       adapter clipping type
@@ -204,129 +250,161 @@ argument_groups:
       - Hamming ... adapter clipping based on Hamming distance, with the number of mismatches controlled by --clip5pAdapterMMp
       - CellRanger4 ... 5p and 3p adapter clipping similar to CellRanger4. Utilizes Opal package by Martin Sosic: https://github.com/Martinsos/opal
       - None ... no adapter clipping, all other clip* parameters are disregarded
+    info:
+      orig_name: --clipAdapterType
     example: Hamming
-  - name: --clip3pNbases
+  - name: --clip3p_nbases
     type: integer
     description: number(s) of bases to clip from 3p of each mate. If one value is
       given, it will be assumed the same for both mates.
+    info:
+      orig_name: --clip3pNbases
     example: 0
-    multiple: yes
-    multiple_sep: ;
-  - name: --clip3pAdapterSeq
+    multiple: true
+  - name: --clip3p_adapter_seq
     type: string
     description: |-
       adapter sequences to clip from 3p of each mate.  If one value is given, it will be assumed the same for both mates.
 
       - polyA ... polyA sequence with the length equal to read length
-    multiple: yes
-    multiple_sep: ;
-  - name: --clip3pAdapterMMp
+    info:
+      orig_name: --clip3pAdapterSeq
+    multiple: true
+  - name: --clip3p_adapter_mm_p
     type: double
     description: max proportion of mismatches for 3p adapter clipping for each mate.  If
       one value is given, it will be assumed the same for both mates.
+    info:
+      orig_name: --clip3pAdapterMMp
     example: 0.1
-    multiple: yes
-    multiple_sep: ;
-  - name: --clip3pAfterAdapterNbases
+    multiple: true
+  - name: --clip3p_after_adapter_nbases
     type: integer
     description: number of bases to clip from 3p of each mate after the adapter clipping.
       If one value is given, it will be assumed the same for both mates.
+    info:
+      orig_name: --clip3pAfterAdapterNbases
     example: 0
-    multiple: yes
-    multiple_sep: ;
-  - name: --clip5pNbases
+    multiple: true
+  - name: --clip5p_nbases
     type: integer
     description: number(s) of bases to clip from 5p of each mate. If one value is
       given, it will be assumed the same for both mates.
+    info:
+      orig_name: --clip5pNbases
     example: 0
-    multiple: yes
-    multiple_sep: ;
+    multiple: true
 - name: Limits
   arguments:
-  - name: --limitGenomeGenerateRAM
+  - name: --limit_genome_generate_ram
     type: long
     description: maximum available RAM (bytes) for genome generation
+    info:
+      orig_name: --limitGenomeGenerateRAM
     example: '31000000000'
-  - name: --limitIObufferSize
+  - name: --limit_io_buffer_size
     type: long
     description: max available buffers size (bytes) for input/output, per thread
+    info:
+      orig_name: --limitIObufferSize
     example:
     - 30000000
     - 50000000
-    multiple: yes
-    multiple_sep: ;
-  - name: --limitOutSAMoneReadBytes
+    multiple: true
+  - name: --limit_out_sam_one_read_bytes
     type: long
     description: 'max size of the SAM record (bytes) for one read. Recommended value:
       >(2*(LengthMate1+LengthMate2+100)*outFilterMultimapNmax'
+    info:
+      orig_name: --limitOutSAMoneReadBytes
     example: 100000
-  - name: --limitOutSJoneRead
+  - name: --limit_out_sj_one_read
     type: integer
     description: max number of junctions for one read (including all multi-mappers)
+    info:
+      orig_name: --limitOutSJoneRead
     example: 1000
-  - name: --limitOutSJcollapsed
+  - name: --limit_out_sj_collapsed
     type: integer
     description: max number of collapsed junctions
+    info:
+      orig_name: --limitOutSJcollapsed
     example: 1000000
-  - name: --limitBAMsortRAM
+  - name: --limit_bam_sort_ram
     type: long
     description: maximum available RAM (bytes) for sorting BAM. If =0, it will be
-      set to the genome index size. 0 value can only be used with --genomeLoad NoSharedMemory
+      set to the genome index size. 0 value can only be used with --genome_load NoSharedMemory
       option.
+    info:
+      orig_name: --limitBAMsortRAM
     example: 0
-  - name: --limitSjdbInsertNsj
+  - name: --limit_sjdb_insert_nsj
     type: integer
     description: maximum number of junctions to be inserted to the genome on the fly
       at the mapping stage, including those from annotations and those detected in
       the 1st step of the 2-pass run
+    info:
+      orig_name: --limitSjdbInsertNsj
     example: 1000000
-  - name: --limitNreadsSoft
+  - name: --limit_nreads_soft
     type: integer
     description: soft limit on the number of reads
+    info:
+      orig_name: --limitNreadsSoft
     example: -1
 - name: 'Output: general'
   arguments:
-  - name: --outTmpKeep
+  - name: --out_tmp_keep
     type: string
     description: |-
       whether to keep the temporary files after STAR runs is finished
 
       - None ... remove all temporary files
       - All ... keep all files
-  - name: --outStd
+    info:
+      orig_name: --outTmpKeep
+  - name: --out_std
     type: string
     description: |-
       which output will be directed to stdout (standard out)
 
       - Log                    ... log messages
       - SAM                    ... alignments in SAM format (which normally are output to Aligned.out.sam file), normal standard output will go into Log.std.out
-      - BAM_Unsorted           ... alignments in BAM format, unsorted. Requires --outSAMtype BAM Unsorted
-      - BAM_SortedByCoordinate ... alignments in BAM format, sorted by coordinate. Requires --outSAMtype BAM SortedByCoordinate
-      - BAM_Quant              ... alignments to transcriptome in BAM format, unsorted. Requires --quantMode TranscriptomeSAM
+      - BAM_Unsorted           ... alignments in BAM format, unsorted. Requires --out_sam_type BAM Unsorted
+      - BAM_SortedByCoordinate ... alignments in BAM format, sorted by coordinate. Requires --out_sam_type BAM SortedByCoordinate
+      - BAM_Quant              ... alignments to transcriptome in BAM format, unsorted. Requires --quant_mode TranscriptomeSAM
+    info:
+      orig_name: --outStd
     example: Log
-  - name: --outReadsUnmapped
+  - name: --out_reads_unmapped
     type: string
     description: |-
       output of unmapped and partially mapped (i.e. mapped only one mate of a paired end read) reads in separate file(s).
 
       - None    ... no output
       - Fastx   ... output in separate fasta/fastq files, Unmapped.out.mate1/2
-  - name: --outQSconversionAdd
+    info:
+      orig_name: --outReadsUnmapped
+  - name: --out_qs_conversion_add
     type: integer
     description: add this number to the quality score (e.g. to convert from Illumina
       to Sanger, use -31)
+    info:
+      orig_name: --outQSconversionAdd
     example: 0
-  - name: --outMultimapperOrder
+  - name: --out_multimapper_order
     type: string
     description: |-
       order of multimapping alignments in the output files
 
       - Old_2.4             ... quasi-random order used before 2.5.0
       - Random              ... random order of alignments for each multi-mapper. Read mates (pairs) are always adjacent, all alignment for each read stay together. This option will become default in the future releases.
+    info:
+      orig_name: --outMultimapperOrder
     example: Old_2.4
 - name: 'Output: SAM and BAM'
   arguments:
-  - name: --outSAMtype
+  - name: --out_sam_type
     type: string
     description: |-
       type of SAM/BAM output
@@ -337,11 +415,12 @@ argument_groups:
       - None ... no SAM/BAM output
       2nd, 3rd:
       - Unsorted           ... standard unsorted
-      - SortedByCoordinate ... sorted by coordinate. This option will allocate extra memory for sorting which can be specified by --limitBAMsortRAM.
+      - SortedByCoordinate ... sorted by coordinate. This option will allocate extra memory for sorting which can be specified by --limit_bam_sort_ram.
+    info:
+      orig_name: --outSAMtype
     example: SAM
-    multiple: yes
-    multiple_sep: ;
-  - name: --outSAMmode
+    multiple: true
+  - name: --out_sam_mode
     type: string
     description: |-
       mode of SAM output
@@ -349,15 +428,19 @@ argument_groups:
       - None ... no SAM output
       - Full ... full SAM output
       - NoQS ... full SAM but without quality scores
+    info:
+      orig_name: --outSAMmode
     example: Full
-  - name: --outSAMstrandField
+  - name: --out_sam_strand_field
     type: string
     description: |-
       Cufflinks-like strand field flag
 
       - None        ... not used
       - intronMotif ... strand derived from the intron motif. This option changes the output alignments: reads with inconsistent and/or non-canonical introns are filtered out.
-  - name: --outSAMattributes
+    info:
+      orig_name: --outSAMstrandField
+  - name: --out_sam_attributes
     type: string
     description: |-
       a string of desired SAM attributes, in the order desired for the output SAM. Tags can be listed in any combination/order.
@@ -368,27 +451,27 @@ argument_groups:
       - All         ... NH HI AS nM NM MD jM jI MC ch
       ***Alignment:
       - NH          ... number of loci the reads maps to: =1 for unique mappers, >1 for multimappers. Standard SAM tag.
-      - HI          ... multiple alignment index, starts with --outSAMattrIHstart (=1 by default). Standard SAM tag.
+      - HI          ... multiple alignment index, starts with --out_sam_attr_ih_start (=1 by default). Standard SAM tag.
       - AS          ... local alignment score, +1/-1 for matches/mismateches, score* penalties for indels and gaps. For PE reads, total score for two mates. Stadnard SAM tag.
       - nM          ... number of mismatches. For PE reads, sum over two mates.
       - NM          ... edit distance to the reference (number of mismatched + inserted + deleted bases) for each mate. Standard SAM tag.
       - MD          ... string encoding mismatched and deleted reference bases (see standard SAM specifications). Standard SAM tag.
       - jM          ... intron motifs for all junctions (i.e. N in CIGAR): 0: non-canonical; 1: GT/AG, 2: CT/AC, 3: GC/AG, 4: CT/GC, 5: AT/AC, 6: GT/AT. If splice junctions database is used, and a junction is annotated, 20 is added to its motif value.
       - jI          ... start and end of introns for all junctions (1-based).
-      - XS          ... alignment strand according to --outSAMstrandField.
+      - XS          ... alignment strand according to --out_sam_strand_field.
       - MC          ... mate's CIGAR string. Standard SAM tag.
-      - ch          ... marks all segment of all chimeric alingments for --chimOutType WithinBAM output.
+      - ch          ... marks all segment of all chimeric alingments for --chim_out_type WithinBAM output.
       - cN          ... number of bases clipped from the read ends: 5' and 3'
       ***Variation:
       - vA          ... variant allele
       - vG          ... genomic coordinate of the variant overlapped by the read.
-      - vW          ... 1 - alignment passes WASP filtering; 2,3,4,5,6,7 - alignment does not pass WASP filtering. Requires --waspOutputMode SAMtag.
+      - vW          ... 1 - alignment passes WASP filtering; 2,3,4,5,6,7 - alignment does not pass WASP filtering. Requires --wasp_output_mode SAMtag.
       - ha          ... haplotype (1/2) when mapping to the diploid genome. Requires genome generated with --genomeTransformType Diploid .
       ***STARsolo:
       - CR CY UR UY ... sequences and quality scores of cell barcodes and UMIs for the solo* demultiplexing.
       - GX GN       ... gene ID and gene name for unique-gene reads.
       - gx gn       ... gene IDs and gene names for unique- and multi-gene reads.
-      - CB UB       ... error-corrected cell barcodes and UMIs for solo* demultiplexing. Requires --outSAMtype BAM SortedByCoordinate.
+      - CB UB       ... error-corrected cell barcodes and UMIs for solo* demultiplexing. Requires --out_sam_type BAM SortedByCoordinate.
       - sM          ... assessment of CB and UMI.
       - sS          ... sequence of the entire barcode (CB,UMI,adapter).
       - sQ          ... quality of the entire barcode.
@@ -396,15 +479,18 @@ argument_groups:
       ***Unsupported/undocumented:
       - rB          ... alignment block read/genomic coordinates.
       - vR          ... read coordinate of the variant.
+    info:
+      orig_name: --outSAMattributes
     example: Standard
-    multiple: yes
-    multiple_sep: ;
-  - name: --outSAMattrIHstart
+    multiple: true
+  - name: --out_sam_attr_ih_start
     type: integer
     description: start value for the IH attribute. 0 may be required by some downstream
       software, such as Cufflinks or StringTie.
+    info:
+      orig_name: --outSAMattrIHstart
     example: 1
-  - name: --outSAMunmapped
+  - name: --out_sam_unmapped
     type: string
     description: |-
       output of unmapped reads in the SAM format
@@ -414,112 +500,141 @@ argument_groups:
       - Within ... output unmapped reads within the main SAM file (i.e. Aligned.out.sam)
       2nd word:
       - KeepPairs ... record unmapped mate for each alignment, and, in case of unsorted output, keep it adjacent to its mapped mate. Only affects multi-mapping reads.
-    multiple: yes
-    multiple_sep: ;
-  - name: --outSAMorder
+    info:
+      orig_name: --outSAMunmapped
+    multiple: true
+  - name: --out_sam_order
     type: string
     description: |-
       type of sorting for the SAM output
 
       Paired: one mate after the other for all paired alignments
       PairedKeepInputOrder: one mate after the other for all paired alignments, the order is kept the same as in the input FASTQ files
+    info:
+      orig_name: --outSAMorder
     example: Paired
-  - name: --outSAMprimaryFlag
+  - name: --out_sam_primary_flag
     type: string
     description: |-
       which alignments are considered primary - all others will be marked with 0x100 bit in the FLAG
 
       - OneBestScore ... only one alignment with the best score is primary
       - AllBestScore ... all alignments with the best score are primary
+    info:
+      orig_name: --outSAMprimaryFlag
     example: OneBestScore
-  - name: --outSAMreadID
+  - name: --out_sam_read_id
     type: string
     description: |-
       read ID record type
 
       - Standard ... first word (until space) from the FASTx read ID line, removing /1,/2 from the end
       - Number   ... read number (index) in the FASTx file
+    info:
+      orig_name: --outSAMreadID
     example: Standard
-  - name: --outSAMmapqUnique
+  - name: --out_sam_mapq_unique
     type: integer
     description: '0 to 255: the MAPQ value for unique mappers'
+    info:
+      orig_name: --outSAMmapqUnique
     example: 255
-  - name: --outSAMflagOR
+  - name: --out_sam_flag_or
     type: integer
     description: '0 to 65535: sam FLAG will be bitwise OR''d with this value, i.e.
       FLAG=FLAG | outSAMflagOR. This is applied after all flags have been set by STAR,
       and after outSAMflagAND. Can be used to set specific bits that are not set otherwise.'
+    info:
+      orig_name: --outSAMflagOR
     example: 0
-  - name: --outSAMflagAND
+  - name: --out_sam_flag_and
     type: integer
     description: '0 to 65535: sam FLAG will be bitwise AND''d with this value, i.e.
       FLAG=FLAG & outSAMflagOR. This is applied after all flags have been set by STAR,
       but before outSAMflagOR. Can be used to unset specific bits that are not set
       otherwise.'
+    info:
+      orig_name: --outSAMflagAND
     example: 65535
-  - name: --outSAMattrRGline
+  - name: --out_sam_attr_rg_line
     type: string
     description: |-
-      SAM/BAM read group line. The first word contains the read group identifier and must start with "ID:", e.g. --outSAMattrRGline ID:xxx CN:yy "DS:z z z".
+      SAM/BAM read group line. The first word contains the read group identifier and must start with "ID:", e.g. --out_sam_attr_rg_line ID:xxx CN:yy "DS:z z z".
 
       xxx will be added as RG tag to each output alignment. Any spaces in the tag values have to be double quoted.
       Comma separated RG lines correspons to different (comma separated) input files in --readFilesIn. Commas have to be surrounded by spaces, e.g.
-      --outSAMattrRGline ID:xxx , ID:zzz "DS:z z" , ID:yyy DS:yyyy
-    multiple: yes
-    multiple_sep: ;
-  - name: --outSAMheaderHD
+      --out_sam_attr_rg_line ID:xxx , ID:zzz "DS:z z" , ID:yyy DS:yyyy
+    info:
+      orig_name: --outSAMattrRGline
+    multiple: true
+  - name: --out_sam_header_hd
     type: string
     description: '@HD (header) line of the SAM header'
-    multiple: yes
-    multiple_sep: ;
-  - name: --outSAMheaderPG
+    info:
+      orig_name: --outSAMheaderHD
+    multiple: true
+  - name: --out_sam_header_pg
     type: string
     description: extra @PG (software) line of the SAM header (in addition to STAR)
-    multiple: yes
-    multiple_sep: ;
-  - name: --outSAMheaderCommentFile
+    info:
+      orig_name: --outSAMheaderPG
+    multiple: true
+  - name: --out_sam_header_comment_file
     type: string
     description: path to the file with @CO (comment) lines of the SAM header
-  - name: --outSAMfilter
+    info:
+      orig_name: --outSAMheaderCommentFile
+  - name: --out_sam_filter
     type: string
     description: |-
       filter the output into main SAM/BAM files
 
-      - KeepOnlyAddedReferences ... only keep the reads for which all alignments are to the extra reference sequences added with --genomeFastaFiles at the mapping stage.
-      - KeepAllAddedReferences ...  keep all alignments to the extra reference sequences added with --genomeFastaFiles at the mapping stage.
-    multiple: yes
-    multiple_sep: ;
-  - name: --outSAMmultNmax
+      - KeepOnlyAddedReferences ... only keep the reads for which all alignments are to the extra reference sequences added with --genome_fasta_files at the mapping stage.
+      - KeepAllAddedReferences ...  keep all alignments to the extra reference sequences added with --genome_fasta_files at the mapping stage.
+    info:
+      orig_name: --outSAMfilter
+    multiple: true
+  - name: --out_sam_mult_nmax
     type: integer
     description: |-
       max number of multiple alignments for a read that will be output to the SAM/BAM files. Note that if this value is not equal to -1, the top scoring alignment will be output first
 
-      - -1 ... all alignments (up to --outFilterMultimapNmax) will be output
+      - -1 ... all alignments (up to --out_filter_multimap_nmax) will be output
+    info:
+      orig_name: --outSAMmultNmax
     example: -1
-  - name: --outSAMtlen
+  - name: --out_sam_tlen
     type: integer
     description: |-
       calculation method for the TLEN field in the SAM/BAM files
 
       - 1 ... leftmost base of the (+)strand mate to rightmost base of the (-)mate. (+)sign for the (+)strand mate
       - 2 ... leftmost base of any mate to rightmost base of any mate. (+)sign for the mate with the leftmost base. This is different from 1 for overlapping mates with protruding ends
+    info:
+      orig_name: --outSAMtlen
     example: 1
-  - name: --outBAMcompression
+  - name: --out_bam_compression
     type: integer
     description: -1 to 10  BAM compression level, -1=default compression (6?), 0=no
       compression, 10=maximum compression
+    info:
+      orig_name: --outBAMcompression
     example: 1
-  - name: --outBAMsortingThreadN
+  - name: --out_bam_sorting_thread_n
     type: integer
     description: '>=0: number of threads for BAM sorting. 0 will default to min(6,--runThreadN).'
+    info:
+      orig_name: --outBAMsortingThreadN
     example: 0
-  - name: --outBAMsortingBinsN
+  - name: --out_bam_sorting_bins_n
     type: integer
     description: '>0:  number of genome bins for coordinate-sorting'
+    info:
+      orig_name: --outBAMsortingBinsN
     example: 50
 - name: BAM processing
   arguments:
-  - name: --bamRemoveDuplicatesType
+  - name: --bam_remove_duplicates_type
     type: string
     description: |-
       mark duplicates in the BAM file, for now only works with (i) sorted BAM fed with inputBAMfile, and (ii) for paired-end alignments only
@@ -527,17 +642,21 @@ argument_groups:
       - -                       ... no duplicate removal/marking
       - UniqueIdentical         ... mark all multimappers, and duplicate unique mappers. The coordinates, FLAG, CIGAR must be identical
       - UniqueIdenticalNotMulti  ... mark duplicate unique mappers but not multimappers.
-  - name: --bamRemoveDuplicatesMate2basesN
+    info:
+      orig_name: --bamRemoveDuplicatesType
+  - name: --bam_remove_duplicates_mate2bases_n
     type: integer
     description: number of bases from the 5' of mate 2 to use in collapsing (e.g.
       for RAMPAGE)
+    info:
+      orig_name: --bamRemoveDuplicatesMate2basesN
     example: 0
 - name: Output Wiggle
   arguments:
-  - name: --outWigType
+  - name: --out_wig_type
     type: string
     description: |-
-      type of signal output, e.g. "bedGraph" OR "bedGraph read1_5p". Requires sorted BAM: --outSAMtype BAM SortedByCoordinate .
+      type of signal output, e.g. "bedGraph" OR "bedGraph read1_5p". Requires sorted BAM: --out_sam_type BAM SortedByCoordinate .
 
       1st word:
       - None       ... no signal output
@@ -546,85 +665,112 @@ argument_groups:
       2nd word:
       - read1_5p   ... signal from only 5' of the 1st read, useful for CAGE/RAMPAGE etc
       - read2      ... signal from only 2nd read
-    multiple: yes
-    multiple_sep: ;
-  - name: --outWigStrand
+    info:
+      orig_name: --outWigType
+    multiple: true
+  - name: --out_wig_strand
     type: string
     description: |-
       strandedness of wiggle/bedGraph output
 
       - Stranded   ...  separate strands, str1 and str2
       - Unstranded ...  collapsed strands
+    info:
+      orig_name: --outWigStrand
     example: Stranded
-  - name: --outWigReferencesPrefix
+  - name: --out_wig_references_prefix
     type: string
     description: prefix matching reference names to include in the output wiggle file,
       e.g. "chr", default "-" - include all references
-  - name: --outWigNorm
+    info:
+      orig_name: --outWigReferencesPrefix
+  - name: --out_wig_norm
     type: string
     description: |-
       type of normalization for the signal
 
       - RPM    ... reads per million of mapped reads
       - None   ... no normalization, "raw" counts
+    info:
+      orig_name: --outWigNorm
     example: RPM
 - name: Output Filtering
   arguments:
-  - name: --outFilterType
+  - name: --out_filter_type
     type: string
     description: |-
       type of filtering
 
       - Normal  ... standard filtering using only current alignment
       - BySJout ... keep only those reads that contain junctions that passed filtering into SJ.out.tab
+    info:
+      orig_name: --outFilterType
     example: Normal
-  - name: --outFilterMultimapScoreRange
+  - name: --out_filter_multimap_score_range
     type: integer
     description: the score range below the maximum score for multimapping alignments
+    info:
+      orig_name: --outFilterMultimapScoreRange
     example: 1
-  - name: --outFilterMultimapNmax
+  - name: --out_filter_multimap_nmax
     type: integer
     description: |-
       maximum number of loci the read is allowed to map to. Alignments (all of them) will be output only if the read maps to no more loci than this value.
 
       Otherwise no alignments will be output, and the read will be counted as "mapped to too many loci" in the Log.final.out .
+    info:
+      orig_name: --outFilterMultimapNmax
     example: 10
-  - name: --outFilterMismatchNmax
+  - name: --out_filter_mismatch_nmax
     type: integer
     description: alignment will be output only if it has no more mismatches than this
       value.
+    info:
+      orig_name: --outFilterMismatchNmax
     example: 10
-  - name: --outFilterMismatchNoverLmax
+  - name: --out_filter_mismatch_nover_lmax
     type: double
     description: alignment will be output only if its ratio of mismatches to *mapped*
       length is less than or equal to this value.
+    info:
+      orig_name: --outFilterMismatchNoverLmax
     example: 0.3
-  - name: --outFilterMismatchNoverReadLmax
+  - name: --out_filter_mismatch_nover_read_lmax
     type: double
     description: alignment will be output only if its ratio of mismatches to *read*
       length is less than or equal to this value.
+    info:
+      orig_name: --outFilterMismatchNoverReadLmax
     example: 1.0
-  - name: --outFilterScoreMin
+  - name: --out_filter_score_min
     type: integer
     description: alignment will be output only if its score is higher than or equal
       to this value.
+    info:
+      orig_name: --outFilterScoreMin
     example: 0
-  - name: --outFilterScoreMinOverLread
+  - name: --out_filter_score_min_over_lread
     type: double
     description: same as outFilterScoreMin, but normalized to read length (sum of
       mates' lengths for paired-end reads)
+    info:
+      orig_name: --outFilterScoreMinOverLread
     example: 0.66
-  - name: --outFilterMatchNmin
+  - name: --out_filter_match_nmin
     type: integer
     description: alignment will be output only if the number of matched bases is higher
       than or equal to this value.
+    info:
+      orig_name: --outFilterMatchNmin
     example: 0
-  - name: --outFilterMatchNminOverLread
+  - name: --out_filter_match_nmin_over_lread
     type: double
     description: sam as outFilterMatchNmin, but normalized to the read length (sum
       of mates' lengths for paired-end reads).
+    info:
+      orig_name: --outFilterMatchNminOverLread
     example: 0.66
-  - name: --outFilterIntronMotifs
+  - name: --out_filter_intron_motifs
     type: string
     description: |-
       filter alignment using their motifs
@@ -632,244 +778,316 @@ argument_groups:
       - None                           ... no filtering
       - RemoveNoncanonical             ... filter out alignments that contain non-canonical junctions
       - RemoveNoncanonicalUnannotated  ... filter out alignments that contain non-canonical unannotated junctions when using annotated splice junctions database. The annotated non-canonical junctions will be kept.
-  - name: --outFilterIntronStrands
+    info:
+      orig_name: --outFilterIntronMotifs
+  - name: --out_filter_intron_strands
     type: string
     description: |-
       filter alignments
 
       - RemoveInconsistentStrands      ... remove alignments that have junctions with inconsistent strands
       - None                           ... no filtering
+    info:
+      orig_name: --outFilterIntronStrands
     example: RemoveInconsistentStrands
 - name: Output splice junctions (SJ.out.tab)
   arguments:
-  - name: --outSJtype
+  - name: --out_sj_type
     type: string
     description: |-
       type of splice junction output
 
       - Standard    ... standard SJ.out.tab output
       - None        ... no splice junction output
+    info:
+      orig_name: --outSJtype
     example: Standard
 - name: 'Output Filtering: Splice Junctions'
   arguments:
-  - name: --outSJfilterReads
+  - name: --out_sj_filter_reads
     type: string
     description: |-
       which reads to consider for collapsed splice junctions output
 
       - All     ... all reads, unique- and multi-mappers
       - Unique  ... uniquely mapping reads only
+    info:
+      orig_name: --outSJfilterReads
     example: All
-  - name: --outSJfilterOverhangMin
+  - name: --out_sj_filter_overhang_min
     type: integer
     description: |-
       minimum overhang length for splice junctions on both sides for: (1) non-canonical motifs, (2) GT/AG and CT/AC motif, (3) GC/AG and CT/GC motif, (4) AT/AC and GT/AT motif. -1 means no output for that motif
 
       does not apply to annotated junctions
+    info:
+      orig_name: --outSJfilterOverhangMin
     example:
     - 30
     - 12
     - 12
     - 12
-    multiple: yes
-    multiple_sep: ;
-  - name: --outSJfilterCountUniqueMin
+    multiple: true
+  - name: --out_sj_filter_count_unique_min
     type: integer
     description: |-
       minimum uniquely mapping read count per junction for: (1) non-canonical motifs, (2) GT/AG and CT/AC motif, (3) GC/AG and CT/GC motif, (4) AT/AC and GT/AT motif. -1 means no output for that motif
 
       Junctions are output if one of outSJfilterCountUniqueMin OR outSJfilterCountTotalMin conditions are satisfied
       does not apply to annotated junctions
+    info:
+      orig_name: --outSJfilterCountUniqueMin
     example:
     - 3
     - 1
     - 1
     - 1
-    multiple: yes
-    multiple_sep: ;
-  - name: --outSJfilterCountTotalMin
+    multiple: true
+  - name: --out_sj_filter_count_total_min
     type: integer
     description: |-
       minimum total (multi-mapping+unique) read count per junction for: (1) non-canonical motifs, (2) GT/AG and CT/AC motif, (3) GC/AG and CT/GC motif, (4) AT/AC and GT/AT motif. -1 means no output for that motif
 
       Junctions are output if one of outSJfilterCountUniqueMin OR outSJfilterCountTotalMin conditions are satisfied
       does not apply to annotated junctions
+    info:
+      orig_name: --outSJfilterCountTotalMin
     example:
     - 3
     - 1
     - 1
     - 1
-    multiple: yes
-    multiple_sep: ;
-  - name: --outSJfilterDistToOtherSJmin
+    multiple: true
+  - name: --out_sj_filter_dist_to_other_sj_min
     type: integer
     description: |-
       minimum allowed distance to other junctions' donor/acceptor
 
       does not apply to annotated junctions
+    info:
+      orig_name: --outSJfilterDistToOtherSJmin
     example:
     - 10
     - 0
     - 5
     - 10
-    multiple: yes
-    multiple_sep: ;
-  - name: --outSJfilterIntronMaxVsReadN
+    multiple: true
+  - name: --out_sj_filter_intron_max_vs_read_n
     type: integer
     description: |-
       maximum gap allowed for junctions supported by 1,2,3,,,N reads
 
       i.e. by default junctions supported by 1 read can have gaps <=50000b, by 2 reads: <=100000b, by 3 reads: <=200000. by >=4 reads any gap <=alignIntronMax
       does not apply to annotated junctions
+    info:
+      orig_name: --outSJfilterIntronMaxVsReadN
     example:
     - 50000
     - 100000
     - 200000
-    multiple: yes
-    multiple_sep: ;
+    multiple: true
 - name: Scoring
   arguments:
-  - name: --scoreGap
+  - name: --score_gap
     type: integer
     description: splice junction penalty (independent on intron motif)
+    info:
+      orig_name: --scoreGap
     example: 0
-  - name: --scoreGapNoncan
+  - name: --score_gap_noncan
     type: integer
     description: non-canonical junction penalty (in addition to scoreGap)
+    info:
+      orig_name: --scoreGapNoncan
     example: -8
-  - name: --scoreGapGCAG
+  - name: --score_gap_gcag
     type: integer
     description: GC/AG and CT/GC junction penalty (in addition to scoreGap)
+    info:
+      orig_name: --scoreGapGCAG
     example: -4
-  - name: --scoreGapATAC
+  - name: --score_gap_atac
     type: integer
     description: AT/AC  and GT/AT junction penalty  (in addition to scoreGap)
+    info:
+      orig_name: --scoreGapATAC
     example: -8
-  - name: --scoreGenomicLengthLog2scale
+  - name: --score_genomic_length_log2scale
     type: integer
     description: 'extra score logarithmically scaled with genomic length of the alignment:
       scoreGenomicLengthLog2scale*log2(genomicLength)'
+    info:
+      orig_name: --scoreGenomicLengthLog2scale
     example: 0
-  - name: --scoreDelOpen
+  - name: --score_del_open
     type: integer
     description: deletion open penalty
+    info:
+      orig_name: --scoreDelOpen
     example: -2
-  - name: --scoreDelBase
+  - name: --score_del_base
     type: integer
     description: deletion extension penalty per base (in addition to scoreDelOpen)
+    info:
+      orig_name: --scoreDelBase
     example: -2
-  - name: --scoreInsOpen
+  - name: --score_ins_open
     type: integer
     description: insertion open penalty
+    info:
+      orig_name: --scoreInsOpen
     example: -2
-  - name: --scoreInsBase
+  - name: --score_ins_base
     type: integer
     description: insertion extension penalty per base (in addition to scoreInsOpen)
+    info:
+      orig_name: --scoreInsBase
     example: -2
-  - name: --scoreStitchSJshift
+  - name: --score_stitch_sj_shift
     type: integer
     description: maximum score reduction while searching for SJ boundaries in the
       stitching step
+    info:
+      orig_name: --scoreStitchSJshift
     example: 1
 - name: Alignments and Seeding
   arguments:
-  - name: --seedSearchStartLmax
+  - name: --seed_search_start_lmax
     type: integer
     description: defines the search start point through the read - the read is split
       into pieces no longer than this value
+    info:
+      orig_name: --seedSearchStartLmax
     example: 50
-  - name: --seedSearchStartLmaxOverLread
+  - name: --seed_search_start_lmax_over_lread
     type: double
     description: seedSearchStartLmax normalized to read length (sum of mates' lengths
       for paired-end reads)
+    info:
+      orig_name: --seedSearchStartLmaxOverLread
     example: 1.0
-  - name: --seedSearchLmax
+  - name: --seed_search_lmax
     type: integer
     description: defines the maximum length of the seeds, if =0 seed length is not
       limited
+    info:
+      orig_name: --seedSearchLmax
     example: 0
-  - name: --seedMultimapNmax
+  - name: --seed_multimap_nmax
     type: integer
     description: only pieces that map fewer than this value are utilized in the stitching
       procedure
+    info:
+      orig_name: --seedMultimapNmax
     example: 10000
-  - name: --seedPerReadNmax
+  - name: --seed_per_read_nmax
     type: integer
     description: max number of seeds per read
+    info:
+      orig_name: --seedPerReadNmax
     example: 1000
-  - name: --seedPerWindowNmax
+  - name: --seed_per_window_nmax
     type: integer
     description: max number of seeds per window
+    info:
+      orig_name: --seedPerWindowNmax
     example: 50
-  - name: --seedNoneLociPerWindow
+  - name: --seed_none_loci_per_window
     type: integer
     description: max number of one seed loci per window
+    info:
+      orig_name: --seedNoneLociPerWindow
     example: 10
-  - name: --seedSplitMin
+  - name: --seed_split_min
     type: integer
     description: min length of the seed sequences split by Ns or mate gap
+    info:
+      orig_name: --seedSplitMin
     example: 12
-  - name: --seedMapMin
+  - name: --seed_map_min
     type: integer
     description: min length of seeds to be mapped
+    info:
+      orig_name: --seedMapMin
     example: 5
-  - name: --alignIntronMin
+  - name: --align_intron_min
     type: integer
     description: minimum intron size, genomic gap is considered intron if its length>=alignIntronMin,
       otherwise it is considered Deletion
+    info:
+      orig_name: --alignIntronMin
     example: 21
-  - name: --alignIntronMax
+  - name: --align_intron_max
     type: integer
     description: maximum intron size, if 0, max intron size will be determined by
       (2^winBinNbits)*winAnchorDistNbins
+    info:
+      orig_name: --alignIntronMax
     example: 0
-  - name: --alignMatesGapMax
+  - name: --align_mates_gap_max
     type: integer
     description: maximum gap between two mates, if 0, max intron gap will be determined
       by (2^winBinNbits)*winAnchorDistNbins
+    info:
+      orig_name: --alignMatesGapMax
     example: 0
-  - name: --alignSJoverhangMin
+  - name: --align_sj_overhang_min
     type: integer
     description: minimum overhang (i.e. block size) for spliced alignments
+    info:
+      orig_name: --alignSJoverhangMin
     example: 5
-  - name: --alignSJstitchMismatchNmax
+  - name: --align_sj_stitch_mismatch_nmax
     type: integer
     description: |-
       maximum number of mismatches for stitching of the splice junctions (-1: no limit).
 
       (1) non-canonical motifs, (2) GT/AG and CT/AC motif, (3) GC/AG and CT/GC motif, (4) AT/AC and GT/AT motif.
+    info:
+      orig_name: --alignSJstitchMismatchNmax
     example:
     - 0
     - -1
     - 0
     - 0
-    multiple: yes
-    multiple_sep: ;
-  - name: --alignSJDBoverhangMin
+    multiple: true
+  - name: --align_sjdb_overhang_min
     type: integer
     description: minimum overhang (i.e. block size) for annotated (sjdb) spliced alignments
+    info:
+      orig_name: --alignSJDBoverhangMin
     example: 3
-  - name: --alignSplicedMateMapLmin
+  - name: --align_spliced_mate_map_lmin
     type: integer
     description: minimum mapped length for a read mate that is spliced
+    info:
+      orig_name: --alignSplicedMateMapLmin
     example: 0
-  - name: --alignSplicedMateMapLminOverLmate
+  - name: --align_spliced_mate_map_lmin_over_lmate
     type: double
     description: alignSplicedMateMapLmin normalized to mate length
+    info:
+      orig_name: --alignSplicedMateMapLminOverLmate
     example: 0.66
-  - name: --alignWindowsPerReadNmax
+  - name: --align_windows_per_read_nmax
     type: integer
     description: max number of windows per read
+    info:
+      orig_name: --alignWindowsPerReadNmax
     example: 10000
-  - name: --alignTranscriptsPerWindowNmax
+  - name: --align_transcripts_per_window_nmax
     type: integer
     description: max number of transcripts per window
+    info:
+      orig_name: --alignTranscriptsPerWindowNmax
     example: 100
-  - name: --alignTranscriptsPerReadNmax
+  - name: --align_transcripts_per_read_nmax
     type: integer
     description: max number of different alignments per read to consider
+    info:
+      orig_name: --alignTranscriptsPerReadNmax
     example: 10000
-  - name: --alignEndsType
+  - name: --align_ends_type
     type: string
     description: |-
       type of read ends alignment
@@ -878,8 +1096,10 @@ argument_groups:
       - EndToEnd          ... force end-to-end read alignment, do not soft-clip
       - Extend5pOfRead1   ... fully extend only the 5p of the read1, all other ends: local alignment
       - Extend5pOfReads12 ... fully extend only the 5p of the both read1 and read2, all other ends: local alignment
+    info:
+      orig_name: --alignEndsType
     example: Local
-  - name: --alignEndsProtrude
+  - name: --align_ends_protrude
     type: string
     description: |-
       allow protrusion of alignment ends, i.e. start (end) of the +strand mate downstream of the start (end) of the -strand mate
@@ -888,68 +1108,90 @@ argument_groups:
       2nd word: string:
       -                     ConcordantPair ... report alignments with non-zero protrusion as concordant pairs
       -                     DiscordantPair ... report alignments with non-zero protrusion as discordant pairs
+    info:
+      orig_name: --alignEndsProtrude
     example: 0    ConcordantPair
-  - name: --alignSoftClipAtReferenceEnds
+  - name: --align_soft_clip_at_reference_ends
     type: string
     description: |-
       allow the soft-clipping of the alignments past the end of the chromosomes
 
       - Yes ... allow
       - No  ... prohibit, useful for compatibility with Cufflinks
+    info:
+      orig_name: --alignSoftClipAtReferenceEnds
     example: 'Yes'
-  - name: --alignInsertionFlush
+  - name: --align_insertion_flush
     type: string
     description: |-
       how to flush ambiguous insertion positions
 
       - None    ... insertions are not flushed
       - Right   ... insertions are flushed to the right
+    info:
+      orig_name: --alignInsertionFlush
 - name: Paired-End reads
   arguments:
-  - name: --peOverlapNbasesMin
+  - name: --pe_overlap_nbases_min
     type: integer
     description: minimum number of overlapping bases to trigger mates merging and
       realignment. Specify >0 value to switch on the "merginf of overlapping mates"
       algorithm.
+    info:
+      orig_name: --peOverlapNbasesMin
     example: 0
-  - name: --peOverlapMMp
+  - name: --pe_overlap_mm_p
     type: double
     description: maximum proportion of mismatched bases in the overlap area
+    info:
+      orig_name: --peOverlapMMp
     example: 0.01
 - name: Windows, Anchors, Binning
   arguments:
-  - name: --winAnchorMultimapNmax
+  - name: --win_anchor_multimap_nmax
     type: integer
     description: max number of loci anchors are allowed to map to
+    info:
+      orig_name: --winAnchorMultimapNmax
     example: 50
-  - name: --winBinNbits
+  - name: --win_bin_nbits
     type: integer
     description: =log2(winBin), where winBin is the size of the bin for the windows/clustering,
       each window will occupy an integer number of bins.
+    info:
+      orig_name: --winBinNbits
     example: 16
-  - name: --winAnchorDistNbins
+  - name: --win_anchor_dist_nbins
     type: integer
     description: max number of bins between two anchors that allows aggregation of
       anchors into one window
+    info:
+      orig_name: --winAnchorDistNbins
     example: 9
-  - name: --winFlankNbins
+  - name: --win_flank_nbins
     type: integer
     description: log2(winFlank), where win Flank is the size of the left and right
       flanking regions for each window
+    info:
+      orig_name: --winFlankNbins
     example: 4
-  - name: --winReadCoverageRelativeMin
+  - name: --win_read_coverage_relative_min
     type: double
     description: minimum relative coverage of the read sequence by the seeds in a
       window, for STARlong algorithm only.
+    info:
+      orig_name: --winReadCoverageRelativeMin
     example: 0.5
-  - name: --winReadCoverageBasesMin
+  - name: --win_read_coverage_bases_min
     type: integer
     description: minimum number of bases covered by the seeds in a window , for STARlong
       algorithm only.
+    info:
+      orig_name: --winReadCoverageBasesMin
     example: 0
 - name: Chimeric Alignments
   arguments:
-  - name: --chimOutType
+  - name: --chim_out_type
     type: string
     description: |-
       type of chimeric output
@@ -959,83 +1201,109 @@ argument_groups:
       - WithinBAM       ... output into main aligned BAM files (Aligned.*.bam)
       - WithinBAM HardClip  ... (default) hard-clipping in the CIGAR for supplemental chimeric alignments (default if no 2nd word is present)
       - WithinBAM SoftClip  ... soft-clipping in the CIGAR for supplemental chimeric alignments
+    info:
+      orig_name: --chimOutType
     example: Junctions
-    multiple: yes
-    multiple_sep: ;
-  - name: --chimSegmentMin
+    multiple: true
+  - name: --chim_segment_min
     type: integer
     description: minimum length of chimeric segment length, if ==0, no chimeric output
+    info:
+      orig_name: --chimSegmentMin
     example: 0
-  - name: --chimScoreMin
+  - name: --chim_score_min
     type: integer
     description: minimum total (summed) score of the chimeric segments
+    info:
+      orig_name: --chimScoreMin
     example: 0
-  - name: --chimScoreDropMax
+  - name: --chim_score_drop_max
     type: integer
     description: max drop (difference) of chimeric score (the sum of scores of all
       chimeric segments) from the read length
+    info:
+      orig_name: --chimScoreDropMax
     example: 20
-  - name: --chimScoreSeparation
+  - name: --chim_score_separation
     type: integer
     description: minimum difference (separation) between the best chimeric score and
       the next one
+    info:
+      orig_name: --chimScoreSeparation
     example: 10
-  - name: --chimScoreJunctionNonGTAG
+  - name: --chim_score_junction_non_gtag
     type: integer
     description: penalty for a non-GT/AG chimeric junction
+    info:
+      orig_name: --chimScoreJunctionNonGTAG
     example: -1
-  - name: --chimJunctionOverhangMin
+  - name: --chim_junction_overhang_min
     type: integer
     description: minimum overhang for a chimeric junction
+    info:
+      orig_name: --chimJunctionOverhangMin
     example: 20
-  - name: --chimSegmentReadGapMax
+  - name: --chim_segment_read_gap_max
     type: integer
     description: maximum gap in the read sequence between chimeric segments
+    info:
+      orig_name: --chimSegmentReadGapMax
     example: 0
-  - name: --chimFilter
+  - name: --chim_filter
     type: string
     description: |-
       different filters for chimeric alignments
 
       - None ... no filtering
       - banGenomicN ... Ns are not allowed in the genome sequence around the chimeric junction
+    info:
+      orig_name: --chimFilter
     example: banGenomicN
-    multiple: yes
-    multiple_sep: ;
-  - name: --chimMainSegmentMultNmax
+    multiple: true
+  - name: --chim_main_segment_mult_nmax
     type: integer
     description: maximum number of multi-alignments for the main chimeric segment.
       =1 will prohibit multimapping main segments.
+    info:
+      orig_name: --chimMainSegmentMultNmax
     example: 10
-  - name: --chimMultimapNmax
+  - name: --chim_multimap_nmax
     type: integer
     description: |-
       maximum number of chimeric multi-alignments
 
       - 0 ... use the old scheme for chimeric detection which only considered unique alignments
+    info:
+      orig_name: --chimMultimapNmax
     example: 0
-  - name: --chimMultimapScoreRange
+  - name: --chim_multimap_score_range
     type: integer
     description: the score range for multi-mapping chimeras below the best chimeric
-      score. Only works with --chimMultimapNmax > 1
+      score. Only works with --chim_multimap_nmax > 1
+    info:
+      orig_name: --chimMultimapScoreRange
     example: 1
-  - name: --chimNonchimScoreDropMin
+  - name: --chim_nonchim_score_drop_min
     type: integer
     description: to trigger chimeric detection, the drop in the best non-chimeric
       alignment score with respect to the read length has to be greater than this
       value
+    info:
+      orig_name: --chimNonchimScoreDropMin
     example: 20
-  - name: --chimOutJunctionFormat
+  - name: --chim_out_junction_format
     type: integer
     description: |-
       formatting type for the Chimeric.out.junction file
 
       - 0 ... no comment lines/headers
       - 1 ... comment lines at the end of the file: command line and Nreads: total, unique/multi-mapping
+    info:
+      orig_name: --chimOutJunctionFormat
     example: 0
 - name: Quantification of Annotations
   arguments:
-  - name: --quantMode
+  - name: --quant_mode
     type: string
     description: |-
       types of quantification requested
@@ -1043,9 +1311,10 @@ argument_groups:
       - -                ... none
       - TranscriptomeSAM ... output SAM/BAM alignments to transcriptome into a separate file
       - GeneCounts       ... count reads per gene
-    multiple: yes
-    multiple_sep: ;
-  - name: --quantTranscriptomeBAMcompression
+    info:
+      orig_name: --quantMode
+    multiple: true
+  - name: --quant_transcriptome_bam_compression
     type: integer
     description: |-
       -2 to 10  transcriptome BAM compression level
@@ -1054,8 +1323,10 @@ argument_groups:
       - -1  ... default compression (6?)
       -  0  ... no compression
       -  10 ... maximum compression
+    info:
+      orig_name: --quantTranscriptomeBAMcompression
     example: 1
-  - name: --quantTranscriptomeSAMoutput
+  - name: --quant_transcriptome_sam_output
     type: string
     description: |-
       alignment filtering for TranscriptomeSAM output
@@ -1063,26 +1334,301 @@ argument_groups:
       - BanSingleEnd_BanIndels_ExtendSoftclip ... prohibit indels and single-end alignments, extend softclips - compatible with RSEM
       - BanSingleEnd               ... prohibit single-end alignments, allow indels and softclips
       - BanSingleEnd_ExtendSoftclip ... prohibit single-end alignments, extend softclips, allow indels
+    info:
+      orig_name: --quantTranscriptomeSAMoutput
     example: BanSingleEnd_BanIndels_ExtendSoftclip
 - name: 2-pass Mapping
   arguments:
-  - name: --twopassMode
+  - name: --twopass_mode
     type: string
     description: |-
       2-pass mapping mode.
 
       - None        ... 1-pass mapping
       - Basic       ... basic 2-pass mapping, with all 1st pass junctions inserted into the genome indices on the fly
-  - name: --twopass1readsN
+    info:
+      orig_name: --twopassMode
+  - name: --twopass1reads_n
     type: integer
     description: number of reads to process for the 1st step. Use very large number
       (or default -1) to map all reads in the first step.
+    info:
+      orig_name: --twopass1readsN
     example: -1
 - name: WASP parameters
   arguments:
-  - name: --waspOutputMode
+  - name: --wasp_output_mode
     type: string
     description: |-
       WASP allele-specific output type. This is re-implementation of the original WASP mappability filtering by Bryce van de Geijn, Graham McVicker, Yoav Gilad & Jonathan K Pritchard. Please cite the original WASP paper: Nature Methods 12, 1061-1063 (2015), https://www.nature.com/articles/nmeth.3582 .
 
       - SAMtag      ... add WASP tags to the alignments that pass WASP filtering
+    info:
+      orig_name: --waspOutputMode
+- name: STARsolo (single cell RNA-seq) parameters
+  arguments:
+  - name: --solo_type
+    type: string
+    description: |-
+      type of single-cell RNA-seq
+
+      - CB_UMI_Simple   ... (a.k.a. Droplet) one UMI and one Cell Barcode of fixed length in read2, e.g. Drop-seq and 10X Chromium.
+      - CB_UMI_Complex  ... multiple Cell Barcodes of varying length, one UMI of fixed length and one adapter sequence of fixed length are allowed in read2 only (e.g. inDrop, ddSeq).
+      - CB_samTagOut    ... output Cell Barcode as CR and/or CB SAm tag. No UMI counting. --readFilesIn cDNA_read1 [cDNA_read2 if paired-end] CellBarcode_read . Requires --out_sam_type BAM Unsorted [and/or SortedByCoordinate]
+      - SmartSeq        ... Smart-seq: each cell in a separate FASTQ (paired- or single-end), barcodes are corresponding read-groups, no UMI sequences, alignments deduplicated according to alignment start and end (after extending soft-clipped bases)
+    info:
+      orig_name: --soloType
+    multiple: true
+  - name: --solo_cb_type
+    type: string
+    description: |-
+      cell barcode type
+
+      Sequence: cell barcode is a sequence (standard option)
+      String: cell barcode is an arbitrary string
+    info:
+      orig_name: --soloCBtype
+    example: Sequence
+  - name: --solo_cb_whitelist
+    type: string
+    description: |-
+      file(s) with whitelist(s) of cell barcodes. Only --solo_type CB_UMI_Complex allows more than one whitelist file.
+
+      - None            ... no whitelist: all cell barcodes are allowed
+    info:
+      orig_name: --soloCBwhitelist
+    multiple: true
+  - name: --solo_cb_start
+    type: integer
+    description: cell barcode start base
+    info:
+      orig_name: --soloCBstart
+    example: 1
+  - name: --solo_cb_len
+    type: integer
+    description: cell barcode length
+    info:
+      orig_name: --soloCBlen
+    example: 16
+  - name: --solo_umi_start
+    type: integer
+    description: UMI start base
+    info:
+      orig_name: --soloUMIstart
+    example: 17
+  - name: --solo_umi_len
+    type: integer
+    description: UMI length
+    info:
+      orig_name: --soloUMIlen
+    example: 10
+  - name: --solo_barcode_read_length
+    type: integer
+    description: |-
+      length of the barcode read
+
+      - 1   ... equal to sum of soloCBlen+soloUMIlen
+      - 0   ... not defined, do not check
+    info:
+      orig_name: --soloBarcodeReadLength
+    example: 1
+  - name: --solo_barcode_mate
+    type: integer
+    description: |-
+      identifies which read mate contains the barcode (CB+UMI) sequence
+
+      - 0   ... barcode sequence is on separate read, which should always be the last file in the --readFilesIn listed
+      - 1   ... barcode sequence is a part of mate 1
+      - 2   ... barcode sequence is a part of mate 2
+    info:
+      orig_name: --soloBarcodeMate
+    example: 0
+  - name: --solo_cb_position
+    type: string
+    description: |-
+      position of Cell Barcode(s) on the barcode read.
+
+      Presently only works with --solo_type CB_UMI_Complex, and barcodes are assumed to be on Read2.
+      Format for each barcode: startAnchor_startPosition_endAnchor_endPosition
+      start(end)Anchor defines the Anchor Base for the CB: 0: read start; 1: read end; 2: adapter start; 3: adapter end
+      start(end)Position is the 0-based position with of the CB start(end) with respect to the Anchor Base
+      String for different barcodes are separated by space.
+      Example: inDrop (Zilionis et al, Nat. Protocols, 2017):
+      --solo_cb_position  0_0_2_-1  3_1_3_8
+    info:
+      orig_name: --soloCBposition
+    multiple: true
+  - name: --solo_umi_position
+    type: string
+    description: |-
+      position of the UMI on the barcode read, same as soloCBposition
+
+      Example: inDrop (Zilionis et al, Nat. Protocols, 2017):
+      --solo_cb_position  3_9_3_14
+    info:
+      orig_name: --soloUMIposition
+  - name: --solo_adapter_sequence
+    type: string
+    description: adapter sequence to anchor barcodes. Only one adapter sequence is
+      allowed.
+    info:
+      orig_name: --soloAdapterSequence
+  - name: --solo_adapter_mismatches_nmax
+    type: integer
+    description: maximum number of mismatches allowed in adapter sequence.
+    info:
+      orig_name: --soloAdapterMismatchesNmax
+    example: 1
+  - name: --solo_cb_match_wl_type
+    type: string
+    description: |-
+      matching the Cell Barcodes to the WhiteList
+
+      - Exact                           ... only exact matches allowed
+      - 1MM                             ... only one match in whitelist with 1 mismatched base allowed. Allowed CBs have to have at least one read with exact match.
+      - 1MM_multi                       ... multiple matches in whitelist with 1 mismatched base allowed, posterior probability calculation is used choose one of the matches.
+      Allowed CBs have to have at least one read with exact match. This option matches best with CellRanger 2.2.0
+      - 1MM_multi_pseudocounts          ... same as 1MM_Multi, but pseudocounts of 1 are added to all whitelist barcodes.
+      - 1MM_multi_Nbase_pseudocounts    ... same as 1MM_multi_pseudocounts, multimatching to WL is allowed for CBs with N-bases. This option matches best with CellRanger >= 3.0.0
+      - EditDist_2                    ... allow up to edit distance of 3 fpr each of the barcodes. May include one deletion + one insertion. Only works with --solo_type CB_UMI_Complex. Matches to multiple passlist barcdoes are not allowed. Similar to ParseBio Split-seq pipeline.
+    info:
+      orig_name: --soloCBmatchWLtype
+    example: 1MM_multi
+  - name: --solo_input_sam_attr_barcode_seq
+    type: string
+    description: |-
+      when inputting reads from a SAM file (--readsFileType SAM SE/PE), these SAM attributes mark the barcode sequence (in proper order).
+
+      For instance, for 10X CellRanger or STARsolo BAMs, use --solo_input_sam_attr_barcode_seq CR UR .
+      This parameter is required when running STARsolo with input from SAM.
+    info:
+      orig_name: --soloInputSAMattrBarcodeSeq
+    multiple: true
+  - name: --solo_input_sam_attr_barcode_qual
+    type: string
+    description: |-
+      when inputting reads from a SAM file (--readsFileType SAM SE/PE), these SAM attributes mark the barcode qualities (in proper order).
+
+      For instance, for 10X CellRanger or STARsolo BAMs, use --solo_input_sam_attr_barcode_qual CY UY .
+      If this parameter is '-' (default), the quality 'H' will be assigned to all bases.
+    info:
+      orig_name: --soloInputSAMattrBarcodeQual
+    multiple: true
+  - name: --solo_strand
+    type: string
+    description: |-
+      strandedness of the solo libraries:
+
+      - Unstranded  ... no strand information
+      - Forward     ... read strand same as the original RNA molecule
+      - Reverse     ... read strand opposite to the original RNA molecule
+    info:
+      orig_name: --soloStrand
+    example: Forward
+  - name: --solo_features
+    type: string
+    description: |-
+      genomic features for which the UMI counts per Cell Barcode are collected
+
+      - Gene            ... genes: reads match the gene transcript
+      - SJ              ... splice junctions: reported in SJ.out.tab
+      - GeneFull        ... full gene (pre-mRNA): count all reads overlapping genes' exons and introns
+      - GeneFull_ExonOverIntron ... full gene (pre-mRNA): count all reads overlapping genes' exons and introns: prioritize 100% overlap with exons
+      - GeneFull_Ex50pAS        ... full gene (pre-RNA): count all reads overlapping genes' exons and introns: prioritize >50% overlap with exons. Do not count reads with 100% exonic overlap in the antisense direction.
+    info:
+      orig_name: --soloFeatures
+    example: Gene
+    multiple: true
+  - name: --solo_multi_mappers
+    type: string
+    description: |-
+      counting method for reads mapping to multiple genes
+
+      - Unique     ... count only reads that map to unique genes
+      - Uniform    ... uniformly distribute multi-genic UMIs to all genes
+      - Rescue     ... distribute UMIs proportionally to unique+uniform counts (~ first iteration of EM)
+      - PropUnique ... distribute UMIs proportionally to unique mappers, if present, and uniformly if not.
+      - EM         ... multi-gene UMIs are distributed using Expectation Maximization algorithm
+    info:
+      orig_name: --soloMultiMappers
+    example: Unique
+    multiple: true
+  - name: --solo_umi_dedup
+    type: string
+    description: |-
+      type of UMI deduplication (collapsing) algorithm
+
+      - 1MM_All                     ... all UMIs with 1 mismatch distance to each other are collapsed (i.e. counted once).
+      - 1MM_Directional_UMItools    ... follows the "directional" method from the UMI-tools by Smith, Heger and Sudbery (Genome Research 2017).
+      - 1MM_Directional             ... same as 1MM_Directional_UMItools, but with more stringent criteria for duplicate UMIs
+      - Exact                       ... only exactly matching UMIs are collapsed.
+      - NoDedup                     ... no deduplication of UMIs, count all reads.
+      - 1MM_CR                      ... CellRanger2-4 algorithm for 1MM UMI collapsing.
+    info:
+      orig_name: --soloUMIdedup
+    example: 1MM_All
+    multiple: true
+  - name: --solo_umi_filtering
+    type: string
+    description: |-
+      type of UMI filtering (for reads uniquely mapping to genes)
+
+      - -                  ... basic filtering: remove UMIs with N and homopolymers (similar to CellRanger 2.2.0).
+      - MultiGeneUMI       ... basic + remove lower-count UMIs that map to more than one gene.
+      - MultiGeneUMI_All   ... basic + remove all UMIs that map to more than one gene.
+      - MultiGeneUMI_CR    ... basic + remove lower-count UMIs that map to more than one gene, matching CellRanger > 3.0.0 .
+      Only works with --solo_umi_dedup 1MM_CR
+    info:
+      orig_name: --soloUMIfiltering
+    multiple: true
+  - name: --solo_out_file_names
+    type: string
+    description: |-
+      file names for STARsolo output:
+
+      file_name_prefix   gene_names   barcode_sequences   cell_feature_count_matrix
+    info:
+      orig_name: --soloOutFileNames
+    example:
+    - Solo.out/
+    - features.tsv
+    - barcodes.tsv
+    - matrix.mtx
+    multiple: true
+  - name: --solo_cell_filter
+    type: string
+    description: |-
+      cell filtering type and parameters
+
+      - None            ... do not output filtered cells
+      - TopCells        ... only report top cells by UMI count, followed by the exact number of cells
+      - CellRanger2.2   ... simple filtering of CellRanger 2.2.
+      Can be followed by numbers: number of expected cells, robust maximum percentile for UMI count, maximum to minimum ratio for UMI count
+      The harcoded values are from CellRanger: nExpectedCells=3000;  maxPercentile=0.99;  maxMinRatio=10
+      - EmptyDrops_CR   ... EmptyDrops filtering in CellRanger flavor. Please cite the original EmptyDrops paper: A.T.L Lun et al, Genome Biology, 20, 63 (2019): https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1662-y
+      Can be followed by 10 numeric parameters:  nExpectedCells   maxPercentile   maxMinRatio   indMin   indMax   umiMin   umiMinFracMedian   candMaxN   FDR   simN
+      The harcoded values are from CellRanger:             3000            0.99            10    45000    90000      500               0.01      20000  0.01  10000
+    info:
+      orig_name: --soloCellFilter
+    example:
+    - CellRanger2.2
+    - '3000'
+    - '0.99'
+    - '10'
+    multiple: true
+  - name: --solo_out_format_features_gene_field3
+    type: string
+    description: field 3 in the Gene features.tsv file. If "-", then no 3rd field
+      is output.
+    info:
+      orig_name: --soloOutFormatFeaturesGeneField3
+    example: Gene Expression
+    multiple: true
+  - name: --solo_cell_read_stats
+    type: string
+    description: |-
+      Output reads statistics for each CB
+
+      - Standard    ... standard output
+    info:
+      orig_name: --soloCellReadStats
