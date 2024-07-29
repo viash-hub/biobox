@@ -89,7 +89,7 @@ printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "tes
 printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/expected.gff"
 printf "chr1\t.\tCDS\t1600\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/expected.gff"
 
-# Test 1: -wa option
+# Test 1: Default intersect
 mkdir test1
 cd test1
 
@@ -107,7 +107,7 @@ echo "- test1 succeeded -"
 
 cd ..
 
-# Test 2: Default intersect
+# Test 2: Write A option
 mkdir test2
 cd test2
 
@@ -335,9 +335,6 @@ assert_identical_content "output.bed" "../test_data/expected.gff"
 echo "- test13 succeeded -"
 
 cd ..
-
-# TODO: 
-# - test for different options combinations
 
 echo "---- All tests succeeded! ----"
 exit 0

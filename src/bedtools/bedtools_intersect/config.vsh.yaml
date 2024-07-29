@@ -35,8 +35,7 @@ argument_groups:
         direction: input
         multiple: true
         description: | 
-          The input file (BED/GFF/VCF/BAM) to be used as the -b file.
-          Note: -b may be followed with multiple databases and/or wildcard (*) character(s).
+          The input file(s) (BED/GFF/VCF/BAM) to be used as the -b file(s).
         required: true
         example: input_b.bed
     
@@ -250,15 +249,6 @@ engines:
       - type: docker
         run: |
           echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
-
-# engines:
-#   - type: docker
-#     image: biocontainers/bedtools:v2.27.1dfsg-4-deb_cv1
-#     setup:
-#       - type: apt
-#       - type: docker
-#         run: |
-#           bedtools --version > /var/software_versions.txt
 
 runners:
   - type: executable
