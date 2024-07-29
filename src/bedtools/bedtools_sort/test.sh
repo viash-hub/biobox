@@ -30,12 +30,18 @@ echo "Creating Test Data..."
 mkdir -p test_data
 
 # Create and populate example files
-printf "chr1\t300\t400\nchr1\t150\t250\nchr1\t100\t200" > "../test_data/featureA.bed"
-printf "chr2\t290\t390\nchr2\t180\t280\nchr1\t500\t600" > "../test_data/featureB.bed"
-printf "chr3\t120\t220\nchr1\t250\t350\nchr2\t500\t580" > "../test_data/featureC.bed"
+printf "chr1\t300\t400\nchr1\t150\t250\nchr1\t100\t200" > "test_data/featureA.bed"
+printf "chr2\t290\t390\nchr2\t180\t280\nchr1\t500\t600" > "test_data/featureB.bed"
+printf "chr3\t120\t220\nchr1\t250\t350\nchr2\t500\t580" > "test_data/featureC.bed"
 
 # Create and populate example.gff file
-
+printf "##gff-version 3\n" > "test_data/example.gff"
+printf "chr1\t.\tgene\t1000\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/example.gff"
+printf "chr3\t.\tmRNA\t1000\t2000\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "test_data/example.gff"
+printf "chr1\t.\texon\t1000\t1200\t.\t+\t.\tID=exon1;Parent=transcript1\n" >> "test_data/example.gff"
+printf "chr2\t.\texon\t1500\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "test_data/example.gff"
+printf "chr1\t.\tCDS\t1000\t1200\t.\t+\t0\tID=cds1;Parent=transcript1\n" >> "test_data/example.gff"
+printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/example.gff"
 
 # Create expected output files
 
