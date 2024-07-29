@@ -28,7 +28,7 @@ meta = {
 with open(meta["config"], 'r') as stream:
     config = yaml.safe_load(stream)
 all_arguments = {
-    arg["name"].removeprefix("-").removeprefix("-"): arg
+    arg["name"].lstrip('-'): arg
     for argument_group in config["argument_groups"]
     for arg in argument_group["arguments"]
 }
