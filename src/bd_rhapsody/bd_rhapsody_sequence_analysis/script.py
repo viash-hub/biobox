@@ -186,7 +186,7 @@ def main(par: dict[str, Any], meta: dict[str, Any]):
                 f.write(config_content)
             
             # add cwl and params file to the cmd
-            cmd.extend[[cwl_file, config_file]]
+            cmd.extend([cwl_file, config_file])
             
             # keep environment variables but set TMPDIR to temp_dir
             env = dict(os.environ)
