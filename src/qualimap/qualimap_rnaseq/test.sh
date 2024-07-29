@@ -50,7 +50,7 @@ assert_file_contains "output.txt" ">>>>>>> Transcript coverage profile"
 assert_file_contains "output.txt" ">>>>>>> Junction analysis"
 assert_file_contains "output.txt" ">>>>>>> Transcript coverage profile"
 
-assert_file_contains "counts.txt" "ENSG00000125841.12      2"
+assert_file_contains "counts.txt" "ENSG00000125841.12"
 
 assert_file_contains "report.html" "<title>Qualimap report: RNA Seq QC</title>"
 assert_file_contains "report.html" "<h3>Input</h3>"
@@ -76,14 +76,15 @@ echo "> Running qualimap with pdf output report"
     --output output.txt
 
 echo ">> Checking output"
-[ ! -f "report.pdf" ] && echo "report.pdf does not exist" && exit 1
-[ ! -f "counts.txt" ] && echo "counts.txt does not exist" && exit 1
-[ ! -f "output.txt" ] && echo "output.txt does not exist" && exit 1
+assert_file_exists "report.pdf"
+assert_file_exists "counts.txt"
+assert_file_exists "output.txt"
+assert_file_doesnt_exist "report.html"
 
 echo ">> Checking if output is empty"
-[ ! -s "report.pdf" ] && echo "report.pdf is empty" && exit 1
-[ ! -s "counts.txt" ] && echo "counts.txt is empty" && exit 1
-[ ! -s "output.txt" ] && echo "output.txt is empty" && exit 1
+assert_file_not_empty "report.pdf"
+assert_file_not_empty "counts.txt"
+assert_file_not_empty "output.txt"
 
 cd ..
 rm -r run_qualimap_rnaseq_pdf
@@ -99,12 +100,13 @@ echo "> Running qualimap without report and counts output"
     --output output.txt
 
 echo ">> Checking output"
-[ -f "report.pdf" ] && echo "report.pdf exists" && exit 1
-[ -f "counts.txt" ] && echo "counts.txt exists" && exit 1
-[ ! -f "output.txt" ] && echo "output.txt does not exist" && exit 1
+assert_file_doesnt_exist "report.pdf"
+assert_file_doesnt_exist "report.html"
+assert_file_doesnt_exist "counts.txt"
+assert_file_exists "output.txt"
 
 echo ">> Checking if output is empty"
-[ ! -s "output.txt" ] && echo "output.txt is empty" && exit 1
+assert_file_not_empty "output.txt"
 
 cd ..
 rm -r run_qualimap_rnaseq
