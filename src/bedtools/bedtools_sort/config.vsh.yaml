@@ -1,0 +1,50 @@
+name: bedtools_sort
+namespace: bedtools
+description: 
+keywords: [fasta, BED, GFF, VCF]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/sort.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: GPL-2.0
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      
+    
+  - name: Outputs
+    arguments:
+        
+
+  - name: Options
+    arguments:
+      
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bedtools, procps]
+      - type: docker
+        run: |
+          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
