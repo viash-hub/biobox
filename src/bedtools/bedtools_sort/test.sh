@@ -30,7 +30,7 @@ echo "Creating Test Data..."
 mkdir -p test_data
 
 # Create and populate example files
-printf "chr1\t300\t400\nchr1\t150\t250\nchr1\t100\t200" > "test_data/featureA.bed"
+printf "#Header\nchr1\t300\t400\nchr1\t150\t250\nchr1\t100\t200" > "test_data/featureA.bed"
 printf "chr2\t290\t400\nchr2\t180\t220\nchr1\t500\t600" > "test_data/featureB.bed"
 printf "chr1\t100\t200\tfeature1\t960\nchr1\t150\t250\tfeature2\t850\nchr1\t300\t400\tfeature3\t740\nchr2\t290\t390\tfeature4\t630\nchr2\t180\t280\tfeature5\t920\nchr3\t120\t220\tfeature6\t410\n" > "test_data/featureC.bed"
 
@@ -51,7 +51,7 @@ printf "chr1\t500\t600\nchr2\t180\t220\nchr2\t290\t400\n" > "test_data/expected_
 printf "chr1\t500\t600\nchr2\t290\t400\nchr2\t180\t220\n" > "test_data/expected_chrThenSizeD.bed"
 printf "chr1\t300\t400\tfeature3\t740\nchr1\t150\t250\tfeature2\t850\nchr1\t100\t200\tfeature1\t960\nchr2\t290\t390\tfeature4\t630\nchr2\t180\t280\tfeature5\t920\nchr3\t120\t220\tfeature6\t410\n" > "test_data/expected_chrThenScoreA.bed"
 printf "chr1\t100\t200\tfeature1\t960\nchr1\t150\t250\tfeature2\t850\nchr1\t300\t400\tfeature3\t740\nchr2\t180\t280\tfeature5\t920\nchr2\t290\t390\tfeature4\t630\nchr3\t120\t220\tfeature6\t410\n" > "test_data/expected_chrThenScoreD.bed"
-
+printf "#Header\nchr1\t100\t200\nchr1\t150\t250\nchr1\t300\t400\n" > "test_data/expected_header.bed"
 
 # expected_sorted.gff
 printf "chr1\t.\tgene\t1000\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/expected_sorted.gff"
@@ -130,8 +130,6 @@ assert_identical_content "output.bed" "../test_data/expected_sizeD.bed"
 echo "- test4 succeeded -"
 
 cd ..
-
-# vvvvvvv double check after this point vvvvvv
 
 # Test 5: Sort on chrThenSizeA
 mkdir test5
@@ -213,12 +211,12 @@ cd ..
 # "$meta_executable" \
 #     --input "../test_data/featureB.bed" \
 #     --output "output.bed" \
-#     --genomeFile "../test_data/genome.txt"
+#     --genome "../test_data/genome.txt"
 
 # # checks
 # assert_file_exists "output.bed"
 # assert_file_not_empty "output.bed"
-# assert_identical_content "output.bed" "../test_data/expected_sorted_A.bed"
+# assert_identical_content "output.bed" "../test_data/expected_genome.bed"
 # echo "- test9 succeeded -"
 
 # cd ..
@@ -231,33 +229,33 @@ cd ..
 # "$meta_executable" \
 #     --input "../test_data/featureB.bed" \
 #     --output "output.bed" \
-#     --faidxFile "../test_data/genome.fai"
+#     --faidx "../test_data/genome.fai"
 
 # # checks
 # assert_file_exists "output.bed"
 # assert_file_not_empty "output.bed"
-# assert_identical_content "output.bed" "../test_data/expected_sorted_A.bed"
+# assert_identical_content "output.bed" "../test_data/expected_faidx.bed"
 # echo "- test10 succeeded -"
 
 # cd ..
 
-# # Test 11: Sort with header
-# mkdir test11
-# cd test11
+# Test 11: Sort with header
+mkdir test11
+cd test11
 
-# echo "> Run bedtools_sort on BED file with header"
-# "$meta_executable" \
-#     --input "../test_data/featureB.bed" \
-#     --output "output.bed" \
-#     --header
+echo "> Run bedtools_sort on BED file with header"
+"$meta_executable" \
+    --input "../test_data/featureA.bed" \
+    --output "output.bed" \
+    --header
 
-# # checks
-# assert_file_exists "output.bed"
-# assert_file_not_empty "output.bed"
-# assert_identical_content "output.bed" "../test_data/expected_sorted_A.bed"
-# echo "- test11 succeeded -"
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_header.bed"
+echo "- test11 succeeded -"
 
-# cd ..
+cd ..
 
 echo "---- All tests succeeded! ----"
 exit 0
