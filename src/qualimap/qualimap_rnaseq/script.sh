@@ -28,7 +28,6 @@ qualimap rnaseq \
     -bam $par_input \
     -gtf $par_gtf \
     -outdir "$tmp_dir" \
-    --java-mem-size=$par_java_memory_size \
     ${par_output_report:+-outformat $report_extension} \
     ${par_paired:+--paired} \
     ${par_sorted:+--sorted} \
