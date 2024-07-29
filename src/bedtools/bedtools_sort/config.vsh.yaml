@@ -28,8 +28,8 @@ argument_groups:
       - name: --output
         alternatives: -o
         type: file
+        direction: output
         description: Output sorted file (bed/gff/vcf) to be written.
-        required: true
 
   - name: Options
     arguments:
