@@ -33,6 +33,8 @@ mkdir -p test_data
 printf "#Header\nchr1\t300\t400\nchr1\t150\t250\nchr1\t100\t200" > "test_data/featureA.bed"
 printf "chr2\t290\t400\nchr2\t180\t220\nchr1\t500\t600" > "test_data/featureB.bed"
 printf "chr1\t100\t200\tfeature1\t960\nchr1\t150\t250\tfeature2\t850\nchr1\t300\t400\tfeature3\t740\nchr2\t290\t390\tfeature4\t630\nchr2\t180\t280\tfeature5\t920\nchr3\t120\t220\tfeature6\t410\n" > "test_data/featureC.bed"
+printf "chr1\nchr3\nchr2\n" > "test_data/genome.txt"
+printf "chr1\t248956422\nchr3\t242193529\nchr2\t198295559\n" > "test_data/genome.fai"
 
 # Create and populate example.gff file
 printf "##gff-version 3\n" > "test_data/example.gff"
@@ -51,6 +53,7 @@ printf "chr1\t500\t600\nchr2\t180\t220\nchr2\t290\t400\n" > "test_data/expected_
 printf "chr1\t500\t600\nchr2\t290\t400\nchr2\t180\t220\n" > "test_data/expected_chrThenSizeD.bed"
 printf "chr1\t300\t400\tfeature3\t740\nchr1\t150\t250\tfeature2\t850\nchr1\t100\t200\tfeature1\t960\nchr2\t290\t390\tfeature4\t630\nchr2\t180\t280\tfeature5\t920\nchr3\t120\t220\tfeature6\t410\n" > "test_data/expected_chrThenScoreA.bed"
 printf "chr1\t100\t200\tfeature1\t960\nchr1\t150\t250\tfeature2\t850\nchr1\t300\t400\tfeature3\t740\nchr2\t180\t280\tfeature5\t920\nchr2\t290\t390\tfeature4\t630\nchr3\t120\t220\tfeature6\t410\n" > "test_data/expected_chrThenScoreD.bed"
+printf "chr1\t100\t200\tfeature1\t960\nchr1\t150\t250\tfeature2\t850\nchr1\t300\t400\tfeature3\t740\nchr3\t120\t220\tfeature6\t410\nchr2\t180\t280\tfeature5\t920\nchr2\t290\t390\tfeature4\t630\n" > "test_data/expected_genome.bed"
 printf "#Header\nchr1\t100\t200\nchr1\t150\t250\nchr1\t300\t400\n" > "test_data/expected_header.bed"
 
 # expected_sorted.gff
@@ -203,41 +206,41 @@ echo "- test8 succeeded -"
 
 cd ..
 
-# # Test 9: Sort according to genome file
-# mkdir test9
-# cd test9
+# Test 9: Sort according to genome file
+mkdir test9
+cd test9
 
-# echo "> Run bedtools_sort on BED file according to genome file"
-# "$meta_executable" \
-#     --input "../test_data/featureB.bed" \
-#     --output "output.bed" \
-#     --genome "../test_data/genome.txt"
+echo "> Run bedtools_sort on BED file according to genome file"
+"$meta_executable" \
+    --input "../test_data/featureC.bed" \
+    --output "output.bed" \
+    --genome "../test_data/genome.txt"
 
-# # checks
-# assert_file_exists "output.bed"
-# assert_file_not_empty "output.bed"
-# assert_identical_content "output.bed" "../test_data/expected_genome.bed"
-# echo "- test9 succeeded -"
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_genome.bed"
+echo "- test9 succeeded -"
 
-# cd ..
+cd ..
 
-# # Test 10: Sort according to faidx file
-# mkdir test10
-# cd test10
+# Test 10: Sort according to faidx file
+mkdir test10
+cd test10
 
-# echo "> Run bedtools_sort on BED file according to faidx file"
-# "$meta_executable" \
-#     --input "../test_data/featureB.bed" \
-#     --output "output.bed" \
-#     --faidx "../test_data/genome.fai"
+echo "> Run bedtools_sort on BED file according to faidx file"
+"$meta_executable" \
+    --input "../test_data/featureC.bed" \
+    --output "output.bed" \
+    --faidx "../test_data/genome.fai"
 
-# # checks
-# assert_file_exists "output.bed"
-# assert_file_not_empty "output.bed"
-# assert_identical_content "output.bed" "../test_data/expected_faidx.bed"
-# echo "- test10 succeeded -"
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_genome.bed"
+echo "- test10 succeeded -"
 
-# cd ..
+cd ..
 
 # Test 11: Sort with header
 mkdir test11
