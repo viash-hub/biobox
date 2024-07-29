@@ -1,0 +1,102 @@
+```sh
+agat_convert_sp_gff2gtf.pl --help
+```
+ ------------------------------------------------------------------------------
+|   Another GFF Analysis Toolkit (AGAT) - Version: v1.4.0                      |
+|   https://github.com/NBISweden/AGAT                                          |
+|   National Bioinformatics Infrastructure Sweden (NBIS) - www.nbis.se         |
+ ------------------------------------------------------------------------------
+
+
+Name:
+    agat_convert_sp_gff2gtf.pl
+
+Description:
+    The script aims to convert any GTF/GFF file into a proper GTF file. Full
+    information about the format can be found here:
+    https://agat.readthedocs.io/en/latest/gxf.html You can choose among 7
+    different GTF types (1, 2, 2.1, 2.2, 2.5, 3 or relax). Depending the
+    version selected the script will filter out the features that are not
+    accepted. For GTF2.5 and 3, every level1 feature (e.g nc_gene
+    pseudogene) will be converted into gene feature and every level2 feature
+    (e.g mRNA ncRNA) will be converted into transcript feature. Using the
+    "relax" option you will produce a GTF-like output keeping all original
+    feature types (3rd column). No modification will occur e.g. mRNA to
+    transcript.
+
+    To be fully GTF compliant all feature have a gene_id and a transcript_id
+    attribute. The gene_id is unique identifier for the genomic source of
+    the transcript, which is used to group transcripts into genes. The
+    transcript_id is a unique identifier for the predicted transcript, which
+    is used to group features into transcripts.
+
+Usage:
+        agat_convert_sp_gff2gtf.pl --gff infile.gff [ -o outfile ]
+        agat_convert_sp_gff2gtf -h
+
+Options:
+    --gff, --gtf or -i
+            Input GFF/GTF file that will be read
+
+    --gtf_version version of the GTF output (1,2,2.1,2.2,2.5,3 or relax).
+    Default value from AGAT config file (relax for the default config). The
+    script option has the higher priority.
+            relax: all feature types are accepted.
+
+            GTF3 (9 feature types accepted): gene, transcript, exon, CDS,
+            Selenocysteine, start_codon, stop_codon, three_prime_utr and
+            five_prime_utr
+
+            GTF2.5 (8 feature types accepted): gene, transcript, exon, CDS,
+            UTR, start_codon, stop_codon, Selenocysteine
+
+            GTF2.2 (9 feature types accepted): CDS, start_codon, stop_codon,
+            5UTR, 3UTR, inter, inter_CNS, intron_CNS and exon
+
+            GTF2.1 (6 feature types accepted): CDS, start_codon, stop_codon,
+            exon, 5UTR, 3UTR
+
+            GTF2 (4 feature types accepted): CDS, start_codon, stop_codon,
+            exon
+
+            GTF1 (5 feature types accepted): CDS, start_codon, stop_codon,
+            exon, intron
+
+    -o , --output , --out , --outfile or --gtf
+            Output GTF file. If no output file is specified, the output will
+            be written to STDOUT.
+
+    -c or --config
+            String - Input agat config file. By default AGAT takes as input
+            agat_config.yaml file from the working directory if any,
+            otherwise it takes the orignal agat_config.yaml shipped with
+            AGAT. To get the agat_config.yaml locally type: "agat config
+            --expose". The --config option gives you the possibility to use
+            your own AGAT config file (located elsewhere or named
+            differently).
+
+    -h or --help
+            Display this helpful text.
+
+Feedback:
+  Did you find a bug?:
+    Do not hesitate to report bugs to help us keep track of the bugs and
+    their resolution. Please use the GitHub issue tracking system available
+    at this address:
+
+                https://github.com/NBISweden/AGAT/issues
+
+     Ensure that the bug was not already reported by searching under Issues.
+     If you're unable to find an (open) issue addressing the problem, open a new one.
+     Try as much as possible to include in the issue when relevant:
+     - a clear description,
+     - as much relevant information as possible,
+     - the command used,
+     - a data sample,
+     - an explanation of the expected behaviour that is not occurring.
+
+  Do you want to contribute?:
+    You are very welcome, visit this address for the Contributing
+    guidelines:
+    https://github.com/NBISweden/AGAT/blob/master/CONTRIBUTING.md
+

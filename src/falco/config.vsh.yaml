@@ -9,6 +9,9 @@ references:
 license: GPL-3.0
 requirements:
   commands: [falco]
+authors:
+  - __merge__: /src/_authors/toni_verbeiren.yaml
+    roles: [ author, maintainer ]
 
 # Notes:
 # - falco as arguments similar to -subsample and we update those to --subsample

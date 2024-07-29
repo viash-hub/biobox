@@ -27,9 +27,9 @@ echo "> Generate index"
 "$meta_executable" \
   ${meta_cpus:+---cpus $meta_cpus} \
   --index "star_index/" \
-  --genomeFastaFiles "genome.fasta" \
-  --sjdbGTFfile "genes.gtf" \
-  --genomeSAindexNbases 2
+  --genome_fasta_files "genome.fasta" \
+  --sjdb_gtf_file "genes.gtf" \
+  --genome_sa_index_nbases 4 
 
 files=("Genome" "Log.out" "SA" "SAindex" "chrLength.txt" "chrName.txt" "chrNameLength.txt" "chrStart.txt" "exonGeTrInfo.tab" "exonInfo.tab" "geneInfo.tab" "genomeParameters.txt" "sjdbInfo.txt" "sjdbList.fromGTF.out.tab" "sjdbList.out.tab" "transcriptInfo.tab")
 
