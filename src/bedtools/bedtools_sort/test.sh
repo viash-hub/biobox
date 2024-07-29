@@ -29,12 +29,15 @@ assert_identical_content() {
 echo "Creating Test Data..."
 mkdir -p test_data
 
-# Create and populate example.bed file
+# Create and populate example files
+printf "chr1\t300\t400\nchr1\t150\t250\nchr1\t100\t200" > "../test_data/featureA.bed"
+printf "chr2\t290\t390\nchr2\t180\t280\nchr1\t500\t600" > "../test_data/featureB.bed"
+printf "chr3\t120\t220\nchr1\t250\t350\nchr2\t500\t580" > "../test_data/featureC.bed"
 
 # Create and populate example.gff file
 
-# Create expected output files
 
+# Create expected output files
 
 
 # Test 1: Default sort on BED file
