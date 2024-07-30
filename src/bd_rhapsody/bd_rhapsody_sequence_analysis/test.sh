@@ -43,15 +43,6 @@ CWL_FILE="$meta_resources_dir/bd_rhapsody_make_reference.cwl"
 CONFIG_FILE="reference_config.yml"
 REFERENCE_FILE="index/Rhap_reference.tar.gz"
 
-cat > $CONFIG_FILE <<EOF
-Genome_fasta:
-  - class: File
-    location: $meta_resources_dir/test_data/reference_small.fa
-Gtf:
-  - class: File
-    location: $meta_resources_dir/test_data/reference_small.gtf
-EOF
-
 cwl-runner \
   --no-container \
   --preserve-entire-environment \
@@ -79,11 +70,11 @@ echo "> Prepare WTA test data"
 # AAAATCCTGT GTGA AACCAAAGT GACA GATAGAGGAG CGCATGTTTATAAC
 
 gzip -c > WTAreads_R1.fq.gz <<'EOF'
-@A00226:970:H5FGVDMXY:1:1101:2645:1000 1:N:0:CAGAGAGG
+@A00226:970:H5FGVDMXY:1:1101:2645:1000 1:N:0:CGAGGCTG
 AAAATCCTGTGTGAAACCAAAGTGACAGATAGAGGAGCGCATGTTTATAAC
 +
 FFFF:F,FFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFFFFFF,F,,,
-@A00226:970:H5FGVDMXY:1:1101:2862:1000 1:N:0:CAGAGATG
+@A00226:970:H5FGVDMXY:1:1101:2862:1000 1:N:0:CGAGGCTG
 AATAAGTGCGTGAAGAATGGAGGACAACAACTAGAATATTATGTTTGTAAA
 +
 :FFFF:F:FF,,FFFFF:F:F,:FFFF:FFFFF:,:,FF,FFFFFF:,FFF
@@ -97,11 +88,11 @@ EOF
 # TCTTCGCCCGGCCAGGAATCACAAGCTCCGGGTGGATAAGGCAGCTGCTGCAGCAGCGGCACTACAAGCCA
 # AATAATTTCGTAGCATAAATATGTCCCAAGCTTAGTTTGGGACATACTTATGCTAAAAAACATTATTGGTT
 gzip -c > WTAreads_R2.fq.gz <<'EOF'
-@A00226:970:H5FGVDMXY:1:1101:2645:1000 2:N:0:CAGAGAGG
+@A00226:970:H5FGVDMXY:1:1101:2645:1000 2:N:0:CGAGGCTG
 AGAAGCGGGCCGGTCCTTAGTGTTCGAGGCCCACCTATTCCGTCGACGACGTCGTCGCCGTGATGTTCGGT
 +
 FFF:FFF:F:FFFFFFFF,FFFFF:FFF:FFFFFFFFFF,FFFFFFFFFFFFFFF:FFFFFFFFFFF,FFF
-@A00226:970:H5FGVDMXY:1:1101:2862:1000 2:N:0:CAGAGATG
+@A00226:970:H5FGVDMXY:1:1101:2862:1000 2:N:0:CGAGGCTG
 TTATTAAAGCATCGTATTTATACAGGGTTCGAATCAAACCCTGTATGAATACGATTTTTTGTAATAACCAA
 +
 F:FFFF:F,:FFFF,F:FF:F:FFFFFFFF,FF,:FFFFFFFF:FF,,F::FF::FFFFF:F:FFFFF:,F
@@ -142,22 +133,22 @@ EOF
 echo "> Prepare SMK test data"
 
 gzip -c > SMKreads_R1.fq.gz <<'EOF'
-@A00226:970:H5FGVDMXY:1:1101:1199:1000 1:N:0:AAGAGGCA
+@A00226:970:H5FGVDMXY:1:1101:1199:1000 1:N:0:CGAGGCTG
 TCAATAGACGAGGTGAAGGTTCGCTGACAAGTCTGTACGTGTTAAACACCA
 +
 F:FFFFFFF:FFFFFFFFFFFF,FF,FFFF:FFF:,FFFFFFFF:F,,,F,
-@A00226:970:H5FGVDMXY:1:1101:2754:1000 1:N:0:AAGAGGCA
+@A00226:970:H5FGVDMXY:1:1101:2754:1000 1:N:0:CGAGGCTG
 GTTGTACCTTAGTGAGCGACCACCGACAATGGGACTCTCGGACAATTATTT
 +
 :FFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFFFFFFF,,:FF
 EOF
 
 gzip -c > SMKreads_R2.fq.gz <<'EOF'
-@A00226:970:H5FGVDMXY:1:1101:1199:1000 2:N:0:AAGAGGCA
+@A00226:970:H5FGVDMXY:1:1101:1199:1000 2:N:0:CGAGGCTG
 GTTGTCAAGATGCTACCGTTCAGAGATTCAAGGGCAGCCGCGTCACGATTGGATACGACTGTTGGGACCGG
 +
 F,FFF,FFFFF:FFFF:FFF,FF:FFFFFFFFF,FFFFFF,FFFFFFFFFFFFFFF,FFF,FF:F,F,FFF
-@A00226:970:H5FGVDMXY:1:1101:2754:1000 2:N:0:AAGAGGCA
+@A00226:970:H5FGVDMXY:1:1101:2754:1000 2:N:0:CGAGGCTG
 GTTGTCAAGATGCTACCGTTCAGAGTGGATGGGATAAGTGCGTGATGGACCGAAGGGACCTCGTGGCCGGA
 +
 F:FFFFFFFFFFFFFFFF:FFFF:FFFFF:FFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFF
@@ -197,17 +188,17 @@ echo ">> Run $meta_name"
   --exact_cell_count 2 \
   --exclude_intronic_reads false
 
-# echo ">> Check if output exists"
-# assert_file_exists "output.bam"
-# assert_file_exists "log.txt"
-# assert_file_exists "unmapped_r1.bam"
-# assert_file_exists "unmapped_r2.bam"
+echo ">> Check if output exists"
+assert_file_exists "output/sample_Bioproduct_Stats.csv"
+assert_file_exists "output/sample_RSEC_MolsPerCell_Unfiltered_MEX.zip"
+assert_file_exists "output/Logs"
+assert_file_exists "output/sample_Metrics_Summary.csv"
 
 # echo ">> Check if output contents are not empty"
-# assert_file_not_empty "output.bam"
-# assert_file_not_empty "log.txt"
-# assert_file_not_empty "unmapped_r1.bam"
-# assert_file_not_empty "unmapped_r2.bam"
+assert_file_not_empty "output/sample_Bioproduct_Stats.csv"
+assert_file_not_empty "output/sample_RSEC_MolsPerCell_Unfiltered_MEX.zip"
+assert_file_not_empty "output/Logs"
+assert_file_not_empty "output/sample_Metrics_Summary.csv"
 
 # echo ">> Check if output contents are correct"
 # assert_file_contains "log.txt" "Number of input reads \\|	2"
