@@ -21,6 +21,9 @@
 
 * `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
 
+* `agat/agat_convert_genscan2gff`: convert a genscan file into a GFF file (PR #100).
+
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
