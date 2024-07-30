@@ -12,10 +12,10 @@ echo "> Run $meta_name with test data"
   --output "$out_dir/output.gff" 
 
 echo ">> Checking output"
-[ ! -f "output.gff" ] && echo "Output file output.gtf does not exist" && exit 1
+[ ! -f "output.gff" ] && echo "Output file output.gff does not exist" && exit 1
 
 echo ">> Check if output is empty"
-[ ! -s "output.gff" ] && echo "Output file output.gtf is empty" && exit 1
+[ ! -s "output.gff" ] && echo "Output file output.gff is empty" && exit 1
 
 echo ">> Check if output matches expected output"
 diff "$out_dir/output.gff" "$test_dir/agat_convert_genscan2gff_1.gff"

@@ -7,7 +7,6 @@ agat_convert_genscan2gff.pl --help
 |   National Bioinformatics Infrastructure Sweden (NBIS) - www.nbis.se         |
  ------------------------------------------------------------------------------
 
-
 Name:
     agat_convert_genscan2gff.pl
 
