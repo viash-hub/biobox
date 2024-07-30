@@ -186,7 +186,7 @@ echo ">> Run $meta_name"
   --reads ABCreads_R2.fq.gz \
   --abseq_reference bdabseq_smallpanel.fasta \
   --exact_cell_count 2 \
-  --exclude_intronic_reads false
+  --exclude_intronic_reads false \
 
 echo ">> Check if output exists"
 assert_file_exists "output/sample_Bioproduct_Stats.csv"
