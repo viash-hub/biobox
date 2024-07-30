@@ -1,0 +1,23 @@
+```bash
+bedtools bamtofastq
+```
+
+Tool:    bedtools bamtofastq (aka bamToFastq)
+Version: v2.27.1
+Summary: Convert BAM alignments to FASTQ files. 
+
+Usage:   bamToFastq [OPTIONS] -i <BAM> -fq <FQ> 
+
+Options:
+	-fq2	FASTQ for second end.  Used if BAM contains paired-end data.
+		BAM should be sorted by query name is creating paired FASTQ.
+
+	-tags	Create FASTQ based on the mate info
+		in the BAM R2 and Q2 tags.
+
+Tips: 
+	If you want to create a single, interleaved FASTQ file 
+	for paired-end data, you can just write both to /dev/stdout:
+
+	bedtools bamtofastq -i x.bam -fq /dev/stdout -fq2 /dev/stdout > x.ilv.fq
+
