@@ -22,6 +22,18 @@ argument_groups:
         type: file
         description: Input BAM file to be converted to FASTQ.
         required: true
+
+      # - name: --fq
+      #   alternatives: -fq
+      #   type: file
+      #   description: 
+      #   required: true
+
+      # - name: --fq2
+      #   alternatives: -fq2
+      #   type: file
+      #   description: 
+      #   required: true
       
     
   - name: Outputs
