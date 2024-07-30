@@ -5,10 +5,7 @@
 # exit on error
 set -e
 
-## VIASH START
-meta_executable="target/executable/bedtools/bedtools_sort/bedtools_bamtofastq"
-meta_resources_dir="src/bedtools/bedtools_bamtofastq"
-## VIASH END
+test_data="$meta_resources_dir/test_data"
 
 #############################################
 # helper functions
@@ -27,14 +24,29 @@ assert_identical_content() {
 }
 #############################################
 
-# Create directories for tests
-echo "Creating Test Data..."
-mkdir -p test_data
-
-# Create and populate example files
+mkdir -p data
 
 # Create expected output files
+cat << EOF > data/expected.fastq
+@read1
+GATTTGGGGTTCAAAGCAGTATCGATCAAATAGTAAAGGTACGCGTAC
++
+                        
+@read1
+GATTTGGGGTTCAAAGCAGTATCGATCAAATAGTAAAGGTACGCGTAC
++
+                        
+@read3
+GGTTCAAAGCAGTATCGATCAAATAGTAAAGGTACGCGTACGAGTGGG
++
+                        
+EOF
 
+# cat << EOF > data/expected_tags.fastq
+# EOF
+
+# cat << EOF > data/expected_fq2.fastq
+# EOF
 
 # Test 1: 
 mkdir test1
@@ -42,15 +54,58 @@ cd test1
 
 echo "> Run bedtools bamtofastq on BAM file"
 "$meta_executable" \
-  --input "example.bam" \
+  --input "$test_data/example.bam" \
   --output_fq "output.fastq"
 
 # checks
 assert_file_exists "output.fastq"
 assert_file_not_empty "output.fastq"
-assert_identical_content "output.fastq" "../test_data/expected.fastq"
+assert_identical_content "output.fastq" "../data/expected.fastq"
 echo "- test1 succeeded -"
 
 cd ..
 
 # Test 2:
+# mkdir test2
+# cd test2
+
+# echo "> Run bedtools bamtofastq on BAM file with tags"
+# "$meta_executable" \
+#   --input "$test_data/example.bam" \
+#   --output_fq "output.fastq" \
+#   --tags
+
+# # checks
+# assert_file_exists "output.fastq"
+# assert_file_not_empty "output.fastq"
+# assert_identical_content "output.fastq" "../data/expected.fastq"
+# echo "- test2 succeeded -"
+
+# cd ..
+
+# # Test 3:
+# mkdir test3
+# cd test3
+
+# echo "> Run bedtools bamtofastq on BAM file with tags and output_fq2"
+# "$meta_executable" \
+#   --input "$test_data/example.bam" \
+#   --output_fq "output1.fastq" \
+#   --output_fq2 "output2.fastq" \
+#   --tags
+
+# # checks
+# assert_file_exists "output1.fastq"
+# assert_file_not_empty "output1.fastq"
+# assert_identical_content "output1.fastq" "../data/expected.fastq"
+# assert_file_exists "output2.fastq"
+# assert_file_not_empty "output2.fastq"
+# assert_identical_content "output2.fastq" "../data/expected.fastq"
+# echo "- test3 succeeded -"
+
+# cd ..
+
+echo "All tests succeeded"
+exit 0
+
+
