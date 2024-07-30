@@ -3,6 +3,7 @@
 
 # IDE ignores
 .idea/
+.vscode/
 
 # R specific ignores
 .Rhistory
@@ -11,6 +12,8 @@
 
 # viash specific ignores
 target/
+output/
+seqtk_sample_*
 
 # nextflow specific ignores
 .nextflow*
