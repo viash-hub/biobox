@@ -19,7 +19,7 @@ argument_groups:
   - name: Inputs
     arguments:
       - name: --embl
-        description: Input EMBL file that will be read
+        description: Input EMBL file that will be read.
         type: file
         required: true
         direction: input
@@ -46,7 +46,7 @@ argument_groups:
         type: string
         multiple: true
         required: false
-        example: tag1,tag2
+        example: [tag1, tag2]
       - name: -d
         description: |
           Boolean - Means that primary tags provided by the option "primary_tag" will be discarded.
