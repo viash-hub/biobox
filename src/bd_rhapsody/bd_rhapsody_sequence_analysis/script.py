@@ -161,9 +161,9 @@ def generate_cwl_file(meta: dict[str, Any], dir: str) -> str:
 def copy_outputs(par: dict[str, Any], config: dict[str, Any]):
     for arg in config["arguments"]:
         par_value = par[arg["clean_name"]]
-        if par_value and arg["type"] == "file" and par["direction"] == "output":
+        if par_value and arg["type"] == "file" and arg["direction"] == "output":
             # example template: '[sample_name]_(assay)_cell_type_experimental.csv'
-            template = arg.get("info", {}).get("template")
+            template = (arg.get("info") or {}).get("template")
             if template:
                 template_glob = template\
                     .replace("[sample_name]", par["run_name"])\
