@@ -31,7 +31,7 @@ argument_groups:
         type: file
         description: Output FASTQ file.
         required: true
-        
+
       - name: --output_fq2
         alternatives: -fq2
         type: file
@@ -53,6 +53,7 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - path: test_data
 
 engines:
   - type: docker

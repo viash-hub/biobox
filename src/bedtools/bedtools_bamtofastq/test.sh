@@ -24,31 +24,7 @@ assert_identical_content() {
 }
 #############################################
 
-mkdir -p data
-
-# Create expected output files
-cat << EOF > data/expected.fastq
-@read1
-GATTTGGGGTTCAAAGCAGTATCGATCAAATAGTAAAGGTACGCGTAC
-+
-                        
-@read1
-GATTTGGGGTTCAAAGCAGTATCGATCAAATAGTAAAGGTACGCGTAC
-+
-                        
-@read3
-GGTTCAAAGCAGTATCGATCAAATAGTAAAGGTACGCGTACGAGTGGG
-+
-                        
-EOF
-
-# cat << EOF > data/expected_tags.fastq
-# EOF
-
-# cat << EOF > data/expected_fq2.fastq
-# EOF
-
-# Test 1: 
+# Test 1: normal conversion 
 mkdir test1
 cd test1
 
@@ -60,50 +36,49 @@ echo "> Run bedtools bamtofastq on BAM file"
 # checks
 assert_file_exists "output.fastq"
 assert_file_not_empty "output.fastq"
-assert_identical_content "output.fastq" "../data/expected.fastq"
+assert_identical_content "output.fastq" "$test_data/expected.fastq"
 echo "- test1 succeeded -"
 
 cd ..
 
-# Test 2:
-# mkdir test2
-# cd test2
+# Test 2: with tags
+mkdir test2
+cd test2
 
-# echo "> Run bedtools bamtofastq on BAM file with tags"
-# "$meta_executable" \
-#   --input "$test_data/example.bam" \
-#   --output_fq "output.fastq" \
-#   --tags
+echo "> Run bedtools bamtofastq on BAM file with tags"
+"$meta_executable" \
+  --input "$test_data/example.bam" \
+  --output_fq "output.fastq" \
+  --tags
 
-# # checks
-# assert_file_exists "output.fastq"
-# assert_file_not_empty "output.fastq"
-# assert_identical_content "output.fastq" "../data/expected.fastq"
-# echo "- test2 succeeded -"
+# checks
+assert_file_exists "output.fastq"
+assert_file_not_empty "output.fastq"
+assert_identical_content "output.fastq" "../data/expected.fastq"
+echo "- test2 succeeded -"
 
-# cd ..
+cd ..
 
-# # Test 3:
-# mkdir test3
-# cd test3
+# Test 3: with option fq2
+mkdir test3
+cd test3
 
-# echo "> Run bedtools bamtofastq on BAM file with tags and output_fq2"
-# "$meta_executable" \
-#   --input "$test_data/example.bam" \
-#   --output_fq "output1.fastq" \
-#   --output_fq2 "output2.fastq" \
-#   --tags
+echo "> Run bedtools bamtofastq on BAM file with output_fq2"
+"$meta_executable" \
+  --input "$test_data/example.bam" \
+  --output_fq "output1.fastq" \
+  --output_fq2 "output2.fastq" 
 
-# # checks
-# assert_file_exists "output1.fastq"
-# assert_file_not_empty "output1.fastq"
-# assert_identical_content "output1.fastq" "../data/expected.fastq"
-# assert_file_exists "output2.fastq"
-# assert_file_not_empty "output2.fastq"
-# assert_identical_content "output2.fastq" "../data/expected.fastq"
-# echo "- test3 succeeded -"
+# checks
+assert_file_exists "output1.fastq"
+assert_file_not_empty "output1.fastq"
+assert_identical_content "output1.fastq" "../data/expected.fastq"
+assert_file_exists "output2.fastq"
+assert_file_not_empty "output2.fastq"
+assert_identical_content "output2.fastq" "../data/expected.fastq"
+echo "- test3 succeeded -"
 
-# cd ..
+cd ..
 
 echo "All tests succeeded"
 exit 0
