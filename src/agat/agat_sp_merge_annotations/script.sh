@@ -7,7 +7,7 @@
 input_files=""
 IFS=";" read -ra file_names <<< "$par_gff"
 for file in "${file_names[@]}"; do
-    input_files+="-gff $file "
+    input_files+="--gff $file "
 done
 unset IFS
 
