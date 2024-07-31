@@ -121,7 +121,7 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - path: test_data
+  - path: ../test_data
 
 requirements:
   commands: [ "cwl-runner" ]

@@ -187,7 +187,7 @@ echo ">> Run $meta_name"
   --reference_archive "$REFERENCE_FILE" \
   --output_dir output \
   ${meta_cpus:+---cpus $meta_cpus} \
-  ${meta_memory_mb:+---memory ${meta_memory_mb}MB} \
+  ${meta_memory_mb:+---memory "${meta_memory_mb}MB"} \
   --exact_cell_count 2 \
   --exclude_intronic_reads false
 

@@ -635,7 +635,7 @@ test_resources:
     path: test.sh
   - path: ../bd_rhapsody_make_reference/make_rhap_reference_2.2.1_nodocker.cwl
     dest: bd_rhapsody_make_reference.cwl
-  - path: ../bd_rhapsody_make_reference/test_data
+  - path: ../test_data
 
 #   - type: bash_script
 #     path: test_memory.sh
