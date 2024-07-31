@@ -12,6 +12,9 @@ references:
 license: GPL-3.0 
 requirements:
   commands: [ rsem-prepare-reference ]
+authors:
+  - __merge__: /src/_authors/sai_nirmayi_yasa.yaml
+    roles: [ author, maintainer ]
 
 argument_groups:
   - name: Inputs
@@ -19,8 +22,9 @@ argument_groups:
       - name: --reference_fasta_files
         type: file
         description: | 
-          List of Multi-FASTA formatted files OR a directory name. If a directory name is specified, RSEM will read all files with suffix ".fa" or ".fasta" in this directory. The files should contain either the sequences of transcripts or an entire genome, depending on whether the '--gtf' option is used.
+          Semi-colon separated list of Multi-FASTA formatted files OR a directory name. If a directory name is specified, RSEM will read all files with suffix ".fa" or ".fasta" in this directory. The files should contain either the sequences of transcripts or an entire genome, depending on whether the '--gtf' option is used.
         required: true
+        multiple: true
         example: read1.fasta
       - name: --reference_name
         type: string
@@ -145,9 +149,10 @@ engines:
       packages: bowtie
     - type: docker
       env: 
-        - STAR_VERSION 2.7.11b
-        - RSEM_VERSION 1.3.3
-        - TZ Europe/Brussels
+        - STAR_VERSION=2.7.11b
+        - RSEM_VERSION=1.3.3
+        - BOWTIE_VERSION=1.3.1
+        - TZ=Europe/Brussels
       run: |
         ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
         cd /tmp && \
@@ -162,19 +167,27 @@ engines:
         cd RSEM-${RSEM_VERSION} && \
         make && \
         make install && \
-        rm -rf /tmp/STAR-${STAR_VERSION} /tmp/${STAR_VERSION}.zip && \
-        cd && \
-        git clone https://github.com/DaehwanKimLab/hisat2.git && \
-        cd hisat2 && \
+        cd /tmp && \
+        wget --no-check-certificate -O bowtie-${BOWTIE_VERSION}-linux-x86_64.zip https://sourceforge.net/projects/bowtie-bio/files/bowtie/${BOWTIE_VERSION}/bowtie-${BOWTIE_VERSION}-linux-x86_64.zip/download  && \
+        unzip bowtie-${BOWTIE_VERSION}-linux-x86_64.zip && \
+        cp bowtie-${BOWTIE_VERSION}-linux-x86_64/bowtie* /usr/local/bin && \
+        cd /tmp && \
+        git clone https://github.com/DaehwanKimLab/hisat2.git /tmp/hisat2 && \
+        cd /tmp/hisat2 && \
         make && \
+        cp -r hisat2* /usr/local/bin && \
         cd && \
+        rm -rf /tmp/STAR-${STAR_VERSION} /tmp/${STAR_VERSION}.zip /tmp/bowtie-${BOWTIE_VERSION}-linux-x86_64 /tmp/hisat2 && \
         apt-get --purge autoremove -y ${PACKAGES} && \
         apt-get clean 
 
     - type: docker
       run: |
-        echo "RSEM: `rsem-prepare-reference --version | sed -e 's/Current version: RSEM v//g'`" > /var/software_versions.txt && \
-        echo "STAR: `STAR --version | sed -e 's/STAR_//g'`" >> /var/software_versions.txt >> /var/software_versions.txt
+        echo "RSEM: `rsem-calculate-expression --version | sed -e 's/Current version: RSEM v//g'`" > /var/software_versions.txt && \
+        echo "STAR: `STAR --version`" >> /var/software_versions.txt && \
+        echo "bowtie2: `bowtie2 --version | grep -oP '\d+\.\d+\.\d+'`" >> /var/software_versions.txt && \
+        echo "bowtie: `bowtie --version | grep -oP 'bowtie-align-s version \K\d+\.\d+\.\d+'`" >> /var/software_versions.txt && \
+        echo "HISAT2: `hisat2 --version | grep -oP 'hisat2-align-s version \K\d+\.\d+\.\d+'`" >> /var/software_versions.txt
 
 runners:
   - type: executable
