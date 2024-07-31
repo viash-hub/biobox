@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# viash ns build -q bedtools_bamtofastq --setup cb
-
 # exit on error
 set -e
 
@@ -54,7 +52,7 @@ echo "> Run bedtools bamtofastq on BAM file with tags"
 # checks
 assert_file_exists "output.fastq"
 assert_file_not_empty "output.fastq"
-assert_identical_content "output.fastq" "../data/expected.fastq"
+assert_identical_content "output.fastq" "$test_data/expected.fastq"
 echo "- test2 succeeded -"
 
 cd ..
@@ -72,10 +70,10 @@ echo "> Run bedtools bamtofastq on BAM file with output_fq2"
 # checks
 assert_file_exists "output1.fastq"
 assert_file_not_empty "output1.fastq"
-assert_identical_content "output1.fastq" "../data/expected.fastq"
+assert_identical_content "output1.fastq" "$test_data/expected_1.fastq"
 assert_file_exists "output2.fastq"
 assert_file_not_empty "output2.fastq"
-assert_identical_content "output2.fastq" "../data/expected.fastq"
+assert_identical_content "output2.fastq" "$test_data/expected_2.fastq"
 echo "- test3 succeeded -"
 
 cd ..

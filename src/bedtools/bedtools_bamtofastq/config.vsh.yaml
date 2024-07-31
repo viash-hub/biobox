@@ -31,10 +31,11 @@ argument_groups:
         type: file
         description: Output FASTQ file.
         required: true
-
+      
       - name: --output_fq2
         alternatives: -fq2
         type: file
+        direction: output
         description: |
           FASTQ for second end.  Used if BAM contains paired-end data.
           BAM should be sorted by query name is creating paired FASTQ.

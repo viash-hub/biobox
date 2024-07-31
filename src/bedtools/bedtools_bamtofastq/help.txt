@@ -3,7 +3,7 @@ bedtools bamtofastq
 ```
 
 Tool:    bedtools bamtofastq (aka bamToFastq)
-Version: v2.27.1
+Version: v2.30.0
 Summary: Convert BAM alignments to FASTQ files. 
 
 Usage:   bamToFastq [OPTIONS] -i <BAM> -fq <FQ> 
@@ -20,4 +20,6 @@ Tips:
 	for paired-end data, you can just write both to /dev/stdout:
 
 	bedtools bamtofastq -i x.bam -fq /dev/stdout -fq2 /dev/stdout > x.ilv.fq
+
+	Also, the samtools fastq command has more fucntionality and is a useful alternative.
 

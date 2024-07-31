@@ -1,30 +1,13 @@
 #!/bin/bash
 
-# NOTE: you need to have docker running for this script to work.
-
 # create sam file
-printf "@HD\tVN:1.0\tSO:unsorted\n" > example.sam
-printf "@SQ\tSN:chr1\tLN:248956422\n" >> example.sam
-printf "@SQ\tSN:chr2\tLN:242193529\n" >> example.sam
-printf "read1\t99\tchr1\t100\t60\t48M\t=\t150\t100\tGATTTGGGGTTCAAAGCAGTATCGATCAAATAGTAAAGGTACGCGTAC\t*\tNM:i:0\tMD:Z:50\tR2:Z:TGCGTACGGTTAAGAGTACGCGTACGGTACGCGTACGCGTACGCGT\tQ2:Z:IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n" >> example.sam
-printf "read2\t147\tchr1\t150\t60\t48M\t=\t100\t-100\tTTTCAAAGCAGTATCGATCAAATAGTAAAGGTACGCGTACGAGTGGAA\t*\tNM:i:1\tMD:Z:10G39\tR2:Z:GATTTGGGGTTCAAAGCAGTATCGATCAAATAGTAAAGGTACGCGT\tQ2:Z:IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n" >> example.sam
+printf "@SQ\tSN:chr2:172936693-172938111\tLN:1418\n" > example.sam
+printf "my_read\t99\tchr2:172936693-172938111\t129\t60\t100M\t=\t429\t400\tCTAACTAGCCTGGGAAAAAAGGATAGTGTCTCTCTGTTCTTTCATAGGAAATGTTGAATCAGACCCCTACTGGGAAAAGAAATTTAATGCATATCTCACT\t*\tXT:A:U\tNM:i:0\tSM:i:37\tAM:i:37\tX0:i:1\tX1:i:0\tXM:i:0\tXO:i:0\tXG:i:0\tMD:Z:100\n" >> example.sam
+printf "my_read\t147\tchr2:172936693-172938111\t429\t60\t100M\t=\t129\t-400\tTCGAGCTCTGCATTCATGGCTGTGTCTAAAGGGCATGTCAGCCTTTGATTCTCTCTGAGAGGTAATTATCCTTTTCCTGTCACGGAACAACAAATGATAG\t*\tXT:A:U\tNM:i:0\tSM:i:37\tAM:i:37\tX0:i:1\tX1:i:0\tXM:i:0\tXO:i:0\tXG:i:0\tMD:Z:100\n" >> example.sam
 
 # create bam file
-# docker run -it -v `pwd`:/host biocontainers/samtools:v1.9-4-deb_cv1 bash
-# cd /host
 # samtools view -b example.sam > example.bam
-# exit
 
-# # create fastq files
-# docker run -it -v `pwd`:/host biocontainers/bedtools:v2.27.1dfsg-4-deb_cv1 bash
-# cd /host
-
-# # expected.fastq
+# create fastq files
 # bedtools bamtofastq -i example.bam -fq expected.fastq
-
-# # expected_tags.fastq
-#bedtools bamtofastq -i example.bam -fq expected.fastq -tags
-
-# # expected_fq2.fastq
-
-# exit
+# bedtools bamtofastq -i example.bam -fq expected_1.fastq -fq2 expected_2.fastq
