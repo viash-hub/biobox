@@ -1,9 +1,9 @@
 import subprocess
-import os
 import gzip
 from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple
 import numpy as np
+import random
 
 ## VIASH START
 meta = {
@@ -92,10 +92,8 @@ def generate_bd_wta_transcript(
   """
   # todo: generate many transcripts at once to avoid
   # loading the same files multiple times
-
   from Bio import SeqIO
   import gffutils
-  import random
   
   # Load FASTA sequence
   with open(reference_fa, "r") as handle:
@@ -143,12 +141,18 @@ def generate_bd_wta_transcript(
 
 def generate_bd_read(
   cell_index: int = 0,
+  bead_version: str = "EnhV2",
+  umi_length: int = 14,
+  transcript_length: int = 42,
 ) -> Tuple[str, str]:
   """
   Generate a pair of BD Rhapsody FASTQ reads for a given cell index.
 
   Args:
     cell_index: The cell index to generate reads for.
+    bead_version: The bead version to use for generating the cell label.
+    umi_length: The length of the UMI to generate.
+    transcript_length: The length of the transcript to generate
 
   Returns:
     A tuple of two strings, the first string being the R1 read and the second string being the R2 read.
@@ -178,15 +182,16 @@ def generate_bd_read(
   meta_r1 = generate_bd_read_metadata(x=x, y=y, illumina_flag="1:N:0")
   meta_r2 = generate_bd_read_metadata(x=x, y=y, illumina_flag="2:N:0")
 
-  # generate r1
+  # generate r1 (cls1 + link + cls2 + link + cls3 + umi)
   assert cell_index >= 0 and cell_index < 384 * 384 * 384
-  cell_label = index_to_sequence(cell_index + 1, "EnhV2")
-  quality_r1 = "I" * len(cell_label)
-  r1 = f"{meta_r1}\n{cell_label}\n+\n{quality_r1}\n"
+  cell_label = index_to_sequence(cell_index + 1, bead_version=bead_version)
+  umi = ''.join(random.choice(["A", "C", "G", "T"], size=umi_length, replace=True))
+  quality_r1 = "I" * (len(cell_label) + len(umi))
+  r1 = f"{meta_r1}\n{cell_label}{umi}\n+\n{quality_r1}\n"
 
   # generate r2 by extracting sequence from fasta and gtf
-  wta_transcript = generate_bd_wta_transcript(reference_fa=fasta_file, reference_gtf=gtf_file)
-  quality_r2 = "I" * 42
+  wta_transcript = generate_bd_wta_transcript(reference_fa=fasta_file, reference_gtf=gtf_file, transcript_length=transcript_length)
+  quality_r2 = "I" * transcript_length
   r2 = f"{meta_r2}\n{wta_transcript}\n+\n{quality_r2}\n"
 
   return r1, r2
