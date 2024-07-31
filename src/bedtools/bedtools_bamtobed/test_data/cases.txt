@@ -1,0 +1,31 @@
+root@51e8af973440:/pwd/src/bedtools/bedtools_bamtobed/test_data# bedtools bamtobed -i example.bam 
+chr2:172936693-172938111        128     228     my_read/1       60      +
+chr2:172936693-172938111        428     528     my_read/2       60      -
+root@51e8af973440:/pwd/src/bedtools/bedtools_bamtobed/test_data# bedtools bamtobed -i example.bam -bedpe
+chr2:172936693-172938111        128     228     chr2:172936693-172938111        428     528     my_read 60      +       -
+root@51e8af973440:/pwd/src/bedtools/bedtools_bamtobed/test_data# bedtools bamtobed -i example.bam -bedpe -mate1
+chr2:172936693-172938111        128     228     chr2:172936693-172938111        428     528     my_read 60      +       -
+root@51e8af973440:/pwd/src/bedtools/bedtools_bamtobed/test_data# bedtools bamtobed -i example.bam -bed12       
+chr2:172936693-172938111        128     228     my_read/1       60      +       128     228     255,0,0 1       100     0
+chr2:172936693-172938111        428     528     my_read/2       60      -       428     528     255,0,0 1       100     0
+root@51e8af973440:/pwd/src/bedtools/bedtools_bamtobed/test_data# bedtools bamtobed -i example.bam -split
+chr2:172936693-172938111        128     228     my_read/1       60      +
+chr2:172936693-172938111        428     528     my_read/2       60      -
+root@51e8af973440:/pwd/src/bedtools/bedtools_bamtobed/test_data# bedtools bamtobed -i example.bam -splitD
+chr2:172936693-172938111        128     228     my_read/1       60      +
+chr2:172936693-172938111        428     528     my_read/2       60      -
+root@51e8af973440:/pwd/src/bedtools/bedtools_bamtobed/test_data# bedtools bamtobed -i example.bam -ed    
+chr2:172936693-172938111        128     228     my_read/1       0       +
+chr2:172936693-172938111        428     528     my_read/2       0       -
+root@51e8af973440:/pwd/src/bedtools/bedtools_bamtobed/test_data# bedtools bamtobed -i example.bam -tag
+chr2:172936693-172938111        128     228     my_read/1       60      +
+chr2:172936693-172938111        428     528     my_read/2       60      -
+root@51e8af973440:/pwd/src/bedtools/bedtools_bamtobed/test_data# bedtools bamtobed -i example.bam -color
+chr2:172936693-172938111        128     228     my_read/1       60      +
+chr2:172936693-172938111        428     528     my_read/2       60      -
+root@51e8af973440:/pwd/src/bedtools/bedtools_bamtobed/test_data# bedtools bamtobed -i example.bam -bed12 -color
+chr2:172936693-172938111        128     228     my_read/1       60      +       128     228     255,0,0 1       100     0
+chr2:172936693-172938111        428     528     my_read/2       60      -       428     528     255,0,0 1       100     0
+root@51e8af973440:/pwd/src/bedtools/bedtools_bamtobed/test_data# bedtools bamtobed -i example.bam -cigar       
+chr2:172936693-172938111        128     228     my_read/1       60      +       100M
+chr2:172936693-172938111        428     528     my_read/2       60      -       100M
