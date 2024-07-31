@@ -21,6 +21,8 @@
 
 * `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
 
+* `agat/agat_sp_add_introns`: add intron features to gtf/gff file without intron features (PR #104).
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
