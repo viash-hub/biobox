@@ -1,0 +1,61 @@
+name: bedtools_bamtobed
+namespace: bedtools
+description: Converts BAM alignments to BED6 or BEDPE format.
+keywords: [Converts, BAM, BED, BED6, BEDPE]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/bamtobed.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: GPL-2.0, MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: -i
+        type: file
+        description: Input BAM file.
+        required: true
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: -o
+        type: file
+        direction: output
+        description: 
+
+  - name: Options
+    arguments:
+      - name: 
+        type: 
+        description: 
+      
+      
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bedtools, procps]
+      - type: docker
+        run: |
+          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
