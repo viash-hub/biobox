@@ -21,6 +21,8 @@
 
 * `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
 
+* `agat/agat_convert_sp_gxf2gxf`: fixes and/or standardizes any GTF/GFF file into full sorted GTF/GFF file (PR #103).
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
