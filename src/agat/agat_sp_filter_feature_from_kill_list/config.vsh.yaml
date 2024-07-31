@@ -29,6 +29,13 @@ argument_groups:
         type: file
         required: true
         direction: input
+      - name: --kill_list
+        alternatives: [--kl]
+        description: Text file conatining the kill list. One value per line.
+        type: file
+        required: true
+        example: kill_list.txt
+        direction: input
   - name: Outputs
     arguments:
       - name: --output
@@ -53,12 +60,6 @@ argument_groups:
           the value "all" will have the same behaviour.
         type: string
         required: false
-      - name: --kill_list
-        alternatives: [--kl]
-        description: Text file conatining the kill list. One value per line.
-        type: file
-        required: true
-        example: kill_list.txt
       - name: --attribute
         alternatives: [-a]
         description: |
