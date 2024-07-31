@@ -3,7 +3,7 @@ bedtools sort
 ```
 
 Tool:    bedtools sort (aka sortBed)
-Version: v2.27.1
+Version: v2.30.0
 Summary: Sorts a feature file in various and useful ways.
 
 Usage:   bedtools sort [OPTIONS] -i <bed/gff/vcf>
