@@ -1,0 +1,89 @@
+name: agat_sp_statistics
+namespace: agat
+description: |
+  The script provides exhaustive statistics of a gft/gff file. /!\ If you
+  have isoforms in your file, even if correct, some values calculated
+  might sounds incoherent: e.g. total length mRNA can be superior than the
+  genome size. Because all isoforms length is added... It is why by
+  default we always compute the statistics twice when there are isoforms,
+  once with the isoforms, once without (In that case we keep the longest
+  isoform per locus).
+keywords: [gene annotations]
+links:
+  homepage: https://github.com/NBISweden/AGAT
+  documentation: https://agat.readthedocs.io/en/latest/tools/agat_sp_statistics.html
+  issue_tracker: https://github.com/NBISweden/AGAT/issues
+  repository: https://github.com/NBISweden/AGAT
+references: 
+  doi: 10.5281/zenodo.3552717
+license: GPL-3.0
+authors:
+  - __merge__: /src/_authors/leila_paquay.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --gff
+        alternatives: [-i]
+        description: Input GTF/GFF file.
+        type: file
+        required: true
+        direction: input
+        example: input.gff
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: [-o]
+        description: |
+          File where will be written the result. If no output file is specified, the output will be written to STDOUT.
+        type: file
+        direction: output
+        required: true
+        example: output.txt
+  - name: Arguments
+    arguments:
+      - name: -d
+        alternatives: [-p]
+        description: |
+          When this option is used, an histogram of distribution of the features will be printed in pdf files. (d means distribution, p means plot).
+        type: boolean_true
+      - name: --gs
+        alternatives: [-f, -g]
+        description: |
+          This option inform about the genome size in order to compute more statistics. You can give the size in Nucleotide or directly the fasta file.
+        type: string
+        required: false
+        example: genome_size.fasta
+      - name: --verbose
+        alternatives: [-v]
+        description: |
+          Verbose option. To modify verbosity. Default is 1. 0 is quiet, 2 and 3 are increasing verbosity.
+        type: integer
+        required: false
+        example: 1
+      - name: --config
+        alternatives: [-c]
+        description: |
+          String - Input agat config file. By default AGAT takes as input agat_config.yaml file from the working directory if any, otherwise it takes the orignal agat_config.yaml shipped with AGAT. To get the agat_config.yaml locally type: "agat config --expose". The --config option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
+        type: file
+        required: false
+        example: custom_agat_config.yaml
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/agat:1.4.0--pl5321hdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          agat --version | sed 's/AGAT\s\(.*\)/agat: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
