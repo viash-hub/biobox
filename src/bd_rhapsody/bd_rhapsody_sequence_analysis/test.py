@@ -49,6 +49,26 @@ subprocess.run([
     "--genomeSAindexNbases 4"
 ])
 
+#########################################################################################
+# Load reference in memory
+
+from Bio import SeqIO
+import gffutils
+
+# Load FASTA sequence
+with open(fasta_file, "r") as handle:
+  reference_fasta_dict = SeqIO.to_dict(SeqIO.parse(handle, "fasta"))
+
+# create in memory db
+reference_gtf_db = gffutils.create_db(
+  str(gtf_file),
+  dbfn=":memory:",
+  force=True,
+  keep_order=True,
+  merge_strategy="merge",
+  sort_attribute_values=True,
+)
+
 #############################################
 # TODO: move helper functions to separate helper file
 
@@ -83,37 +103,17 @@ def generate_bd_read_metadata(
 
 
 def generate_bd_wta_transcript(
-  reference_fa: Path,
-  reference_gtf: Path,
   transcript_length: int = 42,
 ) -> str:
   """
   Generate a WTA transcript from a given GTF and FASTA file.
   """
-  # todo: generate many transcripts at once to avoid
-  # loading the same files multiple times
-  from Bio import SeqIO
-  import gffutils
-  
-  # Load FASTA sequence
-  with open(reference_fa, "r") as handle:
-    ref_seq_dict = SeqIO.to_dict(SeqIO.parse(handle, "fasta"))
-
-  # create in memory db
-  db = gffutils.create_db(
-    str(reference_gtf),
-    dbfn=":memory:",
-    force=True,
-    keep_order=True,
-    merge_strategy="merge",
-    sort_attribute_values=True,
-  )
 
   # Randomly select a gene
-  gene = random.choice(list(db.features_of_type("gene")))
+  gene = random.choice(list(reference_gtf_db.features_of_type("gene")))
 
   # Find all exons within the gene
-  exons = list(db.children(gene, featuretype="exon", order_by="start"))
+  exons = list(reference_gtf_db.children(gene, featuretype="exon", order_by="start"))
 
   # Calculate total exon length
   total_exon_length = sum(exon.end - exon.start + 1 for exon in exons)
@@ -124,7 +124,7 @@ def generate_bd_wta_transcript(
   # Build the WTA transcript sequence
   sequence = ""
   for exon in exons:
-    exon_seq = str(ref_seq_dict[exon.seqid].seq[exon.start - 1 : exon.end])  
+    exon_seq = str(reference_fasta_dict[exon.seqid].seq[exon.start - 1 : exon.end])  
     sequence += exon_seq
 
     # Break if desired length is reached
@@ -190,7 +190,7 @@ def generate_bd_read(
   r1 = f"{meta_r1}\n{cell_label}{umi}\n+\n{quality_r1}\n"
 
   # generate r2 by extracting sequence from fasta and gtf
-  wta_transcript = generate_bd_wta_transcript(reference_fa=fasta_file, reference_gtf=gtf_file, transcript_length=transcript_length)
+  wta_transcript = generate_bd_wta_transcript(transcript_length=transcript_length)
   quality_r2 = "I" * transcript_length
   r2 = f"{meta_r2}\n{wta_transcript}\n+\n{quality_r2}\n"
 
