@@ -185,7 +185,8 @@ def generate_bd_read(
   # generate r1 (cls1 + link + cls2 + link + cls3 + umi)
   assert cell_index >= 0 and cell_index < 384 * 384 * 384
   cell_label = index_to_sequence(cell_index + 1, bead_version=bead_version)
-  umi = ''.join(random.choice(["A", "C", "G", "T"], size=umi_length, replace=True))
+  # sample random umi
+  umi = "".join(random.choices("ACGT", k=umi_length))
   quality_r1 = "I" * (len(cell_label) + len(umi))
   r1 = f"{meta_r1}\n{cell_label}{umi}\n+\n{quality_r1}\n"
 
