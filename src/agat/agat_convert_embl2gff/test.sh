@@ -18,7 +18,7 @@ echo ">> Check if output is empty"
 [ ! -s "$out_dir/output.gff" ] && echo "Output file output.gff is empty" && exit 1
 
 echo ">> Check if output matches expected output"
-diff "$out_dir/output.gff" "$test_dir/agat_convert_embl2gff_1.gff"
+diff "$out_dir/output.gff" "$test_dir/output.gff"
 if [ $? -ne 0 ]; then
   echo "Output file output.gff does not match expected output"
   exit 1
