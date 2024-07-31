@@ -33,6 +33,12 @@ assert_file_contains_regex() {
 assert_file_not_contains_regex() {
   grep -q -E "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
 }
+assert_dir_exists() {
+  [ -d "$1" ] || { echo "Directory '$1' does not exist" && exit 1; }
+}
+assert_dir_not_empty() {
+  [ "$(ls -A "$1")" ] || { echo "Directory '$1' is empty but shouldn't be" && exit 1; }
+}
 
 #########################################################################################
 
@@ -182,22 +188,19 @@ echo ">> Run $meta_name"
   --output_dir output \
   ${meta_cpus:+---cpus $meta_cpus} \
   ${meta_memory_mb:+---memory ${meta_memory_mb}MB} \
-  --reads ABCreads_R1.fq.gz \
-  --reads ABCreads_R2.fq.gz \
-  --abseq_reference bdabseq_smallpanel.fasta \
   --exact_cell_count 2 \
-  --exclude_intronic_reads false \
+  --exclude_intronic_reads false
 
 echo ">> Check if output exists"
 assert_file_exists "output/sample_Bioproduct_Stats.csv"
 assert_file_exists "output/sample_RSEC_MolsPerCell_Unfiltered_MEX.zip"
-assert_file_exists "output/Logs"
+assert_dir_exists "output/Logs"
 assert_file_exists "output/sample_Metrics_Summary.csv"
 
 # echo ">> Check if output contents are not empty"
 assert_file_not_empty "output/sample_Bioproduct_Stats.csv"
 assert_file_not_empty "output/sample_RSEC_MolsPerCell_Unfiltered_MEX.zip"
-assert_file_not_empty "output/Logs"
+assert_dir_not_empty "output/Logs"
 assert_file_not_empty "output/sample_Metrics_Summary.csv"
 
 # echo ">> Check if output contents are correct"
