@@ -648,7 +648,7 @@ engines:
       - type: apt
         packages: [procps]
       - type: python
-        packages: [cwlref-runner, cwl-runner, ruamel.yaml]
+        packages: [cwlref-runner, cwl-runner]
       - type: docker
         run: |
           echo "bdgenomics/rhapsody: 2.2.1" > /var/software_versions.txt
