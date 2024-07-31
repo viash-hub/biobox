@@ -54,7 +54,7 @@ argument_groups:
           This option inform about the genome size in order to compute more statistics. You can give the size in Nucleotide or directly the fasta file.
         type: string
         required: false
-        example: genome_size.fasta
+        example: genome.fasta
       - name: --verbose
         alternatives: [-v]
         description: |
