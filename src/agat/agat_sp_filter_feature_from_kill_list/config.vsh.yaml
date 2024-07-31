@@ -31,7 +31,7 @@ argument_groups:
         direction: input
       - name: --kill_list
         alternatives: [--kl]
-        description: Text file conatining the kill list. One value per line.
+        description: Text file containing the kill list. One value per line.
         type: file
         required: true
         example: kill_list.txt
