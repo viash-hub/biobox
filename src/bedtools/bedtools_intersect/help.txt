@@ -1,9 +1,9 @@
 ```bash
-bedtools intersect --help
+bedtools intersect
 ```
 
 Tool:    bedtools intersect (aka intersectBed)
-Version: v2.27.1
+Version: v2.30.0
 Summary: Report overlaps between two feature files.
 
 Usage:   bedtools intersect [OPTIONS] -a <bed/gff/vcf/bam> -b <bed/gff/vcf/bam>
@@ -37,7 +37,12 @@ Options:
 
 	-c	For each entry in A, report the number of overlaps with B.
 		- Reports 0 for A entries that have no overlap with B.
-		- Overlaps restricted by -f and -r.
+		- Overlaps restricted by -f, -F, -r, and -s.
+
+	-C	For each entry in A, separately report the number of
+		- overlaps with each B file on a distinct line.
+		- Reports 0 for A entries that have no overlap with B.
+		- Overlaps restricted by -f, -F, -r, and -s.
 
 	-v	Only report those entries in A that have _no overlaps_ with B.
 		- Similar to "grep -v" (an homage).
@@ -111,3 +116,4 @@ Notes:
 
 
 
+***** ERROR: No input file given. Exiting. *****
