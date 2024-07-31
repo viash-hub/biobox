@@ -98,6 +98,7 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - path: test_data
 
 engines:
   - type: docker
