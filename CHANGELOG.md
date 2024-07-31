@@ -1,6 +1,14 @@
 # biobox x.x.x
 
-## NEW FEATURES
+## BREAKING CHANGES
+
+* `star/star_align_reads`: Change all arguments from `--camelCase` to `--snake_case` (PR #62).
+
+* `star/star_genome_generate`: Change all arguments from `--camelCase` to `--snake_case` (PR #62).
+
+## NEW FUNCTIONALITY
+
+* `star/star_align_reads`: Add star solo related arguments (PR #62).
 
 * `bd_rhapsody/bd_rhapsody_make_reference`: Create a reference for the BD Rhapsody pipeline (PR #75).
 
@@ -11,9 +19,14 @@
   - `seqtk/seqtk_subseq`: Extract the sequences (complete or subsequence) from the FASTA/FASTQ files
                 based on a provided sequence IDs or region coordinates file (PR #85).
 
-* `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
+* `agat`:
+  - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
+  - `/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
 
-* `agat/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+* `bedtools`:
+  - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
+  - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
+
 
 ## MINOR CHANGES
 
