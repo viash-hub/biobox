@@ -7,3 +7,4 @@ fi
 
 # copy test data
 cp -r /tmp/agat_source/t/scripts_output/in/agat_convert_embl2gff_1.embl src/agat/agat_convert_embl2gff/test_data/agat_convert_embl2gff_1.embl
+cp -r /tmp/agat_source/t/scripts_output/out/agat_convert_embl2gff_1.gff src/agat/agat_convert_embl2gff/test_data/agat_convert_embl2gff_1.gff
