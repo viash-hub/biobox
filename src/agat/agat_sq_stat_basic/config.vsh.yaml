@@ -1,0 +1,93 @@
+name: agat_sq_stat_basic
+namespace: agat
+description: |
+  The script aims to provide basic statistics of a gtf/gff file.
+keywords: [gene annotations]
+links:
+  homepage: https://github.com/NBISweden/AGAT
+  documentation: https://agat.readthedocs.io/en/latest/tools/agat_sq_stat_basic.html
+  issue_tracker: https://github.com/NBISweden/AGAT/issues
+  repository: https://github.com/NBISweden/AGAT
+references: 
+  doi: 10.5281/zenodo.3552717
+license: GPL-3.0
+authors:
+  - __merge__: /src/_authors/leila_paquay.yaml
+    roles: [ author, maintainer ]
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --gff
+        alternatives: [-i, --file, --input]
+        description: |
+          Input GTF/GFF file. Several files can be processed at once: -i file1 -i file2
+        type: file
+        required: true
+        direction: input
+        example: input.gff
+      - name: --genome_size
+        alternatives: [-g]
+        description: |
+          That input is designed to know the genome size in order to calculate the percentage of the genome represented by each kind of feature type. You can provide an INTEGER. Or you can also pass a fasta file using the argument --genome_size_fasta. If both are provided, only the value of --genome_size will be considered.
+        type: integer
+        required: false
+        example: 10000
+      - name: --genome_size_fasta
+        description: |
+          That input is designed to know the genome size in order to calculate the percentage of the genome represented by each kind of feature type. You can provide the genome in fasta format. Or you can also pass the size directly as an integer using the argument --genome_size. If you provide the fasta, the genome size will be calculated on the fly. If both are provided, only the value of --genome_size will be considered.
+        type: file
+        required: false
+        example: genome.fasta
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: [-o]
+        description: |
+          Output file. If no output file is specified, the output will be written to STDOUT. The result is in tabulate format.
+        type: file
+        direction: output
+        required: true
+        example: output.txt
+  - name: Arguments
+    arguments:
+      - name: --inflate
+        description: |
+            Inflate the statistics taking into account feature with
+            multi-parents. Indeed to avoid redundant information, some gff
+            factorize identical features. e.g: one exon used in two
+            different isoform will be defined only once, and will have
+            multiple parent. By default the script count such feature only
+            once. Using the inflate option allows to count the feature and
+            its size as many time there are parents.
+        type: boolean_true
+      - name: --config
+        alternatives: [-c]
+        description: |
+            String - Input agat config file. By default AGAT takes as input
+            agat_config.yaml file from the working directory if any,
+            otherwise it takes the orignal agat_config.yaml shipped with
+            AGAT. To get the agat_config.yaml locally type: "agat config
+            --expose". The --config option gives you the possibility to use
+            your own AGAT config file (located elsewhere or named
+            differently).
+        type: file
+        required: false
+        example: custom_agat_config.yaml
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/agat:1.4.0--pl5321hdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          agat --version | sed 's/AGAT\s\(.*\)/agat: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
