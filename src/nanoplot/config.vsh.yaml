@@ -1,4 +1,4 @@
-name: nanoplot
+name: NanoPlot
 description: |
   Run NanoPlot on nanopore-sequenced reads.
   "Sample"
