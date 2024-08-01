@@ -21,7 +21,8 @@
 
 * `agat`:
   - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
-  - `/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat_sq_stat_basic`: provide basic statistics of a gtf/gff file (PR #110).
 
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
