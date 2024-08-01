@@ -161,5 +161,26 @@ echo "- test7 succeeded -"
 
 cd ..
 
+# Test 8: 
+mkdir test8
+cd test8
+
+echo "> Run bedtools bamtobed on BAM file with other options"
+"$meta_executable" \
+  --input "$test_data/example.bam" \
+  --output "output.bed" \
+  --bedpe \
+  --mate1 \
+  --split \
+  --splitD \
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../data/expected.bedpe"
+echo "- test8 succeeded -"
+
+cd ..
+
 echo "---- All tests succeeded! ----"
 exit 0
