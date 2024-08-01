@@ -1,0 +1,97 @@
+name: agat_convert_genscan2gff
+namespace: agat
+description: |
+  The script takes a genscan file as input, and will translate it in gff
+  format. The genscan format is described here:
+  http://genome.crg.es/courses/Bioinformatics2003_genefinding/results/gens
+  can.html /!\ vvv Known problem vvv /!\ You must have submited only DNA
+  sequence, wihtout any header!! Indeed the tool expects only DNA
+  sequences and does not crash/warn if an header is submited along the
+  sequence. e.g If you have an header ">seq" s-e-q are seen as the 3 first
+  nucleotides of the sequence. Then all prediction location are shifted
+  accordingly. (checked only on the online version
+  http://argonaute.mit.edu/GENSCAN.html. I don't know if there is the same
+  problem elsewhere.) /!\ ^^^ Known problem ^^^^ /!\
+keywords: [gene annotations, GFF conversion]
+links:
+  homepage: https://github.com/NBISweden/AGAT
+  documentation: https://agat.readthedocs.io/en/latest/tools/agat_convert_genscan2gff.html
+  issue_tracker: https://github.com/NBISweden/AGAT/issues
+  repository: https://github.com/NBISweden/AGAT
+references: 
+  doi: 10.5281/zenodo.3552717
+license: GPL-3.0
+authors:
+  - __merge__: /src/_authors/leila_paquay.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --genscan
+        alternatives: [-g]
+        description: Input genscan bed file that will be converted.
+        type: file
+        required: true
+        direction: input
+  - name: Outputs
+    arguments:       
+      - name: --output
+        alternatives: [-o, --out, --outfile, --gff]
+        description: Output GFF file. If no output file is specified, the output will be written to STDOUT.
+        type: file
+        direction: output
+        required: true
+        example: output.gff
+  - name: Arguments
+    arguments:
+      - name: --source
+        description: |
+          The source informs about the tool used to produce the data and is stored in 2nd field of a gff file. Example: Stringtie, Maker, Augustus, etc. [default: data]
+        type: string
+        required: false
+        example: Stringtie
+      - name: --primary_tag
+        description: |
+          The primary_tag corresponds to the data type and is stored in 3rd field of a gff file. Example: gene, mRNA, CDS, etc. [default: gene]
+        type: string
+        required: false
+        example: gene
+      - name: --inflate_off
+        description: |
+          By default we inflate the block fields (blockCount, blockSizes, blockStarts) to create subfeatures of the main feature (primary_tag). Type of subfeature created based on the inflate_type parameter. If you don't want this inflating behaviour you can deactivate it by using the option --inflate_off.
+        type: boolean_false
+      - name: --inflate_type
+        description: |
+          Feature type (3rd column in gff) created when inflate parameter activated [default: exon].
+        type: string
+        required: false
+        example: exon
+      - name: --verbose
+        description: add verbosity
+        type: boolean_true
+      - name: --config
+        alternatives: [-c]
+        description: |
+          Input agat config file. By default AGAT takes as input agat_config.yaml file from the working directory if any, otherwise it takes the original agat_config.yaml shipped with AGAT. To get the agat_config.yaml locally type: "agat config --expose". The --config option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
+        type: file
+        required: false
+        example: custom_agat_config.yaml
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/agat:1.4.0--pl5321hdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          agat --version | sed 's/AGAT\s\(.*\)/agat: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
