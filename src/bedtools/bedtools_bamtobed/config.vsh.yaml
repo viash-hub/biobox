@@ -74,17 +74,19 @@ argument_groups:
             distance from the two mates is reported.
 
       - name: --tag
-        type: boolean_true
+        type: string
         description: | 
           Use other NUMERIC BAM alignment tag for BED score.
           - Default for BED is to use mapping quality.
             Disallowed with BEDPE output.
+        example: "SM"
       
       - name: --color
-        type: boolean_true
+        type: string
         description: | 
           An R,G,B string for the color used with BED12 format.
           Default is (255,0,0).
+        example: "250,250,250"
 
       - name: --cigar
         type: boolean_true

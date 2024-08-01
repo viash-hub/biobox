@@ -22,9 +22,9 @@ bedtools bamtobed \
     ${par_split:+-split} \
     ${par_splitD:+-splitD} \
     ${par_edit_distance:+-ed} \
-    ${par_tag:+-tag} \
-    ${par_color:+-color} \
+    ${par_tag:+-tag "$par_tag"} \
     ${par_cigar:+-cigar} \
+    ${par_color:+-color "$par_color"} \
     -i "$par_input" \
     > "$par_output"
 

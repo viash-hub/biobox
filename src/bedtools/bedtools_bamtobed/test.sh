@@ -30,10 +30,10 @@ printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\nchr2:172936693-172
 printf "chr2:172936693-172938111\t128\t228\tchr2:172936693-172938111\t428\t528\tmy_read\t60\t+\t-\n" > data/expected.bedpe
 printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\t128\t228\t255,0,0\t1\t100\t0\nchr2:172936693-172938111\t428\t528\tmy_read/2\t60\t-\t428\t528\t255,0,0\t1\t100\t0\n" > data/expected.bed12
 printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t0\t+\nchr2:172936693-172938111\t428\t528\tmy_read/2\t0\t-\n" > data/expected_ed.bed
-printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\t128\t228\t255,0,0\t1\t100\t0\nchr2:172936693-172938111\t428\t528\tmy_read/2\t60\t-\t428\t528\t255,0,0\t1\t100\t0\n" > data/expected_color.bed12
+printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\t128\t228\t250,250,250\t1\t100\t0\nchr2:172936693-172938111\t428\t528\tmy_read/2\t60\t-\t428\t528\t250,250,250\t1\t100\t0\n" > data/expected_color.bed12
 printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\t100M\nchr2:172936693-172938111\t428\t528\tmy_read/2\t60\t-\t100M\n" > data/expected_cigar.bed
+printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t85\t+\nchr2:172936693-172938111\t428\t528\tmy_read/2\t85\t-\n" > data/expected_tag.bed
 
-ls data/
 
 # Test 1: 
 mkdir test1
@@ -96,7 +96,7 @@ echo "> Run bedtools bamtobed on BAM file with -ed"
 "$meta_executable" \
   --input "$test_data/example.bam" \
   --output "output_ed.bed" \
-  --ed
+  --edit_distance
 
 # checks
 assert_file_exists "output_ed.bed"
@@ -114,8 +114,9 @@ echo "> Run bedtools bamtobed on BAM file with -color"
 "$meta_executable" \
   --input "$test_data/example.bam" \
   --output "output_color.bed12" \
-  --color
-
+  --bed12 \
+  --color "250,250,250" \
+  
 # checks
 assert_file_exists "output_color.bed12"
 assert_file_not_empty "output_color.bed12"
@@ -139,6 +140,24 @@ assert_file_exists "output_cigar.bed"
 assert_file_not_empty "output_cigar.bed"
 assert_identical_content "output_cigar.bed" "../data/expected_cigar.bed"
 echo "- test6 succeeded -"
+
+cd ..
+
+# Test 7:
+mkdir test7
+cd test7
+
+echo "> Run bedtools bamtobed on BAM file with -tag"
+"$meta_executable" \
+  --input "$test_data/example.bam" \
+  --output "output_tag.bed" \
+  --tag "XT"
+
+# checks
+assert_file_exists "output_tag.bed"
+assert_file_not_empty "output_tag.bed"
+assert_identical_content "output_tag.bed" "../data/expected_tag.bed"
+echo "- test7 succeeded -"
 
 cd ..
 
