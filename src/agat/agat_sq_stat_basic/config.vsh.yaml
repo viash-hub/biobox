@@ -20,7 +20,7 @@ argument_groups:
       - name: --gff
         alternatives: [-i, --file, --input]
         description: |
-          Input GTF/GFF file. Several files can be processed at once: -i file1 -i file2
+          Input GTF/GFF file.
         type: file
         required: true
         multiple: true
