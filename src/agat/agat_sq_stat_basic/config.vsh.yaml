@@ -32,12 +32,14 @@ argument_groups:
           That input is designed to know the genome size in order to calculate the percentage of the genome represented by each kind of feature type. You can provide an INTEGER. Or you can also pass a fasta file using the argument --genome_size_fasta. If both are provided, only the value of --genome_size will be considered.
         type: integer
         required: false
+        direction: input
         example: 10000
       - name: --genome_size_fasta
         description: |
           That input is designed to know the genome size in order to calculate the percentage of the genome represented by each kind of feature type. You can provide the genome in fasta format. Or you can also pass the size directly as an integer using the argument --genome_size. If you provide the fasta, the genome size will be calculated on the fly. If both are provided, only the value of --genome_size will be considered.
         type: file
         required: false
+        direction: input
         example: genome.fasta
   - name: Outputs
     arguments:
