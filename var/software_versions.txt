@@ -1,1 +1,4 @@
+<<<<<<< HEAD
 seqtk: 1.4-r122
+=======
+>>>>>>> parent of db6391c (software version)
