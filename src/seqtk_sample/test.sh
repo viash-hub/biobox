@@ -25,10 +25,8 @@ if [ ! -f "sampled.fastq" ]; then
 fi
 
 echo ">> Count number of samples"
-<<Comment
-    To count the number of reads in a FASTQ file, you can use grep to count the lines
-    that start with @ (which indicate the beginning of a read in a FASTQ file)
-Comment
+# To count the number of reads in a FASTQ file, you can use grep to count the lines
+# that start with @ (which indicate the beginning of a read in a FASTQ file)
 num_samples=$(grep -c '^@' sampled.fastq)
 if [ "$num_samples" -ne 3 ]; then
     echo ">> sampled.fastq does not contain 3 samples"
