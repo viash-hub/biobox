@@ -1,6 +1,6 @@
 name: bedtools_bedtobam
 namespace: bedtools
-description: Converts feature records to BAM format.
+description: Converts feature records (bed/gff/vcf) to BAM format.
 keywords: [Converts, BED, GFF, VCF, BAM]
 links:
   documentation: https://bedtools.readthedocs.io/en/latest/content/tools/bedtobam.html
@@ -26,7 +26,10 @@ argument_groups:
       - name: --genome
         alternatives: -g
         type: file
-        description: Input genome file.
+        description: | 
+          Input genome file.
+          NOTE: This is not a fasta file. This is a two-column file
+          where the first column is the chromosome name and the second their sizes.
         required: true
     
   - name: Outputs
