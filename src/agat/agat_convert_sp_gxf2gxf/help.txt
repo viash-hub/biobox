@@ -1,0 +1,73 @@
+```sh
+agat_convert_sp_gxf2gxf.pl --help
+```
+
+ ------------------------------------------------------------------------------
+|   Another GFF Analysis Toolkit (AGAT) - Version: v1.4.0                      |
+|   https://github.com/NBISweden/AGAT                                          |
+|   National Bioinformatics Infrastructure Sweden (NBIS) - www.nbis.se         |
+ ------------------------------------------------------------------------------
+
+
+Name:
+    agat_convert_sp_gxf2gxf.pl
+
+Description:
+    This script fixes and/or standardizes any GTF/GFF file into full sorted
+    GTF/GFF file. It AGAT parser removes duplicate features, fixes
+    duplicated IDs, adds missing ID and/or Parent attributes, deflates
+    factorized attributes (attributes with several parents are duplicated
+    with uniq ID), add missing features when possible (e.g. add exon if only
+    CDS described, add UTR if CDS and exon described), fix feature locations
+    (e.g. check exon is embedded in the parent features mRNA, gene), etc...
+
+    All AGAT's scripts with the _sp_ prefix use the AGAT parser, before to
+    perform any supplementary task. So, it is not necessary to run this
+    script prior the use of any other _sp_ script.
+
+Usage:
+        agat_convert_sp_gxf2gxf.pl -g infile.gff [ -o outfile ]
+        agat_convert_sp_gxf2gxf.pl --help
+
+Options:
+    -g, --gtf, --gff or --gxf
+            String - Input GTF/GFF file. Compressed file with .gz extension
+            is accepted.
+
+    -o or --output
+            String - Output GFF file. If no output file is specified, the
+            output will be written to STDOUT.
+
+    -c or --config
+            String - Input agat config file. By default AGAT takes as input
+            agat_config.yaml file from the working directory if any,
+            otherwise it takes the orignal agat_config.yaml shipped with
+            AGAT. To get the agat_config.yaml locally type: "agat config
+            --expose". The --config option gives you the possibility to use
+            your own AGAT config file (located elsewhere or named
+            differently).
+
+    -h or --help
+            Boolean - Display this helpful text.
+
+Feedback:
+  Did you find a bug?:
+    Do not hesitate to report bugs to help us keep track of the bugs and
+    their resolution. Please use the GitHub issue tracking system available
+    at this address:
+
+                https://github.com/NBISweden/AGAT/issues
+
+     Ensure that the bug was not already reported by searching under Issues.
+     If you're unable to find an (open) issue addressing the problem, open a new one.
+     Try as much as possible to include in the issue when relevant:
+     - a clear description,
+     - as much relevant information as possible,
+     - the command used,
+     - a data sample,
+     - an explanation of the expected behaviour that is not occurring.
+
+  Do you want to contribute?:
+    You are very welcome, visit this address for the Contributing
+    guidelines:
+    https://github.com/NBISweden/AGAT/blob/master/CONTRIBUTING.md
