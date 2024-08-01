@@ -3,7 +3,7 @@
 set -e
 
 ## VIASH START
-meta_executable="$PWD/target/executable/seqtk"
+meta_executable="$PWD/target/executable/seqtk/seqtk"
 meta_resources_dir="$PWD/src/seqtk_sample"
 ## VIASH END
 
