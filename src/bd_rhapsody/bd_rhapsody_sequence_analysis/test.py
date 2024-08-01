@@ -10,7 +10,7 @@ import mudata as md
 meta = {
   "name": "bd_rhapsody_sequence_analysis",
   "executable": "target/docker/bd_rhapsody/bd_rhapsody_sequence_analysis/bd_rhapsody_sequence_analysis",
-  "resources_dir": "src/bd_rhapsody/bd_rhapsody_sequence_analysis",
+  "resources_dir": "src/bd_rhapsody",
   "cpus": 8,
   "memory_mb": 4096,
 }
@@ -29,8 +29,9 @@ meta["resources_dir"] = Path(meta["resources_dir"])
 # Generate index
 print("> Generate index", flush=True)
 cwl_file = meta["resources_dir"] / "bd_rhapsody_make_reference.cwl"
-gtf_file = meta["resources_dir"] / "test_data" / "reference_small.gtf"
-fasta_file = meta["resources_dir"] / "test_data" / "reference_small.fa"
+reference_small_gtf = meta["resources_dir"] / "test_data" / "reference_small.gtf"
+reference_small_fa = meta["resources_dir"] / "test_data" / "reference_small.fa"
+bdabseq_panel_fa = meta["resources_dir"] / "test_data" / "BDAbSeq_ImmuneDiscoveryPanel.fasta"
 
 config_file = Path("reference_config.yml")
 reference_file = Path("Rhap_reference.tar.gz")
@@ -43,9 +44,9 @@ subprocess.run([
     ".",
     str(cwl_file),
     "--Genome_fasta",
-    str(fasta_file),
+    str(reference_small_fa),
     "--Gtf", 
-    str(gtf_file),
+    str(reference_small_gtf),
     "--Extra_STAR_params",
     "--genomeSAindexNbases 4"
 ])
@@ -57,12 +58,14 @@ from Bio import SeqIO
 import gffutils
 
 # Load FASTA sequence
-with open(str(fasta_file), "r") as handle:
+with open(str(reference_small_fa), "r") as handle:
   reference_fasta_dict = SeqIO.to_dict(SeqIO.parse(handle, "fasta"))
+with open(str(bdabseq_panel_fa), "r") as handle:
+  bdabseq_panel_fasta_dict = SeqIO.to_dict(SeqIO.parse(handle, "fasta"))
 
 # create in memory db
 reference_gtf_db = gffutils.create_db(
-  str(gtf_file),
+  str(reference_small_gtf),
   dbfn=":memory:",
   force=True,
   keep_order=True,
@@ -142,14 +145,14 @@ def generate_bd_wta_transcript(
   return sequence
 
 
-def generate_bd_read(
+def generate_bd_wta_read(
   cell_index: int = 0,
   bead_version: str = "EnhV2",
   umi_length: int = 14,
   transcript_length: int = 42,
 ) -> Tuple[str, str]:
   """
-  Generate a pair of BD Rhapsody FASTQ reads for a given cell index.
+  Generate a BD Rhapsody WTA read pair for a given cell index.
 
   Args:
     cell_index: The cell index to generate reads for.
@@ -218,7 +221,80 @@ def generate_bd_wta_fastq_files(
   r2_reads = ""
   for cell_index in range(num_cells):
     for _ in range(num_reads_per_cell):
-      r1, r2 = generate_bd_read(cell_index)
+      r1, r2 = generate_bd_wta_read(cell_index)
+      r1_reads += r1
+      r2_reads += r2
+
+  return r1_reads, r2_reads
+
+def generate_bd_abc_read(
+  cell_index: int = 0,
+  bead_version: str = "EnhV2",
+  umi_length: int = 14,
+  transcript_length: int = 72,
+) -> Tuple[str, str]:
+  """
+  Generate a BD Rhapsody ABC read pair for a given cell index.
+
+  Args:
+    cell_index: The cell index to generate reads for.
+    bead_version: The bead version to use for generating the cell label.
+    umi_length: The length of the UMI to generate.
+    transcript_length: The length of the transcript to generate
+
+  Returns:
+    A tuple of two strings, the first string being the R1 read and the second string being the R2 read.
+  """
+  # generate metadata
+  per_row = np.floor((32967 - 1000) / 9)
+  per_col = np.floor((37059 - 1000) / 9)
+  
+  assert cell_index >= 0 and cell_index < per_row * per_col, f"cell_index must be between 0 and {per_row} * {per_col}"
+  x = 1000 + (cell_index % per_row) * 9
+  y = 1000 + (cell_index // per_row) * 9
+  meta_r1 = generate_bd_read_metadata(x=x, y=y, illumina_flag="1:N:0")
+  meta_r2 = generate_bd_read_metadata(x=x, y=y, illumina_flag="2:N:0")
+
+  # generate r1 (cls1 + link + cls2 + link + cls3 + umi)
+  assert cell_index >= 0 and cell_index < 384 * 384 * 384
+  cell_label = index_to_sequence(cell_index + 1, bead_version=bead_version)
+  # sample random umi
+  umi = "".join(random.choices("ACGT", k=umi_length))
+  quality_r1 = "I" * (len(cell_label) + len(umi))
+  r1 = f"{meta_r1}\n{cell_label}{umi}\n+\n{quality_r1}\n"
+
+  # generate r2 by sampling sequence from bdabseq_panel_fa
+  abseq_seq = str(random.choice(list(bdabseq_panel_fasta_dict.values())).seq)
+  abc_prefix = "N" #+ "".join(random.choices("ACGT", k=12))
+  abc_data = abseq_seq[:transcript_length - len(abc_prefix)]
+  abc_suffix = "A" * (transcript_length - len(abc_prefix) - len(abc_data))
+
+  abc_transcript = f"{abc_prefix}{abc_data}{abc_suffix}"
+
+  quality_r2 = "#" + "I" * (len(abc_transcript) - 1)
+  r2 = f"{meta_r2}\n{abc_transcript}\n+\n{quality_r2}\n"
+
+  return r1, r2
+
+def generate_bd_abc_fastq_files(
+  num_cells: int = 100,
+  num_reads_per_cell: int = 1000,
+) -> Tuple[str, str]:
+  """
+  Generate BD Rhapsody ABC FASTQ files for a given number of cells and transcripts per cell.
+
+  Args:
+    num_cells: The number of cells to generate
+    num_reads_per_cell: The number of reads to generate per cell
+
+  Returns:
+    A tuple of two strings, the first string being the R1 reads and the second string being the R2 reads.
+  """
+  r1_reads = ""
+  r2_reads = ""
+  for cell_index in range(num_cells):
+    for _ in range(num_reads_per_cell):
+      r1, r2 = generate_bd_abc_read(cell_index)
       r1_reads += r1
       r2_reads += r2
 
@@ -227,12 +303,18 @@ def generate_bd_wta_fastq_files(
 
 # Prepare WTA, ABC, and SMK test data
 print("> Prepare WTA test data", flush=True)
-
 wta_reads_r1_str, wta_reads_r2_str = generate_bd_wta_fastq_files(num_cells=100, num_reads_per_cell=1000)
 with gzip.open("WTAreads_R1.fq.gz", "wt") as f:
   f.write(wta_reads_r1_str)
 with gzip.open("WTAreads_R2.fq.gz", "wt") as f:
   f.write(wta_reads_r2_str)
+
+print("> Prepare ABC test data", flush=True)
+abc_reads_r1_str, abc_reads_r2_str = generate_bd_abc_fastq_files(num_cells=100, num_reads_per_cell=1000)
+with gzip.open("ABCreads_R1.fq.gz", "wt") as f:
+  f.write(abc_reads_r1_str)
+with gzip.open("ABCreads_R2.fq.gz", "wt") as f:
+  f.write(abc_reads_r2_str)
 
 #########################################################################################
 
@@ -241,9 +323,10 @@ print(f">> Run {meta['name']}", flush=True)
 output_dir = Path("output")
 subprocess.run([
   meta['executable'],
-  "--reads=WTAreads_R1.fq.gz",
-  "--reads=WTAreads_R2.fq.gz",
+  "--reads=WTAreads_R1.fq.gz;WTAreads_R2.fq.gz",
+  "--reads=ABCreads_R1.fq.gz;ABCreads_R2.fq.gz",
   f"--reference_archive={reference_file}",
+  f"--abseq_reference={bdabseq_panel_fa}",
   "--output_dir=output",
   "--exact_cell_count=100",
   f"---cpus={meta['cpus'] or 1}",
@@ -277,6 +360,7 @@ data = md.read_h5mu("mudata.h5mu")
 assert data.n_obs == 100, "Number of cells is incorrect"
 assert "rna" in data.mod, "RNA data is missing"
 
+
 data_rna = data.mod["rna"]
 assert data_rna.n_vars == 1, "Number of genes is incorrect"
 
@@ -284,9 +368,7 @@ assert data_rna.n_vars == 1, "Number of genes is incorrect"
 assert data_rna.X.sum(axis=1).min() > 950, "Number of reads per cell is incorrect"
 assert data_rna.var.Raw_Reads.sum() == 100000, "Number of reads is incorrect"
 
-# TODO: check contents
-# TODO: check whether individual outputs also work
-# TODO: add ABC, VDJ, SMK, ATAC, and targeted RNA to test
+# TODO: add VDJ, SMK, ATAC, and targeted RNA to test
 
 
 #########################################################################################
