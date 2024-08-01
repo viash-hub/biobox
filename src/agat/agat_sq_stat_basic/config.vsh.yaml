@@ -23,6 +23,7 @@ argument_groups:
           Input GTF/GFF file. Several files can be processed at once: -i file1 -i file2
         type: file
         required: true
+        multiple: true
         direction: input
         example: input.gff
       - name: --genome_size
