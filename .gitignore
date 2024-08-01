@@ -12,6 +12,7 @@
 
 # viash specific ignores
 target/
+seqtk_sample_*
 
 # nextflow specific ignores
 .nextflow*
