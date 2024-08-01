@@ -15,7 +15,7 @@
 # Create input array 
 IFS=";" read -ra input <<< $par_input
 
-run fastqc
+# Run fastqc
 fastqc \
   ${par_outdir:+--outdir "$par_outdir"} \
   ${par_casava:+--casava} \

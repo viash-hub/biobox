@@ -244,9 +244,7 @@ echo "-> Run Test: multiple options"
  --nofilter \
  --nogroup \
  --min_length 10 \
- --threads 4 \
  --kmers 5
-
 
 # Check if the html file was generated
 [ ! -f "test_data/input_1_fastqc.html" ] \
