@@ -11,6 +11,7 @@
 bedtools bedtobam \
     ${par_bed12:+-bed12} \
     ${par_uncompress_bam:+-ubam} \
+    ${par_map_quality:+-mapq "$par_map_quality"} \
     -i "$par_input" \
     -g "$par_genome" \
     > "$par_output"

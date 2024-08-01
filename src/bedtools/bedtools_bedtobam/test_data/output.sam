@@ -1,0 +1,7 @@
+@HD	VN:1.0	SO:unsorted
+@PG	ID:BEDTools_bedToBam	VN:Vv2.30.0
+@SQ	SN:chr1	AS:genome.txt	LN:248956422
+@SQ	SN:chr3	AS:genome.txt	LN:242193529
+@SQ	SN:chr2	AS:genome.txt	LN:198295559
+my_read/1	0	chr1	129	255	100M	*	0	0	*	*
+my_read/2	16	chr1	429	255	100M	*	0	0	*	*
