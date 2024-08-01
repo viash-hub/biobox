@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Tuple
 import numpy as np
 import random
+import mudata as md
 
 ## VIASH START
 meta = {
@@ -32,14 +33,14 @@ gtf_file = meta["resources_dir"] / "test_data" / "reference_small.gtf"
 fasta_file = meta["resources_dir"] / "test_data" / "reference_small.fa"
 
 config_file = Path("reference_config.yml")
-reference_file = Path("index/Rhap_reference.tar.gz")
+reference_file = Path("Rhap_reference.tar.gz")
 
 subprocess.run([
     "cwl-runner", 
     "--no-container",
     "--preserve-entire-environment",
     "--outdir",
-    str(reference_file.parent),
+    ".",
     str(cwl_file),
     "--Genome_fasta",
     str(fasta_file),
@@ -56,7 +57,7 @@ from Bio import SeqIO
 import gffutils
 
 # Load FASTA sequence
-with open(fasta_file, "r") as handle:
+with open(str(fasta_file), "r") as handle:
   reference_fasta_dict = SeqIO.to_dict(SeqIO.parse(handle, "fasta"))
 
 # create in memory db
@@ -67,6 +68,8 @@ reference_gtf_db = gffutils.create_db(
   keep_order=True,
   merge_strategy="merge",
   sort_attribute_values=True,
+  disable_infer_transcripts=True,
+  disable_infer_genes=True
 )
 
 #############################################
@@ -99,7 +102,7 @@ def generate_bd_read_metadata(
     sample_id: The sample ID.
   """
   # format: @A00226:970:H5FGVDMXY:1:1101:2645:1000 2:N:0:CAGAGAGG
-  f"@{instrument_id}:{run_id}:{flowcell_id}:{lane}:{tile}:{x}:{y} {illumina_flag}:{sample_id}"
+  return f"@{instrument_id}:{run_id}:{flowcell_id}:{lane}:{tile}:{x}:{y} {illumina_flag}:{sample_id}"
 
 
 def generate_bd_wta_transcript(
@@ -240,19 +243,46 @@ subprocess.run([
   meta['executable'],
   "--reads=WTAreads_R1.fq.gz",
   "--reads=WTAreads_R2.fq.gz",
-  f"reference_archive={reference_file}",
+  f"--reference_archive={reference_file}",
   "--output_dir=output",
   "--exact_cell_count=100",
   f"---cpus={meta['cpus'] or 1}",
-  f"---memory_mb={meta['memory_mb'] or 2048}",
+  f"---memory={meta['memory_mb'] or 2048}mb",
+  "--output_seurat=seurat.rds",
+  "--output_mudata=mudata.h5mu",
+  "--metrics_summary=metrics_summary.csv",
+  "--pipeline_report=pipeline_report.html",
 ])
 
 
 # Check if output exists
 print(">> Check if output exists", flush=True)
 assert (output_dir / "sample_Bioproduct_Stats.csv").exists()
-assert (output_dir / "sample_RSEC_MolsPerCell_Unfiltered_MEX.zip").exists()
 assert (output_dir / "sample_Metrics_Summary.csv").exists()
+assert (output_dir / "sample_Pipeline_Report.html").exists()
+assert (output_dir / "sample_RSEC_MolsPerCell_MEX.zip").exists()
+assert (output_dir / "sample_RSEC_MolsPerCell_Unfiltered_MEX.zip").exists()
+assert (output_dir / "sample_Seurat.rds").exists()
+assert (output_dir / "sample.h5mu").exists()
+
+# check individual outputs
+assert Path("seurat.rds").exists()
+assert Path("mudata.h5mu").exists()
+assert Path("metrics_summary.csv").exists()
+assert Path("pipeline_report.html").exists()
+
+print(">> Check contents of output", flush=True)
+data = md.read_h5mu("mudata.h5mu")
+
+assert data.n_obs == 100, "Number of cells is incorrect"
+assert "rna" in data.mod, "RNA data is missing"
+
+data_rna = data.mod["rna"]
+assert data_rna.n_vars == 1, "Number of genes is incorrect"
+
+# row sum should be greater than 950
+assert data_rna.X.sum(axis=1).min() > 950, "Number of reads per cell is incorrect"
+assert data_rna.var.Raw_Reads.sum() == 100000, "Number of reads is incorrect"
 
 # TODO: check contents
 # TODO: check whether individual outputs also work

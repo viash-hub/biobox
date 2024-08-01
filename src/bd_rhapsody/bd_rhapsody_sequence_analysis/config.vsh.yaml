@@ -190,7 +190,7 @@ argument_groups:
         required: false
         info:
           template: "[sample_name]_Bioproduct.bam"
-      - name: "--bam_inddex"
+      - name: "--bam_index"
         type: file
         direction: output
         description: "Index file for the alignment file."
