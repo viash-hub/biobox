@@ -27,7 +27,7 @@ mkdir -p test_data
 # Create and populate input files
 printf "chr1\t248956422\nchr3\t242193529\nchr2\t198295559\n" > "test_data/genome.txt"
 printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t37\t+\nchr2:172936693-172938111\t428\t528\tmy_read/2\t37\t-\n" > "test_data/example.bed"
-printf "" > "test_data/example.bed12"
+printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\t128\t228\t255,0,0\t1\t100\t0\nchr2:172936693-172938111\t428\t528\tmy_read/2\t60\t-\t428\t528\t255,0,0\t1\t100\t0\n" > "test_data/example.bed12"
 
 # Test 1: Default conversion BED to BAM
 mkdir test1
