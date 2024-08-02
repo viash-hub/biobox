@@ -28,11 +28,20 @@ mkdir -p test_data
 printf "chr1\t248956422\nchr3\t242193529\nchr2\t198295559\n" > "test_data/genome.txt"
 printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t37\t+\nchr2:172936693-172938111\t428\t528\tmy_read/2\t37\t-\n" > "test_data/example.bed"
 printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\t128\t228\t255,0,0\t1\t100\t0\nchr2:172936693-172938111\t428\t528\tmy_read/2\t60\t-\t428\t528\t255,0,0\t1\t100\t0\n" > "test_data/example.bed12"
+# Create and populate example.gff file
+printf "##gff-version 3\n" > "test_data/example.gff"
+printf "chr1\t.\tgene\t1000\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/example.gff"
+printf "chr3\t.\tmRNA\t1000\t2000\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "test_data/example.gff"
+printf "chr1\t.\texon\t1000\t1200\t.\t+\t.\tID=exon1;Parent=transcript1\n" >> "test_data/example.gff"
+printf "chr2\t.\texon\t1500\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "test_data/example.gff"
+printf "chr1\t.\tCDS\t1000\t1200\t.\t+\t0\tID=cds1;Parent=transcript1\n" >> "test_data/example.gff"
+printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/example.gff"
 
 # Expected umcompressed SAM files
 # printf "@HD\tVN:1.0\tSO:unsorted\n@PG\tID:BEDTools_bedToBam\tVN:Vv2.30.0\n@SQ\tSN:chr1\tAS:genome.txt\tLN:248956422\n@SQ\tSN:chr3\tAS:genome.txt\tLN:242193529\n@SQ\tSN:chr2\tAS:genome.txt\tLN:198295559\nmy_read/1\t0\tchr1\t129\t255\t100M\t*\t0\t0\t*\t*\nmy_read/2\t16\tchr1\t429\t255\t100M\t*\t0\t0\t*\t*\n" > "test_data/expected.sam"
 # printf "" > "test_data/expected12.sam"
 # printf "" > "test_data/expected_mapquality.sam"
+# printf "" > "test_data/expected_gff.sam"
 
 # Test 1: Default conversion BED to BAM
 mkdir test1
@@ -114,6 +123,24 @@ assert_file_exists "output.bam"
 assert_file_not_empty "output.bam"
 #assert_identical_content "output.bam" "../test_data/expected_mapquality.sam"
 echo "- test4 succeeded -"
+
+cd ..
+
+# Test 5: gff to bam conversion
+mkdir test5
+cd test5
+
+echo "> Run bedtools_bedtobam on GFF file"
+"$meta_executable" \
+  --input "../test_data/example.gff" \
+  --genome "../test_data/genome.txt" \
+  --output "output.bam"
+
+# checks
+assert_file_exists "output.bam"
+assert_file_not_empty "output.bam"
+# assert_identical_content "output.bam" "../test_data/expected_gff.sam"
+echo "- test5 succeeded -"
 
 cd ..
 
