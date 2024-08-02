@@ -42,8 +42,12 @@ echo "> Run bedtools_bedtobam on BED file"
 # checks
 assert_file_exists "output.bam"
 assert_file_not_empty "output.bam"
-# assert_identical_content # (bam file is compressed and ubam option does not seem to work.)
-# could use samtools view to check the content of the bam file, would need to add samtools as a dependency
+# assert_identical_content # (bam file is compressed and -ubam option does not seem to work on this version.)
+# could use samtools view to check the content of the bam file, would need to add samtools as a dependency.
+# TODO: check if older versions works with -ubam option!!!
+# Version 2.27.1 (bedtools) -ubam outputs better than version 2.30.0 (bedtools).
+# However, its output is still somewhat compressed.
+
 echo "- test1 succeeded -"
 
 cd ..
@@ -70,8 +74,6 @@ cd ..
 # Test 3: Uncompressed BAM file
 mkdir test3
 cd test3
-
-# TODO: check if older versions works with -ubam option!!!
 
 echo "> Run bedtools_bedtobam on BED file with uncompressed BAM output"
 "$meta_executable" \
