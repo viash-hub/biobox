@@ -652,6 +652,7 @@ engines:
       - type: docker
         run: |
           echo "bdgenomics/rhapsody: 2.2.1" > /var/software_versions.txt
+    test_setup:
       - type: python
         packages: [biopython, gffutils]
 runners:

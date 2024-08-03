@@ -185,8 +185,11 @@ def generate_bd_wta_read(
   assert cell_index >= 0 and cell_index < per_row * per_col, f"cell_index must be between 0 and {per_row} * {per_col}"
   x = 1000 + (cell_index % per_row) * 9
   y = 1000 + (cell_index // per_row) * 9
-  meta_r1 = generate_bd_read_metadata(x=x, y=y, illumina_flag="1:N:0")
-  meta_r2 = generate_bd_read_metadata(x=x, y=y, illumina_flag="2:N:0")
+  instrument_id = "A00226"
+  run_id = "970"
+  flowcell_id = "H5FGVMXY"
+  meta_r1 = generate_bd_read_metadata(instrument_id=instrument_id, run_id=run_id, flowcell_id=flowcell_id, x=x, y=y, illumina_flag="1:N:0")
+  meta_r2 = generate_bd_read_metadata(instrument_id=instrument_id, run_id=run_id, flowcell_id=flowcell_id, x=x, y=y, illumina_flag="2:N:0")
 
   # generate r1 (cls1 + link + cls2 + link + cls3 + umi)
   assert cell_index >= 0 and cell_index < 384 * 384 * 384
@@ -252,8 +255,11 @@ def generate_bd_abc_read(
   assert cell_index >= 0 and cell_index < per_row * per_col, f"cell_index must be between 0 and {per_row} * {per_col}"
   x = 1000 + (cell_index % per_row) * 9
   y = 1000 + (cell_index // per_row) * 9
-  meta_r1 = generate_bd_read_metadata(x=x, y=y, illumina_flag="1:N:0")
-  meta_r2 = generate_bd_read_metadata(x=x, y=y, illumina_flag="2:N:0")
+  instrument_id = "A01604"
+  run_id = "19"
+  flowcell_id = "HMKLYDRXY"
+  meta_r1 = generate_bd_read_metadata(instrument_id=instrument_id, run_id=run_id, flowcell_id=flowcell_id, x=x, y=y, illumina_flag="1:N:0")
+  meta_r2 = generate_bd_read_metadata(instrument_id=instrument_id, run_id=run_id, flowcell_id=flowcell_id, x=x, y=y, illumina_flag="2:N:0")
 
   # generate r1 (cls1 + link + cls2 + link + cls3 + umi)
   assert cell_index >= 0 and cell_index < 384 * 384 * 384
@@ -265,9 +271,9 @@ def generate_bd_abc_read(
 
   # generate r2 by sampling sequence from bdabseq_panel_fa
   abseq_seq = str(random.choice(list(bdabseq_panel_fasta_dict.values())).seq)
-  abc_prefix = "N" #+ "".join(random.choices("ACGT", k=12))
-  abc_data = abseq_seq[:transcript_length - len(abc_prefix)]
-  abc_suffix = "A" * (transcript_length - len(abc_prefix) - len(abc_data))
+  abc_suffix = "AAAAAAAAAAAAAAAAAAAAAAA"
+  abc_data = abseq_seq[:transcript_length - len(abc_suffix) - 1]
+  abc_prefix = "N" + "".join(random.choices("ACGT", k=transcript_length - len(abc_data) - len(abc_suffix) - 1))
 
   abc_transcript = f"{abc_prefix}{abc_data}{abc_suffix}"
 
