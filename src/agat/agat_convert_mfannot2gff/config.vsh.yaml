@@ -2,8 +2,9 @@ name: agat_convert_mfannot2gff
 namespace: agat
 description: |
   Conversion utility for MFannot "masterfile" annotation produced by the
-  MFannot pipeline (http://megasun.bch.umontreal.ca/RNAweasel/). Reports
-  GFF3 format.keywords: [gene annotations, GFF conversion]
+  [MFannot pipeline](http://megasun.bch.umontreal.ca/RNAweasel/). Reports
+  GFF3 format.
+keywords: [gene annotations, GFF conversion]
 links:
   homepage: https://github.com/NBISweden/AGAT
   documentation: https://agat.readthedocs.io/en/latest/tools/agat_convert_mfannot2gff.html
@@ -39,7 +40,7 @@ argument_groups:
       - name: --config
         alternatives: [-c]
         description: |
-          Input AGAT config file. By default, AGAT takes as input agat_config.yaml file from the working directory if any, otherwise it takes the original agat_config.yaml shipped with AGAT. To get the agat_config.yaml locally type: "agat config --expose". The --config option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
+          Input AGAT config file. By default, AGAT takes as input agat_config.yaml file from the working directory if any, otherwise it takes the original agat_config.yaml shipped with AGAT. To get the agat_config.yaml locally type: `agat config --expose`. The `--config` option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
         type: file
         required: false
         example: custom_agat_config.yaml
