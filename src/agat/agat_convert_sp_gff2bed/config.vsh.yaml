@@ -61,15 +61,15 @@ argument_groups:
         description: |
           Behaviour for non-coding features (e.g. records without CDS):
 
-          * keep: Default, they are kept but no CDS position is reported in the 7th and 8th columns (a period is reported instead).  
-          * filter: We remove them.  
-          * transcript: We keep them but values in the 7th and 8th columns will contain transcript's start and stop.  
+            * keep: Default, they are kept but no CDS position is reported in the 7th and 8th columns (a period is reported instead).  
+            * filter: We remove them.  
+            * transcript: We keep them but values in the 7th and 8th columns will contain transcript's start and stop.  
         type: string
-        choice: [keep, filter, transcript]
+        choices: [keep, filter, transcript]
         required: false
-        example: keep
       - name: --sub
-        description: Define the subfeature (level3, e.g. exon, cds, utr, etc.) to report as blocks in the BED output. Default: exon.
+        description: |
+          Define the subfeature (level3, e.g. exon, cds, utr, etc.) to report as blocks in the BED output. Default: exon.
         type: string
         required: false
         example: exon
