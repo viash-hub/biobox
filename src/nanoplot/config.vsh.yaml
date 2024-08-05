@@ -30,6 +30,10 @@ argument_groups:
         description: BAM files.
         example: read.bam
         multiple: true
+      # - name: --meta
+      #   type: map
+      #   description: Groovy Map containing sample information
+      #   example: info.map
   - name: Outputs
     arguments:
       - name: --txt
@@ -72,7 +76,8 @@ test_resources:
     path: test_data
 engines:
   - type: docker
-    image: quay.io/biocontainers/nanoplot:0.16.2--py35_0
+    # image: quay.io/biocontainers/nanoplot:0.16.2--py35_0
+    image: quay.io/biocontainers/nanoplot:1.8.1--py35_0
     setup:
       - type: docker
         run: |
