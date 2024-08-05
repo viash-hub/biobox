@@ -33,7 +33,7 @@ argument_groups:
         type: file
         direction: output
         required: false
-        example: output.gff
+        example: output.tsv
   - name: Arguments
     arguments:
       - name: --config
