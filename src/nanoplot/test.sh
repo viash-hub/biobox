@@ -3,7 +3,7 @@
 set -e
 
 ## VIASH START
-meta_executable="$PWD/target/executable/nanoplot/NanoPlot"
+meta_executable="$PWD/target/executable/NanoPlot/NanoPlot"
 meta_resources_dir="$PWD/src/nanoplot"
 ## VIASH END
 
