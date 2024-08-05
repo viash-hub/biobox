@@ -42,7 +42,7 @@ argument_groups:
 
       - name: --specific_strand
         alternatives: -S
-        type: boolean_true
+        type: string
         description: | 
           Force merge for one specific strand only.
           Follow with + or - to force merge from only
