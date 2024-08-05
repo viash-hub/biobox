@@ -8,6 +8,9 @@ meta_executable="target/executable/bedtools/bedtools_sort/bedtools_merge"
 meta_resources_dir="src/bedtools/bedtools_merge"
 ## VIASH END
 
+# directory of the bam file
+test_data="$meta_resources_dir/test_data"
+
 #############################################
 # helper functions
 assert_file_exists() {
@@ -45,6 +48,7 @@ printf "chr3\t.\tmRNA\t1000\t2000\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "t
 printf "chr1\t100\t250\nchr1\t300\t400\n" > "test_data/expected.bed"
 printf "chr1\t100\t250\nchr1\t250\t500\nchr1\t501\t1000\n" > "test_data/expected_strand.bed"
 printf "chr1\t100\t250\nchr1\t501\t1000\n" > "test_data/expected_specific_strand.bed"
+printf "chr1\t128\t228\nchr1\t428\t528\n" > "test_data/expected_bam.bed"
 
 # Test 1: Default sort on BED file
 mkdir test1
@@ -100,22 +104,22 @@ echo "- test3 succeeded -"
 cd ..
 
 # Test 4: BED option
-# mkdir test4
-# cd test4
+mkdir test4
+cd test4
 
-# echo "> Run bedtools_merge on BED file with BED option"
-# "$meta_executable" \
-#   --input "../test_data/featureA.bed" \
-#   --output "output.bed" \
-#   --bed
+echo "> Run bedtools_merge on BAM file with BED option"
+"$meta_executable" \
+  --input "$test_data/feature.bam" \
+  --output "output.bed" \
+  --bed
 
-# # checks
-# assert_file_exists "output.bed"
-# assert_file_not_empty "output.bed"
-# assert_identical_content "output.bed" "../test_data/expected_bed.bed"
-# echo "- test4 succeeded -"
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_bam.bed"
+echo "- test4 succeeded -"
 
-# cd ..
+cd ..
 
 
 
