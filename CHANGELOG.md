@@ -22,7 +22,8 @@
 * `agat`:
   - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
   - `/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
-
+  - `agat_convert_sp_gff2zff`: converts GTF/GFF file into zff file (PR #116).
+  
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
