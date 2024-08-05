@@ -42,7 +42,7 @@ argument_groups:
         type: file
         direction: output
         required: true
-        example: output.ann
+        example: output
   - name: Arguments
     arguments:
       - name: --config
