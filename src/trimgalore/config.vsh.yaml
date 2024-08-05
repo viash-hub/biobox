@@ -236,7 +236,7 @@ argument_groups:
         default: trimmed_output
       - name: --trimmed_r1
         type: file
-        required: true
+        required: false
         description: Output file for read 1. Only works when 1 file (single-end) or 2 files (paired-end) are specified, but not for longer lists.
         direction: output
         example: read_1.fastq
@@ -248,6 +248,7 @@ argument_groups:
         example: read_2.fastq
       - name: --trimming_report_r1
         type: file
+        required: false
         description: Trimming report for read 1. Only works when 1 file (single-end) or 2 files (paired-end) are specified, but not for longer lists.
         direction: output
         example: read_1.trimming_report.txt
@@ -259,6 +260,7 @@ argument_groups:
         example: read_2.trimming_report.txt
       - name: --trimmed_fastqc_html_1
         type: file
+        required: false
         description: FastQC report for trimmed (single-end) reads (or read 1 for paired-end). Only works when 1 file (single-end) or 2 files (paired-end) are specified, but not for longer lists.
         direction: output
         example: read_1.fastqc.html
@@ -270,6 +272,7 @@ argument_groups:
         example: read_2.fastqc.html
       - name: --trimmed_fastqc_zip_1
         type: file
+        required: false
         description: FastQC results for trimmed (single-end) reads (or read 1 for paired-end). Only works when 1 file (single-end) or 2 files (paired-end) are specified, but not for longer lists.
         direction: output
         example: read_1.fastqc.zip
@@ -281,13 +284,13 @@ argument_groups:
         example: read_2.fastqc.zip
       - name: --unpaired_r1
         type: file
-        required: true
+        required: false
         description: Output file for unpired read 1. Only works when 1 file (single-end) or 2 files (paired-end) are specified, but not for longer lists.
         direction: output
         example: unpaired_read_1.fastq
       - name: --unpaired_r2
         type: file
-        required: true
+        required: false
         description: Output file for unpaired read 2. Only works when 1 file (single-end) or 2 files (paired-end) are specified, but not for longer lists.
         direction: output
         example: unpaired_read_2.fastq
