@@ -26,7 +26,6 @@ argument_groups:
   - name: Outputs
     arguments:
       - name: --output
-        alternatives: -o
         type: file
         direction: output
         description: Output sorted file BED to be written.
@@ -34,6 +33,7 @@ argument_groups:
   - name: Options
     arguments:
       - name: --strand
+        alternatives: -s
         type: boolean_true
         description: | 
           Force strandedness.  That is, only merge features
@@ -41,6 +41,7 @@ argument_groups:
           - By default, merging is done without respect to strand.
 
       - name: --specific_strand
+        alternatives: -S
         type: boolean_true
         description: | 
           Force merge for one specific strand only.
@@ -49,6 +50,7 @@ argument_groups:
           - By default, merging is done without respect to strand.
 
       - name: --distance
+        alternatives: -d
         type: integer
         description: | 
           Maximum distance between features allowed for features
@@ -58,13 +60,16 @@ argument_groups:
           - Note: negative values enforce the number of b.p. required for overlap.
 
       - name: --columns
+        alternatives: -c
         type: integer
         description: | 
           Specify columns from the B file to map onto intervals in A.
           Default: 5.
           Multiple columns can be specified in a comma-delimited list.
+      # maybe type is string??? ask tomorrow!
 
       - name: --operation
+        alternatives: -o
         type: string
         description: | 
           Specify the operation that should be applied to -c.
@@ -118,6 +123,7 @@ argument_groups:
           Print the header from the A file prior to results.
 
       - name: --no_buffer
+        alternatives: -nobuf
         type: boolean_true
         description: | 
           Disable buffered output. Using this option will cause each line
