@@ -1,4 +1,4 @@
-name: agat_sp_Prokka_inferNameFromAttributes
+name: agat_sp_prokka_infer_name_from_attributes
 namespace: agat
 description: |
   The script aims to fill a Name attribute based on <gene> attribute in a
