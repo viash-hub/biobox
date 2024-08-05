@@ -58,16 +58,6 @@ trim_galore \
     -o $par_output_dir \
     ${input[*]}
 
-# Split output directory to separate files
-[[ ! -z "$par_trimmed_r1" ]] && mv "$par_output_dir/output.txt" "$trimmed_r1"
-[[ ! -z "$par_trimmed_r2" ]] && mv "$par_output_dir/output.txt.summary" "$par_trimmed_r2"
-[[ ! -z "$par_trimming_report_r1" ]] && mv "$par_output_dir/output.txt" "$par_trimming_report_r1"
-[[ ! -z "$par_trimming_report_r2" ]] && mv "$par_output_dir/output.txt.summary" "$par_trimming_report_r2"
-[[ ! -z "$par_trimmed_fastqc_html_1" ]] && mv "$par_output_dir/output.txt" "$par_trimmed_fastqc_html_1"
-[[ ! -z "$par_trimmed_fastqc_html_2" ]] && mv "$par_output_dir/output.txt.summary" "$par_trimmed_fastqc_html_2"
-[[ ! -z "$par_trimmed_fastqc_zip_1" ]] && mv "$par_output_dir/output.txt" "$par_trimmed_fastqc_zip_1"
-[[ ! -z "$par_trimmed_fastqc_zip_2" ]] && mv "$par_output_dir/output.txt.summary" "$par_trimmed_fastqc_zip_2"
-
 if [ $par_paired == "true" ]; then     
     input_r1=$(basename -- "${input[0]}")
     input_r2=$(basename -- "${input[1]}")
