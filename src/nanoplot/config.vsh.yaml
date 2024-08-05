@@ -77,7 +77,6 @@ test_resources:
 engines:
   - type: docker
     image: quay.io/biocontainers/nanoplot:1.42.0--pyhdfd78af_0
-    # image: quay.io/biocontainers/nanoplot:1.8.1--py35_0
     setup:
       - type: docker
         run: |
