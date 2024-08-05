@@ -61,12 +61,11 @@ argument_groups:
 
       - name: --columns
         alternatives: -c
-        type: integer
+        type: string
         description: | 
           Specify columns from the B file to map onto intervals in A.
           Default: 5.
           Multiple columns can be specified in a comma-delimited list.
-      # maybe type is string??? ask tomorrow!
 
       - name: --operation
         alternatives: -o
@@ -103,8 +102,8 @@ argument_groups:
         type: string
         description: | 
           Specify a custom delimiter for the collapse operations.
-          - Example: -delim "|"
-          - Default: ",".
+        example: "|"
+        default: ","
 
       - name: --precision
         alternatives: -prec

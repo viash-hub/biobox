@@ -19,7 +19,7 @@ bedtools merge \
     ${par_distance:+-d "$par_distance"} \
     ${par_columns:+-c "$par_columns"} \
     ${par_operation:+-o "$par_operation"} \
-    ${par_delimeter:+-delim "$par_delimeter"} \
+    ${par_delimiter:+-delim "$par_delimiter"} \
     ${par_precision:+-prec "$par_precision"} \
     -i "$par_input" \
     > "$par_output"
