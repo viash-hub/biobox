@@ -49,6 +49,7 @@ printf "chr1\t100\t250\nchr1\t300\t400\n" > "test_data/expected.bed"
 printf "chr1\t100\t250\nchr1\t250\t500\nchr1\t501\t1000\n" > "test_data/expected_strand.bed"
 printf "chr1\t100\t250\nchr1\t501\t1000\n" > "test_data/expected_specific_strand.bed"
 printf "chr1\t128\t228\nchr1\t428\t528\n" > "test_data/expected_bam.bed"
+printf "chr1\t100\t400\n" > "test_data/expected_distance.bed"
 
 # Test 1: Default sort on BED file
 mkdir test1
@@ -121,6 +122,41 @@ echo "- test4 succeeded -"
 
 cd ..
 
+# Test 5: distance option
+mkdir test5
+cd test5
+
+echo "> Run bedtools_merge on BED file with distance option"
+"$meta_executable" \
+  --input "../test_data/featureA.bed" \
+  --output "output.bed" \
+  --distance -5 
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected.bed"
+echo "- test5 succeeded -"
+
+cd ..
+
+# Test 6: columns option
+# mkdir test6
+# cd test6
+
+# echo "> Run bedtools_merge on BED file with columns option"
+# "$meta_executable" \
+#   --input "../test_data/featureA.bed" \
+#   --output "output.bed" \
+#   --columns 2
+
+# # checks
+# assert_file_exists "output.bed"
+# assert_file_not_empty "output.bed"
+# assert_identical_content "output.bed" "../test_data/expected.bed"
+# echo "- test6 succeeded -"
+
+# cd ..
 
 
 echo "---- All tests succeeded! ----"
