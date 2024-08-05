@@ -59,14 +59,14 @@ echo ">>> Testing for paired-end reads"
     --paired true \
     --input "example_R1.fastq;example_R2.fastq" \
     --adapter "ACG" \
-    --trim_html_1 example_R1.trimmed.html \
-    --trim_html_2 example_R2.trimmed.html \
-    --trim_zip_1 example_R1.trimmed.zip \
-    --trim_zip_2 example_R2.trimmed.zip \
-    --fastq_1 example_R1.trimmed.fastq \
-    --fastq_2 example_R2.trimmed.fastq \
-    --trim_log_1 example_R1.trimming_report.txt \
-    --trim_log_2 example_R2.trimming_report.txt
+    --trimmed_fastqc_html_1 example_R1.trimmed.html \
+    --trimmed_fastqc_html_2 example_R2.trimmed.html \
+    --trimmed_fastqc_zip_1 example_R1.trimmed.zip \
+    --trimmed_fastqc_zip_2 example_R2.trimmed.zip \
+    --trimmed_r1 example_R1.trimmed.fastq \
+    --trimmed_r2 example_R2.trimmed.fastq \
+    --trimming_report_r1 example_R1.trimming_report.txt \
+    --trimming_report_r2 example_R2.trimming_report.txt
 
 echo ">> Checking output"
 assert_file_exists "example_R1.trimmed.html"
@@ -101,10 +101,10 @@ echo ">>> Testing for single-end reads"
     --paired false \
     --input "example_R1.fastq" \
     --adapter "ACG" \
-    --trim_html_1 example.trimmed.html \
-    --trim_zip_1 example.trimmed.zip \
-    --fastq_1 example.trimmed.fastq \
-    --trim_log_1 example.trimming_report.txt \
+    --trimmed_fastqc_html_1 example.trimmed.html \
+    --trimmed_fastqc_zip_1 example.trimmed.zip \
+    --trimmed_r1 example.trimmed.fastq \
+    --trimming_report_r1 example.trimming_report.txt \
 
 echo ">> Checking output"
 assert_file_exists "example.trimmed.html"
