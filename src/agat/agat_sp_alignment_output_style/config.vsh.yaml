@@ -41,7 +41,6 @@ argument_groups:
         alternatives: [-v]
         description: Verbose option to see the warning messages when parsing the gff file.
         type: boolean_true
-        required: false
       - name: --config
         alternatives: [-c]
         description: |
