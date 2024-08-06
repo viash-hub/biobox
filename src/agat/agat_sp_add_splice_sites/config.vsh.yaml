@@ -4,7 +4,7 @@ description: |
   The script aims to add splice sites features (five_prime_cis_splice_site
   and three_prime_cis_splice_site) to gtf/gff file. The splice sites are
   deduced from CDS features.
-keywords: [gene annotations, GTF conversion]
+keywords: [gene annotations]
 links:
   homepage: https://github.com/NBISweden/AGAT
   documentation: https://agat.readthedocs.io/en/latest/tools/agat_sp_add_splice_sites.html
