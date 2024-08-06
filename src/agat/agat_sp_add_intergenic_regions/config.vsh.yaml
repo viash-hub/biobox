@@ -28,8 +28,8 @@ argument_groups:
         example: input.gff
   - name: Outputs
     arguments:
-      - name: --out
-        alternatives: [--output, -o]
+      - name: --output
+        alternatives: [--out, -o]
         description: Output file (default GFF3 - see config to modify output format).
         type: file
         direction: output
