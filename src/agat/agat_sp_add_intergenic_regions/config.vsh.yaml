@@ -45,6 +45,7 @@ argument_groups:
         required: false
         example: custom_agat_config.yaml
       - name: --verbose
+        alternatives: [-v]
         description: Add verbosity.
         type: boolean_true
 resources:
