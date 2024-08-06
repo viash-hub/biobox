@@ -21,6 +21,6 @@ bedtools groupby \
     -i "$par_input" \
     -g "$par_groupby" \
     -c "$par_column" \
-    -o "$par_operation" \
+    ${par_operation:+-o "$par_operation"} \
     > "$par_output"
     

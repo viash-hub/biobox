@@ -83,7 +83,6 @@ argument_groups:
           E.g., "-c 5,4,6 -o sum,mean,count" will give the sum of column 5,
           the mean of column 4, and the count of column 6.
           The order of output columns will match the ordering given in the command.
-        required: true
 
       - name: --full
         type: boolean_true
