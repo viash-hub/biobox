@@ -164,7 +164,6 @@ echo "> Run bedtools groupby on BED file with delimiter and collapse options"
   --groupby "1-4" \
   --column "9" \
   --operation "collapse" \
-  --collapse \
   --delimiter ";" \
   --output "output.bed"
 
