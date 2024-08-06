@@ -26,6 +26,7 @@
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
+  - `bedtools/bedtools_bedtobam`: Converts feature records (bed/gff/vcf) to BAM format (PR #111).
 
 
 ## MINOR CHANGES
