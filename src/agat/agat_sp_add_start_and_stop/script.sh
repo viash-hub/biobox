@@ -4,10 +4,11 @@
 ## VIASH END
 
 # unset flags
-[[ "$par_ni" == "true" ]] && unset par_ni
+[[ "$par_ni" == "false" ]] && unset par_ni
 [[ "$par_verbose" == "false" ]] && unset par_verbose
+[[ "$par_extend" == "false" ]] && unset par_extend
 
-# run agat_convert_sp_bed2gff.pl
+# run agat_sp_add_start_and_stop.pl
 agat_sp_add_start_and_stop.pl \
   --gff "$par_gff" \
   --fasta "$par_fasta" \
