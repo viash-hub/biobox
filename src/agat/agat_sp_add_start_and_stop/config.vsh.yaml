@@ -45,8 +45,8 @@ argument_groups:
         example: output.gff
   - name: Arguments
     arguments:
-      - name: --ct
-        alternatives: [--codon, --table]
+      - name: --codon
+        alternatives: [--ct, --table]
         description: Codon table to use. [default 1]
         type: integer
         required: false
