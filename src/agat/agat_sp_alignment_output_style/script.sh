@@ -10,5 +10,5 @@
 agat_sp_alignment_output_style.pl \
   --gff "$par_gff" \
   --output "$par_output" \
-  ${par_verbose:+--verbose} \
+  ${par_verbose:+-v} \
   ${par_config:+--config "${par_config}"}
