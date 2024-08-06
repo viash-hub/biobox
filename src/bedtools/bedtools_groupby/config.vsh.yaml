@@ -23,7 +23,7 @@ argument_groups:
         type: file
         direction: input
         description: |
-          The input file (BED/GFF/VCF/BAM) to be used as the -a file.
+          The input BED file to be used.
         required: true
         example: input_a.bed
         
@@ -33,16 +33,27 @@ argument_groups:
         type: file
         direction: output
         description: | 
-          The output BED file. 
+          The output groupby BED file. 
         required: true
         example: output.bed
   
   - name: Options
     arguments:
-      - name: 
-        alternatives: 
-        type: boolean_true
-        description:         
+      - name: --groupby
+        alternatives: -g
+        type: string
+        description: |
+          Specify the columns (1-based) for the grouping.
+          The columns must be comma separated.
+          - Default: 1,2,3   
+
+      # - name: --groupby
+      #   alternatives: -g
+      #   type: string
+      #   description: |
+      #     Specify the columns (1-based) for the grouping.
+      #     The columns must be comma separated.
+      #     - Default: 1,2,3     
 
 resources:
   - type: bash_script
