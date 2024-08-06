@@ -45,17 +45,18 @@ argument_groups:
         description: |
           Specify the columns (1-based) for the grouping.
           The columns must be comma separated.
-          - Default: 1,2,3   
+          - Default: 1,2,3  
+        required: true 
 
       - name: --column
         alternatives: [-c, -opCols]
         type: string
         description: |
           Specify the column (1-based) that should be summarized.
-          - Required.   
+        required: true   
 
       - name: --operation
-        alternatives: [-0, -ops]
+        alternatives: [-o, -ops]
         type: string
         description: |
           Specify the operation that should be applied to opCol.
@@ -82,6 +83,7 @@ argument_groups:
           E.g., "-c 5,4,6 -o sum,mean,count" will give the sum of column 5,
           the mean of column 4, and the count of column 6.
           The order of output columns will match the ordering given in the command.
+        required: true
 
       - name: --full
         type: boolean_true
@@ -111,12 +113,7 @@ argument_groups:
         type: boolean_true
         description: |
           Group values regardless of upper/lower case.
-      
-      - name: --ignorecase
-        type: boolean_true
-        description: |
-          Group values regardless of upper/lower case.
-      
+
       - name: --precision
         alternatives: -prec
         type: integer
