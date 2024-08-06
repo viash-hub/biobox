@@ -26,7 +26,7 @@
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
-
+  - `bedtools/bedtools_groupby`: Summarizes a dataset column based upon common column groupings. Akin to the SQL "group by" command (PR #123).
 
 ## MINOR CHANGES
 
