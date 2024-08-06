@@ -8,7 +8,7 @@
 
 # run agat_sp_add_intergenic_regions.pl
 agat_sp_add_intergenic_regions.pl \
-  --bed "$par_bed" \
-  -o "$par_output" \
+  --gff "$par_gff" \
+  --output "$par_output" \
   ${par_verbose:+--verbose} \
   ${par_config:+--config "${par_config}"}
