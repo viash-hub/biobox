@@ -16,5 +16,5 @@ agat_sp_add_start_and_stop.pl \
   ${par_ct:+--ct "${par_ct}"} \
   ${par_extend:+--extend} \
   ${par_ni:+--ni} \
-  ${par_verbose:+--verbose} \
+  ${par_verbose:+--v} \
   ${par_config:+--config "${par_config}"}
