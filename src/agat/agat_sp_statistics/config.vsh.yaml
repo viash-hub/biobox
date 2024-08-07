@@ -43,8 +43,8 @@ argument_groups:
         example: output.txt
   - name: Arguments
     arguments:
-      - name: -d
-        alternatives: [-p]
+      - name: --plot
+        alternatives: [-p, -d]
         description: |
           When this option is used, an histogram of distribution of the features will be printed in pdf files. (d means distribution, p means plot).
         type: boolean_true

@@ -10,7 +10,7 @@
 agat_sp_statistics.pl \
   -i "$par_gff" \
   -o "$par_output" \
-  ${par_d:+-d} \
+  ${par_plot:+-d} \
   ${par_gs:+--gs "${par_gs}"} \
   ${par_verbose:+--verbose "${par_verbose}"} \
   ${par_config:+--config "${par_config}"}
