@@ -6,8 +6,8 @@
 
 # unset flags
 [[ "$par_emblmygff3" == "false" ]] && unset par_emblmygff3
-[[ "$par_d" == "false" ]] && unset par_d
-[[ "$par_k" == "false" ]] && unset par_k
+[[ "$par_discard" == "false" ]] && unset par_discard
+[[ "$par_keep" == "false" ]] && unset par_keep
 
 # replace ';' with ','
 par_primary_tag=$(echo $par_primary_tag | tr ';' ',')
@@ -18,6 +18,6 @@ agat_convert_embl2gff.pl \
   -o "$par_output" \
   ${par_emblmygff3:+--emblmygff3} \
   ${par_primary_tag:+--primary_tag "${par_primary_tag}"} \
-  ${par_d:+-d} \
-  ${par_k:+-k} \
+  ${par_discard:+-d} \
+  ${par_keep:+-k} \
   ${par_config:+--config "${par_config}"}
