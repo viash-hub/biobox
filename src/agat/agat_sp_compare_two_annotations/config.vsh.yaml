@@ -68,7 +68,6 @@ argument_groups:
         alternatives: [-v]
         description: Verbose option, makes it easier to follow what is going on.
         type: boolean_true
-        required: false
         example: true
       - name: --config
         alternatives: [-c]
