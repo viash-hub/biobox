@@ -6,7 +6,7 @@
 # unset flags
 [[ "$par_verbose" == "false" ]] && unset par_verbose
 
-# Convert a list of file names to multiple -gff arguments
+# Convert a list of file names to multiple --add arguments
 input_files=""
 IFS=";" read -ra file_names <<< "$par_add"
 for file in "${file_names[@]}"; do

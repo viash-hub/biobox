@@ -9,7 +9,7 @@ out_dir="${meta_resources_dir}/out_data"
 echo "> Run $meta_name with test data"
 "$meta_executable" \
   --ref "$test_dir/25_test.gff" \
-  --add "$test_dir/9_test.gff";"$test_dir/9_test.gff" \
+  --add "$test_dir/9_test.gff" \
   --output "$out_dir/output.gff" 
 
 echo ">> Checking output"
