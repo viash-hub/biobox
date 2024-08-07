@@ -1,4 +1,4 @@
-name: agat_sp_clipN_seqExtremities_and_fixCoordinates
+name: agat_sp_clipn_seqextremities_and_fixcoordinates
 namespace: agat
 description: |
     The script aims to clip the N's extremities of the sequences. The
