@@ -22,6 +22,7 @@
 * `agat`:
   - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
   - `/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat_sp_clipn_seqextremities_and_fixcoordinates`: clip the N's extremities of the sequences (PR #125).
 
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
