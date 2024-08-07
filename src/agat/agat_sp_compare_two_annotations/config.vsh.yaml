@@ -49,9 +49,9 @@ argument_groups:
         direction: input
         example: input2.gff
   - name: Outputs
-    arguments:
-      - name: --output
-        alternatives: [-o, --out]
+    arguments:       
+      - name: --output_dir
+        alternatives: [-o, --out, --output]
         description: |
           Output folder. It contains a report that summarizes the type and number of cases, as well as a file per case type containing one case per line with the list of gene feature's ID (or other type of feature level1) from file1 then file2 separated by a |.
         type: string
