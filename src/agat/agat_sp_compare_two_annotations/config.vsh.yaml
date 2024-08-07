@@ -54,7 +54,7 @@ argument_groups:
         alternatives: [-o, --out]
         description: |
           Output folder. It contains a report that summarizes the type and number of cases, as well as a file per case type containing one case per line with the list of gene feature's ID (or other type of feature level1) from file1 then file2 separated by a |.
-        type: folder
+        type: string
         direction: output
         required: true
         example: output_folder
@@ -68,7 +68,6 @@ argument_groups:
         alternatives: [-v]
         description: Verbose option, makes it easier to follow what is going on.
         type: boolean_true
-        example: true
       - name: --config
         alternatives: [-c]
         description: |
