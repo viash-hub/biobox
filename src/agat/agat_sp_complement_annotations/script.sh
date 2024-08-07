@@ -8,9 +8,9 @@
 
 # Convert a list of file names to multiple -gff arguments
 input_files=""
-IFS=";" read -ra file_names <<< "$par_gff"
+IFS=";" read -ra file_names <<< "$par_add"
 for file in "${file_names[@]}"; do
-    input_files+="--gff $file "
+    input_files+="--add $file "
 done
 unset IFS
 
