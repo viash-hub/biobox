@@ -1,1 +1,1 @@
-NanoPlot 0.16.2
+NanoPlot 1.42.0
