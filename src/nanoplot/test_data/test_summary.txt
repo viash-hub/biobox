@@ -1,2 +1,0 @@
-filename	read_id	length	num_events	num_events_insert	num_events_delete
-read.fastq	read_1	1000	5000	100	50

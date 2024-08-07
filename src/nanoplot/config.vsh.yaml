@@ -1,4 +1,4 @@
-name: NanoPlot
+name: nanoplot
 description: |
   Run NanoPlot on nanopore-sequenced reads.
   "Sample"
@@ -15,11 +15,6 @@ argument_groups:
         description: List of input basecalled-FastQ files.
         example: read.fq
         multiple: true
-      # - name: --fasta
-      #   type: file
-      #   description: List of input Fasta files.
-      #   example: read.fa
-      #   multiple: true
       - name: --summary
         type: file
         description: Summary files.
@@ -30,10 +25,6 @@ argument_groups:
         description: BAM files.
         example: read.bam
         multiple: true
-      # - name: --meta
-      #   type: map
-      #   description: Groovy Map containing sample information
-      #   example: info.map
   - name: Outputs
     arguments:
       - name: --txt
@@ -51,21 +42,6 @@ argument_groups:
         description: NanoPlot report
         direction: output
         example: report.html
-      # - name: --meta
-      #   type: map
-      #   description: Groovy Map containing sample information
-      #   direction: output
-      #   example: info.map
-      # - name: --log
-      #   type: file
-      #   description: log file of NanoPlot run
-      #   direction: output
-      #   example: run.log
-      # - name: --versions
-      #   type: file
-      #   description: File containing software versions
-      #   direction: output
-      #   example: versions.yml
 resources:
   - type: bash_script
     path: script.sh
@@ -81,7 +57,6 @@ engines:
       - type: docker
         run: |
           touch ./var/software_versions.txt && \
-          # version=$(NanoPlot --version) && \
           version=$(docker run quay.io/biocontainers/nanoplot:1.42.0--pyhdfd78af_0 NanoPlot --version) && \
           echo "$version" > ./var/software_versions.txt
 runners:
