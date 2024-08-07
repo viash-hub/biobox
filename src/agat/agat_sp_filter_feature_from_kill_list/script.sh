@@ -14,4 +14,4 @@ agat_sp_filter_feature_from_kill_list.pl \
   ${par_type:+--type "${par_type}"} \
   ${par_attribute:+--attribute "${par_attribute}"} \
   ${par_config:+--config "${par_config}"} \
-  ${par_verbose:+--verbose}
+  ${par_verbose:+-v}
