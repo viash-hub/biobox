@@ -1,0 +1,84 @@
+name: agat_convert_embl2gff
+namespace: agat
+description: |
+  The script takes an EMBL file as input, and will translate it in gff format.
+keywords: [gene annotations, GFF conversion]
+links:
+  homepage: https://github.com/NBISweden/AGAT
+  documentation: https://agat.readthedocs.io/en/latest/tools/agat_convert_embl2gff.html
+  issue_tracker: https://github.com/NBISweden/AGAT/issues
+  repository: https://github.com/NBISweden/AGAT
+references: 
+  doi: 10.5281/zenodo.3552717
+license: GPL-3.0
+authors:
+  - __merge__: /src/_authors/leila_paquay.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --embl
+        description: Input EMBL file that will be read.
+        type: file
+        required: true
+        direction: input
+        example: input.embl
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: [-o, --out, --outfile, --gff]
+        description: Output GFF file. If no output file is specified, the output will be written to STDOUT.
+        type: file
+        direction: output
+        required: false
+        example: output.gff
+  - name: Arguments
+    arguments:
+      - name: --emblmygff3
+        description: |
+          Means that the EMBL flat file comes from the EMBLmyGFF3 software. This is an EMBL format dedicated for submission and contains particularity to deal with. This parameter is needed to get a proper sequence id in the GFF3 from an embl made with EMBLmyGFF3.
+        type: boolean_true
+      - name: --primary_tag
+        alternatives: [--pt, -t]
+        description: |
+          List of "primary tag". Useful to discard or keep specific features. Multiple tags must be comma-separated.
+        type: string
+        multiple: true
+        required: false
+        example: [tag1, tag2]
+      - name: --discard
+        alternatives: [-d]
+        description: |
+          Means that primary tags provided by the option "primary_tag" will be discarded.
+        type: boolean_true
+      - name: --keep
+        alternatives: [-k]
+        description: |
+          Means that only primary tags provided by the option "primary_tag" will be kept.
+        type: boolean_true
+      - name: --config
+        alternatives: [-c]
+        description: |
+          Input agat config file. By default AGAT takes as input agat_config.yaml file from the working directory if any, otherwise it takes the original agat_config.yaml shipped with AGAT. To get the agat_config.yaml locally type: "agat config --expose". The --config option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
+        type: file
+        required: false
+        example: custom_agat_config.yaml
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/agat:1.4.0--pl5321hdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          agat --version | sed 's/AGAT\s\(.*\)/agat: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
