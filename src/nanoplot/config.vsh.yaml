@@ -1,11 +1,13 @@
 name: nanoplot
 description: |
   Run NanoPlot on nanopore-sequenced reads.
-  "Sample"
 keywords: ["quality control", "qc", "fastq", "sequencing summary", "nanopore"]
 links:
-  repository: https://github.com/wdecoster/NanoPlot/tree/master
+  repository: https://github.com/wdecoster/NanoPlot
   homepage: http://nanoplot.bioinf.be/
+  documentation: https://nanoplot.bioinf.be/
+references:
+  doi: 10.1093/bioinformatics/btad311
 license: MIT
 argument_groups:
   - name: Inputs
@@ -57,7 +59,8 @@ engines:
       - type: docker
         run: |
           touch ./var/software_versions.txt && \
-          version=$(docker run quay.io/biocontainers/nanoplot:1.42.0--pyhdfd78af_0 NanoPlot --version) && \
+          version=$(NanoPlot --version) && \
+          # version=$(docker run quay.io/biocontainers/nanoplot:1.42.0--pyhdfd78af_0 NanoPlot --version) && \
           echo "$version" > ./var/software_versions.txt
 runners:
   - type: executable
