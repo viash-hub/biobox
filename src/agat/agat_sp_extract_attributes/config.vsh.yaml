@@ -45,7 +45,7 @@ argument_groups:
         type: file
         direction: output
         required: true
-        example: output.gff
+        example: output.txt
   - name: Arguments
     arguments:
       - name: --primary_tag
