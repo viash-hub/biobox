@@ -36,6 +36,7 @@ mkdir -p test_data
 printf "chr1\t248956422\nchr2\t198295559\nchr3\t242193529\n" > "test_data/genome.txt"
 printf "chr2\t128\t228\tmy_read/1\t37\t+\nchr2\t428\t528\tmy_read/2\t37\t-\n" > "test_data/example.bed"
 printf "chr2\t128\t228\tmy_read/1\t60\t+\t128\t228\t255,0,0\t1\t100\t0\nchr2\t428\t528\tmy_read/2\t60\t-\t428\t528\t255,0,0\t1\t100\t0\n" > "test_data/example.bed12"
+printf "chr2\t100\t103\n" > "test_data/example_dz.bed"
 
 # expected outputs
 cat > "test_data/expected_default.bed" <<EOF
@@ -63,6 +64,19 @@ chr2:172936693-172938111	0	1218	1418	0.858956
 chr2:172936693-172938111	1	200	1418	0.141044
 genome	0	1218	1418	0.858956
 genome	1	200	1418	0.141044
+EOF
+cat > "test_data/expected_dz.bed" <<EOF
+chr2	100	1
+chr2	101	1
+chr2	102	1
+EOF
+cat > "test_data/expected_strand.bed" <<EOF
+chr2	0	198295459	198295559	1
+chr2	1	100	198295559	5.04298e-07
+chr1	0	248956422	248956422	1
+chr3	0	242193529	242193529	1
+genome	0	689445410	689445510	1
+genome	1	100	689445510	1.45044e-07
 EOF
 
 # Test 1: 
@@ -101,8 +115,42 @@ echo "- test2 succeeded -"
 cd ..
 
 # Test 3: depth option
+mkdir test3
+cd test3
+
+echo "> Run bedtools_genomecov on BED file with -dz"
+"$meta_executable" \
+  --input "../test_data/example_dz.bed" \
+  --genome "../test_data/genome.txt" \
+  --output "output.bed" \
+  --depth_zero
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_dz.bed"
+echo "- test3 succeeded -"
+
+cd ..
 
 # Test 4: strand option
+mkdir test4
+cd test4
+
+echo "> Run bedtools_genomecov on BED file with -strand"
+"$meta_executable" \
+  --input "../test_data/example.bed" \
+  --genome "../test_data/genome.txt" \
+  --output "output.bed" \
+  --strand "-" \
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_strand.bed"
+echo "- test4 succeeded -"
+
+cd ..
 
 # Test 5: 5' end option
 
