@@ -11,6 +11,8 @@ done
 
 # replace ';' with ','
 par_reference_fasta_files=$(echo $par_reference_fasta_files | tr ';' ',')
+par_gff3_rna_patterns=$(echo $par_gff3_rna_patterns | tr ';' ',')
+par_trusted_sources=$(echo $par_trusted_sources | tr ';' ',')
 
 echo "$par_reference_fasta_files"
 rsem-prepare-reference \

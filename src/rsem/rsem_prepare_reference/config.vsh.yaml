@@ -53,15 +53,17 @@ argument_groups:
         example: annotations.gff
       - name: --gff3_rna_patterns
         type: string
-        description: Comma-separated list of transcript categories, e.g. "mRNA,rRNA". Only transcripts that match the string will be extracted.
-        example: mRNA,rRNA
+        description: List of transcript categories (separated by semi-colon). Only transcripts that match the string will be extracted.
+        multiple: true
+        example: mRNA;rRNA
       - name: --gff3_genes_as_transcripts
         type: boolean_true
         description: This option is designed for untypical organisms, such as viruses, whose GFF3 files only contain genes. RSEM will assume each gene as a unique transcript when it converts the GFF3 file into GTF format.
       - name: --trusted_sources
         type: string
-        description: Comma-separated list of trusted sources, e.g. "ENSEMBL,HAVANA". Only transcripts coming from these sources will be extracted. If this option is off, all sources are accepted.
-        example: ENSEMBL,HAVANA
+        description: List of trusted sources (separated by semi-colon). Only transcripts coming from these sources will be extracted. If this option is off, all sources are accepted.
+        multiple: true
+        example: ENSEMBL;HAVANA
       - name: --transcript_to_gene_map
         type: file
         description: | 
