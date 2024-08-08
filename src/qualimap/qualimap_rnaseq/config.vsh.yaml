@@ -107,7 +107,7 @@ engines:
           unset DISPLAY && \
           mkdir -p tmp && \
           export _JAVA_OPTIONS=-Djava.io.tmpdir=./tmp && \
-          "qualimap: v2.3" > /var/software_versions.txt
+          echo "qualimap: v2.3" > /var/software_versions.txt
 
       - type: r
         bioc: [ NOISeqr ]
