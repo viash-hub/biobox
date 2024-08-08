@@ -6,7 +6,7 @@ keywords: ["Transcriptome", "Index"]
 links:
   homepage: https://github.com/deweylab/RSEM
   documentation: https://deweylab.github.io/RSEM/rsem-prepare-reference.html
-  repository: https://github.com/deweylab/RSEM?
+  repository: https://github.com/deweylab/RSEM
 references: 
   doi: 10.1186/1471-2105-12-323
 license: GPL-3.0 
