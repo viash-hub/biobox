@@ -131,13 +131,13 @@ argument_groups:
           Change strand af the mate read (so both reads from the same strand) useful for strand specific
           Works for BAM files only
 
-      - name: --5_prime
+      - name: --five_prime
         alternatives: -5
         type: boolean_true
         description: |
           Calculate coverage of 5" positions (instead of entire interval).
 
-      - name: --3_prime
+      - name: --three_prime
         alternatives: -3
         type: boolean_true
         description: |

@@ -13,8 +13,8 @@
 [[ "$par_pair_end_coverage" == "false" ]] && unset par_pair_end_coverage
 [[ "$par_fragment_size" == "false" ]] && unset par_fragment_size
 [[ "$par_du" == "false" ]] && unset par_du
-[[ "$par_5_prime" == "false" ]] && unset par_5_prime
-[[ "$par_3_prime" == "false" ]] && unset par_3_prime
+[[ "$par_five_prime" == "false" ]] && unset par_five_prime
+[[ "$par_three_prime" == "false" ]] && unset par_three_prime
 [[ "$par_trackline" == "false" ]] && unset par_trackline
 
 bedtools genomecov \
@@ -28,8 +28,8 @@ bedtools genomecov \
     ${par_pair_end_coverage:+-pc} \
     ${par_fragment_size:+-fs} \
     ${par_du:+-du} \
-    ${par_5_prime:+-5} \
-    ${par_3_prime:+-3} \
+    ${par_five_prime:+-5} \
+    ${par_three_prime:+-3} \
     ${par_trackline:+-trackline} \
     ${par_strand:+-strand "$par_strand"} \
     ${par_max:+-max "$par_max"} \

@@ -30,18 +30,19 @@ echo "Creating Test Data..."
 mkdir -p test_data
 
 # Create and populate input files
-printf "chr1\t248956422\nchr3\t242193529\nchr2\t198295559\n" > "test_data/genome.txt"
-printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t37\t+\nchr2:172936693-172938111\t428\t528\tmy_read/2\t37\t-\n" > "test_data/example.bed"
-printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\t128\t228\t255,0,0\t1\t100\t0\nchr2:172936693-172938111\t428\t528\tmy_read/2\t60\t-\t428\t528\t255,0,0\t1\t100\t0\n" > "test_data/example.bed12"
-# Create and populate example.gff file
-printf "##gff-version 3\n" > "test_data/example.gff"
-printf "chr1\t.\tgene\t1000\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/example.gff"
-printf "chr3\t.\tmRNA\t1000\t2000\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "test_data/example.gff"
-printf "chr1\t.\texon\t1000\t1200\t.\t+\t.\tID=exon1;Parent=transcript1\n" >> "test_data/example.gff"
-printf "chr2\t.\texon\t1500\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "test_data/example.gff"
-printf "chr1\t.\tCDS\t1000\t1200\t.\t+\t0\tID=cds1;Parent=transcript1\n" >> "test_data/example.gff"
-printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/example.gff"
+printf "chr1\t248956422\nchr2\t198295559\nchr3\t242193529\n" > "test_data/genome.txt"
+printf "chr2\t128\t228\tmy_read/1\t37\t+\nchr2\t428\t528\tmy_read/2\t37\t-\n" > "test_data/example.bed"
+printf "chr2\t128\t228\tmy_read/1\t60\t+\t128\t228\t255,0,0\t1\t100\t0\nchr2\t428\t528\tmy_read/2\t60\t-\t428\t528\t255,0,0\t1\t100\t0\n" > "test_data/example.bed12"
 
+# expected output
+cat > "test_data/expected_default.bed" <<EOF
+chr2	0	198295359	198295559	0.999999
+chr2	1	200	198295559	1.0086e-06
+chr1	0	248956422	248956422	1
+chr3	0	242193529	242193529	1
+genome	0	689445310	689445510	1
+genome	1	200	689445510	2.90088e-07
+EOF
 
 # Test 1: 
 mkdir test1
@@ -56,11 +57,24 @@ echo "> Run bedtools_genomecov on BED file"
 # checks
 assert_file_exists "output.bed"
 assert_file_not_empty "output.bed"
-#assert_identical_content "output.bed" "../test_data/expected_default.bed"
+assert_identical_content "output.bed" "../test_data/expected_default.bed"
 echo "- test1 succeeded -"
 
 cd ..
 
+# Test 2: ibam option and pair end option and fragment size option
+
+# Test 3: depth option
+
+# Test 4: strand option
+
+# Test 5: 5' end option
+
+# Test 6: max option
+
+# Test 7: scale option
+
+# Test 8: trackopts option
 
 
 echo "---- All tests succeeded! ----"
