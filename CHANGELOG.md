@@ -32,6 +32,12 @@
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
 
+## NEW FEATURES
+
+* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74). 
+
+# biobox 0.1.0
+
 * Update CI to reusable workflow in `viash-io/viash-actions` (PR #86).
 
 ## DOCUMENTATION
