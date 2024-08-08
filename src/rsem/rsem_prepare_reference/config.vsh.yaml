@@ -4,7 +4,7 @@ description: |
   RSEM is a software package for estimating gene and isoform expression levels from RNA-Seq data. This component prepares transcript references for RSEM.
 keywords: ["Transcriptome", "Index"]
 links:
-  homepage: https://github.com/deweylab/RSEM
+  homepage: http://deweylab.github.io/RSEM
   documentation: https://deweylab.github.io/RSEM/rsem-prepare-reference.html
   repository: https://github.com/deweylab/RSEM
 references: 
