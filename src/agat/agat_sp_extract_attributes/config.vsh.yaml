@@ -5,7 +5,7 @@ description: |
   choosen attributes of all or specific feature types. The 9th column of a
   gff/gtf file contains a list of attributes. An attribute (gff3) looks
   like that `tag=value`.
-keywords: [gene annotations, GFF conversion]
+keywords: [gene annotations]
 links:
   homepage: https://github.com/NBISweden/AGAT
   documentation: https://agat.readthedocs.io/en/latest/tools/agat_sp_extract_attributes.html
