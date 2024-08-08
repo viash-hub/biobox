@@ -36,7 +36,7 @@ argument_groups:
         multiple: true
         type: string
         required: true
-        example: ID,Name
+        example: protein_id
   - name: Outputs
     arguments:       
       - name: --output
