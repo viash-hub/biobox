@@ -1,85 +1,89 @@
 name: "qualimap"
-info:
-  migration_info:
-    git_repo: https://github.com/nf-core/rnaseq.git
-    paths: [modules/nf-core/qualimap/rnaseq/main.nf]
-    last_sha: 54721c6946daf6d602d7069dc127deef9cbe6b33
+keywords: [RNA-seq, quality control, QC Report]
 description: |
-  Qualimap RNA-seq QC RNA-seq QC reports quality control metrics and bias estimations 
+  Qualimap RNA-seq QC reports quality control metrics and bias estimations 
   which are specific for whole transcriptome sequencing, including reads genomic 
   origin, junction analysis, transcript coverage and 5’-3’ bias computation.
-
+links:
+  homepage: http://qualimap.conesalab.org/
+  documentation: http://qualimap.conesalab.org/doc_html/analysis.html#rna-seq-qc
+  issue_tracker: https://bitbucket.org/kokonech/qualimap/issues?status=new&status=open
+  repository: https://bitbucket.org/kokonech/qualimap/commits/branch/master
+references:
+  doi: https://10.1093/bioinformatics/btv566
+license: GNU GPL v2
+authors:
+  - __merge__: /src/_authors/dorien_roosen.yaml
+    roles: [ author, maintainer ]
 argument_groups:
-- name: "Input"
-  arguments: 
-  - name: "--input"
-    type: file
-    required: true
-    example: alignment.bam
-    description: Path to the sequence alignment file in BAM format, produced by a splicing-aware aligner.
-  - name: "--gtf"
-    type: file
-    required: true
-    example: annotations.gtf
-    description: Path to genomic annotations in Ensembl GTF format.
+  - name: "Input"
+    arguments: 
+    - name: "--bam"
+      type: file
+      required: true
+      example: alignment.bam
+      description: Path to the sequence alignment file in BAM format, produced by a splicing-aware aligner.
+    - name: "--gtf"
+      type: file
+      required: true
+      example: annotations.gtf
+      description: Path to genomic annotations in Ensembl GTF format.
 
-- name: "Output"
-  arguments: 
-  - name: "--output"
-    direction: output
-    type: file
-    required: true
-    example: rnaseq_qc_results.txt
-    description: Text file containing the RNAseq QC results.
-  - name: "--output_counts"
-    type: file
-    required: false
-    direction: output
-    description: Output file for computed counts.
-  - name: "--output_report"
-    type: file
-    direction: output
-    required: false
-    example: report.html
-    description: Report output file. Supported formats are PDF or HTML.
+  - name: "Output"
+    arguments: 
+    - name: "--output"
+      direction: output
+      type: file
+      required: true
+      example: rnaseq_qc_results.txt
+      description: Text file containing the RNAseq QC results.
+    - name: "--output_counts"
+      type: file
+      required: false
+      direction: output
+      description: Output file for computed counts.
+    - name: "--output_report"
+      type: file
+      direction: output
+      required: false
+      example: report.html
+      description: Report output file. Supported formats are PDF or HTML.
 
-- name: "Optional"
-  arguments: 
-  - name: "--pr_bases"
-    type: integer
-    required: false
-    default: 100
-    min: 1
-    description: Number of upstream/downstream nucleotide bases to compute 5'-3' bias (default = 100).
-  - name: "--tr_bias"
-    type: integer
-    required: false
-    default: 1000
-    min: 1
-    description: Number of top highly expressed transcripts to compute 5'-3' bias (default = 1000).
-  - name: "--algorithm"
-    type: string
-    required: false
-    choices: ["uniquely-mapped-reads", "proportional"]
-    default: uniquely-mapped-reads
-    description: Counting algorithm (uniquely-mapped-reads (default) or proportional).
-  - name: "--sequencing_protocol"
-    type: string
-    required: false
-    choices: ["non-strand-specific", "strand-specific-reverse", "strand-specific-forward"]
-    default: non-strand-specific
-    description: Sequencing library protocol (strand-specific-forward, strand-specific-reverse or non-strand-specific (default)).
-  - name: "--paired"
-    type: boolean_true
-    description: Setting this flag for paired-end experiments will result in counting fragments instead of reads.
-  - name: "--sorted"
-    type: boolean_true
-    description: Setting this flag indicates that the input file is already sorted by name. If flag is not set, additional sorting by name will be performed. Only requiredfor paired-end analysis.
-  - name: "--java_memory_size"
-    type: string
-    required: false
-    default: 4G 
-    description: maximum Java heap memory size, default = 4G.
+  - name: "Optional"
+    arguments: 
+    - name: "--num_pr_bases"
+      type: integer
+      required: false
+      min: 1
+      description: Number of upstream/downstream nucleotide bases to compute 5'-3' bias (default = 100).
+    - name: "--num_tr_bias"
+      type: integer
+      required: false
+      min: 1
+      description: Number of top highly expressed transcripts to compute 5'-3' bias (default = 1000).
+    - name: "--algorithm"
+      type: string
+      required: false
+      choices: ["uniquely-mapped-reads", "proportional"]
+      default: uniquely-mapped-reads
+      description: Counting algorithm (uniquely-mapped-reads (default) or proportional).
+    - name: "--sequencing_protocol"
+      type: string
+      required: false
+      choices: ["non-strand-specific", "strand-specific-reverse", "strand-specific-forward"]
+      default: non-strand-specific
+      description: Sequencing library protocol (strand-specific-forward, strand-specific-reverse or non-strand-specific (default)).
+    - name: "--paired"
+      type: boolean_true
+      description: Setting this flag for paired-end experiments will result in counting fragments instead of reads.
+    - name: "--sorted"
+      type: boolean_true
+      description: Setting this flag indicates that the input file is already sorted by name. If flag is not set, additional sorting by name will be performed. Only requiredfor paired-end analysis.
+    - name: "--java_memory_size"
+      type: string
+      required: false
+      default: 4G 
+      description: maximum Java heap memory size, default = 4G.
 
 resources:
   - type: bash_script
@@ -90,22 +94,24 @@ test_resources:
   - path: test_data/
 
 engines:
-- type: docker
-  image: ubuntu:22.04
-  setup:   
-    - type: apt
-      packages: [ r-base, unzip, wget, openjdk-8-jdk, libxml2-dev, libcurl4-openssl-dev ]
-    - type: docker
-      run: |
-        wget https://bitbucket.org/kokonech/qualimap/downloads/qualimap_v2.3.zip && \
-        unzip qualimap_v2.3.zip && \
-        cp -a qualimap_v2.3/. usr/bin && \
-        unset DISPLAY && \
-        mkdir -p tmp && \
-        export _JAVA_OPTIONS=-Djava.io.tmpdir=./tmp
-    - type: r
-      bioc: [ NOISeqr ]
-      cran: [ optparse ]
+  - type: docker
+    image: ubuntu:22.04
+    setup:   
+      - type: apt
+        packages: [ r-base, unzip, wget, openjdk-8-jdk, libxml2-dev, libcurl4-openssl-dev ]
+      - type: docker
+        run: |
+          wget https://bitbucket.org/kokonech/qualimap/downloads/qualimap_v2.3.zip && \
+          unzip qualimap_v2.3.zip && \
+          cp -a qualimap_v2.3/. usr/bin && \
+          unset DISPLAY && \
+          mkdir -p tmp && \
+          export _JAVA_OPTIONS=-Djava.io.tmpdir=./tmp && \
+          "qualimap: v2.3" > /var/software_versions.txt
+
+      - type: r
+        bioc: [ NOISeqr ]
+        cran: [ optparse ]
 runners: 
-- type: executable
-- type: nextflow
+  - type: executable
+  - type: nextflow

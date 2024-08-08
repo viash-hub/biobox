@@ -22,12 +22,12 @@ fi
 qualimap rnaseq \
     --java-mem-size=$par_java_memory_size \
     --algorithm $par_algorithm \
-    --num-pr-bases $par_pr_bases \
-    --num-tr-bias $par_tr_bias \
     --sequencing-protocol $par_sequencing_protocol \
-    -bam $par_input \
+    -bam $par_bam \
     -gtf $par_gtf \
     -outdir "$tmp_dir" \
+    ${par_num_pr_bases:+--num-pr-bases $par_num_pr_bases} \
+    ${par_num_tr_bias:+--num-tr-bias $par_num_tr_bias} \
     ${par_output_report:+-outformat $report_extension} \
     ${par_paired:+--paired} \
     ${par_sorted:+--sorted} \

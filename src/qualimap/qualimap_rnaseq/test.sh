@@ -25,7 +25,7 @@ cd "run_qualimap_rnaseq_html"
 echo "> Running qualimap with html output report"
 
 "$meta_executable" \
-    --input $test_dir/a.bam \
+    --bam $test_dir/a.bam \
     --gtf $test_dir/annotation.gtf \
     --output_report report.html \
     --output_counts counts.txt \
@@ -69,7 +69,7 @@ cd "run_qualimap_rnaseq_pdf"
 echo "> Running qualimap with pdf output report"
 
 "$meta_executable" \
-    --input $test_dir/a.bam \
+    --bam $test_dir/a.bam \
     --gtf $test_dir/annotation.gtf \
     --output_report report.pdf \
     --output_counts counts.txt \
@@ -95,7 +95,7 @@ cd "run_qualimap_rnaseq"
 echo "> Running qualimap without report and counts output"
 
 "$meta_executable" \
-    --input $test_dir/a.bam \
+    --bam $test_dir/a.bam \
     --gtf $test_dir/annotation.gtf \
     --output output.txt
 
