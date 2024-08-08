@@ -443,6 +443,7 @@ assert (output_dir / "sample_Metrics_Summary.csv").exists()
 assert (output_dir / "sample_Pipeline_Report.html").exists()
 assert (output_dir / "sample_RSEC_MolsPerCell_MEX.zip").exists()
 assert (output_dir / "sample_RSEC_MolsPerCell_Unfiltered_MEX.zip").exists()
+# seurat object is not generated when abc data is added
 # assert (output_dir / "sample_Seurat.rds").exists()
 assert (output_dir / "sample.h5mu").exists()
 
