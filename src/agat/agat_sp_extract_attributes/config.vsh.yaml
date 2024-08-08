@@ -31,11 +31,9 @@ argument_groups:
         alternatives: [--att, -a]
         description: |
           Attribute tag. The value of the attribute tag specified will be
-          extracted from the feature type specified by the option `-p`. List
-          of attributes must be comma-separated.
+          extracted from the feature type specified by the option `-p`.
         direction: input
         multiple: true
-        multiple_sep: ','
         type: string
         required: true
         example: ID,Name
@@ -54,14 +52,24 @@ argument_groups:
         alternatives: [-p, -t, -l]
         description: |
           Primary tag option, case insensitive, list. Allow to specify the
-          feature types that will be handled. You can specify a specific
-          feature by giving its primary tag name (column 3) as: cds, Gene,
-          mRNA. You can specify directly all the features of a particular
-          level: level2=mRNA,ncRNA,tRNA,etc level3=CDS,exon,UTR,etc. By
-          default, all features are taken into account. Filling the option
+          feature types that will be handled. 
+          
+          You can specify a specific feature by giving its primary tag name (column 3) as: 
+            * cds
+            * Gene
+            * mRNA
+          
+          You can specify directly all the features of a particular
+          level: 
+          
+            * level2=mRNA,ncRNA,tRNA,etc 
+            * level3=CDS,exon,UTR,etc. 
+
+          By default, all features are taken into account. Filling the option
           with the value "all" will have the same behavior.
         type: string
         required: false
+        multiple: true
         example: gene
       - name: --merge
         alternatives: [-m]
