@@ -8,6 +8,9 @@ meta_executable="target/executable/bedtools/bedtools_intersect/bedtools_intersec
 meta_resources_dir="src/bedtools/bedtools_intersect"
 ## VIASH END
 
+# directory of the bam file
+test_data="$meta_resources_dir/test_data"
+
 #############################################
 # helper functions
 assert_file_exists() {
@@ -34,7 +37,7 @@ printf "chr1\t248956422\nchr2\t198295559\nchr3\t242193529\n" > "test_data/genome
 printf "chr2\t128\t228\tmy_read/1\t37\t+\nchr2\t428\t528\tmy_read/2\t37\t-\n" > "test_data/example.bed"
 printf "chr2\t128\t228\tmy_read/1\t60\t+\t128\t228\t255,0,0\t1\t100\t0\nchr2\t428\t528\tmy_read/2\t60\t-\t428\t528\t255,0,0\t1\t100\t0\n" > "test_data/example.bed12"
 
-# expected output
+# expected outputs
 cat > "test_data/expected_default.bed" <<EOF
 chr2	0	198295359	198295559	0.999999
 chr2	1	200	198295559	1.0086e-06
@@ -42,6 +45,24 @@ chr1	0	248956422	248956422	1
 chr3	0	242193529	242193529	1
 genome	0	689445310	689445510	1
 genome	1	200	689445510	2.90088e-07
+EOF
+cat > "test_data/expected_ibam.bed" <<EOF
+chr2:172936693-172938111	0	1218	1418	0.858956
+chr2:172936693-172938111	1	200	1418	0.141044
+genome	0	1218	1418	0.858956
+genome	1	200	1418	0.141044
+EOF
+cat > "test_data/expected_ibam_pc.bed" <<EOF
+chr2:172936693-172938111	0	1018	1418	0.717913
+chr2:172936693-172938111	1	400	1418	0.282087
+genome	0	1018	1418	0.717913
+genome	1	400	1418	0.282087
+EOF
+cat > "test_data/expected_ibam_fs.bed" <<EOF
+chr2:172936693-172938111	0	1218	1418	0.858956
+chr2:172936693-172938111	1	200	1418	0.141044
+genome	0	1218	1418	0.858956
+genome	1	200	1418	0.141044
 EOF
 
 # Test 1: 
@@ -62,7 +83,22 @@ echo "- test1 succeeded -"
 
 cd ..
 
-# Test 2: ibam option and pair end option and fragment size option
+# Test 2: ibam option 
+mkdir test2
+cd test2
+
+echo "> Run bedtools_genomecov on BAM file with -ibam"
+"$meta_executable" \
+  --input_bam "$test_data/example.bam" \
+  --output "output.bed" \
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_ibam.bed"
+echo "- test2 succeeded -"
+
+cd ..
 
 # Test 3: depth option
 
@@ -76,6 +112,44 @@ cd ..
 
 # Test 8: trackopts option
 
+# Test 9: bedgraph option
+
+# Test 10: ibam pc options
+mkdir test10
+cd test10
+
+echo "> Run bedtools_genomecov on BAM file with -ibam, -pc"
+"$meta_executable" \
+  --input_bam "$test_data/example.bam" \
+  --output "output.bed" \
+  --fragment_size \
+  --pair_end_coverage \
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_ibam_pc.bed"
+echo "- test10 succeeded -"
+
+cd ..
+
+# Test 11: ibam fs options
+mkdir test11
+cd test11
+
+echo "> Run bedtools_genomecov on BAM file with -ibam, -fs"
+"$meta_executable" \
+  --input_bam "$test_data/example.bam" \
+  --output "output.bed" \
+  --fragment_size \
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_ibam_fs.bed"
+echo "- test11 succeeded -"
+
+cd ..
 
 echo "---- All tests succeeded! ----"
 exit 0

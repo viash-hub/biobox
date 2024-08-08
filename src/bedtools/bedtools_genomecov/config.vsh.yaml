@@ -24,8 +24,15 @@ argument_groups:
         direction: input
         description: |
           The input file (BED/GFF/VCF) to be used.
-        required: true
         example: input.bed
+      
+      - name: --input_bam
+        alternatives: -ibam
+        type: file
+        description: |
+          The input file is in BAM format.
+          Note: BAM _must_ be sorted by positions.
+          --genome option is ignored!
 
       - name: --genome
         alternatives: -g
@@ -33,7 +40,6 @@ argument_groups:
         direction: input
         description: |
           The genome file to be used.
-        required: true
         example: genome.txt
     
   - name: Outputs
@@ -48,13 +54,7 @@ argument_groups:
   
   - name: Options
     arguments:
-      - name: --input_bam
-        alternatives: -ibam
-        type: boolean_true
-        description: |
-          The input file is in BAM format.
-          Note: BAM _must_ be sorted by position
-      
+
       - name: --depth
         alternatives: -d
         type: boolean_true
@@ -186,6 +186,7 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - path: test_data
 
 engines:
   - type: docker
