@@ -86,7 +86,29 @@ chr3	0	242193529	242193529	1
 genome	0	689445508	689445510	1
 genome	1	2	689445510	2.90088e-09
 EOF
-
+cat > "test_data/expected_bg_scale.bed" <<EOF
+chr2	128	228	100
+chr2	428	528	100
+EOF
+cat > "test_data/expected_trackopts.bed" <<EOF
+track type=bedGraph name=example
+chr2	128	228	1
+chr2	428	528	1
+EOF
+cat > "test_data/expected_split.bed" <<EOF
+chr2	0	198295359	198295559	0.999999
+chr2	1	200	198295559	1.0086e-06
+chr1	0	248956422	248956422	1
+chr3	0	242193529	242193529	1
+genome	0	689445310	689445510	1
+genome	1	200	689445510	2.90088e-07
+EOF
+cat > "test_data/expected_ignoreD_du.bed" <<EOF
+chr2:172936693-172938111	0	1218	1418	0.858956
+chr2:172936693-172938111	1	200	1418	0.141044
+genome	0	1218	1418	0.858956
+genome	1	200	1418	0.141044
+EOF
 
 # Test 1: 
 mkdir test1
@@ -199,32 +221,49 @@ echo "- test6 succeeded -"
 
 cd ..
 
-# Test 7: scale option
-# mkdir test7
-# cd test7
+# Test 7: bedgraph and scale option
+mkdir test7
+cd test7
 
-# echo "> Run bedtools_genomecov on BED file with bedgraph and scale"
-# "$meta_executable" \
-#   --input "../test_data/example.bed" \
-#   --genome "../test_data/genome.txt" \
-#   --output "output.bed" \
-#   --scale 100 \
+echo "> Run bedtools_genomecov on BED file with -bg and -scale"
+"$meta_executable" \
+  --input "../test_data/example.bed" \
+  --genome "../test_data/genome.txt" \
+  --output "output.bed" \
+  --bed_graph \
+  --scale 100 \
 
-# # checks
-# assert_file_exists "output.bed"
-# assert_file_not_empty "output.bed"
-# assert_identical_content "output.bed" "../test_data/expected_default.bed"
-# echo "- test7 succeeded -"
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_bg_scale.bed"
+echo "- test7 succeeded -"
 
-# cd ..
+cd ..
 
 # Test 8: trackopts option
+mkdir test8
+cd test8
 
-# Test 9: bedgraph option
+echo "> Run bedtools_genomecov on BED file with -bg and -trackopts"
+"$meta_executable" \
+  --input "../test_data/example.bed" \
+  --genome "../test_data/genome.txt" \
+  --output "output.bed" \
+  --bed_graph \
+  --trackopts "name=example" \
 
-# Test 10: ibam pc options
-mkdir test10
-cd test10
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_trackopts.bed"
+echo "- test8 succeeded -"
+
+cd ..
+
+# Test 9: ibam pc options
+mkdir test9
+cd test9
 
 echo "> Run bedtools_genomecov on BAM file with -ibam, -pc"
 "$meta_executable" \
@@ -237,13 +276,13 @@ echo "> Run bedtools_genomecov on BAM file with -ibam, -pc"
 assert_file_exists "output.bed"
 assert_file_not_empty "output.bed"
 assert_identical_content "output.bed" "../test_data/expected_ibam_pc.bed"
-echo "- test10 succeeded -"
+echo "- test9 succeeded -"
 
 cd ..
 
-# Test 11: ibam fs options
-mkdir test11
-cd test11
+# Test 10: ibam fs options
+mkdir test10
+cd test10
 
 echo "> Run bedtools_genomecov on BAM file with -ibam, -fs"
 "$meta_executable" \
@@ -255,7 +294,45 @@ echo "> Run bedtools_genomecov on BAM file with -ibam, -fs"
 assert_file_exists "output.bed"
 assert_file_not_empty "output.bed"
 assert_identical_content "output.bed" "../test_data/expected_ibam_fs.bed"
+echo "- test10 succeeded -"
+
+cd ..
+
+# Test 11: split 
+mkdir test11
+cd test11
+
+echo "> Run bedtools_genomecov on BED12 file with -split"
+"$meta_executable" \
+  --input "../test_data/example.bed12" \
+  --genome "../test_data/genome.txt" \
+  --output "output.bed" \
+  --split \
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_split.bed"
 echo "- test11 succeeded -"
+
+cd ..
+
+# Test 12: ignore deletion and du
+mkdir test12
+cd test12
+
+echo "> Run bedtools_genomecov on BAM file with -ignoreD and -du"
+"$meta_executable" \
+  --input_bam "$test_data/example.bam" \
+  --output "output.bed" \
+  --ignore_deletion \
+  --du \
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_ignoreD_du.bed"
+echo "- test12 succeeded -"
 
 cd ..
 
