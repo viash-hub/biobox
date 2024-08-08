@@ -7,6 +7,11 @@
 [[ "$par_merge" == "false" ]] && unset par_merge
 [[ "$par_dot" == "false" ]] && unset par_dot
 
+
+# replace comma with semicolon
+par_attribute=$(echo $par_attribute | tr ',' ';')
+par_primary_tag=$(echo $par_primary_tag | tr ',' ';')
+
 # run agat_sp_extract_attributes.pl
 agat_sp_extract_attributes.pl \
   --gff "$par_gff" \
