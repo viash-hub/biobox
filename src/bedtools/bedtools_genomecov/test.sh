@@ -78,6 +78,15 @@ chr3	0	242193529	242193529	1
 genome	0	689445410	689445510	1
 genome	1	100	689445510	1.45044e-07
 EOF
+cat > "test_data/expected_5.bed" <<EOF
+chr2	0	198295557	198295559	1
+chr2	1	2	198295559	1.0086e-08
+chr1	0	248956422	248956422	1
+chr3	0	242193529	242193529	1
+genome	0	689445508	689445510	1
+genome	1	2	689445510	2.90088e-09
+EOF
+
 
 # Test 1: 
 mkdir test1
@@ -153,10 +162,61 @@ echo "- test4 succeeded -"
 cd ..
 
 # Test 5: 5' end option
+mkdir test5
+cd test5
+
+echo "> Run bedtools_genomecov on BED file with -5"
+"$meta_executable" \
+  --input "../test_data/example.bed" \
+  --genome "../test_data/genome.txt" \
+  --output "output.bed" \
+  --five_prime \
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_5.bed"
+echo "- test5 succeeded -"
+
+cd ..
 
 # Test 6: max option
+mkdir test6
+cd test6
+
+echo "> Run bedtools_genomecov on BED file with -max"
+"$meta_executable" \
+  --input "../test_data/example.bed" \
+  --genome "../test_data/genome.txt" \
+  --output "output.bed" \
+  --max 100 \
+
+# checks
+assert_file_exists "output.bed"
+assert_file_not_empty "output.bed"
+assert_identical_content "output.bed" "../test_data/expected_default.bed"
+echo "- test6 succeeded -"
+
+cd ..
 
 # Test 7: scale option
+# mkdir test7
+# cd test7
+
+# echo "> Run bedtools_genomecov on BED file with bedgraph and scale"
+# "$meta_executable" \
+#   --input "../test_data/example.bed" \
+#   --genome "../test_data/genome.txt" \
+#   --output "output.bed" \
+#   --scale 100 \
+
+# # checks
+# assert_file_exists "output.bed"
+# assert_file_not_empty "output.bed"
+# assert_identical_content "output.bed" "../test_data/expected_default.bed"
+# echo "- test7 succeeded -"
+
+# cd ..
 
 # Test 8: trackopts option
 
