@@ -18,7 +18,7 @@ rsem-prepare-reference \
     ${par_gff3:+--gff3 "${par_gff3}"} \
     ${par_gff3_rna_patterns:+--gff3-RNA-patterns "${par_gff3_rna_patterns}"} \
     ${par_gff3_genes_as_transcripts:+--gff3-genes-as-transcripts "${par_gff3_genes_as_transcripts}"} \
-    ${par_trusted_sources:+--gtrusted-sourcestf "${par_trusted_sources}"} \
+    ${par_trusted_sources:+--trusted-sources "${par_trusted_sources}"} \
     ${par_transcript_to_gene_map:+--transcript-to-gene-map "${par_transcript_to_gene_map}"} \
     ${par_allele_to_gene_map:+--allele-to-gene-map "${par_allele_to_gene_map}"} \
     ${par_polyA:+--polyA} \
