@@ -156,7 +156,7 @@ def generate_cwl_file(meta: dict[str, Any], dir: str) -> str:
     else:
         cwl_file = orig_cwl_file
 
-    return cwl_file
+    return os.path.abspath(cwl_file)
 
 def copy_outputs(par: dict[str, Any], config: dict[str, Any]):
     for arg in config["arguments"]:
