@@ -17,3 +17,5 @@ if [ -z "$(ls -A ./output)" ]; then
     echo "No output"
     exit 1
 fi
+
+# Check whether the contents of the resulting file is correct
