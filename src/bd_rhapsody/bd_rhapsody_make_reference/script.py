@@ -110,7 +110,7 @@ def get_cwl_file(meta: dict[str, Any]) -> str:
     # create cwl file (if need be)
     cwl_file=os.path.join(meta["resources_dir"], "make_rhap_reference_2.2.1_nodocker.cwl")
 
-    return cwl_file
+    return os.path.abspath(cwl_file)
 
 def main(par: dict[str, Any], meta: dict[str, Any]):
     config = read_config(meta["config"])
