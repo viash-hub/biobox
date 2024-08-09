@@ -12,6 +12,10 @@
 
 # viash specific ignores
 target/
+var/
+seqtk_sample_*
+output/
+Nanoplot_*
 
 # nextflow specific ignores
 .nextflow*
