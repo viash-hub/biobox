@@ -7,7 +7,7 @@ links:
   repository: https://github.com/arq5x/bedtools2
 references:
   doi: 10.1093/bioinformatics/btq033
-license: GPL-2.0, MIT
+license: MIT
 requirements:
   commands: [bedtools]
 authors:
@@ -28,7 +28,7 @@ argument_groups:
         type: file
         description: | 
           Input genome file.
-          NOTE: This is not a fasta file. This is a two-column file
+          NOTE: This is not a fasta file. This is a two-column tab-delimited file
           where the first column is the chromosome name and the second their sizes.
         required: true
     
@@ -79,6 +79,10 @@ engines:
       - type: docker
         run: |
           echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+    test_setup:  
+      - type: apt  
+        packages: 
+          - samtools
 
 runners:
   - type: executable
