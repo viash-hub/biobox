@@ -9,8 +9,8 @@
 # Execute bedtools bamtofastq with the provided arguments
 bedtools bamtofastq \
     ${par_tags:+-tags} \
-    ${par_output_fq2:+-fq2 "$par_output_fq2"} \
+    ${par_fastq2:+-fq2 "$par_fastq2"} \
     -i "$par_input" \
-    -fq "$par_output_fq"
+    -fq "$par_fastq"
     
 

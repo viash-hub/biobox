@@ -29,7 +29,7 @@ cd test1
 echo "> Run bedtools bamtofastq on BAM file"
 "$meta_executable" \
   --input "$test_data/example.bam" \
-  --output_fq "output.fastq"
+  --fastq "output.fastq"
 
 # checks
 assert_file_exists "output.fastq"
@@ -46,7 +46,7 @@ cd test2
 echo "> Run bedtools bamtofastq on BAM file with tags"
 "$meta_executable" \
   --input "$test_data/example.bam" \
-  --output_fq "output.fastq" \
+  --fastq "output.fastq" \
   --tags
 
 # checks
@@ -64,8 +64,8 @@ cd test3
 echo "> Run bedtools bamtofastq on BAM file with output_fq2"
 "$meta_executable" \
   --input "$test_data/example.bam" \
-  --output_fq "output1.fastq" \
-  --output_fq2 "output2.fastq" 
+  --fastq "output1.fastq" \
+  --fastq2 "output2.fastq" 
 
 # checks
 assert_file_exists "output1.fastq"

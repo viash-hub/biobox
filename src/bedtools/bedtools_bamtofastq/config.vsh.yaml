@@ -1,13 +1,14 @@
 name: bedtools_bamtofastq
 namespace: bedtools
-description: Conversion tool for extracting FASTQ records from sequence alignments in BAM format.
+description: | 
+  Conversion tool for extracting FASTQ records from sequence alignments in BAM format.
 keywords: [Conversion ,BAM, FASTQ]
 links:
   documentation: https://bedtools.readthedocs.io/en/latest/content/tools/bamtofastq.html
   repository: https://github.com/arq5x/bedtools2
 references:
   doi: 10.1093/bioinformatics/btq033
-license: GPL-2.0, MIT
+license: MIT
 requirements:
   commands: [bedtools]
 authors:
@@ -25,19 +26,19 @@ argument_groups:
     
   - name: Outputs
     arguments:
-      - name: --output_fq
+      - name: --fastq
         alternatives: -fq
         direction: output
         type: file
         description: Output FASTQ file.
         required: true
       
-      - name: --output_fq2
+      - name: --fastq2
         alternatives: -fq2
         type: file
         direction: output
         description: |
-          FASTQ for second end.  Used if BAM contains paired-end data.
+          FASTQ for second end. Used if BAM contains paired-end data.
           BAM should be sorted by query name is creating paired FASTQ.
          
   - name: Options
