@@ -3,6 +3,8 @@
 ## VIASH START
 ## VIASH END
 
+set -eo pipefail
+
 # Unset parameters
 [[ "$par_bed12" == "false" ]] && unset par_bed12
 [[ "$par_uncompress_bam" == "false" ]] && unset par_uncompress_bam
