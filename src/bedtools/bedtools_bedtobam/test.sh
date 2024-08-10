@@ -41,6 +41,48 @@ printf "chr2\t.\texon\t1500\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "$
 printf "chr1\t.\tCDS\t1000\t1200\t.\t+\t0\tID=cds1;Parent=transcript1\n" >> "$TMPDIR/example.gff"
 printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "$TMPDIR/example.gff"
 
+# Expected output sam files for each test
+cat <<EOF > "$TMPDIR/expected.sam"
+@HD	VN:1.0	SO:unsorted
+@PG	ID:BEDTools_bedToBam	VN:Vv2.30.0
+@SQ	SN:chr1	AS:genome.txt	LN:248956422
+@SQ	SN:chr3	AS:genome.txt	LN:242193529
+@SQ	SN:chr2	AS:genome.txt	LN:198295559
+my_read/1	0	chr1	129	255	100M	*	0	0	*	*
+my_read/2	16	chr1	429	255	100M	*	0	0	*	*
+EOF
+cat <<EOF > "$TMPDIR/expected12.sam"
+@HD	VN:1.0	SO:unsorted
+@PG	ID:BEDTools_bedToBam	VN:Vv2.30.0
+@SQ	SN:chr1	AS:genome.txt	LN:248956422
+@SQ	SN:chr3	AS:genome.txt	LN:242193529
+@SQ	SN:chr2	AS:genome.txt	LN:198295559
+my_read/1	0	chr1	129	255	100M	*	0	0	*	*
+my_read/2	16	chr1	429	255	100M	*	0	0	*	*
+EOF
+cat <<EOF > "$TMPDIR/expected_mapquality.sam"
+@HD	VN:1.0	SO:unsorted
+@PG	ID:BEDTools_bedToBam	VN:Vv2.30.0
+@SQ	SN:chr1	AS:genome.txt	LN:248956422
+@SQ	SN:chr3	AS:genome.txt	LN:242193529
+@SQ	SN:chr2	AS:genome.txt	LN:198295559
+my_read/1	0	chr1	129	10	100M	*	0	0	*	*
+my_read/2	16	chr1	429	10	100M	*	0	0	*	*
+EOF
+cat <<EOF > "$TMPDIR/expected_gff.sam"
+@HD	VN:1.0	SO:unsorted
+@PG	ID:BEDTools_bedToBam	VN:Vv2.30.0
+@SQ	SN:chr1	AS:/viash_automount/Users/theo/Desktop/biobox/src/bedtools/bedtools_bedtobam/test_data/genome.txt	LN:248956422
+@SQ	SN:chr3	AS:/viash_automount/Users/theo/Desktop/biobox/src/bedtools/bedtools_bedtobam/test_data/genome.txt	LN:242193529
+@SQ	SN:chr2	AS:/viash_automount/Users/theo/Desktop/biobox/src/bedtools/bedtools_bedtobam/test_data/genome.txt	LN:198295559
+gene	0	chr1	1000	255	1001M	*	0	0	*	*
+mRNA	0	chr3	1000	255	1001M	*	0	0	*	*
+exon	0	chr1	1000	255	201M	*	0	0	*	*
+exon	0	chr2	1500	255	201M	*	0	0	*	*
+CDS	0	chr1	1000	255	201M	*	0	0	*	*
+CDS	0	chr1	1500	255	201M	*	0	0	*	*
+EOF
+
 # Test 1: Default conversion BED to BAM
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
 
@@ -50,9 +92,12 @@ echo "> Run bedtools_bedtobam on BED file"
   --genome "../genome.txt" \
   --output "output.bam"
 
+samtools view -h output.bam > output.sam
+
 # checks
 assert_file_exists "output.bam"
 assert_file_not_empty "output.bam"
+assert_identical_content "output.sam" "../expected.sam"
 echo "- test1 succeeded -"
 
 popd > /dev/null
@@ -72,12 +117,13 @@ echo "> Run bedtools_bedtobam on BED12 file"
   --genome "../genome.txt" \
   --output "output.bam" \
   --bed12 \
-#  --uncompress_bam
+
+samtools view -h output.bam > output.sam
 
 # checks
 assert_file_exists "output.bam"
 assert_file_not_empty "output.bam"
-# assert_identical_content "output.bam" "../test_data/expected12.sam"
+assert_identical_content "output.bam" "../expected12.sam"
 echo "- test2 succeeded -"
 
 popd > /dev/null
@@ -95,7 +141,7 @@ echo "> Run bedtools_bedtobam on BED file with uncompressed BAM output"
 # checks
 assert_file_exists "output.bam"
 assert_file_not_empty "output.bam"
-# assert_identical_content "output.bam" "../test_data/expected.sam"
+# Cannot assert_identical_content because umcompress option does not work on this version of bedtools.
 
 echo "- test3 succeeded -"
 
@@ -110,12 +156,13 @@ echo "> Run bedtools_bedtobam on BED file with map quality"
   --genome "../genome.txt" \
   --output "output.bam" \
   --map_quality 10 \
-#  --uncompress_bam
+
+samtools view -h output.bam > output.sam
 
 # checks
 assert_file_exists "output.bam"
 assert_file_not_empty "output.bam"
-#assert_identical_content "output.bam" "../test_data/expected_mapquality.sam"
+assert_identical_content "output.bam" "../expected_mapquality.sam"
 echo "- test4 succeeded -"
 
 popd > /dev/null
@@ -128,12 +175,13 @@ echo "> Run bedtools_bedtobam on GFF file"
   --input "../example.gff" \
   --genome "../genome.txt" \
   --output "output.bam"
-#  --uncompress_bam
+
+samtools view -h output.bam > output.sam
 
 # checks
 assert_file_exists "output.bam"
 assert_file_not_empty "output.bam"
-# assert_identical_content "output.bam" "../test_data/expected_gff.sam"
+assert_identical_content "output.bam" "../expected_gff.sam"
 echo "- test5 succeeded -"
 
 popd > /dev/null
