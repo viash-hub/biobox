@@ -7,7 +7,7 @@ links:
   repository: https://github.com/arq5x/bedtools2
 references:
   doi: 10.1093/bioinformatics/btq033
-license: GPL-2.0, MIT
+license: MIT
 requirements:
   commands: [bedtools]
 authors:
@@ -20,7 +20,7 @@ argument_groups:
       - name: --input
         alternatives: -i
         type: file
-        description: Input file (BED/GFF/VCF) to be sorted.
+        description: Input file (BED/GFF/VCF) to be merged.
         required: true
     
   - name: Outputs
@@ -28,7 +28,7 @@ argument_groups:
       - name: --output
         type: file
         direction: output
-        description: Output sorted file BED to be written.
+        description: Output merged file BED to be written.
 
   - name: Options
     arguments:
@@ -36,7 +36,7 @@ argument_groups:
         alternatives: -s
         type: boolean_true
         description: | 
-          Force strandedness.  That is, only merge features
+          Force strandedness. That is, only merge features
           that are on the same strand.
           - By default, merging is done without respect to strand.
 
