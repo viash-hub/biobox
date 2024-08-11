@@ -1,14 +1,15 @@
 name: bedtools_groupby
 namespace: bedtools
 description: |
-  Summarizes a dataset column based upon common column groupings. Akin to the SQL "group by" command.
+  Summarizes a dataset column based upon common column groupings. 
+  Akin to the SQL "group by" command.
 keywords: [groupby, BED]
 links:
   documentation: https://bedtools.readthedocs.io/en/latest/content/tools/groupby.html
   repository: https://github.com/arq5x/bedtools2
 references:
   doi: 10.1093/bioinformatics/btq033
-license: GPL-2.0, MIT
+license: MIT
 requirements:
   commands: [bedtools]
 authors:
@@ -87,7 +88,7 @@ argument_groups:
       - name: --full
         type: boolean_true
         description: |
-          Print all columns from input file.  The first line in the group is used.
+          Print all columns from input file. The first line in the group is used.
           Default: print only grouped columns.
 
       - name: --inheader
