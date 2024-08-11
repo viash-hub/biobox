@@ -47,7 +47,8 @@ argument_groups:
         type: integer
         description: | 
           Set the mappinq quality for the BAM records.
-          (INT) Default: 255
+        min: 0
+        max: 255
         default: 255
       
       - name: --bed12
