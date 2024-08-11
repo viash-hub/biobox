@@ -1,5 +1,5 @@
 ```bash
-bedtools bamtobed --help
+bedtools bamtobed
 ```
 
 Tool:    bedtools bamtobed (aka bamToBed)
