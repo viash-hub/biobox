@@ -1,8 +1,8 @@
 name: "rsem_calculate_expression"
 namespace: "rsem"
 description: | 
-  Calculate expression with RSEM.
-keywords: [Transcriptome, Index, RSEM]
+  Calculate expression with RSEM. 
+keywords: [Transcriptome, Index, Alignment, RSEM]
 links:
   homepage: https://deweylab.github.io/RSEM/
   documentation: https://deweylab.github.io/RSEM/rsem-calculate-expression.html
@@ -74,6 +74,359 @@ argument_groups:
     description: Transcript BAM file (optional)
     example: $id.transcript.bam
     direction: output
+  - name: "--sort_bam_by_read_name"
+    type: boolean_true
+    description: |
+      Sort BAM file aligned under transcript coordidate by read name. Setting this option on will produce 
+      deterministic maximum likelihood estimations from independent runs. Note that sorting will take long 
+      time and lots of memory.
+  - name: "--no_bam_output"
+    type: boolean_true
+    description: Do not output any BAM file.
+  - name: "--sampling_for_bam"
+    type: boolean_true
+    description: |
+      When RSEM generates a BAM file, instead of outputting all alignments a read has with their posterior 
+      probabilities, one alignment is sampled according to the posterior probabilities. The sampling procedure 
+      includes the alignment to the "noise" transcript, which does not appear in the BAM file. Only the 
+      sampled alignment has a weight of 1. All other alignments have weight 0. If the "noise" transcript is 
+      sampled, all alignments appeared in the BAM file should have weight 0.
+  - name: "--output_genome_bam"
+    type: boolean_true
+    description: |
+      Generate a BAM file, 'sample_name.genome.bam', with alignments mapped to genomic coordinates and 
+      annotated with their posterior probabilities. In addition, RSEM will call samtools (included in RSEM 
+      package) to sort and index the bam file. 'sample_name.genome.sorted.bam' and 'sample_name.genome.sorted.bam.bai' 
+      will be generated.
+  - name: "--sort_bam_by_coordinate"
+    type: boolean_true
+    description: |
+      Sort RSEM generated transcript and genome BAM files by coordinates and build associated indices.
+
+- name: "Basic Options"
+  arguments:
+    - name: "--no_qualities"
+      type: boolean_true
+      description: Input reads do not contain quality scores.
+    - name: "--alignments"
+      type: boolean_true
+      description: |
+        Input file contains alignments in SAM/BAM/CRAM format. The exact file format will be determined 
+        automatically.
+    - name: "--fai"
+      type: file
+      description: |
+        If the header section of input alignment file does not contain reference sequence information, 
+        this option should be turned on. <file> is a FAI format file containing each reference sequence's 
+        name and length. Please refer to the SAM official website for the details of FAI format.
+    - name: "--bowtie2"
+      type: boolean_true
+      description: |
+        Use Bowtie 2 instead of Bowtie to align reads. Since currently RSEM does not handle indel, local 
+        and discordant alignments, the Bowtie2 parameters are set in a way to avoid those alignments. In 
+        particular, we use options '--sensitive --dpad 0 --gbar 99999999 --mp 1,1 --np 1 --score_min L,0,-0.1' 
+        by default. The last parameter of '--score_min', '-0.1', is the negative of maximum mismatch rate. 
+        This rate can be set by option '--bowtie2_mismatch_rate'. If reads are paired-end, we additionally 
+        use options '--no_mixed' and '--no_discordant'.
+    - name: "--star"
+      type: boolean_true
+      description: |
+        Use STAR to align reads. Alignment parameters are from ENCODE3's STAR-RSEM pipeline. To save 
+        computational time and memory resources, STAR's Output BAM file is unsorted. It is stored in RSEM's 
+        temporary directory with name as 'sample_name.bam'. Each STAR job will have its own private copy of 
+        the genome in memory.
+    - name: "--hisat2_hca"
+      type: boolean_true
+      description: |
+        Use HISAT2 to align reads to the transcriptome according to Human Cell Atlast.
+    - name: "--append_names"
+      type: boolean_true
+      description: |
+        If gene_name/transcript_name is available, append it to the end of gene_id/transcript_id (separated 
+        by '_') in files 'sample_name.isoforms.results' and 'sample_name.genes.results'.
+    - name: "--seed"
+      type: integer
+      description: |
+        Set the seed for the random number generators used in calculating posterior mean estimates and 
+        credibility intervals. The seed must be a non-negative 32 bit integer.
+    - name: "--single_cell_prior"
+      type: boolean_true
+      description: |
+        By default, RSEM uses Dirichlet(1) as the prior to calculate posterior mean estimates and credibility 
+        intervals. However, much less genes are expressed in single cell RNA-Seq data. Thus, if you want to 
+        compute posterior mean estimates and/or credibility intervals and you have single-cell RNA-Seq data, 
+        you are recommended to turn on this option. Then RSEM will use Dirichlet(0.1) as the prior which 
+        encourage the sparsity of the expression levels.
+    - name: "--calc_pme"
+      type: boolean_true
+      description: Run RSEM's collapsed Gibbs sampler to calculate posterior mean estimates.
+    - name: "--calc_ci"
+      type: boolean_true
+      description: |
+        Calculate 95% credibility intervals and posterior mean estimates. The credibility level can be 
+        changed by setting '--ci_credibility_level'.
+    - name: "--quiet"
+      alternatives: "-q"
+      type: boolean_true
+      description: Suppress the output of logging information.
+
+- name: "Aligner Options"
+  arguments:
+    - name: "--seed_length"
+      type: integer
+      description: |
+        Seed length used by the read aligner. Providing the correct value is important for RSEM. If RSEM 
+        runs Bowtie, it uses this value for Bowtie's seed length parameter. Any read with its or at least 
+        one of its mates' (for paired-end reads) length less than this value will be ignored. If the 
+        references are not added poly(A) tails, the minimum allowed value is 5, otherwise, the minimum 
+        allowed value is 25. Note that this script will only check if the value >= 5 and give a warning 
+        message if the value < 25 but >= 5. (Default: 25)
+      example: 25
+    - name: "--phred64_quals"
+      type: boolean_true
+      description: |
+        Input quality scores are encoded as Phred+64 (default for GA Pipeline ver. >= 1.3). This option is 
+        used by Bowtie, Bowtie 2 and HISAT2. Otherwise, quality score will be encoded as Phred+33. (Default: false)
+    - name: "--solexa_quals"
+      type: boolean_true
+      description: |
+        Input quality scores are solexa encoded (from GA Pipeline ver. < 1.3). This option is used by 
+        Bowtie, Bowtie 2 and HISAT2. Otherwise, quality score will be encoded as Phred+33. (Default: false)
+    - name: "--bowtie_n"
+      type: integer
+      description: |
+        (Bowtie parameter) max # of mismatches in the seed. (Range: 0-3, Default: 2)
+      choices: [0, 1, 2, 3]
+      example: 2
+    - name: "--bowtie_e"
+      type: integer
+      description: |
+        (Bowtie parameter) max sum of mismatch quality scores across the alignment. (Default: 99999999)
+      example: 99999999
+    - name: "--bowtie_m"
+      type: integer
+      description: |
+        (Bowtie parameter) suppress all alignments for a read if > <int> valid alignments exist. (Default: 200)
+      example: 200
+    - name: "--bowtie_chunkmbs"
+      type: integer
+      description: |
+        (Bowtie parameter) memory allocated for best first alignment calculation (Default: 0 - use Bowtie's default)
+      example: 0
+    - name: "--bowtie2_mismatch_rate"
+      type: double
+      description: |
+        (Bowtie 2 parameter) The maximum mismatch rate allowed. (Default: 0.1)
+      example: 0.1
+    - name: "--bowtie2_k"
+      type: integer
+      description: |
+        (Bowtie 2 parameter) Find up to <int> alignments per read. (Default: 200)
+      example: 200
+    - name: "--bowtie2_sensitivity_level"
+      type: string
+      description: |
+        (Bowtie 2 parameter) Set Bowtie 2's preset options in --end-to-end mode. This option controls how 
+        hard Bowtie 2 tries to find alignments. <string> must be one of "very_fast", "fast", "sensitive" 
+        and "very_sensitive". The four candidates correspond to Bowtie 2's "--very-fast", "--fast", 
+        "--sensitive" and "--very-sensitive" options. (Default: "sensitive" - use Bowtie 2's default)
+      choices: ["very_fast", "fast", "sensitive", "very_sensitive"]
+      example: sensitive
+    - name: "--star_gzipped_read_file"
+      type: boolean_true
+      description: |
+        Input read file(s) is compressed by gzip. (Default: false)
+    - name: "--star_bzipped_read_file"
+      type: boolean_true
+      description: |
+        Input read file(s) is compressed by bzip2. (Default: false)
+    - name: "--star_output_genome_bam"
+      type: boolean_true
+      description: |
+        Save the BAM file from STAR alignment under genomic coordinate to 'sample_name.STAR.genome.bam'. 
+        This file is NOT sorted by genomic coordinate. In this file, according to STAR's manual, 'paired 
+        ends of an alignment are always adjacent, and multiple alignments of a read are adjacent as well'. 
+        (Default: false)
+
+- name: "Advanced Options"
+  arguments:
+    - name: "--tag"
+      type: string
+      description: |
+        The name of the optional field used in the SAM input for identifying a read with too many valid 
+        alignments. The field should have the format <tagName>:i:<value>, where a <value> bigger than 0 
+        indicates a read with too many alignments. (Default: "")
+      example: ""
+    - name: "--fragment_length_min"
+      type: integer
+      description: |
+        Minimum read/insert length allowed. This is also the value for the Bowtie/Bowtie2 -I option. 
+        (Default: 1)
+      example: 1
+    - name: "--fragment_length_max"
+      type: integer
+      description: |
+        Maximum read/insert length allowed. This is also the value for the Bowtie/Bowtie 2 -X option. 
+        (Default: 1000)
+      example: 1000
+    - name: "--fragment_length_mean"
+      type: integer
+      description: |
+        (single-end data only) The mean of the fragment length distribution, which is assumed to be a 
+        Gaussian. (Default: -1, which disables use of the fragment length distribution)
+      example: -1
+    - name: "--gragment_length_sd"
+      type: double
+      description: |
+        (single-end data only) The standard deviation of the fragment length distribution, which is 
+        assumed to be a Gaussian. (Default: 0, which assumes that all fragments are of the same length, 
+        given by the rounded value of --fragment_length_mean).
+      example: 0
+    - name: "--estimate_rspd"
+      type: boolean_true
+      description: |
+        Set this option if you want to estimate the read start position distribution (RSPD) from data.
+        Otherwise, RSEM will use a uniform RSPD.
+    - name: "--num_rspd_bins"
+      type: integer
+      description: |
+        Number of bins in the RSPD. Only relevant when '--estimate_rspd' is specified. Use of the default 
+        setting is recommended. (Default: 20)
+      example: 20
+    - name: "--gibbs_burnin"
+      type: integer
+      description: |
+        The number of burn-in rounds for RSEM's Gibbs sampler. Each round passes over the entire data set 
+        once. If RSEM can use multiple threads, multiple Gibbs samplers will start at the same time and all 
+        samplers share the same burn-in number. (Default: 200)
+      example: 200
+    - name: "--gibbs_number_of_samples"
+      type: integer
+      description: |
+        The total number of count vectors RSEM will collect from its Gibbs samplers. (Default: 1000)
+      example: 1000
+    - name: "--gibbs_sampling_gap"
+      type: integer
+      description: |
+        The number of rounds between two succinct count vectors RSEM collects. If the count vector after 
+        round N is collected, the count vector after round N + <int> will also be collected. (Default: 1)
+      example: 1
+    - name: "--ci_credibility_level"
+      type: double
+      description: |
+        The credibility level for credibility intervals. (Default: 0.95)
+      example: 0.95
+    - name: "--ci_number_of_samples_per_count_vector"
+      type: integer
+      description: |
+        The number of read generating probability vectors sampled per sampled count vector. The crebility 
+        intervals are calculated by first sampling P(C | D) and then sampling P(Theta | C) for each sampled 
+        count vector. This option controls how many Theta vectors are sampled per sampled count vector. 
+        (Default: 50)
+      example: 50
+    - name: "--keep_intermediate_files"
+      type: boolean_true
+      description: |
+        Keep temporary files generated by RSEM. RSEM creates a temporary directory, 'sample_name.temp', 
+        into which it puts all intermediate output files. If this directory already exists, RSEM overwrites 
+        all files generated by previous RSEM runs inside of it. By default, after RSEM finishes, the 
+        temporary directory is deleted. Set this option to prevent the deletion of this directory and the 
+        intermediate files inside of it.
+    - name: "--temporary_folder"
+      type: string
+      description: |
+        Set where to put the temporary files generated by RSEM. If the folder specified does not exist, 
+        RSEM will try to create it. (Default: sample_name.temp)
+      example: sample_name.temp
+    - name: "--time"
+      type: boolean_true
+      description: |
+        Output time consumed by each step of RSEM to 'sample_name.time'.
+
+- name: "Prior-Enhanced RSEM Options"
+  arguments:
+    - name: "--run_pRSEM"
+      type: boolean_true
+      description: |
+        Running prior-enhanced RSEM (pRSEM). Prior parameters, i.e. isoform's initial pseudo-count for 
+        RSEM's Gibbs sampling, will be learned from input RNA-seq data and an external data set. When pRSEM 
+        needs and only needs ChIP-seq peak information to partition isoforms (e.g. in pRSEM's default 
+        partition model), either ChIP-seq peak file (with the '--chipseq_peak_file' option) or ChIP-seq 
+        FASTQ files for target and input and the path for Bowtie executables are required (with the 
+        '--chipseq_target_read_files <string>', '--chipseq_control_read_files <string>', and '--bowtie_path 
+        <path> options), otherwise, ChIP-seq FASTQ files for target and control and the path to Bowtie 
+        executables are required.
+    - name: "--chipseq_peak_file"
+      type: file
+      must_exist: true
+      description: |
+        Full path to a ChIP-seq peak file in ENCODE's narrowPeak, i.e. BED6+4, format. This file is used 
+        when running prior-enhanced RSEM in the default two-partition model. It partitions isoforms by 
+        whether they have ChIP-seq overlapping with their transcription start site region or not. Each 
+        partition will have its own prior parameter learned from a training set. This file can be either 
+        gzipped or ungzipped.
+    - name: "--chipseq_target_read_files"
+      type: file
+      must_exist: true
+      description: |
+        Comma-separated full path of FASTQ read file(s) for ChIP-seq target. This option is used when running 
+        prior-enhanced RSEM. It provides information to calculate ChIP-seq peaks and signals. The file(s) 
+        can be either ungzipped or gzipped with a suffix '.gz' or '.gzip'. The options '--bowtie_path <path>' 
+        and '--chipseq_control_read_files <string>' must be defined when this option is specified.
+    - name: "--chipseq_control_read_files"
+      type: file
+      must_exist: true
+      description: |
+        Comma-separated full path of FASTQ read file(s) for ChIP-seq conrol. This option is used when running 
+        prior-enhanced RSEM. It provides information to call ChIP-seq peaks. The file(s) can be either 
+        ungzipped or gzipped with a suffix '.gz' or '.gzip'. The options '--bowtie_path <path>' and 
+        '--chipseq_target_read_files <string>' must be defined when this option is specified.
+    - name: "--chipseq_read_files_multi_targets"
+      type: file
+      must_exist: true
+      description: |
+        Comma-separated full path of FASTQ read files for multiple ChIP-seq targets. This option is used when 
+        running prior-enhanced RSEM, where prior is learned from multiple complementary data sets. It provides 
+        information to calculate ChIP-seq signals. All files can be either ungzipped or gzipped with a suffix 
+        '.gz' or '.gzip'. When this option is specified, the option '--bowtie_path <path>' must be defined and 
+        the option '--partition_model <string>' will be set to 'cmb_lgt' automatically.
+    - name: "--chipseq_bed_files_multi_targets"
+      type: file
+      must_exist: true
+      description: |
+        Comma-separated full path of BED files for multiple ChIP-seq targets. This option is used when running 
+        prior-enhanced RSEM, where prior is learned from multiple complementary data sets. It provides information 
+        of ChIP-seq signals and must have at least the first six BED columns. All files can be either ungzipped 
+        or gzipped with a suffix '.gz' or '.gzip'. When this option is specified, the option '--partition_model 
+        <string>' will be set to 'cmb_lgt' automatically.
+    - name: "--cap_stacked_chipseq_reads"
+      type: boolean_true
+      description: |
+        Keep a maximum number of ChIP-seq reads that aligned to the same genomic interval. This option is used 
+        when running prior-enhanced RSEM, where prior is learned from multiple complementary data sets. This 
+        option is only in use when either '--chipseq_read_files_multi_targets <string>' or 
+        '--chipseq_bed_files_multi_targets <string>' is specified.
+    - name: "--n_max_stacked_chipseq_reads"
+      type: integer
+      description: |
+        The maximum number of stacked ChIP-seq reads to keep. This option is used when running prior-enhanced 
+        RSEM, where prior is learned from multiple complementary data sets. This option is only in use when the 
+        option '--cap_stacked_chipseq_reads' is set.
+    - name: "--partition_model"
+      type: string
+      description: |
+        A keyword to specify the partition model used by prior-enhanced RSEM. It must be one of the following 
+        keywords:
+        * pk
+        * pk_lgtnopk
+        * lm3, lm4, lm5, or lm6
+        * nopk_lm2pk, nopk_lm3pk, nopk_lm4pk, or nopk_lm5pk
+        * pk_lm2nopk, pk_lm3nopk, pk_lm4nopk, or pk_lm5nopk
+        * cmb_lgt
+        Parameters for all the above models are learned from a training set. For detailed explanations, please 
+        see prior-enhanced RSEM's paper. (Default: 'pk')
+      example: "pk"
+    
 
 resources:
   - type: bash_script
@@ -114,6 +467,15 @@ engines:
           cd RSEM-1.3.3 && \
           make && \
           make install
+    - type: docker
+      run: |
+          echo "RSEM: `rsem-calculate-expression --version | sed -e 's/Current version: RSEM v//g'`" > /var/software_versions.txt && \
+          echo "STAR: `STAR --version`" >> /var/software_versions.txt && \
+          echo "bowtie2: `bowtie2 --version | grep -oP '\d+\.\d+\.\d+'`" >> /var/software_versions.txt && \
+          echo "bowtie: `bowtie --version | grep -oP 'bowtie-align-s version \K\d+\.\d+\.\d+'`" >> /var/software_versions.txt && \
+          echo "HISAT2: `hisat2 --version | grep -oP 'hisat2-align-s version \K\d+\.\d+\.\d+'`" >> /var/software_versions.txt
 runners:
   - type: executable
   - type: nextflow
+
+

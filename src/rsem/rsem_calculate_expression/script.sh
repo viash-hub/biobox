@@ -30,5 +30,6 @@ rsem-calculate-expression \
     $par_extra_args \
     ${input[*]} \
     $INDEX \
-    $par_id
+    $par_id \
+    --quiet
    
