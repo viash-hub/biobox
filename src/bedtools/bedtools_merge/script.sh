@@ -3,6 +3,9 @@
 ## VIASH START
 ## VIASH END
 
+# Exit on error
+set -eo pipefail
+
 # Unset parameters
 [[ "$par_strand" == "false" ]] && unset par_strand
 [[ "$par_bed" == "false" ]] && unset par_bed
