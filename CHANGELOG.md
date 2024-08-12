@@ -36,6 +36,8 @@
 
 * Update CI to reusable workflow in `viash-io/viash-actions` (PR #86).
 
+* Update several components in order to avoid duplicate code when using `unset` on boolean arguments (PR #133).
+
 ## DOCUMENTATION
 
 * Extend the contributing guidelines (PR #82):
