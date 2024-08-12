@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # exit on error
-set -e
+set -eo pipefail
 
 # directory of the bam file
 test_data="$meta_resources_dir/test_data"

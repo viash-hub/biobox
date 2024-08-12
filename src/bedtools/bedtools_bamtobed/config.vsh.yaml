@@ -27,6 +27,7 @@ argument_groups:
     arguments:
       - name: --output
         alternatives: -o
+        required: true
         type: file
         direction: output
         description: Output BED file.
