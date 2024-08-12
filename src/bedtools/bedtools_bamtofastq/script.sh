@@ -3,6 +3,9 @@
 ## VIASH START
 ## VIASH END
 
+# Exit on error
+set -eo pipefail
+
 # Unset parameters
 [[ "$par_tags" == "false" ]] && unset par_tags
 
