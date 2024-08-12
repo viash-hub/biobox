@@ -4,8 +4,10 @@ description: |
   Compute the coverage of a feature file among a genome.
 keywords: [genome coverage, BED, GFF, VCF, BAM]
 links:
+  homepage: https://bedtools.readthedocs.io/en/latest/#
   documentation: https://bedtools.readthedocs.io/en/latest/content/tools/genomecov.html
   repository: https://github.com/arq5x/bedtools2
+  issue_tracker: https://github.com/arq5x/bedtools2/issues
 references:
   doi: 10.1093/bioinformatics/btq033
 license: MIT
@@ -32,7 +34,7 @@ argument_groups:
         description: |
           The input file is in BAM format.
           Note: BAM _must_ be sorted by positions.
-          --genome option is ignored!
+          '--genome' option is ignored if you use '--input_bam' option!
 
       - name: --genome
         alternatives: -g
@@ -106,10 +108,10 @@ argument_groups:
 
       - name: --strand
         type: string
+        choices: ["+", "-"]
         description: |
           Calculate coverage of intervals from a specific strand.
           With BED files, requires at least 6 columns (strand is column 6). 
-          - (STRING): can be + or -
 
       - name: --pair_end_coverage
         alternatives: -pc
@@ -145,6 +147,7 @@ argument_groups:
 
       - name: --max
         type: integer
+        min: 0
         description: |
           Combine all positions with a depth >= max into
           a single bin in the histogram. Irrelevant
@@ -153,6 +156,7 @@ argument_groups:
 
       - name: --scale
         type: double
+        min: 0
         description: |
           Scale the coverage by a constant factor.
           Each coverage value is multiplied by this factor before being reported.
