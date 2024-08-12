@@ -277,13 +277,21 @@ Next, we need to write a runner script that runs the tool with the input argumen
 ## VIASH END
 
 # unset flags
-[[ "$par_option" == "false" ]] && unset par_option
+unset_if_false=(
+    par_option
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 xxx \
   --input "$par_input" \
   --output "$par_output" \
   ${par_option:+--option}
 ```
+
 
 When building a Viash component, Viash will automatically replace the `## VIASH START` and `## VIASH END` lines (and anything in between) with environment variables based on the arguments specified in the config.
 
@@ -296,9 +304,16 @@ As an example, this is what the Bash script for the `arriba` component looks lik
 ## VIASH END
 
 # unset flags
-[[ "$par_skip_duplicate_marking" == "false" ]] && unset par_skip_duplicate_marking
-[[ "$par_extra_information" == "false" ]] && unset par_extra_information
-[[ "$par_fill_gaps" == "false" ]] && unset par_fill_gaps
+unset_if_false=(
+    par_skip_duplicate_marking
+    par_extra_information
+    par_fill_gaps 
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 arriba \
   -x "$par_bam" \
