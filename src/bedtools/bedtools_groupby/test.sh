@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # exit on error
-set -e
+set -eo pipefail
 
 ## VIASH START
 meta_executable="target/executable/bedtools/bedtools_groupby/bedtools_groupby"

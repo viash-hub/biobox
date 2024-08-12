@@ -3,6 +3,9 @@
 ## VIASH START
 ## VIASH END
 
+# Exit on error
+set -eo pipefail
+
 # Unset parameters
 [[ "$par_full" == "false" ]] && unset par_full
 [[ "$par_inheader" == "false" ]] && unset par_inheader
