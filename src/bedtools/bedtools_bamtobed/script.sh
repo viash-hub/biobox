@@ -3,6 +3,8 @@
 ## VIASH START
 ## VIASH END
 
+set -eo pipefail
+
 # Unset parameters
 [[ "$par_bedpe" == "false" ]] && unset par_bedpe
 [[ "$par_mate1" == "false" ]] && unset par_mate1

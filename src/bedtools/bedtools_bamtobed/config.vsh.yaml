@@ -36,8 +36,7 @@ argument_groups:
       - name: --bedpe
         type: boolean_true
         description: | 
-          Write BEDPE format.
-          - Requires BAM to be grouped or sorted by query.
+          Write BEDPE format. Requires BAM to be grouped or sorted by query.
       
       - name: --mate1
         type: boolean_true
@@ -48,7 +47,7 @@ argument_groups:
         type: boolean_true
         description: | 
           Write "blocked" BED format (aka "BED12"). Forces -split.
-          http://genome-test.cse.ucsc.edu/FAQ/FAQformat#format1
+          See http://genome-test.cse.ucsc.edu/FAQ/FAQformat#format1
 
       - name: --split
         type: boolean_true
@@ -77,8 +76,7 @@ argument_groups:
         type: string
         description: | 
           Use other NUMERIC BAM alignment tag for BED score.
-          - Default for BED is to use mapping quality.
-            Disallowed with BEDPE output.
+          Default for BED is to use mapping quality. Disallowed with BEDPE output.
         example: "SM"
       
       - name: --color
