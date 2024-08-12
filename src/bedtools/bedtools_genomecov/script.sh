@@ -3,6 +3,9 @@
 ## VIASH START
 ## VIASH END
 
+# Exit on error
+set -eo pipefail
+
 [[ "$par_input_bam" == "false" ]] && unset par_input_bam
 [[ "$par_depth" == "false" ]] && unset par_depth
 [[ "$par_depth_zero" == "false" ]] && unset par_depth_zero
