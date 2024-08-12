@@ -1,0 +1,101 @@
+namespace: "bbmap"
+name: "bbmap_bbsplit"
+description: |
+  Split sequencing reads by mapping them to multiple references simultaneously.
+links:
+  homepage: https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/
+  documentation: https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/
+  repository: https://github.com/BioInfoTools/BBMap/blob/master/sh/bbsplit.sh
+
+license: BBTools Copyright (c) 2014
+
+argument_groups:
+- name: "Input"
+  arguments:
+  - name: "--id"
+    type: string
+    description: Sample ID
+  - name: "--paired"
+    type: boolean 
+    default: false
+    description: Paired fastq files or not?
+  - name: "--input"
+    type: file
+    multiple: true
+    description: Input fastq files, either one or two (paired), separated by ";".
+    example: sample.fastq
+  - name: "--primary_ref"
+    type: file
+    description: Primary reference FASTA
+  - name: "--other_ref_names"
+    type: file
+    description: Path to comma-separated file containing a list of reference genomes to filter reads against with BBSplit.
+  - name: "--only_build_index"
+    type: boolean
+    description: true = only build index; false = mapping
+
+- name: "Output"
+  arguments:
+  - name: "--fastq_1"
+    type: file
+    description: |
+      Output file for read 1.
+    direction: output
+    example: read_1.fastq
+  - name: "--fastq_2"
+    type: file
+    description: |
+      Output file for read 2.
+    direction: output
+    example: read_2.fastq
+  - name: "--primary_fastq"
+    type: file
+    description: |
+      Output reads that map to the primary reference.
+    direction: output
+    example: primary.fastq.gz
+  - name: "--all_fastq"
+    type: file
+    description: |
+      Output reads that map to the primary reference.
+    direction: output
+    example: all.fastq.gz
+  - name: "--index"
+    type: file
+    description: |
+      Directory with index files.
+    direction: output
+    example: bbsplit
+  - name : "--stats"
+    type: file
+    description: |
+      Tab-delimited text file containing mapping statistics.
+    direction: output
+    example: stats.txt
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: test_data
+  
+engines:
+- type: docker
+  image: ubuntu:22.04
+  setup:
+    - type: docker
+      run: | 
+        apt-get update && \
+        apt-get install -y build-essential openjdk-17-jdk wget tar && \
+        wget --no-check-certificate https://sourceforge.net/projects/bbmap/files/BBMap_39.01.tar.gz && \
+        tar xzf BBMap_39.01.tar.gz && \
+        cp -r bbmap/* /usr/local/bin
+    - type: docker
+      run: |
+        echo "${meta_functionality_name}: bbmap: $(bbversion.sh | grep -v "Duplicate cpuset")" > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
