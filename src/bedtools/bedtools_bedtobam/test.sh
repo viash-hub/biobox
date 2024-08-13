@@ -45,36 +45,40 @@ printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "$TM
 cat <<EOF > "$TMPDIR/expected.sam"
 @HD	VN:1.0	SO:unsorted
 @PG	ID:BEDTools_bedToBam	VN:Vv2.30.0
-@SQ	SN:chr1	AS:genome.txt	LN:248956422
-@SQ	SN:chr3	AS:genome.txt	LN:242193529
-@SQ	SN:chr2	AS:genome.txt	LN:198295559
+@PG	ID:samtools	PN:samtools	PP:BEDTools_bedToBam	VN:1.16.1	CL:samtools view -h output.bam
+@SQ	SN:chr1	AS:../genome.txt	LN:248956422
+@SQ	SN:chr3	AS:../genome.txt	LN:242193529
+@SQ	SN:chr2	AS:../genome.txt	LN:198295559
 my_read/1	0	chr1	129	255	100M	*	0	0	*	*
 my_read/2	16	chr1	429	255	100M	*	0	0	*	*
 EOF
 cat <<EOF > "$TMPDIR/expected12.sam"
 @HD	VN:1.0	SO:unsorted
 @PG	ID:BEDTools_bedToBam	VN:Vv2.30.0
-@SQ	SN:chr1	AS:genome.txt	LN:248956422
-@SQ	SN:chr3	AS:genome.txt	LN:242193529
-@SQ	SN:chr2	AS:genome.txt	LN:198295559
+@PG	ID:samtools	PN:samtools	PP:BEDTools_bedToBam	VN:1.16.1	CL:samtools view -h output.bam
+@SQ	SN:chr1	AS:../genome.txt	LN:248956422
+@SQ	SN:chr3	AS:../genome.txt	LN:242193529
+@SQ	SN:chr2	AS:../genome.txt	LN:198295559
 my_read/1	0	chr1	129	255	100M	*	0	0	*	*
 my_read/2	16	chr1	429	255	100M	*	0	0	*	*
 EOF
 cat <<EOF > "$TMPDIR/expected_mapquality.sam"
 @HD	VN:1.0	SO:unsorted
 @PG	ID:BEDTools_bedToBam	VN:Vv2.30.0
-@SQ	SN:chr1	AS:genome.txt	LN:248956422
-@SQ	SN:chr3	AS:genome.txt	LN:242193529
-@SQ	SN:chr2	AS:genome.txt	LN:198295559
+@PG	ID:samtools	PN:samtools	PP:BEDTools_bedToBam	VN:1.16.1	CL:samtools view -h output.bam
+@SQ	SN:chr1	AS:../genome.txt	LN:248956422
+@SQ	SN:chr3	AS:../genome.txt	LN:242193529
+@SQ	SN:chr2	AS:../genome.txt	LN:198295559
 my_read/1	0	chr1	129	10	100M	*	0	0	*	*
 my_read/2	16	chr1	429	10	100M	*	0	0	*	*
 EOF
 cat <<EOF > "$TMPDIR/expected_gff.sam"
 @HD	VN:1.0	SO:unsorted
 @PG	ID:BEDTools_bedToBam	VN:Vv2.30.0
-@SQ	SN:chr1	AS:/viash_automount/Users/theo/Desktop/biobox/src/bedtools/bedtools_bedtobam/test_data/genome.txt	LN:248956422
-@SQ	SN:chr3	AS:/viash_automount/Users/theo/Desktop/biobox/src/bedtools/bedtools_bedtobam/test_data/genome.txt	LN:242193529
-@SQ	SN:chr2	AS:/viash_automount/Users/theo/Desktop/biobox/src/bedtools/bedtools_bedtobam/test_data/genome.txt	LN:198295559
+@PG	ID:samtools	PN:samtools	PP:BEDTools_bedToBam	VN:1.16.1	CL:samtools view -h output.bam
+@SQ	SN:chr1	AS:../genome.txt	LN:248956422
+@SQ	SN:chr3	AS:../genome.txt	LN:242193529
+@SQ	SN:chr2	AS:../genome.txt	LN:198295559
 gene	0	chr1	1000	255	1001M	*	0	0	*	*
 mRNA	0	chr3	1000	255	1001M	*	0	0	*	*
 exon	0	chr1	1000	255	201M	*	0	0	*	*
@@ -102,12 +106,6 @@ echo "- test1 succeeded -"
 
 popd > /dev/null
 
-# I could not assert_identical_content (bam file is compressed and -ubam option does not seem to work on this version).
-# could use samtools view to check the content of the bam file, would need to add samtools as a dependency.
-# TODO: check if older versions works with -ubam option!!!
-# Version 2.27.1 (bedtools) -ubam outputs better than version 2.30.0 (bedtools).
-# However, its output is still somewhat compressed.
-
 # Test 2: BED12 file
 mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
 
@@ -123,7 +121,7 @@ samtools view -h output.bam > output.sam
 # checks
 assert_file_exists "output.bam"
 assert_file_not_empty "output.bam"
-assert_identical_content "output.bam" "../expected12.sam"
+assert_identical_content "output.sam" "../expected12.sam"
 echo "- test2 succeeded -"
 
 popd > /dev/null
@@ -162,7 +160,7 @@ samtools view -h output.bam > output.sam
 # checks
 assert_file_exists "output.bam"
 assert_file_not_empty "output.bam"
-assert_identical_content "output.bam" "../expected_mapquality.sam"
+assert_identical_content "output.sam" "../expected_mapquality.sam"
 echo "- test4 succeeded -"
 
 popd > /dev/null
@@ -181,7 +179,7 @@ samtools view -h output.bam > output.sam
 # checks
 assert_file_exists "output.bam"
 assert_file_not_empty "output.bam"
-assert_identical_content "output.bam" "../expected_gff.sam"
+assert_identical_content "output.sam" "../expected_gff.sam"
 echo "- test5 succeeded -"
 
 popd > /dev/null
