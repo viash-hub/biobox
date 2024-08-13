@@ -19,7 +19,16 @@
   - `seqtk/seqtk_subseq`: Extract the sequences (complete or subsequence) from the FASTA/FASTQ files
                 based on a provided sequence IDs or region coordinates file (PR #85).
 
-* `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
+* `agat`:
+  - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
+  - `/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+
+* `bedtools`:
+  - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
+  - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
+
+
+* `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
 
 * `agat/agat_convert_sp_gxf2gxf`: fixes and/or standardizes any GTF/GFF file into full sorted GTF/GFF file (PR #103).
 
@@ -28,6 +37,10 @@
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
 
 * Update CI to reusable workflow in `viash-io/viash-actions` (PR #86).
+
+* Update several components in order to avoid duplicate code when using `unset` on boolean arguments (PR #133).
+
+* Bump viash to `0.9.0-RC7` (PR #134)
 
 ## DOCUMENTATION
 
