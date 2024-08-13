@@ -4,13 +4,20 @@
 ## VIASH END
 
 # Unset parameters
-[[ "$par_sizeA" == "false" ]] && unset par_sizeA
-[[ "$par_sizeD" == "false" ]] && unset par_sizeD
-[[ "$par_chrThenSizeA" == "false" ]] && unset par_chrThenSizeA
-[[ "$par_chrThenSizeD" == "false" ]] && unset par_chrThenSizeD
-[[ "$par_chrThenScoreA" == "false" ]] && unset par_chrThenScoreA
-[[ "$par_chrThenScoreD" == "false" ]] && unset par_chrThenScoreD
-[[ "$par_header" == "false" ]] && unset par_header
+unset_if_false=(
+    par_sizeA
+    par_sizeD
+    par_chrThenSizeA
+    par_chrThenSizeD
+    par_chrThenScoreA
+    par_chrThenScoreD
+    par_header
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 # Execute bedtools sort with the provided arguments
 bedtools sort \
