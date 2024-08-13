@@ -30,6 +30,8 @@
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
   - `bedtools/bedtools_bamtofastq`: Convert BAM alignments to FASTQ files (PR #101).
 
+* `agat/agat_convert_sp_gxf2gxf`: fixes and/or standardizes any GTF/GFF file into full sorted GTF/GFF file (PR #103).
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
