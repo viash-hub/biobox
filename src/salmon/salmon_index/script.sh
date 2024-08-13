@@ -5,12 +5,19 @@ set -e
 ## VIASH START
 ## VIASH END
 
-[[ "$par_gencode" == "false" ]] && unset par_gencode
-[[ "$par_features" == "false" ]] && unset par_features
-[[ "$par_keep_duplicates" == "false" ]] && unset par_keep_duplicates
-[[ "$par_keep_fixed_fasta" == "false" ]] && unset par_keep_fixed_fasta
-[[ "$par_sparse" == "false" ]] && unset par_sparse
-[[ "$par_no_clip" == "false" ]] && unset par_no_clip
+unset_if_false=(
+    par_gencode
+    par_features
+    par_keep_duplicates
+    par_keep_fixed_fasta
+    par_sparse
+    par_no_clip
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 tmp_dir=$(mktemp -d -p "$meta_temp_dir" "${meta_functionality_name}_XXXXXX")
 mkdir -p "$tmp_dir/temp"
