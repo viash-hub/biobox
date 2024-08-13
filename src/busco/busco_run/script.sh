@@ -3,18 +3,24 @@
 ## VIASH START
 ## VIASH END
 
+unset_if_false=(
+    par_tar
+    par_force
+    par_quiet
+    par_restart
+    par_auto_lineage
+    par_auto_lineage_euk
+    par_auto_lineage_prok
+    par_augustus
+    par_long
+    par_scaffold_composition
+    par_miniprot
+)
 
-[[ "$par_tar" == "false" ]] && unset par_tar
-[[ "$par_force" == "false" ]] && unset par_force
-[[ "$par_quiet" == "false" ]] && unset par_quiet
-[[ "$par_restart" == "false" ]] && unset par_restart
-[[ "$par_auto_lineage" == "false" ]] && unset par_auto_lineage
-[[ "$par_auto_lineage_euk" == "false" ]] && unset par_auto_lineage_euk
-[[ "$par_auto_lineage_prok" == "false" ]] && unset par_auto_lineage_prok
-[[ "$par_augustus" == "false" ]] && unset par_augustus
-[[ "$par_long" == "false" ]] && unset par_long
-[[ "$par_scaffold_composition" == "false" ]] && unset par_scaffold_composition
-[[ "$par_miniprot" == "false" ]] && unset par_miniprot
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 tmp_dir=$(mktemp -d -p "$meta_temp_dir" busco_XXXXXXXXX)
 prefix=$(openssl rand -hex 8)
@@ -39,6 +45,7 @@ busco \
     ${par_force:+--force} \
     ${par_limit:+--limit "$par_limit"} \
     ${par_long:+--long} \
+    ${par_metaeuk:+--metaeuk} \
     ${par_metaeuk_parameters:+--metaeuk_parameters "$par_metaeuk_parameters"} \
     ${par_metaeuk_rerun_parameters:+--metaeuk_rerun_parameters "$par_metaeuk_rerun_parameters"} \
     ${par_miniprot:+--miniprot} \

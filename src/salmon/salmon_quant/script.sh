@@ -4,48 +4,55 @@ set -e
 
 ## VIASH START
 ## VIASH END
+unset_if_false=(
+    par_discard_orphans
+    par_ont
+    par_seq_bias
+    par_gc_bias
+    par_pos_bias
+    par_meta
+    par_discard_orphans_quasi
+    par_disable_chaining_heuristic
+    par_allow_dovetail
+    par_recover_orphans
+    par_mimicBT2
+    par_mimic_strictBT2
+    par_softclip
+    par_softclip_overhangs
+    par_full_length_alignment
+    par_hard_filter
+    par_write_mappings
+    par_write_qualities
+    par_alternative_init_mode
+    par_skip_quant
+    par_dump_eq
+    par_dump_eq_weights
+    par_reduce_GC_memory
+    par_init_uniform
+    par_no_length_correction
+    par_no_effective_length_correction
+    par_no_single_frag_prob
+    par_no_frag_length_dist
+    par_no_bias_length_threshold
+    par_useEM
+    par_useVBOpt
+    par_no_Gamma_draw
+    par_bootstrap_reproject
+    par_quiet
+    par_per_transcript_prior
+    par_per_nucleotide_prior
+    par_write_orphan_links
+    par_write_unmapped_names
+    par_no_error_model
+    par_sample_out
+    par_sample_unaligned
+    par_gencode
+)
 
-[[ "$par_discard_orphans" == "false" ]] && unset par_discard_orphans
-[[ "$par_ont" == "false" ]] && unset par_ont
-[[ "$par_seq_bias" == "false" ]] && unset par_seq_bias
-[[ "$par_gc_bias" == "false" ]] && unset par_gc_bias
-[[ "$par_pos_bias" == "false" ]] && unset par_pos_bias
-[[ "$par_meta" == "false" ]] && unset par_meta
-[[ "$par_discard_orphans_quasi" == "false" ]] && unset par_discard_orphans_quasi
-[[ "$par_disable_chaining_heuristic" == "false" ]] && unset par_disable_chaining_heuristic
-[[ "$par_allow_dovetail" == "false" ]] && unset par_allow_dovetail
-[[ "$par_recover_orphans" == "false" ]] && unset par_recover_orphans
-[[ "$par_mimicBT2" == "false" ]] && unset par_mimicBT2
-[[ "$par_mimic_strictBT2" == "false" ]] && unset par_mimic_strictBT2
-[[ "$par_softclip" == "false" ]] && unset par_softclip
-[[ "$par_softclip_overhangs" == "false" ]] && unset par_softclip_overhangs
-[[ "$par_full_length_alignment" == "false" ]] && unset par_full_length_alignment
-[[ "$par_hard_filter" == "false" ]] && unset par_hard_filter
-[[ "$par_write_qualities" == "false" ]] && unset par_write_qualities
-[[ "$par_alternative_init_mode" == "false" ]] && unset par_alternative_init_mode
-[[ "$par_skip_quant" == "false" ]] && unset par_skip_quant
-[[ "$par_dump_eq" == "false" ]] && unset par_dump_eq
-[[ "$par_dump_eq_weights" == "false" ]] && unset par_dump_eq_weights
-[[ "$par_reduce_GC_memory" == "false" ]] && unset par_reduce_GC_memory
-[[ "$par_init_uniform" == "false" ]] && unset par_init_uniform
-[[ "$par_no_length_correction" == "false" ]] && unset par_no_length_correction
-[[ "$par_no_effective_length_correction" == "false" ]] && unset par_no_effective_length_correction
-[[ "$par_no_single_frag_prob" == "false" ]] && unset par_no_single_frag_prob
-[[ "$par_no_frag_length_dist" == "false" ]] && unset par_no_frag_length_dist
-[[ "$par_no_bias_length_threshold" == "false" ]] && unset par_no_bias_length_threshold
-[[ "$par_useEM" == "false" ]] && unset par_useEM
-[[ "$par_useVBOpt" == "false" ]] && unset par_useVBOpt
-[[ "$par_no_Gamma_draw" == "false" ]] && unset par_no_Gamma_draw
-[[ "$par_bootstrap_reproject" == "false" ]] && unset par_bootstrap_reproject
-[[ "$par_quiet" == "false" ]] && unset par_quiet
-[[ "$par_per_transcript_prior" == "false" ]] && unset par_per_transcript_prior
-[[ "$par_per_nucleotide_prior" == "false" ]] && unset par_per_nucleotide_prior
-[[ "$par_write_orphan_links" == "false" ]] && unset par_write_orphan_links
-[[ "$par_write_unmapped_names" == "false" ]] && unset par_write_unmapped_names
-[[ "$par_no_error_model" == "false" ]] && unset par_no_error_model
-[[ "$par_sample_out" == "false" ]] && unset par_sample_out
-[[ "$par_sample_unaligned" == "false" ]] && unset par_sample_unaligned
-[[ "$par_gencode" == "false" ]] && unset par_gencode
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 IFS=";" read -ra unmated_reads <<< $par_unmated_reads
 IFS=";" read -ra mates1 <<< $par_mates1
@@ -96,7 +103,7 @@ salmon quant \
     ${par_full_length_alignment:+--fullLengthAlignment} \
     ${par_hard_filter:+--hardFilter} \
     ${par_min_aln_prob:+--minAlnProb "${par_min_aln_prob}"} \
-    ${par_write_mappings:+-z "${par_write_mappings}"} \
+    ${par_write_mappings:+--write_mappings="${par_mappings_sam}"} \
     ${par_write_qualities:+--writeQualities} \
     ${par_hit_filter_policy:+--hitFilterPolicy "${par_hit_filter_policy}"} \
     ${par_alternative_init_mode:+--alternativeInitMode} \

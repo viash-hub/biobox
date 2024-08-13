@@ -1,0 +1,80 @@
+```
+samtools fastq
+```
+
+Usage: samtools fastq [options...] <in.bam>
+
+Description:
+Converts a SAM, BAM or CRAM to FASTQ format.
+
+Options:
+  -0 FILE      write reads designated READ_OTHER to FILE
+  -1 FILE      write reads designated READ1 to FILE
+  -2 FILE      write reads designated READ2 to FILE
+  -o FILE      write reads designated READ1 or READ2 to FILE
+               note: if a singleton file is specified with -s, only
+               paired reads will be written to the -1 and -2 files.
+  -d, --tag TAG[:VAL]
+               only include reads containing TAG, optionally with value VAL
+  -f, --require-flags INT
+               only include reads with all  of the FLAGs in INT present [0]
+  -F, --excl[ude]-flags INT
+               only include reads with none of the FLAGs in INT present [0x900]
+      --rf, --incl[ude]-flags INT
+               only include reads with any  of the FLAGs in INT present [0]
+  -G INT       only EXCLUDE reads with all  of the FLAGs in INT present [0]
+  -n           don't append /1 and /2 to the read name
+  -N           always append /1 and /2 to the read name
+  -O           output quality in the OQ tag if present
+  -s FILE      write singleton reads designated READ1 or READ2 to FILE
+  -t           copy RG, BC and QT tags to the FASTQ header line
+  -T TAGLIST   copy arbitrary tags to the FASTQ header line, '*' for all
+  -v INT       default quality score if not given in file [1]
+  -i           add Illumina Casava 1.8 format entry to header (eg 1:N:0:ATCACG)
+  -c INT       compression level [0..9] to use when writing bgzf files [1]
+  --i1 FILE    write first index reads to FILE
+  --i2 FILE    write second index reads to FILE
+  --barcode-tag TAG
+               Barcode tag [BC]
+  --quality-tag TAG
+               Quality tag [QT]
+  --index-format STR
+               How to parse barcode and quality tags
+
+      --input-fmt-option OPT[=VAL]
+               Specify a single input file format option in the form
+               of OPTION or OPTION=VALUE
+      --reference FILE
+               Reference sequence FASTA FILE [null]
+  -@, --threads INT
+               Number of additional threads to use [0]
+      --verbosity INT
+               Set level of verbosity
+
+The files will be automatically compressed if the file names have a .gz
+or .bgzf extension.  The input to this program must be collated by name.
+Run 'samtools collate' or 'samtools sort -n' to achieve this.
+
+Reads are designated READ1 if FLAG READ1 is set and READ2 is not set.
+Reads are designated READ2 if FLAG READ1 is not set and READ2 is set.
+Otherwise reads are designated READ_OTHER (both flags set or both flags unset).
+Run 'samtools flags' for more information on flag codes and meanings.
+
+The index-format string describes how to parse the barcode and quality tags.
+It is made up of 'i' or 'n' followed by a length or '*'.  For example:
+   i14i8       The first 14 characters are index 1, the next 8 are index 2
+   n8i14       Ignore the first 8 characters, and use the next 14 for index 1
+
+If the tag contains a separator, then the numeric part can be replaced with
+'*' to mean 'read until the separator or end of tag', for example:
+   i*i*        Break the tag at the separator into index 1 and index 2
+   n*i*        Ignore the left part of the tag until the separator,
+               then use the second part of the tag as index 1
+
+Examples:
+To get just the paired reads in separate files, use:
+   samtools fastq -1 pair1.fq -2 pair2.fq -0 /dev/null -s /dev/null -n in.bam
+
+To get all non-supplementary/secondary reads in a single file, redirect
+the output:
+   samtools fastq in.bam > all_reads.fq

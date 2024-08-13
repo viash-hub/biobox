@@ -2,6 +2,7 @@ import tempfile
 import subprocess
 import shutil
 from pathlib import Path
+import yaml
 
 ## VIASH START
 par = {
@@ -18,9 +19,19 @@ par = {
 }
 meta = {
     "cpus": 8,
-    "temp_dir": "/tmp"
+    "temp_dir": "/tmp",
+    "config": "target/executable/star/star_align_reads/.config.vsh.yaml",
 }
 ## VIASH END
+
+# read config
+with open(meta["config"], 'r') as stream:
+    config = yaml.safe_load(stream)
+all_arguments = {
+    arg["name"].lstrip('-'): arg
+    for argument_group in config["argument_groups"]
+    for arg in argument_group["arguments"]
+}
 
 ##################################################
 # check and process SE / PE R1 input files
@@ -58,7 +69,8 @@ expected_outputs = {
     "log": "Log.final.out",
     "splice_junctions": "SJ.out.tab",
     "unmapped": "Unmapped.out.mate1",
-    "unmapped_r2": "Unmapped.out.mate2"
+    "unmapped_r2": "Unmapped.out.mate2", 
+    "reads_aligned_to_transcriptome": "Aligned.toTranscriptome.out.bam"
 }
 output_paths = {name: par[name] for name in expected_outputs.keys()}
 for name in expected_outputs.keys():
@@ -86,8 +98,13 @@ with tempfile.TemporaryDirectory(prefix="star-", dir=meta["temp_dir"], ignore_cl
     cmd_args = [ "STAR" ]
     for name, value in par.items():
         if value is not None:
+            if name in all_arguments:
+                arg_info = all_arguments[name].get("info", {})
+                cli_name = arg_info.get("orig_name", f"--{name}")
+            else:
+                cli_name = f"--{name}"
             val_to_add = value if isinstance(value, list) else [value]
-            cmd_args.extend([f"--{name}"] + [str(x) for x in val_to_add])
+            cmd_args.extend([cli_name] + [str(x) for x in val_to_add])
     print("", flush=True)
 
     # run command

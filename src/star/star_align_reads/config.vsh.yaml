@@ -11,6 +11,11 @@ references:
 license: MIT
 requirements:
   commands: [ STAR, python, ps, zcat, bzcat ]
+authors:
+  - __merge__: /src/_authors/angela_o_pisco.yaml
+    roles: [ author ]
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [ author, maintainer ]
 # manually taking care of the main input and output arguments
 argument_groups:
   - name: Inputs
@@ -72,6 +77,12 @@ argument_groups:
         description: The output file containing the splice junctions.
         direction: output
         example: splice_junctions.tsv
+      - type: file
+        name: --reads_aligned_to_transcriptome
+        required: false
+        description: The output file containing the alignments to transcriptome in BAM formats. This file is generated when --quantMode is set to TranscriptomeSAM.
+        direction: output
+        example: transcriptome_aligned.bam
 # other arguments are defined in a separate file
 __merge__: argument_groups.yaml
 resources:
@@ -107,6 +118,8 @@ engines:
             rm -rf /tmp/STAR-${STAR_VERSION} /tmp/${STAR_VERSION}.zip && \
             apt-get --purge autoremove -y ${PACKAGES} && \
             apt-get clean
+      - type: python
+        packages: [ pyyaml ]
       - type: docker
         run: |
           STAR --version | sed 's#\(.*\)#star: "\1"#' > /var/software_versions.txt

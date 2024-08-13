@@ -1,0 +1,138 @@
+name: star_genome_generate
+namespace: star
+description: | 
+  Create index for STAR
+keywords: [genome, index, align]
+links:
+  repository: https://github.com/alexdobin/STAR
+  documentation: https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf
+references:
+  doi: 10.1093/bioinformatics/bts635
+license: MIT
+requirements:
+  commands: [ STAR ]
+authors:
+  - __merge__: /src/_authors/sai_nirmayi_yasa.yaml
+    roles: [ author, maintainer ]
+argument_groups:
+- name: "Input"
+  arguments: 
+  - name: "--genome_fasta_files"
+    type: file
+    description: |
+      Path(s) to the fasta files with the genome sequences, separated by spaces. These files should be plain text FASTA files, they *cannot* be zipped.
+    required: true
+    multiple: true
+  - name: "--sjdb_gtf_file"
+    type: file
+    description: Path to the GTF file with annotations
+  - name: --sjdb_overhang
+    type: integer
+    description: Length of the donor/acceptor sequence on each side of the junctions, ideally = (mate_length - 1)
+    example: 100
+  - name: --sjdb_gtf_chr_prefix
+    type: string
+    description: Prefix for chromosome names in a GTF file (e.g. 'chr' for using ENSMEBL annotations with UCSC genomes)
+  - name: --sjdb_gtf_feature_exon
+    type: string
+    description: Feature type in GTF file to be used as exons for building transcripts
+    example: exon
+  - name: --sjdb_gtf_tag_exon_parent_transcript
+    type: string
+    description: GTF attribute name for parent transcript ID (default "transcript_id" works for GTF files)
+    example: transcript_id
+  - name: --sjdb_gtf_tag_exon_parent_gene
+    type: string
+    description: GTF attribute name for parent gene ID (default "gene_id" works for GTF files)
+    example: gene_id
+  - name: --sjdb_gtf_tag_exon_parent_gene_name
+    type: string
+    description: GTF attribute name for parent gene name
+    example: gene_name
+    multiple: true
+  - name: --sjdb_gtf_tag_exon_parent_gene_type
+    type: string
+    description: GTF attribute name for parent gene type
+    example:
+    - gene_type
+    - gene_biotype
+    multiple: true
+  - name: --limit_genome_generate_ram
+    type: long
+    description: Maximum available RAM (bytes) for genome generation
+    example: 31000000000
+  - name: --genome_sa_index_nbases
+    type: integer
+    description: Length (bases) of the SA pre-indexing string. Typically between 10 and 15. Longer strings will use much more memory, but allow faster searches. For small genomes, this parameter must be scaled down to min(14, log2(GenomeLength)/2 - 1).
+    example: 14
+  - name: --genome_chr_bin_nbits
+    type: integer
+    description: Defined as log2(chrBin), where chrBin is the size of the bins for genome storage. Each chromosome will occupy an integer number of bins. For a genome with large number of contigs, it is recommended to scale this parameter as min(18, log2[max(GenomeLength/NumberOfReferences,ReadLength)]).
+    example: 18
+  - name: --genome_sa_sparse_d
+    type: integer
+    min: 0
+    example: 1
+    description: Suffux array sparsity, i.e. distance between indices. Use bigger numbers to decrease needed RAM at the cost of mapping speed reduction.
+  - name: --genome_suffix_length_max
+    type: integer
+    description: Maximum length of the suffixes, has to be longer than read length. Use -1 for infinite length.
+    example: -1
+  - name: --genome_transform_type   
+    type: string
+    description: |
+      Type of genome transformation
+        None       ... no transformation
+        Haploid    ... replace reference alleles with alternative alleles from VCF file (e.g. consensus allele)
+        Diploid    ... create two haplotypes for each chromosome listed in VCF file, for genotypes 1|2, assumes perfect phasing (e.g. personal genome)
+    example: None
+  - name: --genome_transform_vcf
+    type: file
+    description: path to VCF file for genome transformation
+  
+- name: "Output"
+  arguments: 
+  - name: "--index"
+    type: file
+    direction: output
+    description: STAR index directory.
+    default: STAR_index
+    required: true
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  
+engines:
+- type: docker
+  image: ubuntu:22.04
+  setup:
+    # setup derived from https://github.com/alexdobin/STAR/blob/master/extras/docker/Dockerfile
+    - type: docker
+      env: 
+        - STAR_VERSION 2.7.11b
+        - PACKAGES gcc g++ make wget zlib1g-dev unzip xxd
+      run: |
+        apt-get update && \
+          apt-get install -y --no-install-recommends ${PACKAGES} && \
+          cd /tmp && \
+          wget --no-check-certificate https://github.com/alexdobin/STAR/archive/refs/tags/${STAR_VERSION}.zip && \
+          unzip ${STAR_VERSION}.zip && \
+          cd STAR-${STAR_VERSION}/source && \
+          make STARstatic CXXFLAGS_SIMD=-std=c++11 && \
+          cp STAR /usr/local/bin && \
+          cd / && \
+          rm -rf /tmp/STAR-${STAR_VERSION} /tmp/${STAR_VERSION}.zip && \
+          apt-get --purge autoremove -y ${PACKAGES} && \
+          apt-get clean
+    - type: docker
+      run: |
+        STAR --version | sed 's#\(.*\)#star: "\1"#' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

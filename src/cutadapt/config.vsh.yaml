@@ -1,0 +1,484 @@
+name: cutadapt
+description: |
+  Cutadapt removes adapter sequences from high-throughput sequencing reads.
+keywords: [RNA-seq, scRNA-seq, high-throughput]
+links:
+  homepage: https://cutadapt.readthedocs.io
+  documentation: https://cutadapt.readthedocs.io
+  repository: https://github.com/marcelm/cutadapt
+references:
+  doi: 10.14806/ej.17.1.200
+license: MIT
+authors:
+  - __merge__: /src/_authors/toni_verbeiren.yaml
+    roles: [ author, maintainer ]
+argument_groups:
+  ####################################################################
+  - name: Specify Adapters for R1
+    arguments:
+      - name: --adapter
+        alternatives: [-a]
+        type: string
+        multiple: true
+        description: |
+          Sequence of an adapter ligated to the 3' end (paired data:
+          of the first read). The adapter and subsequent bases are
+          trimmed. If a '$' character is appended ('anchoring'), the
+          adapter is only found if it is a suffix of the read.
+        required: false
+      - name: --front
+        alternatives: [-g]
+        type: string
+        multiple: true
+        description: |
+          Sequence of an adapter ligated to the 5' end (paired data:
+          of the first read). The adapter and any preceding bases
+          are trimmed. Partial matches at the 5' end are allowed. If
+          a '^' character is prepended ('anchoring'), the adapter is
+          only found if it is a prefix of the read.
+        required: false
+      - name: --anywhere
+        alternatives: [-b]
+        type: string
+        multiple: true
+        description: |
+          Sequence of an adapter that may be ligated to the 5' or 3'
+          end (paired data: of the first read). Both types of
+          matches as described under -a and -g are allowed. If the
+          first base of the read is part of the match, the behavior
+          is as with -g, otherwise as with -a. This option is mostly
+          for rescuing failed library preparations - do not use if
+          you know which end your adapter was ligated to!
+        required: false
+
+  ####################################################################
+  - name: Specify Adapters using Fasta files for R1
+    arguments:
+      - name: --adapter_fasta
+        type: file
+        multiple: true
+        description: |
+          Fasta file containing sequences of an adapter ligated to the 3' end (paired data:
+          of the first read). The adapter and subsequent bases are
+          trimmed. If a '$' character is appended ('anchoring'), the
+          adapter is only found if it is a suffix of the read.
+        required: false
+      - name: --front_fasta
+        type: file
+        description: |
+          Fasta file containing sequences of an adapter ligated to the 5' end (paired data:
+          of the first read). The adapter and any preceding bases
+          are trimmed. Partial matches at the 5' end are allowed. If
+          a '^' character is prepended ('anchoring'), the adapter is
+          only found if it is a prefix of the read.
+        required: false
+      - name: --anywhere_fasta
+        type: file
+        description: |
+          Fasta file containing sequences of an adapter that may be ligated to the 5' or 3'
+          end (paired data: of the first read). Both types of
+          matches as described under -a and -g are allowed. If the
+          first base of the read is part of the match, the behavior
+          is as with -g, otherwise as with -a. This option is mostly
+          for rescuing failed library preparations - do not use if
+          you know which end your adapter was ligated to!
+        required: false
+
+  ####################################################################
+  - name: Specify Adapters for R2
+    arguments:
+      - name: --adapter_r2
+        alternatives: [-A]
+        type: string
+        multiple: true
+        description: |
+          Sequence of an adapter ligated to the 3' end (paired data:
+          of the first read). The adapter and subsequent bases are
+          trimmed. If a '$' character is appended ('anchoring'), the
+          adapter is only found if it is a suffix of the read.
+        required: false
+      - name: --front_r2
+        alternatives: [-G]
+        type: string
+        multiple: true
+        description: |
+          Sequence of an adapter ligated to the 5' end (paired data:
+          of the first read). The adapter and any preceding bases
+          are trimmed. Partial matches at the 5' end are allowed. If
+          a '^' character is prepended ('anchoring'), the adapter is
+          only found if it is a prefix of the read.
+        required: false
+      - name: --anywhere_r2
+        alternatives: [-B]
+        type: string
+        multiple: true
+        description: |
+          Sequence of an adapter that may be ligated to the 5' or 3'
+          end (paired data: of the first read). Both types of
+          matches as described under -a and -g are allowed. If the
+          first base of the read is part of the match, the behavior
+          is as with -g, otherwise as with -a. This option is mostly
+          for rescuing failed library preparations - do not use if
+          you know which end your adapter was ligated to!
+        required: false
+
+  ####################################################################
+  - name: Specify Adapters using Fasta files for R2
+    arguments:
+      - name: --adapter_r2_fasta
+        type: file
+        description: |
+          Fasta file containing sequences of an adapter ligated to the 3' end (paired data:
+          of the first read). The adapter and subsequent bases are
+          trimmed. If a '$' character is appended ('anchoring'), the
+          adapter is only found if it is a suffix of the read.
+        required: false
+      - name: --front_r2_fasta
+        type: file
+        description: |
+          Fasta file containing sequences of an adapter ligated to the 5' end (paired data:
+          of the first read). The adapter and any preceding bases
+          are trimmed. Partial matches at the 5' end are allowed. If
+          a '^' character is prepended ('anchoring'), the adapter is
+          only found if it is a prefix of the read.
+        required: false
+      - name: --anywhere_r2_fasta
+        type: file
+        description: |
+          Fasta file containing sequences of an adapter that may be ligated to the 5' or 3'
+          end (paired data: of the first read). Both types of
+          matches as described under -a and -g are allowed. If the
+          first base of the read is part of the match, the behavior
+          is as with -g, otherwise as with -a. This option is mostly
+          for rescuing failed library preparations - do not use if
+          you know which end your adapter was ligated to!
+        required: false
+
+  ####################################################################
+  - name: Paired-end options
+    arguments:
+      - name: --pair_adapters
+        type: boolean_true
+        description: |
+          Treat adapters given with -a/-A etc. as pairs. Either both
+          or none are removed from each read pair.
+      - name: --pair_filter
+        type: string
+        choices: [any, both, first]
+        description: |
+          Which of the reads in a paired-end read have to match the
+          filtering criterion in order for the pair to be filtered.
+      - name: --interleaved
+        type: boolean_true
+        description: |
+          Read and/or write interleaved paired-end reads.
+
+  ####################################################################
+  - name: Input parameters
+    arguments:
+      - name: --input
+        type: file
+        required: true
+        description: |
+          Input fastq file for single-end reads or R1 for paired-end reads.
+      - name: --input_r2
+        type: file
+        required: false
+        description: |
+          Input fastq file for R2 in the case of paired-end reads.
+      - name: --error_rate
+        alternatives: [-E, --errors]
+        type: double
+        description: |
+          Maximum allowed error rate (if 0 <= E < 1), or absolute
+          number of errors for full-length adapter match (if E is an
+          integer >= 1). Error rate = no. of errors divided by
+          length of matching region. Default: 0.1 (10%).
+        example: 0.1
+      - name: --no_indels
+        type: boolean_false
+        description: |
+          Allow only mismatches in alignments.
+
+      - name: --times
+        type: integer
+        alternatives: [-n]
+        description: |
+          Remove up to COUNT adapters from each read. Default: 1.
+        example: 1
+      - name: --overlap
+        alternatives: [-O]
+        type: integer
+        description: |
+          Require MINLENGTH overlap between read and adapter for an
+          adapter to be found. The default is 3.
+        example: 3
+      - name: --match_read_wildcards
+        type: boolean_true
+        description: |
+          Interpret IUPAC wildcards in reads.
+      - name: --no_match_adapter_wildcards
+        type: boolean_false
+        description: |
+          Do not interpret IUPAC wildcards in adapters.
+      - name: --action
+        type: string
+        choices:
+          - trim
+          - retain
+          - mask
+          - lowercase
+          - none
+        description: |
+          What to do if a match was found. trim: trim adapter and
+          up- or downstream sequence; retain: trim, but retain
+          adapter; mask: replace with 'N' characters; lowercase:
+          convert to lowercase; none: leave unchanged.
+          The default is trim.
+        example: trim
+      - name: --revcomp
+        alternatives: [--rc]
+        type: boolean_true
+        description: |
+          Check both the read and its reverse complement for adapter
+          matches. If match is on reverse-complemented version,
+          output that one.
+  
+  ####################################################################
+  - name: "Demultiplexing options"
+    arguments:
+      - name: "--demultiplex_mode"
+        type: string
+        choices: ["single", "unique_dual", "combinatorial_dual"]
+        required: false
+        description: |
+          Enable demultiplexing and set the mode for it.
+          With mode 'unique_dual', adapters from the first and second read are used,
+          and the indexes from the reads are only used in pairs. This implies
+          --pair_adapters.
+          Enabling mode 'combinatorial_dual' allows all combinations of the sets of indexes
+          on R1 and R2. It is necessary to write each read pair to an output
+          file depending on the adapters found on both R1 and R2.
+          Mode 'single', uses indexes or barcodes located at the 5'
+          end of the R1 read (single). 
+
+  ####################################################################
+  - name: Read modifications
+    arguments:
+      - name: --cut
+        alternatives: [-u]
+        type: integer
+        multiple: true
+        description: |
+          Remove LEN bases from each read (or R1 if paired; use --cut_r2
+          option for R2). If LEN is positive, remove bases from the
+          beginning. If LEN is negative, remove bases from the end.
+          Can be used twice if LENs have different signs. Applied
+          *before* adapter trimming.
+      - name: --cut_r2
+        type: integer
+        multiple: true
+        description: |
+          Remove LEN bases from each read (for R2). If LEN is positive, remove bases from the
+          beginning. If LEN is negative, remove bases from the end.
+          Can be used twice if LENs have different signs. Applied
+          *before* adapter trimming.
+      - name: --nextseq_trim
+        type: string
+        description: |
+          NextSeq-specific quality trimming (each read). Trims also
+          dark cycles appearing as high-quality G bases.
+      - name: --quality_cutoff
+        alternatives: [-q]
+        type: string
+        description: |
+          Trim low-quality bases from 5' and/or 3' ends of each read
+          before adapter removal. Applied to both reads if data is
+          paired. If one value is given, only the 3' end is trimmed.
+          If two comma-separated cutoffs are given, the 5' end is
+          trimmed with the first cutoff, the 3' end with the second.
+      - name: --quality_cutoff_r2
+        alternatives: [-Q]
+        type: string
+        description: |
+          Quality-trimming cutoff for R2. Default: same as for R1
+      - name: --quality_base
+        type: integer
+        description: |
+          Assume that quality values in FASTQ are encoded as
+          ascii(quality + N). This needs to be set to 64 for some
+          old Illumina FASTQ files. The default is 33.
+        example: 33
+      - name: --poly_a
+        type: boolean_true
+        description: Trim poly-A tails
+      - name: --length
+        alternatives: [-l]
+        type: integer
+        description: |
+          Shorten reads to LENGTH. Positive values remove bases at
+          the end while negative ones remove bases at the beginning.
+          This and the following modifications are applied after
+          adapter trimming.
+      - name: --trim_n
+        type: boolean_true
+        description: Trim N's on ends of reads.
+      - name: --length_tag
+        type: string
+        description: |
+          Search for TAG followed by a decimal number in the
+          description field of the read. Replace the decimal number
+          with the correct length of the trimmed read. For example,
+          use --length-tag 'length=' to correct fields like
+          'length=123'.
+        example: "length="
+      - name: --strip_suffix
+        type: string
+        description: |
+          Remove this suffix from read names if present. Can be
+          given multiple times.
+      - name: --prefix
+        alternatives: [-x]
+        type: string
+        description: |
+          Add this prefix to read names. Use {name} to insert the
+          name of the matching adapter.
+      - name: --suffix
+        alternatives: [-y]
+        type: string
+        description: |
+          Add this suffix to read names; can also include {name}
+      - name: --rename
+        type: string
+        description: |
+          Rename reads using TEMPLATE containing variables such as
+          {id}, {adapter_name} etc. (see documentation)
+      - name: --zero_cap
+        alternatives: [-z]
+        type: boolean_true
+        description: Change negative quality values to zero.
+
+  ####################################################################
+  - name: Filtering of processed reads
+    description: |
+      Filters are applied after above read modifications. Paired-end reads are
+      always discarded pairwise (see also --pair_filter).
+    arguments:
+      - name: --minimum_length
+        alternatives: [-m]
+        type: string
+        description: |
+          Discard reads shorter than LEN. Default is 0.
+          When trimming paired-end reads, the minimum lengths for R1 and R2 can be specified separately by separating them with a colon (:).
+          If the colon syntax is not used, the same minimum length applies to both reads, as discussed above.
+          Also, one of the values can be omitted to impose no restrictions.
+          For example, with -m 17:, the length of R1 must be at least 17, but the length of R2 is ignored.
+        example: "0"
+      - name: --maximum_length
+        alternatives: [-M]
+        type: string
+        description: |
+          Discard reads longer than LEN. Default: no limit.
+          For paired reads, see the remark for --minimum_length
+      - name: --max_n
+        type: string
+        description: |
+          Discard reads with more than COUNT 'N' bases. If COUNT is
+          a number between 0 and 1, it is interpreted as a fraction
+          of the read length.
+      - name: --max_expected_errors
+        alternatives: [--max_ee]
+        type: long
+        description: |
+          Discard reads whose expected number of errors (computed
+          from quality values) exceeds ERRORS.
+      - name: --max_average_error_rate
+        alternatives: [--max_aer]
+        type: long
+        description: |
+          as --max_expected_errors (see above), but divided by
+          length to account for reads of varying length.
+      - name: --discard_trimmed
+        alternatives: [--discard]
+        type: boolean_true
+        description: |
+          Discard reads that contain an adapter. Use also -O to
+          avoid discarding too many randomly matching reads.
+      - name: --discard_untrimmed
+        alternatives: [--trimmed_only]
+        type: boolean_true
+        description: |
+          Discard reads that do not contain an adapter.
+      - name: --discard_casava
+        type: boolean_true
+        description: |
+          Discard reads that did not pass CASAVA filtering (header
+          has :Y:).
+
+  ####################################################################
+  - name: Output parameters
+    arguments:
+      - name: --report
+        type: string
+        choices: [full, minimal]
+        description: |
+          Which type of report to print: 'full' (default) or 'minimal'.
+        example: full
+      - name: --json
+        type: boolean_true
+        description: |
+          Write report in JSON format to this file.
+      - name: --output
+        type: file
+        description: |
+          Glob pattern for matching the expected output files.
+          Should include `$output_dir`.
+        example: "fastq/*_001.fast[a,q]"
+        direction: output
+        required: true
+        must_exist: true
+        multiple: true
+      - name: --fasta
+        type: boolean_true
+        description: |
+          Output FASTA to standard output even on FASTQ input.
+      - name: --info_file
+        type: boolean_true
+        description: |
+          Write information about each read and its adapter matches
+          into info.txt in the output directory.
+          See the documentation for the file format.
+      # - name: -Z
+      # - name: --rest_file
+      # - name: --wildcard-file
+      # - name: --too_short_output
+      # - name: --too_long_output
+      # - name: --untrimmed_output
+      # - name: --untrimmed_paired_output
+      # - name: too_short_paired_output
+      # - name: too_long_paired_output
+  - name: Debug
+    arguments:
+      - type: boolean_true
+        name: --debug
+        description: Print debug information
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: python:3.12
+    setup:
+      - type: python
+        pip:
+          - cutadapt
+      - type: docker
+        run: |
+          cutadapt --version | sed 's/\(.*\)/cutadapt: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
