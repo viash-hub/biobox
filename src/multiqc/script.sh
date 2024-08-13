@@ -1,26 +1,32 @@
 #!/bin/bash
 
 # disable flags
-[[ "$par_ignore_symlinks" == "false" ]] && unset par_ignore_symlinks
-[[ "$par_dirs" == "false" ]] && unset par_dirs
-[[ "$par_full_names" == "false" ]] && unset par_full_names
-[[ "$par_fn_as_s_name" == "false" ]] && unset par_fn_as_s_name
-[[ "$par_profile_runtime" == "false" ]] && unset par_profile_runtime
-[[ "$par_verbose" == "false" ]] && unset par_verbose
-[[ "$par_quiet" == "false" ]] && unset par_quiet
-[[ "$par_strict" == "false" ]] && unset par_strict
-[[ "$par_development" == "false" ]] && unset par_development
-[[ "$par_require_logs" == "false" ]] && unset par_require_logs
-[[ "$par_no_megaqc_upload" == "false" ]] && unset par_no_megaqc_upload
-[[ "$par_no_ansi" == "false" ]] && unset par_no_ansi
-[[ "$par_flat" == "false" ]] && unset par_flat
-[[ "$par_interactive" == "false" ]] && unset par_interactive
-[[ "$par_static_plot_export" == "false" ]] && unset par_static_plot_export
-[[ "$par_data_dir" == "false" ]] && unset par_data_dir
-[[ "$par_no_data_dir" == "false" ]] && unset par_no_data_dir
-[[ "$par_zip_data_dir" == "false" ]] && unset par_zip_data_dir
-[[ "$par_pdf" == "false" ]] && unset par_pdf
+unset_if_false=(
+    par_ignore_symlinks
+    par_dirs
+    par_full_names
+    par_fn_as_s_name
+    par_profile_runtime
+    par_verbose
+    par_quiet
+    par_strict
+    par_development
+    par_require_logs
+    par_no_megaqc_upload
+    par_no_ansi
+    par_flat
+    par_interactive
+    par_static_plot_export
+    par_data_dir
+    par_no_data_dir
+    par_zip_data_dir
+    par_pdf
+)
 
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 # handle inputs
 out_dir=$(dirname "$par_output_report")
