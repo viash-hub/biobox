@@ -29,11 +29,17 @@
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
 
 
+* `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
 
 * Update CI to reusable workflow in `viash-io/viash-actions` (PR #86).
+
+* Update several components in order to avoid duplicate code when using `unset` on boolean arguments (PR #133).
+
+* Bump viash to `0.9.0-RC7` (PR #134)
 
 ## DOCUMENTATION
 
