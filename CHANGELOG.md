@@ -38,6 +38,8 @@
 
 * Update several components in order to avoid duplicate code when using `unset` on boolean arguments (PR #133).
 
+* Bump viash to `0.9.0-RC7` (PR #134)
+
 ## DOCUMENTATION
 
 * Extend the contributing guidelines (PR #82):
