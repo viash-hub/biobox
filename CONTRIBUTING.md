@@ -320,6 +320,31 @@ Notes:
 
 * If your tool allows for multiple inputs using a separator other than `;` (which is the default Viash multiple separator), you can substitute these values with a command like: `par_disable_filters=$(echo $par_disable_filters | tr ';' ',')`.
 
+* If you have a lot of boolean variables that you would like to unset when the value is `false`, you can avoid duplicate code by using the following syntax:
+
+```bash
+unset_if_false=(
+    par_argument_1
+    par_argument_2
+    par_argument_3
+    par_argument_4
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
+```
+
+this code is equivalent to
+
+```bash
+[[ "$par_argument_1" == "false" ]] && unset par_argument_1
+[[ "$par_argument_2" == "false" ]] && unset par_argument_2
+[[ "$par_argument_3" == "false" ]] && unset par_argument_3
+[[ "$par_argument_4" == "false" ]] && unset par_argument_4
+```
+
 
 ### Step 12: Create test script
 

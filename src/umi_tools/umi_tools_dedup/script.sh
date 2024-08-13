@@ -7,19 +7,26 @@ set -e
 
 test_dir="${metal_executable}/test_data"
 
-[[ "$par_paired" == "false" ]] && unset par_paired
-[[ "$par_in_sam" == "false" ]] && unset par_in_sam
-[[ "$par_out_sam" == "false" ]] && unset par_out_sam
-[[ "$par_spliced_is_unique" == "false" ]] && unset par_spliced_is_unique
-[[ "$par_per_gene" == "false" ]] && unset par_per_gene
-[[ "$par_per_contig" == "false" ]] && unset par_per_contig
-[[ "$par_per_cell" == "false" ]] && unset par_per_cell
-[[ "$par_no_sort_output" == "false" ]] && unset par_no_sort_output
-[[ "$par_buffer_whole_contig" == "false" ]] && unset par_buffer_whole_contig
-[[ "$par_ignore_umi" == "false" ]] && unset par_ignore_umi
-[[ "$par_subset" == "false" ]] && unset par_subset
-[[ "$par_log2stderr" == "false" ]] && unset par_log2stderr
-[[ "$par_read_length" == "false" ]] && unset par_read_length
+unset_if_false=(
+   par_paired
+   par_in_sam
+   par_out_sam
+   par_spliced_is_unique
+   par_per_gene
+   par_per_contig
+   par_per_cell
+   par_no_sort_output
+   par_buffer_whole_contig
+   par_ignore_umi
+   par_subset
+   par_log2stderr
+   par_read_length
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 umi_tools dedup \
     --stdin "$par_input" \
