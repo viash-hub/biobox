@@ -5,14 +5,19 @@
 
 set -exo pipefail
 
-test_dir="${metal_executable}/test_data"
+unset_if_false=(
+   par_error_correct_cell
+   par_reconcile_pairs
+   par_three_prime
+   par_ignore_read_pair_suffixes
+   par_timeit_header
+   par_log2stderr
+)
 
-[[ "$par_error_correct_cell" == "false" ]] && unset par_error_correct_cell
-[[ "$par_reconcile_pairs" == "false" ]] && unset par_reconcile_pairs
-[[ "$par_three_prime" == "false" ]] && unset par_three_prime
-[[ "$par_ignore_read_pair_suffixes" == "false" ]] && unset par_ignore_read_pair_suffixes
-[[ "$par_timeit_header" == "false" ]] && unset par_timeit_header
-[[ "$par_log2stderr" == "false" ]] && unset par_log2stderr
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 
 # Check if we have the correct number of input files and patterns for paired-end or single-end reads
