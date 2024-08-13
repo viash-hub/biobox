@@ -88,14 +88,14 @@ cd star_align_reads_se
 echo "> Run star_align_reads on SE"
 "$meta_executable" \
   --input "../reads_R1.fastq" \
-  --genomeDir "../index/" \
+  --genome_dir "../index/" \
   --aligned_reads "output.sam" \
   --log "log.txt" \
-  --outReadsUnmapped "Fastx" \
+  --out_reads_unmapped "Fastx" \
   --unmapped "unmapped.sam" \
-  --quantMode "TranscriptomeSAM;GeneCounts" \
+  --quant_mode "TranscriptomeSAM;GeneCounts" \
   --reads_per_gene "reads_per_gene.tsv" \
-  --outSJtype Standard \
+  --out_sj_type Standard \
   --splice_junctions "splice_junctions.tsv" \
   --reads_aligned_to_transcriptome "transcriptome_aligned.bam" \
   ${meta_cpus:+---cpus $meta_cpus}
@@ -143,10 +143,10 @@ echo ">> Run star_align_reads on PE"
 "$meta_executable" \
   --input ../reads_R1.fastq \
   --input_r2 ../reads_R2.fastq \
-  --genomeDir ../index/ \
+  --genome_dir ../index/ \
   --aligned_reads output.bam \
   --log log.txt \
-  --outReadsUnmapped Fastx \
+  --out_reads_unmapped Fastx \
   --unmapped unmapped_r1.bam \
   --unmapped_r2 unmapped_r2.bam \
   ${meta_cpus:+---cpus $meta_cpus}
