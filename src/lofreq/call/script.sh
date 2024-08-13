@@ -4,21 +4,28 @@
 ## VIASH END
 
 # Unset all parameters that are set to "false"
-[[ "$par_no_baq" == "false" ]] && unset par_no_baq
-[[ "$par_no_idaq" == "false" ]] && unset par_no_idaq
-[[ "$par_del_baq" == "false" ]] && unset par_del_baq
-[[ "$par_no_ext_baq" == "false" ]] && unset par_no_ext_baq
-[[ "$par_no_mq" == "false" ]] && unset par_no_mq
-[[ "$par_call_indels" == "false" ]] && unset par_call_indels
-[[ "$par_only_indels" == "false" ]] && unset par_only_indels
-[[ "$par_src_qual" == "false" ]] && unset par_src_qual
-[[ "$par_illumina_13" == "false" ]] && unset par_illumina_13
-[[ "$par_use_orphan" == "false" ]] && unset par_use_orphan
-[[ "$par_plp_summary_only" == "false" ]] && unset par_plp_summary_only
-[[ "$par_no_default_filter" == "false" ]] && unset par_no_default_filter
-[[ "$par_force_overwrite" == "false" ]] && unset par_force_overwrite
-[[ "$par_verbose" == "false" ]] && unset par_verbose
-[[ "$par_debug" == "false" ]] && unset par_debug
+unset_if_false=(
+    par_no_baq
+    par_no_idaq
+    par_del_baq
+    par_no_ext_baq
+    par_no_mq
+    par_call_indels
+    par_only_indels
+    par_src_qual
+    par_illumina_13
+    par_use_orphan
+    par_plp_summary_only
+    par_no_default_filter
+    par_force_overwrite
+    par_verbose
+    par_debug
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 # Run lofreq call
 lofreq call \
