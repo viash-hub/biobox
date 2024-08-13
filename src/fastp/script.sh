@@ -4,25 +4,32 @@
 ## VIASH END
 
 # disable flags
-[[ "$par_disable_adapter_trimming" == "false" ]] && unset par_disable_adapter_trimming
-[[ "$par_detect_adapter_for_pe" == "false" ]] && unset par_detect_adapter_for_pe
-[[ "$par_merge" == "false" ]] && unset par_merge
-[[ "$par_include_unmerged" == "false" ]] && unset par_include_unmerged
-[[ "$par_interleaved_in" == "false" ]] && unset par_interleaved_in
-[[ "$par_fix_mgi_id" == "false" ]] && unset par_fix_mgi_id
-[[ "$par_phred64" == "false" ]] && unset par_phred64
-[[ "$par_dont_overwrite" == "false" ]] && unset par_dont_overwrite
-[[ "$par_verbose" == "false" ]] && unset par_verbose
-[[ "$par_dedup" == "false" ]] && unset par_dedup
-[[ "$par_dont_eval_duplication" == "false" ]] && unset par_dont_eval_duplication
-[[ "$par_trim_poly_g" == "false" ]] && unset par_trim_poly_g
-[[ "$par_disable_trim_poly_g" == "false" ]] && unset par_disable_trim_poly_g
-[[ "$par_trim_poly_x" == "false" ]] && unset par_trim_poly_x
-[[ "$par_disable_quality_filtering" == "false" ]] && unset par_disable_quality_filtering
-[[ "$par_disable_length_filtering" == "false" ]] && unset par_disable_length_filtering
-[[ "$par_low_complexity_filter" == "false" ]] && unset par_low_complexity_filter
-[[ "$par_umi" == "false" ]] && unset par_umi
-[[ "$par_overrepresentation_analysis" == "false" ]] && unset par_overrepresentation_analysis
+unset_if_false=(
+    par_disable_adapter_trimming
+    par_detect_adapter_for_pe
+    par_merge
+    par_include_unmerged
+    par_interleaved_in
+    par_fix_mgi_id
+    par_phred64
+    par_dont_overwrite
+    par_verbose
+    par_dedup
+    par_dont_eval_duplication
+    par_trim_poly_g
+    par_disable_trim_poly_g
+    par_trim_poly_x
+    par_disable_quality_filtering
+    par_disable_length_filtering
+    par_low_complexity_filter
+    par_umi
+    par_overrepresentation_analysis
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 # run command
 fastp \
