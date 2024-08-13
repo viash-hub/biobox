@@ -19,24 +19,31 @@ par_feature_type=$(echo $par_feature_type | tr ',' ';')
 par_extra_attributes=$(echo $par_extra_attributes | tr ',' ';')
 
 # unset flag variables
-[[ "$par_feature_level" == "false" ]] && unset par_feature_level
-[[ "$par_overlapping" == "false" ]] && unset par_overlapping
-[[ "$par_largest_overlap" == "false" ]] && unset par_largest_overlap
-[[ "$par_multi_mapping" == "false" ]] && unset par_multi_mapping
-[[ "$par_fraction" == "false" ]] && unset par_fraction
-[[ "$par_split_only" == "false" ]] && unset par_split_only
-[[ "$par_non_split_only" == "false" ]] && unset par_non_split_only
-[[ "$par_primary" == "false" ]] && unset par_primary
-[[ "$par_ignore_dup" == "false" ]] && unset par_ignore_dup
-[[ "$par_paired" == "false" ]] && unset par_paired
-[[ "$par_count_read_pairs" == "false" ]] && unset par_count_read_pairs
-[[ "$par_both_aligned" == "false" ]] && unset par_both_aligned
-[[ "$par_check_pe_dist" == "false" ]] && unset par_check_pe_dist
-[[ "$par_same_strand" == "false" ]] && unset par_same_strand
-[[ "$par_donotsort" == "false" ]] && unset par_donotsort
-[[ "$par_by_read_group" == "false" ]] && unset par_by_read_group
-[[ "$par_long_reads" == "false" ]] && unset par_long_reads
-[[ "$par_verbose" == "false" ]] && unset par_verbose
+unset_if_false=(
+    par_feature_level
+    par_overlapping
+    par_largest_overlap
+    par_multi_mapping
+    par_fraction
+    par_split_only
+    par_non_split_only
+    par_primary
+    par_ignore_dup
+    par_paired
+    par_count_read_pairs
+    par_both_aligned
+    par_check_pe_dist
+    par_same_strand
+    par_donotsort
+    par_by_read_group
+    par_long_reads
+    par_verbose
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 IFS=";" read -ra input <<< $par_input
 
