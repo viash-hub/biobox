@@ -1,0 +1,93 @@
+name: bedtools_sort
+namespace: bedtools
+description: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria.
+keywords: [sort, BED, GFF, VCF]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/sort.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: GPL-2.0, MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: -i
+        type: file
+        description: Input file (bed/gff/vcf) to be sorted.
+        required: true
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: -o
+        type: file
+        direction: output
+        description: Output sorted file (bed/gff/vcf) to be written.
+
+  - name: Options
+    arguments:
+      - name: --sizeA
+        type: boolean_true
+        description: Sort by feature size in ascending order.
+      
+      - name: --sizeD
+        type: boolean_true
+        description: Sort by feature size in descending order.
+
+      - name: --chrThenSizeA 
+        type: boolean_true
+        description: Sort by chrom (asc), then feature size (asc).
+      
+      - name: --chrThenSizeD
+        type: boolean_true
+        description: Sort by chrom (asc), then feature size (desc).
+
+      - name: --chrThenScoreA
+        type: boolean_true
+        description: Sort by chrom (asc), then score (asc).
+
+      - name: --chrThenScoreD
+        type: boolean_true
+        description: Sort by chrom (asc), then score (desc).
+
+      - name: --genome
+        alternatives: -g
+        type: file
+        description: Sort according to the chromosomes declared in "genome.txt"
+
+      - name: --faidx
+        type: file
+        description: Sort according to the chromosomes declared in "names.txt"
+
+      - name: --header
+        type: boolean_true
+        description: Print the header from the A file prior to results.
+      
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bedtools, procps]
+      - type: docker
+        run: |
+          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
