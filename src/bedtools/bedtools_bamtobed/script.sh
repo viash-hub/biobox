@@ -6,15 +6,22 @@
 set -eo pipefail
 
 # Unset parameters
-[[ "$par_bedpe" == "false" ]] && unset par_bedpe
-[[ "$par_mate1" == "false" ]] && unset par_mate1
-[[ "$par_bed12" == "false" ]] && unset par_bed12
-[[ "$par_split" == "false" ]] && unset par_split
-[[ "$par_splitD" == "false" ]] && unset par_splitD
-[[ "$par_edit_distance" == "false" ]] && unset par_edit_distance
-[[ "$par_tag" == "false" ]] && unset par_tag
-[[ "$par_color" == "false" ]] && unset par_color
-[[ "$par_cigar" == "false" ]] && unset par_cigar
+unset_if_false=( 
+  par_bedpe
+  par_mate1
+  par_bed12
+  par_split
+  par_splitD
+  par_edit_distance
+  par_tag
+  par_color
+  par_cigar
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 # Execute bedtools sort with the provided arguments
 bedtools bamtobed \
