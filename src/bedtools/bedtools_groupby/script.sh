@@ -7,11 +7,18 @@
 set -eo pipefail
 
 # Unset parameters
-[[ "$par_full" == "false" ]] && unset par_full
-[[ "$par_inheader" == "false" ]] && unset par_inheader
-[[ "$par_outheader" == "false" ]] && unset par_outheader
-[[ "$par_header" == "false" ]] && unset par_header
-[[ "$par_ignorecase" == "false" ]] && unset par_ignorecase
+unset_if_false=(
+    par_full
+    par_inheader
+    par_outheader
+    par_header
+    par_ignorecase
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 bedtools groupby \
     ${par_full:+-full} \
