@@ -15,7 +15,7 @@ argument_groups:
       - name: --fastq
         type: file
         description: Data is in one or more default fastq file(s).
-        default: "/test_data"
+        default: "src/nanoplot/test_data/test1.fastq"
         example: read.fq
         direction: input
         multiple: true
@@ -107,6 +107,11 @@ argument_groups:
         description: NanoPlot report
         direction: output
         example: NanoPlot-report.html
+      - name: --log
+        type: file
+        description: Output Log file.
+        direction: output
+        example: NanoPlot_*.log
   - name: Options
     arguments:
       - name: --threads
@@ -217,6 +222,9 @@ argument_groups:
       - name: --no_N50 
         type: boolean_false
         description: Hide the N50 mark in the read length histogram.
+      - name: --N50 
+        type: boolean_true
+        description: Show the N50 mark in the read length histogram.
       - name: --title
         type: string
         description: Add a title to all plots, requires quoting if using spaces.
