@@ -12,7 +12,6 @@ IFS=";" read -ra file_names <<< "$par_gff"
 for file in "${file_names[@]}"; do
     input_files+="--gff $file "
 done
-unset IFS
 
 # take care of --genome (can originally be either a fasta file or an integer)
 if [[ -n "$par_genome_size" ]]; then
