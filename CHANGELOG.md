@@ -20,15 +20,14 @@
                 based on a provided sequence IDs or region coordinates file (PR #85).
 
 * `agat`:
-  - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
-  - `/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
+  - `agat/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
+  - `agat/agat_sp_compare_two_annotations`: compare two annotation of the same assembly (PR #127).
 
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
-
-
-* `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
 
 ## MINOR CHANGES
 
