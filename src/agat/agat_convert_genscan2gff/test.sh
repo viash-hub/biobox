@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ## VIASH START
 ## VIASH END
 
