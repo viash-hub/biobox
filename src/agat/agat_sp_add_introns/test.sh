@@ -8,7 +8,7 @@ set -e
 test_dir="${meta_resources_dir}/test_data"
 
 # create temporary directory and clean up on exit
-TMPDIR=$(mktemp --tmpdir "$meta_temp_dir")
+TMPDIR=$(mktemp -d --tmpdir "$meta_temp_dir")
 function clean_up {
  rm -rf "$TMPDIR"
 }
