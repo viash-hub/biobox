@@ -62,8 +62,9 @@ argument_groups:
             
           You can specify directly all the feature of a particular
           level: 
-          * level2=mRNA,ncRNA,tRNA,etc 
-          * level3=CDS,exon,UTR,etc. 
+
+            * level2=mRNA,ncRNA,tRNA,etc 
+            * level3=CDS,exon,UTR,etc. 
           
           By default all features are taken into account. Fill the option with the value "all" will have the same behaviour.
         type: string
