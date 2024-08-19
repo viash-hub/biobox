@@ -21,6 +21,8 @@ links:
 references: 
   doi: 10.5281/zenodo.3552717
 license: GPL-3.0
+requirements:
+  - commands: [agat]
 authors:
   - __merge__: /src/_authors/leila_paquay.yaml
     roles: [ author, maintainer ]
