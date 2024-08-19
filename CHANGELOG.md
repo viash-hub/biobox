@@ -30,6 +30,8 @@
 
 * `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
 
+* `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
