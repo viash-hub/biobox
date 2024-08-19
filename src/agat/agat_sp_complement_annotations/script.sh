@@ -14,8 +14,6 @@ IFS=";" read -ra file_names <<< "$par_add"
 for file in "${file_names[@]}"; do
     input_files+="--add $file "
 done
-unset IFS
-
 
 # run agat_sp_complement_annotations.pl
 agat_sp_complement_annotations.pl \
