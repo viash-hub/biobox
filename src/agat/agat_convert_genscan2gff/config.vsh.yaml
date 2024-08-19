@@ -1,8 +1,8 @@
 name: agat_convert_genscan2gff
 namespace: agat
 description: |
-  The script takes a genscan file as input, and will translate it in gff
-  format. The genscan format is described [here](http://genome.crg.es/courses/Bioinformatics2003_genefinding/results/genscan.html).
+  The script takes a GENSCAN file as input, and will translate it in gff
+  format. The GENSCAN format is described [here](http://genome.crg.es/courses/Bioinformatics2003_genefinding/results/genscan.html).
   
   **Known problem** 
 
@@ -12,7 +12,7 @@ description: |
   nucleotides of the sequence. Then all prediction location are shifted
   accordingly. (checked only on the [online version](http://argonaute.mit.edu/GENSCAN.html). 
   I don't know if there is the same problem elsewhere.)
-keywords: [gene annotations, GFF conversion]
+keywords: [gene annotations, GFF conversion, GENSCAN]
 links:
   homepage: https://github.com/NBISweden/AGAT
   documentation: https://agat.readthedocs.io/en/latest/tools/agat_convert_genscan2gff.html
