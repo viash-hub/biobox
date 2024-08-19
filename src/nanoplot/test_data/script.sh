@@ -1,7 +1,6 @@
 #!/bin/bash
 
 ## Fastq file ##
-
 # Define the number of reads
 NUM_READS=10
 OUTPUT_FILE="./src/nanoplot/test_data/test1.fastq"
