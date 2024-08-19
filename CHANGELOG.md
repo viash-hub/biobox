@@ -25,7 +25,7 @@
   - `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
   - `agat/agat_convert_sp_gff2tsv`: convert gtf/gff file into tabulated file (PR #102).
   - `agat/agat_convert_sp_gxf2gxf`: fixes and/or standardizes any GTF/GFF file into full sorted GTF/GFF file (PR #103).
-  - `agat_sp_extract_attributes`: extract choosen attributes from a GFF file (PR #131).
+  - `agat/agat_sp_extract_attributes`: extract choosen attributes from a GFF file (PR #131).
 
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
