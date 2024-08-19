@@ -1,7 +1,7 @@
 name: agat_sp_add_introns
 namespace: agat
 description: |
-  The script aims to add intron features to gtf/gff file without intron features.
+  Add intronic elements to a gtf/gff file without intron features.
 keywords: [gene annotations, GTF conversion]
 links:
   homepage: https://github.com/NBISweden/AGAT
