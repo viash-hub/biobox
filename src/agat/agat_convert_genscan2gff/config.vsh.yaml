@@ -57,10 +57,6 @@ argument_groups:
         type: string
         required: false
         example: gene
-      - name: --inflate_off
-        description: |
-          By default we inflate the block fields (blockCount, blockSizes, blockStarts) to create subfeatures of the main feature (primary_tag). Type of subfeature created based on the inflate_type parameter. If you don't want this inflating behaviour you can deactivate it by using the option --inflate_off.
-        type: boolean_false
       - name: --inflate_type
         description: |
           Feature type (3rd column in gff) created when inflate parameter activated [default: exon].
