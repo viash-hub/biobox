@@ -1,6 +1,6 @@
 name: trimgalore
 description: | 
-  
+  A wrapper tool around Cutadapt and FastQC to consistently apply quality and adapter trimming to FastQ files. 
 keywords: ["trimming", "adapters"]
 links:
   homepage: https://github.com/FelixKrueger/TrimGalore
@@ -36,12 +36,10 @@ argument_groups:
         type: boolean
         description: Instructs Cutadapt to use ASCII+33 quality scores as Phred scores (Sanger/Illumina 1.9+ encoding) for quality trimming. 
         required: false
-        default: true
       - name: --phred64
         type: boolean
         description: Instructs Cutadapt to use ASCII+64 quality scores as Phred scores (Illumina 1.5 encoding) for quality trimming.
         required: false
-        default: false
       - name: --fastqc
         type: boolean
         description: Run FastQC in the default mode on the FastQ file once trimming is complete.
@@ -309,7 +307,7 @@ engines:
   setup:
     - type: docker
       run: |
-        echo "TrimGalore: `trim_galore --version | grep -oP 'version \K\d+\.\d+\.\d+'`" > /var/software_versions.txt
+        echo "TrimGalore: `trim_galore --version | sed -n 's/.*version\s\+\([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p'`" > /var/software_versions.txt
 
 runners:
   - type: executable

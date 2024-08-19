@@ -6,7 +6,25 @@ set -eo pipefail
 
 IFS=";" read -ra input <<< $par_input
 
-unset_if_false=( par_phred33 par_phred64 par_fastqc par_illumina par_stranded_illumina par_nextera par_small_rna par_gzip par_dont_gzip par_no_report_file par_suppress_warn par_clock par_polyA par_rrbs par_non_directional par_keep par_paired par_retain_unpaired )
+unset_if_false=( 
+    par_phred33 
+    par_phred64 
+    par_fastqc 
+    par_illumina 
+    par_stranded_illumina 
+    par_nextera 
+    par_small_rna 
+    par_gzip 
+    par_dont_gzip 
+    par_no_report_file 
+    par_suppress_warn 
+    par_clock 
+    par_polyA 
+    par_rrbs 
+    par_non_directional 
+    par_keep par_paired 
+    par_retain_unpaired 
+)
 
 for par in ${unset_if_false[@]}; do
     test_val="${!par}"
@@ -59,21 +77,35 @@ trim_galore \
     ${input[*]}
 
 if [ $par_paired == "true" ]; then     
+
     input_r1=$(basename -- "${input[0]}")
     input_r2=$(basename -- "${input[1]}")
-    [[ ! -z "$par_trimmed_r1" ]] && mv "$par_output_dir/*val_1*.f*q.*" "$par_trimmed_r1"
-    [[ ! -z "$par_trimmed_r2" ]] && mv "$par_output_dir/*val_2*.f*q.*" "$par_trimmed_r2"
-    [[ ! -z "$par_trimming_report_r1" ]] && mv "$par_output_dir/${input_r1}_trimming_report.txt" "$par_trimming_report_r1"
-    [[ ! -z "$par_trimming_report_r2" ]] && mv "$par_output_dir/${input_r1}_trimming_report.txt" "$par_trimming_report_r2"
-    [[ ! -z "$par_trimmed_fastqc_html_1" ]] && mv "$par_output_dir/*val_1*.html" "$par_trimmed_fastqc_html_1"
-    [[ ! -z "$par_trimmed_fastqc_html_2" ]] && mv "$par_output_dir/*val_2*.html" "$par_trimmed_fastqc_html_2"
-    [[ ! -z "$par_trimmed_fastqc_zip_1" ]] && mv "$par_output_dir/*val_1*.zip" "$par_trimmed_fastqc_zip_1"
-    [[ ! -z "$par_trimmed_fastqc_zip_2" ]] && mv "$par_output_dir/*val_2*.zip" "$par_trimmed_fastqc_zip_2"
-    [[ ! -z "$par_unpaired_r1" ]] && mv "$par_output_dir/*.unpaired_1.f*q.*" "$par_unpaired_r1"
-    [[ ! -z "$par_unpaired_r2" ]] && mv "$par_output_dir/*.unpaired_2.f*q.*" "$par_unpaired_r2"
+    [[ ! -z "$par_trimmed_r1" ]] && mv $par_output_dir/*val_1.f*q* $par_trimmed_r1
+    [[ ! -z "$par_trimmed_r2" ]] && mv $par_output_dir/*val_2.f*q* $par_trimmed_r2
+    [[ ! -z "$par_trimming_report_r1" ]] && mv $par_output_dir/${input_r1}_trimming_report.txt $par_trimming_report_r1
+    [[ ! -z "$par_trimming_report_r2" ]] && mv $par_output_dir/${input_r2}_trimming_report.txt $par_trimming_report_r2
+    
+    if [ "$par_fastqc" == "true" ]; then 
+        [[ ! -z "$par_trimmed_fastqc_html_1" ]] && mv $par_output_dir/*val_1_fastqc.html $par_trimmed_fastqc_html_1
+        [[ ! -z "$par_trimmed_fastqc_html_2" ]] && mv $par_output_dir/*val_2_fastqc.html $par_trimmed_fastqc_html_2
+        [[ ! -z "$par_trimmed_fastqc_zip_1" ]] && mv $par_output_dir/*val_1_fastqc.zip $par_trimmed_fastqc_zip_1
+        [[ ! -z "$par_trimmed_fastqc_zip_2" ]] && mv $par_output_dir/*val_2_fastqc.zip $par_trimmed_fastqc_zip_2
+    fi
+    
+    if [ "$par_retain_unpaired" == "true" ]; then
+        [[ ! -z "$par_unpaired_r1" ]] && mv $par_output_dir/*.unpaired_1.f*q* $par_unpaired_r1
+        [[ ! -z "$par_unpaired_r2" ]] && mv $par_output_dir/*.unpaired_2.f*q* $par_unpaired_r2
+    fi
+
 else
+    
     input_r1=$(basename -- "${input[0]}")
-    [[ ! -z "$par_trimmed_r1" ]] && mv "$par_output_dir/*_trimmed.fq*" "$trimmed_r1"
-    [[ ! -z "$par_trimming_report_r1" ]] && mv "$par_output_dir/${input_r1}_trimming_report.txt" "$par_trimming_report_r1"
-    [[ ! -z "$par_trimmed_fastqc_html_1" ]] && mv "$par_output_dir/*_trimmed_fastqc.html" "$par_trimmed_fastqc_html_1"
-    [[ ! -z "$par_trimmed_fastqc_zip_1" ]] && mv "$par_output_dir/*_trimmed_fastqc.zip" "$par_trimmed_fastqc_zip_1"
+    [[ ! -z "$par_trimmed_r1" ]] && mv $par_output_dir/*_trimmed.fq* $par_trimmed_r1
+    [[ ! -z "$par_trimming_report_r1" ]] && mv $par_output_dir/${input_r1}_trimming_report.txt $par_trimming_report_r1
+    
+    if [ "$par_fastqc" == "true" ]; then 
+        [[ ! -z "$par_trimmed_fastqc_html_1" ]] && mv $par_output_dir/*_trimmed_fastqc.html $par_trimmed_fastqc_html_1
+        [[ ! -z "$par_trimmed_fastqc_zip_1" ]] && mv $par_output_dir/*_trimmed_fastqc.zip $par_trimmed_fastqc_zip_1
+    fi
+
+fi

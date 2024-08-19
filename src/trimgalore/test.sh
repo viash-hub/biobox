@@ -19,9 +19,6 @@ assert_file_not_empty() {
 assert_file_contains() {
   grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
 }
-assert_file_contains_line() {
-  grep -q -x "$2" "$1" || { echo "File '$1' does not contain line '$2'" && exit 1; }
-}
 assert_file_not_contains() {
   grep -q "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
 }
@@ -31,68 +28,26 @@ assert_file_not_contains() {
 echo ">>> Prepare test data"
 
 cat > example_R1.fastq <<'EOF'
-@read1
-ACGTACGTACGTAAAAA
+@SRR6357071.22842410 22842410/1 kraken:taxid|4932
+CAAGTTTTCATCTTCAACAGCTGATTGACTTCTTTGTGGTATGCCTCGATATATTTTTCTTTTTCTTTAATATCTTTATTATAGGTGATTGCCTCATCGTA
 +
-IIIIIIIIIIIIIIIII
-@read2
-ACGTACGTACGTCCCCC
+BBBBBFFFFFFFFFFFFFFF/BFFFFFFFFFFFFFFFFBFFBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFFFFFFFFFFFFFFFFFBF<
+@SRR6357071.52260105 52260105/1 kraken:taxid|4932
+TAGACTTACCAGTACCCTTTTCGACGGCGGAAACATTCAAAATACCGTTAGAGTCGACATCGAAAGTGACTTCAATTTGTGGGACACCTCTTGGAGCTGGT
 +
-IIIIIIIIIIIIIIIII
+BBBBBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF/FFFFFFFFFFFFFFFF
 EOF
 
 cat > example_R2.fastq <<'EOF'
-@read1
-ACGTACGTACGTGGGGG
+@SRR6357071.22842410 22842410/2 kraken:taxid|4932
+CCGAGATCGAAGAAACGAATTCACCTGATTGCAGCTGTAAAAGCAGTAAAATCAATCAAACCAATACGGACAACCTTACGATACGATGAGGCAATCACCTA
 +
-IIIIIIIIIIIIIIIII
-@read2
-ACGTACGTACGTTTTTT
+BBBBBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@SRR6357071.52260105 52260105/2 kraken:taxid|4932
+GTTGATTCCAAGAAACTCTACCATTCCAACTAAGAAATCCGAAGTTTTCTCTACTTATGCTGACAACCAACCAGGTGTCTTGATTCAAGTCTTTGAAGGTG
 +
-IIIIIIIIIIIIIIIII
+BBBBBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 EOF
-
-#################################################################
-
-echo ">>> Testing for paired-end reads"
-"$meta_executable" \
-    --paired true \
-    --input "example_R1.fastq;example_R2.fastq" \
-    --adapter "ACG" \
-    --trimmed_fastqc_html_1 example_R1.trimmed.html \
-    --trimmed_fastqc_html_2 example_R2.trimmed.html \
-    --trimmed_fastqc_zip_1 example_R1.trimmed.zip \
-    --trimmed_fastqc_zip_2 example_R2.trimmed.zip \
-    --trimmed_r1 example_R1.trimmed.fastq \
-    --trimmed_r2 example_R2.trimmed.fastq \
-    --trimming_report_r1 example_R1.trimming_report.txt \
-    --trimming_report_r2 example_R2.trimming_report.txt
-
-echo ">> Checking output"
-assert_file_exists "example_R1.trimmed.html"
-assert_file_exists "example_R2.trimmed.html"
-assert_file_exists "example_R1.trimmed.zip"
-assert_file_exists "example_R2.trimmed.zip"
-assert_file_exists "example_R1.trimmed.fastq"
-assert_file_exists "example_R2.trimmed.fastq"
-assert_file_exists "example_R1.trimming_report.txt"
-assert_file_exists "example_R2.trimming_report.txt"
-
-echo ">> Check if output is empty"
-assert_file_not_empty "example_R1.trimmed.html"
-assert_file_not_empty "example_R2.trimmed.html"
-assert_file_not_empty "example_R1.trimmed.zip"
-assert_file_not_empty "example_R2.trimmed.zip"
-assert_file_not_empty "example_R1.trimmed.fastq"
-assert_file_not_empty "example_R2.trimmed.fastq"
-assert_file_not_empty "example_R1.trimming_report.txt"
-assert_file_not_empty "example_R2.trimming_report.txt"
-
-echo ">> Check contents"
-assert_file_contains_line "example_R1.trimmed.fastq" "TACGTACGTAAAAA"
-assert_file_contains_line "example_R2.trimmed.fastq" "TACGTACGTGGGGG"
-assert_file_contains "example_R1.trimming_report.txt" "sequences processed in total"
-assert_file_contains "example_R2.trimming_report.txt" "Number of sequence pairs removed because at least one read was shorter than the length cutoff"
 
 #################################################################
 
@@ -100,27 +55,71 @@ echo ">>> Testing for single-end reads"
 "$meta_executable" \
     --paired false \
     --input "example_R1.fastq" \
-    --adapter "ACG" \
-    --trimmed_fastqc_html_1 example.trimmed.html \
-    --trimmed_fastqc_zip_1 example.trimmed.zip \
-    --trimmed_r1 example.trimmed.fastq \
-    --trimming_report_r1 example.trimming_report.txt \
+    --trimmed_fastqc_html_1 output_se_test/example.trimmed.html \
+    --trimmed_fastqc_zip_1 output_se_test/example.trimmed.zip \
+    --trimmed_r1 output_se_test/example.trimmed.fastq \
+    --trimming_report_r1 output_se_test/example.trimming_report.txt \
+    --fastqc true \
+    --output_dir output_se_test
 
 echo ">> Checking output"
-assert_file_exists "example.trimmed.html"
-assert_file_exists "example.trimmed.zip"
-assert_file_exists "example.trimmed.fastq"
-assert_file_exists "example.trimming_report.txt"
+assert_file_exists "output_se_test/example.trimmed.html"
+assert_file_exists "output_se_test/example.trimmed.zip"
+assert_file_exists "output_se_test/example.trimmed.fastq"
+assert_file_exists "output_se_test/example.trimming_report.txt"
 
 echo ">> Check if output is empty"
-assert_file_not_empty "example.trimmed.html"
-assert_file_not_empty "example.trimmed.zip"
-assert_file_not_empty "example.trimmed.fastq"
-assert_file_not_empty "example.trimming_report.txt"
+assert_file_not_empty "output_se_test/example.trimmed.html"
+assert_file_not_empty "output_se_test/example.trimmed.zip"
+assert_file_not_empty "output_se_test/example.trimmed.fastq"
+assert_file_not_empty "output_se_test/example.trimming_report.txt"
 
 echo ">> Check contents"
-assert_file_contains_line "example.trimmed.fastq" "TACGTACGTAAAAA"
-assert_file_contains "example.trimming_report.txt" "Sequences removed because they became shorter than the length cutoff"
+assert_file_contains "output_se_test/example.trimmed.fastq" "@SRR6357071.22842410 22842410/1"
+assert_file_contains "output_se_test/example.trimming_report.txt" "Sequences removed because they became shorter than the length cutoff"
+
+#################################################################
+
+echo ">>> Testing for paired-end reads"
+"$meta_executable" \
+    --paired true \
+    --input "example_R1.fastq;example_R2.fastq" \
+    --trimmed_fastqc_html_1 output_pe_test/example_R1.trimmed.html \
+    --trimmed_fastqc_html_2 output_pe_test/example_R2.trimmed.html \
+    --trimmed_fastqc_zip_1 output_pe_test/example_R1.trimmed.zip \
+    --trimmed_fastqc_zip_2 output_pe_test/example_R2.trimmed.zip \
+    --trimmed_r1 output_pe_test/example_R1.trimmed.fastq \
+    --trimmed_r2 output_pe_test/example_R2.trimmed.fastq \
+    --trimming_report_r1 output_pe_test/example_R1.trimming_report.txt \
+    --trimming_report_r2 output_pe_test/example_R2.trimming_report.txt \
+    --fastqc true \
+    --output_dir output_pe_test
+
+echo ">> Checking output"
+assert_file_exists "output_pe_test/example_R1.trimmed.html"
+assert_file_exists "output_pe_test/example_R2.trimmed.html"
+assert_file_exists "output_pe_test/example_R1.trimmed.zip"
+assert_file_exists "output_pe_test/example_R2.trimmed.zip"
+assert_file_exists "output_pe_test/example_R1.trimmed.fastq"
+assert_file_exists "output_pe_test/example_R2.trimmed.fastq"
+assert_file_exists "output_pe_test/example_R1.trimming_report.txt"
+assert_file_exists "output_pe_test/example_R2.trimming_report.txt"
+
+echo ">> Check if output is empty"
+assert_file_not_empty "output_pe_test/example_R1.trimmed.html"
+assert_file_not_empty "output_pe_test/example_R2.trimmed.html"
+assert_file_not_empty "output_pe_test/example_R1.trimmed.zip"
+assert_file_not_empty "output_pe_test/example_R2.trimmed.zip"
+assert_file_not_empty "output_pe_test/example_R1.trimmed.fastq"
+assert_file_not_empty "output_pe_test/example_R2.trimmed.fastq"
+assert_file_not_empty "output_pe_test/example_R1.trimming_report.txt"
+assert_file_not_empty "output_pe_test/example_R2.trimming_report.txt"
+
+echo ">> Check contents"
+assert_file_contains "output_pe_test/example_R1.trimmed.fastq" "@SRR6357071.22842410 22842410/1"
+assert_file_contains "output_pe_test/example_R2.trimmed.fastq" "@SRR6357071.22842410 22842410/2"
+assert_file_contains "output_pe_test/example_R1.trimming_report.txt" "sequences processed in total"
+assert_file_contains "output_pe_test/example_R2.trimming_report.txt" "Number of sequence pairs removed because at least one read was shorter than the length cutoff"
 
 #################################################################
 
