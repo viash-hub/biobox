@@ -55,6 +55,8 @@ for i in $(seq 1 $NUM_READS); do
     echo >> $OUTPUT_FILE  # Add a blank line between reads
 done
 
+#########################################################################################
+
 ## Bam file ##
 if [ ! -d /tmp/snakemake-wrappers ]; then
   git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
