@@ -4,7 +4,7 @@ description: |
   Merge different gff annotation files into one. It uses the
   AGAT parser that takes care of duplicated names and fixes other oddities
   met in those files.
-keywords: [gene annotations]
+keywords: [gene annotations, merge, gff]
 links:
   homepage: https://github.com/NBISweden/AGAT
   documentation: https://agat.readthedocs.io/en/latest/tools/agat_sp_merge_annotations.html
