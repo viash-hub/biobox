@@ -1,0 +1,91 @@
+name: bedtools_bedtobam
+namespace: bedtools
+description: Converts feature records (bed/gff/vcf) to BAM format.
+keywords: [Converts, BED, GFF, VCF, BAM]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/bedtobam.html
+  repository: https://github.com/arq5x/bedtools2
+  homepage: https://bedtools.readthedocs.io/en/latest/#
+  issue_tracker: https://github.com/arq5x/bedtools2/issues
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: -i
+        type: file
+        description: Input file (bed/gff/vcf).
+        required: true
+      
+      - name: --genome
+        alternatives: -g
+        type: file
+        description: | 
+          Input genome file.
+          NOTE: This is not a fasta file. This is a two-column tab-delimited file
+          where the first column is the chromosome name and the second their sizes.
+        required: true
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: -o
+        type: file
+        direction: output
+        description: Output BAM file to be written.
+
+  - name: Options
+    arguments:
+      - name: --map_quality
+        alternatives: -mapq
+        type: integer
+        description: | 
+          Set the mappinq quality for the BAM records.
+        min: 0
+        max: 255
+        default: 255
+      
+      - name: --bed12
+        type: boolean_true
+        description: | 
+          The BED file is in BED12 format. The BAM CIGAR
+          string will reflect BED "blocks".
+
+      - name: --uncompress_bam
+        alternatives: -ubam
+        type: boolean_true
+        description: | 
+          Write uncompressed BAM output. Default writes compressed BAM.
+      
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bedtools, procps]
+      - type: docker
+        run: |
+          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+    test_setup:  
+      - type: apt  
+        packages: [samtools]
+
+runners:
+  - type: executable
+  - type: nextflow
