@@ -68,6 +68,7 @@ argument_groups:
           
           By default all features are taken into account. Fill the option with the value "all" will have the same behaviour.
         type: string
+        multiple: true
         required: false
       - name: --attribute
         alternatives: [-a]
