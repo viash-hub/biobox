@@ -30,6 +30,8 @@
 
 * `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
 
+* `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
