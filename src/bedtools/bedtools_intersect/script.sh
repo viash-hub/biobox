@@ -24,6 +24,7 @@ unset_if_false=(
     par_sortout
     par_bed
     par_no_buffer_output
+    par_header
 )
 
 for par in ${unset_if_false[@]}; do
