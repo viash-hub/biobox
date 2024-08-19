@@ -6,7 +6,6 @@ set -eo pipefail
 ## VIASH END
 
 test_dir="${meta_resources_dir}/test_data"
-out_dir="${meta_resources_dir}/out_data"
 
 echo "> Run $meta_name with test data"
 "$meta_executable" \
