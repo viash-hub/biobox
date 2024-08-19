@@ -52,13 +52,20 @@ argument_groups:
       - name: --type
         alternatives: [-p, -l]
         description: |
-          Primary tag option, case insensitive, list. Allow to specify the
-          feature types that will be handled. You can specify a specific
-          feature by giving its primary tag name (column 3) as: cds, Gene,
-          MrNa. You can specify directly all the feature of a particular
-          level: level2=mRNA,ncRNA,tRNA,etc level3=CDS,exon,UTR,etc. By
-          default all features are taken into account. Fill the option with
-          the value "all" will have the same behaviour.
+          Primary tag option, case insensitive, list. Allow to specify the feature types that will be handled. 
+          
+          You can specify a specific feature by giving its primary tag name (column 3) as: 
+          
+            * cds
+            * Gene
+            * mRNA
+            
+          You can specify directly all the feature of a particular
+          level: 
+          * level2=mRNA,ncRNA,tRNA,etc 
+          * level3=CDS,exon,UTR,etc. 
+          
+          By default all features are taken into account. Fill the option with the value "all" will have the same behaviour.
         type: string
         required: false
       - name: --attribute
