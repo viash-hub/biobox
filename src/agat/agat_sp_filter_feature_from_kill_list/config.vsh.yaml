@@ -44,7 +44,7 @@ argument_groups:
           Path to the output GFF file that contains filtered features. 
         type: file
         direction: output
-        required: false
+        required: true
   - name: Arguments
     arguments:
       - name: --type
