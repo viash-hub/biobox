@@ -7,7 +7,7 @@ description: |
   Removing a level1 or level2 feature will automatically remove all linked
   subfeatures, and removing all children of a feature will automatically
   remove this feature too.
-keywords: [gene annotations]
+keywords: [gene annotations, filtering, gff]
 links:
   homepage: https://github.com/NBISweden/AGAT
   documentation: https://agat.readthedocs.io/en/latest/tools/agat_sp_filter_feature_from_kill_list.html
