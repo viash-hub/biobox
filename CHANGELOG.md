@@ -32,6 +32,8 @@
   - `bedtools/bedtools_bamtofastq`: Convert BAM alignments to FASTQ files (PR #101).
   - `bedtools/bedtools_bedtobam`: Converts genomic feature records (bed/gff/vcf) to BAM format (PR #111).
 
+* `agat/agat_sp_statistics`: provides exhaustive statistics of a gft/gff file (PR #107).
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
