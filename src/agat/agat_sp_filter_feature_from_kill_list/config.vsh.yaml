@@ -41,8 +41,7 @@ argument_groups:
       - name: --output
         alternatives: [-o, --out]
         description: |
-          Output GFF file. If no output file is specified, the output will
-          be written to STDOUT.
+          Path to the output GFF file that contains filtered features. 
         type: file
         direction: output
         required: false
