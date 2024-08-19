@@ -9,7 +9,6 @@ IFS=";" read -ra file_names <<< "$par_gff"
 for file in "${file_names[@]}"; do
     input_files+="--gff $file "
 done
-unset IFS
 
 # run agat_sp_merge_annotations
 agat_sp_merge_annotations.pl \
