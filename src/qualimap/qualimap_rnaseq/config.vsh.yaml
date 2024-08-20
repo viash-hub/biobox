@@ -65,13 +65,11 @@ argument_groups:
       type: string
       required: false
       choices: ["uniquely-mapped-reads", "proportional"]
-      default: uniquely-mapped-reads
       description: Counting algorithm (uniquely-mapped-reads (default) or proportional).
     - name: "--sequencing_protocol"
       type: string
       required: false
       choices: ["non-strand-specific", "strand-specific-reverse", "strand-specific-forward"]
-      default: non-strand-specific
       description: Sequencing library protocol (strand-specific-forward, strand-specific-reverse or non-strand-specific (default)).
     - name: "--paired"
       type: boolean_true
@@ -82,7 +80,6 @@ argument_groups:
     - name: "--java_memory_size"
       type: string
       required: false
-      default: 4G 
       description: maximum Java heap memory size, default = 4G.
 
 resources:

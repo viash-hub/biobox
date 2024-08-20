@@ -27,9 +27,9 @@ echo "> Running qualimap with html output report"
 "$meta_executable" \
     --bam $test_dir/a.bam \
     --gtf $test_dir/annotation.gtf \
-    --output_report report.html \
-    --output_counts counts.txt \
-    --output output.txt
+    --report report.html \
+    --counts counts.txt \
+    --qc_results output.txt
 
 echo ">> Checking output"
 assert_file_exists "report.html"
@@ -71,9 +71,9 @@ echo "> Running qualimap with pdf output report"
 "$meta_executable" \
     --bam $test_dir/a.bam \
     --gtf $test_dir/annotation.gtf \
-    --output_report report.pdf \
-    --output_counts counts.txt \
-    --output output.txt
+    --report report.pdf \
+    --counts counts.txt \
+    --qc_results output.txt
 
 echo ">> Checking output"
 assert_file_exists "report.pdf"
@@ -97,7 +97,7 @@ echo "> Running qualimap without report and counts output"
 "$meta_executable" \
     --bam $test_dir/a.bam \
     --gtf $test_dir/annotation.gtf \
-    --output output.txt
+    --qc_results output.txt
 
 echo ">> Checking output"
 assert_file_doesnt_exist "report.pdf"
