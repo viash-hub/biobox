@@ -45,6 +45,7 @@ argument_groups:
       - name: --specific_strand
         alternatives: -S
         type: string
+        choices: ["+", "-"]
         description: | 
           Force merge for one specific strand only.
           Follow with + or - to force merge from only

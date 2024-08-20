@@ -7,10 +7,17 @@
 set -eo pipefail
 
 # Unset parameters
-[[ "$par_strand" == "false" ]] && unset par_strand
-[[ "$par_bed" == "false" ]] && unset par_bed
-[[ "$par_header" == "false" ]] && unset par_header
-[[ "$par_no_buffer" == "false" ]] && unset par_no_buffer
+unset_if_false=(
+    par_strand
+    par_bed
+    par_header
+    par_no_buffer
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 # Execute bedtools merge with the provided arguments
 bedtools merge \
