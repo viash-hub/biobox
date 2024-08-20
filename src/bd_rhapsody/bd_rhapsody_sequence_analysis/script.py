@@ -79,7 +79,7 @@ def process_params(par: dict[str, Any], config, temp_dir: str) -> str:
         par["run_name"] = re.sub("[^A-Za-z0-9\\-]", "-", par["run_name"])
 
     # make paths absolute
-   for argument in config["arguments"]:
+    for argument in config["arguments"]:
         arg_clean_name = argument["clean_name"]
         if not par[arg_clean_name] or not argument["type"] == "file":
             continue
