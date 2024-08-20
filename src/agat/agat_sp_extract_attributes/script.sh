@@ -13,7 +13,7 @@ set -eo pipefail
 agat_sp_extract_attributes.pl \
   --gff "$par_gff" \
   --attribute "$par_attribute" \
-  -output "$par_output" \
+  --output "$par_output" \
   ${par_primary_tag:+-p "${par_primary_tag}"} \
   ${par_merge:+--merge} \
   ${par_dot:+-d} \

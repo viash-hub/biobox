@@ -43,9 +43,8 @@ argument_groups:
     arguments:       
       - name: --output
         alternatives: [-o, --out, --outfile]
-        description: Output GFF file.
-        type: file
-        direction: output
+        description: Output GFF file. One file per attribute tag will be created using the attribute tag name as file name suffix.
+        type: string
         required: true
         example: output.txt
   - name: Arguments
