@@ -6,19 +6,27 @@
 # Exit on error
 set -eo pipefail
 
-[[ "$par_input_bam" == "false" ]] && unset par_input_bam
-[[ "$par_depth" == "false" ]] && unset par_depth
-[[ "$par_depth_zero" == "false" ]] && unset par_depth_zero
-[[ "$par_bed_graph" == "false" ]] && unset par_bed_graph
-[[ "$par_bed_graph_zero_coverage" == "false" ]] && unset par_bed_graph_zero_coverage
-[[ "$par_split" == "false" ]] && unset par_split
-[[ "$par_ignore_deletion" == "false" ]] && unset par_ignore_deletion
-[[ "$par_pair_end_coverage" == "false" ]] && unset par_pair_end_coverage
-[[ "$par_fragment_size" == "false" ]] && unset par_fragment_size
-[[ "$par_du" == "false" ]] && unset par_du
-[[ "$par_five_prime" == "false" ]] && unset par_five_prime
-[[ "$par_three_prime" == "false" ]] && unset par_three_prime
-[[ "$par_trackline" == "false" ]] && unset par_trackline
+# Unset variables
+unset_if_false=(
+    par_input_bam
+    par_depth
+    par_depth_zero
+    par_bed_graph
+    par_bed_graph_zero_coverage
+    par_split
+    par_ignore_deletion
+    par_pair_end_coverage
+    par_fragment_size
+    par_du
+    par_five_prime
+    par_three_prime
+    par_trackline
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 bedtools genomecov \
     ${par_depth:+-d} \
