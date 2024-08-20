@@ -51,10 +51,7 @@ input_dir=$(dirname ${input[0]})
 
 # Moves extracted output directory to current directory
 if [[ -n "$par_extract" ]]; then
-  # Substitute .bam, .sam, .bam_mapped, .sam_mapped, and .fastq to .fq
-  input_html=$(echo ${input[$i]} | sed 's/\(\.bam\|\.sam\|\.bam_mapped\|\.sam_mapped\|\.fastq\)/.fq/g') 
-  sample_name=$(basename $input_html .fq)
-  mv "$input_dir/$sample_name"_fastqc $(pwd)
+  mv "$input_dir/"*_fastqc $(pwd)
 fi
 
 # Both outputs args passed (html and zip)
