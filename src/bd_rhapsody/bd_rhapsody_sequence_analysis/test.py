@@ -470,7 +470,7 @@ assert data_rna.var.Raw_Reads.sum() >= 99999, "Number of reads is incorrect" # o
 
 # check prot data
 data_prot = data.mod["prot"]
-assert data_prot.n_vars == bdabseq_panel_fa.n_seqs, "Number of proteins is incorrect"
+assert data_prot.n_vars == len(sampletagsequences_fasta_dict), "Number of proteins is incorrect"
 assert data_prot.X.sum(axis=1).min() > 950, "Number of reads per cell is incorrect"
 assert data_prot.var.Raw_Reads.sum() == 100000, "Number of reads is incorrect"
 
