@@ -1,4 +1,4 @@
-name: bd_rhapody_sequence_analysis
+name: bd_rhapsody_sequence_analysis
 namespace: bd_rhapsody
 description: |
   BD Rhapsody Sequence Analysis CWL pipeline v2.2.

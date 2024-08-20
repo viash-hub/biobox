@@ -12,7 +12,7 @@
 
 * `bd_rhapsody`:
   - `bd_rhapsody_make_reference`: Create a reference for the BD Rhapsody pipeline (PR #75).
-  - `bd_rhapody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
+  - `bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
 
 * `umitools/umitools_dedup`: Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read (PR #54).
 
