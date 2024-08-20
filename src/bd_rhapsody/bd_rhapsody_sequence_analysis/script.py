@@ -47,7 +47,7 @@ meta = {
 ## VIASH END
 
 def clean_arg(argument):
-    argument["clean_name"] = re.sub("^-*", "", argument["name"])
+    argument["clean_name"] = argument["name"].lstrip("-")
     return argument
 
 def read_config(path: str) -> dict[str, Any]:
@@ -79,12 +79,16 @@ def process_params(par: dict[str, Any], config, temp_dir: str) -> str:
         par["run_name"] = re.sub("[^A-Za-z0-9\\-]", "-", par["run_name"])
 
     # make paths absolute
-    for argument in config["arguments"]:
-        if par[argument["clean_name"]] and argument["type"] == "file":
-            if isinstance(par[argument["clean_name"]], list):
-                par[argument["clean_name"]] = [ os.path.abspath(f) for f in par[argument["clean_name"]] ]
-            else:
-                par[argument["clean_name"]] = os.path.abspath(par[argument["clean_name"]])
+   for argument in config["arguments"]:
+        arg_clean_name = argument["clean_name"]
+        if not par[arg_clean_name] or not argument["type"] == "file":
+            continue
+        par_value = par[arg_clean_name]
+        if isinstance(par_value, list):
+            par_value_absolute = list(map(os.path.abspath, file_path))
+        else:
+            par_value_absolute = os.path.abspath(file_path)
+        par_value_absolute[arg_clean_name] = par_value_absolute
     
     return par
 
@@ -96,16 +100,18 @@ def generate_config(par: dict[str, Any], config) -> str:
         |""")]
 
     for argument in config["arguments"]:
+        arg_clean_name = argument["clean_name"]
+        arg_par_value = par[arg_clean_name]
         arg_info = argument.get("info") or {}
         config_key = arg_info.get("config_key")
-        if par[argument["clean_name"]] and config_key:
+        if arg_par_value and config_key:
 
             if argument["type"] == "file":
                 str = strip_margin(f"""\
                     |{config_key}:
                     |""")
-                if isinstance(par[argument["clean_name"]], list):
-                    for file in par[argument["clean_name"]]:
+                if isinstance(arg_par_value, list):
+                    for file in arg_par_value:
                         str += strip_margin(f"""\
                             | - class: File
                             |   location: "{file}"
@@ -113,12 +119,12 @@ def generate_config(par: dict[str, Any], config) -> str:
                 else:
                     str += strip_margin(f"""\
                         |   class: File
-                        |   location: "{par[argument["clean_name"]]}"
+                        |   location: "{arg_par_value}"
                         |""")
                 content_list.append(str)
             else:
                 content_list.append(strip_margin(f"""\
-                    |{config_key}: {par[argument["clean_name"]]}
+                    |{config_key}: {arg_par_value}
                     |"""))
 
     ## Write config to file
@@ -134,28 +140,27 @@ def generate_config_file(par: dict[str, Any], config: dict[str, Any], temp_dir: 
 def generate_cwl_file(meta: dict[str, Any], dir: str) -> str:
     # create cwl file (if need be)
     orig_cwl_file=os.path.join(meta["resources_dir"], "rhapsody_pipeline_2.2.1_nodocker.cwl")
+    if not meta["memory_mb"] and not meta["cpus"]:
+        return os.path.abspath(orig_cwl_file)
+     
+    # Inject computational requirements into pipeline
+    cwl_file = os.path.join(dir, "pipeline.cwl")
+
+    # Read in the file
+    with open(orig_cwl_file, 'r') as file :
+        cwl_data = file.read()
 
     # Inject computational requirements into pipeline
-    if meta["memory_mb"] or meta["cpus"]:
-        cwl_file = os.path.join(dir, "pipeline.cwl")
+    if meta["memory_mb"]:
+        memory = int(meta["memory_mb"]) - 2000 # keep 2gb for OS
+        cwl_data = re.sub('"ramMin": [^\n]*[^,](,?)\n', f'"ramMin": {memory}\\1\n', cwl_data)
+    if meta["cpus"]:
+        cwl_data = re.sub('"coresMin": [^\n]*[^,](,?)\n', f'"coresMin": {meta["cpus"]}\\1\n', cwl_data)
 
-        # Read in the file
-        with open(orig_cwl_file, 'r') as file :
-            cwl_data = file.read()
-
-        # Inject computational requirements into pipeline
-        if meta["memory_mb"]:
-            memory = int(meta["memory_mb"]) - 2000 # keep 2gb for OS
-            cwl_data = re.sub('"ramMin": [^\n]*[^,](,?)\n', f'"ramMin": {memory}\\1\n', cwl_data)
-        if meta["cpus"]:
-            cwl_data = re.sub('"coresMin": [^\n]*[^,](,?)\n', f'"coresMin": {meta["cpus"]}\\1\n', cwl_data)
-
-        # Write the file out again
-        with open(cwl_file, 'w') as file:
-            file.write(cwl_data)
-    else:
-        cwl_file = orig_cwl_file
-
+    # Write the file out again
+    with open(cwl_file, 'w') as file:
+        file.write(cwl_data)
+        
     return os.path.abspath(cwl_file)
 
 def copy_outputs(par: dict[str, Any], config: dict[str, Any]):
@@ -170,7 +175,7 @@ def copy_outputs(par: dict[str, Any], config: dict[str, Any]):
                     .replace("(assay)", "*")\
                     .replace("[number]", "*")
                 files = glob.glob(os.path.join(par["output_dir"], template_glob))
-                if len(files) == 0 and arg["required"]:
+                if not files and arg["required"]:
                     raise ValueError(f"Expected output file '{template_glob}' not found.")
                 elif len(files) > 1 and not arg["multiple"]:
                     raise ValueError(f"Expected single output file '{template_glob}', but found multiple.")
