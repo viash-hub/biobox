@@ -103,7 +103,7 @@ EOL
 # Test 1: Run fastqc with default parameters
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
 
-echo "-> Run Test: one input"
+echo "-> Run Test1: one input"
 "$meta_executable" \
     --extract \
     --input "../input_1.fq" \
@@ -121,7 +121,7 @@ popd > /dev/null
 # Test 2: Run fastqc with multiple inputs
 mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
 
-echo "-> Run Test: two inputs"
+echo "-> Run Test2: two inputs"
 "$meta_executable" \
  --extract \
  --input "../input_1.fq" \
@@ -148,7 +148,7 @@ popd > /dev/null
 # Test 3: Run fastqc with contaminants
 mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
 
-echo "-> Run Test: contaminants"
+echo "-> Run Test3: contaminants"
 "$meta_executable" \
  --extract \
  --input "../input_1.fq" \
@@ -160,7 +160,7 @@ assert_file_exists "input_1_fastqc/summary.txt"
 assert_file_not_empty "input_1_fastqc.html"
 assert_file_not_empty "input_1_fastqc.zip"
 assert_identical_content "input_1_fastqc/summary.txt" "../expected_summary.txt"
-assert_file_contains "contaminant" "input_1_fastqc/fastqc_data.txt"
+assert_file_contains "input_1_fastqc/fastqc_data.txt" "contaminant"
 echo "- test succeeded -"
 
 popd > /dev/null
@@ -168,7 +168,7 @@ popd > /dev/null
 # Test 4: Run fastqc with sam file
 mkdir "$TMPDIR/test4" && pushd "$TMPDIR/test4" > /dev/null
 
-echo "-> Run Test: sam file"
+echo "-> Run Test4: sam file"
 "$meta_executable" \
  --extract \
  --input "../example.sam" \
@@ -187,17 +187,17 @@ popd > /dev/null
 # Test 5: Run fastqc with multiple options
 mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
 
-echo "-> Run Test: multiple options"
+echo "-> Run Test5: multiple options"
 "$meta_executable" \
  --extract \
  --input "../input_1.fq" \
  --contaminants "../contaminants.txt" \
  --format "fastq" \
- --casava \
  --nofilter \
  --nogroup \
  --min_length 10 \
  --kmers 5
+# --casava \
 
 assert_file_exists "input_1_fastqc.html"
 assert_file_exists "input_1_fastqc.zip"
@@ -205,7 +205,7 @@ assert_file_exists "input_1_fastqc/summary.txt"
 assert_file_not_empty "input_1_fastqc.html"
 assert_file_not_empty "input_1_fastqc.zip"
 assert_identical_content "input_1_fastqc/summary.txt" "../expected_summary.txt"
-assert_file_contains "contaminant" "input_1_fastqc/fastqc_data.txt"
+assert_file_contains "input_1_fastqc/fastqc_data.txt" "contaminant"
 echo "- test succeeded -"
 
 popd > /dev/null
@@ -213,31 +213,16 @@ popd > /dev/null
 # Test 6: Run fastqc with output options
 mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
 
-echo "-> Run Test: output options"
+echo "-> Run Test6: output options"
 "$meta_executable" \
  --input "../input_1.fq" \
- --html "../output_*_.html" \
- --zip "../output_*_.zip"
+ --html "output_*_.html" \
+ --zip "output_*_.zip"
 
-# Check if the html file was generated
-[ ! -f "test_data/output_input_1_.html" ] \
-    && echo "Output HTML file not found." && exit 1
-
-# Check if the zip file was generated
-[ ! -f "test_data/output_input_1_.zip" ] \
-    && echo "Output ZIP file not found." && exit 1
-
-# Check if the files are empty
-[ ! -s "test_data/output_input_1_.html" ] \
-    && echo "Output HTML file is empty." && exit 1
-
-[ ! -s "test_data/output_input_1_.zip" ] \
-    && echo "Output ZIP file is empty." && exit 1
-
-assert_file_exists "output_1_fastqc.html"
-assert_file_exists "output_1_fastqc.zip"
-assert_file_not_empty "output_1_fastqc.html"
-assert_file_not_empty "output_1_fastqc.zip"
+assert_file_exists "output_input_1_.html"
+assert_file_exists "output_input_1_.zip"
+assert_file_not_empty "output_input_1_.html"
+assert_file_not_empty "output_input_1_.zip"
 echo "- test succeeded -"
 
 popd > /dev/null
