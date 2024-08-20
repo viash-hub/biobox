@@ -122,6 +122,7 @@ multiqc \
     "${inputs[@]}" 
 
 # Move outputs
+
 if [[ -n "$par_output_data" ]] && [[ -d "${out_dir}/${report_name}_data" ]]; then
     mv "${out_dir}/${report_name}_data" "$par_output_data"
 elif [[ -n "$par_output_data" ]] && [[ ! -d "${out_dir}/${report_name}_data" ]]; then
