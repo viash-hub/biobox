@@ -4,13 +4,20 @@
 ## VIASH END
 
 # unset flags
-[[ "$par_casava" == "false" ]] && unset par_casava
-[[ "$par_nano" == "false" ]] && unset par_nano
-[[ "$par_nofilter" == "false" ]] && unset par_nofilter
-[[ "$par_extract" == "false" ]] && unset par_extract
-[[ "$par_noextract" == "false" ]] && unset par_noextract
-[[ "$par_nogroup" == "false" ]] && unset par_nogroup
-[[ "$par_quiet" == "false" ]] && unset par_quiet
+unset_if_false=(
+  par_casava
+  par_nano
+  par_nofilter
+  par_extract
+  par_noextract
+  par_nogroup
+  par_quiet
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 # Create input array 
 IFS=";" read -ra input <<< $par_input
