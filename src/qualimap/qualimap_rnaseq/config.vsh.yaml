@@ -1,4 +1,5 @@
-name: "qualimap"
+name: qualimap_rnaseq
+namespace: qualimap
 keywords: [RNA-seq, quality control, QC Report]
 description: |
   Qualimap RNA-seq QC reports quality control metrics and bias estimations 
