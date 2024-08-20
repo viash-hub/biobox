@@ -139,7 +139,9 @@ def generate_config_file(par: dict[str, Any], config: dict[str, Any], temp_dir: 
 
 def generate_cwl_file(meta: dict[str, Any], dir: str) -> str:
     # create cwl file (if need be)
-    orig_cwl_file=os.path.join(meta["resources_dir"], "rhapsody_pipeline_2.2.1_nodocker.cwl")
+    # orig_cwl_file=os.path.join(meta["resources_dir"], "rhapsody_pipeline_2.2.1_nodocker.cwl")
+    orig_cwl_file="/var/bd_rhapsody_cwl/v2.2.1/rhapsody_pipeline_2.2.1.cwl"
+
     if not meta["memory_mb"] and not meta["cpus"]:
         return os.path.abspath(orig_cwl_file)
      

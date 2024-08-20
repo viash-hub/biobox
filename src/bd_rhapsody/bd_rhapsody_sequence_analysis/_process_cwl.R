@@ -5,30 +5,8 @@ lines <- read_lines("https://bitbucket.org/CRSwDev/cwl/raw/8feeace1141b24749ea60
 cwl_header <- lines[[1]]
 cwl_obj <- jsonlite::fromJSON(lines[-1], simplifyVector = FALSE)
 
-# recursively remove objects with `"class": "DockerRequirement"`
-remove_docker <- function(x) {
-  if (is.list(x)) {
-    if ("class" %in% names(x) && x$class == "DockerRequirement") {
-      return(NULL)
-    } else {
-      out <- map(x, remove_docker)
-      out2 <- out[!sapply(out, is.null)]
-      return(out2)
-    }
-  } else {
-    return(x)
-  }
-}
-cwl_obj_2 <- remove_docker(cwl_obj)
-# js2 <- js
-
-# write to file
-new_lines <- c(cwl_header, jsonlite::toJSON(cwl_obj_2, auto_unbox = TRUE, pretty = TRUE))
-
-write_lines(new_lines, "src/bd_rhapsody/bd_rhapsody_sequence_analysis/rhapsody_pipeline_2.2.1_nodocker.cwl")
-
 # detect main workflow arguments
-gr <- dynutils::list_as_tibble(cwl_obj_2$`$graph`)
+gr <- dynutils::list_as_tibble(cwl_obj$`$graph`)
 
 gr %>% print(n = 100)
 

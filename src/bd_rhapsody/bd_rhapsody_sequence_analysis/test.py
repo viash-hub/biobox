@@ -28,7 +28,8 @@ meta["resources_dir"] = Path(meta["resources_dir"])
 
 # Generate index
 print("> Generate index", flush=True)
-cwl_file = meta["resources_dir"] / "bd_rhapsody_make_reference.cwl"
+# cwl_file = meta["resources_dir"] / "bd_rhapsody_make_reference.cwl"
+cwl_file = "/var/bd_rhapsody_cwl/v2.2.1/Extra_Utilities/bd_rhapsody_make_reference.cwl"
 reference_small_gtf = meta["resources_dir"] / "test_data" / "reference_small.gtf"
 reference_small_fa = meta["resources_dir"] / "test_data" / "reference_small.fa"
 bdabseq_panel_fa = meta["resources_dir"] / "test_data" / "BDAbSeq_ImmuneDiscoveryPanel.fasta"

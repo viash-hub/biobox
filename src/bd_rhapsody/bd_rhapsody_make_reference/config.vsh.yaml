@@ -116,7 +116,6 @@ argument_groups:
 resources:
   - type: python_script
     path: script.py
-  - path: make_rhap_reference_2.2.1_nodocker.cwl
 
 test_resources:
   - type: bash_script
@@ -131,12 +130,19 @@ engines:
     image: bdgenomics/rhapsody:2.2.1
     setup:
       - type: apt
-        packages: [procps]
+        packages: [procps, git]
       - type: python
         packages: [cwlref-runner, cwl-runner]
       - type: docker
         run: |
-          echo "bdgenomics/rhapsody: 2.2.1" > /var/software_versions.txt
+          mkdir /var/bd_rhapsody_cwl
+          cd /var/bd_rhapsody_cwl
+          git clone https://bitbucket.org/CRSwDev/cwl.git .
+          git checkout 8feeace1141b24749ea6003f8e6ad6d3ad5232de
+      - type: docker
+        run: |
+          VERSION=$(ls -v /var/bd_rhapsody_cwl | grep '^v' | sed 's#v##' | tail -1)
+          echo "bdgenomics/rhapsody: \"$VERSION\"" > /var/software_versions.txt
 
 runners:
   - type: executable
