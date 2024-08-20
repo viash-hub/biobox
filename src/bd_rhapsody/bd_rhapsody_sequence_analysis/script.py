@@ -107,21 +107,21 @@ def generate_config(par: dict[str, Any], config) -> str:
         if arg_par_value and config_key:
 
             if argument["type"] == "file":
-                str = strip_margin(f"""\
+                content = strip_margin(f"""\
                     |{config_key}:
                     |""")
                 if isinstance(arg_par_value, list):
                     for file in arg_par_value:
-                        str += strip_margin(f"""\
+                        content += strip_margin(f"""\
                             | - class: File
                             |   location: "{file}"
                             |""")
                 else:
-                    str += strip_margin(f"""\
+                    content += strip_margin(f"""\
                         |   class: File
                         |   location: "{arg_par_value}"
                         |""")
-                content_list.append(str)
+                content_list.append(content)
             else:
                 content_list.append(strip_margin(f"""\
                     |{config_key}: {arg_par_value}

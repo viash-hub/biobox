@@ -83,21 +83,21 @@ def generate_config(par: dict[str, Any], meta, config) -> str:
 
     for config_key, arg_type, par_value in config_key_value_pairs:
         if arg_type == "file":
-            str = strip_margin(f"""\
+            content = strip_margin(f"""\
                 |{config_key}:
                 |""")
             if isinstance(par_value, list):
                 for file in par_value:
-                    str += strip_margin(f"""\
+                    content += strip_margin(f"""\
                         | - class: File
                         |   location: "{file}"
                         |""")
             else:
-                str += strip_margin(f"""\
+                content += strip_margin(f"""\
                     |   class: File
                     |   location: "{par_value}"
                     |""")
-            content_list.append(str)
+            content_list.append(content)
         else:
             content_list.append(strip_margin(f"""\
                 |{config_key}: {par_value}
