@@ -182,6 +182,7 @@ argument_groups:
             -trackopts 'name="My Track" visibility=2 color=255,30,30'
             Note the use of single-quotes if you have spaces in your parameters.
           - (TEXT)
+        multiple: true
 
 resources:
   - type: bash_script

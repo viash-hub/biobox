@@ -95,7 +95,7 @@ chr2	128	228	100
 chr2	428	528	100
 EOF
 cat > "$TMPDIR/expected_trackopts.bed" <<EOF
-track type=bedGraph name=example
+track type=bedGraph name=example llama=Alpaco
 chr2	128	228	1
 chr2	428	528	1
 EOF
@@ -248,6 +248,7 @@ echo "> Run bedtools_genomecov on BED file with -bg and -trackopts"
   --output "output.bed" \
   --bed_graph \
   --trackopts "name=example" \
+  --trackopts "llama=Alpaco" \
 
 # checks
 assert_file_exists "output.bed"

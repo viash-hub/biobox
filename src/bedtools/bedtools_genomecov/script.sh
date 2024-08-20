@@ -28,6 +28,9 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
+# Create input array 
+IFS=";" read -ra trackopts <<< $par_trackopts
+
 bedtools genomecov \
     ${par_depth:+-d} \
     ${par_depth_zero:+-dz} \
@@ -42,7 +45,7 @@ bedtools genomecov \
     ${par_strand:+-strand "$par_strand"} \
     ${par_max:+-max "$par_max"} \
     ${par_scale:+-scale "$par_scale"} \
-    ${par_trackopts:+-trackopts "$par_trackopts"} \
+    ${par_trackopts:+-trackopts "${trackopts[*]}"} \
     ${par_input_bam:+-ibam "$par_input_bam"} \
     ${par_input:+-i "$par_input"} \
     ${par_genome:+-g "$par_genome"} \
