@@ -1,26 +1,47 @@
 #!/bin/bash
 
 # exit on error
-set -e
+set -eo pipefail
 
 ## VIASH START
-meta_executable="target/executable/fastqc"
-meta_resources_dir="src/fastqc"
+# meta_executable="target/executable/fastqc"
+# meta_resources_dir="src/fastqc"
 ## VIASH END
+
+#############################################
+# helper functions
+assert_file_exists() {
+  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
+}
+assert_file_not_empty() {
+  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
+}
+assert_file_contains() {
+  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
+}
+assert_identical_content() {
+  diff -a "$2" "$1" \
+    || (echo "Files are not identical!" && exit 1)
+}
+#############################################
 
 # Create directories for tests
 echo "Creating Test Data..."
-mkdir test_data
+TMPDIR=$(mktemp -d "$meta_temp_dir/XXXXXX")
+function clean_up {
+  [[ -d "$TMPDIR" ]] && rm -r "$TMPDIR"
+}
+trap clean_up EXIT
 
 # Create and populate input.fasta
-cat > "test_data/input_1.fq" <<EOL
+cat > "$TMPDIR/input_1.fq" <<EOL
 @HWI-ST330:304:H045HADXX:1:1101:1111:61397
 CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNNNNNNANNNCGAGGCCCTGGGGTAGAGGGNNNNNNNNNNNNNNGATCTTGG
 +
 @?@DDDDDDHHH?GH:?FCBGGB@C?DBEGIIIIAEF;FCGGI#########################################################
 EOL
 
-cat > "test_data/input_2.fq" <<EOL
+cat > "$TMPDIR/input_2.fq" <<EOL
 @HWI-ST330:304:H045HADXX:1:1101:1111:61397
 CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNNNNNNANNNCGAGGCCCTGGGGTAGAGGGNNNNNNNNNNNNNNGATCTTGG
 +
@@ -28,19 +49,19 @@ CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNNNNNNANNNCGAGGCCCTGGGGTAGAGGGNN
 EOL
 
 # Create and populate contaminants.txt
-printf "contaminant_sequence1\tCACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGA\n" > "test_data/contaminants.txt"
-printf "contaminant_sequence2\tGATCTTGG\n" >> "test_data/contaminants.txt"
+printf "contaminant_sequence1\tCACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGA\n" > "$TMPDIR/contaminants.txt"
+printf "contaminant_sequence2\tGATCTTGG\n" >> "$TMPDIR/contaminants.txt"
 
 # Create and populate SAM file 
-printf "@HD\tVN:1.0\tSO:unsorted\n" > "test_data/example.sam"
-printf "@SQ\tSN:chr1\tLN:248956422\n" >> "test_data/example.sam"
-printf "@SQ\tSN:chr2\tLN:242193529\n" >> "test_data/example.sam"
-printf "@PG\tID:bowtie2\tPN:bowtie2\tVN:2.3.4.1\tCL:\"/usr/bin/bowtie2-align-s --wrapper basic-0 -x genome -U reads.fq -S output.sam\"\n" >> "test_data/example.sam"
-printf "read1\t0\tchr1\t100\t255\t50M\t*\t0\t0\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\tAS:i:-10\tXN:i:0\tXM:i:0\tXO:i:0\tXG:i:0\tNM:i:0\tMD:Z:50\tYT:Z:UU\n" >> "test_data/example.sam"
-printf "read2\t0\tchr2\t150\t255\t50M\t*\t0\t0\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC\tIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\tAS:i:-8\tXN:i:0\tXM:i:0\tXO:i:0\tXG:i:0\tNM:i:0\tMD:Z:50\tYT:Z:UU\n" >> "test_data/example.sam"
-printf "read3\t16\tchr1\t200\t255\t50M\t*\t0\t0\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTA\tIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\tAS:i:-12\tXN:i:0\tXM:i:0\tXO:i:0\tXG:i:0\tNM:i:0\tMD:Z:50\tYT:Z:UU" >> "test_data/example.sam"
+printf "@HD\tVN:1.0\tSO:unsorted\n" > "$TMPDIR/example.sam"
+printf "@SQ\tSN:chr1\tLN:248956422\n" >> "$TMPDIR/example.sam"
+printf "@SQ\tSN:chr2\tLN:242193529\n" >> "$TMPDIR/example.sam"
+printf "@PG\tID:bowtie2\tPN:bowtie2\tVN:2.3.4.1\tCL:\"/usr/bin/bowtie2-align-s --wrapper basic-0 -x genome -U reads.fq -S output.sam\"\n" >> "$TMPDIR/example.sam"
+printf "read1\t0\tchr1\t100\t255\t50M\t*\t0\t0\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\tAS:i:-10\tXN:i:0\tXM:i:0\tXO:i:0\tXG:i:0\tNM:i:0\tMD:Z:50\tYT:Z:UU\n" >> "$TMPDIR/example.sam"
+printf "read2\t0\tchr2\t150\t255\t50M\t*\t0\t0\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC\tIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\tAS:i:-8\tXN:i:0\tXM:i:0\tXO:i:0\tXG:i:0\tNM:i:0\tMD:Z:50\tYT:Z:UU\n" >> "$TMPDIR/example.sam"
+printf "read3\t16\tchr1\t200\t255\t50M\t*\t0\t0\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTA\tIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\tAS:i:-12\tXN:i:0\tXM:i:0\tXO:i:0\tXG:i:0\tNM:i:0\tMD:Z:50\tYT:Z:UU" >> "$TMPDIR/example.sam"
 
-cat > "test_data/expected_summary.txt" <<EOL
+cat > "$TMPDIR/expected_summary.txt" <<EOL
 PASS	Basic Statistics	input_1.fq
 PASS	Per base sequence quality	input_1.fq
 FAIL	Per sequence quality scores	input_1.fq
@@ -53,7 +74,7 @@ FAIL	Overrepresented sequences	input_1.fq
 PASS	Adapter Content	input_1.fq
 EOL
 
-cat > "test_data/expected_summary2.txt" <<EOL
+cat > "$TMPDIR/expected_summary2.txt" <<EOL
 PASS	Basic Statistics	input_2.fq
 PASS	Per base sequence quality	input_2.fq
 FAIL	Per sequence quality scores	input_2.fq
@@ -66,7 +87,7 @@ FAIL	Overrepresented sequences	input_2.fq
 PASS	Adapter Content	input_2.fq
 EOL
 
-cat > "test_data/expected_summary_sam.txt" <<EOL
+cat > "$TMPDIR/expected_summary_sam.txt" <<EOL
 PASS	Basic Statistics	example.sam
 PASS	Per base sequence quality	example.sam
 FAIL	Per sequence quality scores	example.sam
@@ -80,165 +101,97 @@ PASS	Adapter Content	example.sam
 EOL
 
 # Test 1: Run fastqc with default parameters
+mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
+
 echo "-> Run Test: one input"
 "$meta_executable" \
- --extract \
- --input "test_data/input_1.fq" 
+    --extract \
+    --input "../input_1.fq" \
 
-# Check if the html file was generated
-[ ! -f "test_data/input_1_fastqc.html" ] \
-    && echo "Output HTML file not found." && exit 1
-
-# Check if the zip file was generated
-[ ! -f "test_data/input_1_fastqc.zip" ] \
-    && echo "Output ZIP file not found." && exit 1
-
-# Check if the files are empty
-[ ! -s "test_data/input_1_fastqc.html" ] \
-    && echo "Output HTML file is empty." && exit 1
-
-[ ! -s "test_data/input_1_fastqc.zip" ] \
-    && echo "Output ZIP file is empty." && exit 1
-
-# Check if the summary.txt was extracted
-[ ! -f "test_data/input_1_fastqc/summary.txt" ] && echo "Extracted files not found." && exit 1
-
-# Check if the summary.txt is correct
-diff -a "test_data/expected_summary.txt" "test_data/input_1_fastqc/summary.txt" \
-    || (echo "Output summary file does not match expected output" && exit 1)
-
-rm -r "test_data/input_1_fastqc"
-rm "test_data/input_1_fastqc.html"
-rm "test_data/input_1_fastqc.zip"
-
+assert_file_exists "input_1_fastqc.html"
+assert_file_exists "input_1_fastqc.zip"
+assert_file_exists "input_1_fastqc/summary.txt"
+assert_file_not_empty "input_1_fastqc.html"
+assert_file_not_empty "input_1_fastqc.zip"
+assert_identical_content "input_1_fastqc/summary.txt" "../expected_summary.txt"
 echo "- test succeeded -"
 
+popd > /dev/null
+
 # Test 2: Run fastqc with multiple inputs
+mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
+
 echo "-> Run Test: two inputs"
 "$meta_executable" \
  --extract \
- --input "test_data/input_1.fq" \
- --input "test_data/input_2.fq" 
+ --input "../input_1.fq" \
+ --input "../input_2.fq" 
 
-# Check if the html files was generated
-[ ! -f "test_data/input_1_fastqc.html" ] && [ ! -f "test_data/input_2_fastqc.html" ] \
-    && echo "Output HTML files not found." && exit 1
-
-# Check if the zip files was generated
-[ ! -f "test_data/input_1_fastqc.zip" ] && [ ! -f "test_data/input_2_fastqc.zip" ] \
-    && echo "Output ZIP files not found." && exit 1
-
-# Check if the files are empty
-[ ! -s "test_data/input_1_fastqc.html" ] && [ ! -s "test_data/input_2_fastqc.html" ] \
-    && echo "Output HTML files are empty." && exit 1
-
-[ ! -s "test_data/input_1_fastqc.zip" ] && [ ! -s "test_data/input_2_fastqc.zip" ] \
-    && echo "Output ZIP files are empty." && exit 1
-
-# Check if the summary.txt was extracted
-[ ! -f "test_data/input_1_fastqc/summary.txt" ] && echo "Extracted files not found." && exit 1
-[ ! -f "test_data/input_2_fastqc/summary.txt" ] && echo "Extracted files not found." && exit 1
-
-# Check if the summary.txt is correct
-diff -a "test_data/expected_summary.txt" "test_data/input_1_fastqc/summary.txt" \
-    || (echo "Output summary file does not match expected output" && exit 1)
-diff -a "test_data/expected_summary2.txt" "test_data/input_2_fastqc/summary.txt" \
-    || (echo "Output summary file does not match expected output" && exit 1)
-
-rm -r "test_data/input_1_fastqc"
-rm -r "test_data/input_2_fastqc"
-rm "test_data/input_1_fastqc.html"
-rm "test_data/input_2_fastqc.html"
-rm "test_data/input_1_fastqc.zip"
-rm "test_data/input_2_fastqc.zip"
-
+# File 1
+assert_file_exists "input_1_fastqc.html"
+assert_file_exists "input_1_fastqc.zip"
+assert_file_exists "input_1_fastqc/summary.txt"
+assert_file_not_empty "input_1_fastqc.html"
+assert_file_not_empty "input_1_fastqc.zip"
+assert_identical_content "input_1_fastqc/summary.txt" "../expected_summary.txt"
+# File 2
+assert_file_exists "input_2_fastqc.html"
+assert_file_exists "input_2_fastqc.zip"
+assert_file_exists "input_2_fastqc/summary.txt"
+assert_file_not_empty "input_2_fastqc.html"
+assert_file_not_empty "input_2_fastqc.zip"
+assert_identical_content "input_2_fastqc/summary.txt" "../expected_summary2.txt"
 echo "- test succeeded -"
 
+popd > /dev/null
+
 # Test 3: Run fastqc with contaminants
+mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
+
 echo "-> Run Test: contaminants"
 "$meta_executable" \
  --extract \
- --input "test_data/input_1.fq" \
- --contaminants "test_data/contaminants.txt"
+ --input "../input_1.fq" \
+ --contaminants "../contaminants.txt"
 
-# Check if the html file was generated
-[ ! -f "test_data/input_1_fastqc.html" ] \
-    && echo "Output HTML file not found." && exit 1
-
-# Check if the zip file was generated
-[ ! -f "test_data/input_1_fastqc.zip" ] \
-    && echo "Output ZIP file not found." && exit 1
-
-# Check if the files are empty
-[ ! -s "test_data/input_1_fastqc.html" ] \
-    && echo "Output HTML file is empty." && exit 1
-
-[ ! -s "test_data/input_1_fastqc.zip" ] \
-    && echo "Output ZIP file is empty." && exit 1
-
-# Check if the summary.txt was extracted
-[ ! -f "test_data/input_1_fastqc/summary.txt" ] && echo "Extracted files not found." && exit 1
-
-# Checking for contaminants in fastqc_data.txt
-echo "Checking for contaminants in fastqc_data.txt"
-result=$(cat test_data/input_1_fastqc/fastqc_data.txt | grep "contaminant" )
-expecte_result=$(printf "CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNN\t1\t100.0\tcontaminant_sequence1 (100%% over 44bp)\n")
-
-[ -z "$result" ] && echo "Contaminants not found in fastqc_data.txt" && exit 1
-
-[ "$result" != "$expecte_result" ] \
- && echo "Contaminants do not match expected output" \
- && echo "Result: $result" \
- && echo "Expected: $expecte_result" \
- && exit 1
-
-rm -r "test_data/input_1_fastqc"
-rm "test_data/input_1_fastqc.html"
-rm "test_data/input_1_fastqc.zip"
-
+assert_file_exists "input_1_fastqc.html"
+assert_file_exists "input_1_fastqc.zip"
+assert_file_exists "input_1_fastqc/summary.txt"
+assert_file_not_empty "input_1_fastqc.html"
+assert_file_not_empty "input_1_fastqc.zip"
+assert_identical_content "input_1_fastqc/summary.txt" "../expected_summary.txt"
+assert_file_contains "contaminant" "input_1_fastqc/fastqc_data.txt"
 echo "- test succeeded -"
 
+popd > /dev/null
+
 # Test 4: Run fastqc with sam file
+mkdir "$TMPDIR/test4" && pushd "$TMPDIR/test4" > /dev/null
+
 echo "-> Run Test: sam file"
 "$meta_executable" \
  --extract \
- --input "test_data/example.sam" \
+ --input "../example.sam" \
  --format "sam"
 
-# Check if the html file was generated
-[ ! -f "test_data/example_fastqc.html" ] \
-    && echo "Output HTML file not found." && exit 1
-
-# Check if the zip file was generated
-[ ! -f "test_data/example_fastqc.zip" ] \
-    && echo "Output ZIP file not found." && exit 1
-
-# Check if the files are empty
-[ ! -s "test_data/example_fastqc.html" ] \
-    && echo "Output HTML file is empty." && exit 1
-
-[ ! -s "test_data/example_fastqc.zip" ] \
-    && echo "Output ZIP file is empty." && exit 1
-
-# Check if the summary.txt was extracted
-[ ! -f "test_data/example_fastqc/summary.txt" ] && echo "Extracted files not found." && exit 1
-
-# Check if the summary.txt is correct
-diff -a "test_data/expected_summary_sam.txt" "test_data/example_fastqc/summary.txt" \
-    || (echo "Output summary file does not match expected output" && exit 1)
-
-rm -r "test_data/example_fastqc"
-rm "test_data/example_fastqc.html"
-rm "test_data/example_fastqc.zip"
-
+assert_file_exists "example_fastqc.html"
+assert_file_exists "example_fastqc.zip"
+assert_file_exists "example_fastqc/summary.txt"
+assert_file_not_empty "example_fastqc.html"
+assert_file_not_empty "example_fastqc.zip"
+assert_identical_content "example_fastqc/summary.txt" "../expected_summary_sam.txt"
 echo "- test succeeded -"
 
+popd > /dev/null
+
 # Test 5: Run fastqc with multiple options
+mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
+
 echo "-> Run Test: multiple options"
 "$meta_executable" \
  --extract \
- --input "test_data/input_1.fq" \
- --contaminants "test_data/contaminants.txt" \
+ --input "../input_1.fq" \
+ --contaminants "../contaminants.txt" \
  --format "fastq" \
  --casava \
  --nofilter \
@@ -246,53 +199,25 @@ echo "-> Run Test: multiple options"
  --min_length 10 \
  --kmers 5
 
-# Check if the html file was generated
-[ ! -f "test_data/input_1_fastqc.html" ] \
-    && echo "Output HTML file not found." && exit 1
-
-# Check if the zip file was generated
-[ ! -f "test_data/input_1_fastqc.zip" ] \
-    && echo "Output ZIP file not found." && exit 1
-
-# Check if the files are empty
-[ ! -s "test_data/input_1_fastqc.html" ] \
-    && echo "Output HTML file is empty." && exit 1
-
-[ ! -s "test_data/input_1_fastqc.zip" ] \
-    && echo "Output ZIP file is empty." && exit 1
-
-# Check if the summary.txt was extracted
-[ ! -f "test_data/input_1_fastqc/summary.txt" ] && echo "Extracted files not found." && exit 1
-
-# Check if the summary.txt is correct
-diff -a "test_data/expected_summary.txt" "test_data/input_1_fastqc/summary.txt" \
-    || (echo "Output summary file does not match expected output" && exit 1)
-
-# Checking for contaminants in fastqc_data.txt
-echo "Checking for contaminants in fastqc_data.txt"
-result=$(cat test_data/input_1_fastqc/fastqc_data.txt | grep "contaminant" )
-expecte_result=$(printf "CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNN\t1\t100.0\tcontaminant_sequence1 (100%% over 44bp)\n")
-
-[ -z "$result" ] && echo "Contaminants not found in fastqc_data.txt" && exit 1
-
-[ "$result" != "$expecte_result" ] \
- && echo "Contaminants do not match expected output" \
- && echo "Result: $result" \
- && echo "Expected: $expecte_result" \
- && exit 1
-
-rm -r "test_data/input_1_fastqc"
-rm "test_data/input_1_fastqc.html"
-rm "test_data/input_1_fastqc.zip"
-
+assert_file_exists "input_1_fastqc.html"
+assert_file_exists "input_1_fastqc.zip"
+assert_file_exists "input_1_fastqc/summary.txt"
+assert_file_not_empty "input_1_fastqc.html"
+assert_file_not_empty "input_1_fastqc.zip"
+assert_identical_content "input_1_fastqc/summary.txt" "../expected_summary.txt"
+assert_file_contains "contaminant" "input_1_fastqc/fastqc_data.txt"
 echo "- test succeeded -"
 
+popd > /dev/null
+
 # Test 6: Run fastqc with output options
+mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
+
 echo "-> Run Test: output options"
 "$meta_executable" \
- --input "test_data/input_1.fq" \
- --html "test_data/output_*_.html" \
- --zip "test_data/output_*_.zip"
+ --input "../input_1.fq" \
+ --html "../output_*_.html" \
+ --zip "../output_*_.zip"
 
 # Check if the html file was generated
 [ ! -f "test_data/output_input_1_.html" ] \
@@ -309,11 +234,13 @@ echo "-> Run Test: output options"
 [ ! -s "test_data/output_input_1_.zip" ] \
     && echo "Output ZIP file is empty." && exit 1
 
-rm "test_data/output_input_1_.html"
-rm "test_data/output_input_1_.zip"
-
+assert_file_exists "output_1_fastqc.html"
+assert_file_exists "output_1_fastqc.zip"
+assert_file_not_empty "output_1_fastqc.html"
+assert_file_not_empty "output_1_fastqc.zip"
 echo "- test succeeded -"
 
+popd > /dev/null
 
 echo "All tests succeeded!"
 exit 0

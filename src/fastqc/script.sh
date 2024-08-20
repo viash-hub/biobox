@@ -3,6 +3,9 @@
 ## VIASH START
 ## VIASH END
 
+# exit on error
+set -eo pipefail
+
 # unset flags
 unset_if_false=(
   par_casava
@@ -46,7 +49,15 @@ fastqc \
 # Get input directory
 input_dir=$(dirname ${input[0]})
 
-# Both outputs args passed
+# Moves extracted output directory to current directory
+if [[ -n "$par_extract" ]]; then
+  # Substitute .bam, .sam, .bam_mapped, .sam_mapped, and .fastq to .fq
+  input_html=$(echo ${input[$i]} | sed 's/\(\.bam\|\.sam\|\.bam_mapped\|\.sam_mapped\|\.fastq\)/.fq/g') 
+  sample_name=$(basename $input_html .fq)
+  mv "$input_dir/$sample_name"_fastqc $(pwd)
+fi
+
+# Both outputs args passed (html and zip)
 if [[ -n "$par_html" ]] && [[ -n "$par_zip" ]]; then
   for i in "${!input[@]}"; do
     # Substitute .bam, .sam, .bam_mapped, .sam_mapped, and .fastq to .fq
@@ -81,5 +92,7 @@ elif [[ -n "$par_zip" ]]; then
     mv "$input_zip" "$zip_file"
   done
   rm "$input_dir"/*.html
+else 
+  mv "$input_dir"/*.html "$input_dir"/*.zip $(pwd)
 fi
 
