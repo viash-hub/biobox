@@ -108,8 +108,7 @@ def generate_config(par: dict[str, Any], meta, config) -> str:
 
 def get_cwl_file(meta: dict[str, Any]) -> str:
     # create cwl file (if need be)
-    #cwl_file=os.path.join(meta["resources_dir"], "make_rhap_reference_2.2.1_nodocker.cwl")
-    cwl_file="/var/bd_rhapsody_cwl/v2.2.1/Extra_Utilities/bd_rhapsody_make_reference.cwl"
+    cwl_file="/var/bd_rhapsody_cwl/v2.2.1/Extra_Utilities/make_rhap_reference_2.2.1.cwl"
 
     return os.path.abspath(cwl_file)
 
