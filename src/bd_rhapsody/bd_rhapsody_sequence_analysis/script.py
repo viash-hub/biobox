@@ -85,9 +85,9 @@ def process_params(par: dict[str, Any], config, temp_dir: str) -> str:
             continue
         par_value = par[arg_clean_name]
         if isinstance(par_value, list):
-            par_value_absolute = list(map(os.path.abspath, file_path))
+            par_value_absolute = list(map(os.path.abspath, par_value))
         else:
-            par_value_absolute = os.path.abspath(file_path)
+            par_value_absolute = os.path.abspath(par_value)
         par_value_absolute[arg_clean_name] = par_value_absolute
     
     return par
