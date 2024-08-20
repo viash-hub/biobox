@@ -76,7 +76,8 @@ argument_groups:
               freqasc (i.e., print asc. list of values:freq)
               first (i.e., print first value)
               last (i.e., print last value)
-          - Default: sum   
+          
+          Default value: sum   
 
           If there is only column, but multiple operations, all operations will be
           applied on that column. Likewise, if there is only one operation, but
