@@ -31,16 +31,12 @@
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
   - `bedtools/bedtools_bamtofastq`: Convert BAM alignments to FASTQ files (PR #101).
   - `bedtools/bedtools_bedtobam`: Converts genomic feature records (bed/gff/vcf) to BAM format (PR #111).
+ 
+* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74). 
 
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
-
-## NEW FEATURES
-
-* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74). 
-
-# biobox 0.1.0
 
 * Update CI to reusable workflow in `viash-io/viash-actions` (PR #86).
 
