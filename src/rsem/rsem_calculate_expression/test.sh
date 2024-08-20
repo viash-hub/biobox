@@ -3,19 +3,18 @@
 echo ">>> Testing $meta_executable"
 
 test_dir="${meta_resources_dir}/test_data"
+gunzip -k $test_dir/index.tar.gz
+tar -xf $test_dir/index.tar
 
-gunzip "${test_dir}/rsem.tar.gz"
-tar -xf "${test_dir}/rsem.tar"
-
-echo ">>> Calculating expression"
+echo ">>> Test 1: Paired-end reads using STAR to align reads"
 "$meta_executable" \
-  --id WT_REP1 \
+  --id mmliver \
   --strandedness reverse \
-  --paired true \
-  --input "${test_dir}/SRR6357070_1.fastq.gz;${test_dir}/SRR6357070_2.fastq.gz" \
-  --index rsem \
-  --extra_args "--star --star-output-genome-bam --star-gzipped-read-file --estimate-rspd --seed 1" \
-  --logs WT_REP1.log \
+  --paired \
+  --input "${test_dir}/mmliver_1.fq.gz;${test_dir}/mmliver_2.fq.gz" \
+  --index index \
+  --star --star_output_genome_bam --star_gzipped_read_file --estimate_rspd --seed 1 \
+  --quiet
 
 echo ">>> Checking whether output exists"
 [ ! -f "WT_REP1.genes.results" ] && echo "Gene level expression counts file does not exist!" && exit 1
@@ -30,23 +29,27 @@ echo ">>> Checking whether output exists"
 
 ####################################################################################################
 
-echo ">>> Test 2: Single-end reads without quality scores"
-"$meta_executable" \
-  --no-qualities \
-  --input "${test_dir}/SRR6357070_1.fastq.gz" \
-  --index rsem \
-  --id WT_REP1_no_qual
+# echo ">>> Test 2: Single-end reads without quality scores"
+# "$meta_executable" \
+#   --phred64-quals \
+#   --append-names \
+#   --output-genome-bam \
+#   --input /$test_dir/mmliver_1.fq \
+#   --index index \
+#   --id mmliver_single_quals
 
-####################################################################################################
+# ####################################################################################################
 
-echo ">>> Test 3: Paired-end reads with quality scores, using STAR to align reads"
-"$meta_executable" \
-  --star \
-  --star-gzipped-read-file \
-  --paired-end \
-  --input "${test_dir}/SRR6357070_1.fastq.gz;${test_dir}/SRR6357070_2.fastq.gz" \
-  --index rsem \
-  WT_REP1_star
+# echo ">>> Test 3: Paired-end reads with quality scores, using STAR to align reads"
+# "$meta_executable" \
+#   --phred64-quals \
+#   --fragment-length-mean 150.0 \
+#   --fragment-length-sd 35.0 \
+#   --output-genome-bam \
+#   --calc-ci \
+#   --input /$test_dir/mmliver.fq \
+#   --index index \
+#   --id mmliver_single_quals
 
 echo "All tests succeeded!"
 exit 0

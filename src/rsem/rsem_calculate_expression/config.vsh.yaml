@@ -23,7 +23,7 @@ argument_groups:
     description: Sample strand-specificity. Must be one of unstranded, forward, reverse
     choices: [forward, reverse, unstranded]
   - name: "--paired"
-    type: boolean
+    type: boolean_true
     description: Paired-end reads or not?
   - name: "--input"
     type: file
