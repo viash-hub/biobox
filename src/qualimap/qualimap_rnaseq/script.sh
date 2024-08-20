@@ -20,9 +20,9 @@ fi
 
 # Run qualimap
 qualimap rnaseq \
-    --java-mem-size=$par_java_memory_size \
-    --algorithm $par_algorithm \
-    --sequencing-protocol $par_sequencing_protocol \
+    ${meta_memory_mb:+--java-mem-size=${meta_memory_mb}M} \
+    ${par_algorithm:+--algorithm $par_algorithm} \
+    ${par_sequencing_protocol:+--sequencing-protocol $par_sequencing_protocol} \
     -bam $par_bam \
     -gtf $par_gtf \
     -outdir "$tmp_dir" \

@@ -11,7 +11,7 @@ links:
   repository: https://bitbucket.org/kokonech/qualimap/commits/branch/master
 references:
   doi: https://10.1093/bioinformatics/btv566
-license: GNU GPL v2
+license: GPL-2.0
 authors:
   - __merge__: /src/_authors/dorien_roosen.yaml
     roles: [ author, maintainer ]
@@ -31,18 +31,18 @@ argument_groups:
 
   - name: "Output"
     arguments: 
-    - name: "--output"
+    - name: "--qc_results"
       direction: output
       type: file
       required: true
       example: rnaseq_qc_results.txt
       description: Text file containing the RNAseq QC results.
-    - name: "--output_counts"
+    - name: "--counts"
       type: file
       required: false
       direction: output
       description: Output file for computed counts.
-    - name: "--output_report"
+    - name: "--report"
       type: file
       direction: output
       required: false
