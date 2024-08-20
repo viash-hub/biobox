@@ -10,7 +10,7 @@ links:
   issue_tracker: https://bitbucket.org/kokonech/qualimap/issues?status=new&status=open
   repository: https://bitbucket.org/kokonech/qualimap/commits/branch/master
 references:
-  doi: https://10.1093/bioinformatics/btv566
+  doi: 10.1093/bioinformatics/btv566
 license: GPL-2.0
 authors:
   - __merge__: /src/_authors/dorien_roosen.yaml
