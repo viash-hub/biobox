@@ -102,7 +102,6 @@ echo "Test 2 succeeded."
 echo "> Run Test 3: multiple options"
 "$meta_executable" \
   --fastq "$meta_resources_dir/test_data/test1.fastq" \
-  -t 2 \
   --maxlength 40000 \
   --format jpg \
   --prefix biobox_ \

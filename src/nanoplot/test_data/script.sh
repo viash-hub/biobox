@@ -57,9 +57,19 @@ done
 
 #########################################################################################
 
-## Bam file ##
+## Fasta file ##
+# Dowload test data from snakemake wrapper
 if [ ! -d /tmp/snakemake-wrappers ]; then
   git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
 fi
 
+cp -r /tmp/snakemake-wrappers/bio/assembly-stats/test/*.fasta src/nanoplot/test_data/test.fasta
+
+#########################################################################################
+
+## Bam file ##
 cp -r /tmp/snakemake-wrappers/bio/arriba/test/A.bam src/nanoplot/test_data/test.bam
+
+#########
+
+## Cram file ##

@@ -7,29 +7,31 @@ set -eo pipefail
 
 ## Default output directory
 # Search for biobox directory starting from the current working directory
-file_path=$(find "$(pwd)" -name "biobox" -type d)
-par_output="$file_path//target/result/"
+
+# file_path=$(find "$(pwd)" -name "biobox" -type d)
+# par_output="$file_path//target/result/"
+# par_output="output"
 
 # Unset flags
 [[ "$par_verbose" == "false" ]] && unset par_verbose
 [[ "$par_store" == "false" ]] && unset par_store
 [[ "$par_raw" == "false" ]] && unset par_raw
 [[ "$par_huge" == "false" ]] && unset par_huge
-[[ "$par_no_static" == "false" ]] && unset par_no_static
+[[ "$par_no_static" == "true" ]] && unset par_no_static
 [[ "$par_tsv_stats" == "false" ]] && unset par_tsv_stats
 [[ "$par_only_report" == "false" ]] && unset par_only_report
 [[ "$par_info_in_report" == "false" ]] && unset par_info_in_report
-[[ "$par_drop_outliers" == "false" ]] && unset par_drop_outliers
+[[ "$par_drop_outliers" == "true" ]] && unset par_drop_outliers
 [[ "$par_loglength" == "false" ]] && unset par_loglength
 [[ "$par_percentqual" == "false" ]] && unset par_percentqual
 [[ "$par_alength" == "false" ]] && unset par_alength
 [[ "$par_barcoded" == "false" ]] && unset par_barcoded
-[[ "$par_no_supplementary" == "false" ]] && unset par_no_supplementary
+[[ "$par_no_supplementary" == "true" ]] && unset par_no_supplementary
 [[ "$par_listcolors" == "false" ]] && unset par_listcolors
 [[ "$par_listcolormaps" == "false" ]] && unset par_listcolormaps
-[[ "$par_no_N50" == "false" ]] && unset par_no_N50
+[[ "$par_no_N50" == "true" ]] && unset par_no_N50
 [[ "$par_N50" == "false" ]] && unset par_N50
-[[ "$par_hide_stats" == "false" ]] && unset par_hide_stats
+[[ "$par_hide_stats" == "true" ]] && unset par_hide_stats
 
 # Multiple inputs - replace ';' with ' ' (space)
 par_fastq=$(echo $par_fastq | tr ';' ' ')
@@ -55,8 +57,7 @@ NanoPlot \
     ${par_cram:+--cram "$par_cram"} \
     ${par_pickle:+--pickle "$par_pickle"} \
     ${par_feather:+--feather "$par_feather"} \
-    ${par_threads:+--threads "$par_threads"} \
-    # ${meta_cpus:+--threads "${meta_cpus}"} \
+    # ${par_threads:+--threads "$par_threads"} \
     ${par_verbose:+--verbose} \
     ${par_store:+--store} \
     ${par_raw:+--raw} \
@@ -90,7 +91,8 @@ NanoPlot \
     ${par_title:+--title "$par_title"} \
     ${par_font_scale:+--font_scale "$par_font_scale"} \
     ${par_dpi:+--dpi "$par_dpi"} \
-    ${par_hide_stats:+--hide_stats}
+    ${par_hide_stats:+--hide_stats} \
+    # -o output
 
 ## Move output to output directory ##
 # Move NanoPlot summary file
@@ -100,10 +102,10 @@ if [[ -n "$par_statsum" ]]; then
     base_name=$(echo "$par_statsum" | sed 's/\*.*//')
     # Make a folder with the extracted string as the name
     mkdir -p "$base_name"
-    mv *.txt "$base_name"
-else
-    mkdir -p "$par_output"
-    mv *.txt "$par_output"
+    mv "$par_temp"/*.txt "$base_name"
+# else
+#     mkdir -p "$par_output"
+#     mv *.txt "$par_output"
 fi
 
 # Move NanoPlot plots
