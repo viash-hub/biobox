@@ -72,7 +72,7 @@ argument_groups:
         type: boolean_true
         description: |
           If set then the zipped output file will be uncompressed in
-          the same directory after it has been created.  By default
+          the current directory after it has been created. By default
           this option will be set if fastqc is run in non-interactive
           mode.
      
