@@ -77,6 +77,8 @@
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
+* `rsem`:
+    - `rsem_calculate_expression`: Calculate expression levels (PR #93).
 
 ## MINOR CHANGES
 
