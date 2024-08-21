@@ -5,11 +5,18 @@
 
 set -e
 
-[[ "$par_no_suffix" == "false" ]] && unset par_no_suffix
-[[ "$par_suffix" == "false" ]] && unset par_suffix
-[[ "$par_use_oq" == "false" ]] && unset par_use_oq
-[[ "$par_copy_tags" == "false" ]] && unset par_copy_tags
-[[ "$par_casava" == "false" ]] && unset par_casava
+unset_if_false=(
+  par_no_suffix
+  par_suffix
+  par_use_oq
+  par_copy_tags
+  par_casava
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 if [[ "$meta_name" == "samtools_fasta" ]]; then
   subcommand=fasta
