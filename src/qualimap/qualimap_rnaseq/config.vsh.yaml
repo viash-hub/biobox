@@ -93,23 +93,11 @@ test_resources:
 
 engines:
   - type: docker
-    image: ubuntu:22.04
+    image: quay.io/biocontainers/qualimap:2.3--hdfd78af_0
     setup:   
-      - type: apt
-        packages: [ r-base, unzip, wget, openjdk-8-jdk, libxml2-dev, libcurl4-openssl-dev ]
       - type: docker
         run: |
-          wget https://bitbucket.org/kokonech/qualimap/downloads/qualimap_v2.3.zip && \
-          unzip qualimap_v2.3.zip && \
-          cp -a qualimap_v2.3/. usr/bin && \
-          unset DISPLAY && \
-          mkdir -p tmp && \
-          export _JAVA_OPTIONS=-Djava.io.tmpdir=./tmp && \
-          echo "qualimap: v2.3" > /var/software_versions.txt
-
-      - type: r
-        bioc: [ NOISeqr ]
-        cran: [ optparse ]
+          echo QualiMap: $(qualimap 2>&1 | grep QualiMap | sed 's/^.*QualiMap//')
 runners: 
   - type: executable
   - type: nextflow
