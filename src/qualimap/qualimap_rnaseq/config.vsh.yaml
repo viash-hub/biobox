@@ -97,7 +97,7 @@ engines:
     setup:   
       - type: docker
         run: |
-          echo QualiMap: $(qualimap 2>&1 | grep QualiMap | sed 's/^.*QualiMap//')
+          echo QualiMap: $(qualimap 2>&1 | grep QualiMap | sed 's/^.*QualiMap//') > /var/software_versions.txt
 runners: 
   - type: executable
   - type: nextflow
