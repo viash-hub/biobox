@@ -15,7 +15,11 @@ argument_groups:
         type: file
         direction: input
         multiple: true
-        description: FASTQ file(s) to be analyzed.
+        description: | 
+          FASTQ file(s) to be analyzed.
+          Must have one of the following extensions 
+          if used with output options --html or --zip: 
+            .fastq, .fq, .bam, .sam, .bam_mapped, .sam_mapped 
         required: true
         example: input.fq
         
