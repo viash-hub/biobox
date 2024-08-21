@@ -36,7 +36,7 @@ rsem-prepare-reference \
     ${par_mappability_bigwig_file:+--mappability-bigwig-file "${par_mappability_bigwig_file}"} \
     ${meta_cpus:+--num-threads "${meta_cpus}"} \
     "${par_reference_fasta_files}" \
-    "${par_reference_name}
+    "${par_reference_name}"
 
 mkdir -p "${par_output}"
-mv "${par_reference_name}.*" "${par_output}/"
+mv ${par_reference_name}.* "${par_output}/"
