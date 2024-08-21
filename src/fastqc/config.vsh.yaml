@@ -1,5 +1,4 @@
 name: fastqc
-namespace: fastqc
 description: FastQC - A high throughput sequence QC analysis tool.
 keywords: [Quality control, BAM, SAM, FASTQ]
 links:
@@ -175,7 +174,7 @@ engines:
     setup:
       - type: docker
         run: |
-          fastqc --version > /var/software_versions.txt
+          echo "fastqc: $(fastqc --version | sed -n 's/^FastQC //p')" > /var/software_versions.txt
 
 runners:
   - type: executable
