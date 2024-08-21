@@ -12,9 +12,9 @@ trap clean_up EXIT
 
 tmpdir=$(mktemp -d "$meta_temp_dir/$meta_functionality_name-XXXXXXXX")
 
-if [ $par_strandedness == 'forward' ]; then
+if [ "$par_strandedness" == 'forward' ]; then
     strandedness='--strandedness forward'
-elif [ $par_strandedness == 'reverse' ]; then
+elif [ "$par_strandedness" == 'reverse' ]; then
     strandedness="--strandedness reverse"
 else
     strandedness=''
@@ -23,6 +23,18 @@ fi
 IFS=";" read -ra input <<< $par_input
 
 INDEX=$(find -L $meta_resources_dir/$par_index -name "*.grp" | sed 's/\.grp$//')
+
+unset_if_false=( par_paired par_quiet par_no_bam_output par_sampling_for_bam par_no_qualities 
+                 par_alignments par_bowtie2 par_star par_hisat2_hca par_append_names 
+                 par_single_cell_prior par_calc_pme par_calc_ci par_phred64_quals 
+                 par_solexa_quals par_star_gzipped_read_file par_star_bzipped_read_file 
+                 par_star_output_genome_bam par_estimate_rspd par_keep_intermediate_files 
+                 par_time par_run_pRSEM par_cap_stacked_chipseq_reads par_sort_bam_by_read_name )
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 rsem-calculate-expression \
     ${par_quiet:+-q} \
