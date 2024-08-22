@@ -109,6 +109,7 @@ echo "-> Run Test1: one input"
   --input "../input_1.fq" \
   --html "*_fastqc.html" \
   --zip "*_fastqc.zip" \
+  --quiet \
 
 assert_file_exists "input_1_fastqc.html"
 assert_file_exists "input_1_fastqc.zip"
@@ -133,6 +134,7 @@ echo "-> Run Test2: two inputs"
   --input "../input_2.fq" \
   --html "*_fastqc.html" \
   --zip "*_fastqc.zip" \
+  --quiet \
 
 # File 1
 assert_file_exists "input_1_fastqc.html"
@@ -165,7 +167,7 @@ echo "-> Run Test3: contaminants"
   --contaminants "../contaminants.txt" \
   --html "*_fastqc.html" \
   --zip "*_fastqc.zip" \
-
+  --quiet \
 
 assert_file_exists "input_1_fastqc.html"
 assert_file_exists "input_1_fastqc.zip"
@@ -190,6 +192,7 @@ echo "-> Run Test4: sam file"
   --format "sam" \
   --html "*_fastqc.html" \
   --zip "*_fastqc.zip" \
+  --quiet \
 
 assert_file_exists "example_fastqc.html"
 assert_file_exists "example_fastqc.zip"
@@ -218,6 +221,7 @@ echo "-> Run Test5: multiple options"
   --kmers 5 \
   --html "*_fastqc.html" \
   --zip "*_fastqc.zip" \
+  --quiet \
 # --casava \
 
 assert_file_exists "input_1_fastqc.html"

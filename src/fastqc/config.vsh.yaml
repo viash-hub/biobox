@@ -25,7 +25,7 @@ argument_groups:
         
   - name: Outputs
     description: |
-      At least one of the output options (--html or --zip) must be used:
+      At least one of the output options (--html or --zip) must be used.
     arguments:
 
       - name: --html
@@ -39,7 +39,7 @@ argument_groups:
           e.g. 
             --input "sample_1.fq"
             --html "*.html"
-            would create a html file named sample_1.html
+            would create an output html file named sample_1.html
         example: "*.html"
       
       - name: --zip
@@ -53,7 +53,7 @@ argument_groups:
           e.g. 
             --input "sample_1.fq"
             --html "*.zip"
-            would create a zip file named sample_1.zip
+            would create an output zip file named sample_1.zip
         example: "*.zip"    
 
   - name: Options
