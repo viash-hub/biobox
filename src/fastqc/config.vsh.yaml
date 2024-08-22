@@ -67,7 +67,7 @@ argument_groups:
           e.g. 
             --input "sample_1.fq"
             --summary "*_summary.txt"
-            would create an output zip file named sample_1_summary.txt
+            would create an output summary.txt file named sample_1_summary.txt
         example: "*_summary.txt"
 
       - name: --data
@@ -81,7 +81,7 @@ argument_groups:
           e.g. 
             --input "sample_1.fq"
             --summary "*_data.txt"
-            would create an output zip file named sample_1_data.txt
+            would create an output data.txt file named sample_1_data.txt
         example: "*_data.txt"
 
   - name: Options
