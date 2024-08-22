@@ -69,7 +69,3 @@ cp -r /tmp/snakemake-wrappers/bio/assembly-stats/test/*.fasta src/nanoplot/test_
 
 ## Bam file ##
 cp -r /tmp/snakemake-wrappers/bio/arriba/test/A.bam src/nanoplot/test_data/test.bam
-
-#########
-
-## Cram file ##

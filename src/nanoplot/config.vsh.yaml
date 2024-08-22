@@ -15,7 +15,6 @@ argument_groups:
       - name: --fastq
         type: file
         description: Data is in one or more default fastq file(s).
-        # default: "src/nanoplot/test_data/test1.fastq"
         example: read.fq
         direction: input
         multiple: true

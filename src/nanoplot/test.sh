@@ -210,4 +210,44 @@ echo "Test 4 succeeded."
 
 ###########################################################################
 
+# Test 5: Run NanoPlot with different input
+
+# Check if HTML file is generated
+if ! ls target/result/*.html 1> /dev/null 2>&1; then
+  echo "Output HTML file not found"
+  exit 1
+fi
+
+# Check if summary file is generated
+if ! ls target/result/*.txt 1> /dev/null 2>&1; then
+  echo "NanoPlot summary file not found"
+  exit 1
+fi
+
+# Check if plots are generated
+if ! ls target/result/*.png 1> /dev/null 2>&1; then
+  echo "Plots are not found"
+  exit 1
+fi
+
+# Check if files are empty
+if find target/result -name "*.html" -type f -size 0 | grep -q .; then 
+  echo "At least one HTML file is empty."
+  exit 1
+fi
+if find target/result -name "*.png" -type f -size 0 | grep -q .; then 
+  echo "At least one plot is empty."
+  exit 1
+fi
+if find target/result -name "*.txt" -type f -size 0 | grep -q .; then 
+  echo "NanoPlot summary file is empty."
+  exit 1
+fi
+
+# rm -f target/result/* # Clear output
+
+echo "Test 5 succeeded."
+
+###########################################################################
+
 echo "All tests successfully completed!"

@@ -102,7 +102,7 @@ if [[ -n "$par_statsum" ]]; then
     base_name=$(echo "$par_statsum" | sed 's/\*.*//')
     # Make a folder with the extracted string as the name
     mkdir -p "$base_name"
-    mv "$par_temp"/*.txt "$base_name"
+    mv *.txt "$base_name"
 # else
 #     mkdir -p "$par_output"
 #     mv *.txt "$par_output"
