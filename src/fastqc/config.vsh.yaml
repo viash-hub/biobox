@@ -17,14 +17,15 @@ argument_groups:
         multiple: true
         description: | 
           FASTQ file(s) to be analyzed.
-          Must have one of the following extensions 
-          if used with output options --html or --zip: 
-            .fastq, .fq, .bam, .sam, .bam_mapped, .sam_mapped 
         required: true
         example: input.fq
         
   - name: Outputs
+    description: |
+      At least one of the following output options must be used:
+        --html, --zip
     arguments:
+
       - name: --html
         type: file
         direction: output
@@ -32,8 +33,12 @@ argument_groups:
         description: |
           Create the HTML report of the results. 
           '*' wild card must be provided in the output file name. 
-          Wild card will be replaced by the input basename.
-        example: example_*.html
+          Wild card will be replaced by the input file basename.
+          e.g. 
+            --input "sample_1.fq"
+            --html "*.html"
+            would create a html file named sample_1.html
+        example: "*.html"
       
       - name: --zip
         type: file
@@ -43,7 +48,11 @@ argument_groups:
           Create the zip file(s) containing: html report, data, images, icons, summary, etc.
           '*' wild card must be provided in the output file name.
           Wild card will be replaced by the input basename.
-        example: example_*.zip     
+          e.g. 
+            --input "sample_1.fq"
+            --html "*.zip"
+            would create a zip file named sample_1.zip
+        example: "*.zip"    
 
   - name: Options
     arguments:  
@@ -183,4 +192,3 @@ engines:
 runners:
   - type: executable
   - type: nextflow
-  
