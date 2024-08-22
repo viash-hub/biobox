@@ -63,18 +63,19 @@ for file in "${input[@]}"; do
   # Removes everthing after the first dot of the basename
   sample_name=$(basename "${file}" | sed 's/\..*$//')
   if [[ -n "$par_html" ]]; then
-    input_html="$tempdir/${sample_name}_fastqc.html"
+    input_html="${tmpdir}/${sample_name}_fastqc.html"
     html_file="${par_html//\*/$sample_name}"
     mv "$input_html" "$html_file"
   fi
   if [[ -n "$par_zip" ]]; then
-    input_zip="$tempdir/${sample_name}_fastqc.zip"
+    input_zip="${tmpdir}/${sample_name}_fastqc.zip"
     zip_file="${par_zip//\*/$sample_name}"
     mv "$input_zip" "$zip_file"
   fi
   if [[ -n "$par_extract" ]]; then
-    # moves the extracted directory to the same directory as the input file
-    extract_dir="$tempdir/${sample_name}_fastqc"
+    # Moves the extracted directory to the same directory as the input file
+    extract_dir="${tmpdir}/${sample_name}_fastqc"
     mv "$extract_dir" "$file_dir"
   fi
 done
+

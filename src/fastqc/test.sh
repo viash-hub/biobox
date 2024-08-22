@@ -107,6 +107,8 @@ echo "-> Run Test1: one input"
 "$meta_executable" \
     --extract \
     --input "../input_1.fq" \
+    --html "*_fastqc.html" \
+    --zip "*_fastqc.zip" \
 
 assert_file_exists "input_1_fastqc.html"
 assert_file_exists "input_1_fastqc.zip"
