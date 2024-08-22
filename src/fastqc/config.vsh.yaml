@@ -54,7 +54,35 @@ argument_groups:
             --input "sample_1.fq"
             --html "*.zip"
             would create an output zip file named sample_1.zip
-        example: "*.zip"    
+        example: "*.zip"   
+
+      - name: --summary
+        type: file
+        direction: output
+        multiple: true
+        description: |
+          Create the summary file(s).
+          '*' wild card must be provided in the output file name.
+          Wild card will be replaced by the input basename.
+          e.g. 
+            --input "sample_1.fq"
+            --summary "*_summary.txt"
+            would create an output zip file named sample_1_summary.txt
+        example: "*_summary.txt"
+
+      - name: --data
+        type: file
+        direction: output
+        multiple: true
+        description: |
+          Create the data file(s).
+          '*' wild card must be provided in the output file name.
+          Wild card will be replaced by the input basename.
+          e.g. 
+            --input "sample_1.fq"
+            --summary "*_data.txt"
+            would create an output zip file named sample_1_data.txt
+        example: "*_data.txt"
 
   - name: Options
     arguments:  
@@ -82,21 +110,6 @@ argument_groups:
         description: |
           If running with --casava then don't remove read flagged by
           casava as poor quality when performing the QC analysis.
-      
-      - name: --extract
-        type: boolean_true
-        description: |
-          If set then the zipped output file will be uncompressed in
-          the current directory after it has been created. By default
-          this option will be set if fastqc is run in non-interactive
-          mode.
-     
-      - name: --noextract
-        type: boolean_true
-        description: |
-          Do not uncompress the output file after creating it. 
-          You should set this option if you do not wish to uncompress 
-          the output when running in non-interactive mode.
 
       - name: --nogroup
         type: boolean_true

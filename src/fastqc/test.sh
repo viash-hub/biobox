@@ -105,21 +105,20 @@ mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
 
 echo "-> Run Test1: one input"
 "$meta_executable" \
-  --extract \
   --input "../input_1.fq" \
   --html "*_fastqc.html" \
   --zip "*_fastqc.zip" \
+  --summary "*_summary.txt" \
+  --data "*_data.txt" \
   --quiet \
 
 assert_file_exists "input_1_fastqc.html"
 assert_file_exists "input_1_fastqc.zip"
-assert_file_exists "../input_1_fastqc/summary.txt"
+assert_file_exists "input_1_summary.txt"
 assert_file_not_empty "input_1_fastqc.html"
 assert_file_not_empty "input_1_fastqc.zip"
-assert_identical_content "../input_1_fastqc/summary.txt" "../expected_summary.txt"
+assert_identical_content "input_1_summary.txt" "../expected_summary.txt"
 echo "- test succeeded -"
-
-rm -r "$TMPDIR/input_1_fastqc"
 
 popd > /dev/null
 
@@ -129,31 +128,29 @@ mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
 
 echo "-> Run Test2: two inputs"
 "$meta_executable" \
-  --extract \
   --input "../input_1.fq" \
   --input "../input_2.fq" \
   --html "*_fastqc.html" \
   --zip "*_fastqc.zip" \
+  --summary "*_summary.txt" \
+  --data "*_data.txt" \
   --quiet \
 
 # File 1
 assert_file_exists "input_1_fastqc.html"
 assert_file_exists "input_1_fastqc.zip"
-assert_file_exists "../input_1_fastqc/summary.txt"
+assert_file_exists "input_1_summary.txt"
 assert_file_not_empty "input_1_fastqc.html"
 assert_file_not_empty "input_1_fastqc.zip"
-assert_identical_content "../input_1_fastqc/summary.txt" "../expected_summary.txt"
+assert_identical_content "input_1_summary.txt" "../expected_summary.txt"
 # File 2
 assert_file_exists "input_2_fastqc.html"
 assert_file_exists "input_2_fastqc.zip"
-assert_file_exists "../input_2_fastqc/summary.txt"
+assert_file_exists "input_2_summary.txt"
 assert_file_not_empty "input_2_fastqc.html"
 assert_file_not_empty "input_2_fastqc.zip"
-assert_identical_content "../input_2_fastqc/summary.txt" "../expected_summary2.txt"
+assert_identical_content "input_2_summary.txt" "../expected_summary2.txt"
 echo "- test succeeded -"
-
-rm -r "$TMPDIR/input_1_fastqc"
-rm -r "$TMPDIR/input_2_fastqc"
 
 popd > /dev/null
 
@@ -162,23 +159,22 @@ mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
 
 echo "-> Run Test3: contaminants"
 "$meta_executable" \
-  --extract \
   --input "../input_1.fq" \
   --contaminants "../contaminants.txt" \
   --html "*_fastqc.html" \
   --zip "*_fastqc.zip" \
+  --summary "*_summary.txt" \
+  --data "*_data.txt" \
   --quiet \
 
 assert_file_exists "input_1_fastqc.html"
 assert_file_exists "input_1_fastqc.zip"
-assert_file_exists "../input_1_fastqc/summary.txt"
+assert_file_exists "input_1_summary.txt"
 assert_file_not_empty "input_1_fastqc.html"
 assert_file_not_empty "input_1_fastqc.zip"
-assert_identical_content "../input_1_fastqc/summary.txt" "../expected_summary.txt"
-assert_file_contains "../input_1_fastqc/fastqc_data.txt" "contaminant"
+assert_identical_content "input_1_summary.txt" "../expected_summary.txt"
+assert_file_contains "input_1_data.txt" "contaminant"
 echo "- test succeeded -"
-
-rm -r "$TMPDIR/input_1_fastqc"
 
 popd > /dev/null
 
@@ -187,22 +183,21 @@ mkdir "$TMPDIR/test4" && pushd "$TMPDIR/test4" > /dev/null
 
 echo "-> Run Test4: sam file"
 "$meta_executable" \
-  --extract \
   --input "../example.sam" \
   --format "sam" \
   --html "*_fastqc.html" \
   --zip "*_fastqc.zip" \
+  --summary "*_summary.txt" \
+  --data "*_data.txt" \
   --quiet \
 
 assert_file_exists "example_fastqc.html"
 assert_file_exists "example_fastqc.zip"
-assert_file_exists "../example_fastqc/summary.txt"
+assert_file_exists "example_summary.txt"
 assert_file_not_empty "example_fastqc.html"
 assert_file_not_empty "example_fastqc.zip"
-assert_identical_content "../example_fastqc/summary.txt" "../expected_summary_sam.txt"
+assert_identical_content "example_summary.txt" "../expected_summary_sam.txt"
 echo "- test succeeded -"
-
-rm -r "$TMPDIR/example_fastqc"
 
 popd > /dev/null
 
@@ -211,7 +206,6 @@ mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
 
 echo "-> Run Test5: multiple options"
 "$meta_executable" \
-  --extract \
   --input "../input_1.fq" \
   --contaminants "../contaminants.txt" \
   --format "fastq" \
@@ -221,19 +215,19 @@ echo "-> Run Test5: multiple options"
   --kmers 5 \
   --html "*_fastqc.html" \
   --zip "*_fastqc.zip" \
+  --summary "*_summary.txt" \
+  --data "*_data.txt" \
   --quiet \
 # --casava \
 
 assert_file_exists "input_1_fastqc.html"
 assert_file_exists "input_1_fastqc.zip"
-assert_file_exists "../input_1_fastqc/summary.txt"
+assert_file_exists "input_1_summary.txt"
 assert_file_not_empty "input_1_fastqc.html"
 assert_file_not_empty "input_1_fastqc.zip"
-assert_identical_content "../input_1_fastqc/summary.txt" "../expected_summary.txt"
-assert_file_contains "../input_1_fastqc/fastqc_data.txt" "contaminant"
+assert_identical_content "input_1_summary.txt" "../expected_summary.txt"
+assert_file_contains "input_1_data.txt" "contaminant"
 echo "- test succeeded -"
-
-rm -r "$TMPDIR/input_1_fastqc"
 
 popd > /dev/null
 

@@ -39,11 +39,10 @@ IFS=";" read -ra input <<< $par_input
 
 # Run fastqc
 fastqc \
+  --extract \
   ${par_casava:+--casava} \
   ${par_nano:+--nano} \
   ${par_nofilter:+--nofilter} \
-  ${par_extract:+--extract} \
-  ${par_noextract:+--noextract} \
   ${par_nogroup:+--nogroup} \
   ${par_min_length:+--min_length "$par_min_length"} \
   ${par_format:+--format "$par_format"} \
@@ -56,10 +55,9 @@ fastqc \
   ${meta_temp_dir:+--dir "$meta_temp_dir"} \
   --outdir "${tmpdir}" \
   "${input[@]}"
-
+ 
 # Move output files
 for file in "${input[@]}"; do
-  file_dir=$(dirname "$file")
   # Removes everthing after the first dot of the basename
   sample_name=$(basename "${file}" | sed 's/\..*$//')
   if [[ -n "$par_html" ]]; then
@@ -72,10 +70,17 @@ for file in "${input[@]}"; do
     zip_file="${par_zip//\*/$sample_name}"
     mv "$input_zip" "$zip_file"
   fi
-  if [[ -n "$par_extract" ]]; then
-    # Moves the extracted directory to the same directory as the input file
-    extract_dir="${tmpdir}/${sample_name}_fastqc"
-    mv "$extract_dir" "$file_dir"
+  if [[ -n "$par_summary" ]]; then
+    summary_file="${tmpdir}/${sample_name}_fastqc/summary.txt"
+    new_summary="${par_summary//\*/$sample_name}"
+    mv "$summary_file" "$new_summary"
   fi
+  if [[ -n "$par_data" ]]; then
+    data_file="${tmpdir}/${sample_name}_fastqc/fastqc_data.txt"
+    new_data="${par_data//\*/$sample_name}"
+    mv "$data_file" "$new_data"
+  fi
+  # Remove the extracted directory
+  rm -r "${tmpdir}/${sample_name}_fastqc"
 done
 
