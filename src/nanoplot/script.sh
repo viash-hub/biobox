@@ -45,8 +45,14 @@ par_cram=$(echo $par_cram | tr ';' ' ')
 par_pickle=$(echo $par_pickle | tr ';' ' ')
 par_feather=$(echo $par_feather | tr ';' ' ')
 
+tmpdir=$(mktemp -d "${meta_temp_dir}/${meta_name}-XXXXXXXX")
+function clean_up {
+  rm -rf "$tmpdir"
+}
+trap clean_up EXIT
+
 # Run NanoPlot
-NanoPlot \
+cmd="NanoPlot \
     ${par_fastq:+--fastq "$par_fastq"} \
     ${par_fasta:+--fasta "$par_fasta"} \
     ${par_fastq_rich:+--fastq_rich "$par_fastq_rich"} \
@@ -57,7 +63,6 @@ NanoPlot \
     ${par_cram:+--cram "$par_cram"} \
     ${par_pickle:+--pickle "$par_pickle"} \
     ${par_feather:+--feather "$par_feather"} \
-    # ${par_threads:+--threads "$par_threads"} \
     ${par_verbose:+--verbose} \
     ${par_store:+--store} \
     ${par_raw:+--raw} \
@@ -92,17 +97,23 @@ NanoPlot \
     ${par_font_scale:+--font_scale "$par_font_scale"} \
     ${par_dpi:+--dpi "$par_dpi"} \
     ${par_hide_stats:+--hide_stats} \
-    # -o output
+    -o "${tmpdir}""
+
+echo $cmd
+$cmd
+
+ls -l ${tmpdir}
 
 ## Move output to output directory ##
 # Move NanoPlot summary file
 # Check if par_statsum argument is passed and is not empty
+
 if [[ -n "$par_statsum" ]]; then
     # Extract the string before the '*' character
     base_name=$(echo "$par_statsum" | sed 's/\*.*//')
     # Make a folder with the extracted string as the name
     mkdir -p "$base_name"
-    mv *.txt "$base_name"
+    mv ${tmpdir}/*.txt ${par_statsum}
 # else
 #     mkdir -p "$par_output"
 #     mv *.txt "$par_output"
@@ -111,55 +122,49 @@ fi
 # Move NanoPlot plots
 # Check if static plots are generated
 if [[ ! -n "$par_no_static" ]] && [[ ! -n "$par_only_report" ]]; then
-    # Check the format of the plots
-    if [[ -n "$par_format" ]]; then
-        format=".$par_format"
-    else
-        format=".png"
-    fi
     # Check if par_nanoplots argument is passed and is not empty
     if [[ -n "$par_nanoplots" ]]; then
         # Extract the string before the '*' character
         base_name=$(echo "$par_nanoplots" | sed 's/\*.*//')
         # Make a folder with the extracted string as the name
         mkdir -p "$base_name"
-        mv *"$format" "$base_name"
-    else
-        mkdir -p "$par_output"
-        mv *"$format" "$par_output"
+        mv ${tmpdir}/*.$par_format "$base_name"
+    # else
+    #     mkdir -p "$par_output"
+    #     mv *"$format" "$par_output"
     fi
 fi
 
-# Move NanoPlot report and HTML files.
-# Check if par_html argument is passed and is not empty
-if [[ -n "$par_html" ]]; then
-    # Extract the string before the '*' character
-    base_name=$(echo "$par_html" | sed 's/\*.*//')
-    # Make a folder with the extracted string as the name
-    mkdir -p "$base_name"
-    mv *.html "$base_name"
-else
-    mkdir -p "$par_output"
-    mv *.html "$par_output"
-fi
+# # Move NanoPlot report and HTML files.
+# # Check if par_html argument is passed and is not empty
+# if [[ -n "$par_html" ]]; then
+#     # Extract the string before the '*' character
+#     base_name=$(echo "$par_html" | sed 's/\*.*//')
+#     # Make a folder with the extracted string as the name
+#     mkdir -p "$base_name"
+#     mv *.html "$base_name"
+# else
+#     mkdir -p "$par_output"
+#     mv *.html "$par_output"
+# fi
 
-# Move output log file
-# Check if par_log argument is passed and is not empty
-if [[ -n "$par_log" ]]; then
-    # Extract the string before the '*' character
-    base_name=$(echo "$par_log" | sed 's/\*.*//')
-    # Make a folder with the extracted string as the name
-    mkdir -p "$base_name"
-    mv *.log "$base_name"
-else
-    mkdir -p "$par_output"
-    mv *.log "$par_output"
-fi
+# # Move output log file
+# # Check if par_log argument is passed and is not empty
+# if [[ -n "$par_log" ]]; then
+#     # Extract the string before the '*' character
+#     base_name=$(echo "$par_log" | sed 's/\*.*//')
+#     # Make a folder with the extracted string as the name
+#     mkdir -p "$base_name"
+#     mv *.log "$base_name"
+# else
+#     mkdir -p "$par_output"
+#     mv *.log "$par_output"
+# fi
 
-## Move extracted data (if any) to current working directory
-if [[ -n "$par_store" ]]; then
-    mv *NanoPlot-data.pickle "$par_output" #--prefix
-fi
-if [[ -n "$par_raw" ]]; then
-    mv *NanoPlot-data.tsv "$par_output" #--prefix
-fi
+# ## Move extracted data (if any) to current working directory
+# if [[ -n "$par_store" ]]; then
+#     mv *NanoPlot-data.pickle "$par_output" #--prefix
+# fi
+# if [[ -n "$par_raw" ]]; then
+#     mv *NanoPlot-data.tsv "$par_output" #--prefix
+# fi

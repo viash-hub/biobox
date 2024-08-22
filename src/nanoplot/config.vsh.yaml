@@ -201,6 +201,7 @@ argument_groups:
       - name: --format
         alternatives: [-f]
         type: string
+        default: png
         description: |
           Specify the output format of the plots.
           {eps,jpeg,jpg,pdf,pgf,png,ps,raw,rgba,svg,svgz,tif,tiff}
