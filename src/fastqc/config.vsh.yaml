@@ -2,7 +2,10 @@ name: fastqc
 description: FastQC - A high throughput sequence QC analysis tool.
 keywords: [Quality control, BAM, SAM, FASTQ]
 links:
+  homepage: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/
+  documentation: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/
   repository: https://github.com/s-andrews/FastQC
+  issue_tracker: https://github.com/s-andrews/FastQC/issues
 license: GPL-3.0, Apache-2.0
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
