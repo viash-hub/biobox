@@ -7,8 +7,8 @@
 set -eo pipefail
 
 # Check if both outputs are empty, at least one must be passed.
-if [[ -z "$par_html" ]] && [[ -z "$par_zip" ]]; then
-  echo "Error: At least one of the output arguments (--html or --zip) must be passed."
+if [[ -z "$par_html" ]] && [[ -z "$par_zip" ]] && [[ -z "$par_summary" ]] && [[ -z "$par_data" ]]; then
+  echo "Error: At least one of the output arguments (--html, --zip, --summary, and --data) must be passed."
   exit 1
 fi
 
