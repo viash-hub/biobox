@@ -63,7 +63,7 @@ rsem-calculate-expression \
     ${par_counts_gene:+--counts-gene "$par_counts_gene"} \
     ${par_counts_transcripts:+--counts-transcripts "$par_counts_transcripts"} \
     ${par_stat:+--stat "$par_stat"} \
-    ${par_bam_star:+--bam-star "\$par_bam_star"} \
+    ${par_bam_star:+--bam-star "$par_bam_star"} \
     ${par_bam_genome:+--bam-genome "$par_bam_genome"} \
     ${par_bam_transcript:+--bam-transcript "$par_bam_transcript"} \
     ${par_fai:+--fai "$par_fai"} \

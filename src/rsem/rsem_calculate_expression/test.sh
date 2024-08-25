@@ -4,34 +4,91 @@ echo ">>> Testing $meta_executable"
 
 test_dir="${meta_resources_dir}/test_data"
 
-wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq3/reference/rsem.tar.gz
-gunzip -k rsem.tar.gz
-tar -xf rsem.tar
+# wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq3/reference/rsem.tar.gz
+# gunzip -k rsem.tar.gz
+# tar -xf rsem.tar
+# mv $test_dir/rsem $meta_resources_dir
 
-mv $test_dir/rsem $meta_resources_dir
+echo "> Prepare test data"
+
+cat > reads_R1.fastq <<'EOF'
+@SEQ_ID1
+ACGCTGCCTCATAAGCCTCACACAT
++
+IIIIIIIIIIIIIIIIIIIIIIIII
+@SEQ_ID2
+ACCCGCAAGATTAGGCTCCGTACAC
++
+!!!!!!!!!!!!!!!!!!!!!!!!!
+EOF
+
+cat > reads_R2.fastq <<'EOF'
+@SEQ_ID1
+ATGTGTGAGGCTTATGAGGCAGCGT
++
+IIIIIIIIIIIIIIIIIIIIIIIII
+@SEQ_ID2
+GTGTACGGAGCCTAATCTTGCAGGG
++
+!!!!!!!!!!!!!!!!!!!!!!!!!
+EOF
+
+cat > genome.fasta <<'EOF'
+>chr1
+TGGCATGAGCCAACGAACGCTGCCTCATAAGCCTCACACATCCGCGCCTATGTTGTGACTCTCTGTGAGCGTTCGTGGG
+GCTCGTCACCACTATGGTTGGCCGGTTAGTAGTGTGACTCCTGGTTTTCTGGAGCTTCTTTAAACCGTAGTCCAGTCAA
+TGCGAATGGCACTTCACGACGGACTGTCCTTAGGTGTGAGGCTTATGAGGCACTCAGGGGA
+EOF
+
+cat > genes.gtf <<'EOF'
+chr1	example_source	gene	0	50	.	+	.	gene_id "gene1"; transcript_id "transcript1";
+chr1	example_source	exon	20	40	.	+	.	gene_id "gene1"; transcript_id "transcript1";
+chr1	example_source	gene	100	219	.	+	.	gene_id "gene2"; transcript_id "transcript2";
+chr1	example_source	exon	191	210	.	+	.	gene_id "gene2"; transcript_id "transcript2";
+EOF
+
+
+echo "> Generate index"
+
+rsem-prepare-reference \
+  --gtf "genes.gtf" \
+  "genome.fasta" \
+  "index"\
+
+mkdir index
+mv index.* index/
+  
+STAR \
+  ${meta_cpus:+--runThreadN $meta_cpus} \
+  --runMode genomeGenerate \
+  --genomeDir "index/" \
+  --genomeFastaFiles "genome.fasta" \
+  --sjdbGTFfile "genes.gtf" \
+  --genomeSAindexNbases 2
+  
+#########################################################################################
 
 echo ">>> Test 1: Paired-end reads using STAR to align reads"
 "$meta_executable" \
-    --star \
-    --star_gzipped_read_file \
-    --paired \
-    --input "$test_dir/SRR6357070_1.fastq.gz;$test_dir/SRR6357070_2.fastq.gz" \
-    --index rsem \
-    --id WT_REP1 \
-    --seed 1 \
-    --quiet
+	--star \
+	--paired \
+	--input "reads_R1.fastq;reads_R2.fastq" \
+	--index index \
+	--id test \
+	--seed 1 \
+	--quiet
 
 echo ">>> Checking whether output exists"
-[ ! -f "WT_REP1.genes.results" ] && echo "Gene level expression counts file does not exist!" && exit 1
-[ ! -s "WT_REP1.genes.results" ] && echo "Gene level expression counts file is empty!" && exit 1
-[ ! -f "WT_REP1.isoforms.results" ] && echo "Transcript level expression counts file does not exist!" && exit 1
-[ ! -s "WT_REP1.isoforms.results" ] && echo "Transcript level expression counts file is empty!" && exit 1
-[ ! -d "WT_REP1.stat" ] && echo "Stats file does not exist!" && exit 1
+[ ! -f "test.genes.results" ] && echo "Gene level expression counts file does not exist!" && exit 1
+[ ! -s "test.genes.results" ] && echo "Gene level expression counts file is empty!" && exit 1
+[ ! -f "test.isoforms.results" ] && echo "Transcript level expression counts file does not exist!" && exit 1
+[ ! -s "test.isoforms.results" ] && echo "Transcript level expression counts file is empty!" && exit 1
+[ ! -d "test.stat" ] && echo "Stats file does not exist!" && exit 1
 
 echo ">>> Check wheter output is correct"
-diff $test_dir/ref.genes.results WT_REP1.genes.results || { echo "Gene level expression counts file is incorrect!"; exit 1; }
-diff $test_dir/ref.isoforms.results WT_REP1.isoforms.results || { echo "Transcript level expression counts file is incorrect!"; exit 1; }
-diff $test_dir/ref.cnt WT_REP1.stat/WT_REP1.cnt || { echo "Stats file is incorrect!"; exit 1; }
+diff $test_dir/output/ref.genes.results test.genes.results || { echo "Gene level expression counts file is incorrect!"; exit 1; }
+diff $test_dir/output/ref.isoforms.results test.isoforms.results || { echo "Transcript level expression counts file is incorrect!"; exit 1; }
+diff $test_dir/output/ref.cnt test.stat/test.cnt || { echo "Stats file is incorrect!"; exit 1; }
 
 #####################################################################################################
 

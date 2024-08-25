@@ -1,0 +1,3 @@
+gene_id	transcript_id(s)	length	effective_length	expected_count	TPM	FPKM
+gene1	transcript1	21.00	21.00	0.00	0.00	0.00
+gene2	transcript2	20.00	20.00	0.00	0.00	0.00
