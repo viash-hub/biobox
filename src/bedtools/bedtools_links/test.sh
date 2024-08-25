@@ -65,7 +65,7 @@ echo "> Run bedtools_links with base option"
 "$meta_executable" \
   --input "../genes.bed" \
   --output "genes.html" \
-  --base_url "http://mirror.uni.edu"
+  --base_url "http://genome.ucsc.edu"
 
 # checks
 assert_file_exists "genes.html"
@@ -82,7 +82,7 @@ echo "> Run bedtools_links with organism option and genome database build"
 "$meta_executable" \
   --input "../genes.bed" \
   --output "genes.html" \
-  --base_url "http://mirror.uni.edu" \
+  --base_url "http://genome.ucsc.edu" \
   --organism "mouse" \
   --database "mm9"
 
