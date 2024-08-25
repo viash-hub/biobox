@@ -75,11 +75,7 @@ engines:
       - type: docker
         run: |
           echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
-    test_setup:  
-      - type: apt  
-        packages: [samtools]
 
 runners:
   - type: executable
   - type: nextflow
-  

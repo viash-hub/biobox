@@ -53,7 +53,7 @@ echo "> Run bedtools_links on BED file"
 # checks
 assert_file_exists "genes.html"
 assert_file_not_empty "genes.html"
-#assert_file_contains "genes.html" "uc002yip.1"
+assert_file_contains "genes.html" "uc002yip.1"
 echo "- test1 succeeded -"
 
 popd > /dev/null
@@ -67,12 +67,10 @@ echo "> Run bedtools_links with base option"
   --output "genes.html" \
   --base_url "http://mirror.uni.edu"
 
-samtools view -h output.bam > output.sam
-
 # checks
 assert_file_exists "genes.html"
 assert_file_not_empty "genes.html"
-#assert_file_contains "genes.html" "uc002yip.1"
+assert_file_contains "genes.html" "uc002yip.1"
 echo "- test2 succeeded -"
 
 popd > /dev/null
@@ -80,18 +78,18 @@ popd > /dev/null
 # Test 3: Uncompressed BAM file
 mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
 
-echo "> Run bedtools_links with organism option and genome build"
+echo "> Run bedtools_links with organism option and genome database build"
 "$meta_executable" \
   --input "../genes.bed" \
   --output "genes.html" \
   --base_url "http://mirror.uni.edu" \
   --organism "mouse" \
-  --detabse "mm9"
+  --database "mm9"
 
 # checks
 assert_file_exists "genes.html"
 assert_file_not_empty "genes.html"
-#assert_file_contains "genes.html" "uc002yip.1"
+assert_file_contains "genes.html" "uc002yip.1"
 echo "- test3 succeeded -"
 
 popd > /dev/null
