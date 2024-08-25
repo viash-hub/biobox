@@ -1,0 +1,415 @@
+name: "bbmap_bbsplit"
+namespace: "bbmap"
+argument_groups:
+- name: "Input"
+  arguments:
+  - type: "string"
+    name: "--id"
+    description: "Sample ID"
+    info: null
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "boolean_true"
+    name: "--paired"
+    description: "Paired fastq files or not?"
+    info: null
+    direction: "input"
+  - type: "file"
+    name: "--input"
+    description: "Input fastq files, either one or two (paired), separated by \";\"\
+      ."
+    info: null
+    example:
+    - "reads.fastq"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: true
+    multiple_sep: ";"
+  - type: "file"
+    name: "--primary_ref"
+    description: "Primary reference FASTA"
+    info: null
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--other_ref_names"
+    description: "Path to comma-separated file containing a list of reference genomes\
+      \ to filter reads\nagainst with BBSplit.\n"
+    info: null
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "boolean_true"
+    name: "--only_build_index"
+    description: "If set, only builds the index. Otherwise, mapping is performed."
+    info: null
+    direction: "input"
+  - type: "string"
+    name: "--index"
+    description: "Designate index to use. Corresponds to the number specified when\
+      \ building the index.\nIf building the index, this will be the build's id. If\
+      \ multiple references are indexed\nin the same directory, each needs a unique\
+      \ build ID. Default: 1.\\\n"
+    info: null
+    example:
+    - "1"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "string"
+    name: "--qin"
+    description: "Set to 33 or 64 to specify input quality value ASCII offset. Automatically\
+      \ detected if\nnot specified.\n"
+    info: null
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "boolean_true"
+    name: "--interleaved"
+    description: "True forces paired/interleaved input; false forces single-ended\
+      \ mapping.\nIf not specified, interleaved status will be autodetected from read\
+      \ names.\n"
+    info: null
+    direction: "input"
+  - type: "integer"
+    name: "--maxindel"
+    description: "Don't look for indels longer than this. Lower is faster. Set to\
+      \ >=100k for RNA-seq.\n"
+    info: null
+    example:
+    - 20
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "double"
+    name: "--minratio"
+    description: "Fraction of max alignment score required to keep a site. Higher\
+      \ is faster.\n"
+    info: null
+    example:
+    - 0.56
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "integer"
+    name: "--minhits"
+    description: "Minimum number of seed hits required for candidate sites. Higher\
+      \ is faster.\n"
+    info: null
+    example:
+    - 1
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "string"
+    name: "--ambiguous"
+    description: "Set behavior on ambiguously-mapped reads (with multiple top-scoring\
+      \ mapping locations).\n  * best    Use the first best site (Default)\n  * toss\
+      \    Consider unmapped\n  * random  Select one top-scoring site randomly\n \
+      \ * all     Retain all top-scoring sites.  Does not work yet with SAM output\n"
+    info: null
+    example:
+    - "best"
+    required: false
+    choices:
+    - "best"
+    - "toss"
+    - "random"
+    - "all"
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "string"
+    name: "--ambiguous2"
+    description: "Set behavior only for reads that map ambiguously to multiple different\
+      \ references.\nNormal 'ambiguous=' controls behavior on all ambiguous reads;\n\
+      Ambiguous2 excludes reads that map ambiguously within a single reference.\n\
+      \  * best    Use the first best site (Default)\n  * toss    Consider unmapped\n\
+      \  * all     Write a copy to the output for each reference to which it maps\n\
+      \  * split   Write a copy to the AMBIGUOUS_ output for each reference to which\
+      \ it maps\n"
+    info: null
+    example:
+    - "best"
+    required: false
+    choices:
+    - "best"
+    - "toss"
+    - "all"
+    - "split"
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "string"
+    name: "--qtrim"
+    description: "Quality-trim ends to Q5 before mapping. Options are 'l' (left),\
+      \ 'r' (right), and 'lr' (both).\n"
+    info: null
+    required: false
+    choices:
+    - "l"
+    - "r"
+    - "lr"
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "boolean_true"
+    name: "--untrim"
+    description: "Undo trimming after mapping. Untrimmed bases will be soft-clipped\
+      \ in cigar strings."
+    info: null
+    direction: "input"
+- name: "Output"
+  arguments:
+  - type: "file"
+    name: "--fastq_1"
+    description: "Output file for read 1.\n"
+    info: null
+    example:
+    - "read_out1.fastq"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "output"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--fastq_2"
+    description: "Output file for read 2.\n"
+    info: null
+    example:
+    - "read_out2.fastq"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "output"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--primary_fastq"
+    description: "Output reads that map to the primary reference.\n"
+    info: null
+    example:
+    - "primary.fastq.gz"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "output"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--all_fastq"
+    description: "Output reads that map to the primary reference.\n"
+    info: null
+    example:
+    - "all.fastq.gz"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "output"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--ref_fasta_list"
+    description: "Directory with index files.\n"
+    info: null
+    example:
+    - "bbsplit"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "output"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--sam2bam"
+    alternatives:
+    - "--bs"
+    description: "Write a shell script to 'file' that will turn the sam output into\
+      \ a sorted, indexed bam file.\n"
+    info: null
+    example:
+    - "script.sh"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "output"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--scafstats"
+    description: "Write statistics on how many reads mapped to which scaffold to this\
+      \ file.\n"
+    info: null
+    example:
+    - "scaffold_stats.txt"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "output"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--refstats"
+    description: "Write statistics on how many reads were assigned to which reference\
+      \ to this file.\nUnmapped reads whose mate mapped to a reference are considered\
+      \ assigned and will be counted.\n"
+    info: null
+    example:
+    - "reference_stats.txt"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "output"
+    multiple: false
+    multiple_sep: ";"
+  - type: "boolean_true"
+    name: "--nzo"
+    description: "Only print lines with nonzero coverage."
+    info: null
+    direction: "input"
+resources:
+- type: "bash_script"
+  path: "script.sh"
+  is_executable: true
+description: "Split sequencing reads by mapping them to multiple references simultaneously."
+test_resources:
+- type: "bash_script"
+  path: "test.sh"
+  is_executable: true
+- type: "file"
+  path: "test_data"
+info: null
+status: "enabled"
+requirements:
+  commands:
+  - "ps"
+license: "BBTools Copyright (c) 2014"
+links:
+  repository: "https://github.com/BioInfoTools/BBMap/blob/master/sh/bbsplit.sh"
+  homepage: "https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/"
+  documentation: "https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/"
+runners:
+- type: "executable"
+  id: "executable"
+  docker_setup_strategy: "ifneedbepullelsecachedbuild"
+- type: "nextflow"
+  id: "nextflow"
+  directives:
+    tag: "$id"
+  auto:
+    simplifyInput: true
+    simplifyOutput: false
+    transcript: false
+    publish: false
+  config:
+    labels:
+      mem1gb: "memory = 1000000000.B"
+      mem2gb: "memory = 2000000000.B"
+      mem5gb: "memory = 5000000000.B"
+      mem10gb: "memory = 10000000000.B"
+      mem20gb: "memory = 20000000000.B"
+      mem50gb: "memory = 50000000000.B"
+      mem100gb: "memory = 100000000000.B"
+      mem200gb: "memory = 200000000000.B"
+      mem500gb: "memory = 500000000000.B"
+      mem1tb: "memory = 1000000000000.B"
+      mem2tb: "memory = 2000000000000.B"
+      mem5tb: "memory = 5000000000000.B"
+      mem10tb: "memory = 10000000000000.B"
+      mem20tb: "memory = 20000000000000.B"
+      mem50tb: "memory = 50000000000000.B"
+      mem100tb: "memory = 100000000000000.B"
+      mem200tb: "memory = 200000000000000.B"
+      mem500tb: "memory = 500000000000000.B"
+      mem1gib: "memory = 1073741824.B"
+      mem2gib: "memory = 2147483648.B"
+      mem4gib: "memory = 4294967296.B"
+      mem8gib: "memory = 8589934592.B"
+      mem16gib: "memory = 17179869184.B"
+      mem32gib: "memory = 34359738368.B"
+      mem64gib: "memory = 68719476736.B"
+      mem128gib: "memory = 137438953472.B"
+      mem256gib: "memory = 274877906944.B"
+      mem512gib: "memory = 549755813888.B"
+      mem1tib: "memory = 1099511627776.B"
+      mem2tib: "memory = 2199023255552.B"
+      mem4tib: "memory = 4398046511104.B"
+      mem8tib: "memory = 8796093022208.B"
+      mem16tib: "memory = 17592186044416.B"
+      mem32tib: "memory = 35184372088832.B"
+      mem64tib: "memory = 70368744177664.B"
+      mem128tib: "memory = 140737488355328.B"
+      mem256tib: "memory = 281474976710656.B"
+      mem512tib: "memory = 562949953421312.B"
+      cpu1: "cpus = 1"
+      cpu2: "cpus = 2"
+      cpu5: "cpus = 5"
+      cpu10: "cpus = 10"
+      cpu20: "cpus = 20"
+      cpu50: "cpus = 50"
+      cpu100: "cpus = 100"
+      cpu200: "cpus = 200"
+      cpu500: "cpus = 500"
+      cpu1000: "cpus = 1000"
+  debug: false
+  container: "docker"
+engines:
+- type: "docker"
+  id: "docker"
+  image: "ubuntu:22.04"
+  namespace_separator: "/"
+  setup:
+  - type: "docker"
+    run:
+    - "apt-get update && \\\napt-get install -y build-essential openjdk-17-jdk wget\
+      \ tar && \\\nwget --no-check-certificate https://sourceforge.net/projects/bbmap/files/BBMap_39.01.tar.gz\
+      \ && \\\ntar xzf BBMap_39.01.tar.gz && \\\ncp -r bbmap/* /usr/local/bin\n"
+  - type: "docker"
+    run:
+    - "echo \"${meta_functionality_name}: bbmap: $(bbversion.sh | grep -v \"Duplicate\
+      \ cpuset\")\" > /var/software_versions.txt\n"
+  entrypoint: []
+  cmd: null
+build_info:
+  config: "[anonymized]/config.vsh.yaml"
+  runner: "executable"
+  engine: "docker"
+  output: "output"
+  executable: "output/bbmap_bbsplit"
+  viash_version: "0.9.0-RC6"
+  git_commit: "53e4dee07670cc9ee651ee10921fd2045097b4f1"
+  git_remote: "git@github.com:emmarousseau/biobox.git"
+package_config:
+  name: "biobox"
+  description: "A collection of bioinformatics tools for working with sequence data.\n"
+  info: null
+  viash_version: "0.9.0-RC6"
+  source: "src"
+  target: "target"
+  config_mods:
+  - ".requirements.commands := ['ps']"
+  keywords:
+  - "bioinformatics"
+  - "modules"
+  - "sequencing"
+  license: "MIT"
+  links:
+    repository: "https://github.com/viash-hub/biobox"
+    issue_tracker: "https://github.com/viash-hub/biobox/issues"

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+## VIASH START
+## VIASH END
+
 set -eo pipefail
 
 function clean_up {
@@ -15,7 +18,7 @@ for var in "${unset_if_false[@]}"; do
     fi
 done
 
-if [ ! -d "$par_built_index" ]; then
+if [ ! -d "$par_index" ]; then
     other_refs=()
     while IFS="," read -r name path 
     do
@@ -36,8 +39,8 @@ else
     IFS="," read -ra input <<< "$par_input"
     tmpdir=$(mktemp -d "$meta_temp_dir/$meta_functionality_name-XXXXXXXX")
     index_files=''
-    if [ -d "$par_built_index" ]; then
-        index_files="path=$par_built_index"
+    if [ -d "$par_index" ]; then
+        index_files="path=$par_index"
     elif [ -f "$par_primary_ref" ] && [ ${#other_refs[@]} -gt 0 ]; then
         index_files="ref_primary=$par_primary_ref ${other_refs[@]}"
     else

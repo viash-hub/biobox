@@ -10,8 +10,8 @@ HERE
 echo ">>> Building BBSplit index"
 "${meta_executable}" \
   --primary_ref "${meta_resources_dir}/test_data/genome.fasta" \
-  --ref_fasta_list "bbsplit_fasta_list.txt" \
-  --only_build_index true \
+  --ref_fasta_list bbsplit_fasta_list.txt \
+  --only_build_index \
   --index "BBSplit_index" 
 
 echo ">>> Check whether output exists"
@@ -23,10 +23,9 @@ echo ">>> Filtering ribosomal RNA reads"
 echo ">>> Testing with single-end reads and primary/non-primary FASTA files"
 "${meta_executable}" \
   --input "${meta_resources_dir}/test_data/SRR6357070_1.fastq.gz" \
-  --only_build_index false \
   --primary_ref "${meta_resources_dir}/test_data/genome.fasta" \
-  --ref_fasta_list "bbsplit_fasta_list.txt" \
-  --fastq_1 "filtered_SRR6357070_1.fastq.gz"
+  --ref_fasta_list bbsplit_fasta_list.txt \
+  --fastq_1 filtered_SRR6357070_1.fastq.gz
 
 echo ">>> Check whether output exists"
 [ ! -f "filtered_SRR6357070_1.fastq.gz" ] && echo "Filtered reads file does not exist!" && exit 1
@@ -38,7 +37,6 @@ echo ">>> Testing with paired-end reads and primary/non-primary FASTA files"
 "${meta_executable}" \
   --paired \
   --input "${meta_resources_dir}/test_data/SRR6357070_1.fastq.gz,${meta_resources_dir}/test_data/SRR6357070_2.fastq.gz" \
-  --only_build_index false \
   --primary_ref "${meta_resources_dir}/test_data/genome.fasta" \
   --ref_fasta_list "bbsplit_fasta_list.txt" \
   --fastq_1 "filtered_SRR6357070_1.fastq.gz" \
@@ -55,8 +53,7 @@ rm filtered_SRR6357070_1.fastq.gz filtered_SRR6357070_2.fastq.gz
 echo ">>> Testing with single-end reads and BBSplit index"
 "${meta_executable}" \
   --input "${meta_resources_dir}/test_data/SRR6357070_1.fastq.gz" \
-  --only_build_index false \
-  --built_index "BBSplit_index" \
+  --index "BBSplit_index" \
   --fastq_1 "filtered_SRR6357070_1.fastq.gz"
 
 echo ">>> Check whether output exists"
@@ -67,8 +64,7 @@ echo ">>> Testing with paired-end reads and BBSplit index"
 "${meta_executable}" \
   --paired \
   --input "${meta_resources_dir}/test_data/SRR6357070_1.fastq.gz,${meta_resources_dir}/test_data/SRR6357070_2.fastq.gz" \
-  --only_build_index false \
-  --built_index "BBSplit_index" \
+  --index "BBSplit_index" \
   --fastq_1 "filtered_SRR6357070_1.fastq.gz" \
   --fastq_2 "filtered_SRR6357070_2.fastq.gz"
 

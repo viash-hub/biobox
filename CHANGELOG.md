@@ -78,6 +78,9 @@
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
 
+* `bbmap`:
+    - `bbmap_bbsplit`: Split sequencing reads by mapping them to multiple references simultaneously (PR #138).
+
 ## MINOR CHANGES
 
 * Uniformize component metadata (PR #23).

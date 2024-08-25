@@ -21,6 +21,7 @@ argument_groups:
     type: file
     multiple: true
     description: Input fastq files, either one or two (paired), separated by ";".
+    multiple_sep: ","
     example: reads.fastq
   - name: "--primary_ref"
     type: file
@@ -38,8 +39,8 @@ argument_groups:
     description: |
       Designate index to use. Corresponds to the number specified when building the index.
       If building the index, this will be the build's id. If multiple references are indexed
-      in the same directory, each needs a unique build ID. Default: 1.\
-    example: 1
+      in the same directory, each needs a unique build ID. Default: 1.
+    example: "1"
   - name: "--qin"
     type: string
     description: |
@@ -127,8 +128,6 @@ argument_groups:
     type: file
     description: |
       Directory with index files.
-    direction: output
-    example: bbsplit
   - name: "--sam2bam"
     alternatives: ["--bs"]
     type: file
@@ -175,7 +174,7 @@ engines:
         cp -r bbmap/* /usr/local/bin
     - type: docker
       run: |
-        echo "${meta_functionality_name}: bbmap: $(bbversion.sh | grep -v "Duplicate cpuset")" > /var/software_versions.txt
+        bbsplit.sh --version 2>&1 | awk '/BBMap version/{print "BBMAP:", $NF}' > /var/software_versions.txt
 runners:
   - type: executable
   - type: nextflow
