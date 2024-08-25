@@ -58,7 +58,7 @@ echo "- test1 succeeded -"
 
 popd > /dev/null
 
-# Test 2: BED12 file
+# Test 2: Base URL
 mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
 
 echo "> Run bedtools_links with base option"
@@ -75,7 +75,7 @@ echo "- test2 succeeded -"
 
 popd > /dev/null
 
-# Test 3: Uncompressed BAM file
+# Test 3: Organism and Genome Database Build
 mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
 
 echo "> Run bedtools_links with organism option and genome database build"
