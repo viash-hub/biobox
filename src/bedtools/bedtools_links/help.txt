@@ -1,5 +1,5 @@
 ```
-linksBed -h
+bedtools links -h
 ```
 
 Tool:    bedtools links (aka linksBed)
