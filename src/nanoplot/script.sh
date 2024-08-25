@@ -51,8 +51,10 @@ function clean_up {
 }
 trap clean_up EXIT
 
+# par_outdir="output"
+
 # Run NanoPlot
-cmd="NanoPlot \
+NanoPlot \
     ${par_fastq:+--fastq "$par_fastq"} \
     ${par_fasta:+--fasta "$par_fasta"} \
     ${par_fastq_rich:+--fastq_rich "$par_fastq_rich"} \
@@ -97,69 +99,67 @@ cmd="NanoPlot \
     ${par_font_scale:+--font_scale "$par_font_scale"} \
     ${par_dpi:+--dpi "$par_dpi"} \
     ${par_hide_stats:+--hide_stats} \
-    -o "${tmpdir}""
+    --outdir "$par_outdir"
+    # --outdir "${tmpdir}""
 
-echo $cmd
-$cmd
+# echo $cmd
+# $cmd
 
-ls -l ${tmpdir}
+# ls -l ${tmpdir}
 
-## Move output to output directory ##
-# Move NanoPlot summary file
-# Check if par_statsum argument is passed and is not empty
+# ## Move output to output directory ##
+# # Move NanoPlot summary file
+# # Check if par_statsum argument is passed and is not empty
 
-if [[ -n "$par_statsum" ]]; then
-    # Extract the string before the '*' character
-    base_name=$(echo "$par_statsum" | sed 's/\*.*//')
-    # Make a folder with the extracted string as the name
-    mkdir -p "$base_name"
-    mv ${tmpdir}/*.txt ${par_statsum}
+# if [[ -z "$par_outdir" ]]; then
+#     mkdir -p "output"
+#     mv ${tmpdir}/*.txt output
 # else
 #     mkdir -p "$par_output"
 #     mv *.txt "$par_output"
-fi
-
-# Move NanoPlot plots
-# Check if static plots are generated
-if [[ ! -n "$par_no_static" ]] && [[ ! -n "$par_only_report" ]]; then
-    # Check if par_nanoplots argument is passed and is not empty
-    if [[ -n "$par_nanoplots" ]]; then
-        # Extract the string before the '*' character
-        base_name=$(echo "$par_nanoplots" | sed 's/\*.*//')
-        # Make a folder with the extracted string as the name
-        mkdir -p "$base_name"
-        mv ${tmpdir}/*.$par_format "$base_name"
-    # else
-    #     mkdir -p "$par_output"
-    #     mv *"$format" "$par_output"
-    fi
-fi
-
-# # Move NanoPlot report and HTML files.
-# # Check if par_html argument is passed and is not empty
-# if [[ -n "$par_html" ]]; then
-#     # Extract the string before the '*' character
-#     base_name=$(echo "$par_html" | sed 's/\*.*//')
-#     # Make a folder with the extracted string as the name
-#     mkdir -p "$base_name"
-#     mv *.html "$base_name"
-# else
-#     mkdir -p "$par_output"
-#     mv *.html "$par_output"
 # fi
 
-# # Move output log file
-# # Check if par_log argument is passed and is not empty
-# if [[ -n "$par_log" ]]; then
-#     # Extract the string before the '*' character
-#     base_name=$(echo "$par_log" | sed 's/\*.*//')
-#     # Make a folder with the extracted string as the name
-#     mkdir -p "$base_name"
-#     mv *.log "$base_name"
-# else
-#     mkdir -p "$par_output"
-#     mv *.log "$par_output"
+# # Move NanoPlot plots
+# # Check if static plots are generated
+# if [[ ! -n "$par_no_static" ]] && [[ ! -n "$par_only_report" ]]; then
+#     # Check if par_nanoplots argument is passed and is not empty
+#     if [[ -n "$par_nanoplots" ]]; then
+#         # Extract the string before the '*' character
+#         base_name=$(echo "$par_nanoplots" | sed 's/\*.*//')
+#         # Make a folder with the extracted string as the name
+#         mkdir -p "$base_name"
+#         mv ${tmpdir}/*.$par_format "$base_name"
+#     # else
+#     #     mkdir -p "$par_output"
+#     #     mv *"$format" "$par_output"
+#     fi
 # fi
+
+# # # Move NanoPlot report and HTML files.
+# # # Check if par_html argument is passed and is not empty
+# # if [[ -n "$par_html" ]]; then
+# #     # Extract the string before the '*' character
+# #     base_name=$(echo "$par_html" | sed 's/\*.*//')
+# #     # Make a folder with the extracted string as the name
+# #     mkdir -p "$base_name"
+# #     mv *.html "$base_name"
+# # else
+# #     mkdir -p "$par_output"
+# #     mv *.html "$par_output"
+# # fi
+
+# # # Move output log file
+# # # Check if par_log argument is passed and is not empty
+# # if [[ -n "$par_log" ]]; then
+# #     # Extract the string before the '*' character
+# #     base_name=$(echo "$par_log" | sed 's/\*.*//')
+# #     # Make a folder with the extracted string as the name
+# #     mkdir -p "$base_name"
+# #     mv *.log "$base_name"
+# # else
+# #     mkdir -p "$par_output"
+# #     mv *.log "$par_output"
+# # fi
 
 # ## Move extracted data (if any) to current working directory
 # if [[ -n "$par_store" ]]; then
