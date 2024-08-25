@@ -7,19 +7,27 @@ function clean_up {
 }
 trap clean_up EXIT 
 
-if [ ! -d "$par_built_bbsplit_index" ]; then
+unset_if_false=( par_paired par_only_build_index par_interleaved par_untrim par_nzo)
+
+for var in "${unset_if_false[@]}"; do
+    if [ -z "${!var}" ]; then
+        unset $var
+    fi
+done
+
+if [ ! -d "$par_built_index" ]; then
     other_refs=()
     while IFS="," read -r name path 
     do
         other_refs+=("ref_$name=$path")
-    done < "$par_bbsplit_fasta_list"
+    done < "$par_ref_fasta_list"
 fi
 
 if $par_only_build_index; then
     if [ -f "$par_primary_ref" ] && [ ${#other_refs[@]} -gt 0 ]; then
         bbsplit.sh \
             ref_primary="$par_primary_ref" "${other_refs[@]}" \
-            path=$par_bbsplit_index \
+            path=$par_index \
             threads=${meta_cpus:-1}
     else
         echo "ERROR: Please specify as input a primary fasta file along with names and paths to non-primary fasta files."
@@ -28,8 +36,8 @@ else
     IFS="," read -ra input <<< "$par_input"
     tmpdir=$(mktemp -d "$meta_temp_dir/$meta_functionality_name-XXXXXXXX")
     index_files=''
-    if [ -d "$par_built_bbsplit_index" ]; then
-        index_files="path=$par_built_bbsplit_index"
+    if [ -d "$par_built_index" ]; then
+        index_files="path=$par_built_index"
     elif [ -f "$par_primary_ref" ] && [ ${#other_refs[@]} -gt 0 ]; then
         index_files="ref_primary=$par_primary_ref ${other_refs[@]}"
     else
