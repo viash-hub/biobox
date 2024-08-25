@@ -1,0 +1,61 @@
+name: "rsem_merge_counts"
+namespace: "rsem"
+description: Merge the transcript quantification results obtained from rsem calculate-expression across all samples.
+keywords: [rsem, transcript, expression, counts]
+links:
+  homepage: https://deweylab.github.io/RSEM/
+  documentation: https://deweylab.github.io/RSEM/rsem-calculate-expression.html
+  repository: https://github.com/deweylab/RSEM
+references: 
+  doi: https://doi.org/10.1186/1471-2105-12-323
+license: GPL-3.0
+
+argument_groups:
+- name: "Input"
+  arguments:
+  - name: "--counts_gene"
+    type: file
+    description: Expression counts on gene level (genes)
+  - name: "--counts_transcripts"
+    type: file
+    description: Expression counts on transcript level (isoforms)
+
+- name: "Output"
+  arguments: 
+  - name: "--merged_gene_counts"
+    type: file
+    description: File containing gene counts across all samples.
+    example: rsem.merged.gene_counts.tsv
+    direction: output
+  - name: "--merged_gene_tpm"
+    type: file
+    description: File containing gene TPM across all samples.
+    example: rsem.merged.gene_tpm.tsv
+    direction: output
+  - name: "--merged_transcript_counts"
+    type: file
+    description: File containing transcript counts across all samples.
+    example: rsem.merged.transcript_counts.tsv
+    direction: output
+  - name: "--merged_transcript_tpm"
+    type: file
+    description: File containing transcript TPM across all samples.
+    example: rsem.merged.transcript_tpm.tsv
+    direction: output
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: test_data
+
+engines:
+  - type: docker
+    image: ubuntu:22.04
+    
+runners:
+  - type: executable
+  - type: nextflow
