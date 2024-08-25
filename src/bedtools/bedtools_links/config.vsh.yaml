@@ -36,6 +36,16 @@ argument_groups:
         description: Output HTML file to be written.
 
   - name: Options
+    description: |
+      By default, the links created will point to human (hg18) UCSC browser.
+      If you have a local mirror, you can override this behavior by supplying
+      the -base, -org, and -db options.
+
+      For example, if the URL of your local mirror for mouse MM9 is called: 
+      http://mymirror.myuniversity.edu, then you would use the following:
+      --base_url http://mymirror.myuniversity.edu
+      --organism mouse
+      --database mm9
     arguments:
       - name: --base_url
         alternatives: -base
