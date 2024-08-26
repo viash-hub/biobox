@@ -67,5 +67,25 @@ cp -r /tmp/snakemake-wrappers/bio/assembly-stats/test/*.fasta src/nanoplot/test_
 
 #########################################################################################
 
-# ## Bam file ##
-# cp -r /tmp/snakemake-wrappers/bio/arriba/test/A.bam src/nanoplot/test_data/test.bam
+## Summary file ##
+# Download the tar.gz file
+if [ ! -f metadata.tar.gz ]; then
+  wget -O metadata.tar.gz "https://zenodo.org/records/1442916/files/metadata_called_reads_Olivier_GL261_cDNA_2017-Aug-04.tar.gz?download=1"
+fi
+
+# Extract only the sequencing_summary.txt file
+tar -xzf metadata.tar.gz --wildcards --no-anchored 'sequencing_summary.txt' --strip-components=1
+
+mv sequencing_summary.txt src/nanoplot/test_data/test_summary.txt
+rm -f metadata.tar.gz
+
+#########################################################################################
+
+## Bam file ##
+cp -r /tmp/snakemake-wrappers/bio/biobambam2/bamsormadup/test/mapped/a.bam src/nanoplot/test_data/test.bam
+
+#########################################################################################
+
+## Pickle file ##
+# Output of -> target/nanoplot --fastq src/nanoplot/test_data/test1.fastq --store
+# mv output/NanoPlot-data.pickle src/nanoplot/test_data/test.pickle

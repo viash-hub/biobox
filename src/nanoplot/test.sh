@@ -195,7 +195,7 @@ echo "Test 4 succeeded."
 
 echo "> Run Test 5: different input"
 "$meta_executable" \
-  --fasta "$meta_resources_dir/test_data/test.fasta"
+  --bam "$meta_resources_dir/test_data/test.bam"
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
