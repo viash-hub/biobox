@@ -58,34 +58,47 @@ done
 #########################################################################################
 
 ## Fasta file ##
-# Dowload test data from snakemake wrapper
-if [ ! -d /tmp/snakemake-wrappers ]; then
-  git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
+# Dowload test data from GitHub
+if [ ! -d nanotest ]; then
+  git clone --depth 1 --single-branch --branch master https://github.com/wdecoster/nanotest/
 fi
+mv nanotest/reads.fa.gz src/nanoplot/test_data/test.fasta.gz
 
-cp -r /tmp/snakemake-wrappers/bio/assembly-stats/test/*.fasta src/nanoplot/test_data/test.fasta
+#########################################################################################
+
+## Fastq_rich file ##
+mv nanotest/reads-mixed-timestamp.fastq src/nanoplot/test_data/test_rich.fastq 
+
+#########################################################################################
+
+## Fastq_minimal file ##
+mv nanotest/reads.fastq.gz src/nanoplot/test_data/test_minimal.fastq.gz
 
 #########################################################################################
 
 ## Summary file ##
-# Download the tar.gz file
-if [ ! -f metadata.tar.gz ]; then
-  wget -O metadata.tar.gz "https://zenodo.org/records/1442916/files/metadata_called_reads_Olivier_GL261_cDNA_2017-Aug-04.tar.gz?download=1"
-fi
-
-# Extract only the sequencing_summary.txt file
-tar -xzf metadata.tar.gz --wildcards --no-anchored 'sequencing_summary.txt' --strip-components=1
-
-mv sequencing_summary.txt src/nanoplot/test_data/test_summary.txt
-rm -f metadata.tar.gz
+mv nanotest/sequencing_summary.txt src/nanoplot/test_data/test_summary.txt
 
 #########################################################################################
 
 ## Bam file ##
-cp -r /tmp/snakemake-wrappers/bio/biobambam2/bamsormadup/test/mapped/a.bam src/nanoplot/test_data/test.bam
+mv nanotest/alignment_fasta.bam src/nanoplot/test_data/test.bam
+mv nanotest/alignment_fasta.bam.bai src/nanoplot/test_data/test.bam.bai
+
+#########################################################################################
+
+## Ubam file ##
+mv nanotest/alignment.bam src/nanoplot/test_data/test_ubam.bam
+mv nanotest/alignment.bam.bai src/nanoplot/test_data/test_ubam.bam.bai
 
 #########################################################################################
 
 ## Pickle file ##
-# Output of -> target/nanoplot --fastq src/nanoplot/test_data/test1.fastq --store
-# mv output/NanoPlot-data.pickle src/nanoplot/test_data/test.pickle
+mv nanotest/alignment.pickle src/nanoplot/test_data/test.pickle
+
+#########################################################################################
+
+## Feather/Arrow file ##
+mv nanotest/summary1.feather src/nanoplot/test_data/test.feather
+
+rm -rf nanotest
