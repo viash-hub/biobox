@@ -37,7 +37,7 @@ argument_groups:
 
   - name: Options
     arguments:
-      - name: --n
+      - name: --n_score
         alternatives: -n
         type: boolean_true
         description: | 
@@ -64,3 +64,4 @@ engines:
 runners:
   - type: executable
   - type: nextflow
+  

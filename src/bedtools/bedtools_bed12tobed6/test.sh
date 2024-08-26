@@ -41,6 +41,12 @@ chr21	10079666	10120808	uc002yiv.1	0	-
 chr21	10080031	10081687	uc002yiw.1	0	-
 chr21	10081660	10120796	uc002yix.2	0	-
 EOF
+# Expected output bed6 file
+cat <<EOF > "$TMPDIR/expected_n.bed6"
+chr21	10079666	10120808	uc002yiv.1	1	-
+chr21	10080031	10081687	uc002yiw.1	1	-
+chr21	10081660	10120796	uc002yix.2	1	-
+EOF
 
 # Test 1: Default conversion BED12 to BED6
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
@@ -55,6 +61,23 @@ assert_file_exists "output.bed6"
 assert_file_not_empty "output.bed6"
 assert_identical_content "output.bed6" "../expected.bed6"
 echo "- test1 succeeded -"
+
+popd > /dev/null
+
+# Test 2: Conversion BED12 to BED6 with -n option
+mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
+
+echo "> Run bedtools_bed12tobed6 on BED12 file with -n option"
+"$meta_executable" \
+  --input "../example.bed12" \
+  --output "output.bed6" \
+  --n_score
+
+# checks
+assert_file_exists "output.bed6"
+assert_file_not_empty "output.bed6"
+assert_identical_content "output.bed6" "../expected_n.bed6"
+echo "- test2 succeeded -"
 
 popd > /dev/null
 
