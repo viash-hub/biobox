@@ -1,0 +1,65 @@
+name: bcftools_sort
+namespace: bcftools
+description: | 
+  Sorts VCF/BCF files.
+keywords: [Sort ,VCF, BCF]
+links:
+  homepage: https://samtools.github.io/bcftools/
+  documentation: https://samtools.github.io/bcftools/bcftools.html
+  repository: https://github.com/samtools/bcftools
+  issue_tracker: https://github.com/samtools/bcftools/issues
+references:
+  doi: https://doi.org/10.1093/gigascience/giab008
+license: [MIT/Expat, GNU]
+requirements:
+  commands: [bcftools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: -i
+        type: file
+        description: Input VCF/BCF file.
+        required: true
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: -o
+        direction: output
+        type: file
+        description: Output sorted VCF/BCF file.
+        required: true
+         
+  # - name: Options
+  #   arguments:
+  #     - name: 
+  #       type:
+  #       description: |
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: test_data
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bcftools, procps]
+      - type: docker
+        run: |
+          echo "bcftools: \"$(bcftools --version | sed -n 's/^bcftools //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
