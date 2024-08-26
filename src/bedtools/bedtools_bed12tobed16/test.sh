@@ -29,7 +29,7 @@ function clean_up {
 trap clean_up EXIT
 
 # Create example BED12 file
-cat <<EOF > "$TMPDIR/expected.sam"
+cat <<EOF > "$TMPDIR/example.bed12"
 chr21	10079666	10120808	uc002yiv.1	0	-	10081686	1	0	1	2	0	6	0	8	0	4	528,91,101,215,	0,1930,39750,40927,
 chr21	10080031	10081687	uc002yiw.1	0	-	10080031	1	0	0	8	0	0	3	1	0	2	200,91,	0,1565,
 chr21	10081660	10120796	uc002yix.2	0	-	10081660	1	0	0	8	1	6	6	0	0	3	27,101,223,	0,37756,38913,
@@ -37,7 +37,9 @@ EOF
 
 # Expected output bed6 file
 cat <<EOF > "$TMPDIR/expected.bed6"
-
+chr21	10079666	10120808	uc002yiv.1	0	-
+chr21	10080031	10081687	uc002yiw.1	0	-
+chr21	10081660	10120796	uc002yix.2	0	-
 EOF
 
 # Test 1: Default conversion BED12 to BED6
@@ -51,7 +53,7 @@ echo "> Run bedtools_bed12tobed6 on BED12 file"
 # checks
 assert_file_exists "output.bed6"
 assert_file_not_empty "output.bed6"
-#assert_identical_content "output.bed6" "../expected.bed6"
+assert_identical_content "output.bed6" "../expected.bed6"
 echo "- test1 succeeded -"
 
 popd > /dev/null
