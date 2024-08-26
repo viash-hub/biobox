@@ -41,7 +41,7 @@ chr21	10079666	10120808	uc002yiv.1	0	-
 chr21	10080031	10081687	uc002yiw.1	0	-
 chr21	10081660	10120796	uc002yix.2	0	-
 EOF
-# Expected output bed6 file
+# Expected output bed6 file with -n option
 cat <<EOF > "$TMPDIR/expected_n.bed6"
 chr21	10079666	10120808	uc002yiv.1	1	-
 chr21	10080031	10081687	uc002yiw.1	1	-
