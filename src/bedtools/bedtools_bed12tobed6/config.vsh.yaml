@@ -1,4 +1,4 @@
-name: bedtools_bed12tobed16
+name: bedtools_bed12tobed6
 namespace: bedtools
 description: | 
   Converts BED features in BED12 (a.k.a. “blocked” BED features such as genes) to discrete BED6 features.
@@ -34,6 +34,14 @@ argument_groups:
         type: file
         direction: output
         description: Output BED6 file to be written.
+
+  - name: Options
+    arguments:
+      - name: --n
+        alternatives: -n
+        type: boolean_true
+        description: | 
+          Force the score to be the (1-based) block number from the BED12.
 
 resources:
   - type: bash_script
