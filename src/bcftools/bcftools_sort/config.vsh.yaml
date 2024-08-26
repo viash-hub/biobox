@@ -10,7 +10,7 @@ links:
   issue_tracker: https://github.com/samtools/bcftools/issues
 references:
   doi: https://doi.org/10.1093/gigascience/giab008
-license: [MIT/Expat, GNU]
+license: MIT/Expat, GNU
 requirements:
   commands: [bcftools]
 authors:
