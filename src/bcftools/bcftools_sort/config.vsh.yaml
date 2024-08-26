@@ -39,13 +39,14 @@ argument_groups:
     arguments:
       - name: --output_type
         type: string
+        choices: [b, u, z, v]
         description: | 
           Compresses or uncompresses the output.
           The options are:
             b: compressed BCF, 
             u: uncompressed BCF, 
             z: compressed VCF, 
-            v: uncompressed VCF.
+            v: uncompressed VCF.        
 
 resources:
   - type: bash_script
