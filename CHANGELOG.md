@@ -36,6 +36,9 @@
 
 * `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
 
+* `bcftools`:
+  - `bcftools/bcftools_sort`: Sorts BCF/VCF files by position and other criterias (PR #141).
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
