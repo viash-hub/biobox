@@ -31,6 +31,7 @@
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
   - `bedtools/bedtools_bamtofastq`: Convert BAM alignments to FASTQ files (PR #101).
   - `bedtools/bedtools_bedtobam`: Converts genomic feature records (bed/gff/vcf) to BAM format (PR #111).
+  - `bedtools/bedtools_bed12tobed6`: Converts BED features in BED12 to discrete BED6 features (PR #140).
  
 * `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74). 
 
