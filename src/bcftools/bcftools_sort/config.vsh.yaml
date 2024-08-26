@@ -38,6 +38,7 @@ argument_groups:
   - name: Options
     arguments:
       - name: --output_type
+        alternatives: -O
         type: string
         choices: [b, u, z, v]
         description: | 
@@ -55,6 +56,7 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - path: test_data
 
 engines:
   - type: docker
