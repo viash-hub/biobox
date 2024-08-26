@@ -35,11 +35,17 @@ argument_groups:
         description: Output sorted VCF/BCF file.
         required: true
          
-  # - name: Options
-  #   arguments:
-  #     - name: 
-  #       type:
-  #       description: |
+  - name: Options
+    arguments:
+      - name: --output_type
+        type: string
+        description: | 
+          Compresses or uncompresses the output.
+          The options are:
+            b: compressed BCF, 
+            u: uncompressed BCF, 
+            z: compressed VCF, 
+            v: uncompressed VCF.
 
 resources:
   - type: bash_script
@@ -52,13 +58,14 @@ test_resources:
 
 engines:
   - type: docker
+    # image: biocontainers/bcftools:v1.9-1-deb_cv1
     image: debian:stable-slim
     setup:
       - type: apt
-        packages: [bcftools, procps]
+        packages: [bedtools, procps]
       - type: docker
         run: |
-          echo "bcftools: \"$(bcftools --version | sed -n 's/^bcftools //p')\"" > /var/software_versions.txt
+          echo "bcftools: \"$(bcftools --version | grep 'bcftools' | sed -n 's/^bcftools //p')\"" > /var/software_versions.txt
 
 runners:
   - type: executable

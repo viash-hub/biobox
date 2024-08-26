@@ -6,9 +6,9 @@
 # Exit on error
 set -eo pipefail
 
-# Unset parameters
-# [[ "$par_tags" == "false" ]] && unset par_tags
-
 # Execute bedtools bamtofastq with the provided arguments
 bcftools sort \
+    -o "$par_output" \
+    ${par_output_type:+-O "$par_output_type"} \
+    $par_input \
 
