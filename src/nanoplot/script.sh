@@ -5,13 +5,6 @@ set -eo pipefail
 ## VIASH START
 ## VIASH END
 
-## Default output directory
-# Search for biobox directory starting from the current working directory
-
-# file_path=$(find "$(pwd)" -name "biobox" -type d)
-# par_output="$file_path//target/result/"
-# par_output="output"
-
 # Unset flags
 [[ "$par_verbose" == "false" ]] && unset par_verbose
 [[ "$par_store" == "false" ]] && unset par_store
@@ -44,14 +37,6 @@ par_ubam=$(echo $par_ubam | tr ';' ' ')
 par_cram=$(echo $par_cram | tr ';' ' ')
 par_pickle=$(echo $par_pickle | tr ';' ' ')
 par_feather=$(echo $par_feather | tr ';' ' ')
-
-tmpdir=$(mktemp -d "${meta_temp_dir}/${meta_name}-XXXXXXXX")
-function clean_up {
-  rm -rf "$tmpdir"
-}
-trap clean_up EXIT
-
-# par_outdir="output"
 
 # Run NanoPlot
 NanoPlot \
@@ -100,71 +85,3 @@ NanoPlot \
     ${par_dpi:+--dpi "$par_dpi"} \
     ${par_hide_stats:+--hide_stats} \
     --outdir "$par_outdir"
-    # --outdir "${tmpdir}""
-
-# echo $cmd
-# $cmd
-
-# ls -l ${tmpdir}
-
-# ## Move output to output directory ##
-# # Move NanoPlot summary file
-# # Check if par_statsum argument is passed and is not empty
-
-# if [[ -z "$par_outdir" ]]; then
-#     mkdir -p "output"
-#     mv ${tmpdir}/*.txt output
-# else
-#     mkdir -p "$par_output"
-#     mv *.txt "$par_output"
-# fi
-
-# # Move NanoPlot plots
-# # Check if static plots are generated
-# if [[ ! -n "$par_no_static" ]] && [[ ! -n "$par_only_report" ]]; then
-#     # Check if par_nanoplots argument is passed and is not empty
-#     if [[ -n "$par_nanoplots" ]]; then
-#         # Extract the string before the '*' character
-#         base_name=$(echo "$par_nanoplots" | sed 's/\*.*//')
-#         # Make a folder with the extracted string as the name
-#         mkdir -p "$base_name"
-#         mv ${tmpdir}/*.$par_format "$base_name"
-#     # else
-#     #     mkdir -p "$par_output"
-#     #     mv *"$format" "$par_output"
-#     fi
-# fi
-
-# # # Move NanoPlot report and HTML files.
-# # # Check if par_html argument is passed and is not empty
-# # if [[ -n "$par_html" ]]; then
-# #     # Extract the string before the '*' character
-# #     base_name=$(echo "$par_html" | sed 's/\*.*//')
-# #     # Make a folder with the extracted string as the name
-# #     mkdir -p "$base_name"
-# #     mv *.html "$base_name"
-# # else
-# #     mkdir -p "$par_output"
-# #     mv *.html "$par_output"
-# # fi
-
-# # # Move output log file
-# # # Check if par_log argument is passed and is not empty
-# # if [[ -n "$par_log" ]]; then
-# #     # Extract the string before the '*' character
-# #     base_name=$(echo "$par_log" | sed 's/\*.*//')
-# #     # Make a folder with the extracted string as the name
-# #     mkdir -p "$base_name"
-# #     mv *.log "$base_name"
-# # else
-# #     mkdir -p "$par_output"
-# #     mv *.log "$par_output"
-# # fi
-
-# ## Move extracted data (if any) to current working directory
-# if [[ -n "$par_store" ]]; then
-#     mv *NanoPlot-data.pickle "$par_output" #--prefix
-# fi
-# if [[ -n "$par_raw" ]]; then
-#     mv *NanoPlot-data.tsv "$par_output" #--prefix
-# fi

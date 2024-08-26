@@ -96,7 +96,7 @@ argument_groups:
         type: file
         direction: output
         description: Specify directory in which output has to be created.
-        default: put
+        default: output
   - name: Options
     arguments:
       - name: --verbose
