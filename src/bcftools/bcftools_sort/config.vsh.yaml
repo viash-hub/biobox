@@ -54,15 +54,13 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - path: test_data
 
 engines:
   - type: docker
-    # image: biocontainers/bcftools:v1.9-1-deb_cv1
     image: debian:stable-slim
     setup:
       - type: apt
-        packages: [bedtools, procps]
+        packages: [bcftools, procps]
       - type: docker
         run: |
           echo "bcftools: \"$(bcftools --version | grep 'bcftools' | sed -n 's/^bcftools //p')\"" > /var/software_versions.txt
