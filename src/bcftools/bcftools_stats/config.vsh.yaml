@@ -1,7 +1,7 @@
 name: bcftools_stats
 namespace: bcftools
 description: | 
-  Parses VCF or BCF and produces stats which can be plotted using plot-vcfstats.
+  Parses VCF or BCF and produces a txt stats file which can be plotted using plot-vcfstats.
   When two files are given, the program generates separate stats for intersection
   and the complements. By default only sites are compared, -s/-S must given to include
   also sample columns.
@@ -26,7 +26,8 @@ argument_groups:
       - name: --input
         alternatives: -i
         type: file
-        description: Input VCF/BCF file.
+        multiple: true
+        description: Input VCF/BCF file. Maximum of two files.
         required: true
     
   - name: Outputs
@@ -208,7 +209,7 @@ engines:
           echo "bcftools: \"$(bcftools --version | grep 'bcftools' | sed -n 's/^bcftools //p')\"" > /var/software_versions.txt
     test_setup:  
       - type: apt  
-        packages: [tabix, samtools]
+        packages: [tabix]
 
 runners:
   - type: executable

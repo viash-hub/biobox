@@ -18,6 +18,15 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
+# Create input array 
+IFS=";" read -ra input <<< $par_input
+
+# Check the size of the input array
+if [[ ${#input[@]} -gt 2 ]]; then
+    echo "Error: --input only takes a max of two files!"
+    exit 1
+fi
+
 # Execute bedtools bamtofastq with the provided arguments
 bcftools stats \
     ${par_first_allele_only:+--1st-allele-only} \
@@ -41,6 +50,6 @@ bcftools stats \
     ${par_targets_file:+-T "${par_targets_file}"} \
     ${par_targets_overlaps:+--targets-overlap "${par_targets_overlaps}"} \
     ${par_user_tstv:+-u "${par_user_tstv}"} \
-    $par_input \
+    "${input[@]}" \
     > $par_output
 

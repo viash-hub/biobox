@@ -59,17 +59,18 @@ cat <<EOF > "$TMPDIR/example.vcf"
 ##ALT=<ID=DEL:ME:ALU,Description="Deletion of ALU element">
 ##ALT=<ID=CNV,Description="Copy number variable region">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA00001	NA00002	NA00003
-19	112	.	A	G	10	.	.	GT:HQ	0|0:10,10	0|0:10,10	0/1:3,3
 19	111	.	A	C	9.6	.	.	GT:HQ	0|0:10,10	0|0:10,10	0/1:3,3
-20	1235237	.	T	.	.	.	.	GT	0/0	0|0	./.
+19	112	.	A	G	10	.	.	GT:HQ	0|0:10,10	0|0:10,10	0/1:3,3
 20	14370	rs6054257	G	A	29	PASS	NS=3;DP=14;AF=0.5;DB;H2	GT:GQ:DP:HQ	0|0:48:1:51,51	1|0:48:8:51,51	1/1:43:5:.,.
 20	17330	.	T	A	3	q10	NS=3;DP=11;AF=0.017	GT:GQ:DP:HQ	0|0:49:3:58,50	0|1:3:5:65,3	0/0:41:3:.,.
 20	1110696	rs6040355	A	G,T	67	PASS	NS=2;DP=10;AF=0.333,0.667;AA=T;DB	GT:GQ:DP:HQ	1|2:21:6:23,27	2|1:2:0:18,2	2/2:35:4:.,.
 20	1230237	.	T	.	47	PASS	NS=3;DP=13;AA=T	GT:GQ:DP:HQ	0|0:54:.:56,60	0|0:48:4:51,51	0/0:61:2:.,.
 20	1234567	microsat1	G	GA,GAC	50	PASS	NS=3;DP=9;AA=G;AN=6;AC=3,1	GT:GQ:DP	0/1:.:4	0/2:17:2	1/1:40:3
+20	1235237	.	T	.	.	.	.	GT	0/0	0|0	./.
 EOF
 
-# bgzip -c $TMPDIR/example.vcf > $TMPDIR/example.vcf
+bgzip -c $TMPDIR/example.vcf > $TMPDIR/example.vcf.gz
+tabix -p vcf $TMPDIR/example.vcf.gz
 
 cat <<EOF > "$TMPDIR/exons.bed"
 chr19	12345	12567
@@ -81,17 +82,14 @@ bgzip -c $TMPDIR/exons.bed > $TMPDIR/exons.bed.gz
 tabix -s1 -b2 -e3 $TMPDIR/exons.bed.gz
 
 # Create test data
-cat <<EOF > "$TMPDIR/reference.fasta"
->seq1
-ATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC
->seq2
-CGTAGCTAGCTAGGCTAGCTGATCGATCGTAGCTAGCTAGC
->seq3
-TGCATGCTAGCTAGCTGATCGTAGCTAGCTAGCTAGCTAGC
+cat <<EOF > "$TMPDIR/reference.fasta.fai"
+1	248956422	52	60	61
+2	242193529	253404903	60	61
+3	198295559	499159537	60	61
+4	190214555	700362049	60	61
+19	181538259	895464957	60	61
+20	170805979	1083893029	60	61
 EOF
-
-# Index the fasta reference
-#samtools faidx $TMPDIR/reference.fasta
 
 # Test 1: Default Use
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
@@ -173,12 +171,12 @@ echo "> Run bcftools_stats on VCF file with exons, apply filters, and fasta refe
   --output "stats.txt" \
   --exons "../exons.bed.gz" \
   --apply_filters "PASS" \
-  #--fasta_reference "../reference.fasta.fai" \
+  --fasta_reference "../reference.fasta.fai" \
 
 # checks
 assert_file_exists "stats.txt"
 assert_file_not_empty "stats.txt"
-assert_file_contains "stats.txt" "bcftools stats  -E ../exons.bed.gz -f PASS ../example.vcf"
+assert_file_contains "stats.txt" "bcftools stats  -E ../exons.bed.gz -f PASS -F ../reference.fasta.fai ../example.vcf"
 echo "- test5 succeeded -"
 
 popd > /dev/null
@@ -188,15 +186,15 @@ mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
 
 echo "> Run bcftools_stats on VCF file with include, regions"
 "$meta_executable" \
-  --input "../example.vcf" \
+  --input "../example.vcf.gz" \
   --output "stats.txt" \
   --include "GT='mis'" \
-#  --regions "19" \
+  --regions "20:1000000-2000000" \
 
 # checks
 assert_file_exists "stats.txt"
 assert_file_not_empty "stats.txt"
-assert_file_contains "stats.txt" "bcftools stats  -i GT='mis' ../example.vcf"
+assert_file_contains "stats.txt" "bcftools stats  -i GT='mis' -r 20:1000000-2000000 ../example.vcf.gz"
 echo "- test6 succeeded -"
 
 popd > /dev/null
@@ -236,6 +234,43 @@ assert_file_contains "stats.txt" "bcftools stats  -t 20:1000000-2000000 --target
 echo "- test8 succeeded -"
 
 popd > /dev/null
+
+# Test 9: User TSTV and Verbose
+mkdir "$TMPDIR/test9" && pushd "$TMPDIR/test9" > /dev/null
+
+echo "> Run bcftools_stats on VCF file with user TSTV and verbose"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "stats.txt" \
+  --user_tstv "DP" \
+  --verbose \
+
+# checks
+assert_file_exists "stats.txt"
+assert_file_not_empty "stats.txt"
+assert_file_contains "stats.txt" "bcftools stats  --verbose -u DP ../example.vcf"
+echo "- test9 succeeded -"
+
+popd > /dev/null
+
+# Test 10: Two vcf files
+mkdir "$TMPDIR/test10" && pushd "$TMPDIR/test10" > /dev/null
+
+echo "> Run bcftools_stats on two VCF files"
+"$meta_executable" \
+  --input "../example.vcf.gz" \
+  --input "../example.vcf.gz" \
+  --output "stats.txt" \
+
+# checks
+assert_file_exists "stats.txt"
+assert_file_not_empty "stats.txt"
+assert_file_contains "stats.txt" "bcftools stats  ../example.vcf.gz ../example.vcf.gz"
+echo "- test10 succeeded -"
+
+popd > /dev/null
+
+# Only missing option fasta reference
 
 echo "---- All tests succeeded! ----"
 exit 0
