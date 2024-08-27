@@ -53,8 +53,8 @@ argument_groups:
         description: | 
           Allele frequency tag to use, by default estimated from AN,AC or GT.
 
-      - name: --1st_allele_only
-        alternatives: --1st_only
+      - name: --first_allele_only
+        alternatives: --first_only
         type: boolean_true
         description: | 
           Include only 1st allele at multiallelic sites
@@ -174,7 +174,7 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - path: test_data
+  # - path: test_data
 
 engines:
   - type: docker

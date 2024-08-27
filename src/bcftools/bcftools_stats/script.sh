@@ -20,8 +20,7 @@ done
 
 # Execute bedtools bamtofastq with the provided arguments
 bcftools stats \
-    -o "$par_output" \
-    ${par_1st_allele_only:+--1st-allele-only} \
+    ${par_first_allele_only:+--1st-allele-only} \
     ${par_split_by_ID:+--split-by-ID} \
     ${par_verbose:+--verbose} \
     ${par_allele_frequency_bins:+--af-bins "${par_allele_frequency_bins}"} \
@@ -43,5 +42,5 @@ bcftools stats \
     ${par_targets_overlaps:+--targets-overlap "${par_targets_overlaps}"} \
     ${par_user_tstv:+-u "${par_user_tstv}"} \
     $par_input \
+    > $par_output
 
-    

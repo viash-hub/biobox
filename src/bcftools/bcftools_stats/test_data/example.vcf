@@ -1,40 +1,3 @@
-#!/bin/bash
-
-## VIASH START
-## VIASH END
-
-# Exit on error
-set -eo pipefail
-
-#test_data="$meta_resources_dir/test_data"
-
-#############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-assert_identical_content() {
-  diff -a "$2" "$1" \
-    || (echo "Files are not identical!" && exit 1)
-}
-#############################################
-
-# Create directories for tests
-echo "Creating Test Data..."
-TMPDIR=$(mktemp -d "$meta_temp_dir/XXXXXX")
-function clean_up {
-  [[ -d "$TMPDIR" ]] && rm -r "$TMPDIR"
-}
-trap clean_up EXIT
-
-# Create test data
-cat <<EOF > "$TMPDIR/example.vcf"
 ##fileformat=VCFv4.0
 ##fileDate=20090805
 ##source=myImputationProgramV3.1
@@ -67,26 +30,3 @@ cat <<EOF > "$TMPDIR/example.vcf"
 20	1110696	rs6040355	A	G,T	67	PASS	NS=2;DP=10;AF=0.333,0.667;AA=T;DB	GT:GQ:DP:HQ	1|2:21:6:23,27	2|1:2:0:18,2	2/2:35:4:.,.
 20	1230237	.	T	.	47	PASS	NS=3;DP=13;AA=T	GT:GQ:DP:HQ	0|0:54:.:56,60	0|0:48:4:51,51	0/0:61:2:.,.
 20	1234567	microsat1	G	GA,GAC	50	PASS	NS=3;DP=9;AA=G;AN=6;AC=3,1	GT:GQ:DP	0/1:.:4	0/2:17:2	1/1:40:3
-EOF
-
-
-# Test 1: Default Use
-mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
-
-echo "> Run bcftools_stats on VCF file"
-"$meta_executable" \
-  --input "../example.vcf" \
-  --output "stats.txt" \
-  &> /dev/null
-
-# checks
-assert_file_exists "stats.txt"
-assert_file_not_empty "stats.txt"
-#assert_identical_content "output.vcf" "../expected_output.vcf"
-echo "- test1 succeeded -"
-
-popd > /dev/null
-
-
-echo "---- All tests succeeded! ----"
-exit 0
