@@ -90,7 +90,7 @@ argument_groups:
           The file is BGZF-compressed and indexed with tabix
           e.g. 
             tabix -s1 -b2 -e3 file.gz
-            
+
       - name: --apply_filters
         alternatives: --f
         type: string
@@ -174,7 +174,6 @@ argument_groups:
         description: | 
           Produce verbose per-site and per-sample output.
 
-
 resources:
   - type: bash_script
     path: script.sh
@@ -182,7 +181,7 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  # - path: test_data
+  - path: test_data
 
 engines:
   - type: docker
@@ -193,6 +192,9 @@ engines:
       - type: docker
         run: |
           echo "bcftools: \"$(bcftools --version | grep 'bcftools' | sed -n 's/^bcftools //p')\"" > /var/software_versions.txt
+    test_setup:  
+      - type: apt  
+        packages: [tabix, samtools]
 
 runners:
   - type: executable

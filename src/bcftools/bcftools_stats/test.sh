@@ -69,6 +69,27 @@ cat <<EOF > "$TMPDIR/example.vcf"
 20	1234567	microsat1	G	GA,GAC	50	PASS	NS=3;DP=9;AA=G;AN=6;AC=3,1	GT:GQ:DP	0/1:.:4	0/2:17:2	1/1:40:3
 EOF
 
+cat <<EOF > "$TMPDIR/exons.bed"
+chr19	12345	12567
+chr20	23456	23789
+EOF
+
+# Compressing and indexing the exons file
+bgzip -c $TMPDIR/exons.bed > $TMPDIR/exons.bed.gz
+tabix -s1 -b2 -e3 $TMPDIR/exons.bed.gz
+
+# Create test data
+cat <<EOF > "$TMPDIR/reference.fasta"
+>seq1
+ATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC
+>seq2
+CGTAGCTAGCTAGGCTAGCTGATCGATCGTAGCTAGCTAGC
+>seq3
+TGCATGCTAGCTAGCTGATCGTAGCTAGCTAGCTAGCTAGC
+EOF
+
+# Index the fasta reference
+#samtools faidx $TMPDIR/reference.fasta
 
 # Test 1: Default Use
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
@@ -141,48 +162,42 @@ echo "- test4 succeeded -"
 
 popd > /dev/null
 
-# # Test 5: Exons, Apply Filters, Fasta Reference
-# mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
+# Test 5: Exons, Apply Filters, Fasta Reference
+mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
 
-# echo "> Run bcftools_stats on VCF file with exons, apply filters, and fasta reference"
-# "$meta_executable" \
-#   --input "../example.vcf" \
-#   --output "stats.txt" \
-#   --exons "exons.bed" \
-#   --apply_filters "PASS" \
-#   --fasta_reference "reference.fasta" \
+echo "> Run bcftools_stats on VCF file with exons, apply filters, and fasta reference"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "stats.txt" \
+  --exons "../exons.bed.gz" \
+  --apply_filters "PASS" \
+  #--fasta_reference "../reference.fasta.fai" \
 
-# echo 
-# cat stats.txt
-# echo
-# exit 0
+# checks
+assert_file_exists "stats.txt"
+assert_file_not_empty "stats.txt"
+assert_file_contains "stats.txt" "bcftools stats  -E ../exons.bed.gz -f PASS ../example.vcf"
+echo "- test5 succeeded -"
 
-# # checks
-# assert_file_exists "stats.txt"
-# assert_file_not_empty "stats.txt"
-# assert_file_contains "stats.txt" "number of records:	8"
-# echo "- test5 succeeded -"
+popd > /dev/null
 
-# popd > /dev/null
+# Test 6: Include, Regions, Regions File
+mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
 
-# # Test 6: Include, Regions, Regions File
-# mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
+echo "> Run bcftools_stats on VCF file with include, regions, and regions file"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "stats.txt" \
+  --include "GT='mis'" \
+  --regions "20" \
 
-# echo "> Run bcftools_stats on VCF file with include, regions, and regions file"
-# "$meta_executable" \
-#   --input "../example.vcf" \
-#   --output "stats.txt" \
-#   --include "PASS" \
-#   --regions "20:1000000-2000000" \
-#   --regions_file "regions.bed" \
+# checks
+assert_file_exists "stats.txt"
+assert_file_not_empty "stats.txt"
+assert_file_contains "stats.txt" "number of records:	8"
+echo "- test6 succeeded -"
 
-# # checks
-# assert_file_exists "stats.txt"
-# assert_file_not_empty "stats.txt"
-# assert_file_contains "stats.txt" "number of records:	8"
-# echo "- test6 succeeded -"
-
-# popd > /dev/null
+popd > /dev/null
 
 # # Test 7: Regions Overlap, Samples, Samples File
 # mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
