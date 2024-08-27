@@ -36,6 +36,9 @@
 
 * `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
 
+* `bcftools`:
+  - `bcftools/bcftools_stats`: Parses VCF or BCF and produces a txt stats file which can be plotted using plot-vcfstats (PR #142).
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
