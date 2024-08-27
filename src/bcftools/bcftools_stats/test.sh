@@ -81,7 +81,7 @@ echo "> Run bcftools_stats on VCF file"
 # checks
 assert_file_exists "stats.txt"
 assert_file_not_empty "stats.txt"
-assert_file_contains "stats.txt" "number of records:	8"
+assert_file_contains "stats.txt" "bcftools stats  ../example.vcf"
 echo "- test1 succeeded -"
 
 popd > /dev/null
@@ -100,7 +100,7 @@ echo "> Run bcftools_stats on VCF file with first allele only"
 # checks
 assert_file_exists "stats.txt"
 assert_file_not_empty "stats.txt"
-assert_file_contains "stats.txt" "number of records:	8"
+assert_file_contains "stats.txt" "bcftools stats  --1st-allele-only --af-bins 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9 --af-tag AF ../example.vcf"
 echo "- test2 succeeded -"
 
 popd > /dev/null
@@ -129,14 +129,14 @@ echo "> Run bcftools_stats on VCF file with collapse, depth, and exclude"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "stats.txt" \
-  --depth "DP" \
-  --exclude "DB" \
-  #  --collapse "NS" \
+  --depth "0,500,1" \
+  --exclude "GT='mis'" \
+  --collapse "snps" \
 
 # checks
 assert_file_exists "stats.txt"
 assert_file_not_empty "stats.txt"
-assert_file_contains "stats.txt" "number of records:	8"
+assert_file_contains "stats.txt" "bcftools stats  -c snps -d 0,500,1 -e GT='mis' ../example.vcf"
 echo "- test4 succeeded -"
 
 popd > /dev/null
@@ -151,6 +151,11 @@ popd > /dev/null
 #   --exons "exons.bed" \
 #   --apply_filters "PASS" \
 #   --fasta_reference "reference.fasta" \
+
+# echo 
+# cat stats.txt
+# echo
+# exit 0
 
 # # checks
 # assert_file_exists "stats.txt"

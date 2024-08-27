@@ -35,7 +35,7 @@ argument_groups:
         alternatives: -o
         direction: output
         type: file
-        description: Output sorted VCF/BCF file.
+        description: Output txt statistics file.
         required: true
          
   - name: Options
@@ -62,27 +62,35 @@ argument_groups:
       - name: --collapse
         alternatives: --c
         type: string
+        choices: [ snps, indels, both, all, some, none ]
         description: | 
-          Treat as identical records with <snps|indels|both|all|some|none>, see man page for details [none]
+          Treat as identical records with <snps|indels|both|all|some|none>.
+          See https://samtools.github.io/bcftools/bcftools.html#common_options for details.
 
       - name: --depth
         alternatives: --d
         type: string
         description: | 
           Depth distribution: min,max,bin size [0,500,1]
+        example: 0,500,1
 
       - name: --exclude
         alternatives: --e
         type: string
         description: | 
-          Exclude sites for which the expression is true (see man page for details)
+          Exclude sites for which the expression is true.
+          See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
 
       - name: --exons
         alternatives: --E
         type: file
         description: | 
-          Tab-delimited file with exons for indel frameshifts (chr,beg,end; 1-based, inclusive, bgzip compressed)
-
+          tab-delimited file with exons for indel frameshifts statistics. 
+          The columns of the file are CHR, FROM, TO, with 1-based, inclusive, positions. 
+          The file is BGZF-compressed and indexed with tabix
+          e.g. 
+            tabix -s1 -b2 -e3 file.gz
+            
       - name: --apply_filters
         alternatives: --f
         type: string
