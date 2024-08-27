@@ -8,7 +8,7 @@ set -eo pipefail
 
 # Unset parameters
 unset_if_false=(
-    par_1st_allele_only
+    par_first_allele_only
     par_split_by_ID
     par_verbose 
 )

@@ -77,16 +77,147 @@ echo "> Run bcftools_stats on VCF file"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "stats.txt" \
-  &> /dev/null
 
 # checks
 assert_file_exists "stats.txt"
 assert_file_not_empty "stats.txt"
-#assert_identical_content "output.vcf" "../expected_output.vcf"
+assert_file_contains "stats.txt" "number of records:	8"
 echo "- test1 succeeded -"
 
 popd > /dev/null
 
+# Test 2: First allele only
+mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
+
+echo "> Run bcftools_stats on VCF file with first allele only"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "stats.txt" \
+  --first_allele_only \
+  --allele_frequency_bins "0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9" \
+  --allele_frequency_tag "AF" \
+
+# checks
+assert_file_exists "stats.txt"
+assert_file_not_empty "stats.txt"
+assert_file_contains "stats.txt" "number of records:	8"
+echo "- test2 succeeded -"
+
+popd > /dev/null
+
+# Test 3: Split by ID
+mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
+
+echo "> Run bcftools_stats on VCF file with split by ID"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "stats.txt" \
+  --split_by_ID \
+
+# checks
+assert_file_exists "stats.txt"
+assert_file_not_empty "stats.txt"
+assert_file_contains "stats.txt" "bcftools stats  --split-by-ID ../example.vcf"
+echo "- test3 succeeded -"
+
+popd > /dev/null
+
+# Test 4: Collapse, Depth, Exclude
+mkdir "$TMPDIR/test4" && pushd "$TMPDIR/test4" > /dev/null
+
+echo "> Run bcftools_stats on VCF file with collapse, depth, and exclude"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "stats.txt" \
+  --depth "DP" \
+  --exclude "DB" \
+  #  --collapse "NS" \
+
+# checks
+assert_file_exists "stats.txt"
+assert_file_not_empty "stats.txt"
+assert_file_contains "stats.txt" "number of records:	8"
+echo "- test4 succeeded -"
+
+popd > /dev/null
+
+# # Test 5: Exons, Apply Filters, Fasta Reference
+# mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
+
+# echo "> Run bcftools_stats on VCF file with exons, apply filters, and fasta reference"
+# "$meta_executable" \
+#   --input "../example.vcf" \
+#   --output "stats.txt" \
+#   --exons "exons.bed" \
+#   --apply_filters "PASS" \
+#   --fasta_reference "reference.fasta" \
+
+# # checks
+# assert_file_exists "stats.txt"
+# assert_file_not_empty "stats.txt"
+# assert_file_contains "stats.txt" "number of records:	8"
+# echo "- test5 succeeded -"
+
+# popd > /dev/null
+
+# # Test 6: Include, Regions, Regions File
+# mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
+
+# echo "> Run bcftools_stats on VCF file with include, regions, and regions file"
+# "$meta_executable" \
+#   --input "../example.vcf" \
+#   --output "stats.txt" \
+#   --include "PASS" \
+#   --regions "20:1000000-2000000" \
+#   --regions_file "regions.bed" \
+
+# # checks
+# assert_file_exists "stats.txt"
+# assert_file_not_empty "stats.txt"
+# assert_file_contains "stats.txt" "number of records:	8"
+# echo "- test6 succeeded -"
+
+# popd > /dev/null
+
+# # Test 7: Regions Overlap, Samples, Samples File
+# mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
+
+# echo "> Run bcftools_stats on VCF file with regions overlap, samples, and samples file"
+# "$meta_executable" \
+#   --input "../example.vcf" \
+#   --output "stats.txt" \
+#   --regions_overlap "20:1000000-2000000" \
+#   --samples "NA00001,NA00002" \
+#   --samples_file "samples.txt" \
+
+# # checks
+# assert_file_exists "stats.txt"
+# assert_file_not_empty "stats.txt"
+# assert_file_contains "stats.txt" "number of records:	8"
+# echo "- test7 succeeded -"
+
+# popd > /dev/null
+
+# # Test 8: Targets, Targets File, Targets Overlaps
+# mkdir "$TMPDIR/test8" && pushd "$TMPDIR/test8" > /dev/null
+
+# echo "> Run bcftools_stats on VCF file with targets, targets file, and targets overlaps"
+# "$meta_executable" \
+#   --input "../example.vcf" \
+#   --output "stats.txt" \
+#   --targets "20:1000000-2000000" \
+#   --targets_file "targets.bed" \
+#   --targets_overlaps "20:1000000-2000000" \
+
+# # checks
+# assert_file_exists "stats.txt"
+# assert_file_not_empty "stats.txt"
+# assert_file_contains "stats.txt" "number of records:	8"
+# echo "- test8 succeeded -"
+
+# popd > /dev/null
 
 echo "---- All tests succeeded! ----"
 exit 0
+
+
