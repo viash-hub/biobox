@@ -153,7 +153,7 @@ argument_groups:
         description: | 
           Include if POS in the region (0), record overlaps (1), variant overlaps (2) [0].
 
-      - name: --user-tstv
+      - name: --user_tstv
         alternatives: --u
         type: string
         description: | 
@@ -164,10 +164,8 @@ argument_groups:
         alternatives: --v
         type: boolean_true
         description: | 
-          Produce verbose per-site and per-sample output
+          Produce verbose per-site and per-sample output.
 
-      
-          
 
 resources:
   - type: bash_script
