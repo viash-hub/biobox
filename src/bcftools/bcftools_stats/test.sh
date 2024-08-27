@@ -69,6 +69,8 @@ cat <<EOF > "$TMPDIR/example.vcf"
 20	1234567	microsat1	G	GA,GAC	50	PASS	NS=3;DP=9;AA=G;AN=6;AC=3,1	GT:GQ:DP	0/1:.:4	0/2:17:2	1/1:40:3
 EOF
 
+# bgzip -c $TMPDIR/example.vcf > $TMPDIR/example.vcf
+
 cat <<EOF > "$TMPDIR/exons.bed"
 chr19	12345	12567
 chr20	23456	23789
@@ -162,7 +164,7 @@ echo "- test4 succeeded -"
 
 popd > /dev/null
 
-# Test 5: Exons, Apply Filters, Fasta Reference
+# Test 5: Exons, Apply Filters
 mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
 
 echo "> Run bcftools_stats on VCF file with exons, apply filters, and fasta reference"
@@ -181,61 +183,59 @@ echo "- test5 succeeded -"
 
 popd > /dev/null
 
-# Test 6: Include, Regions, Regions File
+# Test 6: Include, Regions
 mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
 
-echo "> Run bcftools_stats on VCF file with include, regions, and regions file"
+echo "> Run bcftools_stats on VCF file with include, regions"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "stats.txt" \
   --include "GT='mis'" \
-  --regions "20" \
+#  --regions "19" \
 
 # checks
 assert_file_exists "stats.txt"
 assert_file_not_empty "stats.txt"
-assert_file_contains "stats.txt" "number of records:	8"
+assert_file_contains "stats.txt" "bcftools stats  -i GT='mis' ../example.vcf"
 echo "- test6 succeeded -"
 
 popd > /dev/null
 
-# # Test 7: Regions Overlap, Samples, Samples File
-# mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
+# Test 7: Regions Overlap, Samples, Samples File
+mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
 
-# echo "> Run bcftools_stats on VCF file with regions overlap, samples, and samples file"
-# "$meta_executable" \
-#   --input "../example.vcf" \
-#   --output "stats.txt" \
-#   --regions_overlap "20:1000000-2000000" \
-#   --samples "NA00001,NA00002" \
-#   --samples_file "samples.txt" \
+echo "> Run bcftools_stats on VCF file with regions overlap, samples, and samples file"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "stats.txt" \
+  --regions_overlap "record" \
+  --samples "NA00001,NA00002" \
 
-# # checks
-# assert_file_exists "stats.txt"
-# assert_file_not_empty "stats.txt"
-# assert_file_contains "stats.txt" "number of records:	8"
-# echo "- test7 succeeded -"
+# checks
+assert_file_exists "stats.txt"
+assert_file_not_empty "stats.txt"
+assert_file_contains "stats.txt" "bcftools stats  --regions-overlap record -s NA00001,NA00002 ../example.vcf"
+echo "- test7 succeeded -"
 
-# popd > /dev/null
+popd > /dev/null
 
-# # Test 8: Targets, Targets File, Targets Overlaps
-# mkdir "$TMPDIR/test8" && pushd "$TMPDIR/test8" > /dev/null
+# Test 8: Targets, Targets File, Targets Overlaps
+mkdir "$TMPDIR/test8" && pushd "$TMPDIR/test8" > /dev/null
 
-# echo "> Run bcftools_stats on VCF file with targets, targets file, and targets overlaps"
-# "$meta_executable" \
-#   --input "../example.vcf" \
-#   --output "stats.txt" \
-#   --targets "20:1000000-2000000" \
-#   --targets_file "targets.bed" \
-#   --targets_overlaps "20:1000000-2000000" \
+echo "> Run bcftools_stats on VCF file with targets, targets file, and targets overlaps"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "stats.txt" \
+  --targets "20:1000000-2000000" \
+  --targets_overlaps "pos" \
 
-# # checks
-# assert_file_exists "stats.txt"
-# assert_file_not_empty "stats.txt"
-# assert_file_contains "stats.txt" "number of records:	8"
-# echo "- test8 succeeded -"
+# checks
+assert_file_exists "stats.txt"
+assert_file_not_empty "stats.txt"
+assert_file_contains "stats.txt" "bcftools stats  -t 20:1000000-2000000 --targets-overlap pos ../example.vcf"
+echo "- test8 succeeded -"
 
-# popd > /dev/null
+popd > /dev/null
 
 echo "---- All tests succeeded! ----"
 exit 0

@@ -107,7 +107,8 @@ argument_groups:
         alternatives: --i
         type: string
         description: | 
-          Select sites for which the expression is true (see man page for details)
+          Select sites for which the expression is true.
+          See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
       
       - name: --split_by_ID
         alternatives: --I
@@ -129,8 +130,13 @@ argument_groups:
 
       - name: --regions_overlap
         type: string
+        choices: ['pos', 'record', 'variant', '0', '1', '2']
         description: | 
-          Include if POS in the region (0), record overlaps (1), variant overlaps (2) [1].
+          This option controls how overlapping records are determined: 
+          set to 'pos' or '0' if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
+          set to 'record' or '1' if also overlapping records with POS outside a region should be included (this is the default behavior of -r/-R, 
+          and includes indels with POS at the end of a region, which are technically outside the region); 
+          or set to 'variant' or '2' to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
 
       - name: --samples
         alternatives: --s
@@ -148,7 +154,14 @@ argument_groups:
         alternatives: --t
         type: string
         description: | 
-          Similar to -r but streams rather than index-jumps.
+          Similar as -r, --regions, but the next position is accessed by streaming the whole VCF/BCF 
+          rather than using the tbi/csi index. Both -r and -t options can be applied simultaneously: -r uses the 
+          index to jump to a region and -t discards positions which are not in the targets. Unlike -r, targets 
+          can be prefixed with "^" to request logical complement. For example, "^X,Y,MT" indicates that 
+          sequences X, Y and MT should be skipped. Yet another difference between the -t/-T and -r/-R is 
+          that -r/-R checks for proper overlaps and considers both POS and the end position of an indel, 
+          while -t/-T considers the POS coordinate only (by default; see also --regions-overlap and --targets-overlap). 
+          Note that -t cannot be used in combination with -T.
       
       - name: --targets_file
         alternatives: --T
@@ -157,9 +170,10 @@ argument_groups:
           Similar to -R but streams rather than index-jumps.
 
       - name: --targets_overlaps
-        type: file
+        type: string
+        choices: ['pos', 'record', 'variant', '0', '1', '2']
         description: | 
-          Include if POS in the region (0), record overlaps (1), variant overlaps (2) [0].
+          Include if POS in the region (0), record overlaps (1), variant overlaps (2).
 
       - name: --user_tstv
         alternatives: --u
