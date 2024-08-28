@@ -1,3 +1,6 @@
+```
+bcftools stats -h
+```
 
 About:   Parses VCF or BCF and produces stats which can be plotted using plot-vcfstats.
          When two files are given, the program generates separate stats for intersection

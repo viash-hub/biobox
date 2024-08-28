@@ -27,7 +27,7 @@ if [[ ${#input[@]} -gt 2 ]]; then
     exit 1
 fi
 
-# Execute bedtools bamtofastq with the provided arguments
+# Execute bcftools stats with the provided arguments
 bcftools stats \
     ${par_first_allele_only:+--1st-allele-only} \
     ${par_split_by_ID:+--split-by-ID} \
