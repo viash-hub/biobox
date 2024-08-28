@@ -183,7 +183,7 @@ popd > /dev/null
 # Test 6: Include, Regions
 mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
 
-echo "> Run bcftools_stats on VCF file with include, regions"
+echo "> Run bcftools_stats on VCF file with include and regions options"
 "$meta_executable" \
   --input "../example.vcf.gz" \
   --output "stats.txt" \
@@ -198,10 +198,10 @@ echo "- test6 succeeded -"
 
 popd > /dev/null
 
-# Test 7: Regions Overlap, Samples, Samples File
+# Test 7: Regions Overlap, Samples
 mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
 
-echo "> Run bcftools_stats on VCF file with regions overlap, samples, and samples file"
+echo "> Run bcftools_stats on VCF file with regions overlap, and samples options"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "stats.txt" \

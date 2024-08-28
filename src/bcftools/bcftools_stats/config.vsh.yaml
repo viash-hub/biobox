@@ -58,7 +58,7 @@ argument_groups:
         alternatives: --first_only
         type: boolean_true
         description: | 
-          Include only 1st allele at multiallelic sites
+          Include only 1st allele at multiallelic sites.
 
       - name: --collapse
         alternatives: --c
@@ -72,7 +72,7 @@ argument_groups:
         alternatives: --d
         type: string
         description: | 
-          Depth distribution: min,max,bin size [0,500,1]
+          Depth distribution: min,max,bin size.
         example: 0,500,1
 
       - name: --exclude
@@ -88,21 +88,19 @@ argument_groups:
         description: | 
           tab-delimited file with exons for indel frameshifts statistics. 
           The columns of the file are CHR, FROM, TO, with 1-based, inclusive, positions. 
-          The file is BGZF-compressed and indexed with tabix
-          e.g. 
-            tabix -s1 -b2 -e3 file.gz
+          The file is BGZF-compressed and indexed with tabix (e.g. tabix -s1 -b2 -e3 file.gz).
 
       - name: --apply_filters
         alternatives: --f
         type: string
         description: | 
-          Require at least one of the listed FILTER strings (e.g. "PASS,.")
+          Require at least one of the listed FILTER strings (e.g. "PASS,.").
 
       - name: --fasta_reference
         alternatives: --F
         type: file
         description: | 
-          Faidx indexed reference sequence file to determine INDEL context
+          Faidx indexed reference sequence file to determine INDEL context.
 
       - name: --include
         alternatives: --i
@@ -115,13 +113,13 @@ argument_groups:
         alternatives: --I
         type: boolean_true
         description: | 
-          Collect stats for sites with ID separately (known vs novel)
+          Collect stats for sites with ID separately (known vs novel).
 
       - name: --regions
         alternatives: --r
         type: string
         description: | 
-          Restrict to comma-separated list of regions
+          Restrict to comma-separated list of regions.
 
       - name: --regions_file
         alternatives: --R
@@ -168,7 +166,7 @@ argument_groups:
         alternatives: --T
         type: file
         description: | 
-          Similar to -R but streams rather than index-jumps.
+          Similar to --regions_file option but streams rather than index-jumps.
 
       - name: --targets_overlaps
         type: string
