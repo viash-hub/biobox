@@ -53,7 +53,7 @@ argument_groups:
 
       - name: --column
         alternatives: [-c, -opCols]
-        type: string
+        type: integer
         description: |
           Specify the column (1-based) that should be summarized.
         required: true   
