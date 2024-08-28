@@ -9,9 +9,9 @@ meta_resources_dir="$PWD/src/nanoplot"
 
 ###########################################################################
 
-# Test 1: Run NanoPlot with only input parameter
+# Test 1: Run NanoPlot with only input parameter (Fastq)
 
-echo "> Run Test 1: one input"
+echo "> Run Test 1: one input (Fastq)"
 "$meta_executable" \
   --fastq "$meta_resources_dir/test_data/test1.fastq"
 
@@ -47,9 +47,9 @@ echo "Test 1 succeeded."
 
 ###########################################################################
 
-# Test 2: Run NanoPlot with multiple inputs
+# Test 2: Run NanoPlot with multiple inputs (Fastq)
 
-echo "> Run Test 2: multiple inputs"
+echo "> Run Test 2: multiple inputs (Fastq)"
 "$meta_executable" \
   --fastq "$meta_resources_dir/test_data/test1.fastq" "$meta_resources_dir/test_data/test2.fastq"
 
@@ -192,11 +192,11 @@ echo "Test 4 succeeded."
 
 ###########################################################################
 
-# Test 5: Run NanoPlot with different input
+# Test 5: Run NanoPlot with different input (Fasta)
 
-echo "> Run Test 5: different input"
+echo "> Run Test 5: Input Fasta"
 "$meta_executable" \
-  --bam "$meta_resources_dir/test_data/test.bam"
+  --fasta "$meta_resources_dir/test_data/test.fasta"
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -230,9 +230,237 @@ echo "Test 5 succeeded."
 
 ###########################################################################
 
-# Test 6: Run NanoPlot with output options
+# Test 6: Run NanoPlot with different input (Fastq_rich)
 
-echo "> Run Test 6: output options"
+echo "> Run Test 6: Input Fastq_rich"
+"$meta_executable" \
+  --fastq_rich "$meta_resources_dir/test_data/test_rich.fastq"
+
+# Check if output directory exists
+if [[ ! -d output ]]; then
+  echo "Output directory not found!"
+  exit 1
+fi
+
+# Check if output files are generated
+if [ "$(ls -1 "output" | wc -l)" -lt 1 ]; then # Apart from log file
+  echo "Output files are not found!"
+  exit 1
+fi
+
+# Check if files are empty
+if find output -name "*.html" -type f -size 0 | grep -q .; then 
+  echo "At least one HTML file is empty."
+  exit 1
+fi
+if find output -name "*.png" -type f -size 0 | grep -q .; then 
+  echo "At least one plot is empty."
+  exit 1
+fi
+if find output -name "*.txt" -type f -size 0 | grep -q .; then 
+  echo "NanoPlot summary file is empty."
+  exit 1
+fi
+
+rm -f output/* # Clear output
+
+echo "Test 6 succeeded."
+
+###########################################################################
+
+# Test 7: Run NanoPlot with different input (Fastq_minimal)
+
+echo "> Run Test 7: Input Fasta"
+"$meta_executable" \
+  --fastq_minimal "$meta_resources_dir/test_data/test_minimal.fastq.gz"
+
+# Check if output directory exists
+if [[ ! -d output ]]; then
+  echo "Output directory not found!"
+  exit 1
+fi
+
+# Check if output files are generated
+if [ "$(ls -1 "output" | wc -l)" -lt 1 ]; then # Apart from log file
+  echo "Output files are not found!"
+  exit 1
+fi
+
+# Check if files are empty
+if find output -name "*.html" -type f -size 0 | grep -q .; then 
+  echo "At least one HTML file is empty."
+  exit 1
+fi
+if find output -name "*.png" -type f -size 0 | grep -q .; then 
+  echo "At least one plot is empty."
+  exit 1
+fi
+if find output -name "*.txt" -type f -size 0 | grep -q .; then 
+  echo "NanoPlot summary file is empty."
+  exit 1
+fi
+
+rm -f output/* # Clear output
+
+echo "Test 7 succeeded."
+
+###########################################################################
+
+# Test 8: Run NanoPlot with different input (Summary)
+
+echo "> Run Test 8: Input Summary"
+"$meta_executable" \
+  --summary "$meta_resources_dir/test_data/test_summary.txt"
+
+# Check if output directory exists
+if [[ ! -d output ]]; then
+  echo "Output directory not found!"
+  exit 1
+fi
+
+# Check if output files are generated
+if [ "$(ls -1 "output" | wc -l)" -lt 1 ]; then # Apart from log file
+  echo "Output files are not found!"
+  exit 1
+fi
+
+# Check if files are empty
+if find output -name "*.html" -type f -size 0 | grep -q .; then 
+  echo "At least one HTML file is empty."
+  exit 1
+fi
+if find output -name "*.png" -type f -size 0 | grep -q .; then 
+  echo "At least one plot is empty."
+  exit 1
+fi
+if find output -name "*.txt" -type f -size 0 | grep -q .; then 
+  echo "NanoPlot summary file is empty."
+  exit 1
+fi
+
+rm -f output/* # Clear output
+
+echo "Test 8 succeeded."
+
+###########################################################################
+
+# Test 9: Run NanoPlot with different input (BAM)
+
+echo "> Run Test 9: Input BAM"
+"$meta_executable" \
+  --bam "$meta_resources_dir/test_data/test.bam"
+
+# Check if output directory exists
+if [[ ! -d output ]]; then
+  echo "Output directory not found!"
+  exit 1
+fi
+
+# Check if output files are generated
+if [ "$(ls -1 "output" | wc -l)" -lt 1 ]; then # Apart from log file
+  echo "Output files are not found!"
+  exit 1
+fi
+
+# Check if files are empty
+if find output -name "*.html" -type f -size 0 | grep -q .; then 
+  echo "At least one HTML file is empty."
+  exit 1
+fi
+if find output -name "*.png" -type f -size 0 | grep -q .; then 
+  echo "At least one plot is empty."
+  exit 1
+fi
+if find output -name "*.txt" -type f -size 0 | grep -q .; then 
+  echo "NanoPlot summary file is empty."
+  exit 1
+fi
+
+rm -f output/* # Clear output
+
+echo "Test 9 succeeded."
+
+###########################################################################
+
+# Test 10: Run NanoPlot with different input (pickle)
+
+echo "> Run Test 10: Input pickle"
+"$meta_executable" \
+  --pickle "$meta_resources_dir/test_data/test.pickle"
+
+# Check if output directory exists
+if [[ ! -d output ]]; then
+  echo "Output directory not found!"
+  exit 1
+fi
+
+# Check if output files are generated
+if [ "$(ls -1 "output" | wc -l)" -lt 1 ]; then # Apart from log file
+  echo "Output files are not found!"
+  exit 1
+fi
+
+# Check if files are empty
+if find output -name "*.html" -type f -size 0 | grep -q .; then 
+  echo "At least one HTML file is empty."
+  exit 1
+fi
+if find output -name "*.png" -type f -size 0 | grep -q .; then 
+  echo "At least one plot is empty."
+  exit 1
+fi
+if find output -name "*.txt" -type f -size 0 | grep -q .; then 
+  echo "NanoPlot summary file is empty."
+  exit 1
+fi
+
+rm -f output/* # Clear output
+
+echo "Test 10 succeeded."
+
+###########################################################################
+
+# Test 11: Run NanoPlot with different input (feather)
+
+echo "> Run Test 11: Input feather"
+"$meta_executable" \
+  --arrow "$meta_resources_dir/test_data/test.feather"
+
+# Check if output directory exists
+if [[ ! -d output ]]; then
+  echo "Output directory not found!"
+  exit 1
+fi
+
+# Check if output files are generated
+if [ "$(ls -1 "output" | wc -l)" -lt 1 ]; then # Apart from log file
+  echo "Output files are not found!"
+  exit 1
+fi
+
+# Check if files are empty
+if find output -name "*.html" -type f -size 0 | grep -q .; then 
+  echo "At least one HTML file is empty."
+  exit 1
+fi
+if find output -name "*.png" -type f -size 0 | grep -q .; then 
+  echo "At least one plot is empty."
+  exit 1
+fi
+if find output -name "*.txt" -type f -size 0 | grep -q .; then 
+  echo "NanoPlot summary file is empty."
+  exit 1
+fi
+
+rm -f output/* # Clear output
+
+echo "Test 11 succeeded."
+
+###########################################################################
+
+# Test 12: Run NanoPlot with output options
+
+echo "> Run Test 12: output options"
 "$meta_executable" \
   --fastq "$meta_resources_dir/test_data/test1.fastq" \
   --outdir out
@@ -265,7 +493,7 @@ fi
 
 rm -rf out/ # Clear output
 
-echo "Test 6 succeeded."
+echo "Test 12 succeeded."
 
 ###########################################################################
 

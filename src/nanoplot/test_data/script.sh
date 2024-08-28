@@ -63,15 +63,20 @@ wget -O src/nanoplot/test_data/test.fasta https://raw.githubusercontent.com/mere
 #########################################################################################
 
 ## Fastq_rich file ##
-if [ ! -d nanotest ]; then
-  git clone --depth 1 --single-branch --branch master https://github.com/wdecoster/nanotest/
-fi
+wget -O src/nanoplot/test_data/test_rich.fastq.gz https://github.com/epi2me-labs/fastcat/raw/master/test/data/bc0.fastq.gz
 
-mv nanotest/reads-mixed-timestamp.fastq src/nanoplot/test_data/test_rich.fastq 
+# Unzip file
+gunzip -c src/nanoplot/test_data/test_rich.fastq.gz > src/nanoplot/test_data/test_rich.fastq
+
+rm src/nanoplot/test_data/test_rich.fastq.gz 
 
 #########################################################################################
 
 ## Fastq_minimal file ##
+if [ ! -d nanotest ]; then
+  git clone --depth 1 --single-branch --branch master https://github.com/wdecoster/nanotest/
+fi
+
 mv nanotest/reads.fastq.gz src/nanoplot/test_data/test_minimal.fastq.gz
 
 # Unzip file
@@ -92,7 +97,7 @@ mv nanotest/sequencing_summary.txt src/nanoplot/test_data/test_summary.txt
 
 #########################################################################################
 
-## Bam file ##
+## BAM file ##
 if [ ! -d /tmp/snakemake-wrappers ]; then
   git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
 fi
