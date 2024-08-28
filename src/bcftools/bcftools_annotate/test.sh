@@ -42,6 +42,9 @@ cat <<EOF > "$TMPDIR/example.vcf"
 1	752722	.	G	A	.	.	.	.	.
 EOF
 
+bgzip -c $TMPDIR/example.vcf > $TMPDIR/example.vcf.gz
+tabix -p vcf $TMPDIR/example.vcf.gz
+
 cat <<EOF > "$TMPDIR/annots.tsv"
 1	752567	752567	FooValue1	12345
 1	752722	752722	FooValue2	67890
@@ -168,8 +171,103 @@ echo "- test6 succeeded -"
 
 popd > /dev/null
 
+# Test 7: Single overlaps
+mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
 
+echo "> Run bcftools_annotate with --single-overlaps option"	
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "annotated.vcf" \
+  --single_overlaps \
+  --keep_sites \
 
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+assert_file_contains "annotated.vcf" "annotate -k --single-overlaps -o annotated.vcf ../example.vcf"
+echo "- test7 succeeded -"
+
+popd > /dev/null
+
+# Test 8: Min overlap
+mkdir "$TMPDIR/test8" && pushd "$TMPDIR/test8" > /dev/null
+
+echo "> Run bcftools_annotate with --min-overlap option"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "annotated.vcf" \
+  --annotations "../annots.tsv.gz" \
+  --columns "CHROM,FROM,TO,FMT/FOO,BAR" \
+  --header_lines "../header.hdr" \
+  --min_overlap "1"
+
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+assert_file_contains "annotated.vcf" "annotate -a ../annots.tsv.gz -c CHROM,FROM,TO,FMT/FOO,BAR -h ../header.hdr --min-overlap 1 -o annotated.vcf ../example.vcf"
+echo "- test8 succeeded -"
+
+popd > /dev/null
+
+# Test 9: Regions
+mkdir "$TMPDIR/test9" && pushd "$TMPDIR/test9" > /dev/null
+
+echo "> Run bcftools_annotate with -r option"
+"$meta_executable" \
+  --input "../example.vcf.gz" \
+  --output "annotated.vcf" \
+  --regions "1:752567-752722"
+
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+assert_file_contains "annotated.vcf" "annotate -r 1:752567-752722 -o annotated.vcf ../example.vcf.gz"
+echo "- test9 succeeded -"
+
+popd > /dev/null
+
+# Test 10: pair-logic
+mkdir "$TMPDIR/test10" && pushd "$TMPDIR/test10" > /dev/null
+
+echo "> Run bcftools_annotate with --pair-logic option"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "annotated.vcf" \
+  --pair_logic "all"
+
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+assert_file_contains "annotated.vcf" "annotate --pair-logic all -o annotated.vcf ../example.vcf"
+echo "- test10 succeeded -"
+
+popd > /dev/null
+
+# Test 11: regions-overlap
+mkdir "$TMPDIR/test11" && pushd "$TMPDIR/test11" > /dev/null
+
+echo "> Run bcftools_annotate with --regions-overlap option"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "annotated.vcf" \
+  --regions_overlap "1"
+
+echo
+cat "annotated.vcf"
+echo
+
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+assert_file_contains "annotated.vcf" "annotate --regions-overlap 1 -o annotated.vcf ../example.vcf"
+echo "- test11 succeeded -"
+
+popd > /dev/null
 
 echo "---- All tests succeeded! ----"
 exit 0
+
+
+# echo
+# cat "annotated.vcf"
+# echo
