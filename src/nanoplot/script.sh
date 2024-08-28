@@ -84,4 +84,5 @@ NanoPlot \
     ${par_font_scale:+--font_scale "$par_font_scale"} \
     ${par_dpi:+--dpi "$par_dpi"} \
     ${par_hide_stats:+--hide_stats} \
+    ${meta_cpus:+--threads "$meta_cpus"} \
     --outdir "$par_outdir"

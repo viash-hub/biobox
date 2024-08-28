@@ -58,21 +58,32 @@ done
 #########################################################################################
 
 ## Fasta file ##
-# Dowload test data from GitHub
-if [ ! -d nanotest ]; then
-  git clone --depth 1 --single-branch --branch master https://github.com/wdecoster/nanotest/
-fi
-mv nanotest/reads.fa.gz src/nanoplot/test_data/test.fasta.gz
+wget -O src/nanoplot/test_data/test.fasta https://raw.githubusercontent.com/merenlab/reads-for-assembly/master/examples/files/fasta_01.fa
 
 #########################################################################################
 
 ## Fastq_rich file ##
+if [ ! -d nanotest ]; then
+  git clone --depth 1 --single-branch --branch master https://github.com/wdecoster/nanotest/
+fi
+
 mv nanotest/reads-mixed-timestamp.fastq src/nanoplot/test_data/test_rich.fastq 
 
 #########################################################################################
 
 ## Fastq_minimal file ##
 mv nanotest/reads.fastq.gz src/nanoplot/test_data/test_minimal.fastq.gz
+
+# Unzip file
+gunzip -c src/nanoplot/test_data/test_minimal.fastq.gz > src/nanoplot/test_data/test_minimal.fastq
+
+# Extract the first 5 reads (first 20 lines)
+head -n 20 src/nanoplot/test_data/test_minimal.fastq > first_5_reads.fastq
+
+mv first_5_reads.fastq src/nanoplot/test_data/test_minimal.fastq
+
+# Zip the output file
+gzip -f src/nanoplot/test_data/test_minimal.fastq
 
 #########################################################################################
 
@@ -82,14 +93,11 @@ mv nanotest/sequencing_summary.txt src/nanoplot/test_data/test_summary.txt
 #########################################################################################
 
 ## Bam file ##
-mv nanotest/alignment_fasta.bam src/nanoplot/test_data/test.bam
-mv nanotest/alignment_fasta.bam.bai src/nanoplot/test_data/test.bam.bai
+if [ ! -d /tmp/snakemake-wrappers ]; then
+  git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
+fi
 
-#########################################################################################
-
-## Ubam file ##
-mv nanotest/alignment.bam src/nanoplot/test_data/test_ubam.bam
-mv nanotest/alignment.bam.bai src/nanoplot/test_data/test_ubam.bam.bai
+cp -r /tmp/snakemake-wrappers/bio/biobambam2/bamsormadup/test/mapped/a.bam src/nanoplot/test_data/test.bam
 
 #########################################################################################
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eo pipefail
 
 ## VIASH START
 meta_executable="$PWD/target/executable/nanoplot/nanoplot"
@@ -136,6 +136,7 @@ fi
 # Check if the output file starts with "biobox" prefix
 if ! ls output/biobox* > /dev/null 2>&1; then
     echo "The prefix is not added to the output files."
+    exit 1
 fi
 
 rm -f output/* # Clear output
