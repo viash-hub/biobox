@@ -35,48 +35,25 @@ trap clean_up EXIT
 
 # Create test data
 cat <<EOF > "$TMPDIR/example.vcf"
-##fileformat=VCFv4.0
-##fileDate=20090805
-##source=myImputationProgramV3.1
-##reference=1000GenomesPilot-NCBI36
-##contig=<ID=19,length=58617616>
-##contig=<ID=20,length=58617616>
-##phasing=partial
-##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of Samples With Data">
-##INFO=<ID=AN,Number=1,Type=Integer,Description="Total number of alleles in called genotypes">
-##INFO=<ID=AC,Number=.,Type=Integer,Description="Allele count in genotypes, for each ALT allele, in the same order as listed">
-##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
-##INFO=<ID=AF,Number=.,Type=Float,Description="Allele Frequency">
-##INFO=<ID=AA,Number=1,Type=String,Description="Ancestral Allele">
-##INFO=<ID=DB,Number=0,Type=Flag,Description="dbSNP membership, build 129">
-##INFO=<ID=H2,Number=0,Type=Flag,Description="HapMap2 membership">
-##FILTER=<ID=q10,Description="Quality below 10">
-##FILTER=<ID=s50,Description="Less than 50% of samples have data">
-##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
-##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">
-##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
-##FORMAT=<ID=HQ,Number=2,Type=Integer,Description="Haplotype Quality">
-##ALT=<ID=DEL:ME:ALU,Description="Deletion of ALU element">
-##ALT=<ID=CNV,Description="Copy number variable region">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA00001	NA00002	NA00003
-19	111	.	A	C	9.6	.	.	GT:HQ	0|0:10,10	0|0:10,10	0/1:3,3
-19	112	.	A	G	10	.	.	GT:HQ	0|0:10,10	0|0:10,10	0/1:3,3
-20	14370	rs6054257	G	A	29	PASS	NS=3;DP=14;AF=0.5;DB;H2	GT:GQ:DP:HQ	0|0:48:1:51,51	1|0:48:8:51,51	1/1:43:5:.,.
-20	17330	.	T	A	3	q10	NS=3;DP=11;AF=0.017	GT:GQ:DP:HQ	0|0:49:3:58,50	0|1:3:5:65,3	0/0:41:3:.,.
-20	1110696	rs6040355	A	G,T	67	PASS	NS=2;DP=10;AF=0.333,0.667;AA=T;DB	GT:GQ:DP:HQ	1|2:21:6:23,27	2|1:2:0:18,2	2/2:35:4:.,.
-20	1230237	.	T	.	47	PASS	NS=3;DP=13;AA=T	GT:GQ:DP:HQ	0|0:54:.:56,60	0|0:48:4:51,51	0/0:61:2:.,.
-20	1234567	microsat1	G	GA,GAC	50	PASS	NS=3;DP=9;AA=G;AN=6;AC=3,1	GT:GQ:DP	0/1:.:4	0/2:17:2	1/1:40:3
-20	1235237	.	T	.	.	.	.	GT	0/0	0|0	./.
+##fileformat=VCFv4.1
+##contig=<ID=1,length=249250621,assembly=b37>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
+1	752567	.	A	C	.	.	.	.	.
+1	752722	.	G	A	.	.	.	.	.
 EOF
 
-cat <<EOF > "$TMPDIR/example.bed"
-# Sample annotation file with columns CHROM, POS, STRING_TAG, NUMERIC_TAG
-19	752566
-20	798959
+cat <<EOF > "$TMPDIR/annots.tsv"
+1	752567	752567	FooValue1	12345
+1	752722	752722	FooValue2	67890
 EOF
 
-bgzip -c $TMPDIR/example.bed > $TMPDIR/example.bed
-tabix -p vcf $TMPDIR/example.bed
+bgzip $TMPDIR/annots.tsv
+tabix -s1 -b2 -e3 $TMPDIR/annots.tsv.gz
+
+cat <<EOF > "$TMPDIR/header.hdr"
+##FORMAT=<ID=FOO,Number=1,Type=String,Description="Some description">
+##INFO=<ID=BAR,Number=1,Type=Integer,Description="Some description">
+EOF
 
 # Test 1: Remove annotations
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
@@ -85,7 +62,7 @@ echo "> Run bcftools_annotate remove annotations"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
-  --remove "ID,INFO/DP,FORMAT/DP"
+  --remove "ID"
 
 # checks
 assert_file_exists "annotated.vcf"
@@ -102,8 +79,9 @@ echo "> Run bcftools_annotate with -a and -c"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
-  --annotations "../example.bed" \
-  --columns "ID,QUAL"
+  --annotations "../annots.tsv.gz" \
+  --header_lines "../header.hdr" \
+  --columns "CHROM,FROM,TO,FMT/FOO,BAR"
 
 
 # checks
@@ -114,28 +92,25 @@ echo "- test2 succeeded -"
 
 popd > /dev/null
 
-exit 0
+# # Test 3: 
+# mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
 
-# Test 3: 
-mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
+# echo "> Run bcftools_annotate with multiple options"
+# "$meta_executable" \
+#   --input "../example.vcf" \
+#   --output "filtered.vcf" \
+#   --remove "ID,INFO/DP,FORMAT/DP" \
+#   --rename_annotations "ID=ID2,INFO/DP=INFO/Depth,FORMAT/DP=FORMAT/Depth" \
+#   --include "FILTER=q10" \
+#   --exclude "INFO/AF<0.5"
 
-echo "> Run bcftools_annotate with multiple options"
-"$meta_executable" \
-  --input "../example.vcf" \
-  --output "filtered.vcf" \
-  --remove "ID,INFO/DP,FORMAT/DP" \
-  --rename_annotations "ID=ID2,INFO/DP=INFO/Depth,FORMAT/DP=FORMAT/Depth" \
-  --include "FILTER=q10" \
-  --exclude "INFO/AF<0.5"
+# # checks
+# assert_file_exists "filtered.vcf"
+# assert_file_not_empty "filtered.vcf"
+# #assert_file_contains "filtered.vcf" ""
+# echo "- test3 succeeded -"
 
-# checks
-assert_file_exists "filtered.vcf"
-assert_file_not_empty "filtered.vcf"
-#assert_file_contains "filtered.vcf" ""
-echo "- test3 succeeded -"
-
-popd > /dev/null
-
+# popd > /dev/null
 
 
 
