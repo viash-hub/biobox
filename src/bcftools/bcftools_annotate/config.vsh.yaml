@@ -37,154 +37,205 @@ argument_groups:
         required: true
          
   - name: Options
+    dexcription: | 
+      For examples on how to use use bcftools annotate see http://samtools.github.io/bcftools/howtos/annotate.html
     arguments:
       
-      # - name: --allele_frequency_bins
-      #   alternatives: --af_bins
-      #   type: string
-      #   description: | 
-      #     Allele frequency bins, a list (0.1,0.5,1) or a file (0.1\n0.5\n1).
+      - name: --annotations
+        alternatives: --a
+        type: file
+        description: | 
+          .
 
-      # - name: --allele_frequency_tag
-      #   alternatives: --af_tag
-      #   type: string
-      #   description: | 
-      #     Allele frequency tag to use, by default estimated from AN,AC or GT.
+      - name: --columns
+        alternatives: --c
+        type: string
+        description: | 
+          .
 
-      # - name: --first_allele_only
-      #   alternatives: --first_only
-      #   type: boolean_true
-      #   description: | 
-      #     Include only 1st allele at multiallelic sites
+      - name: --columns_file
+        alternatives: --C
+        type: file
+        description: | 
+          Read the list of columns from a file (normally given via the -c, --columns option). 
+          "-" to skip a column of the annotation file. One column name per row, 
+          an additional space- or tab-separated field can be present to indicate the merge logic 
+          (normally given via the -l, --merge-logic option). This is useful when many annotations are 
+          added at once.
 
-      # - name: --collapse
-      #   alternatives: --c
-      #   type: string
-      #   choices: [ snps, indels, both, all, some, none ]
-      #   description: | 
-      #     Treat as identical records with <snps|indels|both|all|some|none>.
-      #     See https://samtools.github.io/bcftools/bcftools.html#common_options for details.
+      - name: --exclude
+        alternatives: --e
+        type: string
+        description: | 
+          Exclude sites for which the expression is true.
+          See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
 
-      # - name: --depth
-      #   alternatives: --d
-      #   type: string
-      #   description: | 
-      #     Depth distribution: min,max,bin size [0,500,1]
-      #   example: 0,500,1
+      - name: --force
+        type: boolean_true
+        description: | 
+          continue even when parsing errors, such as undefined tags, are encountered. 
+          Note this can be an unsafe operation and can result in corrupted BCF files. 
+          If this option is used, make sure to sanity check the result thoroughly.
 
-      # - name: --exclude
-      #   alternatives: --e
-      #   type: string
-      #   description: | 
-      #     Exclude sites for which the expression is true.
-      #     See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
+      - name: --header_lines
+        alternatives: --h
+        type: file
+        description: | 
+          Lines to append to the VCF header, see also -c, --columns and -a, --annotations. 
+          For example:
+            ##INFO=<ID=NUMERIC_TAG,Number=1,Type=Integer,Description="Example header line">
+            ##INFO=<ID=STRING_TAG,Number=1,Type=String,Description="Yet another header line">
 
-      # - name: --exons
-      #   alternatives: --E
-      #   type: file
-      #   description: | 
-      #     tab-delimited file with exons for indel frameshifts statistics. 
-      #     The columns of the file are CHR, FROM, TO, with 1-based, inclusive, positions. 
-      #     The file is BGZF-compressed and indexed with tabix
-      #     e.g. 
-      #       tabix -s1 -b2 -e3 file.gz
+      - name: --set_id
+        alternatives: --I
+        type: string
+        description: | 
+          Assign ID on the fly. The format is the same as in the query command (see below). 
+          By default all existing IDs are replaced. If the format string is preceded by "+", 
+          only missing IDs will be set. 
+          For example, one can use:
+            bcftools annotate --set-id +'%CHROM\_%POS\_%REF\_%FIRST_ALT' file.vcf
 
-      # - name: --apply_filters
-      #   alternatives: --f
-      #   type: string
-      #   description: | 
-      #     Require at least one of the listed FILTER strings (e.g. "PASS,.")
-
-      # - name: --fasta_reference
-      #   alternatives: --F
-      #   type: file
-      #   description: | 
-      #     Faidx indexed reference sequence file to determine INDEL context
-
-      # - name: --include
-      #   alternatives: --i
-      #   type: string
-      #   description: | 
-      #     Select sites for which the expression is true.
-      #     See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
+      - name: --include
+        alternatives: --i
+        type: string
+        description: | 
+          Select sites for which the expression is true.
+          See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
       
-      # - name: --split_by_ID
-      #   alternatives: --I
-      #   type: boolean_true
-      #   description: | 
-      #     Collect stats for sites with ID separately (known vs novel)
+      - name: --keep_sites
+        alternatives: --k
+        type: boolean_true
+        description: | 
+          Collect stats for sites with ID separately (known vs novel)
 
-      # - name: --regions
-      #   alternatives: --r
-      #   type: string
-      #   description: | 
-      #     Restrict to comma-separated list of regions
+      - name: --merge_logic
+        alternatives: --l
+        type: string
+        #choices: []
+        description: | 
+          .
 
-      # - name: --regions_file
-      #   alternatives: --R
-      #   type: file
-      #   description: | 
-      #     Restrict to regions listed in a file.
+      - name: --mark_sites
+        alternatives: --m
+        type: string
+        description: | 
+          Annotate sites which are present ("+") or absent ("-") in the -a file with a new INFO/TAG flag.
 
-      # - name: --regions_overlap
-      #   type: string
-      #   choices: ['pos', 'record', 'variant', '0', '1', '2']
-      #   description: | 
-      #     This option controls how overlapping records are determined: 
-      #     set to 'pos' or '0' if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
-      #     set to 'record' or '1' if also overlapping records with POS outside a region should be included (this is the default behavior of -r/-R, 
-      #     and includes indels with POS at the end of a region, which are technically outside the region); 
-      #     or set to 'variant' or '2' to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
+      - name: --min_overlap
+        type: string
+        description: | 
+          minimum overlap required as a fraction of the variant in the annotation -a file (ANN), 
+          in the target VCF file (:VCF), or both for reciprocal overlap (ANN:VCF). 
+          By default overlaps of arbitrary length are sufficient. 
+          The option can be used only with the tab-delimited annotation -a file and with BEG and END columns present.
 
-      # - name: --samples
-      #   alternatives: --s
-      #   type: string
-      #   description: | 
-      #     List of samples for sample stats, "-" to include all samples.
+      - name: --no_version
+        type: boolean_true
+        description: | 
+          Do not append version and command line information to the output VCF header..
 
-      # - name: --samples_file
-      #   alternatives: --S
-      #   type: file
-      #   description: | 
-      #     File of samples to include.
+      - name: --samples_file
+        alternatives: --S
+        type: file
+        description: | 
+          File of samples to include.
 
-      # - name: --targets
-      #   alternatives: --t
-      #   type: string
-      #   description: | 
-      #     Similar as -r, --regions, but the next position is accessed by streaming the whole VCF/BCF 
-      #     rather than using the tbi/csi index. Both -r and -t options can be applied simultaneously: -r uses the 
-      #     index to jump to a region and -t discards positions which are not in the targets. Unlike -r, targets 
-      #     can be prefixed with "^" to request logical complement. For example, "^X,Y,MT" indicates that 
-      #     sequences X, Y and MT should be skipped. Yet another difference between the -t/-T and -r/-R is 
-      #     that -r/-R checks for proper overlaps and considers both POS and the end position of an indel, 
-      #     while -t/-T considers the POS coordinate only (by default; see also --regions-overlap and --targets-overlap). 
-      #     Note that -t cannot be used in combination with -T.
+      - name: --output_type
+        alternatives: --O
+        type: string
+        choices: ['u', 'z', 'b', 'v']
+        description: | 
+          Output compressed BCF (b), uncompressed BCF (u), compressed VCF (z), uncompressed VCF (v).
       
-      # - name: --targets_file
-      #   alternatives: --T
-      #   type: file
-      #   description: | 
-      #     Similar to -R but streams rather than index-jumps.
+      - name: --pair_logic
+        type: string
+        choices: ['snps', 'indels', 'both', 'all', 'some', 'exact']
+        description: | 
+          Controls how to match records from the annotation file to the target VCF. 
+          Effective only when -a is a VCF or BCF. 
+          The option replaces the former uninuitive --collapse. See Common Options for more.
 
-      # - name: --targets_overlaps
-      #   type: string
-      #   choices: ['pos', 'record', 'variant', '0', '1', '2']
-      #   description: | 
-      #     Include if POS in the region (0), record overlaps (1), variant overlaps (2).
+      - name: --regions
+        alternatives: --r
+        type: string
+        description: | 
+          Comma-separated list of regions, see also --regions_file. 
+          Overlapping records are matched even when the starting coordinate is outside of the region, 
+          unlike the -t/-T options where only the POS coordinate is checked. 
+          Note that -r cannot be used in combination with --regions_file.
 
-      # - name: --user_tstv
-      #   alternatives: --u
-      #   type: string
-      #   description: | 
-      #     Collect Ts/Tv stats for any tag using the given binning [0:1:100].
-      #     A subfield can be selected as e.g. 'PV4[0]', here the first value of the PV4 tag.
+      - name: --regions_file
+        alternatives: --R
+        type: string
+        description: | 
+          See https://samtools.github.io/bcftools/bcftools.html#common_options.
+
+      - name: --regions_overlap
+        type: string
+        choices: ['pos', 'record', 'variant', 1', '2', '3']
+        description: | 
+          This option controls how overlapping records are determined: 
+          set to pos or 0 if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
+          set to record or 1 if also overlapping records with POS outside a region should be included (this is the default behavior of -r/-R, 
+          and includes indels with POS at the end of a region, which are technically outside the region); 
+          or set to variant or 2 to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
       
-      # - name: --verbose 
-      #   alternatives: --v
-      #   type: boolean_true
-      #   description: | 
-      #     Produce verbose per-site and per-sample output.
+      - name: --rename_annotations 
+        type: file
+        description: | 
+          rename annotations according to the map in file, with "old_name new_name\n" pairs separated by whitespaces, 
+          each on a separate line. The old name must be prefixed with the annotation type: INFO, FORMAT, or FILTER.
+
+      - name: --rename_chromosomes
+        type: file
+        description: | 
+          Rename chromosomes according to the map in file, with "old_name new_name\n" pairs 
+          separated by whitespaces, each on a separate line.
+
+      - name: --samples
+        type: string
+        description: | 
+          Subset of samples to annotate.
+          See also https://samtools.github.io/bcftools/bcftools.html#common_options.
+
+      - name: --samples_file
+        type: file
+        description: | 
+          Subset of samples to annotate in file format.
+          See also https://samtools.github.io/bcftools/bcftools.html#common_options.
+
+      - name: --single_overlaps
+        type: boolean_true
+        description: | 
+          Use this option to keep memory requirements low with very large annotation files. 
+          Note, however, that this comes at a cost, only single overlapping intervals are considered in this mode. 
+          This was the default mode until the commit af6f0c9 (Feb 24 2019).
+
+      - name: --threads
+        type: integer
+        description: | 
+          See https://samtools.github.io/bcftools/bcftools.html#common_options.
+
+      - name: --remove
+        alternatives: --x
+        type: string
+        description: | 
+          List of annotations to remove. 
+          Use "FILTER" to remove all filters or "FILTER/SomeFilter" to remove a specific filter. 
+          Similarly, "INFO" can be used to remove all INFO tags and "FORMAT" to remove all FORMAT tags except GT. 
+          To remove all INFO tags except "FOO" and "BAR", use "^INFO/FOO,INFO/BAR" (and similarly for FORMAT and FILTER). 
+          "INFO" can be abbreviated to "INF" and "FORMAT" to "FMT".
+
+      - name: --write_index
+        alternatives: --W
+        type: string
+        description: | 
+          Automatically index the output file. 
+          FMT is optional and can be one of "tbi" or "csi" depending on output file format.
+
+
+
 
 resources:
   - type: bash_script
