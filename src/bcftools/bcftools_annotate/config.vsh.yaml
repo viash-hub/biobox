@@ -33,45 +33,33 @@ argument_groups:
         alternatives: -o
         direction: output
         type: file
-        description: Output file.
+        description: Output annotated file.
         required: true
          
   - name: Options
     dexcription: | 
-      For examples on how to use use bcftools annotate see http://samtools.github.io/bcftools/howtos/annotate.html
+      For examples on how to use use bcftools annotate see http://samtools.github.io/bcftools/howtos/annotate.html.
+      For more details on the options see https://samtools.github.io/bcftools/bcftools.html#annotate.
     arguments:
       
       - name: --annotations
         alternatives: --a
         type: file
         description: | 
-          Bgzip-compressed and tabix-indexed file with annotations. 
-          The file can be VCF, BED, or a tab-delimited file with mandatory columns CHROM, POS (or, alternatively, FROM and TO), 
-          optional columns REF and ALT, and arbitrary number of annotation columns. 
-          BED files are expected to have the ".bed" or ".bed.gz" suffix (case-insensitive), 
-          otherwise a tab-delimited file is assumed. Note that in case of tab-delimited file, 
-          the coordinates POS, FROM and TO are one-based and inclusive. When REF and ALT are present, 
-          only matching VCF records will be annotated. If the END coordinate is present in the annotation 
-          file and given on command line as "-c ~INFO/END", then VCF records will be matched also by the 
-          INFO/END coordinate. If ID is present in the annotation file and given as "-c ~ID", then VCF 
-          records will be matched also by the ID column.  
+          VCF file or tabix-indexed FILE with annotations: CHR\tPOS[\tVALUE]+ . 
 
       - name: --columns
         alternatives: --c
         type: string
         description: | 
-          Comma-separated list of columns or tags to carry over from the annotation file (see also -a, --annotations).
-          See https://samtools.github.io/bcftools/bcftools.html#annotate for more details.
+          List of columns in the annotation file, e.g. CHROM,POS,REF,ALT,-,INFO/TAG. 
+          See man page for details.
 
       - name: --columns_file
         alternatives: --C
         type: file
         description: | 
-          Read the list of columns from a file (normally given via the -c, --columns option). 
-          "-" to skip a column of the annotation file. One column name per row, 
-          an additional space- or tab-separated field can be present to indicate the merge logic 
-          (normally given via the -l, --merge-logic option). This is useful when many annotations are 
-          added at once.
+          Read -c columns from FILE, one name per row, with optional --merge_logic TYPE: NAME[ TYPE].
 
       - name: --exclude
         alternatives: --e
@@ -87,11 +75,17 @@ argument_groups:
           Note this can be an unsafe operation and can result in corrupted BCF files. 
           If this option is used, make sure to sanity check the result thoroughly.
 
+      - name: --header_line
+        alternatives: --H
+        type: string
+        description: | 
+          Header line which should be appended to the VCF header, can be given multiple times.
+
       - name: --header_lines
         alternatives: --h
         type: file
         description: | 
-          Lines to append to the VCF header, see also -c, --columns and -a, --annotations. 
+          File with header lines to append to the VCF header.
           For example:
             ##INFO=<ID=NUMERIC_TAG,Number=1,Type=Integer,Description="Example header line">
             ##INFO=<ID=STRING_TAG,Number=1,Type=String,Description="Yet another header line">
@@ -100,11 +94,7 @@ argument_groups:
         alternatives: --I
         type: string
         description: | 
-          Assign ID on the fly. The format is the same as in the query command (see below). 
-          By default all existing IDs are replaced. If the format string is preceded by "+", 
-          only missing IDs will be set. 
-          For example, one can use:
-            bcftools annotate --set-id +'%CHROM\_%POS\_%REF\_%FIRST_ALT' file.vcf
+          Set ID column using a `bcftools query`-like expression, see man page for details.
 
       - name: --include
         alternatives: --i
@@ -117,7 +107,7 @@ argument_groups:
         alternatives: --k
         type: boolean_true
         description: | 
-          Collect stats for sites with ID separately (known vs novel).
+          Leave --include/--exclude sites unchanged instead of discarding them.
 
       - name: --merge_logic
         alternatives: --l
@@ -170,16 +160,15 @@ argument_groups:
         alternatives: --r
         type: string
         description: | 
-          Comma-separated list of regions, see also --regions_file. 
-          Overlapping records are matched even when the starting coordinate is outside of the region, 
-          unlike the -t/-T options where only the POS coordinate is checked. 
-          Note that -r cannot be used in combination with --regions_file.
+          Restrict to comma-separated list of regions.
+          See man page for details.
 
       - name: --regions_file
         alternatives: --R
         type: string
         description: | 
-          See https://samtools.github.io/bcftools/bcftools.html#common_options.
+          Restrict to regions listed in a file.
+          See man page for details.
 
       - name: --regions_overlap
         type: string
@@ -225,6 +214,7 @@ argument_groups:
       - name: --threads
         type: integer
         description: | 
+          Number of extra output compression threads.
           See https://samtools.github.io/bcftools/bcftools.html#common_options.
 
       - name: --remove
@@ -236,16 +226,6 @@ argument_groups:
           Similarly, "INFO" can be used to remove all INFO tags and "FORMAT" to remove all FORMAT tags except GT. 
           To remove all INFO tags except "FOO" and "BAR", use "^INFO/FOO,INFO/BAR" (and similarly for FORMAT and FILTER). 
           "INFO" can be abbreviated to "INF" and "FORMAT" to "FMT".
-
-      - name: --write_index
-        alternatives: --W
-        type: string
-        description: | 
-          Automatically index the output file. 
-          FMT is optional and can be one of "tbi" or "csi" depending on output file format.
-
-
-
 
 resources:
   - type: bash_script

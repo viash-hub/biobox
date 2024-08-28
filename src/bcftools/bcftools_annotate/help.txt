@@ -1,0 +1,41 @@
+```
+bcftools annotate -h
+```
+
+annotate: option requires an argument -- 'h'
+
+About:   Annotate and edit VCF/BCF files.
+Usage:   bcftools annotate [options] VCF
+
+Options:
+   -a, --annotations FILE          VCF file or tabix-indexed FILE with annotations: CHR\tPOS[\tVALUE]+
+   -c, --columns LIST              List of columns in the annotation file, e.g. CHROM,POS,REF,ALT,-,INFO/TAG. See man page for details
+   -C, --columns-file FILE         Read -c columns from FILE, one name per row, with optional --merge-logic TYPE: NAME[ TYPE]
+   -e, --exclude EXPR              Exclude sites for which the expression is true (see man page for details)
+       --force                     Continue despite parsing error (at your own risk!)
+   -H, --header-line STR           Header line which should be appended to the VCF header, can be given multiple times
+   -h, --header-lines FILE         Lines which should be appended to the VCF header
+   -I, --set-id [+]FORMAT          Set ID column using a `bcftools query`-like expression, see man page for details
+   -i, --include EXPR              Select sites for which the expression is true (see man page for details)
+   -k, --keep-sites                Leave -i/-e sites unchanged instead of discarding them
+   -l, --merge-logic TAG:TYPE      Merge logic for multiple overlapping regions (see man page for details), EXPERIMENTAL
+   -m, --mark-sites [+-]TAG        Add INFO/TAG flag to sites which are ("+") or are not ("-") listed in the -a file
+       --min-overlap ANN:VCF       Required overlap as a fraction of variant in the -a file (ANN), the VCF (:VCF), or reciprocal (ANN:VCF)
+       --no-version                Do not append version and command line to the header
+   -o, --output FILE               Write output to a file [standard output]
+   -O, --output-type u|b|v|z[0-9]  u/b: un/compressed BCF, v/z: un/compressed VCF, 0-9: compression level [v]
+       --pair-logic STR            Matching records by <snps|indels|both|all|some|exact>, see man page for details [some]
+   -r, --regions REGION            Restrict to comma-separated list of regions
+   -R, --regions-file FILE         Restrict to regions listed in FILE
+       --regions-overlap 0|1|2     Include if POS in the region (0), record overlaps (1), variant overlaps (2) [1]
+       --rename-annots FILE        Rename annotations: TYPE/old\tnew, where TYPE is one of FILTER,INFO,FORMAT
+       --rename-chrs FILE          Rename sequences according to the mapping: old\tnew
+   -s, --samples [^]LIST           Comma separated list of samples to annotate (or exclude with "^" prefix)
+   -S, --samples-file [^]FILE      File of samples to annotate (or exclude with "^" prefix)
+       --single-overlaps           Keep memory low by avoiding complexities arising from handling multiple overlapping intervals
+   -x, --remove LIST               List of annotations (e.g. ID,INFO/DP,FORMAT/DP,FILTER) to remove (or keep with "^" prefix). See man page for details
+       --threads INT               Number of extra output compression threads [0]
+
+Examples:
+   http://samtools.github.io/bcftools/howtos/annotate.html
+
