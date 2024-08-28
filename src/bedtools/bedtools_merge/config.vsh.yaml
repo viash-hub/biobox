@@ -31,6 +31,7 @@ argument_groups:
         type: file
         direction: output
         description: Output merged file BED to be written.
+        required: true
 
   - name: Options
     arguments:
@@ -64,7 +65,7 @@ argument_groups:
 
       - name: --columns
         alternatives: -c
-        type: string
+        type: integer
         description: | 
           Specify columns from the B file to map onto intervals in A.
           Default: 5.
@@ -134,13 +135,6 @@ argument_groups:
           noticeably slower, but can be useful in conjunction with
           other software tools and scripts that need to process one
           line of bedtools output at a time.
-
-      # - name: --io_buffer
-      #   type: boolean_true
-      #   description: | 
-      #     Specify amount of memory to use for input buffer.
-      #     Takes an integer argument. Optional suffixes K/M/G supported.
-      #     Note: currently has no effect with compressed files.
 
 resources:
   - type: bash_script
