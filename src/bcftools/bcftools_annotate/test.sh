@@ -93,7 +93,8 @@ echo "> Run bcftools_annotate with -a, -c and -h options"
   --output "annotated.vcf" \
   --annotations "../annots.tsv.gz" \
   --header_lines "../header.hdr" \
-  --columns "CHROM,FROM,TO,FMT/FOO,BAR"
+  --columns "CHROM,FROM,TO,FMT/FOO,BAR" \
+  --mark_sites "BAR" \
 
 # checks
 assert_file_exists "annotated.vcf"
@@ -252,10 +253,6 @@ echo "> Run bcftools_annotate with --regions-overlap option"
   --output "annotated.vcf" \
   --regions_overlap "1"
 
-echo
-cat "annotated.vcf"
-echo
-
 # checks
 assert_file_exists "annotated.vcf"
 assert_file_not_empty "annotated.vcf"
@@ -264,10 +261,41 @@ echo "- test11 succeeded -"
 
 popd > /dev/null
 
+# Test 12: include 
+mkdir "$TMPDIR/test12" && pushd "$TMPDIR/test12" > /dev/null
+
+echo "> Run bcftools_annotate with -i option"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "annotated.vcf" \
+  --include "FILTER='PASS'" \
+
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+assert_file_contains "annotated.vcf" "annotate -i FILTER='PASS' -o annotated.vcf ../example.vcf"
+echo "- test12 succeeded -"
+
+popd > /dev/null
+
+# Test 13: exclude
+mkdir "$TMPDIR/test13" && pushd "$TMPDIR/test13" > /dev/null
+
+echo "> Run bcftools_annotate with -e option"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "annotated.vcf" \
+  --exclude "FILTER='PASS'" \
+
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+assert_file_contains "annotated.vcf" "annotate -e FILTER='PASS' -o annotated.vcf ../example.vcf"
+echo "- test13 succeeded -"
+
+popd > /dev/null
+
+
 echo "---- All tests succeeded! ----"
 exit 0
 
-
-# echo
-# cat "annotated.vcf"
-# echo
