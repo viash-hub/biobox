@@ -45,13 +45,23 @@ argument_groups:
         alternatives: --a
         type: file
         description: | 
-          .
+          Bgzip-compressed and tabix-indexed file with annotations. 
+          The file can be VCF, BED, or a tab-delimited file with mandatory columns CHROM, POS (or, alternatively, FROM and TO), 
+          optional columns REF and ALT, and arbitrary number of annotation columns. 
+          BED files are expected to have the ".bed" or ".bed.gz" suffix (case-insensitive), 
+          otherwise a tab-delimited file is assumed. Note that in case of tab-delimited file, 
+          the coordinates POS, FROM and TO are one-based and inclusive. When REF and ALT are present, 
+          only matching VCF records will be annotated. If the END coordinate is present in the annotation 
+          file and given on command line as "-c ~INFO/END", then VCF records will be matched also by the 
+          INFO/END coordinate. If ID is present in the annotation file and given as "-c ~ID", then VCF 
+          records will be matched also by the ID column.  
 
       - name: --columns
         alternatives: --c
         type: string
         description: | 
-          .
+          Comma-separated list of columns or tags to carry over from the annotation file (see also -a, --annotations).
+          See https://samtools.github.io/bcftools/bcftools.html#annotate for more details.
 
       - name: --columns_file
         alternatives: --C
@@ -107,14 +117,14 @@ argument_groups:
         alternatives: --k
         type: boolean_true
         description: | 
-          Collect stats for sites with ID separately (known vs novel)
+          Collect stats for sites with ID separately (known vs novel).
 
       - name: --merge_logic
         alternatives: --l
         type: string
-        #choices: []
         description: | 
-          .
+          When multiple regions overlap a single record, this option defines how to treat multiple annotation values.
+          See https://samtools.github.io/bcftools/bcftools.html#annotate for more details.
 
       - name: --mark_sites
         alternatives: --m
