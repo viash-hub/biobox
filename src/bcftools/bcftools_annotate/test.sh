@@ -69,7 +69,16 @@ cat <<EOF > "$TMPDIR/example.vcf"
 20	1235237	.	T	.	.	.	.	GT	0/0	0|0	./.
 EOF
 
-# Test 1: Default Use
+cat <<EOF > "$TMPDIR/example.bed"
+# Sample annotation file with columns CHROM, POS, STRING_TAG, NUMERIC_TAG
+19	752566
+20	798959
+EOF
+
+bgzip -c $TMPDIR/example.bed > $TMPDIR/example.bed
+tabix -p vcf $TMPDIR/example.bed
+
+# Test 1: Remove annotations
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
 
 echo "> Run bcftools_annotate remove annotations"
@@ -86,20 +95,47 @@ echo "- test1 succeeded -"
 
 popd > /dev/null
 
-# # Test 2: Rename annotations
-# mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
+# Test 2: # Add ID, QUAL and INFO/TAG, not replacing TAG if already present
+mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
 
-# echo "> Run bcftools_annotate rename annotations"
-# "$meta_executable" \
-#   --input "../example.vcf" \
-#   --output "stats.txt" \
-#   --rename_annotations "ID=ID2,INFO/DP=INFO/Depth,FORMAT/DP=FORMAT/Depth"
+echo "> Run bcftools_annotate with -a and -c"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "annotated.vcf" \
+  --annotations "../example.bed" \
+  --columns "ID,QUAL"
 
-# # checks
-# assert_file_exists "stats.txt"
-# assert_file_not_empty "stats.txt"
-# #assert_file_contains "stats.txt" "bcftools stats  ../example.vcf"
-# echo "- test2 succeeded -"
+
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+#assert_file_contains "annotated.vcf" "bcftools stats  ../example.vcf"
+echo "- test2 succeeded -"
+
+popd > /dev/null
+
+exit 0
+
+# Test 3: 
+mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
+
+echo "> Run bcftools_annotate with multiple options"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "filtered.vcf" \
+  --remove "ID,INFO/DP,FORMAT/DP" \
+  --rename_annotations "ID=ID2,INFO/DP=INFO/Depth,FORMAT/DP=FORMAT/Depth" \
+  --include "FILTER=q10" \
+  --exclude "INFO/AF<0.5"
+
+# checks
+assert_file_exists "filtered.vcf"
+assert_file_not_empty "filtered.vcf"
+#assert_file_contains "filtered.vcf" ""
+echo "- test3 succeeded -"
+
+popd > /dev/null
+
 
 
 
