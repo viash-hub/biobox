@@ -8,7 +8,10 @@ set -eo pipefail
 
 # Unset parameters
 unset_if_false=(
-
+    par_force
+    par_keep_sites
+    par_no_version
+    par_single_overlaps
 )
 
 for par in ${unset_if_false[@]}; do
@@ -16,31 +19,34 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
-# Create input array 
-IFS=";" read -ra input <<< $par_input
-
 # Execute bcftools annotate with the provided arguments
 bcftools annotate \
-    ${par_first_allele_only:+--1st-allele-only} \
-    ${par_split_by_ID:+--split-by-ID} \
-    ${par_verbose:+--verbose} \
-    ${par_allele_frequency_bins:+--af-bins "${par_allele_frequency_bins}"} \
-    ${par_allele_frequency_tag:+--af-tag "${par_allele_frequency_tag}"} \
-    ${par_collapse:+-c "${par_collapse}"} \
-    ${par_depth:+-d "${par_depth}"} \
-    ${par_exclude:+-e "${par_exclude}"} \
-    ${par_exons:+-E "${par_exons}"} \
-    ${par_apply_filters:+-f "${par_apply_filters}"} \
-    ${par_fasta_reference:+-F "${par_fasta_reference}"} \
-    ${par_include:+-i "${par_include}"} \
-    ${par_regions:+-r "${par_regions}"} \
-    ${par_regions_file:+-R "${par_regions_file}"} \
-    ${par_regions_overlap:+--regions-overlap "${par_regions_overlap}"} \
-    ${par_samples:+-s "${par_samples}"} \
-    ${par_samples_file:+-S "${par_samples_file}"} \
-    ${par_targets:+-t "${par_targets}"} \
-    ${par_targets_file:+-T "${par_targets_file}"} \
-    ${par_targets_overlaps:+--targets-overlap "${par_targets_overlaps}"} \
-    ${par_user_tstv:+-u "${par_user_tstv}"} \
-    "${input[@]}" \
-    > $par_output
+    ${par_annotations:+-a "$par_annotations"} \
+    ${par_columns:+-c "$par_columns"} \
+    ${par_columns_file:+-C "$par_columns_file"} \
+    ${par_exclude:+-e "$par_exclude"} \
+    ${par_force:+--force} \
+    ${par_header_line:+-H "$par_header_line"} \
+    ${par_header_lines:+-h "$par_header_lines"} \
+    ${par_set_id:+-I "$par_set_id"} \
+    ${par_include:+-i "$par_include"} \
+    ${par_keep_sites:+-k} \
+    ${par_merge_logic:+-l "$par_merge_logic"} \
+    ${par_mark_sites:+-m "$par_mark_sites"} \
+    ${par_min_overlap:+--min-overlap "$par_min_overlap"} \
+    ${par_no_version:+--no-version} \
+    ${par_samples_file:+-S "$par_samples_file"} \
+    ${par_output_type:+-O "$par_output_type"} \
+    ${par_pair_logic:+--pair-logic "$par_pair_logic"} \
+    ${par_regions:+-r "$par_regions"} \
+    ${par_regions_file:+-R "$par_regions_file"} \
+    ${par_regions_overlap:+--regions-overlap "$par_regions_overlap"} \
+    ${par_rename_annotations:+--rename-annotations "$par_rename_annotations"} \
+    ${par_rename_chromosomes:+--rename-chromosomes "$par_rename_chromosomes"} \
+    ${par_samples:+-s "$par_samples"} \
+    ${par_single_overlaps:+--single-overlaps} \
+    ${par_threads:+--threads "$par_threads"} \
+    ${par_remove:+-x "$par_remove"} \
+    -o $par_output \
+    $par_input
+    
