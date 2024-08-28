@@ -37,7 +37,7 @@ argument_groups:
         required: true
          
   - name: Options
-    dexcription: | 
+    description: | 
       For examples on how to use use bcftools annotate see http://samtools.github.io/bcftools/howtos/annotate.html.
       For more details on the options see https://samtools.github.io/bcftools/bcftools.html#annotate.
     arguments:
@@ -134,12 +134,6 @@ argument_groups:
         type: boolean_true
         description: | 
           Do not append version and command line information to the output VCF header..
-
-      - name: --samples_file
-        alternatives: --S
-        type: file
-        description: | 
-          File of samples to include.
 
       - name: --output_type
         alternatives: --O
