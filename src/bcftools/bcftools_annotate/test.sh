@@ -47,12 +47,21 @@ cat <<EOF > "$TMPDIR/annots.tsv"
 1	752722	752722	FooValue2	67890
 EOF
 
+cat <<EOF > "$TMPDIR/rename.tsv"
+INFO/.	Luigi
+EOF
+
 bgzip $TMPDIR/annots.tsv
 tabix -s1 -b2 -e3 $TMPDIR/annots.tsv.gz
 
 cat <<EOF > "$TMPDIR/header.hdr"
 ##FORMAT=<ID=FOO,Number=1,Type=String,Description="Some description">
 ##INFO=<ID=BAR,Number=1,Type=Integer,Description="Some description">
+EOF
+
+cat <<EOF > "$TMPDIR/rename_chrm.tsv"
+1	chr1
+2	chr2
 EOF
 
 # Test 1: Remove ID annotations
@@ -62,7 +71,7 @@ echo "> Run bcftools_annotate remove annotations"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
-  --remove "ID"
+  --remove "ID" \
 
 # checks
 assert_file_exists "annotated.vcf"
@@ -108,10 +117,59 @@ echo "- test3 succeeded -"
 
 popd > /dev/null
 
-# echo
-# cat "annotated.vcf"
-# echo
-# exit 0
+# Test 4:
+mkdir "$TMPDIR/test4" && pushd "$TMPDIR/test4" > /dev/null
+
+echo "> Run bcftools_annotate with --rename-annotations option"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "annotated.vcf" \
+  --rename_annotations "../rename.tsv"
+
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+assert_file_contains "annotated.vcf" "##bcftools_annotateCommand=annotate --rename-annots ../rename.tsv -o annotated.vcf"
+echo "- test4 succeeded -"
+
+popd > /dev/null
+
+# Test 5: Rename chromosomes
+mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
+
+echo "> Run bcftools_annotate with --rename-chromosomes option"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "annotated.vcf" \
+  --rename_chromosomes "../rename_chrm.tsv"
+
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+assert_file_contains "annotated.vcf" "chr1"
+echo "- test5 succeeded -"
+
+popd > /dev/null
+
+# Test 6: Sample option
+mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
+
+echo "> Run bcftools_annotate with -s option"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "annotated.vcf" \
+  --samples "SAMPLE1"
+
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+assert_file_contains "annotated.vcf" "##bcftools_annotateCommand=annotate -s SAMPLE1 -o annotated.vcf ../example.vcf"
+echo "- test6 succeeded -"
+
+popd > /dev/null
+
+
+
 
 echo "---- All tests succeeded! ----"
 exit 0

@@ -177,8 +177,7 @@ argument_groups:
       - name: --rename_annotations 
         type: file
         description: | 
-          rename annotations according to the map in file, with "old_name new_name\n" pairs separated by whitespaces, 
-          each on a separate line. The old name must be prefixed with the annotation type: INFO, FORMAT, or FILTER.
+          Rename annotations: TYPE/old\tnew, where TYPE is one of FILTER,INFO,FORMAT.
 
       - name: --rename_chromosomes
         type: file

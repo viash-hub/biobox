@@ -41,8 +41,8 @@ bcftools annotate \
     ${par_regions:+-r "$par_regions"} \
     ${par_regions_file:+-R "$par_regions_file"} \
     ${par_regions_overlap:+--regions-overlap "$par_regions_overlap"} \
-    ${par_rename_annotations:+--rename-annotations "$par_rename_annotations"} \
-    ${par_rename_chromosomes:+--rename-chromosomes "$par_rename_chromosomes"} \
+    ${par_rename_annotations:+--rename-annots "$par_rename_annotations"} \
+    ${par_rename_chromosomes:+--rename-chrs "$par_rename_chromosomes"} \
     ${par_samples:+-s "$par_samples"} \
     ${par_single_overlaps:+--single-overlaps} \
     ${par_threads:+--threads "$par_threads"} \
