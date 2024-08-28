@@ -50,3 +50,5 @@ bcftools annotate \
     -o $par_output \
     $par_input
     
+
+    

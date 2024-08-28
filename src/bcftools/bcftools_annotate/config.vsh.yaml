@@ -1,7 +1,7 @@
 name: bcftools_annotate
 namespace: bcftools
 description: | 
-  
+  Add or remove annotations from a VCF/BCF file.
 keywords: [Annotate, VCF, BCF]
 links:
   homepage: https://samtools.github.io/bcftools/
@@ -24,7 +24,7 @@ argument_groups:
         alternatives: -i
         type: file
         multiple: true
-        description: Input VCF/BCF file. Maximum of two files.
+        description: Input VCF/BCF file.
         required: true
     
   - name: Outputs
@@ -114,7 +114,7 @@ argument_groups:
         type: string
         description: | 
           When multiple regions overlap a single record, this option defines how to treat multiple annotation values.
-          See https://samtools.github.io/bcftools/bcftools.html#annotate for more details.
+          See man page for more details.
 
       - name: --mark_sites
         alternatives: --m
@@ -125,7 +125,7 @@ argument_groups:
       - name: --min_overlap
         type: string
         description: | 
-          minimum overlap required as a fraction of the variant in the annotation -a file (ANN), 
+          Minimum overlap required as a fraction of the variant in the annotation -a file (ANN), 
           in the target VCF file (:VCF), or both for reciprocal overlap (ANN:VCF). 
           By default overlaps of arbitrary length are sufficient. 
           The option can be used only with the tab-delimited annotation -a file and with BEG and END columns present.
