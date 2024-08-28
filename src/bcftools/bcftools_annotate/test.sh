@@ -38,7 +38,7 @@ cat <<EOF > "$TMPDIR/example.vcf"
 ##fileformat=VCFv4.1
 ##contig=<ID=1,length=249250621,assembly=b37>
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
-1	752567	.	A	C	.	.	.	.	.
+1	752567	llama	A	C	.	.	.	.	.
 1	752722	.	G	A	.	.	.	.	.
 EOF
 
@@ -55,7 +55,7 @@ cat <<EOF > "$TMPDIR/header.hdr"
 ##INFO=<ID=BAR,Number=1,Type=Integer,Description="Some description">
 EOF
 
-# Test 1: Remove annotations
+# Test 1: Remove ID annotations
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
 
 echo "> Run bcftools_annotate remove annotations"
@@ -67,15 +67,15 @@ echo "> Run bcftools_annotate remove annotations"
 # checks
 assert_file_exists "annotated.vcf"
 assert_file_not_empty "annotated.vcf"
-#assert_file_contains "annotated.vcf" ""
+assert_file_contains "annotated.vcf" "1	752567	.	A	C"
 echo "- test1 succeeded -"
 
 popd > /dev/null
 
-# Test 2: # Add ID, QUAL and INFO/TAG, not replacing TAG if already present
+# Test 2: Annotate with -a, -c and -h options
 mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
 
-echo "> Run bcftools_annotate with -a and -c"
+echo "> Run bcftools_annotate with -a, -c and -h options"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
@@ -83,36 +83,35 @@ echo "> Run bcftools_annotate with -a and -c"
   --header_lines "../header.hdr" \
   --columns "CHROM,FROM,TO,FMT/FOO,BAR"
 
-
 # checks
 assert_file_exists "annotated.vcf"
 assert_file_not_empty "annotated.vcf"
-#assert_file_contains "annotated.vcf" "bcftools stats  ../example.vcf"
+assert_file_contains "annotated.vcf" $(echo -e "1\t752567\tllama\tA\tC\t.\t.\tBAR=12345\tFOO\tFooValue1")
 echo "- test2 succeeded -"
 
 popd > /dev/null
 
-# # Test 3: 
-# mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
+# Test 3: 
+mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
 
-# echo "> Run bcftools_annotate with multiple options"
-# "$meta_executable" \
-#   --input "../example.vcf" \
-#   --output "filtered.vcf" \
-#   --remove "ID,INFO/DP,FORMAT/DP" \
-#   --rename_annotations "ID=ID2,INFO/DP=INFO/Depth,FORMAT/DP=FORMAT/Depth" \
-#   --include "FILTER=q10" \
-#   --exclude "INFO/AF<0.5"
+echo "> Run bcftools_annotate with --set_id option"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "annotated.vcf" \
+  --set_id "+'%CHROM\_%POS\_%REF\_%FIRST_ALT'" \
 
-# # checks
-# assert_file_exists "filtered.vcf"
-# assert_file_not_empty "filtered.vcf"
-# #assert_file_contains "filtered.vcf" ""
-# echo "- test3 succeeded -"
+# checks
+assert_file_exists "annotated.vcf"
+assert_file_not_empty "annotated.vcf"
+assert_file_contains "annotated.vcf" "'1_752722_G_A'"
+echo "- test3 succeeded -"
 
-# popd > /dev/null
+popd > /dev/null
 
-
+# echo
+# cat "annotated.vcf"
+# echo
+# exit 0
 
 echo "---- All tests succeeded! ----"
 exit 0
