@@ -97,7 +97,6 @@ argument_groups:
           Set ID column using a `bcftools query`-like expression, see man page for details.
 
       - name: --include
-        alternatives: --i
         type: string
         description: | 
           Select sites for which the expression is true.
@@ -133,22 +132,27 @@ argument_groups:
       - name: --no_version
         type: boolean_true
         description: | 
-          Do not append version and command line information to the output VCF header..
+          Do not append version and command line information to the output VCF header.
 
       - name: --output_type
         alternatives: --O
         type: string
         choices: ['u', 'z', 'b', 'v']
         description: | 
-          Output compressed BCF (b), uncompressed BCF (u), compressed VCF (z), uncompressed VCF (v).
+          Output type:
+            u: uncompressed BCF
+            z: compressed VCF
+            b: compressed BCF
+            v: uncompressed VCF
       
       - name: --pair_logic
         type: string
         choices: ['snps', 'indels', 'both', 'all', 'some', 'exact']
         description: | 
           Controls how to match records from the annotation file to the target VCF. 
-          Effective only when -a is a VCF or BCF. 
-          The option replaces the former uninuitive --collapse. See Common Options for more.
+          Effective only when -a is a VCF or BCF file. 
+          The option replaces the former uninuitive --collapse. 
+          See Common Options for more.
 
       - name: --regions
         alternatives: --r
