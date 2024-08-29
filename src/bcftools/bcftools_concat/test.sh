@@ -45,21 +45,29 @@ EOF
 bgzip -c $TMPDIR/example.vcf > $TMPDIR/example.vcf.gz
 tabix -p vcf $TMPDIR/example.vcf.gz
 
-# Test 1: Remove ID annotations
+cat <<EOF > "$TMPDIR/example_2.vcf"
+##fileformat=VCFv4.1
+##contig=<ID=1,length=249250621,assembly=b37>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
+1	752569	cat	G	C,A	.	.	.	.	1/2
+1	752739	.	G	A,AAA	.	.	.	.	./.
+EOF
+
+# Test 1: Default test
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
 
-echo "> Run bcftools_norm"
+echo "> Run bcftools_concat default test"
 "$meta_executable" \
   --input "../example.vcf" \
-  --output "normalized.vcf" \
-  --atomize \
-  --atom_overlaps "." \
-  &> /dev/null
+  --input "../example_2.vcf" \
+  --output "concatenated.vcf" \
+
+#  &> /dev/null
 
 # checks
-assert_file_exists "normalized.vcf"
-assert_file_not_empty "normalized.vcf"
-assert_file_contains "normalized.vcf" "bcftools_normCommand=norm --atomize --atom-overlaps . -o normalized.vcf ../example.vcf"
+assert_file_exists "concatenated.vcf"
+assert_file_not_empty "concatenated.vcf"
+assert_file_contains "concatenated.vcf" "concat -o concatenated.vcf ../example.vcf ../example_2.vcf"
 echo "- test1 succeeded -"
 
 popd > /dev/null
@@ -67,4 +75,7 @@ popd > /dev/null
 echo "---- All tests succeeded! ----"
 exit 0
 
+echo
+cat concatenated.vcf
+echo
 
