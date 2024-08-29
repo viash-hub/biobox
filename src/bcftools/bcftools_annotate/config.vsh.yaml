@@ -170,7 +170,7 @@ argument_groups:
 
       - name: --regions_overlap
         type: string
-        choices: ['pos', 'record', 'variant', '1', '2', '3']
+        choices: ['pos', 'record', 'variant', '0', '1', '2']
         description: | 
           This option controls how overlapping records are determined: 
           set to pos or 0 if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
