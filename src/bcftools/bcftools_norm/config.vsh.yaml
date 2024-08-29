@@ -38,192 +38,128 @@ argument_groups:
         required: true
          
   - name: Options
-    description: | 
-      For examples on how to use use bcftools annotate see http://samtools.github.io/bcftools/howtos/annotate.html.
-      For more details on the options see https://samtools.github.io/bcftools/bcftools.html#annotate.
     arguments:
       
-      - name: --annotations
-        alternatives: --a
-        type: file
-        description: | 
-          VCF file or tabix-indexed FILE with annotations: CHR\tPOS[\tVALUE]+ . 
+      - name: --atomize
+        alternatives: -a
+        type: boolean_true
+        description: |
+          Decompose complex variants (e.g., MNVs become consecutive SNVs).
 
-      - name: --columns
-        alternatives: --c
+      - name: --atom_overlaps
         type: string
+        choices: [".", "*"]
         description: | 
-          List of columns in the annotation file, e.g. CHROM,POS,REF,ALT,-,INFO/TAG. 
-          See man page for details.
+          Use the star allele (*) for overlapping alleles or set to missing (.).
+        default: "*"
 
-      - name: --columns_file
-        alternatives: --C
-        type: file
-        description: | 
-          Read -c columns from FILE, one name per row, with optional --merge_logic TYPE: NAME[ TYPE].
-
-      - name: --exclude
-        alternatives: --e
+      - name: --check_ref
+        alternatives: -c
         type: string
+        choices: ['e', 'w', 'x', 's']
         description: | 
-          Exclude sites for which the expression is true.
-          See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
+          Check REF alleles and exit (e), warn (w), exclude (x), or set (s) bad sites.
+        default: "e"
+
+      - name: --remove_duplicates
+        alternatives: -D
+        type: boolean_true
+        description: Remove duplicate lines of the same type.
+
+      - name: --rm_dup
+        alternatives: -d
+        type: string
+        choices: ['snps', 'indels', 'both', 'all', 'exact']
+        description: Remove duplicate snps, indels, both, all, or exact matches.
+
+      - name: --fasta_ref
+        alternatives: -f
+        type: file
+        description: Reference sequence file.
 
       - name: --force
         type: boolean_true
         description: | 
-          continue even when parsing errors, such as undefined tags, are encountered. 
-          Note this can be an unsafe operation and can result in corrupted BCF files. 
-          If this option is used, make sure to sanity check the result thoroughly.
+          Try to proceed even if malformed tags are encountered. 
+          Experimental, use at your own risk.
 
-      - name: --header_line
-        alternatives: --H
+      - name: --keep_sum
         type: string
         description: | 
-          Header line which should be appended to the VCF header, can be given multiple times.
+          Keep vector sum constant when splitting multiallelics (see github issue #360).
 
-      - name: --header_lines
-        alternatives: --h
-        type: file
-        description: | 
-          File with header lines to append to the VCF header.
-          For example:
-            ##INFO=<ID=NUMERIC_TAG,Number=1,Type=Integer,Description="Example header line">
-            ##INFO=<ID=STRING_TAG,Number=1,Type=String,Description="Yet another header line">
-
-      - name: --set_id
-        alternatives: --I
+      - name: --multiallelics
+        alternatives: -m
         type: string
+        choices: ['+snps', '+indels', '+both', '+any', '-snps', '-indels', '-both', '-any']
         description: | 
-          Set ID column using a `bcftools query`-like expression, see man page for details.
-
-      - name: --include
-        type: string
-        description: | 
-          Select sites for which the expression is true.
-          See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
-      
-      - name: --keep_sites
-        alternatives: --k
-        type: boolean_true
-        description: | 
-          Leave --include/--exclude sites unchanged instead of discarding them.
-
-      - name: --merge_logic
-        alternatives: --l
-        type: string
-        description: | 
-          When multiple regions overlap a single record, this option defines how to treat multiple annotation values.
-          See man page for more details.
-
-      - name: --mark_sites
-        alternatives: --m
-        type: string
-        description: | 
-          Annotate sites which are present ("+") or absent ("-") in the -a file with a new INFO/TAG flag.
-
-      - name: --min_overlap
-        type: string
-        description: | 
-          Minimum overlap required as a fraction of the variant in the annotation -a file (ANN), 
-          in the target VCF file (:VCF), or both for reciprocal overlap (ANN:VCF). 
-          By default overlaps of arbitrary length are sufficient. 
-          The option can be used only with the tab-delimited annotation -a file and with BEG and END columns present.
+          Split multiallelics (-) or join biallelics (+), type: snps, indels, both, any [default: both].
 
       - name: --no_version
         type: boolean_true
-        description: | 
-          Do not append version and command line information to the output VCF header.
+        description: Do not append version and command line information to the header.
 
-      - name: --output_type
-        alternatives: --O
+      - name: --do_not_normalize
+        alternatives: -N
+        type: boolean_true
+        description: Do not normalize indels (with -m or -c s).
+
+      - name: --old_rec_tag
         type: string
-        choices: ['u', 'z', 'b', 'v']
-        description: | 
-          Output type:
-            u: uncompressed BCF
-            z: compressed VCF
-            b: compressed BCF
-            v: uncompressed VCF
-      
-      - name: --pair_logic
-        type: string
-        choices: ['snps', 'indels', 'both', 'all', 'some', 'exact']
-        description: | 
-          Controls how to match records from the annotation file to the target VCF. 
-          Effective only when -a is a VCF or BCF file. 
-          The option replaces the former uninuitive --collapse. 
-          See Common Options for more.
+        description: Annotate modified records with INFO/STR indicating the original variant.
 
       - name: --regions
-        alternatives: --r
+        alternatives: -r
         type: string
-        description: | 
-          Restrict to comma-separated list of regions.
-          See man page for details.
+        description: Restrict to comma-separated list of regions.
 
       - name: --regions_file
-        alternatives: --R
-        type: string
-        description: | 
-          Restrict to regions listed in a file.
-          See man page for details.
+        alternatives: -R
+        type: file
+        description: Restrict to regions listed in a file.
 
       - name: --regions_overlap
         type: string
         choices: ['pos', 'record', 'variant', '1', '2', '3']
         description: | 
-          This option controls how overlapping records are determined: 
-          set to pos or 0 if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
-          set to record or 1 if also overlapping records with POS outside a region should be included (this is the default behavior of -r/-R, 
-          and includes indels with POS at the end of a region, which are technically outside the region); 
-          or set to variant or 2 to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
-      
-      - name: --rename_annotations 
-        type: file
-        description: | 
-          Rename annotations: TYPE/old\tnew, where TYPE is one of FILTER,INFO,FORMAT.
+          Include if POS in the region (0), record overlaps (1), variant overlaps (2).
+        default: "1"
 
-      - name: --rename_chromosomes
-        type: file
+      - name: --site_win
+        alternatives: -w
+        type: integer
         description: | 
-          Rename chromosomes according to the map in file, with "old_name new_name\n" pairs 
-          separated by whitespaces, each on a separate line.
+          Buffer for sorting lines that changed position during realignment.
+        default: 1000
 
-      - name: --samples
-        type: string
-        description: | 
-          Subset of samples to annotate.
-          See also https://samtools.github.io/bcftools/bcftools.html#common_options.
-
-      - name: --samples_file
-        type: file
-        description: | 
-          Subset of samples to annotate in file format.
-          See also https://samtools.github.io/bcftools/bcftools.html#common_options.
-
-      - name: --single_overlaps
+      - name: --strict_filter
+        alternatives: -s
         type: boolean_true
+        description: When merging (-m+), merged site is PASS only if all sites being merged PASS.
+
+      - name: --targets
+        alternatives: -t
+        type: string
+        description: Similar to -r but streams rather than index-jumps.
+
+      - name: --targets_file
+        alternatives: -T
+        type: file
+        description: Similar to -R but streams rather than index-jumps.
+
+      - name: --targets_overlap
+        type: string
+        choices: ['pos', 'record', 'variant', '1', '2', '3']
         description: | 
-          Use this option to keep memory requirements low with very large annotation files. 
-          Note, however, that this comes at a cost, only single overlapping intervals are considered in this mode. 
-          This was the default mode until the commit af6f0c9 (Feb 24 2019).
+          Include if POS in the region (0), record overlaps (1), variant overlaps (2).
+        default: "0"
 
       - name: --threads
         type: integer
         description: | 
-          Number of extra output compression threads.
-          See https://samtools.github.io/bcftools/bcftools.html#common_options.
+          Use multithreading with the specified number of worker threads.
+        default: 0
 
-      - name: --remove
-        alternatives: --x
-        type: string
-        description: | 
-          List of annotations to remove. 
-          Use "FILTER" to remove all filters or "FILTER/SomeFilter" to remove a specific filter. 
-          Similarly, "INFO" can be used to remove all INFO tags and "FORMAT" to remove all FORMAT tags except GT. 
-          To remove all INFO tags except "FOO" and "BAR", use "^INFO/FOO,INFO/BAR" (and similarly for FORMAT and FILTER). 
-          "INFO" can be abbreviated to "INF" and "FORMAT" to "FMT".
 
 resources:
   - type: bash_script
