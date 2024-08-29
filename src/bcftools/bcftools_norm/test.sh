@@ -123,6 +123,46 @@ assert_file_not_empty "normalized.vcf"
 assert_file_contains "normalized.vcf" "norm -m -any --old-rec-tag wazzaaa -o normalized.vcf ../example.vcf"
 echo "- test4 succeeded -"
 
+popd > /dev/null
+
+# Test 5: Regions
+mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
+
+echo "> Run bcftools_norm with regions"
+"$meta_executable" \
+  --input "../example.vcf.gz" \
+  --output "normalized.vcf" \
+  --atomize \
+  --regions "1:752567-752722" \
+
+# checks
+assert_file_exists "normalized.vcf"
+assert_file_not_empty "normalized.vcf"
+assert_file_contains "normalized.vcf" "norm --atomize -r 1:752567-752722 -o normalized.vcf ../example.vcf.gz"
+echo "- test5 succeeded -"
+
+popd > /dev/null
+
+# Test 6: Targets
+mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
+
+echo "> Run bcftools_norm with targets"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "normalized.vcf" \
+  --atomize \
+  --targets "1:752567-752722" \
+
+# checks
+assert_file_exists "normalized.vcf"
+assert_file_not_empty "normalized.vcf"
+assert_file_contains "normalized.vcf" "norm --atomize -t 1:752567-752722 -o normalized.vcf ../example.vcf"
+echo "- test6 succeeded -"
+
+popd > /dev/null
+
+
+
 echo "---- All tests succeeded! ----"
 exit 0
 
