@@ -51,7 +51,7 @@ argument_groups:
         choices: [".", "*"]
         description: | 
           Use the star allele (*) for overlapping alleles or set to missing (.).
-        default: "*"
+        #default: "*"
 
       - name: --check_ref
         alternatives: -c
@@ -59,18 +59,13 @@ argument_groups:
         choices: ['e', 'w', 'x', 's']
         description: | 
           Check REF alleles and exit (e), warn (w), exclude (x), or set (s) bad sites.
-        default: "e"
+        #default: "e"
 
       - name: --remove_duplicates
-        alternatives: -D
-        type: boolean_true
-        description: Remove duplicate lines of the same type.
-
-      - name: --rm_dup
         alternatives: -d
         type: string
-        choices: ['snps', 'indels', 'both', 'all', 'exact']
-        description: Remove duplicate snps, indels, both, all, or exact matches.
+        choices: ['snps', 'indels', 'both', 'all', 'exact', 'none']
+        description: Remove duplicate snps, indels, both, all, exact matches, or none (old -D option).
 
       - name: --fasta_ref
         alternatives: -f
@@ -134,14 +129,14 @@ argument_groups:
         choices: ['pos', 'record', 'variant', '1', '2', '3']
         description: | 
           Include if POS in the region (0), record overlaps (1), variant overlaps (2).
-        default: "1"
+        #default: "1"
 
       - name: --site_win
         alternatives: -w
         type: integer
         description: | 
           Buffer for sorting lines that changed position during realignment.
-        default: 1000
+        #default: 1000
 
       - name: --strict_filter
         alternatives: -s
@@ -163,13 +158,13 @@ argument_groups:
         choices: ['pos', 'record', 'variant', '1', '2', '3']
         description: | 
           Include if POS in the region (0), record overlaps (1), variant overlaps (2).
-        default: "0"
+        #default: "0"
 
       - name: --threads
         type: integer
         description: | 
           Use multithreading with the specified number of worker threads.
-        default: 0
+        #default: 0
 
 
 resources:

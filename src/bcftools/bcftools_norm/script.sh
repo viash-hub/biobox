@@ -25,23 +25,22 @@ done
 bcftools norm \
     ${par_atomize:+--atomize} \
     ${par_atom_overlaps:+--atom-overlaps "$par_atom_overlaps"} \
-    ${par_check_ref:+--check-ref "$par_check_ref"} \
-    ${par_remove_duplicates:+--remove-duplicates} \
-    ${par_rm_dup:+--rm-dup "$par_rm_dup"} \
-    ${par_fasta_ref:+--fasta-ref "$par_fasta_ref"} \
+    ${par_check_ref:+-c "$par_check_ref"} \
+    ${par_remove_duplicates:+-d "$par_remove_duplicates"} \
+    ${par_fasta_ref:+-f "$par_fasta_ref"} \
     ${par_force:+--force} \
     ${par_keep_sum:+--keep-sum "$par_keep_sum"} \
-    ${par_multiallelics:+--multiallelics "$par_multiallelics"} \
+    ${par_multiallelics:+-m "$par_multiallelics"} \
     ${par_no_version:+--no-version} \
-    ${par_do_not_normalize:+--do-not-normalize} \
+    ${par_do_not_normalize:+-N} \
     ${par_old_rec_tag:+--old-rec-tag "$par_old_rec_tag"} \
-    ${par_regions:+--regions "$par_regions"} \
-    ${par_regions_file:+--regions-file "$par_regions_file"} \
+    ${par_regions:+-r "$par_regions"} \
+    ${par_regions_file:+-R "$par_regions_file"} \
     ${par_regions_overlap:+--regions-overlap "$par_regions_overlap"} \
-    ${par_site_win:+--site-win "$par_site_win"} \
-    ${par_strict_filter:+--strict-filter} \
-    ${par_targets:+--targets "$par_targets"} \
-    ${par_targets_file:+--targets-file "$par_targets_file"} \
+    ${par_site_win:+-w "$par_site_win"} \
+    ${par_strict_filter:+-s} \
+    ${par_targets:+-t "$par_targets"} \
+    ${par_targets_file:+-T "$par_targets_file"} \
     ${par_targets_overlap:+--targets-overlap "$par_targets_overlap"} \
     ${par_threads:+--threads "$par_threads"} \
     ${par_output_type:+-O "$par_output_type"} \
