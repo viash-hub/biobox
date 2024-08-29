@@ -51,7 +51,6 @@ argument_groups:
         choices: [".", "*"]
         description: | 
           Use the star allele (*) for overlapping alleles or set to missing (.).
-        #default: "*"
 
       - name: --check_ref
         alternatives: -c
@@ -59,7 +58,6 @@ argument_groups:
         choices: ['e', 'w', 'x', 's']
         description: | 
           Check REF alleles and exit (e), warn (w), exclude (x), or set (s) bad sites.
-        #default: "e"
 
       - name: --remove_duplicates
         alternatives: -d
@@ -126,17 +124,15 @@ argument_groups:
 
       - name: --regions_overlap
         type: string
-        choices: ['pos', 'record', 'variant', '1', '2', '3']
+        choices: ['pos', 'record', 'variant', '0', '1', '2']
         description: | 
           Include if POS in the region (0), record overlaps (1), variant overlaps (2).
-        #default: "1"
 
       - name: --site_win
         alternatives: -w
         type: integer
         description: | 
           Buffer for sorting lines that changed position during realignment.
-        #default: 1000
 
       - name: --strict_filter
         alternatives: -s
@@ -155,16 +151,14 @@ argument_groups:
 
       - name: --targets_overlap
         type: string
-        choices: ['pos', 'record', 'variant', '1', '2', '3']
+        choices: ['pos', 'record', 'variant', '0', '1', '2']
         description: | 
           Include if POS in the region (0), record overlaps (1), variant overlaps (2).
-        #default: "0"
 
       - name: --threads
         type: integer
         description: | 
           Use multithreading with the specified number of worker threads.
-        #default: 0
 
 
 resources:
