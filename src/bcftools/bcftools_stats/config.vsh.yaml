@@ -18,7 +18,7 @@ requirements:
   commands: [bcftools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [ author ]
 
 argument_groups:
   - name: Inputs
@@ -46,7 +46,19 @@ argument_groups:
         alternatives: --af_bins
         type: string
         description: | 
-          Allele frequency bins, a list (0.1,0.5,1) or a file (0.1\n0.5\n1).
+          Allele frequency bins, a list of bin values (0.1,0.5,1).
+        example: 0.1,0.5,1
+
+      - name: --allele_frequency_bins_file
+        alternatives: --af_bins_file
+        type: file
+        description: | 
+          Same as allele_frequency_bins, but in a file.
+          Format of file is one value per line. 
+          e.g. 
+            0.1
+            0.5
+            1
 
       - name: --allele_frequency_tag
         alternatives: --af_tag
@@ -81,6 +93,7 @@ argument_groups:
         description: | 
           Exclude sites for which the expression is true.
           See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
+        example: 'QUAL < 30 && DP < 10'
 
       - name: --exons
         alternatives: --E
@@ -108,6 +121,7 @@ argument_groups:
         description: | 
           Select sites for which the expression is true.
           See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
+        example: 'QUAL >= 30 && DP >= 10'
       
       - name: --split_by_ID
         alternatives: --I
@@ -119,13 +133,17 @@ argument_groups:
         alternatives: --r
         type: string
         description: | 
-          Restrict to comma-separated list of regions.
+          Restrict to comma-separated list of regions. 
+          Following formats are supported: chr|chr:pos|chr:beg-end|chr:beg-[,…​].
+        example: '20:1000000-2000000'
 
       - name: --regions_file
         alternatives: --R
         type: file
         description: | 
-          Restrict to regions listed in a file.
+          Restrict to regions listed in a file. 
+          Regions can be specified either on a VCF, BED, or tab-delimited file (the default). 
+          For more information check manual.
 
       - name: --regions_overlap
         type: string
@@ -148,6 +166,10 @@ argument_groups:
         type: file
         description: | 
           File of samples to include.
+          e.g. 
+            sample1    1
+            sample2    2
+            sample3    2
 
       - name: --targets
         alternatives: --t
@@ -161,6 +183,8 @@ argument_groups:
           that -r/-R checks for proper overlaps and considers both POS and the end position of an indel, 
           while -t/-T considers the POS coordinate only (by default; see also --regions-overlap and --targets-overlap). 
           Note that -t cannot be used in combination with -T.
+          Following formats are supported: chr|chr:pos|chr:beg-end|chr:beg-[,…​].
+        example: '20:1000000-2000000'
       
       - name: --targets_file
         alternatives: --T
@@ -179,7 +203,9 @@ argument_groups:
         type: string
         description: | 
           Collect Ts/Tv stats for any tag using the given binning [0:1:100].
+          Format is <TAG[:min:max:n]>.
           A subfield can be selected as e.g. 'PV4[0]', here the first value of the PV4 tag.
+          
       
       - name: --verbose 
         alternatives: --v

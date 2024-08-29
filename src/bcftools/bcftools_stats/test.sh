@@ -87,6 +87,19 @@ tabix -s1 -b2 -e3 $TMPDIR/exons.bed.gz
 # 20	10000	1083893029	60	61
 # EOF
 
+# Create allele frequency bins file
+cat <<EOF > "$TMPDIR/allele_frequency_bins.txt"
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+EOF
+
 # Test 1: Default Use
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
 
@@ -268,6 +281,24 @@ assert_file_contains "stats.txt" "bcftools stats  ../example.vcf.gz ../example.v
 echo "- test10 succeeded -"
 
 popd > /dev/null
+
+# Test 11: with allele frequency bins file option
+mkdir "$TMPDIR/test11" && pushd "$TMPDIR/test11" > /dev/null
+
+echo "> Run bcftools_stats on VCF file with allele frequency bins file option"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "stats.txt" \
+  --allele_frequency_bins "../allele_frequency_bins.txt" \
+
+# checks
+assert_file_exists "stats.txt"
+assert_file_not_empty "stats.txt"
+assert_file_contains "stats.txt" "bcftools stats  --af-bins ../allele_frequency_bins.txt ../example.vcf"
+echo "- test11 succeeded -"
+
+popd > /dev/null
+
 
 echo "---- All tests succeeded! ----"
 exit 0

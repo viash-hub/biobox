@@ -33,6 +33,7 @@ bcftools stats \
     ${par_split_by_ID:+--split-by-ID} \
     ${par_verbose:+--verbose} \
     ${par_allele_frequency_bins:+--af-bins "${par_allele_frequency_bins}"} \
+    ${par_allele_frequency_bins_file:+--af-bins "${par_allele_frequency_bins_file}"} \
     ${par_allele_frequency_tag:+--af-tag "${par_allele_frequency_tag}"} \
     ${par_collapse:+-c "${par_collapse}"} \
     ${par_depth:+-d "${par_depth}"} \
