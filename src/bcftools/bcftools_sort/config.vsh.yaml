@@ -2,7 +2,7 @@ name: bcftools_sort
 namespace: bcftools
 description: | 
   Sorts VCF/BCF files.
-keywords: [Sort ,VCF, BCF]
+keywords: [Sort, VCF, BCF]
 links:
   homepage: https://samtools.github.io/bcftools/
   documentation: https://samtools.github.io/bcftools/bcftools.html#sort
