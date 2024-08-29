@@ -161,11 +161,62 @@ echo "- test6 succeeded -"
 
 popd > /dev/null
 
+# Test 7: Regions overlap
+mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
 
+echo "> Run bcftools_norm with regions overlap"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "normalized.vcf" \
+  --atomize \
+  --regions_overlap "pos" \
+
+# checks
+assert_file_exists "normalized.vcf"
+assert_file_not_empty "normalized.vcf"
+assert_file_contains "normalized.vcf" "norm --atomize --regions-overlap pos -o normalized.vcf ../example.vcf"
+echo "- test7 succeeded -"
+
+popd > /dev/null
+
+# Test 8: Strict filter and targets overlap
+mkdir "$TMPDIR/test8" && pushd "$TMPDIR/test8" > /dev/null
+
+echo "> Run bcftools_norm with strict filter and targets overlap"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "normalized.vcf" \
+  --atomize \
+  --strict_filter \
+  --targets_overlap "pos" \
+
+# checks
+assert_file_exists "normalized.vcf"
+assert_file_not_empty "normalized.vcf"
+assert_file_contains "normalized.vcf" "norm --atomize -s --targets-overlap pos -o normalized.vcf ../example.vcf"
+echo "- test8 succeeded -"
+
+popd > /dev/null
+
+# Test 9: Do not normalize
+mkdir "$TMPDIR/test9" && pushd "$TMPDIR/test9" > /dev/null
+
+echo "> Run bcftools_norm with do not normalize"
+"$meta_executable" \
+  --input "../example.vcf" \
+  --output "normalized.vcf" \
+  --do_not_normalize \
+  --atomize \
+
+# checks
+assert_file_exists "normalized.vcf"
+assert_file_not_empty "normalized.vcf"
+assert_file_contains "normalized.vcf" "norm --atomize -N -o normalized.vcf ../example.vcf"
+echo "- test9 succeeded -"
+
+popd > /dev/null
 
 echo "---- All tests succeeded! ----"
 exit 0
 
-# echo
-# cat "normalized.vcf"
-# echo
+
