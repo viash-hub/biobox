@@ -61,6 +61,7 @@ echo "> Run bcftools_norm"
   --output "normalized.vcf" \
   --atomize \
   --atom_overlaps "." \
+  &> /dev/null
 
 # checks
 assert_file_exists "normalized.vcf"
@@ -79,6 +80,7 @@ echo "> Run bcftools_norm with remove duplicates"
   --output "normalized.vcf" \
   --atomize \
   --remove_duplicates 'all' \
+  &> /dev/null
 
 # checks
 assert_file_exists "normalized.vcf"
@@ -98,6 +100,7 @@ echo "> Run bcftools_norm with check reference and fasta reference"
   --atomize \
   --fasta_ref "../reference.fa" \
   --check_ref "e" \
+  &> /dev/null
 
 # checks
 assert_file_exists "normalized.vcf"
@@ -116,6 +119,7 @@ echo "> Run bcftools_norm with multiallelics"
   --output "normalized.vcf" \
   --multiallelics "-any" \
   --old_rec_tag "wazzaaa" \
+  &> /dev/null
 
 # checks
 assert_file_exists "normalized.vcf"
@@ -134,6 +138,7 @@ echo "> Run bcftools_norm with regions"
   --output "normalized.vcf" \
   --atomize \
   --regions "1:752567-752722" \
+  &> /dev/null
 
 # checks
 assert_file_exists "normalized.vcf"
@@ -152,6 +157,7 @@ echo "> Run bcftools_norm with targets"
   --output "normalized.vcf" \
   --atomize \
   --targets "1:752567-752722" \
+  &> /dev/null
 
 # checks
 assert_file_exists "normalized.vcf"
@@ -170,6 +176,7 @@ echo "> Run bcftools_norm with regions overlap"
   --output "normalized.vcf" \
   --atomize \
   --regions_overlap "pos" \
+  &> /dev/null
 
 # checks
 assert_file_exists "normalized.vcf"
@@ -188,12 +195,13 @@ echo "> Run bcftools_norm with strict filter and targets overlap"
   --output "normalized.vcf" \
   --atomize \
   --strict_filter \
-  --targets_overlap "pos" \
+  --targets_overlap "1" \
+  &> /dev/null
 
 # checks
 assert_file_exists "normalized.vcf"
 assert_file_not_empty "normalized.vcf"
-assert_file_contains "normalized.vcf" "norm --atomize -s --targets-overlap pos -o normalized.vcf ../example.vcf"
+assert_file_contains "normalized.vcf" "norm --atomize -s --targets-overlap 1 -o normalized.vcf ../example.vcf"
 echo "- test8 succeeded -"
 
 popd > /dev/null
@@ -207,6 +215,7 @@ echo "> Run bcftools_norm with do not normalize"
   --output "normalized.vcf" \
   --do_not_normalize \
   --atomize \
+  &> /dev/null
 
 # checks
 assert_file_exists "normalized.vcf"
