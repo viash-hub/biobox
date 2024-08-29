@@ -24,7 +24,6 @@ argument_groups:
       - name: --input
         alternatives: -i
         type: file
-        multiple: true
         description: Input VCF/BCF file.
         required: true
     
