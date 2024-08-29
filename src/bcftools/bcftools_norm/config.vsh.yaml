@@ -103,7 +103,18 @@ argument_groups:
         alternatives: -N
         type: boolean_true
         description: Do not normalize indels (with -m or -c s).
-
+      
+      - name: --output_type
+        alternatives: --O
+        type: string
+        choices: ['u', 'z', 'b', 'v']
+        description: | 
+          Output type:
+            u: uncompressed BCF
+            z: compressed VCF
+            b: compressed BCF
+            v: uncompressed VCF
+      
       - name: --old_rec_tag
         type: string
         description: Annotate modified records with INFO/STR indicating the original variant.
