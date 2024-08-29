@@ -36,6 +36,9 @@
 
 * `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
 
+* `bcftools`:
+  - `bcftools_norm`: Left-align and normalize indels, check if REF alleles match the reference, split multiallelic sites into multiple rows; recover multiallelics from multiple rows (PR #144).
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).

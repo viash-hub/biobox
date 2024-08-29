@@ -34,7 +34,7 @@ argument_groups:
         alternatives: -o
         direction: output
         type: file
-        description: Output annotated file.
+        description: Output normalized VCF/BCF file.
         required: true
          
   - name: Options
@@ -68,7 +68,7 @@ argument_groups:
       - name: --fasta_ref
         alternatives: -f
         type: file
-        description: Reference sequence file.
+        description: Reference fasta sequence file.
 
       - name: --force
         type: boolean_true
@@ -159,7 +159,6 @@ argument_groups:
         type: integer
         description: | 
           Use multithreading with the specified number of worker threads.
-
 
 resources:
   - type: bash_script
