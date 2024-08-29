@@ -23,6 +23,9 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
+# Create input array 
+IFS=";" read -ra input <<< $par_input
+
 # Execute bcftools concat with the provided arguments
 bcftools concat \
     ${par_allow_overlaps:+-a} \
@@ -43,4 +46,4 @@ bcftools concat \
     ${par_threads:+--threads "$par_threads"} \
     ${par_verbose:+-v "$par_verbose"} \
     -o $par_output \
-    $par_input
+    ${input[@]} \
