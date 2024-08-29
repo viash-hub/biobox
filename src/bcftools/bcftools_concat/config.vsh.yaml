@@ -1,7 +1,13 @@
 name: bcftools_concat
 namespace: bcftools
 description: | 
-  . 
+  Concatenate or combine VCF/BCF files. All source files must have the same sample
+  columns appearing in the same order. The program can be used, for example, to
+  concatenate chromosome VCFs into one VCF, or combine a SNP VCF and an indel
+  VCF into one. The input files must be sorted by chr and position. The files
+  must be given in the correct order to produce sorted VCF on output unless
+  the -a, --allow-overlaps option is specified. With the --naive option, the files
+  are concatenated without being recompressed, which is very fast.
 keywords: [Concatenate, VCF, BCF]
 links:
   homepage: https://samtools.github.io/bcftools/
