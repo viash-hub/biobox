@@ -19,14 +19,12 @@ argument_groups:
         example: read.fq
         direction: input
         multiple: true
-        multiple_sep: " "
       - name: --fasta
         type: file
         description: Input fasta file(s).
         example: read.fa
         direction: input
         multiple: true
-        multiple_sep: " "
       - name: --fastq_rich
         type: file
         description: |
@@ -35,7 +33,6 @@ argument_groups:
         example: read.fq
         direction: input
         multiple: true
-        multiple_sep: " "
       - name: --fastq_minimal
         type: file
         description: |
@@ -45,7 +42,6 @@ argument_groups:
         example: read.fq
         direction: input
         multiple: true
-        multiple_sep: " "
       - name: --summary
         type: file
         description: |
@@ -53,35 +49,30 @@ argument_groups:
         example: read.txt
         direction: input
         multiple: true
-        multiple_sep: " "
       - name: --bam
         type: file
         description: Input sorted bam file(s).
         example: read.bam
         direction: input
         multiple: true
-        multiple_sep: " "
       - name: --ubam
         type: file
         description: Input unmapped bam file(s).
         example: read.ubam
         direction: input
         multiple: true
-        multiple_sep: " "
       - name: --cram
         type: file
         description: Input sorted cram file(s).
         example: read.cram
         direction: input
         multiple: true
-        multiple_sep: " "
       - name: --pickle
         type: file
         description: Input pickle file stored earlier.
         example: read.pkl
         direction: input
         multiple: true
-        multiple_sep: " "
       - name: --feather
         alternatives: [--arrow]
         type: file
@@ -89,7 +80,6 @@ argument_groups:
         example: read.arrow
         direction: input
         multiple: true
-        multiple_sep: " "
   - name: Outputs
     arguments:
       - name: --outdir
@@ -97,7 +87,7 @@ argument_groups:
         type: file
         direction: output
         description: Specify directory in which output has to be created.
-        default: output
+        required: true
   - name: Options
     arguments:
       - name: --verbose

@@ -11,9 +11,13 @@ meta_resources_dir="$PWD/src/nanoplot"
 
 # Test 1: Run NanoPlot with only input parameter (Fastq)
 
+mkdir test1
+pushd test1 > /dev/null # cd test1 (stack)
+
 echo "> Run Test 1: one input (Fastq)"
 "$meta_executable" \
-  --fastq "$meta_resources_dir/test_data/test1.fastq"
+  --fastq "$meta_resources_dir/test_data/test1.fastq" \
+  --outdir output
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -41,7 +45,7 @@ if find output -name "*.txt" -type f -size 0 | grep -q .; then
   exit 1
 fi
 
-rm -f output/* # Clear output
+popd > /dev/null # Remove directory from stack (LIFO)
 
 echo "Test 1 succeeded."
 
@@ -49,9 +53,13 @@ echo "Test 1 succeeded."
 
 # Test 2: Run NanoPlot with multiple inputs (Fastq)
 
+mkdir test2
+pushd test2 > /dev/null
+
 echo "> Run Test 2: multiple inputs (Fastq)"
 "$meta_executable" \
-  --fastq "$meta_resources_dir/test_data/test1.fastq" "$meta_resources_dir/test_data/test2.fastq"
+  --fastq "$meta_resources_dir/test_data/test1.fastq" "$meta_resources_dir/test_data/test2.fastq" \
+  --outdir output
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -79,13 +87,16 @@ if find output -name "*.txt" -type f -size 0 | grep -q .; then
   exit 1
 fi
 
-rm -f output/* # Clear output
+popd > /dev/null
 
 echo "Test 2 succeeded."
 
 ###########################################################################
 
 # Test 3: Run NanoPlot with multiple options-1
+
+mkdir test3
+pushd test3 > /dev/null
 
 echo "> Run Test 3: multiple options-1"
 "$meta_executable" \
@@ -95,7 +106,8 @@ echo "> Run Test 3: multiple options-1"
   --prefix biobox_ \
   --store \
   --color yellow \
-  --info_in_report
+  --info_in_report \
+  --outdir output
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -139,7 +151,7 @@ if ! ls output/biobox* > /dev/null 2>&1; then
     exit 1
 fi
 
-rm -f output/* # Clear output
+popd > /dev/null
 
 echo "Test 3 succeeded."
 
@@ -147,12 +159,16 @@ echo "Test 3 succeeded."
 
 # Test 4: Run NanoPlot with multiple options-2
 
+mkdir test4
+pushd test4 > /dev/null
+
 echo "> Run Test 4: multiple options-2"
 "$meta_executable" \
   --fastq "$meta_resources_dir/test_data/test1.fastq" \
   --maxlength 40000 \
   --only_report \
-  --raw
+  --raw \
+  --outdir output
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -186,7 +202,7 @@ if find output -name "*.tsv.gz" -type f -size 0 | grep -q .; then
   exit 1
 fi
 
-rm -f output/* # Clear output
+popd > /dev/null
 
 echo "Test 4 succeeded."
 
@@ -194,9 +210,13 @@ echo "Test 4 succeeded."
 
 # Test 5: Run NanoPlot with different input (Fasta)
 
+mkdir test5
+pushd test5 > /dev/null
+
 echo "> Run Test 5: Input Fasta"
 "$meta_executable" \
-  --fasta "$meta_resources_dir/test_data/test.fasta"
+  --fasta "$meta_resources_dir/test_data/test.fasta" \
+  --outdir output
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -224,7 +244,7 @@ if find output -name "*.txt" -type f -size 0 | grep -q .; then
   exit 1
 fi
 
-rm -f output/* # Clear output
+popd > /dev/null
 
 echo "Test 5 succeeded."
 
@@ -232,9 +252,13 @@ echo "Test 5 succeeded."
 
 # Test 6: Run NanoPlot with different input (Fastq_rich)
 
+mkdir test6
+pushd test6 > /dev/null
+
 echo "> Run Test 6: Input Fastq_rich"
 "$meta_executable" \
-  --fastq_rich "$meta_resources_dir/test_data/test_rich.fastq"
+  --fastq_rich "$meta_resources_dir/test_data/test_rich.fastq" \
+  --outdir output
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -262,7 +286,7 @@ if find output -name "*.txt" -type f -size 0 | grep -q .; then
   exit 1
 fi
 
-rm -f output/* # Clear output
+popd > /dev/null
 
 echo "Test 6 succeeded."
 
@@ -270,9 +294,13 @@ echo "Test 6 succeeded."
 
 # Test 7: Run NanoPlot with different input (Fastq_minimal)
 
+mkdir test7
+pushd test7 > /dev/null
+
 echo "> Run Test 7: Input Fasta"
 "$meta_executable" \
-  --fastq_minimal "$meta_resources_dir/test_data/test_minimal.fastq.gz"
+  --fastq_minimal "$meta_resources_dir/test_data/test_minimal.fastq.gz" \
+  --outdir output
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -300,7 +328,7 @@ if find output -name "*.txt" -type f -size 0 | grep -q .; then
   exit 1
 fi
 
-rm -f output/* # Clear output
+popd > /dev/null
 
 echo "Test 7 succeeded."
 
@@ -308,9 +336,13 @@ echo "Test 7 succeeded."
 
 # Test 8: Run NanoPlot with different input (Summary)
 
+mkdir test8
+pushd test8 > /dev/null
+
 echo "> Run Test 8: Input Summary"
 "$meta_executable" \
-  --summary "$meta_resources_dir/test_data/test_summary.txt"
+  --summary "$meta_resources_dir/test_data/test_summary.txt" \
+  --outdir output
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -338,7 +370,7 @@ if find output -name "*.txt" -type f -size 0 | grep -q .; then
   exit 1
 fi
 
-rm -f output/* # Clear output
+popd > /dev/null
 
 echo "Test 8 succeeded."
 
@@ -346,9 +378,13 @@ echo "Test 8 succeeded."
 
 # Test 9: Run NanoPlot with different input (BAM)
 
+mkdir test9
+pushd test9 > /dev/null
+
 echo "> Run Test 9: Input BAM"
 "$meta_executable" \
-  --bam "$meta_resources_dir/test_data/test.bam"
+  --bam "$meta_resources_dir/test_data/test.bam" \
+  --outdir output
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -376,7 +412,7 @@ if find output -name "*.txt" -type f -size 0 | grep -q .; then
   exit 1
 fi
 
-rm -f output/* # Clear output
+popd > /dev/null
 
 echo "Test 9 succeeded."
 
@@ -384,9 +420,13 @@ echo "Test 9 succeeded."
 
 # Test 10: Run NanoPlot with different input (pickle)
 
+mkdir test10
+pushd test10 > /dev/null
+
 echo "> Run Test 10: Input pickle"
 "$meta_executable" \
-  --pickle "$meta_resources_dir/test_data/test.pickle"
+  --pickle "$meta_resources_dir/test_data/test.pickle" \
+  --outdir output
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -414,7 +454,7 @@ if find output -name "*.txt" -type f -size 0 | grep -q .; then
   exit 1
 fi
 
-rm -f output/* # Clear output
+popd > /dev/null
 
 echo "Test 10 succeeded."
 
@@ -422,9 +462,13 @@ echo "Test 10 succeeded."
 
 # Test 11: Run NanoPlot with different input (feather)
 
+mkdir test11
+pushd test11 > /dev/null
+
 echo "> Run Test 11: Input feather"
 "$meta_executable" \
-  --arrow "$meta_resources_dir/test_data/test.feather"
+  --arrow "$meta_resources_dir/test_data/test.feather" \
+  --outdir output
 
 # Check if output directory exists
 if [[ ! -d output ]]; then
@@ -452,15 +496,18 @@ if find output -name "*.txt" -type f -size 0 | grep -q .; then
   exit 1
 fi
 
-rm -f output/* # Clear output
+popd > /dev/null
 
 echo "Test 11 succeeded."
 
 ###########################################################################
 
-# Test 12: Run NanoPlot with output options
+# Test 12: Run NanoPlot with different output directory
 
-echo "> Run Test 12: output options"
+mkdir test12
+pushd test12 > /dev/null
+
+echo "> Run Test 12: different output directory"
 "$meta_executable" \
   --fastq "$meta_resources_dir/test_data/test1.fastq" \
   --outdir out
@@ -491,7 +538,7 @@ if find out -name "*.txt" -type f -size 0 | grep -q .; then
   exit 1
 fi
 
-rm -rf out/ # Clear output
+popd > /dev/null
 
 echo "Test 12 succeeded."
 
