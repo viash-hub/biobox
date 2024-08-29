@@ -112,7 +112,7 @@ argument_groups:
         alternatives: -q
         type: integer
         description: Break phase set if phasing quality is lower than <int>.
-        examples: 30
+        example: 30
 
       - name: --regions
         alternatives: -r
