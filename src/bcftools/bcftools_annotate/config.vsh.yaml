@@ -15,7 +15,7 @@ requirements:
   commands: [bcftools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [author]
 
 argument_groups:
   - name: Inputs
@@ -67,6 +67,7 @@ argument_groups:
         description: | 
           Exclude sites for which the expression is true.
           See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
+        example: 'QUAL >= 30 && DP >= 10'
 
       - name: --force
         type: boolean_true
@@ -101,6 +102,7 @@ argument_groups:
         description: | 
           Select sites for which the expression is true.
           See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
+        example: 'QUAL >= 30 && DP >= 10'
       
       - name: --keep_sites
         alternatives: --k
@@ -111,6 +113,7 @@ argument_groups:
       - name: --merge_logic
         alternatives: --l
         type: string
+        choices: 
         description: | 
           When multiple regions overlap a single record, this option defines how to treat multiple annotation values.
           See man page for more details.
@@ -153,31 +156,33 @@ argument_groups:
           Effective only when -a is a VCF or BCF file. 
           The option replaces the former uninuitive --collapse. 
           See Common Options for more.
-
+      
       - name: --regions
         alternatives: --r
         type: string
         description: | 
-          Restrict to comma-separated list of regions.
-          See man page for details.
+          Restrict to comma-separated list of regions. 
+          Following formats are supported: chr|chr:pos|chr:beg-end|chr:beg-[,…​].
+        example: '20:1000000-2000000'
 
       - name: --regions_file
         alternatives: --R
-        type: string
+        type: file
         description: | 
-          Restrict to regions listed in a file.
-          See man page for details.
+          Restrict to regions listed in a file. 
+          Regions can be specified either on a VCF, BED, or tab-delimited file (the default). 
+          For more information check manual.
 
       - name: --regions_overlap
         type: string
         choices: ['pos', 'record', 'variant', '0', '1', '2']
         description: | 
           This option controls how overlapping records are determined: 
-          set to pos or 0 if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
-          set to record or 1 if also overlapping records with POS outside a region should be included (this is the default behavior of -r/-R, 
+          set to 'pos' or '0' if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
+          set to 'record' or '1' if also overlapping records with POS outside a region should be included (this is the default behavior of -r/-R, 
           and includes indels with POS at the end of a region, which are technically outside the region); 
-          or set to variant or 2 to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
-      
+          or set to 'variant' or '2' to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
+
       - name: --rename_annotations 
         type: file
         description: | 
@@ -207,12 +212,6 @@ argument_groups:
           Use this option to keep memory requirements low with very large annotation files. 
           Note, however, that this comes at a cost, only single overlapping intervals are considered in this mode. 
           This was the default mode until the commit af6f0c9 (Feb 24 2019).
-
-      - name: --threads
-        type: integer
-        description: | 
-          Number of extra output compression threads.
-          See https://samtools.github.io/bcftools/bcftools.html#common_options.
 
       - name: --remove
         alternatives: --x

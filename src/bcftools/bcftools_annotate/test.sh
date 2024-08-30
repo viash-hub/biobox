@@ -283,14 +283,18 @@ mkdir "$TMPDIR/test13" && pushd "$TMPDIR/test13" > /dev/null
 
 echo "> Run bcftools_annotate with -e option"
 "$meta_executable" \
+  --annotations "../annots.tsv.gz" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
   --exclude "FILTER='PASS'" \
+  --header_lines "../header.hdr" \
+  --columns "CHROM,FROM,TO,FMT/FOO,BAR" \
+  --merge_logic "FOO:first" \
 
 # checks
 assert_file_exists "annotated.vcf"
 assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "annotate -e FILTER='PASS' -o annotated.vcf ../example.vcf"
+assert_file_contains "annotated.vcf" "annotate -a ../annots.tsv.gz -c CHROM,FROM,TO,FMT/FOO,BAR -e FILTER='PASS' -h ../header.hdr -l FOO:first -o annotated.vcf ../example.vcf"
 echo "- test13 succeeded -"
 
 popd > /dev/null
