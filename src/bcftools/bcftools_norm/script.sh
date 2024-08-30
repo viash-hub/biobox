@@ -42,7 +42,7 @@ bcftools norm \
     ${par_targets:+-t "$par_targets"} \
     ${par_targets_file:+-T "$par_targets_file"} \
     ${par_targets_overlap:+--targets-overlap "$par_targets_overlap"} \
-    ${par_threads:+--threads "$par_threads"} \
+    ${meta_cpus:+--threads "$meta_cpus"} \\
     ${par_output_type:+-O "$par_output_type"} \
     -o $par_output \
     $par_input

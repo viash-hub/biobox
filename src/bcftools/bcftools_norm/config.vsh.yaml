@@ -3,7 +3,7 @@ namespace: bcftools
 description: | 
   Left-align and normalize indels, check if REF alleles match the reference, split multiallelic sites into multiple rows; 
   recover multiallelics from multiple rows. 
-keywords: [Annotate, VCF, BCF]
+keywords: [Normalize, VCF, BCF]
 links:
   homepage: https://samtools.github.io/bcftools/
   documentation: https://samtools.github.io/bcftools/bcftools.html#norm
@@ -16,7 +16,7 @@ requirements:
   commands: [bcftools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [author]
 
 argument_groups:
   - name: Inputs
@@ -112,20 +112,30 @@ argument_groups:
         description: Annotate modified records with INFO/STR indicating the original variant.
 
       - name: --regions
-        alternatives: -r
+        alternatives: --r
         type: string
-        description: Restrict to comma-separated list of regions.
+        description: | 
+          Restrict to comma-separated list of regions. 
+          Following formats are supported: chr|chr:pos|chr:beg-end|chr:beg-[,…​].
+        example: '20:1000000-2000000'
 
       - name: --regions_file
-        alternatives: -R
+        alternatives: --R
         type: file
-        description: Restrict to regions listed in a file.
+        description: | 
+          Restrict to regions listed in a file. 
+          Regions can be specified either on a VCF, BED, or tab-delimited file (the default). 
+          For more information check manual.
 
       - name: --regions_overlap
         type: string
         choices: ['pos', 'record', 'variant', '0', '1', '2']
         description: | 
-          Include if POS in the region (0), record overlaps (1), variant overlaps (2).
+          This option controls how overlapping records are determined: 
+          set to 'pos' or '0' if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
+          set to 'record' or '1' if also overlapping records with POS outside a region should be included (this is the default behavior of -r/-R, 
+          and includes indels with POS at the end of a region, which are technically outside the region); 
+          or set to 'variant' or '2' to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
 
       - name: --site_win
         alternatives: -w
@@ -142,22 +152,19 @@ argument_groups:
         alternatives: -t
         type: string
         description: Similar to -r but streams rather than index-jumps.
+        example: '20:1000000-2000000'
 
       - name: --targets_file
         alternatives: -T
         type: file
-        description: Similar to -R but streams rather than index-jumps.
+        description: Similar to --regions_file but streams rather than index-jumps.
 
       - name: --targets_overlap
         type: string
         choices: ['pos', 'record', 'variant', '0', '1', '2']
         description: | 
           Include if POS in the region (0), record overlaps (1), variant overlaps (2).
-
-      - name: --threads
-        type: integer
-        description: | 
-          Use multithreading with the specified number of worker threads.
+          Similar to --regions_overlap.
 
 resources:
   - type: bash_script
