@@ -43,7 +43,7 @@ bcftools concat \
     ${par_regions:+-r "$par_regions"} \
     ${par_regions_file:+-R "$par_regions_file"} \
     ${par_regions_overlap:+--regions-overlap "$par_regions_overlap"} \
-    ${par_threads:+--threads "$par_threads"} \
+    ${meta_cpus:+--threads "$meta_cpus"} \
     ${par_verbose:+-v "$par_verbose"} \
     -o $par_output \
     ${input[@]} \

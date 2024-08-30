@@ -21,7 +21,7 @@ requirements:
   commands: [bcftools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [author]
 
 argument_groups:
   - name: Inputs
@@ -98,7 +98,7 @@ argument_groups:
           Dangerous, use with caution.
 
       - name: --output_type
-        alternatives: --O
+        alternatives: -O
         type: string
         choices: ['u', 'z', 'b', 'v']
         description: | 
@@ -117,24 +117,29 @@ argument_groups:
       - name: --regions
         alternatives: -r
         type: string
-        description: Restrict to comma-separated list of regions.
+        description: | 
+          Restrict to comma-separated list of regions. 
+          Following formats are supported: chr|chr:pos|chr:beg-end|chr:beg-[,…​].
+        example: '20:1000000-2000000'
 
       - name: --regions_file
         alternatives: -R
         type: file
-        description: Restrict to regions listed in a file.
+        description: | 
+          Restrict to regions listed in a file. 
+          Regions can be specified either on a VCF, BED, or tab-delimited file (the default). 
+          For more information check manual.
 
       - name: --regions_overlap
         type: string
         choices: ['pos', 'record', 'variant', '0', '1', '2']
         description: | 
-          Include if POS in the region (0), record overlaps (1), variant overlaps (2).
-          
-      - name: --threads
-        type: integer
-        description: | 
-          Use multithreading with the specified number of worker threads.
-  
+          This option controls how overlapping records are determined: 
+          set to 'pos' or '0' if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
+          set to 'record' or '1' if also overlapping records with POS outside a region should be included (this is the default behavior of -r/-R, 
+          and includes indels with POS at the end of a region, which are technically outside the region); 
+          or set to 'variant' or '2' to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
+
       - name: --verbose
         alternatives: -v
         type: integer
