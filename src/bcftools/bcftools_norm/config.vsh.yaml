@@ -151,7 +151,7 @@ argument_groups:
       - name: --targets
         alternatives: -t
         type: string
-        description: Similar to -r but streams rather than index-jumps.
+        description: Similar to --regions but streams rather than index-jumps.
         example: '20:1000000-2000000'
 
       - name: --targets_file
