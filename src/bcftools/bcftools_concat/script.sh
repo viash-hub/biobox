@@ -49,7 +49,6 @@ bcftools concat \
     ${par_regions_file:+-R "$par_regions_file"} \
     ${par_regions_overlap:+--regions-overlap "$par_regions_overlap"} \
     ${meta_cpus:+--threads "$meta_cpus"} \
-    ${par_verbose:+-v "$par_verbose"} \
     -o $par_output \
     ${par_file_list:+-f "$par_file_list"} \
     ${input[@]} \

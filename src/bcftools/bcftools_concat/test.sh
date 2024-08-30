@@ -38,8 +38,8 @@ cat <<EOF > "$TMPDIR/example.vcf"
 ##fileformat=VCFv4.1
 ##contig=<ID=1,length=249250621,assembly=b37>
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
-1	752567	llama	G	C,A	.	.	.	.	1/2
-1	752752	.	G	A,AAA	.	.	.	.	./.
+1	752567	llama	G	C,A	15	.	.	.	1/2
+1	752752	.	G	A,AAA	20	.	.	.	./.
 EOF
 
 bgzip -c $TMPDIR/example.vcf > $TMPDIR/example.vcf.gz
@@ -49,8 +49,8 @@ cat <<EOF > "$TMPDIR/example_2.vcf"
 ##fileformat=VCFv4.1
 ##contig=<ID=1,length=249250621,assembly=b37>
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
-1	752569	cat	G	C,A	.	.	.	.	1/2
-1	752739	.	G	A,AAA	.	.	.	.	./.
+1	752569	cat	G	C,A	15	.	.	.	1/2
+1	752739	.	G	A,AAA	20	.	.	.	./.
 EOF
 
 bgzip -c $TMPDIR/example_2.vcf > $TMPDIR/example_2.vcf.gz
@@ -69,8 +69,7 @@ echo "> Run bcftools_concat default test"
   --input "../example.vcf" \
   --input "../example_2.vcf" \
   --output "concatenated.vcf" \
-
-#  &> /dev/null
+  &> /dev/null
 
 # checks
 assert_file_exists "concatenated.vcf"
@@ -90,7 +89,7 @@ echo "> Run bcftools_concat test with allow overlaps, and remove duplicates"
   --output "concatenated.vcf" \
   --allow_overlaps \
   --remove_duplicates 'none' \
-#  &> /dev/null
+  &> /dev/null
 
 # checks
 assert_file_exists "concatenated.vcf"
@@ -111,7 +110,7 @@ echo "> Run bcftools_concat test with ligate, ligate force and ligate warn"
   --output "concatenated.vcf" \
   --ligate \
   --compact_PS \
-#  &> /dev/null
+  &> /dev/null
 
 
 # checks
@@ -130,7 +129,7 @@ echo "> Run bcftools_concat test with file list, ligate force and ligate warn"
   --file_list "../file_list.txt" \
   --output "concatenated.vcf" \
   --ligate_force \
-#  &> /dev/null
+  &> /dev/null
 
 # checks
 assert_file_exists "concatenated.vcf"
@@ -140,10 +139,89 @@ echo "- test4 succeeded -"
 
 popd > /dev/null
 
+# Test 5: ligate warn and naive
+mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
+
+echo "> Run bcftools_concat test with ligate warn and naive"
+"$meta_executable" \
+  --input "../example.vcf.gz" \
+  --input "../example_2.vcf.gz" \
+  --output "concatenated.vcf.gz" \
+  --ligate_warn \
+  --naive \
+  &> /dev/null
+
+bgzip -d concatenated.vcf.gz
+
+# checks
+assert_file_exists "concatenated.vcf"
+assert_file_not_empty "concatenated.vcf"
+assert_file_contains "concatenated.vcf" "##fileformat=VCFv4.1"
+echo "- test5 succeeded -"
+
+popd > /dev/null
+
+# Test 6: minimal PQ
+mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
+
+echo "> Run bcftools_concat test with minimal PQ"
+"$meta_executable" \
+  --input "../example.vcf.gz" \
+  --input "../example_2.vcf.gz" \
+  --output "concatenated.vcf" \
+  --min_PQ 20 \
+  &> /dev/null
+
+# checks
+assert_file_exists "concatenated.vcf"
+assert_file_not_empty "concatenated.vcf"
+assert_file_contains "concatenated.vcf" "concat -q 20 -o concatenated.vcf ../example.vcf.gz ../example_2.vcf.gz"
+echo "- test6 succeeded -"
+
+popd > /dev/null
+
+# Test 7: regions
+mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
+
+echo "> Run bcftools_concat test with regions"
+"$meta_executable" \
+  --input "../example.vcf.gz" \
+  --input "../example_2.vcf.gz" \
+  --output "concatenated.vcf" \
+  --allow_overlaps \
+  --regions "1:752569-752739" \
+  &> /dev/null
+
+# checks
+assert_file_exists "concatenated.vcf"
+assert_file_not_empty "concatenated.vcf"
+assert_file_contains "concatenated.vcf" "concat -a -r 1:752569-752739 -o concatenated.vcf ../example.vcf.gz ../example_2.vcf.gz"
+echo "- test7 succeeded -"
+
+popd > /dev/null
+
+# Test 8: regions overlap
+mkdir "$TMPDIR/test8" && pushd "$TMPDIR/test8" > /dev/null
+
+echo "> Run bcftools_concat test with regions overlap"
+"$meta_executable" \
+  --input "../example.vcf.gz" \
+  --input "../example_2.vcf.gz" \
+  --output "concatenated.vcf" \
+  --allow_overlaps \
+  --regions_overlap 'pos' \
+  &> /dev/null
+
+# checks
+assert_file_exists "concatenated.vcf"
+assert_file_not_empty "concatenated.vcf"
+assert_file_contains "concatenated.vcf" "concat -a --regions-overlap pos -o concatenated.vcf ../example.vcf.gz ../example_2.vcf.gz"
+echo "- test8 succeeded -"
+
+popd > /dev/null
+
 echo "---- All tests succeeded! ----"
 exit 0
 
-echo
-cat concatenated.vcf
-echo
+
 

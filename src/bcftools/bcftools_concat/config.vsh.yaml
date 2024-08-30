@@ -139,11 +139,12 @@ argument_groups:
           and includes indels with POS at the end of a region, which are technically outside the region); 
           or set to 'variant' or '2' to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
 
-      - name: --verbose
-        alternatives: -v
-        type: integer
-        choices: [0, 1]
-        description: Set verbosity level.
+      #PS: Verbose seems to be broken in this version of bcftools
+      # - name: --verbose
+      #   alternatives: -v
+      #   type: integer
+      #   choices: [0, 1]
+      #   description: Set verbosity level.
 
 resources:
   - type: bash_script
