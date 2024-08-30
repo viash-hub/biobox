@@ -30,8 +30,12 @@ argument_groups:
         alternatives: -i
         type: file
         multiple: true
-        description: Input VCF/BCF file.
-        required: true
+        description: Input VCF/BCF files to concatenate.
+      
+      - name: --file_list
+        alternatives: -f
+        type: file
+        description: Read the list of VCF/BCF files from a file, one file name per line.
     
   - name: Outputs
     arguments:
@@ -60,14 +64,9 @@ argument_groups:
       - name: --remove_duplicates
         alternatives: -d
         type: string
-        choices: ['snps', 'indels', 'both', 'all', 'exact']
+        choices: ['snps', 'indels', 'both', 'all', 'exact', 'none']
         description: |
           Output duplicate records present in multiple files only once: <snps|indels|both|all|exact>.
-      
-      - name: --file_list
-        alternatives: -f
-        type: file
-        description: Read the list of files from a file.
               
       - name: --ligate
         alternatives: -l
