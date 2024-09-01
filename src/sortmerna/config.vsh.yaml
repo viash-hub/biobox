@@ -1,0 +1,292 @@
+name: sortmerna
+description: | 
+  Local sequence alignment tool for filtering, mapping and clustering. The main 
+  application of SortMeRNA is filtering rRNA from metatranscriptomic data. SortMeRNA
+  takes as input files of reads (fasta, fastq, fasta.gz, fastq.gz) and one or multiple
+  rRNA database file(s), and sorts apart aligned and rejected reads into two files.
+keywords: [sort, mRNA, rRNA, alignment, filtering, mapping, clustering]
+links:
+  homepage: https://sortmerna.readthedocs.io/en/latest/
+  documentation: https://sortmerna.readthedocs.io/en/latest/manual4.0.html
+  repository: https://github.com/sortmerna/sortmerna
+references: 
+  doi: 10.1093/bioinformatics/bts611
+license: GPL-3.0
+
+argument_groups:
+- name: "Input"
+  arguments: 
+  - name: "--paired"
+    type: boolean_true
+    description: |
+      Reads are paired-end. If a single reads file is provided, use this option 
+      to indicate the file contains interleaved paired reads when neither
+      'paired_in' | 'paired_out' | 'out2' | 'sout' are specified.
+  - name: "--input"
+    type: file
+    multiple: true
+    description: Input fastq
+  - name: "--ref"
+    type: file
+    multiple: true
+    description: Reference fasta file(s) for rRNA database.
+  - name: "--ribo_database_manifest"
+    type: file
+    description: Text file containing paths to fasta files (one per line) that will be used to create the database for SortMeRNA.
+
+- name: "Output"
+  arguments:     
+  - name: "--log"
+    type: file
+    direction: output
+    must_exist: false
+    example: $id.sortmerna.log
+    description: Sortmerna log file.
+  - name: "--output"
+    alternatives: ["--aligned"]
+    type: string
+    description: |
+      Directory and file prefix for aligned output. The appropriate extension: 
+      (fasta|fastq|blast|sam|etc) is automatically added.
+      If 'dir' is not specified, the output is created in the WORKDIR/out/.
+      If 'pfx' is not specified, the prefix 'aligned' is used.
+  - name: "--other"
+    type: string
+    description: Create Non-aligned reads output file with this path/prefix. Must be used with fastx. 
+
+- name: "Options"
+  arguments:
+  - name: "--kvdb"
+    type: string
+    description: Path to directory of the key-value database file, used for storing the alignment results.
+  - name: "--idx_dir"
+    type: string
+    description: Path to the directory for storing the reference index files.
+  - name: "--readb"
+    type: string
+    description: Path to the directory for storing pre-processed reads.
+  - name: "--fastx"
+    type: boolean_true
+    description: Output aligned reads into FASTA/FASTQ file
+  - name: "--sam"
+    type: boolean_true
+    description: Output SAM alignment for aligned reads.
+  - name: "--sq"
+    type: boolean_true
+    description: Add SQ tags to the SAM file
+  - name: "--blast"
+    type: string
+    description: | 
+      Blast options:
+      * '0'                    - pairwise
+      * '1'                    - tabular(Blast - m 8 format)
+      * '1 cigar'              - tabular + column for CIGAR
+      * '1 cigar qcov'         - tabular + columns for CIGAR and query coverage
+      * '1 cigar qcov qstrand' - tabular + columns for CIGAR, query coverage and strand
+    choices: ['0', '1', '1 cigar', '1 cigar qcov', '1 cigar qcov qstrand']
+  - name: "--num_alignments"
+    type: integer
+    description: |
+      Report first INT alignments per read reaching E-value. If Int = 0, all alignments will be output. Default: '0'
+    example: 0
+  - name: "--min_lis"
+    type: integer
+    description: |
+      search all alignments having the first INT longest LIS. LIS stands for Longest Increasing Subsequence, it is
+      computed using seeds’ positions to expand hits into longer matches prior to Smith-Waterman alignment. Default: '2'.
+    example: 2
+  - name: "--print_all_reads"
+    type: boolean_true
+    description: output null alignment strings for non-aligned reads to SAM and/or BLAST tabular files.
+  - name: "--paired_in"
+    type: boolean_true
+    description: |
+      In the case where a pair of reads is aligned with a score above the threshold, the output of the reads is controlled
+      by the following options:
+      * --paired_in and --paired_out are both false: Only one read per pair is output to the aligned fasta file.
+      * --paired_in is true and --paired_out is false: Both reads of the pair are output to the aligned fasta file.
+      * --paired_in is false and --paired_out is true: Both reads are output the the other fasta file (if it is specified).
+  - name: "--paired_out"
+    type: boolean_true
+    description: See description of --paired_in.
+  - name: "--out2"
+    type: boolean_true
+    description: |
+      Output paired reads into separate files. Must be used with '--fastx'. If a single reads file is provided, this options
+      implies interleaved paired reads. When used with 'sout', four (4) output files for aligned reads will be generated:
+      'aligned-paired-fwd, aligned-paired-rev, aligned-singleton-fwd, aligned-singleton-rev'. If 'other' option is also used,
+      eight (8) output files will be generated.
+  - name: "--sout"
+    type: boolean_true
+    description: |
+      Separate paired and singleton aligned reads. Must be used with '--fastx'. If a single reads file is provided,
+      this options implies interleaved paired reads. Cannot be used with '--paired_in' or '--paired_out'.
+  - name: "--zip_out"
+    type: string
+    description: |
+      Compress the output files. The possible values are: 
+      * '1/true/t/yes/y'
+      * '0/false/f/no/n'
+      *'-1' (the same format as input - default)
+      The values are Not case sensitive.
+    choices: ['1', 'true', 't', 'yes', 'y', '0', 'false', 'f', 'no', 'n', '-1']
+    example: "-1"
+  - name: "--match"
+    type: integer
+    description: |
+      Smith-Waterman score for a match (positive integer). Default: '2'.
+    example: 2
+  - name: "--mismatch"
+    type: integer
+    description: |
+      Smith-Waterman penalty for a mismatch (negative integer). Default: '-3'.
+    example: -3
+  - name: "--gap_open"
+    type: integer
+    description: |
+      Smith-Waterman penalty for introducing a gap (positive integer). Default: '5'.
+    example: 5
+  - name: "--gap_ext"
+    type: integer
+    description: |
+      Smith-Waterman penalty for extending a gap (positive integer). Default: '2'.
+    example: 2
+  - name: "--N"
+    type: integer
+    description: |
+      Smith-Waterman penalty for ambiguous letters (N’s) scored as --mismatch. Default: '-1'.\
+    example: -1
+  - name: "--a"
+    type: integer
+    description: |
+      Number of threads to use. Default: '1'.
+    example: 1
+  - name: "--e"
+    type: double
+    description: |
+      E-value threshold. Default: '1'.
+    example: 1
+  - name: "--F"
+    type: boolean_true
+    description: Search only the forward strand.
+  - name: "--R"
+    type: boolean_true
+    description: Search only the reverse-complementary strand.
+  - name: "--num_alignment"
+    type: integer
+    description: |
+       Report first INT alignments per read reaching E-value (--num_alignments 0 signifies all alignments will be output).
+       Default: '-1'
+    example: -1
+  - name: "--best"
+    type: integer
+    description: |
+      Report INT best alignments per read reaching E-value by searching --min_lis INT candidate alignments (--best 0
+      signifies all candidate alignments will be searched) Default: '1'.
+    example: 1
+  - name: "--verbose"
+    alternatives: ["-v"]
+    type: boolean_true
+    description: Verbose output.
+
+- name: "OTU picking options"
+  arguments:
+    - name: "--id"
+      type: double
+      description: |
+        %id similarity threshold (the alignment must still pass the E-value threshold). Default: '0.97'.
+      example: 0.97
+    - name: "--coverage"
+      type: double
+      description: |
+        %query coverage threshold (the alignment must still pass the E-value threshold). Default: '0.97'.
+      example: 0.97
+    - name: "--de_novo"
+      type: boolean_true
+      description: |
+        FASTA/FASTQ file for reads matching database < %id off (set using --id) and < %cov (set using --coverage)
+        (alignment must still pass the E-value threshold).
+    - name: "--otu_map"
+      type: boolean_true
+      description: |
+        Output OTU map (input to QIIME’s make_otu_table.py).
+
+- name: "Advanced options"
+  arguments:
+  - name: "--num_seed"
+    type: integer
+    description: |
+      Number of seeds matched before searching for candidate LIS. Default: '2'.
+    example: 2
+  - name: "--passes"
+    type: integer
+    multiple: true
+    description: |
+      Three intervals at which to place the seed on the read L,L/2,3 (L is the seed length set in ./indexdb_rna).
+  - name: "--edge"
+    type: string
+    description: |
+      The number (or percentage if followed by %) of nucleotides to add to each edge of the alignment region on the
+      reference sequence before performing Smith-Waterman alignment. Default: '4'.
+    example: 4
+  - name: "--full_search"
+    type: boolean_true
+    description: |
+      Search for all 0-error and 1-error seed off matches in the index rather than stopping after finding a 0-error match
+      (<1% gain in sensitivity with up four-fold decrease in speed).
+
+- name: "Indexing Options"
+  arguments:
+  - name: "--index"
+    type: integer
+    description: |
+      Create index files for the reference database. By default when this option is not used, the program checks the
+      reference index and builds it if not already existing.
+      This can be changed by using '-index' as follows:
+      * '-index 0' - skip indexing. If the index does not exist, the program will terminate
+                              and warn to build the index prior performing the alignment
+      * '-index 1' - only perform the indexing and terminate
+      * '-index 2' - the default behaviour, the same as when not using this option at all
+    example: 2
+    choices: [0, 1, 2]
+  - name: "-L"
+    type: double
+    description: |
+      Indexing seed length. Default: '18'
+    example: 18
+  - name: "--interval"
+    type: integer
+    description: |
+      Index every Nth L-mer in the reference database. Default: '1'
+    example: 1
+  - name: "--max_pos"
+    type: integer
+    description: |
+      Maximum number of positions to store for each unique L-mer. Set to 0 to store all positions. Default: '1000'
+    example: 1000
+  
+  
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: test_data
+  
+engines:
+- type: docker
+  image: ubuntu:22.04
+  setup: 
+    - type: docker
+      run: |
+        apt-get update && \
+        apt-get install -y --no-install-recommends gzip cmake g++ wget && \
+        apt-get clean && \
+        wget --no-check-certificate https://github.com/sortmerna/sortmerna/releases/download/v4.3.6/sortmerna-4.3.6-Linux.sh && \
+        bash sortmerna-4.3.6-Linux.sh --skip-license
+runners: 
+- type: executable
+- type: nextflow 
