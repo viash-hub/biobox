@@ -1,9 +1,7 @@
 name: sortmerna
 description: | 
   Local sequence alignment tool for filtering, mapping and clustering. The main 
-  application of SortMeRNA is filtering rRNA from metatranscriptomic data. SortMeRNA
-  takes as input files of reads (fasta, fastq, fasta.gz, fastq.gz) and one or multiple
-  rRNA database file(s), and sorts apart aligned and rejected reads into two files.
+  application of SortMeRNA is filtering rRNA from metatranscriptomic data.
 keywords: [sort, mRNA, rRNA, alignment, filtering, mapping, clustering]
 links:
   homepage: https://sortmerna.readthedocs.io/en/latest/
