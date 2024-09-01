@@ -86,7 +86,7 @@ diff "$expected_output_dir/transcripts.fa" "$test_output_dir/transcripts.fa" || 
 echo "> Test 4 - Generate table from GFF annotation file"
 
 "$meta_executable" \
-  --table @id,@chr,@start,@end,@strand,@exons,Name,gene,product \
+  --table "@id;@chr;@start;@end;@strand;@exons;Name;gene;product" \
   --outfile "$test_output_dir/annotation.tbl" \
   --input "$test_dir/sequence.gff3"
 

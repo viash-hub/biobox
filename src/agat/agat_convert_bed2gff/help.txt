@@ -1,0 +1,89 @@
+```sh
+agat_convert_bed2gff.pl --help
+```
+ ------------------------------------------------------------------------------
+|   Another GFF Analysis Toolkit (AGAT) - Version: v1.4.0                      |
+|   https://github.com/NBISweden/AGAT                                          |
+|   National Bioinformatics Infrastructure Sweden (NBIS) - www.nbis.se         |
+ ------------------------------------------------------------------------------
+
+
+Name:
+    agat_convert_bed2gff.pl
+
+Description:
+    The script takes a bed file as input, and will translate it in gff
+    format. The BED format is described here:
+    https://genome.ucsc.edu/FAQ/FAQformat.html#format1 The script converts
+    0-based, half-open [start-1, end) bed file to 1-based, closed [start,
+    end] General Feature Format v3 (GFF3).
+
+Usage:
+        agat_convert_bed2gff.pl --bed infile.bed [ -o outfile ]
+        agat_convert_bed2gff.pl -h
+
+Options:
+    --bed   Input bed file that will be converted.
+
+    --source
+            The source informs about the tool used to produce the data and
+            is stored in 2nd field of a gff file. Example:
+            Stringtie,Maker,Augustus,etc. [default: data]
+
+    --primary_tag
+            The primary_tag corresponds to the data type and is stored in
+            3rd field of a gff file. Example: gene,mRNA,CDS,etc. [default:
+            gene]
+
+    --inflate_off
+            By default we inflate the block fields (blockCount, blockSizes,
+            blockStarts) to create subfeatures of the main feature
+            (primary_tag). The type of subfeature created is based on the
+            inflate_type parameter. If you do not want this inflating
+            behaviour you can deactivate it by using the --inflate_off
+            option.
+
+    --inflate_type
+            Feature type (3rd column in gff) created when inflate parameter
+            activated [default: exon].
+
+    --verbose
+            add verbosity
+
+    -o , --output , --out , --outfile or --gff
+            Output GFF file. If no output file is specified, the output will
+            be written to STDOUT.
+
+    -c or --config
+            String - Input agat config file. By default AGAT takes as input
+            agat_config.yaml file from the working directory if any,
+            otherwise it takes the orignal agat_config.yaml shipped with
+            AGAT. To get the agat_config.yaml locally type: "agat config
+            --expose". The --config option gives you the possibility to use
+            your own AGAT config file (located elsewhere or named
+            differently).
+
+    -h or --help
+            Display this helpful text.
+
+Feedback:
+  Did you find a bug?:
+    Do not hesitate to report bugs to help us keep track of the bugs and
+    their resolution. Please use the GitHub issue tracking system available
+    at this address:
+
+                https://github.com/NBISweden/AGAT/issues
+
+     Ensure that the bug was not already reported by searching under Issues.
+     If you're unable to find an (open) issue addressing the problem, open a new one.
+     Try as much as possible to include in the issue when relevant:
+     - a clear description,
+     - as much relevant information as possible,
+     - the command used,
+     - a data sample,
+     - an explanation of the expected behaviour that is not occurring.
+
+  Do you want to contribute?:
+    You are very welcome, visit this address for the Contributing
+    guidelines:
+    https://github.com/NBISweden/AGAT/blob/master/CONTRIBUTING.md
