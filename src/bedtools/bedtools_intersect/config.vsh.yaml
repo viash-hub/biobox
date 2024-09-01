@@ -1,0 +1,255 @@
+name: bedtools_intersect
+namespace: bedtools
+description: |
+  bedtools intersect allows one to screen for overlaps between two sets of genomic features. 
+  Moreover, it allows one to have fine control as to how the intersections are reported. 
+  bedtools intersect works with both BED/GFF/VCF and BAM files as input.
+keywords: [feature intersection, BAM, BED, GFF, VCF]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: GPL-2.0, MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input_a
+        alternatives: -a
+        type: file
+        direction: input
+        description: |
+          The input file (BED/GFF/VCF/BAM) to be used as the -a file.
+        required: true
+        example: input_a.bed
+        
+      - name: --input_b
+        alternatives: -b
+        type: file
+        direction: input
+        multiple: true
+        description: | 
+          The input file(s) (BED/GFF/VCF/BAM) to be used as the -b file(s).
+        required: true
+        example: input_b.bed
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: | 
+          The output BED file. 
+        required: true
+        example: output.bed
+  
+  - name: Options
+    arguments:
+      - name: --write_a
+        alternatives: -wa
+        type: boolean_true
+        description: Write the original A entry for each overlap.      
+      
+      - name: --write_b
+        alternatives: -wb
+        type: boolean_true
+        description: | 
+          Write the original B entry for each overlap. 
+          Useful for knowing _what_ A overlaps. Restricted by -f and -r.
+      
+      - name: --left_outer_join
+        alternatives: -loj
+        type: boolean_true
+        description: |
+          Perform a "left outer join". That is, for each feature in A report each overlap with B. 
+          If no overlaps are found, report a NULL feature for B.
+      
+      - name: --write_overlap
+        alternatives: -wo
+        type: boolean_true
+        description: | 
+          Write the original A and B entries plus the number of base pairs of overlap between the two features.
+          - Overlaps restricted by -f and -r. 
+            Only A features with overlap are reported.
+      
+      - name: --write_overlap_plus
+        alternatives: -wao
+        type: boolean_true
+        description: | 
+          Write the original A and B entries plus the number of base pairs of overlap between the two features.
+          - Overlaps restricted by -f and -r. 
+            However, A features w/o overlap are also reported with a NULL B feature and overlap = 0.
+
+      - name: --report_A_if_no_overlap
+        alternatives: -u
+        type: boolean_true
+        description: | 
+          Write the original A entry _if_ no overlap is found. 
+          - In other words, just report the fact >=1 hit was found.
+          - Overlaps restricted by -f and -r. 
+      
+      - name: --number_of_overlaps_A
+        alternatives: -c
+        type: boolean_true
+        description: | 
+          For each entry in A, report the number of overlaps with B.
+          - Reports 0 for A entries that have no overlap with B.
+          - Overlaps restricted by -f and -r.
+
+      - name: --report_no_overlaps_A
+        alternatives: -v
+        type: boolean_true
+        description: | 
+          Only report those entries in A that have _no overlaps_ with B.
+          - Similar to "grep -v" (an homage).
+      
+      - name: --uncompressed_bam
+        alternatives: -ubam
+        type: boolean_true
+        description: Write uncompressed BAM output. Default writes compressed BAM.
+
+      - name: --same_strand
+        alternatives: -s
+        type: boolean_true
+        description: | 
+          Require same strandedness.  That is, only report hits in B.
+          that overlap A on the _same_ strand.
+          - By default, overlaps are reported without respect to strand.
+
+      - name: --opposite_strand
+        alternatives: -S
+        type: boolean_true
+        description: | 
+          Require different strandedness.  That is, only report hits in B
+          that overlap A on the _opposite_ strand.
+          - By default, overlaps are reported without respect to strand.
+
+      - name: --min_overlap_A
+        alternatives: -f
+        type: double
+        description: | 
+          Minimum overlap required as a fraction of A.
+          - Default is 1E-9 (i.e., 1bp).
+          - FLOAT (e.g. 0.50)
+        example: 0.50
+
+      - name: --min_overlap_B
+        alternatives: -F
+        type: double
+        description: | 
+          Minimum overlap required as a fraction of B.
+          - Default is 1E-9 (i.e., 1bp).
+          - FLOAT (e.g. 0.50)
+        example: 0.50
+
+      - name: --reciprocal_overlap
+        alternatives: -r
+        type: boolean_true
+        description: | 
+          Require that the fraction overlap be reciprocal for A AND B.
+          - In other words, if -f is 0.90 and -r is used, this requires
+          that B overlap 90% of A and A _also_ overlaps 90% of B.
+      
+      - name: --either_overlap
+        alternatives: -e
+        type: boolean_true
+        description: | 
+          Require that the minimum fraction be satisfied for A OR B.
+          - In other words, if -e is used with -f 0.90 and -F 0.10 this requires
+          that either 90% of A is covered OR 10% of B is covered.
+          Without -e, both fractions would have to be satisfied.
+
+      - name: --split
+        type: boolean_true
+        description: Treat "split" BAM or BED12 entries as distinct BED intervals.
+
+      - name: --genome
+        alternatives: -g
+        type: file
+        description: | 
+          Provide a genome file to enforce consistent chromosome 
+          sort order across input files. Only applies when used 
+          with -sorted option.
+        example: genome.txt
+
+      - name: --nonamecheck
+        type: boolean_true
+        description: | 
+          For sorted data, don't throw an error if the file 
+          has different naming conventions for the same chromosome 
+          (e.g., "chr1" vs "chr01").
+
+      - name: --sorted
+        type: boolean_true
+        description: | 
+          Use the "chromsweep" algorithm for sorted (-k1,1 -k2,2n) input.
+
+      - name: --names
+        type: string
+        description: | 
+          When using multiple databases, provide an alias 
+          for each that will appear instead of a fileId when 
+          also printing the DB record.
+
+      - name: --filenames
+        type: boolean_true
+        description: When using multiple databases, show each complete filename instead of a fileId when also printing the DB record.
+
+      - name: --sortout
+        type: boolean_true
+        description: When using multiple databases, sort the output DB hits for each record.
+
+      - name: --bed
+        type: boolean_true
+        description: If using BAM input, write output as BED.
+
+      - name: --header
+        type: boolean_true
+        description: Print the header from the A file prior to results.
+
+      - name: --no_buffer_output
+        alternatives: --nobuf
+        type: boolean_true
+        description: | 
+          Disable buffered output. Using this option will cause each line
+          of output to be printed as it is generated, rather than saved
+          in a buffer. This will make printing large output files 
+          noticeably slower, but can be useful in conjunction with
+          other software tools and scripts that need to process one
+          line of bedtools output at a time.
+
+      - name: --io_buffer_size
+        alternatives: --iobuf
+        type: integer
+        description: | 
+          Specify amount of memory to use for input buffer.
+          Takes an integer argument. Optional suffixes K/M/G supported.
+          Note: currently has no effect with compressed files.       
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bedtools, procps]
+      - type: docker
+        run: |
+          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
