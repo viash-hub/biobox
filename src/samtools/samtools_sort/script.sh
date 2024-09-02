@@ -5,15 +5,22 @@
 
 set -e
 
-[[ "$par_uncompressed" == "false" ]] && unset par_uncompressed
-[[ "$par_minimiser" == "false" ]] && unset par_minimiser
-[[ "$par_not_reverse" == "false" ]] && unset par_not_reverse
-[[ "$par_homopolymers" == "false" ]] && unset par_homopolymers
-[[ "$par_natural_sort" == "false" ]] && unset par_natural_sort
-[[ "$par_ascii_sort" == "false" ]] && unset par_ascii_sort
-[[ "$par_template_coordinate" == "false" ]] && unset par_template_coordinate
-[[ "$par_write_index" == "false" ]] && unset par_write_index
-[[ "$par_no_PG" == "false" ]] && unset par_no_PG
+unset_if_false=(
+   par_uncompressed
+   par_minimiser
+   par_not_reverse
+   par_homopolymers
+   par_natural_sort
+   par_ascii_sort
+   par_template_coordinate
+   par_write_index
+   par_no_PG
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
 
 samtools sort \
