@@ -1,0 +1,91 @@
+name: bedtools_links
+namespace: bedtools
+description: | 
+  Creates an HTML file with links to an instance of the UCSC Genome Browser for all features / intervals in a file. 
+  This is useful for cases when one wants to manually inspect through a large set of annotations or features.
+keywords: [Links, BED, GFF, VCF]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/links.html
+  repository: https://github.com/arq5x/bedtools2
+  homepage: https://bedtools.readthedocs.io/en/latest/#
+  issue_tracker: https://github.com/arq5x/bedtools2/issues
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: -i
+        type: file
+        description: Input file (bed/gff/vcf).
+        required: true
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: -o
+        type: file
+        direction: output
+        description: Output HTML file to be written.
+
+  - name: Options
+    description: |
+      By default, the links created will point to human (hg18) UCSC browser.
+      If you have a local mirror, you can override this behavior by supplying
+      the -base, -org, and -db options.
+
+      For example, if the URL of your local mirror for mouse MM9 is called: 
+      http://mymirror.myuniversity.edu, then you would use the following:
+      --base_url http://mymirror.myuniversity.edu
+      --organism mouse
+      --database mm9
+    arguments:
+      - name: --base_url
+        alternatives: -base
+        type: string
+        description: | 
+          The “basename” for the UCSC browser.
+        default: http://genome.ucsc.edu
+      
+      - name: --organism
+        alternatives: -org
+        type: string
+        description: | 
+          The organism (e.g. mouse, human). 
+        default: human
+
+      - name: --database
+        alternatives: -db
+        type: string
+        description: | 
+          The genome build. 
+        default: hg18
+      
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bedtools, procps]
+      - type: docker
+        run: |
+          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
