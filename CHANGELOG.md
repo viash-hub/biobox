@@ -40,6 +40,8 @@
 
 * `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
 
+* `bcftools`:
+  - `bcftools/bcftools_sort`: Sorts BCF/VCF files by position and other criteria (PR #141).
 
 ## MINOR CHANGES
 
