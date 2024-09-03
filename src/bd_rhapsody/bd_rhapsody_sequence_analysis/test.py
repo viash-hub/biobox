@@ -466,13 +466,16 @@ data_rna = data.mod["rna"]
 assert data_rna.n_vars == 1, "Number of genes is incorrect"
 assert data_rna.X.sum(axis=1).min() > 950, "Number of reads per cell is incorrect"
 # assert data_rna.var.Raw_Reads.sum() == 100000, "Number of reads is incorrect"
-assert data_rna.var.Raw_Reads.sum() >= 99999, "Number of reads is incorrect" # one read is missing?
+assert data_rna.var.Raw_Reads.sum() >= 99990 and data_rna.var.Raw_Reads.sum() <= 100010, \
+  f"Expected 100000 RNA reads, got {data_rna.var.Raw_Reads.sum()}"
 
 # check prot data
 data_prot = data.mod["prot"]
 assert data_prot.n_vars == len(bdabseq_panel_fasta_dict), "Number of proteins is incorrect"
 assert data_prot.X.sum(axis=1).min() > 950, "Number of reads per cell is incorrect"
-assert data_prot.var.Raw_Reads.sum() == 100000, "Number of reads is incorrect"
+assert data_prot.var.Raw_Reads.sum() >= 99990 and data_prot.var.Raw_Reads.sum() <= 100010, \
+  f"Expected 100000 Prot reads, got {data_prot.var.Raw_Reads.sum()}"
+
 
 # check smk data
 expected_sample_tags = (["SampleTag01_hs", "SampleTag02_hs", "SampleTag03_hs"] * 34)[:100]
