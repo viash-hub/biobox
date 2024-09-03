@@ -1,3 +1,26 @@
+# Extract arguments from CWL file and write them to arguments.yaml
+#
+# This script:
+#  - reads the CWL file
+#  - extracts the main workflow arguments
+#  - compares cwl arguments to viash config arguments
+#  - writes the arguments to arguments.yaml
+#
+# It can be used to update the arguments in the viash config after an
+# update to the CWL file has been made.
+#
+# Dependencies: tidyverse, jsonlite, yaml, dynutils
+#
+# Install dependencies:
+# ```R
+# install.packages(c("tidyverse", "jsonlite", "yaml", "dynutils"))
+# ```
+#
+# Usage:
+# ```bash
+# Rscript src/bd_rhapsody/bd_rhapsody_sequence_analysis/_process_cwl.R
+# ```
+
 library(tidyverse)
 
 # fetch and read cwl file
