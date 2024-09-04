@@ -1,0 +1,63 @@
+name: "umi_tools_prepareforrsem"
+namespace: "umi_tools"
+description: Make the output from umi-tools dedup or group compatible with RSEM
+keywords: [umi_tools, rsem, bam, sam]
+links:
+  homepage: https://umi-tools.readthedocs.io/en/latest/
+  documentation: https://umi-tools.readthedocs.io/en/latest/reference/extract.html
+  repository: https://github.com/CGATOxford/UMI-tools
+references: 
+  doi: 10.1101/gr.209601.116
+license: MIT
+
+argument_groups:
+- name: "Input"
+  arguments:  
+  - name: "--input"
+    type: file
+    required: true
+    example: $id.transcriptome.bam
+
+- name: "Output"
+  arguments:    
+  - name: "--output"
+    type: file
+    direction: output
+    example: $id.transcriptome_sorted.bam
+  - name: "--log"
+    type: file
+    direction: output
+
+- name: "Options"
+  arguments:
+  - name: "--tags"
+    type: string
+    description: |
+      Comma-seperated list of tags to transfer from read1 to read2 (Default: 'UG,BX')
+    example: "UG,BX"
+  - name: "--sam"
+    type: boolean_true
+    description: Input and output SAM rather than BAM.
+
+resources:
+  - type: bash_script
+    path: script.sh
+  # copied from https://github.com/nf-core/rnaseq/blob/3.12.0/bin/prepare-for-rsem.py
+  - path: prepare-for-rsem.py
+test_resources:
+  - type: bash_script
+    path: test.sh  
+  - type: file
+    path: test_data
+  
+engines:
+- type: docker
+  image: ubuntu:22.04
+  setup:
+    - type: apt
+      packages: [pip]
+    - type: python
+      packages: [umi_tools, pysam]
+runners: 
+- type: executable
+- type: nextflow
