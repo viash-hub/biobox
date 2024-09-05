@@ -3,8 +3,8 @@
 echo ">>> Test $meta_functionality_name"
 
 cat > bbsplit_fasta_list.txt << HERE
-sarscov2,${meta_resources_dir}/test_data/sarscov2.fa
-human,${meta_resources_dir}/test_data/human.fa
+sarscov2,sarscov2.fa
+human,human.fa
 HERE
 
 echo "> Prepare test data"
@@ -58,7 +58,7 @@ EOF
 
 echo ">>> Building BBSplit index"
 "${meta_executable}" \
-  --primary_ref "${meta_resources_dir}/test_data/genome.fasta" \
+  --primary_ref "genome.fasta" \
   --ref_fasta_list bbsplit_fasta_list.txt \
   --only_build_index \
   --index "BBSplit_index" 
@@ -72,8 +72,8 @@ echo ">>> Check whether output exists"
 
 echo ">>> Testing with single-end reads and primary/non-primary FASTA files"
 "${meta_executable}" \
-  --input "${meta_resources_dir}/test_data/reads_R1.fastq" \
-  --primary_ref "${meta_resources_dir}/test_data/genome.fasta" \
+  --input "reads_R1.fastq" \
+  --primary_ref "genome.fasta" \
   --ref_fasta_list bbsplit_fasta_list.txt \
   --fastq_1 "filtered_reads_R1.fastq"
 
@@ -91,8 +91,8 @@ rm filtered_reads_R1.fastq
 echo ">>> Testing with paired-end reads and primary/non-primary FASTA files"
 "${meta_executable}" \
   --paired \
-  --input "${meta_resources_dir}/test_data/reads_R1.fastq,${meta_resources_dir}/test_data/reads_R2.fastq" \
-  --primary_ref "${meta_resources_dir}/test_data/genome.fasta" \
+  --input "reads_R1.fastq,reads_R2.fastq" \
+  --primary_ref "genome.fasta" \
   --ref_fasta_list "bbsplit_fasta_list.txt" \
   --fastq_1 "filtered_reads_R1.fastq" \
   --fastq_2 "filtered_reads_R2.fastq"
@@ -113,7 +113,7 @@ rm filtered_reads_R1.fastq filtered_reads_R2.fastq
 
 echo ">>> Testing with single-end reads and BBSplit index"
 "${meta_executable}" \
-  --input "${meta_resources_dir}/test_data/reads_R1.fastq" \
+  --input "reads_R1.fastq" \
   --index "BBSplit_index" \
   --fastq_1 "filtered_reads_R1.fastq"
 
@@ -131,7 +131,7 @@ rm filtered_reads_R1.fastq
 echo ">>> Testing with paired-end reads and BBSplit index"
 "${meta_executable}" \
   --paired \
-  --input "${meta_resources_dir}/test_data/reads_R1.fastq,${meta_resources_dir}/test_data/reads_R2.fastq" \
+  --input "reads_R1.fastq,reads_R2.fastq" \
   --index "BBSplit_index" \
   --fastq_1 "filtered_reads_R1.fastq" \
   --fastq_2 "filtered_reads_R2.fastq"
