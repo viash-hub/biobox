@@ -53,7 +53,7 @@ echo "> Generate index"
 rsem-prepare-reference \
   --gtf "genes.gtf" \
   "genome.fasta" \
-  "index"\
+  "index"
 
 mkdir index
 mv index.* index/
