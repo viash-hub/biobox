@@ -45,7 +45,7 @@
   - `bcftools/bcftools_sort`: Sorts BCF/VCF files by position and other criteria (PR #141).
 
 * `fastqc`: High throughput sequence quality control analysis tool (PR #92).
->>>>>>> upstream/main
+
 
 ## MINOR CHANGES
 
