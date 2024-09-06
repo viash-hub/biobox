@@ -5,21 +5,29 @@
 
 set -e
 
-[[ "$par_bam" == "false" ]] && unset par_bam
-[[ "$par_cram" == "false" ]] && unset par_cram
-[[ "$par_fast" == "false" ]] && unset par_fast
-[[ "$par_uncompressed" == "false" ]] && unset par_uncompressed
-[[ "$par_with_header" == "false" ]] && unset par_with_header
-[[ "$par_header_only" == "false" ]] && unset par_header_only
-[[ "$par_no_header" == "false" ]] && unset par_no_header
-[[ "$par_count" == "false" ]] && unset par_count
-[[ "$par_unmap" == "false" ]] && unset par_unmap
-[[ "$par_use_index" == "false" ]] && unset par_use_index
-[[ "$par_fetch_pairs" == "false" ]] && unset par_fetch_pairs
-[[ "$par_customized_index" == "false" ]] && unset par_customized_index
-[[ "$par_no_PG" == "false" ]] && unset par_no_PG
-[[ "$par_write_index" == "false" ]] && unset par_write_index
-[[ "$par_remove_B" == "false" ]] && unset par_remove_B
+unset_if_false=(
+   par_bam
+   par_cram
+   par_fast
+   par_uncompressed
+   par_with_header
+   par_header_only
+   par_no_header
+   par_count
+   par_unmap
+   par_use_index
+   par_fetch_pairs
+   par_customized_index
+   par_no_PG
+   par_write_index
+   par_remove_B
+)
+
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
+
 
 samtools view \
     ${par_bam:+-b} \
