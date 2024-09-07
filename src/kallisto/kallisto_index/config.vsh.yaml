@@ -1,0 +1,89 @@
+name: kallisto_index
+namespace: kallisto
+description: |
+  Build a Kallisto index for the transcriptome to use Kallisto in the mapping-based mode.
+keywords: [kallisto, index]
+links:
+  homepage: https://pachterlab.github.io/kallisto/about
+  documentation: https://pachterlab.github.io/kallisto/manual
+  repository: https://github.com/pachterlab/kallisto
+  issue_tracker: https://github.com/pachterlab/kallisto/issues
+references: 
+  doi: https://doi.org/10.1038/nbt.3519
+license: BSD 2-Clause License
+
+argument_groups:
+- name: "Input"
+  arguments: 
+  - name: "--input"
+    type: file
+    description: |
+      Path to a FASTA-file containing the transcriptome sequences, either in plain text or 
+      compressed (.gz) format.
+    required: true
+  - name: "--d_list"
+    type: file
+    description: |
+      Path to a FASTA-file containing sequences to mask from quantification.
+
+- name: "Output"
+  arguments:
+  - name: "--kallisto_index"
+    type: file
+    direction: output
+    must_exist: false
+    example: Kallisto_index
+
+- name: "Options"
+  arguments:
+  - name: "--kmer_size"
+    type: integer
+    description: |
+      Kmer length passed to indexing step of pseudoaligners (default: '31').
+    example: 31
+  - name: "--make_unique"
+    type: boolean_true
+    description: |
+      Replace repeated target names with unique names.
+  - name: "--aa"
+    type: boolean_true
+    description: |
+      Generate index from a FASTA-file containing amino acid sequences.
+  - name: "--distiguish"
+    type: boolean_true
+    description: |
+       Generate index where sequences are distinguished by the sequence names.
+  - name: "--min_size"
+    alternatives: ["-m"]
+    type: integer
+    description: |
+      Length of minimizers (default: automatically chosen).
+  - name: "--ec_max_size"
+    alternatives: ["-e"]
+    type: integer
+    description: |
+      Maximum number of targets in an equivalence class (default: no maximum).
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: test_data
+
+engines:
+  - type: docker
+    image: ubuntu:22.04
+    setup:
+      - type: docker
+        run: |
+          apt-get update && \
+          apt-get install -y --no-install-recommends wget && \
+          wget --no-check-certificate https://github.com/pachterlab/kallisto/releases/download/v0.50.1/kallisto_linux-v0.50.1.tar.gz && \
+          tar -xzf kallisto_linux-v0.50.1.tar.gz && \
+          mv kallisto/kallisto /usr/local/bin/
+runners:
+  - type: executable
+  - type: nextflow  

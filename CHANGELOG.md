@@ -140,6 +140,9 @@
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
 
+* `kallisto`:
+    - `kallisto_index`: Create a kallisto index (PR #149).
+
 ## MINOR CHANGES
 
 * Uniformize component metadata (PR #23).
