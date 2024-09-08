@@ -1,20 +1,21 @@
 #!/bin/bash
 
-echo ">>>Test1: Testing $meta_functionality_name with make_unique argument"
+echo ">>>Test1: Testing $meta_functionality_name with non-default k-mer size"
 
 "$meta_executable" \
   --input "$meta_resources_dir/test_data/transcriptome.fasta" \
   --kallisto_index Kallisto \
-  --kmer_size 21 \
-  --make_unique 
+  --kmer_size 21
 
 
-echo ">>> Checking whether output exists"
+echo ">>> Checking whether output exists and is correct"
 [ ! -f "Kallisto" ] && echo "Kallisto index does not exist!" && exit 1
 [ ! -s "Kallisto" ] && echo "Kallisto index is empty!" && exit 1
 
 kallisto inspect Kallisto 2> test.txt
 grep "number of k-mers: 2,978" test.txt || { echo "The content of the index seems to be incorrect." && exit 1; }
+
+################################################################################
 
 echo ">>>Test2: Testing $meta_functionality_name with d_list argument"
 
@@ -23,7 +24,7 @@ echo ">>>Test2: Testing $meta_functionality_name with d_list argument"
   --kallisto_index Kallisto \
   --d_list "$meta_resources_dir/test_data/d_list.fasta"
 
-echo ">>> Checking whether output exists"
+echo ">>> Checking whether output exists and is correct"
 [ ! -f "Kallisto" ] && echo "Kallisto index does not exist!" && exit 1
 [ ! -s "Kallisto" ] && echo "Kallisto index is empty!" && exit 1
 
