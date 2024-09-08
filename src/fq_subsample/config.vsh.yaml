@@ -50,23 +50,18 @@ test_resources:
     path: test.sh
   - path: test_data
 
-engines:
+engines:  
   - type: docker
-    image: ubuntu:22.04
-    setup: 
+    image: rust:1.81-slim
+    setup:
       - type: docker
-        env: 
-            - TZ=Europe/Brussels
-        run: | 
-          ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
-          apt-get update && \
-          apt-get install -y --no-install-recommends build-essential git-all curl && \
-          curl https://sh.rustup.rs -sSf | sh -s -- -y && \
-          . "$HOME/.cargo/env" && \
+        run: |
+          apt-get update && apt-get install -y git procps && \
           git clone --depth 1 --branch v0.12.0 https://github.com/stjude-rust-labs/fq.git && \
-          mv fq /usr/local/ && cd /usr/local/fq && \
+          cd fq && \
           cargo install --locked --path . && \
-          mv /usr/local/fq/target/release/fq /usr/local/bin/
+          mv target/release/fq /usr/local/bin/ && \
+          cd / && rm -rf /fq
 
 runners:
   - type: executable
