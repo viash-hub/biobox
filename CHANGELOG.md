@@ -29,6 +29,7 @@
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
+  - `bedtools/bedtools_genomecov`: Compute the coverage of a feature file (bed/gff/vcf/bam) among a genome (PR #128).
   - `bedtools/bedtools_groupby`: Summarizes a dataset column based upon common column groupings. Akin to the SQL "group by" command (PR #123).
   - `bedtools/bedtools_merge`: Merges overlapping BED/GFF/VCF entries into a single interval (PR #118).
   - `bedtools/bedtools_bamtofastq`: Convert BAM alignments to FASTQ files (PR #101).
@@ -44,6 +45,7 @@
   - `bcftools/bcftools_sort`: Sorts BCF/VCF files by position and other criteria (PR #141).
 
 * `fastqc`: High throughput sequence quality control analysis tool (PR #92).
+
 
 ## MINOR CHANGES
 
@@ -140,8 +142,14 @@
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
 
+* `sortmerna`: Local sequence alignment tool for mapping, clustering, and filtering rRNA from metatranscriptomic 
+               data. (PR #146)
+
+* `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
+
 * `kallisto`:
     - `kallisto_index`: Create a kallisto index (PR #149).
+
 
 ## MINOR CHANGES
 
