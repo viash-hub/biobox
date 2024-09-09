@@ -142,6 +142,9 @@
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
 
+* `sortmerna`: Local sequence alignment tool for mapping, clustering, and filtering rRNA from metatranscriptomic 
+               data. (PR #146)
+
 *  `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
 
 ## MINOR CHANGES
