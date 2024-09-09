@@ -142,6 +142,8 @@
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
 
+*  `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
+
 ## MINOR CHANGES
 
 * Uniformize component metadata (PR #23).
