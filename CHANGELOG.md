@@ -29,8 +29,13 @@
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
+  - `bedtools/bedtools_genomecov`: Compute the coverage of a feature file (bed/gff/vcf/bam) among a genome (PR #128).
+  - `bedtools/bedtools_groupby`: Summarizes a dataset column based upon common column groupings. Akin to the SQL "group by" command (PR #123).
+  - `bedtools/bedtools_merge`: Merges overlapping BED/GFF/VCF entries into a single interval (PR #118).
   - `bedtools/bedtools_bamtofastq`: Convert BAM alignments to FASTQ files (PR #101).
   - `bedtools/bedtools_bedtobam`: Converts genomic feature records (bed/gff/vcf) to BAM format (PR #111).
+  - `bedtools/bedtools_bed12tobed6`: Converts BED12 files to BED6 files (PR #140).
+  - `bedtools/bedtools_links`: Creates an HTML file with links to an instance of the UCSC Genome Browser for all features / intervals in a (bed/gff/vcf) file (PR #137).
  
 * `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74). 
 
@@ -38,6 +43,11 @@
 
 * `bcftools`:
   - `bcftools_norm`: Left-align and normalize indels, check if REF alleles match the reference, split multiallelic sites into multiple rows; recover multiallelics from multiple rows (PR #144).
+  - `bcftools_annotate`: Add or remove annotations from a VCF/BCF file (PR #143).
+  - `bcftools/bcftools_stats`: Parses VCF or BCF and produces a txt stats file which can be plotted using plot-vcfstats (PR #142).
+  - `bcftools/bcftools_sort`: Sorts BCF/VCF files by position and other criteria (PR #141).
+
+* `fastqc`: High throughput sequence quality control analysis tool (PR #92).
 
 ## MINOR CHANGES
 
@@ -133,6 +143,11 @@
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
+
+* `sortmerna`: Local sequence alignment tool for mapping, clustering, and filtering rRNA from metatranscriptomic 
+               data. (PR #146)
+
+*  `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
 
 ## MINOR CHANGES
 
