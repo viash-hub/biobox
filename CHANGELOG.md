@@ -20,15 +20,32 @@
                 based on a provided sequence IDs or region coordinates file (PR #85).
 
 * `agat`:
-  - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
-  - `/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
+  - `agat/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
+  - `agat/agat_convert_sp_gff2tsv`: convert gtf/gff file into tabulated file (PR #102).
+  - `agat/agat_convert_sp_gxf2gxf`: fixes and/or standardizes any GTF/GFF file into full sorted GTF/GFF file (PR #103).
 
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
+  - `bedtools/bedtools_genomecov`: Compute the coverage of a feature file (bed/gff/vcf/bam) among a genome (PR #128).
+  - `bedtools/bedtools_groupby`: Summarizes a dataset column based upon common column groupings. Akin to the SQL "group by" command (PR #123).
+  - `bedtools/bedtools_merge`: Merges overlapping BED/GFF/VCF entries into a single interval (PR #118).
+  - `bedtools/bedtools_bamtofastq`: Convert BAM alignments to FASTQ files (PR #101).
+  - `bedtools/bedtools_bedtobam`: Converts genomic feature records (bed/gff/vcf) to BAM format (PR #111).
+  - `bedtools/bedtools_bed12tobed6`: Converts BED12 files to BED6 files (PR #140).
+  - `bedtools/bedtools_links`: Creates an HTML file with links to an instance of the UCSC Genome Browser for all features / intervals in a (bed/gff/vcf) file (PR #137).
+ 
+* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74). 
 
+* `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
 
-* `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
+* `bcftools`:
+  - `bcftools/bcftools_sort`: Sorts BCF/VCF files by position and other criteria (PR #141).
+
+* `fastqc`: High throughput sequence quality control analysis tool (PR #92).
+
 
 * `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
 
@@ -126,6 +143,11 @@
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
+
+* `sortmerna`: Local sequence alignment tool for mapping, clustering, and filtering rRNA from metatranscriptomic 
+               data. (PR #146)
+
+*  `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
 
 ## MINOR CHANGES
 
