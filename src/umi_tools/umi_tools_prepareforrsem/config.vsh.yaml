@@ -58,6 +58,10 @@ engines:
       packages: [pip]
     - type: python
       packages: [umi_tools, pysam]
+    - type: docker
+      run: |
+        pip list --format=freeze | sed 's/==/:/' | sort > /var/software_versions.txt
+
 runners: 
 - type: executable
 - type: nextflow
