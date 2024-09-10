@@ -1,0 +1,172 @@
+name: bcftools_concat
+namespace: bcftools
+description: | 
+  Concatenate or combine VCF/BCF files. All source files must have the same sample
+  columns appearing in the same order. The program can be used, for example, to
+  concatenate chromosome VCFs into one VCF, or combine a SNP VCF and an indel
+  VCF into one. The input files must be sorted by chr and position. The files
+  must be given in the correct order to produce sorted VCF on output unless
+  the -a, --allow-overlaps option is specified. With the --naive option, the files
+  are concatenated without being recompressed, which is very fast.
+keywords: [Concatenate, VCF, BCF]
+links:
+  homepage: https://samtools.github.io/bcftools/
+  documentation: https://samtools.github.io/bcftools/bcftools.html#concat
+  repository: https://github.com/samtools/bcftools
+  issue_tracker: https://github.com/samtools/bcftools/issues
+references:
+  doi: https://doi.org/10.1093/gigascience/giab008
+license: MIT/Expat, GNU
+requirements:
+  commands: [bcftools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [author]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: -i
+        type: file
+        multiple: true
+        description: Input VCF/BCF files to concatenate.
+      
+      - name: --file_list
+        alternatives: -f
+        type: file
+        description: Read the list of VCF/BCF files from a file, one file name per line.
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: -o
+        direction: output
+        type: file
+        description: Output concatenated VCF/BCF file.
+        required: true
+         
+  - name: Options
+    arguments:
+      
+      - name: --allow_overlaps
+        alternatives: -a
+        type: boolean_true
+        description:  | 
+          First coordinate of the next file can precede last record of the current file.
+      
+      - name: --compact_PS
+        alternatives: -c
+        type: boolean_true
+        description: | 
+          Do not output PS tag at each site, only at the start of a new phase set block.
+      
+      - name: --remove_duplicates
+        alternatives: -d
+        type: string
+        choices: ['snps', 'indels', 'both', 'all', 'exact', 'none']
+        description: |
+          Output duplicate records present in multiple files only once: <snps|indels|both|all|exact>.
+              
+      - name: --ligate
+        alternatives: -l
+        type: boolean_true
+        description: Ligate phased VCFs by matching phase at overlapping haplotypes.
+      
+      - name: --ligate_force
+        type: boolean_true
+        description: Ligate even non-overlapping chunks, keep all sites.
+      
+      - name: --ligate_warn
+        type: boolean_true
+        description: Drop sites in imperfect overlaps.
+
+      - name: --no_version
+        type: boolean_true
+        description: Do not append version and command line information to the header.
+        
+      - name: --naive
+        alternatives: -n
+        type: boolean_true
+        description: Concatenate files without recompression, a header check compatibility is performed.
+      
+      - name: --naive_force
+        type: boolean_true
+        description: | 
+          Same as --naive, but header compatibility is not checked. 
+          Dangerous, use with caution.
+
+      - name: --output_type
+        alternatives: -O
+        type: string
+        choices: ['u', 'z', 'b', 'v']
+        description: | 
+          Output type:
+            u: uncompressed BCF
+            z: compressed VCF
+            b: compressed BCF
+            v: uncompressed VCF
+    
+      - name: --min_PQ
+        alternatives: -q
+        type: integer
+        description: Break phase set if phasing quality is lower than <int>.
+        example: 30
+
+      - name: --regions
+        alternatives: -r
+        type: string
+        description: | 
+          Restrict to comma-separated list of regions. 
+          Following formats are supported: chr|chr:pos|chr:beg-end|chr:beg-[,…​].
+        example: '20:1000000-2000000'
+
+      - name: --regions_file
+        alternatives: -R
+        type: file
+        description: | 
+          Restrict to regions listed in a file. 
+          Regions can be specified either on a VCF, BED, or tab-delimited file (the default). 
+          For more information check manual.
+
+      - name: --regions_overlap
+        type: string
+        choices: ['pos', 'record', 'variant', '0', '1', '2']
+        description: | 
+          This option controls how overlapping records are determined: 
+          set to 'pos' or '0' if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
+          set to 'record' or '1' if also overlapping records with POS outside a region should be included (this is the default behavior of -r/-R, 
+          and includes indels with POS at the end of a region, which are technically outside the region); 
+          or set to 'variant' or '2' to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
+
+      #PS: Verbose seems to be broken in this version of bcftools
+      # - name: --verbose
+      #   alternatives: -v
+      #   type: integer
+      #   choices: [0, 1]
+      #   description: Set verbosity level.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bcftools, procps]
+      - type: docker
+        run: |
+          echo "bcftools: \"$(bcftools --version | grep 'bcftools' | sed -n 's/^bcftools //p')\"" > /var/software_versions.txt
+    test_setup:  
+      - type: apt  
+        packages: [tabix]
+
+runners:
+  - type: executable
+  - type: nextflow
