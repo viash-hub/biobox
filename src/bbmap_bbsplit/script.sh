@@ -18,42 +18,58 @@ for var in "${unset_if_false[@]}"; do
     fi
 done
 
-if [ ! -d "$par_index" ]; then
-    other_refs=()
-    while IFS="," read -r name path 
+if [ ! -d "$par_build" ]; then
+    IFS=";" read -ra ref_files <<< "$par_ref"
+    primary_ref="${ref_files[0]}"
+    refs=()
+    for file in "${ref_files[@]:1}"
     do
-        other_refs+=("ref_$name=$path")
-    done < "$par_ref_fasta_list"
+        name=$(basename "$file" | sed 's/\.[^.]*$//')
+        refs+=("ref_$name=$file")
+    done
 fi
 
 if $par_only_build_index; then
-    if [ -f "$par_primary_ref" ] && [ ${#other_refs[@]} -gt 0 ]; then
+    if [ ${#refs[@]} -gt 1 ]; then
         bbsplit.sh \
-            ref_primary="$par_primary_ref" "${other_refs[@]}" \
-            path=$par_index \
-            threads=${meta_cpus:-1}
+            --ref_primary="$primary_ref" \
+            "${refs[@]}" \
+            path=$par_build
     else
-        echo "ERROR: Please specify as input a primary fasta file along with names and paths to non-primary fasta files."
+        echo "ERROR: Please specify at least two reference fasta files."
     fi
 else
-    IFS="," read -ra input <<< "$par_input"
+    IFS=";" read -ra input <<< "$par_input"
     tmpdir=$(mktemp -d "$meta_temp_dir/$meta_functionality_name-XXXXXXXX")
     index_files=''
-    if [ -d "$par_index" ]; then
-        index_files="path=$par_index"
-    elif [ -f "$par_primary_ref" ] && [ ${#other_refs[@]} -gt 0 ]; then
-        index_files="ref_primary=$par_primary_ref ${other_refs[@]}"
+    if [ -d "$par_build" ]; then
+        index_files="path=$par_build"
+    elif [ ${#refs[@]} -gt 0 ]; then
+        index_files="--ref_primary=$primary_ref ${refs[*]}"
     else
-        echo "ERROR: Please either specify a BBSplit index as input or a primary fasta file along with names and paths to non-primary fasta files."
+        echo "ERROR: Please either specify a BBSplit index as input or at least two reference fasta files."
     fi
+
+    extra_args=""
+    if [ -n "$par_refstats" ]; then extra_args+=" --refstats $par_refstats"; fi
+    if [ -n "$par_ambiguous" ]; then extra_args+=" --ambiguous $par_ambiguous"; fi
+    if [ -n "$par_ambiguous2" ]; then extra_args+=" --ambiguous2 $par_ambiguous2"; fi
+    if [ -n "$par_minratio" ]; then extra_args+=" --minratio $par_minratio"; fi
+    if [ -n "$par_minhits" ]; then extra_args+=" --minhits $par_minhits"; fi
+    if [ -n "$par_maxindel" ]; then extra_args+=" --maxindel $par_maxindel"; fi
+    if [ -n "$par_qin" ]; then extra_args+=" --qin $par_qin"; fi
+    if [ -n "$par_qtrim" ]; then extra_args+=" --qtrim $par_qtrim"; fi
+    if [ "$par_interleaved" = true ]; then extra_args+=" --interleaved"; fi
+    if [ "$par_untrim" = true ]; then extra_args+=" --untrim"; fi
+    if [ "$par_nzo" = true ]; then extra_args+=" --nzo"; fi
+
     if $par_paired; then
         bbsplit.sh \
             $index_files \
-            threads=${meta_cpus:-1} \
             in=${input[0]} \
             in2=${input[1]} \
             basename=${tmpdir}/%_#.fastq \
-            refstats=bbsplit_stats.txt
+            $extra_args
         read1=$(find $tmpdir/ -iname primary_1*)
         read2=$(find $tmpdir/ -iname primary_2*)
         cp $read1 $par_fastq_1
@@ -61,10 +77,9 @@ else
     else
         bbsplit.sh \
             $index_files \
-            threads=${meta_cpus:-1} \
             in=${input[0]} \
             basename=${tmpdir}/%.fastq \
-            refstats=bbsplit_stats.txt
+            $extra_args
         read1=$(find $tmpdir/ -iname primary*)
         cp $read1 $par_fastq_1
     fi

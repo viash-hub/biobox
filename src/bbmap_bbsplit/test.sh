@@ -2,11 +2,6 @@
 
 echo ">>> Test $meta_functionality_name"
 
-cat > bbsplit_fasta_list.txt << HERE
-sarscov2,sarscov2.fa
-human,human.fa
-HERE
-
 echo "> Prepare test data"
 
 cat > reads_R1.fastq <<'EOF'
@@ -58,10 +53,9 @@ EOF
 
 echo ">>> Building BBSplit index"
 "${meta_executable}" \
-  --primary_ref "genome.fasta" \
-  --ref_fasta_list bbsplit_fasta_list.txt \
+  --ref "genome.fasta;human.fa;sarscov2.fa" \
   --only_build_index \
-  --index "BBSplit_index" 
+  --build "BBSplit_index" 
 
 echo ">>> Check whether output exists"
 [ ! -d "BBSplit_index" ] && echo "BBSplit index does not exist!" && exit 1
@@ -73,8 +67,7 @@ echo ">>> Check whether output exists"
 echo ">>> Testing with single-end reads and primary/non-primary FASTA files"
 "${meta_executable}" \
   --input "reads_R1.fastq" \
-  --primary_ref "genome.fasta" \
-  --ref_fasta_list bbsplit_fasta_list.txt \
+  --ref "genome.fasta;human.fa;sarscov2.fa" \
   --fastq_1 "filtered_reads_R1.fastq"
 
 echo ">>> Check whether output exists"
@@ -91,9 +84,8 @@ rm filtered_reads_R1.fastq
 echo ">>> Testing with paired-end reads and primary/non-primary FASTA files"
 "${meta_executable}" \
   --paired \
-  --input "reads_R1.fastq,reads_R2.fastq" \
-  --primary_ref "genome.fasta" \
-  --ref_fasta_list "bbsplit_fasta_list.txt" \
+  --input "reads_R1.fastq;reads_R2.fastq" \
+  --ref "genome.fasta;human.fa;sarscov2.fa" \
   --fastq_1 "filtered_reads_R1.fastq" \
   --fastq_2 "filtered_reads_R2.fastq"
 
@@ -114,7 +106,7 @@ rm filtered_reads_R1.fastq filtered_reads_R2.fastq
 echo ">>> Testing with single-end reads and BBSplit index"
 "${meta_executable}" \
   --input "reads_R1.fastq" \
-  --index "BBSplit_index" \
+  --build "BBSplit_index" \
   --fastq_1 "filtered_reads_R1.fastq"
 
 echo ">>> Check whether output exists"
@@ -131,8 +123,8 @@ rm filtered_reads_R1.fastq
 echo ">>> Testing with paired-end reads and BBSplit index"
 "${meta_executable}" \
   --paired \
-  --input "reads_R1.fastq,reads_R2.fastq" \
-  --index "BBSplit_index" \
+  --input "reads_R1.fastq;reads_R2.fastq" \
+  --build "BBSplit_index" \
   --fastq_1 "filtered_reads_R1.fastq" \
   --fastq_2 "filtered_reads_R2.fastq"
 

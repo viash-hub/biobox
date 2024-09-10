@@ -21,20 +21,15 @@ argument_groups:
     type: file
     multiple: true
     description: Input fastq files, either one or two (paired), separated by ";".
-    multiple_sep: ","
     example: reads.fastq
-  - name: "--primary_ref"
+  - name: "--ref"
     type: file
-    description: Primary reference FASTA
-  - name: "--other_ref_names"
-    type: file
-    description: |
-      Path to comma-separated file containing a list of reference genomes to filter reads
-      against with BBSplit.
+    multiple: true
+    description: Reference FASTA files, separated by ";". The primary reference should be specified first.
   - name: "--only_build_index"
     type: boolean_true
     description: If set, only builds the index. Otherwise, mapping is performed.
-  - name: "--index"
+  - name: "--build"
     type: string
     description: |
       Designate index to use. Corresponds to the number specified when building the index.
@@ -112,22 +107,6 @@ argument_groups:
       Output file for read 2.
     direction: output
     example: read_out2.fastq
-  - name: "--primary_fastq"
-    type: file
-    description: |
-      Output reads that map to the primary reference.
-    direction: output
-    example: primary.fastq.gz
-  - name: "--all_fastq"
-    type: file
-    description: |
-      Output reads that map to the primary reference.
-    direction: output
-    example: all.fastq.gz
-  - name: "--ref_fasta_list"
-    type: file
-    description: |
-      Directory with index files.
   - name: "--sam2bam"
     alternatives: ["--bs"]
     type: file
