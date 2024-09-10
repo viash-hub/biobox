@@ -18,12 +18,12 @@ authors:
 argument_groups:
   - name: Input
     arguments:   
-    - name: "--input"
-      type: file
-      description: Input files. Note that paired-end files need to be supplied in a pairwise fashion, e.g. file1_1.fq file1_2.fq SRR2_1.fq.gz SRR2_2.fq.gz
-      required: true
-      multiple: true
-      example: sample1_r1.fq;sample1_r2.fq;sample2_r1.fq;sample2_r2.fq
+      - name: "--input"
+        type: file
+        description: Input files. Note that paired-end files need to be supplied in a pairwise fashion, e.g. file1_1.fq file1_2.fq SRR2_1.fq.gz SRR2_2.fq.gz
+        required: true
+        multiple: true
+        example: sample1_r1.fq;sample1_r2.fq;sample2_r1.fq;sample2_r2.fq
   - name: Trimming options
     arguments: 
       - name: --quality
@@ -31,23 +31,18 @@ argument_groups:
         type: integer
         description: Trim low-quality ends (below the specified Phred score) from reads in addition to adapter removal. For RRBS samples, quality trimming will be performed first, and adapter trimming is carried in a second round. Other files are quality and adapter trimmed in a single pass. The algorithm is the same as the one used by BWA (Subtract INT from all qualities; compute partial sums from all indices to the end of the sequence; cut sequence at the index at which the sum is minimal). 
         example: 20
-        required: false
       - name: --phred33
-        type: boolean
+        type: boolean_true
         description: Instructs Cutadapt to use ASCII+33 quality scores as Phred scores (Sanger/Illumina 1.9+ encoding) for quality trimming. 
-        required: false
       - name: --phred64
-        type: boolean
+        type: boolean_true
         description: Instructs Cutadapt to use ASCII+64 quality scores as Phred scores (Illumina 1.5 encoding) for quality trimming.
-        required: false
       - name: --fastqc
-        type: boolean
+        type: boolean_true
         description: Run FastQC in the default mode on the FastQ file once trimming is complete.
-        required: false
       - name: --fastqc_args
         type: string
         description: Passes extra arguments to FastQC. If more than one argument is to be passed to FastQC they must be in the form "arg1 arg2 ...". Passing extra arguments will automatically invoke FastQC, so --fastqc does not have to be specified separately.
-        required: false
         example: "--nogroup --outdir /home/"
       - name: --adapter
         alternatives: -a
@@ -59,8 +54,6 @@ argument_groups:
           or so:
             -a "file:../multiple_adapters.fa" -a2 "file:../different_adapters.fa"
           Potentially in conjucntion with the parameter "-n 3" to trim all adapters. 
-                example: 20
-        required: false
         example: AGCTCCCG
       - name: --adapter2 
         alternatives: -a2
@@ -69,19 +62,16 @@ argument_groups:
         required: false
         example: AGCTCCCG
       - name: --illumina
-        type: boolean
+        type: boolean_true
         description: Adapter sequence to be trimmed is the first 13bp of the Illumina universal adapter 'AGATCGGAAGAGC' instead of the default auto-detection of adapter sequence.
-        required: false
       - name: --stranded_illumina 
-        type: boolean
+        type: boolean_true
         description: Adapter sequence to be trimmed is the first 13bp of the Illumina stranded mRNA or Total RNA adapter 'ACTGTCTCTTATA' instead of the default auto-detection of adapter sequence. 
-        required: false
       - name: --nextera
-        type: boolean
+        type: boolean_true
         description: Adapter sequence to be trimmed is the first 12bp of the Nextera adapter 'CTGTCTCTTATA' instead of the default auto-detection of adapter sequence.
-        required: false
       - name: --small_rna 
-        type: boolean
+        type: boolean_true
         description: Adapter sequence to be trimmed is the first 12bp of the Illumina Small RNA 3' Adapter 'TGGAATTCTCGG' instead of the default auto-detection of adapter sequence. Selecting to trim smallRNA adapters will also lower the --length value to 18bp. If the smallRNA libraries are paired-end then a automatically (GATCGTCGGACT) unless -a 2 had been defined explicitly.
       - name: --consider_already_trimmed 
         type: integer
@@ -103,13 +93,11 @@ argument_groups:
         required: false
         example: 0.1
       - name: --gzip
-        type: boolean
+        type: boolean_true
         description: Compress the output file with GZIP. If the input files are GZIP-compressed the output files will automatically be GZIP compressed as well. As of v0.2.8 the compression will take place on the fly.
-        required: false
       - name: --dont_gzip 
-        type: boolean
+        type: boolean_true
         description: Output files won't be compressed with GZIP. This option overrides --gzip.
-        required: false
       - name: --length 
         type: integer 
         description: Discard reads that became shorter than the specified length because of either quality or adapter trimming. A value of '0' effectively disables this behaviour. For paired-end files, both reads of a read-pair need to be longer than the specified length to be printed out to validated paired-end files. If only one read became too short there is the possibility of keeping such unpaired single-end reads using the --retain_unpaired option.
@@ -120,17 +108,14 @@ argument_groups:
         description: The total number of Ns a read may contain before it will be removed altogether.In a paired-end setting, either read exceeding this limit will result in the entire pair being removed from the trimmed output files. If COUNT is a number between 0 and 1, it is interpreted as a fraction of the read length.
         required: false
       - name: --trim_n
-        type: boolean
+        type: boolean_true
         description: Removes Ns from either side of the read. This option does currently not work in RRBS mode.
-        required: false
       - name: --no_report_file
-        type: boolean
+        type: boolean_true
         description: If specified no report file will be generated.
-        required: false
       - name: --suppress_warn
-        type: boolean
+        type: boolean_true
         description: If specified any output to STDOUT or STDERR will be suppressed.
-        required: false
       - name: --clip_R1
         type: integer
         description: Instructs TrimGalore to remove given number of bp from the 5' end of read 1 (or single-end reads). This may be useful if the qualities were very poor, or if there is some sort of unwanted bias at the 5' end. 
@@ -155,12 +140,6 @@ argument_groups:
         type: string
         description: Use specified name (PREFERRED_NAME) as the basename for output files, instead of deriving the filenames from the input files. Single-end data would be called PREFERRED_NAME_trimmed.fq(.gz), or PREFERRED_NAME_val_1.fq(.gz) and PREFERRED_NAME_val_2.fq(.gz) for paired-end data. --basename only works when 1 file (single-end) or 2 files (paired-end) are specified, but not for longer lists.
         required: false
-      - name: --cores
-        alternatives: -j
-        type: integer
-        description: Number of cores to be used for trimming
-        required: false
-        example: 1
   - name: Specific trimming options without adapter/quality trimming
     arguments: 
       - name: --hardtrim5 
@@ -172,45 +151,37 @@ argument_groups:
         description: Instead of performing adapter-/quality trimming, this option will simply hard-trim sequences to <int> bp at the 3'-end. Once hard-trimming of files is complete, Trim Galore will exit. Hard-trimmed output files will end in .<int>_3prime.fq(.gz). 
         required: false
       - name: --clock
-        type: boolean
+        type: boolean_true
         description: In this mode, reads are trimmed in a specific way that is currently used for the Mouse Epigenetic Clock.
-        required: false
       - name: --polyA
-        type: boolean
+        type: boolean_true
         description: This is a new, still experimental, trimming mode to identify and remove poly-A tails from sequences. When --polyA is selected, Trim Galore attempts to identify from the first supplied sample whether sequences contain more often a stretch of either 'AAAAAAAAAA' or 'TTTTTTTTTT'. This determines if Read 1 of a paired-end end file, or single-end files, are trimmed for PolyA or PolyT. In case of paired-end sequencing, Read2 is trimmed for the complementary base from the start of the reads. The auto-detection uses a default of A{20} for Read1 (3'-end trimming) and T{150} for Read2 (5'-end trimming). These values may be changed manually using the options -a and -a2. In addition to trimming the sequences, white spaces are replaced with _ and it records in the read ID how many bases were trimmed so it can later be used to identify PolyA trimmed sequences. This is currently done by writing tags to both the start ("32:A:") and end ("_PolyA:32") of the reads. The poly-A trimming mode expects that sequences were both adapter and quality  before looking for Poly-A tails, and it is the user's responsibility to carry out an initial round of trimming. 
-        required: false
       - name: --implicon    
-        type: boolean
+        type: boolean_true
         description: | 
           This is a special mode of operation for paired-end data, such as required for the IMPLICON method, where a UMI sequence is getting transferred from the start of Read 2 to the readID of both reads. Following this, Trim Galore will exit. In it's current implementation, the UMI carrying reads come in the following format
             Read 1  5' FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF 3'
             Read 2  3' UUUUUUUUFFFFFFFFFFFFFFFFFFFFFFFFFFFF 5'
           Where UUUUUUUU is a random 8-mer unique molecular identifier (UMI) and FFFFFFF... is the actual fragment to be sequenced. The UMI of Read 2 (R2) is written into the read ID of both reads and removed from the actual sequence.
-        required: false
   - name: RRBS-specific options
     arguments: 
       - name: --rrbs 
-        type: boolean
+        type: boolean_true
         description: Specifies that the input file was an MspI digested RRBS sample (recognition site is CCGG). Single-end or Read 1 sequences (paired-end) which were adapter-trimmed will have a further 2 bp removed from their 3' end. Sequences which were merely trimmed because of poor quality will not be shortened further. Read 2 of paired-end libraries will in addition have the first 2 bp removed from the 5' end (by setting '--clip_r2 2'). This is to avoid using artificial methylation calls from the filled-in cytosine positions close to the 3' MspI site in sequenced fragments. This option is not recommended for users of the Tecan Ovation RRBS Methyl-Seq with TrueMethyl oxBS 1-16 kit (see below).
-        required: false
       - name: --non_directional
-        type: boolean
+        type: boolean_true
         description: Selecting this option for non-directional RRBS libraries will screen quality-trimmed sequences for 'CAA' or 'CGA' at the start of the read and, if found, removes the first two basepairs. Like with the option '--rrbs' this avoids using cytosine positions that were filled-in during the end-repair step. '--non_directional' requires '--rrbs' to be specified as well. Note that this option does not set '--clip_r2 2' in paired-end mode.
-        required: false
       - name: --keep 
-        type: boolean
+        type: boolean_true
         description: Keep the quality trimmed intermediate file. 
-        required: false
   - name: Paired-end specific options
     arguments: 
       - name: --paired 
-        type: boolean
+        type: boolean_true
         description: This option performs length trimming of quality/adapter/RRBS trimmed reads for paired-end files. To pass the validation test, both sequences of a sequence pair are required to have a certain minimum length which is governed by the option --length (see above). If only one read passes this length threshold the other read can be rescued (see option --retain_unpaired). Using this option lets you discard too short read pairs without disturbing the sequence-by-sequence order of FastQ files which is required by many aligners. Trim Galore expects paired-end files to be supplied in a pairwise fashion, e.g. file1_1.fq file1_2.fq SRR2_1.fq.gz SRR2_2.fq.gz ... .
-        required: false
       - name: --retain_unpaired  
-        type: boolean
+        type: boolean_true
         description: If only one of the two paired-end reads became too short, the longer read will be written to either '.unpaired_1.fq' or '.unpaired_2.fq' output files. The length cutoff for unpaired single-end reads is governed by the parameters -r1/--length_1 and -r2/--length_2. 
-        required: false
       - name: --length_1
         alternatives: -r1
         type: integer 
@@ -303,7 +274,7 @@ test_resources:
     
 engines:
 - type: docker
-  image: quay.io/biocontainers/trim-galore:0.6.9--hdfd78af_0
+  image: quay.io/biocontainers/trim-galore:0.6.10--hdfd78af_0
   setup:
     - type: docker
       run: |

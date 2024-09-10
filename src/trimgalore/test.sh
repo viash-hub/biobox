@@ -53,13 +53,12 @@ EOF
 
 echo ">>> Testing for single-end reads"
 "$meta_executable" \
-    --paired false \
     --input "example_R1.fastq" \
     --trimmed_fastqc_html_1 output_se_test/example.trimmed.html \
     --trimmed_fastqc_zip_1 output_se_test/example.trimmed.zip \
     --trimmed_r1 output_se_test/example.trimmed.fastq \
     --trimming_report_r1 output_se_test/example.trimming_report.txt \
-    --fastqc true \
+    --fastqc \
     --output_dir output_se_test
 
 echo ">> Checking output"
@@ -82,7 +81,7 @@ assert_file_contains "output_se_test/example.trimming_report.txt" "Sequences rem
 
 echo ">>> Testing for paired-end reads"
 "$meta_executable" \
-    --paired true \
+    --paired \
     --input "example_R1.fastq;example_R2.fastq" \
     --trimmed_fastqc_html_1 output_pe_test/example_R1.trimmed.html \
     --trimmed_fastqc_html_2 output_pe_test/example_R2.trimmed.html \
@@ -92,7 +91,7 @@ echo ">>> Testing for paired-end reads"
     --trimmed_r2 output_pe_test/example_R2.trimmed.fastq \
     --trimming_report_r1 output_pe_test/example_R1.trimming_report.txt \
     --trimming_report_r2 output_pe_test/example_R2.trimming_report.txt \
-    --fastqc true \
+    --fastqc \
     --output_dir output_pe_test
 
 echo ">> Checking output"

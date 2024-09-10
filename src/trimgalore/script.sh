@@ -16,13 +16,16 @@ unset_if_false=(
     par_small_rna 
     par_gzip 
     par_dont_gzip 
+    par_trim_n 
     par_no_report_file 
     par_suppress_warn 
     par_clock 
     par_polyA 
+    par_implicon 
     par_rrbs 
     par_non_directional 
-    par_keep par_paired 
+    par_keep 
+    par_paired 
     par_retain_unpaired 
 )
 
@@ -72,7 +75,7 @@ trim_galore \
     ${par_retain_unpaired:+--retain_unpaired} \
     ${par_length_1:+-r1 "${par_length_1}"} \
     ${par_length_2:+-r2 "${par_length_2}"} \
-    ${par_cores:+-j "${par_cores}"} \
+    ${meta_cpus:+-j "${meta_cpus}"} \
     -o $par_output_dir \
     ${input[*]}
 
