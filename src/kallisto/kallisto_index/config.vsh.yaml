@@ -28,10 +28,9 @@ argument_groups:
 
 - name: "Output"
   arguments:
-  - name: "--kallisto_index"
+  - name: "--index"
     type: file
     direction: output
-    must_exist: false
     example: Kallisto_index
 
 - name: "Options"
@@ -63,6 +62,12 @@ argument_groups:
     type: integer
     description: |
       Maximum number of targets in an equivalence class (default: no maximum).
+  - name: "--tmp"
+    alternatives: ["-T"]
+    type: string
+    description: |
+      Path to a directory for temporary files.
+    example: "tmp"
 
 resources:
   - type: bash_script
