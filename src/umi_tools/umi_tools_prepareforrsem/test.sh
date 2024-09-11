@@ -1,6 +1,7 @@
 #!/bin/bash
 
 test_dir="$meta_resources_dir/test_data"
+apt-get -q update && apt-get -q install -y samtools
 
 ################################################################################
 echo ">>> Test 1: with --sam:"
@@ -30,7 +31,6 @@ echo ">>> Check if output is present"
 [[ ! -s "$test_dir/test_output.bam" ]] && echo "Output file is empty" && exit 1
 
 echo ">>> Check if output is correct"
-apt-get update && apt-get install -y samtools
 diff <(samtools view "$test_dir/test_output.bam") <(samtools view "$test_dir/test.bam") || (echo "Output is incorrect" && exit 1)
 
 ################################################################################

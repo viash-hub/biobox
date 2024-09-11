@@ -124,7 +124,7 @@
 
 * `umi_tools`:
     - `umi_tools/umi_tools_extract`: Flexible removal of UMI sequences from fastq reads (PR #71).
-    - `umi_tools/umi_tools_prepareforquant`: Fix paired-end reads in name sorted BAM file to prepare for RSEM (PR #148).
+    - `umi_tools/umi_tools_prepareforrsem`: Fix paired-end reads in name sorted BAM file to prepare for RSEM (PR #148).
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 

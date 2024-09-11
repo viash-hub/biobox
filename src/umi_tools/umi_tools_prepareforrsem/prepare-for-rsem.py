@@ -50,6 +50,7 @@ from collections import defaultdict, Counter
 import pysam
 import sys
 
+
 usage = """
 prepare_for_rsem - make output from dedup or group compatible with RSEM
 
