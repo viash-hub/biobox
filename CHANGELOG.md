@@ -149,7 +149,11 @@
 * `sortmerna`: Local sequence alignment tool for mapping, clustering, and filtering rRNA from metatranscriptomic 
                data. (PR #146)
 
-*  `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
+* `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
+
+* `kallisto`:
+    - `kallisto_index`: Create a kallisto index (PR #149).
+
 
 ## MINOR CHANGES
 
