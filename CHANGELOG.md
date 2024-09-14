@@ -42,10 +42,13 @@
 * `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
 
 * `bcftools`:
+  - `bcftools/bcftools_concat`: Concatenate or combine VCF/BCF files (PR #145).
+  - `bcftools/bcftools_norm`: Left-align and normalize indels, check if REF alleles match the reference, split multiallelic sites into multiple rows; recover multiallelics from multiple rows (PR #144).
+  - `bcftools/bcftools_annotate`: Add or remove annotations from a VCF/BCF file (PR #143).
+  - `bcftools/bcftools_stats`: Parses VCF or BCF and produces a txt stats file which can be plotted using plot-vcfstats (PR #142).
   - `bcftools/bcftools_sort`: Sorts BCF/VCF files by position and other criteria (PR #141).
 
 * `fastqc`: High throughput sequence quality control analysis tool (PR #92).
-
 
 ## MINOR CHANGES
 
@@ -134,7 +137,8 @@
     - `samtools/samtools_fastq`: Converts a SAM/BAM/CRAM file to FASTA (PR #53).
 
 * `umi_tools`:
-    -`umi_tools/umi_tools_extract`: Flexible removal of UMI sequences from fastq reads (PR #71).
+    - `umi_tools/umi_tools_extract`: Flexible removal of UMI sequences from fastq reads (PR #71).
+    - `umi_tools/umi_tools_prepareforrsem`: Fix paired-end reads in name sorted BAM file to prepare for RSEM (PR #148).
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
@@ -149,6 +153,9 @@
                data. (PR #146)
 
 * `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
+
+* `kallisto`:
+    - `kallisto_index`: Create a kallisto index (PR #149).
 
 
 ## MINOR CHANGES
