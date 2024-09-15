@@ -36,6 +36,10 @@
 
 * `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
 
+* `kallisto`:
+  - `kallisto/kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences  
+                               using high-throughput sequencing reads (PR #152).
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
