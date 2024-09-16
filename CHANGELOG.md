@@ -1,4 +1,4 @@
-# biobox x.x.x
+# biobox 0.2.0
 
 ## BREAKING CHANGES
 
