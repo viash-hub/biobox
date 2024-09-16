@@ -51,14 +51,16 @@ argument_groups:
       - name: -input_format
         alternatives: [-i]
         type: string
-        description: Input format [ vcf, bed ]. Default: VCF.
+        description: |
+          Input format [ vcf, bed ]. Default: VCF.
       - name: -fileList
         type: boolean_true
         description: Input actually contains a list of files to process.
       - name: -output_format
         alternatives: [-o]
         type: string
-        description: Ouput format [ vcf, gatk, bed, bedAnn ]. Default: VCF.
+        description: |
+          Output format [ vcf, gatk, bed, bedAnn ]. Default: VCF.
       - name: -stats
         alternatives: [-s, -htmlStats]
         type: boolean_true
@@ -234,7 +236,8 @@ argument_groups:
         description: Only use protein coding transcripts.
       - name: -onlyTr
         type: file
-        description: Only use the transcripts in this file. Format: One transcript ID per line.
+        description: |
+          Only use the transcripts in this file. Format: One transcript ID per line.
         example: file.txt
       - name: -reg
         type: string
@@ -242,10 +245,12 @@ argument_groups:
       - name: -ss
         alternatives: [-spliceSiteSize]
         type: integer
-        description: Set size for splice sites (donor and acceptor) in bases. Default: 2.
+        description: |
+          Set size for splice sites (donor and acceptor) in bases. Default: 2.
       - name: -spliceRegionExonSize
         type: integer
-        description: Set size for splice site region within exons. Default: 3 bases.
+        description: |
+          Set size for splice site region within exons. Default: 3 bases.
       - name: -spliceRegionIntronMin
         type: integer
         description: |
