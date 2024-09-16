@@ -1,3 +1,9 @@
+# biobox x.x.x
+
+## MINOR CHANGES
+
+* Upgrade to Viash 0.9.0.
+
 # biobox 0.2.0
 
 ## BREAKING CHANGES
