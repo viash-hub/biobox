@@ -74,19 +74,19 @@ argument_groups:
         description: |
           Only analyze changes that intersect with the intervals 
           specified in this file. This option can be used several times.
-      - name: -no-downstream 
+      - name: -no_downstream 
         type: boolean_false
         description: Do not show DOWNSTREAM changes
-      - name: -no-intergenic
+      - name: -no_intergenic
         type: boolean_false
         description: Do not show INTERGENIC changes.
-      - name: -no-intron
+      - name: -no_intron
         type: boolean_false
         description: Do not show INTRON changes.
-      - name: -no-upstream
+      - name: -no_upstream
         type: boolean_false
         description: Do not show UPSTREAM changes.
-      - name: -no-utr
+      - name: -no_utr
         type: boolean_false
         description: Do not show 5_PRIME_UTR or 3_PRIME_UTR changes.
       - name: -no
