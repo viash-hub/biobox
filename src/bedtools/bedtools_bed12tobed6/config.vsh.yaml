@@ -1,0 +1,67 @@
+name: bedtools_bed12tobed6
+namespace: bedtools
+description: | 
+  Converts BED features in BED12 (a.k.a. “blocked” BED features such as genes) to discrete BED6 features.
+  For example, in the case of a gene with six exons, bed12ToBed6 would create six separate BED6 features (i.e., one for each exon).
+keywords: [Converts, BED12, BED6]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/bed12tobed6.html
+  repository: https://github.com/arq5x/bedtools2
+  homepage: https://bedtools.readthedocs.io/en/latest/#
+  issue_tracker: https://github.com/arq5x/bedtools2/issues
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: -i
+        type: file
+        description: Input BED12 file.
+        required: true
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: -o
+        type: file
+        direction: output
+        description: Output BED6 file to be written.
+
+  - name: Options
+    arguments:
+      - name: --n_score
+        alternatives: -n
+        type: boolean_true
+        description: | 
+          Force the score to be the (1-based) block number from the BED12.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bedtools, procps]
+      - type: docker
+        run: |
+          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
