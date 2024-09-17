@@ -139,4 +139,3 @@ directory_path=$(dirname "$absolute_path")
 if [ -z "$par_noStats" ]; then
     mv -f snpEff_genes.txt snpEff_summary.html "$directory_path"
 fi
-# mv -f snpEff_genes.txt "$directory_path"
