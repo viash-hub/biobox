@@ -5,6 +5,9 @@
 * `agat`:
   - `agat/agat_convert_genscan2gff`: convert a genscan file into a GFF file (PR #100).
 
+* `bd_rhapsody`:
+  - `bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
+
 ## MINOR CHANGES
 
 * Upgrade to Viash 0.9.0.
@@ -23,7 +26,6 @@
 
 * `bd_rhapsody`:
   - `bd_rhapsody_make_reference`: Create a reference for the BD Rhapsody pipeline (PR #75).
-  - `bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
 
 * `umitools/umitools_dedup`: Deduplicate reads based on the mapping co-ordinate and the UMI attached to the read (PR #54).
 
