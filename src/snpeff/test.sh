@@ -9,7 +9,7 @@ meta_resources_dir="$PWD/src/snpeff"
 
 ###########################################################################
 
-Test 1: Run SnpEff with only required parameters
+# Test 1: Run SnpEff with only required parameters
 
 mkdir test1
 pushd test1 > /dev/null # cd test1 (stack)
