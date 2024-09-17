@@ -102,7 +102,7 @@ def generate_config(par: dict[str, Any], config) -> str:
     for argument in config["arguments"]:
         arg_clean_name = argument["clean_name"]
         arg_par_value = par[arg_clean_name]
-        arg_info = argument.get("info") or {}
+        arg_info = argument.get("info") or {} # Note: .info might be None
         config_key = arg_info.get("config_key")
         if arg_par_value and config_key:
 
@@ -170,7 +170,7 @@ def copy_outputs(par: dict[str, Any], config: dict[str, Any]):
         par_value = par[arg["clean_name"]]
         if par_value and arg["type"] == "file" and arg["direction"] == "output":
             # example template: '[sample_name]_(assay)_cell_type_experimental.csv'
-            template = (arg.get("info") or {}).get("template")
+            template = (arg.get("info") or {}).get("template") # Note: .info might be None
             if template:
                 template_glob = template\
                     .replace("[sample_name]", par["run_name"])\
