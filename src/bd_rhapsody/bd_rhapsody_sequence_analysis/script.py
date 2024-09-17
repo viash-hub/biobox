@@ -228,10 +228,11 @@ def main(par: dict[str, Any], meta: dict[str, Any], temp_dir: str):
 
     # Run command
     print("> " + ' '.join(cmd), flush=True)
-    _ = subprocess.check_call(
+    _ = subprocess.run(
         cmd,
         cwd=os.path.dirname(config_file),
-        env=env
+        env=env,
+        check=True
     )
 
     # Copy outputs
