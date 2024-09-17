@@ -9,7 +9,7 @@ meta_resources_dir="$PWD/src/snpeff"
 
 ###########################################################################
 
-# Test 1: Run SnpEff with only required parameters
+Test 1: Run SnpEff with only required parameters
 
 mkdir test1
 pushd test1 > /dev/null # cd test1 (stack)
@@ -45,38 +45,38 @@ echo "Test 1 succeeded."
 
 # Test 2: Run SnpEff with a different input + options
 
-# mkdir test2
-# pushd test2 > /dev/null
+mkdir test2
+pushd test2 > /dev/null
 
-# echo "> Run Test 2: different input + options"
-# "$meta_executable" \
-#   -genome_version GRCh37.66 \
-#   -input "$meta_resources_dir/test_data/test.vcf" \
-#   -interval "$meta_resources_dir/test_data/my_annotations.bed" \
-#   -noStats \
-#   -output output.vcf
+echo "> Run Test 2: different input + options"
+"$meta_executable" \
+  -genome_version GRCh37.75 \
+  -input "$meta_resources_dir/test_data/test.vcf" \
+  -interval "$meta_resources_dir/test_data/my_annotations.bed" \
+  -noStats \
+  -output output.vcf
 
-# # Check if out.vcf exists
-# if [ ! -e "output.vcf" ]; then
-#     echo "File out.vcf does not exist."
-# fi
+# Check if out.vcf exists
+if [ ! -e "output.vcf" ]; then
+    echo "File out.vcf does not exist."
+fi
 
-# # These files should not exist
-# files=("snpEff_genes.txt" "snpEff_summary.html")
-# for file in "${files[@]}"; do
-#     if [ -e "$file" ]; then
-#         echo "Error: File $file exists."
-#     fi
-# done
+# These files should not exist
+files=("snpEff_genes.txt" "snpEff_summary.html")
+for file in "${files[@]}"; do
+    if [ -e "$file" ]; then
+        echo "Error: File $file exists."
+    fi
+done
 
-# # Check if output.vcf is empty
-# if [ ! -s "output.vcf" ]; then
-#     echo "File output.vcf is empty."
-# fi
+# Check if output.vcf is empty
+if [ ! -s "output.vcf" ]; then
+    echo "File output.vcf is empty."
+fi
 
-# popd > /dev/null
+popd > /dev/null
 
-# echo "Test 2 succeeded."
+echo "Test 2 succeeded."
 
 ###########################################################################
 

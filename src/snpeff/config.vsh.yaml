@@ -28,7 +28,7 @@ argument_groups:
         required: true
   - name: Outputs
     arguments:
-      - name: --output
+      - name: -output
         type: file
         description: The output file.
         example: out.vcf
@@ -280,10 +280,10 @@ engines:
     setup:
       - type: docker
         run: |
-          touch ./var/software_versions.txt && \
-          version=$(snpEff -version) && \
-          version_trimmed=$(echo "$version" | awk '{print $1, $2}')
-          echo "$version_trimmed" > ./var/software_versions.txt
+          # touch ./var/software_versions.txt && \
+          # version=$(snpEff -version) && \
+          # version_trimmed=$(echo "$version" | awk '{print $1, $2}') && \
+          # echo "$version_trimmed" > ./var/software_versions.txt
 runners:
   - type: executable
   - type: nextflow
