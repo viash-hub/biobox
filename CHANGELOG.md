@@ -5,6 +5,8 @@
 * `agat`:
   - `agat/agat_convert_genscan2gff`: convert a genscan file into a GFF file (PR #100).
 
+* `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
+
 ## MINOR CHANGES
 
 * Upgrade to Viash 0.9.0.
