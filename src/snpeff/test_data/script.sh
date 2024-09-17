@@ -1,7 +1,15 @@
-# clone repo
-if [ ! -d /tmp/snakemake-wrappers ]; then
-  git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
+# Test files from SnpEff examples
+if [ ! -f snpEff_latest_core.zip ]; then
+    wget https://snpeff.blob.core.windows.net/versions/snpEff_latest_core.zip
 fi
 
-# copy test data
-cp -r /tmp/snakemake-wrappers/bio/snpeff/annotate/test/*.vcf src/snpeff/test_data/test.vcf
+if [ ! -d snpEff ]; then
+    unzip snpEff_latest_core.zip
+fi
+
+mv snpEff/examples/test.vcf src/snpeff/test_data/
+mv snpEff/examples/cancer.vcf src/snpeff/test_data/
+mv snpEff/examples/my_annotations.bed src/snpeff/test_data/
+
+rm -rf snpEff_latest_core.zip
+rm -rf snpEff

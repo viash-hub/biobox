@@ -74,7 +74,7 @@ snpEff \
     ${par_stats:+-stats} \
     ${par_noStats:+-noStats} \
     ${par_fi:+-fi "$par_fi"} \
-    ${par_no_downstream :+-no-downstream } \
+    ${par_no_downstream:+-no-downstream} \
     ${par_no_intergenic:+-no-intergenic} \
     ${par_no_intron:+-no-intron} \
     ${par_no_upstream:+-no-upstream} \
@@ -103,7 +103,7 @@ snpEff \
     ${par_noLog:+-noLog} \
     ${par_quiet:+-quiet} \
     ${par_verbose:+-verbose} \
-    ${par_canon :+-canon} \
+    ${par_canon:+-canon} \
     ${par_canonList:+-canonList "$par_canonList"} \
     ${par_tag:+-tag "$par_tag"} \
     ${par_notag:+-notag} \
@@ -130,3 +130,13 @@ snpEff \
     "$par_genome_version" \
     "$par_input" \
     > "$par_output"
+
+# Path of the output file (par_output)
+absolute_path=$(realpath "$par_output")
+directory_path=$(dirname "$absolute_path")
+
+# Move the automatically generated outputs to the pwd
+if [ -z "$par_noStats" ]; then
+    mv -f snpEff_genes.txt snpEff_summary.html "$directory_path"
+fi
+# mv -f snpEff_genes.txt "$directory_path"
