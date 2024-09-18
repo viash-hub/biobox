@@ -8,8 +8,9 @@ links:
 references: 
   doi: 10.12688/f1000research.23297.2
 license: MIT
-requirements:
-  commands: [ gffread ]
+authors:
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author, maintainer ]
 argument_groups:
   - name: Inputs
     arguments:
@@ -52,7 +53,7 @@ argument_groups:
         required: true
         description: |
           Write the output records into <outfile>.
-        default: output.gff
+        example: output.gff
       - name: --force_exons
         type: boolean_true
         description: |
@@ -154,7 +155,6 @@ argument_groups:
       - name: --table
         type: string
         multiple: true
-        multiple_sep: ","
         description: |
           Output a simple tab delimited format instead of GFF, with columns having the values 
           of GFF attributes given in <attrlist>; special pseudo-attributes (prefixed by @) are 

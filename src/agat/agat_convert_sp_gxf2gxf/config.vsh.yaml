@@ -1,0 +1,75 @@
+name: agat_convert_sp_gxf2gxf
+namespace: agat
+description: |
+  This script fixes and/or standardizes any GTF/GFF file into full sorted
+  GTF/GFF file. It AGAT parser removes duplicate features, fixes
+  duplicated IDs, adds missing ID and/or Parent attributes, deflates
+  factorized attributes (attributes with several parents are duplicated
+  with uniq ID), add missing features when possible (e.g. add exon if only
+  CDS described, add UTR if CDS and exon described), fix feature locations
+  (e.g. check exon is embedded in the parent features mRNA, gene), etc...
+
+  All AGAT's scripts with the _sp_ prefix use the AGAT parser, before to
+  perform any supplementary task. So, it is not necessary to run this
+  script prior the use of any other _sp_ script.
+keywords: [gene annotations, GFF conversion]
+links:
+  homepage: https://github.com/NBISweden/AGAT
+  documentation: https://agat.readthedocs.io/en/latest/tools/agat_convert_sp_gxf2gxf.html
+  issue_tracker: https://github.com/NBISweden/AGAT/issues
+  repository: https://github.com/NBISweden/AGAT
+references: 
+  doi: 10.5281/zenodo.3552717
+license: GPL-3.0
+authors:
+  - __merge__: /src/_authors/leila_paquay.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --gxf
+        alternatives: [-g, --gtf, --gff]
+        description: |
+          String - Input GTF/GFF file. Compressed file with .gz extension is accepted.
+        type: file
+        required: true
+        direction: input
+        example: input.gff
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: [-o]
+        description: |
+          String - Output GFF file. If no output file is specified, the output will be written to STDOUT.
+        type: file
+        direction: output
+        required: true
+        example: output.gff
+  - name: Arguments
+    arguments:
+      - name: --config
+        alternatives: [-c]
+        description: |
+          String - Input agat config file. By default AGAT takes as input agat_config.yaml file from the working directory if any, otherwise it takes the original agat_config.yaml shipped with AGAT. To get the agat_config.yaml locally type: "agat config --expose". The --config option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
+        type: file
+        required: false
+        example: custom_agat_config.yaml
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/agat:1.4.0--pl5321hdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          agat --version | sed 's/AGAT\s\(.*\)/agat: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow

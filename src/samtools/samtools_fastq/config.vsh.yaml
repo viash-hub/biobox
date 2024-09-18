@@ -9,7 +9,9 @@ links:
 references: 
   doi: [10.1093/bioinformatics/btp352, 10.1093/gigascience/giab008]
 license: MIT/Expat
-
+authors:
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author, maintainer ]
 argument_groups:
   - name: Inputs
     arguments:
@@ -56,7 +58,7 @@ argument_groups:
         type: string
         description: |
           Specify a comma-separated list of tags to copy to the FASTQ header line, if they exist. 
-          TAGLIST can be blank or * to indicate all tags should be copied to the output. If using *, 
+          TAGLIST can be blank or `*` to indicate all tags should be copied to the output. If using `*`, 
           be careful to quote it to avoid unwanted shell expansion.
       - name: --read1
         alternatives: -1
@@ -91,35 +93,35 @@ argument_groups:
         type: integer
         description: |
           Only output alignments with all bits set in INT present in the FLAG field. INT can be specified 
-          in hex by beginning with `0x' (i.e. /^0x[0-9A-F]+/) or in octal by beginning with `0' 
-          (i.e. /^0[0-7]+/).
-        default: 0
+          in hex by beginning with '0x' (i.e. /^0x[0-9A-F]+/) or in octal by beginning with '0'
+          (i.e. /^0[0-7]+/). Default: `0`.
+        example: 0
       - name: --excl_flags
         alternatives: -F
         type: string
         description: |
           Do not output alignments with any bits set in INT present in the FLAG field. INT can be specified 
-          in hex by beginning with `0x' (i.e. /^0x[0-9A-F]+/) or in octal by beginning with `0' 
+          in hex by beginning with '0x' (i.e. /^0x[0-9A-F]+/) or in octal by beginning with '0' 
           (i.e. /^0[0-7]+/). This defaults to 0x900 representing filtering of secondary and 
-          supplementary alignments.
-        default: 0x900
+          supplementary alignments. Default: `0x900`.
+        example: "0x900"
       - name: --incl_flags
         alternatives: --rf
         type: string
         description: |
           Only output alignments with any bits set in INT present in the FLAG field. INT can be specified 
-          in hex by beginning with `0x' (i.e. /^0x[0-9A-F]+/), in octal by beginning with `0' 
+          in hex by beginning with '0x' (i.e. /^0x[0-9A-F]+/), in octal by beginning with '0'
           (i.e. /^0[0-7]+/), as a decimal number not beginning with '0' or as a comma-separated list of 
-          flag names.
-        default: 0
+          flag names. Default: `0`.
+        example: 0
       - name: --excl_flags_all
         alternatives: -G
         type: integer
         description: |
           Only EXCLUDE reads with all of the bits set in INT present in the FLAG field. INT can be specified 
-          in hex by beginning with `0x' (i.e. /^0x[0-9A-F]+/) or in octal by beginning with `0' 
-          (i.e. /^0[0-7]+/).
-        default: 0
+          in hex by beginning with '0x' (i.e. /^0x[0-9A-F]+/) or in octal by beginning with '0' (i.e. /^0[0-7]+/).
+          Default: `0`.
+        example: 0
       - name: --aux_tag
         alternatives: -d
         type: string
@@ -137,12 +139,13 @@ argument_groups:
       - name: --casava
         alternatives: -i
         type: boolean_true
-        description: add Illumina Casava 1.8 format entry to header (eg 1:N:0:ATCACG)
+        description: |
+          Add Illumina Casava 1.8 format entry to header, for example: `1:N:0:ATCACG`.
       - name: --compression
         alternatives: -c
         type: integer
         description: set compression level when writing gz or bgzf fastq files.
-        default: 0
+        example: 0
       - name: --index1
         alternatives: --i1
         type: file
@@ -153,20 +156,22 @@ argument_groups:
         description: write second index reads to FILE.
       - name: --barcode_tag
         type: string
-        description: Auxiliary tag to find index reads in.
-        default: BC
+        description: |
+          Auxiliary tag to find index reads in. Default: `BC`.
+        example: "BC"
       - name: --quality_tag
         type: string
-        description: Auxiliary tag to find index quality in.
-        default: QT
+        description: |
+          Auxiliary tag to find index quality in. Default: `QT`.
+        example: QT
       - name: --index_format
         type: string
         description: |
           string to describe how to parse the barcode and quality tags. For example:
-          [i14i8]: the first 14 characters are index 1, the next 8 characters are index 2.
-          [n8i14]: ignore the first 8 characters, and use the next 14 characters for index 1.
+          * `i14i8`: the first 14 characters are index 1, the next 8 characters are index 2.
+          * `n8i14`: ignore the first 8 characters, and use the next 14 characters for index 1.
           If the tag contains a separator, then the numeric part can be replaced with '*' to mean 
-          'read until the separator or end of tag', for example: [n*i*].
+          'read until the separator or end of tag', for example: `n*i*`.
 
 resources:
   - type: bash_script

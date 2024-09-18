@@ -1,0 +1,197 @@
+name: umi_tools_extract
+namespace: umi_tools
+description: |
+  Flexible removal of UMI sequences from fastq reads.
+  UMIs are removed and appended to the read name. Any other barcode, for example a library barcode,
+  is left on the read. Can also filter reads by quality or against a whitelist.
+keywords: [ extract, umi-tools, umi, fastq ]
+links:
+  homepage: https://umi-tools.readthedocs.io/en/latest/
+  documentation: https://umi-tools.readthedocs.io/en/latest/reference/extract.html
+  repository: https://github.com/CGATOxford/UMI-tools
+references: 
+  doi: 10.1101/gr.209601.116
+license: MIT
+
+argument_groups:
+
+  - name: Input
+    arguments: 
+    - name: --input
+      type: file
+      required: true
+      description: File containing the input data.
+      example: sample.fastq
+    - name: --read2_in
+      type: file
+      required: false
+      description: File containing the input data for the R2 reads (if paired). If provided, a <list of other required arguments> need to be provided.
+      example: sample_R2.fastq
+    - name: --bc_pattern
+      alternatives: -p
+      type: string
+      description: |
+        The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides 
+        of the read are from the UMI.
+    - name: --bc_pattern2
+      type: string
+      description: The UMI barcode pattern to use for read 2.
+    
+  - name: "Output"
+    arguments:  
+    - name: --output
+      type: file
+      required: true
+      description: Output file for read 1.
+      direction: output
+    - name: --read2_out
+      type: file
+      description: Output file for read 2.
+      direction: output
+    - name: --filtered_out
+      type: file
+      description: |
+        Write out reads not matching regex pattern or cell barcode whitelist to this file.
+    - name: --filtered_out2
+      type: file
+      description: |
+        Write out read pairs not matching regex pattern or cell barcode whitelist to this file.
+
+  - name: Extract Options
+    arguments:
+    - name: --extract_method
+      type: string
+      choices: [string, regex]
+      description: |
+        UMI pattern to use. Default: `string`.
+      example: "string"
+    - name: --error_correct_cell
+      type: boolean_true
+      description: Error correct cell barcodes to the whitelist.
+    - name: --whitelist
+      type: file
+      description: |
+        Whitelist of accepted cell barcodes tab-separated format, where column 1 is the whitelisted
+        cell barcodes and column 2 is the list (comma-separated) of other cell barcodes which should 
+        be corrected to the barcode in column 1. If the --error_correct_cell option is not used, this
+        column will be ignored.
+    - name: --blacklist
+      type: file
+      description: BlackWhitelist of cell barcodes to discard.
+    - name: --subset_reads
+      type: integer
+      description: Only parse the first N reads.
+    - name: --quality_filter_threshold
+      type: integer
+      description: Remove reads where any UMI base quality score falls below this threshold.
+    - name: --quality_filter_mask
+      type: string
+      description: |
+        If a UMI base has a quality below this threshold, replace the base with 'N'.
+    - name: --quality_encoding
+      type: string
+      choices: [phred33, phred64, solexa]
+      description: |
+        Quality score encoding. Choose from:
+          * phred33 [33-77]
+          * phred64 [64-106]
+          * solexa [59-106]
+    - name: --reconcile_pairs
+      type: boolean_true
+      description: |
+        Allow read 2 infile to contain reads not in read 1 infile. This enables support for upstream protocols
+        where read one contains cell barcodes, and the read pairs have been filtered and corrected without regard
+        to the read2.
+    - name: --three_prime
+      alternatives: --3prime
+      type: boolean_true
+      description: |
+        By default the barcode is assumed to be on the 5' end of the read, but use this option to sepecify that it is
+        on the 3' end instead. This option only works with --extract_method=string since 3' encoding can be specified
+        explicitly with a regex, e.g `.*(?P<umi_1>.{5})$`.
+    - name: --ignore_read_pair_suffixes
+      type: boolean_true
+      description: |
+        Ignore "/1" and "/2" read name suffixes. Note that this options is required if the suffixes are not whitespace
+        separated from the rest of the read name.
+        arguments:
+    - name: --umi_separator
+      type: string
+      description: |
+        The character that separates the UMI in the read name. Most likely a colon if you skipped the extraction with
+        UMI-tools and used other software. Default: `_`
+      example: "_"
+    - name: --grouping_method
+      type: string
+      choices: [unique, percentile, cluster, adjacency, directional]
+      description: |
+        Method to use to determine read groups by subsuming those with similar UMIs. All methods start by identifying
+        the reads with the same mapping position, but treat similar yet nonidentical UMIs differently. Default: `directional`
+      example: "directional"
+    - name: --umi_discard_read
+      type: integer
+      choices: [0, 1, 2]
+      description: |
+        After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively. Default: `0`
+      example: 0
+
+  - name: Common Options
+    arguments:
+    - name: --log
+      type: file
+      description: File with logging information.
+      direction: output
+    - name: --log2stderr
+      type: boolean_true
+      description: Send logging information to stderr.
+      direction: output
+    - name: --verbose
+      type: integer
+      description: Log level. The higher, the more output.
+    - name: --error
+      type: file
+      description: File with error information.
+      direction: output
+    - name: --temp_dir
+      type: string
+      description: |
+        Directory for temporary files. If not set, the bash environmental variable TMPDIR is used.
+    - name: --compresslevel
+      type: integer
+      description: |
+        Level of Gzip compression to use. Default=6 matches GNU gzip rather than python gzip default (which is 9).
+        Default `6`.
+      example: 6
+    - name: --timeit
+      type: file
+      description: Store timing information in file.
+      direction: output
+    - name: --timeit_name
+      type: string
+      description: Name in timing file for this class of jobs.
+      default: all
+    - name: --timeit_header
+      type: boolean_true
+      description: Add header for timing information.
+    - name: --random_seed
+      type: integer
+      description: Random seed to initialize number generator with.
+  
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/umi_tools:1.1.4--py310h4b81fae_2
+    setup:
+      - type: docker
+        run: |
+            umi_tools -v | sed 's/ version//g' > /var/software_versions.txt
+runners:
+- type: executable
+- type: nextflow

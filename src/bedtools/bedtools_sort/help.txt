@@ -1,0 +1,21 @@
+```bash
+bedtools sort
+```
+
+Tool:    bedtools sort (aka sortBed)
+Version: v2.30.0
+Summary: Sorts a feature file in various and useful ways.
+
+Usage:   bedtools sort [OPTIONS] -i <bed/gff/vcf>
+
+Options: 
+	-sizeA			Sort by feature size in ascending order.
+	-sizeD			Sort by feature size in descending order.
+	-chrThenSizeA		Sort by chrom (asc), then feature size (asc).
+	-chrThenSizeD		Sort by chrom (asc), then feature size (desc).
+	-chrThenScoreA		Sort by chrom (asc), then score (asc).
+	-chrThenScoreD		Sort by chrom (asc), then score (desc).
+	-g (names.txt)	Sort according to the chromosomes declared in "genome.txt"
+	-faidx (names.txt)	Sort according to the chromosomes declared in "names.txt"
+	-header	Print the header from the A file prior to results.
+

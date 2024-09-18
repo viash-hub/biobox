@@ -1,0 +1,106 @@
+'''
+Generated from the following UMI-tools documentation:
+      https://umi-tools.readthedocs.io/en/latest/common_options.html#common-options
+      https://umi-tools.readthedocs.io/en/latest/reference/extract.html
+'''
+
+extract - Extract UMI from fastq
+
+Usage:
+
+   Single-end:
+      umi_tools extract [OPTIONS] -p PATTERN [-I IN_FASTQ[.gz]] [-S OUT_FASTQ[.gz]]
+
+   Paired end:
+      umi_tools extract [OPTIONS] -p PATTERN [-I IN_FASTQ[.gz]] [-S OUT_FASTQ[.gz]] --read2-in=IN2_FASTQ[.gz] --read2-out=OUT2_FASTQ[.gz]
+
+   note: If -I/-S are ommited standard in and standard out are used
+         for input and output.  To generate a valid BAM file on
+         standard out, please redirect log with --log=LOGFILE or
+         --log2stderr. Input/Output will be (de)compressed if a
+         filename provided to -S/-I/--read2-in/read2-out ends in .gz
+
+Common UMI-tools Options:
+
+      -S, --stdout                  File where output is to go [default = stdout].
+      -L, --log                     File with logging information [default = stdout].
+      --log2stderr                  Send logging information to stderr [default = False].
+      -v, --verbose                 Log level. The higher, the more output [default = 1].
+      -E, --error                   File with error information [default = stderr].
+      --temp-dir                    Directory for temporary files. If not set, the bash environmental variable TMPDIR is used[default = None].
+      --compresslevel               Level of Gzip compression to use. Default=6 matches GNU gzip rather than python gzip default (which is 9)
+
+      profiling and debugging options:
+      --timeit                      Store timing information in file [default=none].
+      --timeit-name                 Name in timing file for this class of jobs [default=all].
+      --timeit-header               Add header for timing information [default=none].
+      --random-seed                 Random seed to initialize number generator with [default=none].
+
+Extract Options:
+      -I, --stdin                   File containing the input data [default = stdin].
+      --error-correct-cell          Error correct cell barcodes to the whitelist (see --whitelist)
+      --whitelist                   Whitelist of accepted cell barcodes. The whitelist should be in the following format (tab-separated):
+                                          AAAAAA    AGAAAA
+                                          AAAATC
+                                          AAACAT
+                                          AAACTA    AAACTN,GAACTA
+                                          AAATAC
+                                          AAATCA    GAATCA
+                                          AAATGT    AAAGGT,CAATGT
+                                    Where column 1 is the whitelisted cell barcodes and column 2 is the list (comma-separated) of other cell 
+                                    barcodes which should be corrected to the barcode in column 1. If the --error-correct-cell option is not 
+                                    used, this column will be ignored. Any additional columns in the whitelist input, such as the counts columns 
+                                    from the output of umi_tools whitelist, will be ignored.
+      --blacklist                   BlackWhitelist of cell barcodes to discard
+      --subset-reads=[N]            Only parse the first N reads
+      --quality-filter-threshold    Remove reads where any UMI base quality score falls below this threshold
+      --quality-filter-mask         If a UMI base has a quality below this threshold, replace the base with 'N'
+      --quality-encoding            Quality score encoding. Choose from:
+                                          'phred33' [33-77]
+                                          'phred64' [64-106]
+                                          'solexa' [59-106]
+      --reconcile-pairs             Allow read 2 infile to contain reads not in read 1 infile. This enables support for upstream protocols
+                                    where read one contains cell barcodes, and the read pairs have been filtered and corrected without regard
+                                    to the read2s.
+
+Experimental options:
+      Note: These options have not been extensively testing to ensure behaviour is as expected. If you have some suitable input files which
+            we can use for testing, please contact us.
+            If you have a library preparation method where the UMI may be in either read, you can use the following options to search for the
+            UMI in either read:
+
+                  --either-read --extract-method --bc-pattern=[PATTERN1] --bc-pattern2=[PATTERN2]
+
+            Where both patterns match, the default behaviour is to discard both reads. If you want to select the read with the UMI with highest
+            sequence quality, provide --either-read-resolve=quality.
+
+
+      --bc-pattern                  Pattern for barcode(s) on read 1. See --extract-method
+      --bc-pattern2                 Pattern for barcode(s) on read 2. See --extract-method
+      --extract-method              There are two methods enabled to extract the umi barcode (+/- cell barcode). For both methods, the patterns
+                                    should be provided using the --bc-pattern and --bc-pattern2 options.x   
+                                    string: 
+                                    This should be used where the barcodes are always in the same place in the read.
+                                          N = UMI position (required)
+                                          C = cell barcode position (optional)
+                                          X = sample position (optional)
+                                    Bases with Ns and Cs will be extracted and added to the read name. The corresponding sequence qualities will
+                                    be removed from the read. Bases with an X will be reattached to the read.
+                                    regex:
+                                    This method allows for more flexible barcode extraction and should be used where the cell barcodes are variable
+                                    in length. Alternatively, the regex option can also be used to filter out reads which do not contain an expected
+                                    adapter sequence. The regex must contain groups to define how the barcodes are encoded in the read. 
+                                    The expected groups in the regex are:
+                                          umi_n = UMI positions, where n can be any value (required) 
+                                          cell_n = cell barcode positions, where n can be any value (optional) 
+                                          discard_n = positions to discard, where n can be any value (optional)
+      --3prime                      By default the barcode is assumed to be on the 5' end of the read, but use this option to sepecify that it is
+                                    on the 3' end instead. This option only works with --extract-method=string since 3' encoding can be specified
+                                    explicitly with a regex, e.g .*(?P<umi_1>.{5})$
+      --read2-in                    Filename for read pairs
+      --filtered-out                Write out reads not matching regex pattern or cell barcode whitelist to this file
+      --filtered-out2               Write out read pairs not matching regex pattern or cell barcode whitelist to this file
+      --ignore-read-pair-suffixes   Ignore SOH and STX read name suffixes. Note that this options is required if the suffixes are not whitespace
+                                    separated from the rest of the read name
+
+For full UMI-tools documentation, see https://umi-tools.readthedocs.io/en/latest/

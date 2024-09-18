@@ -1,29 +1,30 @@
 #!/bin/bash
 
 set -e
+set -eo pipefail
 
 #############################################
 # helper functions
 assert_file_exists() {
-  [ -f "$1" ] || (echo "File '$1' does not exist" && exit 1)
+  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
 }
 assert_file_doesnt_exist() {
-  [ ! -f "$1" ] || (echo "File '$1' exists but shouldn't" && exit 1)
+  [ ! -f "$1" ] || { echo "File '$1' exists but shouldn't" && exit 1; }
 }
 assert_file_empty() {
-  [ ! -s "$1" ] || (echo "File '$1' is not empty but should be" && exit 1)
+  [ ! -s "$1" ] || { echo "File '$1' is not empty but should be" && exit 1; }
 }
 assert_file_not_empty() {
-  [ -s "$1" ] || (echo "File '$1' is empty but shouldn't be" && exit 1)
+  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
 }
 assert_file_contains() {
-  grep -q "$2" "$1" || (echo "File '$1' does not contain '$2'" && exit 1)
+  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
 }
 assert_file_not_contains() {
-  grep -q "$2" "$1" && (echo "File '$1' contains '$2' but shouldn't" && exit 1)
+  grep -q "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
 }
-
 #############################################
+
 mkdir test_multiple_output
 cd test_multiple_output
 
@@ -57,6 +58,7 @@ EOF
   --adapter ADAPTER \
   --input example.fa \
   --fasta \
+  --demultiplex_mode single \
   --no_match_adapter_wildcards \
   --json
 
@@ -101,6 +103,7 @@ EOF
   --output "out_test1/*.fasta" \
   --adapter ADAPTER \
   --input example.fa \
+  --demultiplex_mode single \
   --fasta \
   --no_match_adapter_wildcards \
   --json
@@ -160,6 +163,7 @@ EOF
   --adapter AAAAA \
   --adapter_fasta adapters1.fasta \
   --adapter_fasta adapters2.fasta \
+  --demultiplex_mode single \
   --input example.fa \
   --fasta \
   --json
@@ -224,6 +228,7 @@ EOF
   --input example_R1.fastq \
   --input_r2 example_R2.fastq \
   --quality_cutoff 20 \
+  --demultiplex_mode unique_dual \
   --json \
   ---cpus 1
 

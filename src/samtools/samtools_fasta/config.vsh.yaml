@@ -1,0 +1,193 @@
+name: samtools_fasta
+namespace: samtools
+description: Converts a SAM, BAM or CRAM to FASTA format.
+keywords: [fasta, bam, sam, cram]
+links:
+  homepage: https://www.htslib.org/
+  documentation: https://www.htslib.org/doc/samtools-fasta.html
+  repository: https://github.com/samtools/samtools
+references: 
+  doi: [10.1093/bioinformatics/btp352, 10.1093/gigascience/giab008]
+license: MIT/Expat
+authors:
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author, maintainer ]
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        type: file
+        description: input SAM/BAM/CRAM file
+        required: true
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: output FASTA file
+        required: true
+        direction: output
+  - name: Options
+    arguments:
+      - name: --no_suffix
+        alternatives: -n
+        type: boolean_true
+        description: |
+          By default, either '/1' or '/2' is added to the end of read names where the corresponding 
+          READ1 or READ2 FLAG bit is set. Using -n causes read names to be left as they are.
+      - name: --suffix
+        alternatives: -N
+        type: boolean_true
+        description: |
+          Always add either '/1' or '/2' to the end of read names even when put into different files.
+      - name: --use_oq
+        alternatives: -O
+        type: boolean_true
+        description: |
+          Use quality values from OQ tags in preference to standard quality string if available.
+      - name: --singleton
+        alternatives: -s
+        type: file
+        description: write singleton reads to FILE.
+      - name: --copy_tags
+        alternatives: -t
+        type: boolean_true
+        description: |
+          Copy RG, BC and QT tags to the FASTA header line, if they exist.
+      - name: --copy_tags_list
+        alternatives: -T
+        type: string
+        description: |
+          Specify a comma-separated list of tags to copy to the FASTA header line, if they exist. 
+          TAGLIST can be blank or `*` to indicate all tags should be copied to the output. If using `*`, 
+          be careful to quote it to avoid unwanted shell expansion.
+      - name: --read1
+        alternatives: -1
+        type: file
+        description: |
+          Write reads with the READ1 FLAG set (and READ2 not set) to FILE instead of outputting them. 
+          If the -s option is used, only paired reads will be written to this file.
+        direction: output
+      - name: --read2
+        alternatives: -2
+        type: file
+        description: |
+          Write reads with the READ2 FLAG set (and READ1 not set) to FILE instead of outputting them. 
+          If the -s option is used, only paired reads will be written to this file.
+        direction: output
+      - name: --output_reads
+        alternatives: -o
+        type: file
+        description: |
+          Write reads with either READ1 FLAG or READ2 flag set to FILE instead of outputting them to stdout. 
+          This is equivalent to -1 FILE -2 FILE.
+        direction: output
+      - name: --output_reads_both
+        alternatives: -0
+        type: file
+        description: |
+          Write reads where the READ1 and READ2 FLAG bits set are either both set or both unset to FILE 
+          instead of outputting them.
+        direction: output
+      - name: --filter_flags
+        alternatives: -f
+        type: integer
+        description: |
+          Only output alignments with all bits set in INT present in the FLAG field. INT can be specified 
+          in hex by beginning with '0x' (i.e. /^0x[0-9A-F]+/) or in octal by beginning with '0' 
+          (i.e. /^0[0-7]+/). Default: `0`.
+        example: 0
+      - name: --excl_flags
+        alternatives: -F
+        type: string
+        description: |
+          Do not output alignments with any bits set in INT present in the FLAG field. INT can be specified 
+          in hex by beginning with '0x' (i.e. /^0x[0-9A-F]+/) or in octal by beginning with '0'
+          (i.e. /^0[0-7]+/). This defaults to 0x900 representing filtering of secondary and 
+          supplementary alignments. Default: `0x900`.
+        example: "0x900"
+      - name: --incl_flags
+        alternatives: --rf
+        type: string
+        description: |
+          Only output alignments with any bits set in INT present in the FLAG field. INT can be specified 
+          in hex by beginning with '0x' (i.e. /^0x[0-9A-F]+/), in octal by beginning with '0'
+          (i.e. /^0[0-7]+/), as a decimal number not beginning with '0' or as a comma-separated list of 
+          flag names. Default: `0`.
+        example: 0
+      - name: --excl_flags_all
+        alternatives: -G
+        type: integer
+        description: |
+          Only EXCLUDE reads with all of the bits set in INT present in the FLAG field. INT can be specified 
+          in hex by beginning with '0x' (i.e. /^0x[0-9A-F]+/) or in octal by beginning with '0' (i.e. /^0[0-7]+/).
+          Default: `0`.
+        example: 0
+      - name: --aux_tag
+        alternatives: -d
+        type: string
+        description: |
+          Only output alignments containing an auxiliary tag matching both TAG and VAL. If VAL is omitted 
+          then any value is accepted. The tag types supported are i, f, Z, A and H. "B" arrays are not 
+          supported. This is comparable to the method used in samtools view --tag. The option may be specified 
+          multiple times and is equivalent to using the --aux_tag_file option.
+      - name: --aux_tag_file
+        alternatives: -D
+        type: string
+        description: |
+          Only output alignments containing an auxiliary tag matching TAG and having a value listed in FILE. 
+          The format of the file is one line per value. This is equivalent to specifying --aux_tag multiple times.
+      - name: --casava
+        alternatives: -i
+        type: boolean_true
+        description: add Illumina Casava 1.8 format entry to header (eg 1:N:0:ATCACG)
+      - name: --compression
+        alternatives: -c
+        type: integer
+        description: set compression level when writing gz or bgzf fasta files.
+        example: 0
+      - name: --index1
+        alternatives: --i1
+        type: file
+        description: write first index reads to FILE.
+      - name: --index2
+        alternatives: --i2
+        type: file
+        description: write second index reads to FILE.
+      - name: --barcode_tag
+        type: string
+        description: |
+          Auxiliary tag to find index reads in. Default: `BC`.
+        example: "BC"
+      - name: --quality_tag
+        type: string
+        description: |
+          Auxiliary tag to find index quality in. Default: `QT`.
+        example: "QT"
+      - name: --index_format
+        type: string
+        description: |
+          string to describe how to parse the barcode and quality tags. For example:
+          * `i14i8`: the first 14 characters are index 1, the next 8 characters are index 2.
+          * `n8i14`: ignore the first 8 characters, and use the next 14 characters for index 1.
+          If the tag contains a separator, then the numeric part can be replaced with`*` to mean 
+          'read until the separator or end of tag', for example: `n*i*`.
+
+resources:
+  - type: bash_script
+    path: ../samtools_fastq/script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/samtools:1.19.2--h50ea8bc_1
+    setup:
+      - type: docker
+        run: |
+          samtools --version 2>&1 | grep -E '^(samtools|Using htslib)' | \
+          sed 's#Using ##;s# \([0-9\.]*\)$#: \1#' > /var/software_versions.txt
+runners:
+- type: executable
+- type: nextflow

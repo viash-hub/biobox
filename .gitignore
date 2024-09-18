@@ -3,6 +3,7 @@
 
 # IDE ignores
 .idea/
+.vscode/
 
 # R specific ignores
 .Rhistory
