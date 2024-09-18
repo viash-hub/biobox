@@ -7,6 +7,8 @@
 
 * `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
 
+* `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
+
 ## MINOR CHANGES
 
 * Upgrade to Viash 0.9.0.
