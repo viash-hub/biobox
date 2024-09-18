@@ -1,0 +1,9 @@
+```bash
+seqtk subseq
+```
+Usage:   seqtk subseq [options] <in.fa> <in.bed>|<name.list>
+Options:
+  -t       TAB delimited output
+  -s       strand aware
+  -l INT   sequence line length [0]
+Note: Use 'samtools faidx' if only a few regions are intended.

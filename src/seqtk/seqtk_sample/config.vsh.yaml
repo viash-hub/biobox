@@ -1,0 +1,57 @@
+name: seqtk_sample
+namespace: seqtk
+description: Subsamples sequences from FASTA/Q files.
+keywords: [sample, FASTA, FASTQ]
+links:
+  repository: https://github.com/lh3/seqtk/tree/v1.4
+license: MIT
+authors:
+  - __merge__: /src/_authors/jakub_majercik.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        type: file
+        description: The input FASTA/Q file.
+        required: true
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: The output FASTA/Q file.
+        required: true
+        direction: output
+
+  - name: Options
+    arguments:
+      - name: --seed
+        type: integer
+        description: Seed for random generator.
+        example: 42
+      - name: --fraction_number
+        type: double
+        description: Fraction or number of sequences to sample.
+        required: true
+        example: 0.1
+      - name: --two_pass_mode
+        type: boolean_true
+        description: Twice as slow but with much reduced memory
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: ../test_data
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/seqtk:1.4--he4a0461_2
+runners:
+  - type: executable
+  - type: nextflow

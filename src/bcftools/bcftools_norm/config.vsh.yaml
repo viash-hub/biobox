@@ -1,0 +1,194 @@
+name: bcftools_norm
+namespace: bcftools
+description: | 
+  Left-align and normalize indels, check if REF alleles match the reference, split multiallelic sites into multiple rows; 
+  recover multiallelics from multiple rows. 
+keywords: [Normalize, VCF, BCF]
+links:
+  homepage: https://samtools.github.io/bcftools/
+  documentation: https://samtools.github.io/bcftools/bcftools.html#norm
+  repository: https://github.com/samtools/bcftools
+  issue_tracker: https://github.com/samtools/bcftools/issues
+references:
+  doi: https://doi.org/10.1093/gigascience/giab008
+license: MIT/Expat, GNU
+requirements:
+  commands: [bcftools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [author]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: -i
+        type: file
+        description: Input VCF/BCF file.
+        required: true
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: -o
+        direction: output
+        type: file
+        description: Output normalized VCF/BCF file.
+        required: true
+         
+  - name: Options
+    arguments:
+      
+      - name: --atomize
+        alternatives: -a
+        type: boolean_true
+        description: |
+          Decompose complex variants (e.g., MNVs become consecutive SNVs).
+
+      - name: --atom_overlaps
+        type: string
+        choices: [".", "*"]
+        description: | 
+          Use the star allele (*) for overlapping alleles or set to missing (.).
+
+      - name: --check_ref
+        alternatives: -c
+        type: string
+        choices: ['e', 'w', 'x', 's']
+        description: | 
+          Check REF alleles and exit (e), warn (w), exclude (x), or set (s) bad sites.
+
+      - name: --remove_duplicates
+        alternatives: -d
+        type: string
+        choices: ['snps', 'indels', 'both', 'all', 'exact', 'none']
+        description: Remove duplicate snps, indels, both, all, exact matches, or none (old -D option).
+
+      - name: --fasta_ref
+        alternatives: -f
+        type: file
+        description: Reference fasta sequence file.
+
+      - name: --force
+        type: boolean_true
+        description: | 
+          Try to proceed even if malformed tags are encountered. 
+          Experimental, use at your own risk.
+
+      - name: --keep_sum
+        type: string
+        description: | 
+          Keep vector sum constant when splitting multiallelics (see github issue #360).
+
+      - name: --multiallelics
+        alternatives: -m
+        type: string
+        choices: ['+snps', '+indels', '+both', '+any', '-snps', '-indels', '-both', '-any']
+        description: | 
+          Split multiallelics (-) or join biallelics (+), type: snps, indels, both, any [default: both].
+
+      - name: --no_version
+        type: boolean_true
+        description: Do not append version and command line information to the header.
+
+      - name: --do_not_normalize
+        alternatives: -N
+        type: boolean_true
+        description: Do not normalize indels (with -m or -c s).
+      
+      - name: --output_type
+        alternatives: --O
+        type: string
+        choices: ['u', 'z', 'b', 'v']
+        description: | 
+          Output type:
+            u: uncompressed BCF
+            z: compressed VCF
+            b: compressed BCF
+            v: uncompressed VCF
+      
+      - name: --old_rec_tag
+        type: string
+        description: Annotate modified records with INFO/STR indicating the original variant.
+
+      - name: --regions
+        alternatives: --r
+        type: string
+        description: | 
+          Restrict to comma-separated list of regions. 
+          Following formats are supported: chr|chr:pos|chr:beg-end|chr:beg-[,…​].
+        example: '20:1000000-2000000'
+
+      - name: --regions_file
+        alternatives: --R
+        type: file
+        description: | 
+          Restrict to regions listed in a file. 
+          Regions can be specified either on a VCF, BED, or tab-delimited file (the default). 
+          For more information check manual.
+
+      - name: --regions_overlap
+        type: string
+        choices: ['pos', 'record', 'variant', '0', '1', '2']
+        description: | 
+          This option controls how overlapping records are determined: 
+          set to 'pos' or '0' if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
+          set to 'record' or '1' if also overlapping records with POS outside a region should be included (this is the default behavior of -r/-R, 
+          and includes indels with POS at the end of a region, which are technically outside the region); 
+          or set to 'variant' or '2' to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
+
+      - name: --site_win
+        alternatives: -w
+        type: integer
+        description: | 
+          Buffer for sorting lines that changed position during realignment.
+
+      - name: --strict_filter
+        alternatives: -s
+        type: boolean_true
+        description: When merging (-m+), merged site is PASS only if all sites being merged PASS.
+
+      - name: --targets
+        alternatives: -t
+        type: string
+        description: Similar to --regions but streams rather than index-jumps.
+        example: '20:1000000-2000000'
+
+      - name: --targets_file
+        alternatives: -T
+        type: file
+        description: Similar to --regions_file but streams rather than index-jumps.
+
+      - name: --targets_overlap
+        type: string
+        choices: ['pos', 'record', 'variant', '0', '1', '2']
+        description: | 
+          Include if POS in the region (0), record overlaps (1), variant overlaps (2).
+          Similar to --regions_overlap.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bcftools, procps]
+      - type: docker
+        run: |
+          echo "bcftools: \"$(bcftools --version | grep 'bcftools' | sed -n 's/^bcftools //p')\"" > /var/software_versions.txt
+    test_setup:  
+      - type: apt  
+        packages: [tabix]
+
+runners:
+  - type: executable
+  - type: nextflow
+
+

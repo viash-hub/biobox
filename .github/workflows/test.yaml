@@ -1,9 +1,11 @@
-name: Component Testing
+name: Test components
 
 on:
   pull_request:
   push:
+    branches:
+      - main
 
 jobs:
   test:
-    uses: viash-hub/toolbox/.github/workflows/test.yaml@main
+    uses: viash-io/viash-actions/.github/workflows/test.yaml@v6
