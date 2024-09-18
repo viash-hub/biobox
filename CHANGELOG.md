@@ -1,12 +1,13 @@
 # biobox x.x.x
 
-* `rsem`:
-    - `rsem_calculate_expression`: Calculate expression levels (PR #93).
+## NEW FUNCTIONALITY
 
 * `agat`:
   - `agat/agat_convert_genscan2gff`: convert a genscan file into a GFF file (PR #100).
 
 * `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
+
+* `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
 ## MINOR CHANGES
 
