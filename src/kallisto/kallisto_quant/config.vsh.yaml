@@ -9,7 +9,7 @@ links:
   repository: https://github.com/pachterlab/kallisto
   issue_tracker: https://github.com/pachterlab/kallisto/issues
 references: 
-  doi: https://doi.org/10.1038/nbt.3519
+  doi: 10.1038/nbt.3519
 license: BSD 2-Clause License
 
 argument_groups:
@@ -96,7 +96,9 @@ engines:
           apt-get install -y --no-install-recommends wget && \
           wget --no-check-certificate https://github.com/pachterlab/kallisto/releases/download/v0.50.1/kallisto_linux-v0.50.1.tar.gz && \
           tar -xzf kallisto_linux-v0.50.1.tar.gz && \
-          mv kallisto/kallisto /usr/local/bin/ && \
+          mv kallisto/kallisto /usr/local/bin/
+      - type: docker
+        run: |
           echo "kallisto: $(kallisto version | sed 's/kallisto, version //')" > /var/software_versions.txt
 runners:
   - type: executable
