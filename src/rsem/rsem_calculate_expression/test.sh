@@ -47,6 +47,26 @@ chr1	example_source	gene	100	219	.	+	.	gene_id "gene2"; transcript_id "transcrip
 chr1	example_source	exon	191	210	.	+	.	gene_id "gene2"; transcript_id "transcript2";
 EOF
 
+cat > ref.cnt <<'EOF'
+1 0 0 1
+0 0 0
+0 3
+0	1
+Inf	0
+EOF
+
+cat > ref.genes.results <<'EOF'
+gene_id	transcript_id(s)	length	effective_length	expected_count	TPM	FPKM
+gene1	transcript1	21.00	21.00	0.00	0.00	0.00
+gene2	transcript2	20.00	20.00	0.00	0.00	0.00
+EOF
+
+cat > ref.isoforms.results <<'EOF'
+transcript_id	gene_id	length	effective_length	expected_count	TPM	FPKM	IsoPct
+transcript1	gene1	21	21.00	0.00	0.00	0.00	0.00
+transcript2	gene2	20	20.00	0.00	0.00	0.00	0.00
+EOF
+
 
 echo "> Generate index"
 
@@ -86,9 +106,9 @@ echo ">>> Checking whether output exists"
 [ ! -d "test.stat" ] && echo "Stats file does not exist!" && exit 1
 
 echo ">>> Check wheter output is correct"
-diff $test_dir/output/ref.genes.results test.genes.results || { echo "Gene level expression counts file is incorrect!"; exit 1; }
-diff $test_dir/output/ref.isoforms.results test.isoforms.results || { echo "Transcript level expression counts file is incorrect!"; exit 1; }
-diff $test_dir/output/ref.cnt test.stat/test.cnt || { echo "Stats file is incorrect!"; exit 1; }
+diff ref.genes.results test.genes.results || { echo "Gene level expression counts file is incorrect!"; exit 1; }
+diff ref.isoforms.results test.isoforms.results || { echo "Transcript level expression counts file is incorrect!"; exit 1; }
+diff ref.cnt test.stat/test.cnt || { echo "Stats file is incorrect!"; exit 1; }
 
 #####################################################################################################
 
