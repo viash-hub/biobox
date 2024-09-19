@@ -1,5 +1,20 @@
 # biobox x.x.x
 
+## NEW FUNCTIONALITY
+
+* `agat`:
+  - `agat/agat_convert_genscan2gff`: convert a genscan file into a GFF file (PR #100).
+
+* `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
+
+* `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
+
+## MINOR CHANGES
+
+* Upgrade to Viash 0.9.0.
+
+# biobox 0.2.0
+
 ## BREAKING CHANGES
 
 * `star/star_align_reads`: Change all arguments from `--camelCase` to `--snake_case` (PR #62).
@@ -49,6 +64,16 @@
   - `bcftools/bcftools_sort`: Sorts BCF/VCF files by position and other criteria (PR #141).
 
 * `fastqc`: High throughput sequence quality control analysis tool (PR #92).
+
+* `sortmerna`: Local sequence alignment tool for mapping, clustering, and filtering rRNA from
+  metatranscriptomic data (PR #146).
+
+* `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
+
+* `kallisto`:
+    - `kallisto_index`: Create a kallisto index (PR #149).
+    - `kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads (PR #152).
+
 
 * `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
 
@@ -139,7 +164,8 @@
     - `samtools/samtools_fastq`: Converts a SAM/BAM/CRAM file to FASTA (PR #53).
 
 * `umi_tools`:
-    -`umi_tools/umi_tools_extract`: Flexible removal of UMI sequences from fastq reads (PR #71).
+    - `umi_tools/umi_tools_extract`: Flexible removal of UMI sequences from fastq reads (PR #71).
+    - `umi_tools/umi_tools_prepareforrsem`: Fix paired-end reads in name sorted BAM file to prepare for RSEM (PR #148).
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
@@ -147,10 +173,8 @@
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
 
-* `sortmerna`: Local sequence alignment tool for mapping, clustering, and filtering rRNA from metatranscriptomic 
-               data. (PR #146)
 
-*  `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
+
 
 ## MINOR CHANGES
 
