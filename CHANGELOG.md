@@ -42,10 +42,13 @@
 * `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
 
 * `bcftools`:
+  - `bcftools/bcftools_concat`: Concatenate or combine VCF/BCF files (PR #145).
+  - `bcftools/bcftools_norm`: Left-align and normalize indels, check if REF alleles match the reference, split multiallelic sites into multiple rows; recover multiallelics from multiple rows (PR #144).
+  - `bcftools/bcftools_annotate`: Add or remove annotations from a VCF/BCF file (PR #143).
+  - `bcftools/bcftools_stats`: Parses VCF or BCF and produces a txt stats file which can be plotted using plot-vcfstats (PR #142).
   - `bcftools/bcftools_sort`: Sorts BCF/VCF files by position and other criteria (PR #141).
 
 * `fastqc`: High throughput sequence quality control analysis tool (PR #92).
-
 
 * `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
 
