@@ -34,12 +34,24 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
+# Add FastQC file arguments to fastqc_args
+fastqc_args="${par_fastqc_args}"
+if [ -f "$par_fastqc_contaminants" ]; then 
+    fastqc_args+=" --contaminants $par_fastqc_contaminants"
+fi
+if [ -f "$par_fastqc_adapters" ]; then 
+    fastqc_args+=" --adapters $par_fastqc_adapters"
+fi
+if [ -f "$par_fastqc_limits" ]; then 
+    fastqc_args+=" --limits $par_fastqc_limits"
+fi
+
 trim_galore \
     ${par_quality:+-q "${par_quality}"} \
     ${par_phred33:+--phred33} \
     ${par_phred64:+--phred64 } \
     ${par_fastqc:+--fastqc } \
-    ${par_fastqc_args:+--fastqc_args "${par_fastqc_args}"} \
+    ${fastqc_args:+--fastqc_args "${fastqc_args}"} \
     ${par_adapter:+-a "${par_adapter}"} \
     ${par_adapter2:+-a2 "${par_adapter2}"} \
     ${par_illumina:+--illumina} \

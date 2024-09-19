@@ -42,8 +42,20 @@ argument_groups:
         description: Run FastQC in the default mode on the FastQ file once trimming is complete.
       - name: --fastqc_args
         type: string
-        description: Passes extra arguments to FastQC. If more than one argument is to be passed to FastQC they must be in the form "arg1 arg2 ...". Passing extra arguments will automatically invoke FastQC, so --fastqc does not have to be specified separately.
-        example: "--nogroup --outdir /home/"
+        description: Passes extra arguments (excluding files) to FastQC. If more than one argument is to be passed to FastQC they must be in the form "arg1 arg2 ...". Passing extra arguments will automatically invoke FastQC, so --fastqc does not have to be specified separately.
+        example: "--nogroup --noextract"
+      - name: --fastqc_contaminants
+        type: file
+        description: Specifies a non-default file which contains the list of contaminants for FastQC to screen overrepresented sequences against. The file must contain sets of named contaminants in the form name[tab]sequence. Lines prefixed with a hash will be ignored.
+        example: "contaminants.txt"
+      - name: --fastqc_adapters
+        type: file
+        description: Specifies a non-default file which contains the list of adapter sequences which which FasstQC will explicity search against the library. The file must contain sets of named adapters in the form name[tab]sequence.  Lines prefixed with a hash will be ignored.
+        example: "adapters.txt"
+      - name: --fastqc_limits
+        type: file
+        description: Specifies a non-default file which contains a set of criteria which FastQC will use to determine the warn/error limits for the various modules. This file can also be used to selectively remove some modules from the output all together.  The format needs to mirror the default limits.txt file found in the Configuration folder.
+        example: "limits.txt"
       - name: --adapter
         alternatives: -a
         type: string
@@ -201,7 +213,7 @@ argument_groups:
         type: file
         description: If specified all output will be written to this directory instead of the current directory. 
         direction: output
-        required: false
+        required: true
         default: trimmed_output
       - name: --trimmed_r1
         type: file
