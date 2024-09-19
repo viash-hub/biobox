@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -e
 set -eo pipefail
 
 # helper functions
