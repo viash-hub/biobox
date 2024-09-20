@@ -103,7 +103,7 @@ argument_groups:
       - name: -cancer_samples
         type: file
         description: Two column TXT file defining 'original \t derived' samples.
-      - name: -fasta_prot
+      - name: -fastaprot
         type: file
         description: |
           Create an output file containing the resulting protein sequences.

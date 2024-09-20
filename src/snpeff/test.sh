@@ -53,7 +53,7 @@ echo "> Run Test 2: different input + options"
   -genome_version GRCh37.75 \
   -input "$meta_resources_dir/test_data/test.vcf" \
   -interval "$meta_resources_dir/test_data/my_annotations.bed" \
-  -noStats \
+  -no_stats \
   -output output.vcf
 
 # Check if out.vcf exists
