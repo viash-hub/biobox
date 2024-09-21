@@ -7,6 +7,10 @@ meta_executable="$PWD/target/executable/nanoplot/nanoplot"
 meta_resources_dir="$PWD/src/nanoplot"
 ## VIASH END
 
+# Files at runtime (.gz, .pickle and .feather)
+wget "https://github.com/wdecoster/nanotest/archive/refs/heads/master.zip"
+unzip master.zip
+
 ###########################################################################
 
 # Test 1: Run NanoPlot with only input parameter (Fastq)
@@ -299,7 +303,7 @@ pushd test7 > /dev/null
 
 echo "> Run Test 7: Input Fasta"
 "$meta_executable" \
-  --fastq_minimal "$meta_resources_dir/test_data/test_minimal.fastq.gz" \
+  --fastq_minimal "../nanotest-master/reads.fastq.gz" \
   --outdir output
 
 # Check if output directory exists
@@ -425,7 +429,7 @@ pushd test10 > /dev/null
 
 echo "> Run Test 10: Input pickle"
 "$meta_executable" \
-  --pickle "$meta_resources_dir/test_data/test.pickle" \
+  --pickle "../nanotest-master/alignment.pickle" \
   --outdir output
 
 # Check if output directory exists
@@ -467,7 +471,7 @@ pushd test11 > /dev/null
 
 echo "> Run Test 11: Input feather"
 "$meta_executable" \
-  --arrow "$meta_resources_dir/test_data/test.feather" \
+  --arrow "../nanotest-master/summary1.feather" \
   --outdir output
 
 # Check if output directory exists

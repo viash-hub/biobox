@@ -72,28 +72,14 @@ rm src/nanoplot/test_data/test_rich.fastq.gz
 
 #########################################################################################
 
-## Fastq_minimal file ##
+## Summary file ##
 if [ ! -d nanotest ]; then
   git clone --depth 1 --single-branch --branch master https://github.com/wdecoster/nanotest/
 fi
 
-mv nanotest/reads.fastq.gz src/nanoplot/test_data/test_minimal.fastq.gz
-
-# Unzip file
-gunzip -c src/nanoplot/test_data/test_minimal.fastq.gz > src/nanoplot/test_data/test_minimal.fastq
-
-# Extract the first 5 reads (first 20 lines)
-head -n 20 src/nanoplot/test_data/test_minimal.fastq > first_5_reads.fastq
-
-mv first_5_reads.fastq src/nanoplot/test_data/test_minimal.fastq
-
-# Zip the output file
-gzip -f src/nanoplot/test_data/test_minimal.fastq
-
-#########################################################################################
-
-## Summary file ##
 mv nanotest/sequencing_summary.txt src/nanoplot/test_data/test_summary.txt
+
+rm -rf nanotest
 
 #########################################################################################
 
@@ -103,15 +89,3 @@ if [ ! -d /tmp/snakemake-wrappers ]; then
 fi
 
 cp -r /tmp/snakemake-wrappers/bio/biobambam2/bamsormadup/test/mapped/a.bam src/nanoplot/test_data/test.bam
-
-#########################################################################################
-
-## Pickle file ##
-mv nanotest/alignment.pickle src/nanoplot/test_data/test.pickle
-
-#########################################################################################
-
-## Feather/Arrow file ##
-mv nanotest/summary1.feather src/nanoplot/test_data/test.feather
-
-rm -rf nanotest
