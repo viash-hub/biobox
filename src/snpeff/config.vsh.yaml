@@ -33,6 +33,19 @@ argument_groups:
         description: The output file.
         example: out.vcf
         direction: output
+        required: true
+      - name: -summary
+        type: file
+        description: Summary file directory.
+        example: summary_dir
+        direction: output
+        required: false
+      - name: -genes
+        type: file
+        description: Txt file directory.
+        example: genes_dir
+        direction: output
+        required: false
   - name: Options
     arguments:
       - name: -chr

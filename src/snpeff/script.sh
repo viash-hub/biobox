@@ -135,7 +135,19 @@ snpEff \
 absolute_path=$(realpath "$par_output")
 directory_path=$(dirname "$absolute_path")
 
-# Move the automatically generated outputs to the pwd
+# Move the automatically generated outputs to their locations
 if [ -z "$par_no_stats" ]; then
-    mv -f snpEff_genes.txt snpEff_summary.html "$directory_path"
+    if [ ! -z "$par_summary" ]; then
+    mv -f snpEff_summary.html "$par_summary"
+    else
+    mv -f snpEff_summary.html "$directory_path"
+    fi
+fi
+
+if [ -z "$par_no_stats" ]; then
+    if [ ! -z "$par_genes" ]; then
+    mv -f snpEff_genes.txt "$par_genes"
+    else
+    mv -f snpEff_genes.txt "$directory_path"
+    fi
 fi

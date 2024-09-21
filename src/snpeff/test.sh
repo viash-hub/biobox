@@ -56,9 +56,9 @@ echo "> Run Test 2: different input + options"
   -no_stats \
   -output output.vcf
 
-# Check if out.vcf exists
+# Check if output.vcf exists
 if [ ! -e "output.vcf" ]; then
-    echo "File out.vcf does not exist."
+    echo "File output.vcf does not exist."
 fi
 
 # These files should not exist
@@ -77,6 +77,54 @@ fi
 popd > /dev/null
 
 echo "Test 2 succeeded."
+
+###########################################################################
+
+# Test 3: Move the output files to other locations
+
+mkdir test3
+pushd test3 > /dev/null
+
+mkdir temp
+
+echo "> Run Test 3: move output files"
+"$meta_executable" \
+  -genome_version GRCh37.75 \
+  -input "$meta_resources_dir/test_data/test.vcf" \
+  -output output.vcf \
+  -summary temp \
+  -genes temp
+
+# Check if output.vcf exists
+if [ ! -e "output.vcf" ]; then
+    echo "File output.vcf does not exist."
+fi
+
+# Check if the other output files have been moved to temp folder
+output_files=("snpEff_genes.txt" "snpEff_summary.html")
+
+# Check if any of the files do not exist
+for file in "${output_files[@]}"; do
+    if [ ! -e "temp/$file" ]; then
+        echo "File $file does not exist in "temp" folder."
+    fi
+done
+
+# Check if output.vcf is empty
+if [ ! -s "output.vcf" ]; then
+    echo "File output.vcf is empty."
+fi
+
+# Check if the other output files in temp folder are empty
+for file in "${output_files[@]}"; do
+    if [ ! -s "temp/$file" ]; then
+        echo "File $file is empty."
+    fi
+done
+
+popd > /dev/null
+
+echo "Test 3 succeeded."
 
 ###########################################################################
 
