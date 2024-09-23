@@ -20,23 +20,19 @@ argument_groups:
   - name: "--input"
     type: file 
     required: true
-    description: input alignment file in BAM or SAM format
-
+    description: Input alignment file in BAM or SAM format.
   - name: "--map_qual"
     type: integer
-    required: false
-    default: 30 
-    description: Minimum mapping quality (phred scaled) to determine uniquely mapped reads, default=30.
-    min: 0
+    example: 30 
+    description: |
+      Minimum mapping quality (phred scaled) to determine uniquely mapped reads. Default: '30'.
     
 - name: "Output"
   arguments: 
   - name: "--output"
     type: file
     direction: output
-    required: false
-    default: $id.mapping_quality.txt
-    description: output file (txt) with mapping quality statistics
+    description: Output file (txt) with mapping quality statistics.
 
 resources:
   - type: bash_script
@@ -44,7 +40,8 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - path: /testData/unit_test_resources/sarscov2/test.paired_end.sorted.bam
+  - type: file
+    path: test_data
   
 engines:
 - type: docker
@@ -54,6 +51,9 @@ engines:
       packages: [ python3-pip ]
     - type: python
       packages: [ RSeQC ]
+    - type: docker
+      run: |
+        echo "RSeQC bam_stat.py: $(bam_stat.py --version | cut -d' ' -f2-)" > /var/software_versions.txt
 runners: 
 - type: executable
 - type: nextflow
