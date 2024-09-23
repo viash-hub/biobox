@@ -75,6 +75,8 @@
     - `kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads (PR #152).
 
 
+* `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
