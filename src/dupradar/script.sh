@@ -5,6 +5,7 @@
 
 set -eo pipefail 
 
+
 function num_strandness {
     if [ $par_strandedness == 'unstranded' ]; then echo 0
     elif [ $par_strandedness == 'forward' ]; then echo 1
@@ -14,12 +15,16 @@ function num_strandness {
     fi
 }
 
-Rscript "$meta_resources_dir/script.R" \
+
+if [ $par_paired ]; then paired=TRUE; else paired=FALSE; fi
+
+
+Rscript "$meta_resources_dir/dupradar.r" \
     $par_input \
     $par_id \
     $par_gtf_annotation \
     $(num_strandness) \
-    $par_paired \
+    ${paired} \
     ${meta_cpus:-1}
 
 mv "$par_id"_dupMatrix.txt $par_output_dupmatrix
@@ -30,9 +35,5 @@ mv "$par_id"_duprateExpDensCurve_mqc.txt $par_output_duprate_exp_denscurve_mqc
 mv "$par_id"_expressionHist.pdf $par_output_expression_histogram
 mv "$par_id"_intercept_slope.txt $par_output_intercept_slope
 
-
-dupradar_ver=$(Rscript -e "library(dupRadar); cat(as.character(packageVersion('dupRadar')))")
-text="bioconductor-dupradar: ${dupradar_ver}"
-echo "$text"
 
 exit 0

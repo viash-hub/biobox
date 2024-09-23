@@ -47,17 +47,29 @@ if (!require("parallel")) {
     library("parallel")
 }
 
+
 # Duplicate stats
 dm <- analyzeDuprates(input_bam, annotation_gtf, stranded, paired_end, threads)
+print(input_bam)
+print(output_prefix)
+print(annotation_gtf)
+print(stranded)
+print(paired_end)
+print(threads)
+print("analyzeDuprates done")
 write.table(dm, file=paste(output_prefix, "_dupMatrix.txt", sep=""), quote=F, row.name=F, sep="\t")
+print("write.table done")
 
 # 2D density scatter plot
 pdf(paste0(output_prefix, "_duprateExpDens.pdf"))
+print("pdf done")
 duprateExpDensPlot(DupMat=dm)
 title("Density scatter plot")
 mtext(output_prefix, side=3)
 dev.off()
+print("duprateExpDensPlot done")
 fit <- duprateExpFit(DupMat=dm)
+print("duprateExpFit done")
 cat(
     paste("- dupRadar Int (duprate at low read counts):", fit$intercept),
     paste("- dupRadar Sl (progression of the duplication rate):", fit$slope),
@@ -82,6 +94,7 @@ Sample dupRadar_intercept"
 
 write(line,file=paste0(output_prefix, "_dup_intercept_mqc.txt"),append=TRUE)
 write(paste(sample_name, fit$intercept),file=paste0(output_prefix, "_dup_intercept_mqc.txt"),append=TRUE)
+print("write dup_intercept_mqc done")
 
 # Get numbers from dupRadar GLM
 curve_x <- sort(log10(dm$RPK))
@@ -135,22 +148,24 @@ write.table(
     file=paste0(output_prefix, "_duprateExpDensCurve_mqc.txt"),
     quote=FALSE, row.names=FALSE, col.names=FALSE, append=TRUE,
 )
-
+print("write duprateExpDensCurve_mqc done")
 # Distribution of expression box plot
 pdf(paste0(output_prefix, "_duprateExpBoxplot.pdf"))
 duprateExpBoxplot(DupMat=dm)
 title("Percent Duplication by Expression")
 mtext(output_prefix, side=3)
 dev.off()
-
+print("duprateExpBoxplot done")
 # Distribution of RPK values per gene
 pdf(paste0(output_prefix, "_expressionHist.pdf"))
 expressionHist(DupMat=dm)
 title("Distribution of RPK values per gene")
 mtext(output_prefix, side=3)
 dev.off()
+print("expressionHist done")
 
 # Print sessioninfo to standard out
 print(output_prefix)
-citation("dupRadar")
-sessionInfo()
+# citation("dupRadar")
+# print("citation done")
+# sessionInfo()

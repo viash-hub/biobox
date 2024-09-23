@@ -58,14 +58,11 @@ echo ">> Check if output is empty"
     && echo "Output file $output_intercept_slope is empty" && exit 1
 
 echo ">> Check if output is correct"
-cat "$output_dupmatrix"
-cat "$output_dup_intercept_mqc"
-cat "$output_intercept_slope"
 # diff ignoring white spaces
-diff -B -b "test_dupMatrix.pdf" "${meta_resources_dir}/test_data/test_dupMatrix.txt" || 
-    (echo "Output file $output_dupmatrix is not correct" && exit 1)
-diff -B -b "$output_dup_intercept_mqc" "${meta_resources_dir}/test_data/test_duprateExpDensCurve_mqc.txt" || \
-    (echo "Output file $output_dup_intercept_mqc is not correct" && exit 1)
+diff -B -b "$meta_resources_dir/test_data/test_dupMatrix.txt" "${meta_resources_dir}/test_data/test_dupMatrix.txt" || \
+    { echo "Output file $output_dupmatrix is not correct"; exit 1; }
+diff -B -b "$output_duprate_exp_denscurve_mqc" "${meta_resources_dir}/test_data/test_duprateExpDensCurve_mqc.txt" || \
+    { echo "Output file $output_duprate_exp_denscurve_mqc is not correct"; exit 1; }
 diff -B -b "$output_intercept_slope" "${meta_resources_dir}/test_data/test_intercept_slope.txt" || \
-    (echo "Output file $output_intercept_slope is not correct" && exit 1)
+    { echo "Output file $output_intercept_slope is not correct"; exit 1; }
 exit 0

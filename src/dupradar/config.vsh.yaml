@@ -79,15 +79,26 @@ resources:
     path: script.sh
   # Copied from https://github.com/nf-core/rnaseq/blob/3.12.0/bin/dupradar.r
   - type: r_script
-    path: script.R
+    path: dupradar.r
 test_resources:
   - type: bash_script
     path: test.sh
   - type: file
     path: test_data
+    
 engines:
   - type: docker
-    image: quay.io/biocontainers/bioconductor-dupradar:1.32.0--r43hdfd78af_0
+    image: ubuntu:22.04
+    setup:   
+      - type: apt
+        packages: [ r-base ]
+      - type: r
+        bioc: [ dupRadar ]
+        packages: [ parallel ]
+      - type: docker
+        run: |
+          echo "DupRadar: $(Rscript -e "library(dupRadar); cat(as.character(packageVersion('dupRadar')))")" > /var/software_versions.txt
+        
 runners:
   - type: executable  
   - type: nextflow

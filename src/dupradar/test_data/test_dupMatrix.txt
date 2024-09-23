@@ -1,4 +1,4 @@
-ID	geneLength	allCountsMulti	filteredCountsMulti	dupRateMulti	dupsPerIdMulti	RPKMulti	PKMMulti	allCounts	filteredCounts	dupRate	dupsPerId	RPK	RPKM
+ID	geneLength	allCountsMulti	filteredCountsMulti	dupRateMulti	dupsPerIdMulti	RPKMulti	RPKMMulti	allCounts	filteredCounts	dupRate	dupsPerId	RPK	RPKM
 WASH7P	1769	41	41	0	0	23.1769361221029	188430.374976446	1	1	0	0	0.565291124929339	4595.86280430357
 FAM138A	2260	0	0	NA	0	0	0	0	0	NA	0	0	0
 FAM138F	2260	0	0	NA	0	0	0	0	0	NA	0	0	0
