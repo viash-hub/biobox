@@ -65,6 +65,18 @@
 
 * `fastqc`: High throughput sequence quality control analysis tool (PR #92).
 
+* `sortmerna`: Local sequence alignment tool for mapping, clustering, and filtering rRNA from
+  metatranscriptomic data (PR #146).
+
+* `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
+
+* `kallisto`:
+    - `kallisto_index`: Create a kallisto index (PR #149).
+    - `kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads (PR #152).
+
+
+* `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
+
 ## MINOR CHANGES
 
 * `busco` components: update BUSCO to `5.7.1` (PR #72).
@@ -161,13 +173,7 @@
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
 
-* `sortmerna`: Local sequence alignment tool for mapping, clustering, and filtering rRNA from metatranscriptomic 
-               data. (PR #146)
 
-* `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
-
-* `kallisto`:
-    - `kallisto_index`: Create a kallisto index (PR #149).
 
 
 ## MINOR CHANGES
