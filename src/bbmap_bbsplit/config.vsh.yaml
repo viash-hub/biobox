@@ -130,7 +130,11 @@ argument_groups:
   - name: "--nzo"
     type: boolean_true
     description: Only print lines with nonzero coverage.
-
+  - name: "--bbmap_args"
+    type: string
+    description: |
+      Additional arguments from BBMap to pass to BBSplit.
+    
 resources:
   - type: bash_script
     path: script.sh

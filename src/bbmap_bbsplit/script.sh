@@ -63,6 +63,9 @@ else
     if [ "$par_untrim" = true ]; then extra_args+=" --untrim"; fi
     if [ "$par_nzo" = true ]; then extra_args+=" --nzo"; fi
 
+    if [ -n "$par_bbmap_args" ]; then extra_args+=" $par_bbmap_args"; fi
+
+    
     if $par_paired; then
         bbsplit.sh \
             $index_files \
