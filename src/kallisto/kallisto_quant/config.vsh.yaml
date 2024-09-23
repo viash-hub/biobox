@@ -1,0 +1,105 @@
+name: kallisto_quant
+namespace: kallisto
+description: |
+  Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads.
+keywords: [kallisto, quant, pseudoalignment]
+links:
+  homepage: https://pachterlab.github.io/kallisto/about
+  documentation: https://pachterlab.github.io/kallisto/manual
+  repository: https://github.com/pachterlab/kallisto
+  issue_tracker: https://github.com/pachterlab/kallisto/issues
+references: 
+  doi: 10.1038/nbt.3519
+license: BSD 2-Clause License
+
+argument_groups:
+- name: "Input"
+  arguments:
+  - name: "--input"
+    type: file
+    description: List of input FastQ files of size 1 and 2 for single-end and paired-end data, respectively.
+    direction: "input"
+    multiple: true
+    required: true
+  - name: "--index"
+    alternatives: ["-i"]
+    type: file
+    description: Kallisto genome index.
+    must_exist: true
+    required: true
+
+- name: "Output"
+  arguments:
+  - name: "--output_dir"
+    alternatives: ["-o"]
+    type: string
+    description: Directory to write output to.
+    required: true
+
+- name: "Options"
+  arguments:
+  - name: "--single"
+    type: boolean_true
+    description: Single end mode.
+  - name: "--single_overhang"
+    type: boolean_true
+    description: Include reads where unobserved rest of fragment is predicted to lie outside a transcript.
+  - name: "--fr_stranded"
+    type: boolean_true
+    description: Strand specific reads, first read forward.
+  - name: "--rf_stranded"
+    type: boolean_true
+    description: Strand specific reads, first read reverse.
+  - name: "--fragment_length"
+    alternatives: ["-l"]
+    type: double
+    description: The estimated average fragment length.
+  - name: "--sd"
+    alternatives: ["-s"]
+    type: double
+    description: |
+      The estimated standard deviation of the fragment length (default: -l, -s values are estimated 
+      from paired end data, but are required when using --single).
+  - name: "--plaintext"
+    type: boolean_true
+    description: Output plaintext instead of HDF5.
+  - name: "--bootstrap_samples"
+    alternatives: ["-b"]
+    type: integer
+    description: |
+      Number of bootstrap samples to draw. Default: '0'
+    example: 0
+  - name: "--seed"
+    type: integer
+    description: |
+      Random seed for bootstrap. Default: '42'
+    example: 42
+
+
+resources:
+- type: bash_script
+  path: script.sh
+
+test_resources:
+- type: bash_script
+  path: test.sh
+- type: file
+  path: test_data
+
+engines:
+  - type: docker
+    image: ubuntu:22.04
+    setup:
+      - type: docker
+        run: |
+          apt-get update && \
+          apt-get install -y --no-install-recommends wget && \
+          wget --no-check-certificate https://github.com/pachterlab/kallisto/releases/download/v0.50.1/kallisto_linux-v0.50.1.tar.gz && \
+          tar -xzf kallisto_linux-v0.50.1.tar.gz && \
+          mv kallisto/kallisto /usr/local/bin/
+      - type: docker
+        run: |
+          echo "kallisto: $(kallisto version | sed 's/kallisto, version //')" > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow  
