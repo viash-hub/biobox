@@ -83,21 +83,21 @@ def generate_config(par: dict[str, Any], meta, config) -> str:
 
     for config_key, arg_type, par_value in config_key_value_pairs:
         if arg_type == "file":
-            str = strip_margin(f"""\
+            content = strip_margin(f"""\
                 |{config_key}:
                 |""")
             if isinstance(par_value, list):
                 for file in par_value:
-                    str += strip_margin(f"""\
+                    content += strip_margin(f"""\
                         | - class: File
                         |   location: "{file}"
                         |""")
             else:
-                str += strip_margin(f"""\
+                content += strip_margin(f"""\
                     |   class: File
                     |   location: "{par_value}"
                     |""")
-            content_list.append(str)
+            content_list.append(content)
         else:
             content_list.append(strip_margin(f"""\
                 |{config_key}: {par_value}
@@ -108,9 +108,9 @@ def generate_config(par: dict[str, Any], meta, config) -> str:
 
 def get_cwl_file(meta: dict[str, Any]) -> str:
     # create cwl file (if need be)
-    cwl_file=os.path.join(meta["resources_dir"], "make_rhap_reference_2.2.1_nodocker.cwl")
+    cwl_file="/var/bd_rhapsody_cwl/v2.2.1/Extra_Utilities/make_rhap_reference_2.2.1.cwl"
 
-    return cwl_file
+    return os.path.abspath(cwl_file)
 
 def main(par: dict[str, Any], meta: dict[str, Any]):
     config = read_config(meta["config"])

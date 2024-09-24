@@ -1,0 +1,41 @@
+```
+bcftools norm -h
+```
+
+About:   Left-align and normalize indels; check if REF alleles match the reference;
+         split multiallelic sites into multiple rows; recover multiallelics from
+         multiple rows.
+Usage:   bcftools norm [options] <in.vcf.gz>
+
+Options:
+    -a, --atomize                   Decompose complex variants (e.g. MNVs become consecutive SNVs)
+        --atom-overlaps '*'|.       Use the star allele (*) for overlapping alleles or set to missing (.) [*]
+    -c, --check-ref e|w|x|s         Check REF alleles and exit (e), warn (w), exclude (x), or set (s) bad sites [e]
+    -D, --remove-duplicates         Remove duplicate lines of the same type.
+    -d, --rm-dup TYPE               Remove duplicate snps|indels|both|all|exact
+    -f, --fasta-ref FILE            Reference sequence
+        --force                     Try to proceed even if malformed tags are encountered. Experimental, use at your own risk
+        --keep-sum TAG,..           Keep vector sum constant when splitting multiallelics (see github issue #360)
+    -m, --multiallelics -|+TYPE     Split multiallelics (-) or join biallelics (+), type: snps|indels|both|any [both]
+        --no-version                Do not append version and command line to the header
+    -N, --do-not-normalize          Do not normalize indels (with -m or -c s)
+        --old-rec-tag STR           Annotate modified records with INFO/STR indicating the original variant
+    -o, --output FILE               Write output to a file [standard output]
+    -O, --output-type u|b|v|z[0-9]  u/b: un/compressed BCF, v/z: un/compressed VCF, 0-9: compression level [v]
+    -r, --regions REGION            Restrict to comma-separated list of regions
+    -R, --regions-file FILE         Restrict to regions listed in a file
+        --regions-overlap 0|1|2     Include if POS in the region (0), record overlaps (1), variant overlaps (2) [1]
+    -s, --strict-filter             When merging (-m+), merged site is PASS only if all sites being merged PASS
+    -t, --targets REGION            Similar to -r but streams rather than index-jumps
+    -T, --targets-file FILE         Similar to -R but streams rather than index-jumps
+        --targets-overlap 0|1|2     Include if POS in the region (0), record overlaps (1), variant overlaps (2) [0]
+        --threads INT               Use multithreading with <int> worker threads [0]
+    -w, --site-win INT              Buffer for sorting lines which changed position during realignment [1000]
+
+Examples:
+   # normalize and left-align indels
+   bcftools norm -f ref.fa in.vcf
+
+   # split multi-allelic sites
+   bcftools norm -m- in.vcf
+
