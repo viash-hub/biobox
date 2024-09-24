@@ -9,6 +9,9 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `rseqc`:
+  - `rseqc/bamstat`: Generate statistics from a bam file (PR #155).
+
 ## MINOR CHANGES
 
 * Upgrade to Viash 0.9.0.
