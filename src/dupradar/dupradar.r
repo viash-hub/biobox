@@ -1,24 +1,48 @@
 #!/usr/bin/env Rscript
 
-# Command line argument processing
-args = commandArgs(trailingOnly=TRUE)
-if (length(args) < 5) {
+## VIASH START
+par <- list(
+  "input" = 'test_data/sample.bam',
+  "id" = 'test',
+  "gtf_annotation" = 'test_data/genes.gtf',
+  "strandedness" = 1,
+  "paired" = TRUE,
+  "threads" = 1,
+  "output_dupmatrix"="dup_matrix.txt",
+  "output_dup_intercept_mqc"="dup_intercept_mqc.txt",
+  "output_duprate_exp_boxplot"="duprate_exp_boxplot.pdf",
+  "output_duprate_exp_densplot"="duprate_exp_densityplot.pdf",
+  "output_duprate_exp_denscurve_mqc"="duprate_exp_density_curve_mqc.pdf",
+  "output_expression_histogram"="expression_hist.pdf",
+  "output_intercept_slope"="intercept_slope.txt"
+)
+## VIASH END
+
+
+if (length(par) < 5) {
     stop("Usage: dupRadar.r <input.bam> <sample_id> <annotation.gtf> <strandDirection:0=unstranded/1=forward/2=reverse> <paired/single> <nbThreads> <R-package-location (optional)>", call.=FALSE)
 }
 
-message("paired_end is", args[5])
-message("the type is is", class(args[5]))
 
-input_bam <- args[1]
-output_prefix <- args[2]
-annotation_gtf <- args[3]
-stranded <- as.numeric(args[4])
-paired_end <- ifelse(args[5] == "true", TRUE, FALSE)
-threads <- as.numeric(args[6])
+input_bam <- par$input
+output_prefix <- par$id
+annotation_gtf <- par$gtf_annotation
+stranded <- ifelse(is.null(par$strandedness), 0, as.integer(par$strandedness))
+paired_end <- ifelse(par$paired, TRUE, FALSE)
+threads <- ifelse(is.null(par$threads), 1, as.integer(par$threads))
+
+output_dupmatrix <- ifelse(is.null(par$output_dupmatrix), paste0(output_prefix, "_dupMatrix.txt", sep=""), par$output_dupmatrix)
+output_dup_intercept_mqc <- ifelse(is.null(par$output_dup_intercept_mqc), paste0(output_prefix, "_dup_intercept_mqc.txt", sep=""), par$output_dup_intercept_mqc)
+output_duprate_exp_boxplot <- ifelse(is.null(par$output_duprate_exp_boxplot), paste0(output_prefix, "_duprateExpBoxplot.pdf", sep=""), par$output_duprate_exp_boxplot)
+output_duprate_exp_densplot <- ifelse(is.null(par$output_duprate_exp_densplot), paste0(output_prefix, "_duprate_exp_densplot.pdf", sep=""), par$output_duprate_exp_densplot)
+output_duprate_exp_denscurve_mqc <- ifelse(is.null(par$output_duprate_exp_denscurve_mqc), paste0(output_prefix, "_duprateExpDensCurve_mqc.txt", sep=""), par$output_duprate_exp_denscurve_mqc)
+output_expression_histogram <- ifelse(is.null(par$output_expression_histogram), paste0(output_prefix, "_expressionHist.pdf", sep=""), par$output_expression_histogram)
+output_intercept_slope <- ifelse(is.null(par$output_intercept_slope), paste0(output_prefix, "_intercept_slope.txt", sep=""), par$output_intercept_slope)
 
 bamRegex <- "(.+)\\.bam$"
 
-if(!(grepl(bamRegex, input_bam) && file.exists(input_bam) &&  (!file.info(input_bam)$isdir))) stop("First argument '<input.bam>' must be an existing file (not a directory) with '.bam' extension...")
+
+if(!(grepl(bamRegex, input_bam) && file.exists(input_bam) && (!file.info(input_bam)$isdir))) stop("First argument '<input.bam>' must be an existing file (not a directory) with '.bam' extension...")
 if(!(file.exists(annotation_gtf) &&  (!file.info(annotation_gtf)$isdir))) stop("Third argument '<annotation.gtf>' must be an existing file (and not a directory)...")
 if(is.na(stranded) || (!(stranded %in% (0:2)))) stop("Fourth argument <strandDirection> must be a numeric value in 0(unstranded)/1(forward)/2(reverse)...")
 if(is.na(threads) || (threads<=0)) stop("Fifth argument <nbThreads> must be a strictly positive numeric value...")
@@ -27,7 +51,7 @@ if(is.na(threads) || (threads<=0)) stop("Fifth argument <nbThreads> must be a st
 message("Input bam      (Arg 1): ", input_bam)
 message("Output basename(Arg 2): ", output_prefix)
 message("Input gtf      (Arg 3): ", annotation_gtf)
-message("Strandness     (Arg 4): ", c("unstranded", "forward", "reverse")[stranded+1])
+message("Strandness     (Arg 4): ", c("unstranded", "forward", "reverse")[stranded])
 message("paired_end     (Arg 5): ", paired_end)
 message("Nb threads     (Arg 6): ", threads)
 message("R package loc. (Arg 7): ", ifelse(length(args) > 4, args[5], "Not specified"))
@@ -43,25 +67,18 @@ if (!require("dupRadar")) {
   library("dupRadar")
 }
 if (!require("parallel")) {
-    install.packages("parallel", dependencies=TRUE, repos='http://cloud.r-project.org/')
     library("parallel")
 }
 
 
 # Duplicate stats
 dm <- analyzeDuprates(input_bam, annotation_gtf, stranded, paired_end, threads)
-print(input_bam)
-print(output_prefix)
-print(annotation_gtf)
-print(stranded)
-print(paired_end)
-print(threads)
 print("analyzeDuprates done")
-write.table(dm, file=paste(output_prefix, "_dupMatrix.txt", sep=""), quote=F, row.name=F, sep="\t")
+write.table(dm, file=output_dupmatrix, quote=F, row.name=F, sep="\t")
 print("write.table done")
 
 # 2D density scatter plot
-pdf(paste0(output_prefix, "_duprateExpDens.pdf"))
+pdf(output_duprate_exp_densplot)
 print("pdf done")
 duprateExpDensPlot(DupMat=dm)
 title("Density scatter plot")
@@ -74,7 +91,7 @@ cat(
     paste("- dupRadar Int (duprate at low read counts):", fit$intercept),
     paste("- dupRadar Sl (progression of the duplication rate):", fit$slope),
     fill=TRUE, labels=output_prefix,
-    file=paste0(output_prefix, "_intercept_slope.txt"), append=FALSE
+    file=output_intercept_slope, append=FALSE
 )
 
 # Create a multiqc file dupInt
@@ -92,8 +109,8 @@ line="#id: DupInt
 #        format: '{:.2f}%'
 Sample dupRadar_intercept"
 
-write(line,file=paste0(output_prefix, "_dup_intercept_mqc.txt"),append=TRUE)
-write(paste(sample_name, fit$intercept),file=paste0(output_prefix, "_dup_intercept_mqc.txt"),append=TRUE)
+write(line,file=output_dup_intercept_mqc, append=TRUE)
+write(paste(sample_name, fit$intercept),file=output_dup_intercept_mqc, append=TRUE)
 print("write dup_intercept_mqc done")
 
 # Get numbers from dupRadar GLM
@@ -142,27 +159,30 @@ line="#id: dupradar
 #          value: 1000
 #          width: 1"
 
-write(line,file=paste0(output_prefix, "_duprateExpDensCurve_mqc.txt"),append=TRUE)
+write(line,file=output_duprate_exp_denscurve_mqc, append=TRUE)
 write.table(
     cbind(curve_x, curve_y),
-    file=paste0(output_prefix, "_duprateExpDensCurve_mqc.txt"),
+    file=output_duprate_exp_denscurve_mqc,
     quote=FALSE, row.names=FALSE, col.names=FALSE, append=TRUE,
 )
 print("write duprateExpDensCurve_mqc done")
 # Distribution of expression box plot
-pdf(paste0(output_prefix, "_duprateExpBoxplot.pdf"))
+pdf(output_duprate_exp_boxplot)
 duprateExpBoxplot(DupMat=dm)
 title("Percent Duplication by Expression")
 mtext(output_prefix, side=3)
 dev.off()
 print("duprateExpBoxplot done")
 # Distribution of RPK values per gene
-pdf(paste0(output_prefix, "_expressionHist.pdf"))
+pdf(output_expression_histogram)
 expressionHist(DupMat=dm)
 title("Distribution of RPK values per gene")
 mtext(output_prefix, side=3)
 dev.off()
 print("expressionHist done")
+
+
+# 
 
 # Print sessioninfo to standard out
 print(output_prefix)

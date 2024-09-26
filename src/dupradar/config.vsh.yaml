@@ -24,13 +24,15 @@ argument_groups:
     required: true
     description: Path to GTF annotation file.
   - name: --paired
-    type: boolean
+    type: boolean_true
     description: Add flag if input alignment file consists of paired reads
   - name: --strandedness
-    type: string
-    choices: [forward, reverse, unstranded]
+    type: integer
+    choices: [0, 1, 2]
     description: |
-      Strandedness of input bam file reads (forward, reverse or unstranded (default, applicable to paired reads))
+      Strandedness of input bam file reads (1 = forward, 2 = reverse or 0 = unstranded (default, 
+      applicable to paired reads))
+    example: 0
     
 - name: Output
   arguments: 
@@ -47,7 +49,6 @@ argument_groups:
   - name: --output_duprate_exp_boxplot
     type: file
     direction: output
-    default: duprate_exp_boxplot.pdf
     description: |
       Path to output file (pdf) of distribution of expression box plot
   - name: --output_duprate_exp_densplot
@@ -75,9 +76,7 @@ argument_groups:
     example: intercept_slope.txt
 
 resources:
-  - type: bash_script
-    path: script.sh
-  # Copied from https://github.com/nf-core/rnaseq/blob/3.12.0/bin/dupradar.r
+  # Adapted from https://github.com/nf-core/rnaseq/blob/3.12.0/bin/dupradar.r
   - type: r_script
     path: dupradar.r
 test_resources:
