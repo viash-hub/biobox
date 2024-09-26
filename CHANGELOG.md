@@ -9,6 +9,8 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `dupradar`: Assessment of duplication rates in RNA-Seq datasets (PR #154).
+
 ## MINOR CHANGES
 
 * Upgrade to Viash 0.9.0.
