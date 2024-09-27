@@ -34,12 +34,19 @@ argument_groups:
         required: true
         direction: input
         example: input.gff
+      - name: --gs_fasta
+        description: |
+          Genome size directly from a fasta file to compute more statistics.
+        type: file
+        required: false
+        direction: input
+        example: genome.fasta
   - name: Outputs
     arguments:
       - name: --output
         alternatives: [-o]
         description: |
-          File where will be written the result.
+          The file where the results will be written.
         type: file
         direction: output
         required: true
@@ -51,13 +58,12 @@ argument_groups:
         description: |
           When this option is used, an histogram of distribution of the features will be printed in pdf files. (d means distribution, p means plot).
         type: boolean_true
-      - name: --gs
-        alternatives: [-f, -g]
+      - name: --gs_size
         description: |
-          This option inform about the genome size in order to compute more statistics. You can give the size in Nucleotide or directly the fasta file.
-        type: string
+          Genome size in nucleotides to compute more statistics.
+        type: integer
         required: false
-        example: genome.fasta
+        example: 1000000
       - name: --verbose
         alternatives: [-v]
         description: |
