@@ -82,6 +82,10 @@ functionality:
           description: trim <int> bases from 3'/right end of reads (0)
           type: integer
           default: 0
+        - name: --trim-to
+          description: "[3:|5:]<int> trim reads exceeding <int> bases from either 3' or 5' end. If the read end is not specified then it defaults to 3 (0)"
+          type: string
+        - name: phred
         
 
   resources:
