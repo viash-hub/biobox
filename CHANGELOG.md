@@ -11,7 +11,7 @@
 
 ## BREAKING CHANGES
 
-* `falco`: Fix a typo in the `--reverse_compliment` argument (PR #157).
+* `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
 
 ## MINOR CHANGES
 

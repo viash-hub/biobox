@@ -86,7 +86,7 @@ argument_groups:
           bisulfite sequencing, and more Ts and fewer 
           Cs are therefore expected and will be 
           accounted for in base content.
-      - name: --reverse_compliment
+      - name: --reverse_complement
         alternatives: [-r]
         type: boolean_true
         description: |
