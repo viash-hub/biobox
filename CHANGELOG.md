@@ -9,6 +9,10 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+## BREAKING CHANGES
+
+* `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
+
 ## MINOR CHANGES
 
 * Upgrade to Viash 0.9.0.
