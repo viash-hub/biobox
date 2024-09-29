@@ -9,6 +9,9 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `rseqc`:
+  - `rseqc/rseqc_inferexperiment`: Infer strandedness from sequencing reads (PR #158).
+
 ## MINOR CHANGES
 
 * Upgrade to Viash 0.9.0.
