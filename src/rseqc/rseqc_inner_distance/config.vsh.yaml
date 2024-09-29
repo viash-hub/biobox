@@ -29,8 +29,8 @@ argument_groups:
 
   - name: "--sample_size"
     type: integer
-    example: 200000
-    description: Numer of reads sampled from SAM/BAM file, default = 200000.
+    example: 1000000
+    description: Numer of reads sampled from SAM/BAM file, default = 1000000.
   
   - name: "--map_qual"
     type: integer
@@ -59,7 +59,7 @@ argument_groups:
     type: string
     required: true
     description: Rrefix of output files.
-    
+
   - name: "--output_stats"
     type: file
     direction: output
