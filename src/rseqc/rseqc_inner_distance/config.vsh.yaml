@@ -1,0 +1,109 @@
+name: "rseqc_inner_distance"
+namespace: "rseqc"
+description: |
+  Calculate inner distance between read pairs.
+links:
+  homepage: https://rseqc.sourceforge.net/
+  documentation: https://rseqc.sourceforge.net/#inner-distance-py
+  issue_tracker: https://github.com/MonashBioinformaticsPlatform/RSeQC/issues
+  repository: https://github.com/MonashBioinformaticsPlatform/RSeQC
+references:
+  doi: 10.1093/bioinformatics/bts356
+license: GPL-3.0
+authors:
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+- name: "Input"
+  arguments: 
+  - name: "--input"
+    type: file 
+    required: true
+    description: input alignment file in BAM or SAM format
+
+  - name: "--refgene"
+    type: file 
+    required: true
+    description: Reference gene model in bed format
+
+  - name: "--sample_size"
+    type: integer
+    example: 200000
+    description: Numer of reads sampled from SAM/BAM file, default = 200000.
+  
+  - name: "--map_qual"
+    type: integer
+    example: 30 
+    description: Minimum mapping quality (phred scaled) to determine uniquely mapped reads, default=30.
+
+  - name: "--lower_bound_size"
+    type: integer
+    example: -250 
+    description: Lower bound of inner distance (bp). This option is used for ploting histograme, default=-250.
+
+  - name: "--upper_bound_size"
+    type: integer
+    example: 250 
+    description: Upper bound of inner distance (bp). This option is used for ploting histograme, default=250.
+
+  - name: "--step_size"
+    type: integer
+    example: 5 
+    description: Step size (bp) of histograme. This option is used for plotting histogram, default=5.
+
+- name: "Output"
+  arguments: 
+  - name: "--output_prefix"
+    alternatives: ["-o"]
+    type: string
+    required: true
+    description: Rrefix of output files.
+    
+  - name: "--output_stats"
+    type: file
+    direction: output
+    description: output file (txt) with summary statistics of inner distances of paired reads
+
+  - name: "--output_dist"
+    type: file
+    direction: output
+    description: output file (txt) with inner distances of all paired reads
+
+  - name: "--output_freq"
+    type: file
+    direction: output
+    description: output file (txt) with frequencies of inner distances of all paired reads
+
+  - name: "--output_plot"
+    type: file
+    direction: output
+    description: output file (pdf) with histogram plot of of inner distances of all paired reads
+
+  - name: "--output_plot_r"
+    type: file
+    direction: output
+    description: output file (R) with script of histogram plot of of inner distances of all paired reads
+    
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: test_data
+  
+engines:
+- type: docker
+  image: ubuntu:22.04
+  setup:   
+    - type: apt
+      packages: [python3-pip, r-base]
+    - type: python
+      packages: [ RSeQC ]
+    - type: docker
+      run: |
+        echo "RSeQC - inner_distance.py: $(inner_distance.py --version | cut -d' ' -f2)" > /var/software_versions.txt
+runners: 
+- type: executable
+- type: nextflow

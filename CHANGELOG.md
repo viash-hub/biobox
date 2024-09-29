@@ -9,6 +9,9 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `rseqc`:
+  - `rseqc/rseqc_inner_distance`: Calculate inner distance between read pairs (PR #159).
+
 ## MINOR CHANGES
 
 * Upgrade to Viash 0.9.0.
