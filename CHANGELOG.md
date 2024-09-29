@@ -12,6 +12,8 @@
 * `rseqc`:
   - `rseqc/rseqc_inner_distance`: Calculate inner distance between read pairs (PR #159).
 
+* `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
+
 ## MINOR CHANGES
 
 * Upgrade to Viash 0.9.0.
