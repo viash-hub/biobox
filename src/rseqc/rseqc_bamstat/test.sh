@@ -2,14 +2,14 @@
 
 # define input and output for script
 
-input_bam="test.paired_end.sorted.bam"
+input_bam="sample.bam"
 output_summary="mapping_quality.txt"
 
 # run executable and tests
 echo "> Running $meta_functionality_name."
 
 "$meta_executable" \
-    --input "$meta_resources_dir/test_data/$input_bam" \
+    --input_file "$meta_resources_dir/test_data/$input_bam" \
     --output "$output_summary"
 
 exit_code=$?
@@ -26,15 +26,15 @@ diff "$meta_resources_dir/test_data/ref_output.txt" "$meta_resources_dir/$output
 
 echo ">>> Test 2: Test with non-default mapping quality threshold"
 
-output_summary="mapping_quality_mapq_30.txt"
+output_summary="mapping_quality_mapq_50.txt"
 
 # run executable and tests
 echo "> Running $meta_functionality_name."
 
 "$meta_executable" \
-    --input "$meta_resources_dir/test_data/$input_bam" \
+    --input_file "$meta_resources_dir/test_data/$input_bam" \
     --output "$output_summary" \
-    --map_qual 50
+    --mapq 50
 
 exit_code=$?
 [[ $exit_code != 0 ]] && echo "Non zero exit code: $exit_code" && exit 1

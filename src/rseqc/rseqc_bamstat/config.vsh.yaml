@@ -17,11 +17,13 @@ authors:
 argument_groups:
 - name: "Input"
   arguments: 
-  - name: "--input"
+  - name: "--input_file"
+    alternatives: -i
     type: file 
     required: true
     description: Input alignment file in BAM or SAM format.
-  - name: "--map_qual"
+  - name: "--mapq"
+    alternatives: -q
     type: integer
     example: 30 
     description: |
@@ -45,10 +47,8 @@ test_resources:
   
 engines:
 - type: docker
-  image: ubuntu:22.04
-  setup:   
-    - type: apt
-      packages: [ python3-pip ]
+  image: python:3.10
+  setup:
     - type: python
       packages: [ RSeQC ]
     - type: docker

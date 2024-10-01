@@ -4,6 +4,6 @@
 set -eo pipefail 
 
 bam_stat.py \
-    --input "${par_input}" \
-    ${par_map_qual:+--mapq "${par_map_qual}"} \
+    --input-file "${par_input_file}" \
+    ${par_mapq:+--mapq "${par_mapq}"} \
 > $par_output
