@@ -17,11 +17,13 @@ authors:
 argument_groups:
 - name: "Input"
   arguments: 
-  - name: "--input"
+  - name: "--input_file"
+    alternatives: ["-i"]
     type: file 
     required: true
     description: input alignment file in BAM or SAM format
   - name: "--refgene"
+    alternatives: ["-r"]
     type: file 
     required: true
     description: Reference gene model in bed format
@@ -38,11 +40,13 @@ argument_groups:
 - name: "Options"
   arguments:
     - name: "--sample_size"
+      alternatives: ["-s"]
       type: integer
       description: |
         Number of reads sampled from SAM/BAM file. Default: 200000
       example: 200000
-    - name: "--map_qual"
+    - name: "--mapq"
+      alternatives: ["-q"]
       type: integer
       description: |
         Minimum mapping quality (phred scaled) to determine uniquely mapped reads. Default: 30
@@ -59,10 +63,8 @@ test_resources:
 
 engines:
 - type: docker
-  image: ubuntu:22.04
-  setup:   
-    - type: apt
-      packages: [ python3-pip ]
+  image: python:3.10
+  setup:
     - type: python
       packages: [ RSeQC ]
     - type: docker

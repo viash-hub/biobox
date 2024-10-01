@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # define input and output for script
-input_bam="$meta_resources_dir/test_data/test.paired_end.sorted.bam"
+input_bam="$meta_resources_dir/test_data/sample.bam"
 input_bed="$meta_resources_dir/test_data/test.bed12"
 output="strandedness.txt"
 
@@ -26,7 +26,7 @@ EOF
 echo ">>> Test 1: Test with default parameters"
 
 "$meta_executable" \
-    --input "$input_bam" \
+    --input_file "$input_bam" \
     --refgene "$input_bed" \
     --output "$output"
 
@@ -49,11 +49,11 @@ rm "$output"
 echo ">>> Test 2: Test with non-default sample size and map quality"
 
 "$meta_executable" \
-    --input "$input_bam" \
+    --input_file "$input_bam" \
     --refgene "$input_bed" \
     --output "$output" \
     --sample_size 150000 \
-    --map_qual 90
+    --mapq 90
 
 exit_code=$?
 [[ $exit_code != 0 ]] && echo "Non zero exit code: $exit_code" && exit 1
