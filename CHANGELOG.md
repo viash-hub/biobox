@@ -9,8 +9,12 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+
 * `rseqc`:
-  - `rseqc/bamstat`: Generate statistics from a bam file (PR #155).
+  - `rseqc/bam_stat`: Generate statistics from a bam file (PR #155).
+
+* `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
+
 
 ## MINOR CHANGES
 
