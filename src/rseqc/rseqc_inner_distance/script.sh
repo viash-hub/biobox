@@ -4,14 +4,14 @@ set -exo pipefail
 
 
 inner_distance.py \
-    -i $par_input \
+    -i $par_input_file \
     -r $par_refgene \
     -o $par_output_prefix \
     ${par_sample_size:+-k "${par_sample_size}"} \
-    ${par_lower_bound_size:+-l "${par_lower_bound_size}"} \
-    ${par_upper_bound_size:+-u "${par_upper_bound_size}"} \
-    ${par_step_size:+-s "${par_step_size}"} \
-    ${par_map_qual:+-q "${par_map_qual}"} \
+    ${par_lower_bound:+-l "${par_lower_bound}"} \
+    ${par_upper_bound:+-u "${par_upper_bound}"} \
+    ${par_step:+-s "${par_step}"} \
+    ${par_mapq:+-q "${par_mapq}"} \
 > stdout.txt
 
 if [[ -n $par_output_stats ]]; then head -n 2 stdout.txt > $par_output_stats; fi

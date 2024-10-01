@@ -17,37 +17,44 @@ authors:
 argument_groups:
 - name: "Input"
   arguments: 
-  - name: "--input"
+  - name: "--input_file"
+    alternatives: ["-i"]
     type: file 
     required: true
     description: input alignment file in BAM or SAM format
 
   - name: "--refgene"
+    alternatives: ["-r"]
     type: file 
     required: true
     description: Reference gene model in bed format
 
   - name: "--sample_size"
+    alternatives: ["-k"]
     type: integer
     example: 1000000
     description: Numer of reads sampled from SAM/BAM file, default = 1000000.
   
-  - name: "--map_qual"
+  - name: "--mapq"
+    alternatives: ["-q"]
     type: integer
     example: 30 
     description: Minimum mapping quality (phred scaled) to determine uniquely mapped reads, default=30.
 
-  - name: "--lower_bound_size"
+  - name: "--lower_bound"
+    alternatives: ["-l"]
     type: integer
     example: -250 
     description: Lower bound of inner distance (bp). This option is used for ploting histograme, default=-250.
 
-  - name: "--upper_bound_size"
+  - name: "--upper_bound"
+    alternatives: ["-u"]
     type: integer
     example: 250 
     description: Upper bound of inner distance (bp). This option is used for ploting histograme, default=250.
 
-  - name: "--step_size"
+  - name: "--step"
+    alternatives: ["-s"]
     type: integer
     example: 5 
     description: Step size (bp) of histograme. This option is used for plotting histogram, default=5.
@@ -95,10 +102,10 @@ test_resources:
   
 engines:
 - type: docker
-  image: ubuntu:22.04
+  image: python:3.10
   setup:   
     - type: apt
-      packages: [python3-pip, r-base]
+      packages: [r-base]
     - type: python
       packages: [ RSeQC ]
     - type: docker

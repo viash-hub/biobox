@@ -15,7 +15,7 @@ output_freq="inner_distance_freq.txt"
 echo "> Running $meta_functionality_name"
 
 "$meta_executable" \
-    --input $input_bam \
+    --input_file $input_bam \
     --refgene $input_bed \
     --output_prefix "test" \
     --output_stats $output_stats \
@@ -50,11 +50,11 @@ rm "$output_stats" "$output_dist" "$output_plot" "$output_plot_r" "$output_freq"
 
 echo "> Running $meta_functionality_name with non-default parameters and default output file names"
 "$meta_executable" \
-    --input $input_bam \
+    --input_file $input_bam \
     --refgene $input_bed \
     --output_prefix "test" \
     --sample_size 4 \
-    --map_qual 10
+    --mapq 10
 
 exit_code=$?
 [[ $exit_code != 0 ]] && echo "Non zero exit code: $exit_code" && exit 1
