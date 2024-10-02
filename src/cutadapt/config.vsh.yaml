@@ -196,7 +196,7 @@ argument_groups:
           length of matching region. Default: 0.1 (10%).
         example: 0.1
       - name: --no_indels
-        type: boolean_false
+        type: boolean_true
         description: |
           Allow only mismatches in alignments.
 
