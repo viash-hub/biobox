@@ -96,9 +96,9 @@ debug
 # Input arguments 
 ###########################################################
 echo ">> Parsing input arguments"
-[[ "$par_no_indels" == "true" ]] && unset par_no_indels
+[[ "$par_no_indels" == "false" ]] && unset par_no_indels
 [[ "$par_match_read_wildcards" == "false" ]] && unset par_match_read_wildcards
-[[ "$par_no_match_adapter_wildcards" == "true" ]] && unset par_no_match_adapter_wildcards
+[[ "$par_no_match_adapter_wildcards" == "false" ]] && unset par_no_match_adapter_wildcards
 [[ "$par_revcomp" == "false" ]] && unset par_revcomp
 
 input_args=$(echo \
