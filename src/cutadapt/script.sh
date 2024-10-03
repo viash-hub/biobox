@@ -108,7 +108,7 @@ input_args=$(echo \
   ${par_overlap:+--overlap "${par_overlap}"} \
   ${par_match_read_wildcards:+--match-read-wildcards} \
   ${par_no_match_adapter_wildcards:+--no-match-adapter-wildcards} \
-  ${par_action:+--action "${par_action}"} \
+  ${par_action:+--action="${par_action}"} \
   ${par_revcomp:+--revcomp} \
 )
 debug "Arguments to cutadapt:"
