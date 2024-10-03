@@ -15,7 +15,7 @@
 
 ## BUG FIXES
 
-* `cutadapt`: fix the the non-functional `action` parameter (PR #).
+* `cutadapt`: fix the the non-functional `action` parameter (PR #161).
 
 ## MINOR CHANGES
 
