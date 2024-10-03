@@ -13,6 +13,10 @@
 
 * `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
 
+## BUG FIXES
+
+* `cutadapt`: fix the the non-functional `action` parameter (PR #161).
+
 ## MINOR CHANGES
 
 * Upgrade to Viash 0.9.0.
