@@ -9,7 +9,8 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
-## BREAKING CHANGES
+* `rseqc`:
+  - `rseqc/rseqc_inner_distance`: Calculate inner distance between read pairs (PR #159).
 
 * `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
 
