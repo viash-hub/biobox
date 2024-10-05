@@ -1,5 +1,31 @@
 # biobox x.x.x
 
+## NEW FUNCTIONALITY
+
+* `agat`:
+  - `agat/agat_convert_genscan2gff`: convert a genscan file into a GFF file (PR #100).
+
+* `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
+
+* `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
+
+* `bedtools`:
+   - `bedtools/bedtools_bamtobed`: Converts BAM alignments to BED6 or BEDPE format (PR #109).
+
+## BREAKING CHANGES
+
+* `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
+
+## BUG FIXES
+
+* `cutadapt`: fix the the non-functional `action` parameter (PR #161).
+
+## MINOR CHANGES
+
+* Upgrade to Viash 0.9.0.
+
+# biobox 0.2.0
+
 ## BREAKING CHANGES
 
 * `star/star_align_reads`: Change all arguments from `--camelCase` to `--snake_case` (PR #62).
@@ -29,9 +55,38 @@
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
-  - `bedtools/bedtools_bamtobed`: Converts BAM alignments to BED6 or BEDPE format (PR #109).
+  - `bedtools/bedtools_genomecov`: Compute the coverage of a feature file (bed/gff/vcf/bam) among a genome (PR #128).
+  - `bedtools/bedtools_groupby`: Summarizes a dataset column based upon common column groupings. Akin to the SQL "group by" command (PR #123).
+  - `bedtools/bedtools_merge`: Merges overlapping BED/GFF/VCF entries into a single interval (PR #118).
   - `bedtools/bedtools_bamtofastq`: Convert BAM alignments to FASTQ files (PR #101).
   - `bedtools/bedtools_bedtobam`: Converts genomic feature records (bed/gff/vcf) to BAM format (PR #111).
+  - `bedtools/bedtools_bed12tobed6`: Converts BED12 files to BED6 files (PR #140).
+  - `bedtools/bedtools_links`: Creates an HTML file with links to an instance of the UCSC Genome Browser for all features / intervals in a (bed/gff/vcf) file (PR #137).
+ 
+* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74). 
+
+* `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
+
+* `bcftools`:
+  - `bcftools/bcftools_concat`: Concatenate or combine VCF/BCF files (PR #145).
+  - `bcftools/bcftools_norm`: Left-align and normalize indels, check if REF alleles match the reference, split multiallelic sites into multiple rows; recover multiallelics from multiple rows (PR #144).
+  - `bcftools/bcftools_annotate`: Add or remove annotations from a VCF/BCF file (PR #143).
+  - `bcftools/bcftools_stats`: Parses VCF or BCF and produces a txt stats file which can be plotted using plot-vcfstats (PR #142).
+  - `bcftools/bcftools_sort`: Sorts BCF/VCF files by position and other criteria (PR #141).
+
+* `fastqc`: High throughput sequence quality control analysis tool (PR #92).
+
+* `sortmerna`: Local sequence alignment tool for mapping, clustering, and filtering rRNA from
+  metatranscriptomic data (PR #146).
+
+* `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
+
+* `kallisto`:
+    - `kallisto_index`: Create a kallisto index (PR #149).
+    - `kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads (PR #152).
+
+
+* `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
 
 ## MINOR CHANGES
 
@@ -120,13 +175,17 @@
     - `samtools/samtools_fastq`: Converts a SAM/BAM/CRAM file to FASTA (PR #53).
 
 * `umi_tools`:
-    -`umi_tools/umi_tools_extract`: Flexible removal of UMI sequences from fastq reads (PR #71).
+    - `umi_tools/umi_tools_extract`: Flexible removal of UMI sequences from fastq reads (PR #71).
+    - `umi_tools/umi_tools_prepareforrsem`: Fix paired-end reads in name sorted BAM file to prepare for RSEM (PR #148).
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
+
+
+
 
 ## MINOR CHANGES
 

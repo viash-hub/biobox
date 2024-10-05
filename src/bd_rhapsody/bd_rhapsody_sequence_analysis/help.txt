@@ -1,0 +1,167 @@
+```bash
+cwl-runner src/bd_rhapsody/bd_rhapsody_sequence_analysis/rhapsody_pipeline_2.2.1_nodocker.cwl --help
+```
+
+usage: src/bd_rhapsody/bd_rhapsody_sequence_analysis/rhapsody_pipeline_2.2.1_nodocker.cwl
+       [-h] [--AbSeq_Reference ABSEQ_REFERENCE] [--AbSeq_UMI ABSEQ_UMI]
+       [--Cell_Calling_ATAC_Algorithm CELL_CALLING_ATAC_ALGORITHM]
+       [--Cell_Calling_Bioproduct_Algorithm CELL_CALLING_BIOPRODUCT_ALGORITHM]
+       [--Cell_Calling_Data CELL_CALLING_DATA]
+       [--Custom_STAR_Params CUSTOM_STAR_PARAMS]
+       [--Custom_bwa_mem2_Params CUSTOM_BWA_MEM2_PARAMS]
+       [--Exact_Cell_Count EXACT_CELL_COUNT] [--Exclude_Intronic_Reads]
+       [--Expected_Cell_Count EXPECTED_CELL_COUNT] [--Generate_Bam]
+       [--Long_Reads] [--Maximum_Threads MAXIMUM_THREADS]
+       [--Predefined_ATAC_Peaks PREDEFINED_ATAC_PEAKS] [--Reads READS]
+       [--Reads_ATAC READS_ATAC] [--Reference_Archive REFERENCE_ARCHIVE]
+       [--Run_Name RUN_NAME] [--Sample_Tags_Version SAMPLE_TAGS_VERSION]
+       [--Supplemental_Reference SUPPLEMENTAL_REFERENCE]
+       [--Tag_Names TAG_NAMES] [--Target_analysis]
+       [--Targeted_Reference TARGETED_REFERENCE]
+       [--VDJ_JGene_Evalue VDJ_JGENE_EVALUE]
+       [--VDJ_VGene_Evalue VDJ_VGENE_EVALUE] [--VDJ_Version VDJ_VERSION]
+       [--Write_Filtered_Reads]
+       [job_order]
+
+The BD Rhapsody™ assays are used to create sequencing libraries from single
+cell transcriptomes. After sequencing, the analysis pipeline takes the FASTQ
+files and a reference file for gene alignment. The pipeline generates
+molecular counts per cell, read counts per cell, metrics, and an alignment
+file.
+
+positional arguments:
+  job_order             Job input json file
+
+options:
+  -h, --help            show this help message and exit
+  --AbSeq_Reference ABSEQ_REFERENCE
+                        AbSeq Reference
+  --AbSeq_UMI ABSEQ_UMI
+  --Cell_Calling_ATAC_Algorithm CELL_CALLING_ATAC_ALGORITHM
+                        Specify the ATAC algorithm to be used for ATAC
+                        putative cell calling. The Basic algorithm is the
+                        default.
+  --Cell_Calling_Bioproduct_Algorithm CELL_CALLING_BIOPRODUCT_ALGORITHM
+                        Specify the bioproduct algorithm to be used for
+                        mRNA/AbSeq putative cell calling. The Basic algorithm
+                        is the default.
+  --Cell_Calling_Data CELL_CALLING_DATA
+                        Specify the data to be used for putative cell calling.
+                        The default data for putative cell calling will be
+                        determined the following way: - If mRNA and ATAC Reads
+                        exist, mRNA_and_ATAC is the default. - If only ATAC
+                        Reads exist, ATAC is the default. - Otherwise, mRNA is
+                        the default.
+  --Custom_STAR_Params CUSTOM_STAR_PARAMS
+                        Allows you to specify custom STAR aligner mapping
+                        parameters. Only the mapping parameters you provide
+                        here will be used with STAR, meaning that you must
+                        provide the complete list of parameters that you want
+                        to take effect. For reference, the parameters used by
+                        default in the pipeline are: 1. Short Reads:
+                        --outFilterScoreMinOverLread 0
+                        --outFilterMatchNminOverLread 0
+                        --outFilterMultimapScoreRange 0 --clip3pAdapterSeq
+                        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                        --seedSearchStartLmax 50 --outFilterMatchNmin 25
+                        --limitOutSJcollapsed 2000000 2. Long Reads: Same
+                        options as short reads + --seedPerReadNmax 10000
+                        Example input: --alignIntronMax 500000
+                        --outFilterScoreMinOverLread 0 --limitOutSJcollapsed
+                        2000000 Important: 1. This applies to fastqs provided
+                        in the Reads user input 2. Please do not specify any
+                        non-mapping related params like: --runThreadN,
+                        --genomeDir --outSAMtype, etc. 3. Please only use
+                        params supported by STAR version 2.7.10b
+  --Custom_bwa_mem2_Params CUSTOM_BWA_MEM2_PARAMS
+                        Allows you to specify custom bwa-mem2 mapping
+                        parameters. Only the mapping parameters you provide
+                        here will be used with bwa-mem2, meaning that you must
+                        provide the complete list of parameters that you want
+                        to take effect. The pipeline uses program default
+                        mapping parameters. Example input: -k 15 -w 200 -r 2
+                        Important: 1. This applies to fastqs provided in the
+                        Reads_ATAC user input 2. Please do not specify any
+                        non-mapping related params like: -C, -t, etc. 3.
+                        Please only use params supported by bwa-mem2 version
+                        2.2.1
+  --Exact_Cell_Count EXACT_CELL_COUNT
+                        Set a specific number (>=1) of cells as putative,
+                        based on those with the highest error-corrected read
+                        count
+  --Exclude_Intronic_Reads
+                        By default, reads aligned to exons and introns are
+                        considered and represented in molecule counts.
+                        Including intronic reads may increase sensitivity,
+                        resulting in an increase in molecule counts and the
+                        number of genes per cell for both cellular and nuclei
+                        samples. Intronic reads may indicate unspliced mRNAs
+                        and are also useful, for example, in the study of
+                        nuclei and RNA velocity. When set to true, intronic
+                        reads will be excluded.
+  --Expected_Cell_Count EXPECTED_CELL_COUNT
+                        Optional. Guide the basic putative cell calling
+                        algorithm by providing an estimate of the number of
+                        cells expected. Usually this can be the number of
+                        cells loaded into the Rhapsody cartridge. If there are
+                        multiple inflection points on the second derivative
+                        cumulative curve, this will ensure the one selected is
+                        near the expected.
+  --Generate_Bam        Default: false. A Bam read alignment file contains
+                        reads from all the input libraries, but creating it
+                        can consume a lot of compute and disk resources. By
+                        setting this field to true, the Bam file will be
+                        created. This option is shared for both Bioproduct and
+                        ATAC libraries.
+  --Long_Reads          By default, we detect if there are any reads longer
+                        than 650bp and then flag QualCLAlign to use STARlong
+                        instead of STAR. This flag can be explicitly set if it
+                        is known in advance that there are reads longer than
+                        650bp.
+  --Maximum_Threads MAXIMUM_THREADS
+                        The maximum number of threads to use in the pipeline.
+                        By default, all available cores are used.
+  --Predefined_ATAC_Peaks PREDEFINED_ATAC_PEAKS
+                        An optional BED file containing pre-established
+                        chromatin accessibility peak regions for generating
+                        the ATAC cell-by-peak matrix. Only applies to ATAC
+                        assays.
+  --Reads READS         FASTQ files from libraries that may include WTA mRNA,
+                        Targeted mRNA, AbSeq, Sample Multiplexing, and related
+                        technologies
+  --Reads_ATAC READS_ATAC
+                        FASTQ files from libraries generated using the ATAC
+                        assay protocol. Each lane of a library is expected to
+                        have 3 FASTQs - R1, R2 and I1/I2, where the index read
+                        contains the Cell Barcode and UMI sequence. Only
+                        applies to ATAC assays.
+  --Reference_Archive REFERENCE_ARCHIVE
+                        Reference Files Archive
+  --Run_Name RUN_NAME   This is a name for output files, for example
+                        Experiment1_Metrics_Summary.csv. Default if left empty
+                        is to name run based on a library. Any non-alpha
+                        numeric characters will be changed to a hyphen.
+  --Sample_Tags_Version SAMPLE_TAGS_VERSION
+                        The sample multiplexing kit version. This option
+                        should only be set for a multiplexed experiment.
+  --Supplemental_Reference SUPPLEMENTAL_REFERENCE
+                        Supplemental Reference
+  --Tag_Names TAG_NAMES
+                        Specify the Sample Tag number followed by - (hyphen)
+                        and a sample name to appear in the output files. For
+                        example: 4-Ramos. Should be alpha numeric, with + -
+                        and _ allowed. Any special characters: &, (), [], {},
+                        <>, ?, | will be corrected to underscores.
+  --Target_analysis
+  --Targeted_Reference TARGETED_REFERENCE
+                        Targeted Reference
+  --VDJ_JGene_Evalue VDJ_JGENE_EVALUE
+                        The e-value threshold for J gene call by IgBlast/PyIR,
+                        default is set as 0.001
+  --VDJ_VGene_Evalue VDJ_VGENE_EVALUE
+                        The e-value threshold for V gene call by IgBlast/PyIR,
+                        default is set as 0.001
+  --VDJ_Version VDJ_VERSION
+                        The VDJ species and chain types. This option should
+                        only be set for VDJ experiment.
+  --Write_Filtered_Reads
