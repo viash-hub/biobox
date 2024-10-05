@@ -9,6 +9,9 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `bedtools`:
+   - `bedtools/bedtools_bamtobed`: Converts BAM alignments to BED6 or BEDPE format (PR #109).
+
 ## BREAKING CHANGES
 
 * `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
