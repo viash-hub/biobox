@@ -151,3 +151,5 @@ if [ -z "$par_no_stats" ]; then
     mv -f snpEff_genes.txt "$directory_path"
     fi
 fi
+
+exit 0

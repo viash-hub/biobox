@@ -3,8 +3,6 @@
 set -eo pipefail
 
 ## VIASH START
-meta_executable="$PWD/target/executable/snpeff/snpeff"
-meta_resources_dir="$PWD/src/snpeff"
 ## VIASH END
 
 ###########################################################################
@@ -16,9 +14,9 @@ pushd test1 > /dev/null # cd test1 (stack)
 
 echo "> Run Test 1: required parameters"
 "$meta_executable" \
-  -genome_version GRCh37.75 \
-  -input "$meta_resources_dir/test_data/cancer.vcf" \
-  -output out.vcf
+  --genome_version GRCh37.75 \
+  --input "$meta_resources_dir/test_data/cancer.vcf" \
+  --output out.vcf
 
 # Check if output files are generated
 output_files=("out.vcf" "snpEff_genes.txt" "snpEff_summary.html")
@@ -50,11 +48,11 @@ pushd test2 > /dev/null
 
 echo "> Run Test 2: different input + options"
 "$meta_executable" \
-  -genome_version GRCh37.75 \
-  -input "$meta_resources_dir/test_data/test.vcf" \
-  -interval "$meta_resources_dir/test_data/my_annotations.bed" \
-  -no_stats \
-  -output output.vcf
+  --genome_version GRCh37.75 \
+  --input "$meta_resources_dir/test_data/test.vcf" \
+  --interval "$meta_resources_dir/test_data/my_annotations.bed" \
+  --no_stats \
+  --output output.vcf
 
 # Check if output.vcf exists
 if [ ! -e "output.vcf" ]; then
@@ -89,11 +87,11 @@ mkdir temp
 
 echo "> Run Test 3: move output files"
 "$meta_executable" \
-  -genome_version GRCh37.75 \
-  -input "$meta_resources_dir/test_data/test.vcf" \
-  -output output.vcf \
-  -summary temp \
-  -genes temp
+  --genome_version GRCh37.75 \
+  --input "$meta_resources_dir/test_data/test.vcf" \
+  --output output.vcf \
+  --summary temp \
+  --genes temp
 
 # Check if output.vcf exists
 if [ ! -e "output.vcf" ]; then
