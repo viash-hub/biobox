@@ -1,0 +1,36 @@
+```
+bcftools concat -h
+```
+
+concat: option requires an argument -- 'h'
+
+About:   Concatenate or combine VCF/BCF files. All source files must have the same sample
+         columns appearing in the same order. The program can be used, for example, to
+         concatenate chromosome VCFs into one VCF, or combine a SNP VCF and an indel
+         VCF into one. The input files must be sorted by chr and position. The files
+         must be given in the correct order to produce sorted VCF on output unless
+         the -a, --allow-overlaps option is specified. With the --naive option, the files
+         are concatenated without being recompressed, which is very fast.
+Usage:   bcftools concat [options] <A.vcf.gz> [<B.vcf.gz> [...]]
+
+Options:
+   -a, --allow-overlaps           First coordinate of the next file can precede last record of the current file.
+   -c, --compact-PS               Do not output PS tag at each site, only at the start of a new phase set block.
+   -d, --rm-dups STRING           Output duplicate records present in multiple files only once: <snps|indels|both|all|exact>
+   -D, --remove-duplicates        Alias for -d exact
+   -f, --file-list FILE           Read the list of files from a file.
+   -l, --ligate                   Ligate phased VCFs by matching phase at overlapping haplotypes
+       --ligate-force             Ligate even non-overlapping chunks, keep all sites
+       --ligate-warn              Drop sites in imperfect overlaps
+       --no-version               Do not append version and command line to the header
+   -n, --naive                    Concatenate files without recompression, a header check compatibility is performed
+       --naive-force              Same as --naive, but header compatibility is not checked. Dangerous, use with caution.
+   -o, --output FILE              Write output to a file [standard output]
+   -O, --output-type u|b|v|z[0-9] u/b: un/compressed BCF, v/z: un/compressed VCF, 0-9: compression level [v]
+   -q, --min-PQ INT               Break phase set if phasing quality is lower than <int> [30]
+   -r, --regions REGION           Restrict to comma-separated list of regions
+   -R, --regions-file FILE        Restrict to regions listed in a file
+       --regions-overlap 0|1|2    Include if POS in the region (0), record overlaps (1), variant overlaps (2) [1]
+       --threads INT              Use multithreading with <int> worker threads [0]
+   -v, --verbose 0|1              Set verbosity level [1]
+

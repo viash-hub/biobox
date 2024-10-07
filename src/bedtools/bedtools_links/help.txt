@@ -1,0 +1,25 @@
+```
+bedtools links -h
+```
+
+Tool:    bedtools links (aka linksBed)
+Version: v2.30.0
+Summary: Creates HTML links to an UCSC Genome Browser from a feature file.
+
+Usage:   bedtools links [OPTIONS] -i <bed/gff/vcf> > out.html
+
+Options: 
+	-base	The browser basename.  Default: http://genome.ucsc.edu 
+	-org	The organism. Default: human
+	-db	The build.  Default: hg18
+
+Example: 
+	By default, the links created will point to human (hg18) UCSC browser.
+	If you have a local mirror, you can override this behavior by supplying
+	the -base, -org, and -db options.
+
+	For example, if the URL of your local mirror for mouse MM9 is called: 
+	http://mymirror.myuniversity.edu, then you would use the following:
+	-base http://mymirror.myuniversity.edu
+	-org mouse
+	-db mm9
