@@ -225,7 +225,7 @@ engines:
         run: |
           touch ./var/software_versions.txt && \
           version=$(NanoPlot --version) && \
-          echo "$version" > ./var/software_versions.txt
+          echo "$version" > /var/software_versions.txt
 runners:
   - type: executable
   - type: nextflow

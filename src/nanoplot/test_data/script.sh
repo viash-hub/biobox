@@ -59,6 +59,7 @@ done
 
 ## Fasta file ##
 wget -O src/nanoplot/test_data/test.fasta https://raw.githubusercontent.com/merenlab/reads-for-assembly/master/examples/files/fasta_01.fa
+# reduced the size of each sequence to ~300 bp.
 
 #########################################################################################
 
@@ -78,6 +79,8 @@ if [ ! -d nanotest ]; then
 fi
 
 mv nanotest/sequencing_summary.txt src/nanoplot/test_data/test_summary.txt
+# reduce to first 101 lines
+head -n 51 src/nanoplot/test_data/test_summary.txt > src/nanoplot/test_data/summary.txt
 
 rm -rf nanotest
 
@@ -88,4 +91,12 @@ if [ ! -d /tmp/snakemake-wrappers ]; then
   git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
 fi
 
-cp -r /tmp/snakemake-wrappers/bio/biobambam2/bamsormadup/test/mapped/a.bam src/nanoplot/test_data/test.bam
+cp /tmp/snakemake-wrappers/bio/biobambam2/bamsormadup/test/mapped/a.bam src/nanoplot/test_data/test.bam
+
+# samtools view -h test.bam | head -n 44 > test_sm.sam
+# samtools view -bS test_sm.sam > test_sm.bam
+# samtools index test_sm.bam
+# rm test.bam
+# mv test_sm.bam test.bam
+# mv test_sm.bam.bai test.bam.bai
+# rm test_sm.sam

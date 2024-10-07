@@ -345,7 +345,7 @@ pushd test8 > /dev/null
 
 echo "> Run Test 8: Input Summary"
 "$meta_executable" \
-  --summary "$meta_resources_dir/test_data/test_summary.txt" \
+  --summary "$meta_resources_dir/test_data/summary.txt" \
   --outdir output
 
 # Check if output directory exists
