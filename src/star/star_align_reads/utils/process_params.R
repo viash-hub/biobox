@@ -14,6 +14,14 @@ param_txt <- iconv(param_txt, "UTF-8", "ASCII//TRANSLIT")
 dev_begin <- grep("#####UnderDevelopment_begin", param_txt)
 dev_end <- grep("#####UnderDevelopment_end", param_txt)
 
+camel_case_to_snake_case <- function(x) {
+  x %>%
+    str_replace_all("([A-Z][A-Z][A-Z]*)", "_\\1_") %>%
+    str_replace_all("([a-z])([A-Z])", "\\1_\\2") %>%
+    str_to_lower() %>%
+    str_replace_all("_$", "")
+}
+
 # strip development sections
 nondev_ix <- unlist(map2(c(1, dev_end + 1), c(dev_begin - 1, length(param_txt)), function(i, j) {
   if (i >= 1 && i < j) {
@@ -128,9 +136,8 @@ out2 <- out %>%
   # remove arguments that are related to a different runmode
   filter(!grepl("--runMode", description) | grepl("--runMode alignReads", description)) %>%
   filter(!grepl("--runMode", group_name) | grepl("--runMode alignReads", group_name)) %>%
-  filter(!grepl("STARsolo", group_name)) %>%
   mutate(
-    viash_arg = paste0("--", name),
+    viash_arg = paste0("--", camel_case_to_snake_case(name)),
     type_step1 = type %>%
       str_replace_all(".*(int, string|string|int|real|double)\\(?(s?).*", "\\1\\2"),
     viash_type = type_map[gsub("(int, string|string|int|real|double).*", "\\1", type_step1)],
@@ -155,28 +162,41 @@ out2 <- out %>%
     group_name = gsub(" - .*", "", group_name),
     required = ifelse(name %in% required_args, TRUE, NA)
   )
-print(out2, n = 200)
-out2 %>% mutate(i = row_number()) %>% 
-  # filter(is.na(default_step1) != is.na(viash_default)) %>%
+
+# change references to argument names
+out3 <- out2
+for (i in seq_len(nrow(out2))) {
+  orig_name <- paste0("--", out2$name[[i]])
+  new_name <- out2$viash_arg[[i]]
+  out3$description <- str_replace_all(out3$description, orig_name, new_name)
+}
+
+# sanity checks
+out3 %>% select(name, viash_arg) %>% as.data.frame()
+print(out3, n = 200)
+out3 %>%
+  mutate(i = row_number()) %>%
   select(-group_name, -description)
+out3 %>% filter(!grepl("--runMode", description) | grepl("--runMode alignReads", description))
 
-out2 %>% filter(!grepl("--runMode", description) | grepl("--runMode alignReads", description))
-
-argument_groups <- map(unique(out2$group_name), function(group_name) {
-  args <- out2 %>%
+# create argument groups
+argument_groups <- map(unique(out3$group_name), function(group_name) {
+  args <- out3 %>%
     filter(group_name == !!group_name) %>%
-    pmap(function(viash_arg, viash_type, multiple, viash_default, description, required, ...) {
-      li <- lst(
+    pmap(function(viash_arg, viash_type, multiple, viash_default, description, required, name, ...) {
+      li <- list(
         name = viash_arg,
         type = viash_type,
-        description = description
+        description = description,
+        info = list(
+          orig_name = paste0("--", name)
+        )
       )
       if (all(!is.na(viash_default))) {
         li$example <- viash_default
       }
       if (!is.na(multiple) && multiple) {
         li$multiple <- multiple
-        li$multiple_sep <- ";"
       }
       if (!is.na(required) && required) {
         li$required <- required
@@ -186,4 +206,10 @@ argument_groups <- map(unique(out2$group_name), function(group_name) {
   list(name = group_name, arguments = args)
 })
 
-yaml::write_yaml(list(argument_groups = argument_groups), yaml_file)
+yaml::write_yaml(
+  list(argument_groups = argument_groups),
+  yaml_file,
+  handlers = list(
+    logical = yaml::verbatim_logical
+  )
+)

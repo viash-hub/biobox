@@ -9,6 +9,9 @@ references:
 license: GPL-3.0
 requirements:
   commands: [falco]
+authors:
+  - __merge__: /src/_authors/toni_verbeiren.yaml
+    roles: [ author, maintainer ]
 
 # Notes:
 # - falco as arguments similar to -subsample and we update those to --subsample
@@ -83,7 +86,7 @@ argument_groups:
           bisulfite sequencing, and more Ts and fewer 
           Cs are therefore expected and will be 
           accounted for in base content.
-      - name: --reverse_complliment
+      - name: --reverse_complement
         alternatives: [-r]
         type: boolean_true
         description: |

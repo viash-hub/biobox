@@ -1,0 +1,107 @@
+name: "umi_tools_prepareforrsem"
+namespace: "umi_tools"
+description: Make the output from umi-tools dedup or group compatible with RSEM
+keywords: [umi_tools, rsem, bam, sam]
+links:
+  homepage: https://umi-tools.readthedocs.io/en/latest/
+  documentation: https://umi-tools.readthedocs.io/en/latest/reference/extract.html
+  repository: https://github.com/CGATOxford/UMI-tools
+references: 
+  doi: 10.1101/gr.209601.116
+license: MIT
+
+argument_groups:
+- name: "Input"
+  arguments:  
+  - name: "--input"
+    alternatives: ["-I", "--stdin"]
+    type: file
+    required: true
+    example: $id.transcriptome.bam
+
+- name: "Output"
+  arguments:    
+  - name: "--output"
+    alternatives: ["-S", "--stdout"]
+    type: file
+    direction: output
+    example: $id.transcriptome_sorted.bam
+  - name: "--log"
+    alternatives: ["-L"]
+    type: file
+    direction: output
+    description: File with logging information [default = stdout].
+  - name: "--error"
+    alternatives: ["-E"]
+    type: file
+    direction: output
+    description: File with error information [default = stderr].
+  - name: "--log2stderr"
+    type: boolean_true
+    description: Send logging information to stderr [default = False].
+  - name: "--temp_dir"
+    type: string
+    description: |
+      Directory for temporary files. If not set, the bash environmental variable 
+      TMPDIR is used.
+  - name: "--compresslevel"
+    type: integer
+    description: |
+      Level of Gzip compression to use. Default (6) matchesGNU gzip rather than python 
+      gzip default (which is 9).
+
+- name: "Options"
+  arguments:
+  - name: "--tags"
+    type: string
+    description: |
+      Comma-seperated list of tags to transfer from read1 to read2 (Default: 'UG,BX')
+    example: "UG,BX"
+  - name: "--sam"
+    type: boolean_true
+    description: Input and output SAM rather than BAM.
+  - name: "--timeit"
+    type: string
+    description: |
+      Store timeing information in file [none].
+  - name: "--timeit_name"
+    type: string
+    description: |
+      Name in timing file for this class of jobs [all].
+  - name: "--timeit_header"
+    type: boolean_true
+    description: Add header for timing information [none].
+  - name: "--verbose"
+    alternatives: ["-v"]
+    type: integer
+    description: |
+      Loglevel [1]. The higher, the more output.
+  - name: "--random_seed"
+    type: integer
+    description: |
+      Random seed to initialize number generator with [none].
+  
+
+resources:
+  - type: bash_script
+    path: script.sh
+  # copied from https://github.com/nf-core/rnaseq/blob/3.12.0/bin/prepare-for-rsem.py
+  - path: prepare-for-rsem.py
+test_resources:
+  - type: bash_script
+    path: test.sh  
+  - type: file
+    path: test_data
+  
+engines:
+  - type: docker
+    image: quay.io/biocontainers/umi_tools:1.1.5--py38h0020b31_3
+    setup:
+      - type: docker
+        run: |
+          umi_tools -v | sed 's/ version//g' > /var/software_versions.txt
+
+
+runners: 
+- type: executable
+- type: nextflow

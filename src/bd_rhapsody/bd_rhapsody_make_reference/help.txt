@@ -1,0 +1,66 @@
+```bash
+cwl-runner src/bd_rhapsody/bd_rhapsody_make_reference/make_rhap_reference_2.2.1_nodocker.cwl --help
+```
+
+usage: src/bd_rhapsody/bd_rhapsody_make_reference/make_rhap_reference_2.2.1_nodocker.cwl
+       [-h] [--Archive_prefix ARCHIVE_PREFIX]
+       [--Extra_STAR_params EXTRA_STAR_PARAMS]
+       [--Extra_sequences EXTRA_SEQUENCES] [--Filtering_off] --Genome_fasta
+       GENOME_FASTA --Gtf GTF [--Maximum_threads MAXIMUM_THREADS]
+       [--Mitochondrial_Contigs MITOCHONDRIAL_CONTIGS] [--WTA_Only]
+       [job_order]
+
+The Reference Files Generator creates an archive containing Genome Index and
+Transcriptome annotation files needed for the BD Rhapsodyâ„¢ Sequencing
+Analysis Pipeline. The app takes as input one or more FASTA and GTF files and
+produces a compressed archive in the form of a tar.gz file. The archive
+contains:\n - STAR index\n - Filtered GTF file
+
+positional arguments:
+  job_order             Job input json file
+
+options:
+  -h, --help            show this help message and exit
+  --Archive_prefix ARCHIVE_PREFIX
+                        A prefix for naming the compressed archive file
+                        containing the Reference genome index and annotation
+                        files. The default value is constructed based on the
+                        input Reference files.
+  --Extra_STAR_params EXTRA_STAR_PARAMS
+                        Additional parameters to pass to STAR when building
+                        the genome index. Specify exactly like how you would
+                        on the command line. Example: --limitGenomeGenerateRAM
+                        48000 --genomeSAindexNbases 11
+  --Extra_sequences EXTRA_SEQUENCES
+                        Additional sequences in FASTA format to use when
+                        building the STAR index. (E.g. phiX genome)
+  --Filtering_off       By default the input Transcript Annotation files are
+                        filtered based on the gene_type/gene_biotype
+                        attribute. Only features having the following
+                        attribute values are are kept: - protein_coding -
+                        lncRNA (lincRNA and antisense for Gencode <
+                        v31/M22/Ensembl97) - IG_LV_gene - IG_V_gene -
+                        IG_V_pseudogene - IG_D_gene - IG_J_gene -
+                        IG_J_pseudogene - IG_C_gene - IG_C_pseudogene -
+                        TR_V_gene - TR_V_pseudogene - TR_D_gene - TR_J_gene -
+                        TR_J_pseudogene - TR_C_gene If you have already pre-
+                        filtered the input Annotation files and/or wish to
+                        turn-off the filtering, please set this option to
+                        True.
+  --Genome_fasta GENOME_FASTA
+                        Reference genome file in FASTA format. The BD
+                        Rhapsodyâ„¢ Sequencing Analysis Pipeline uses GRCh38
+                        for Human and GRCm39 for Mouse.
+  --Gtf GTF             Transcript annotation files in GTF format. The BD
+                        Rhapsodyâ„¢ Sequencing Analysis Pipeline uses Gencode
+                        v42 for Human and M31 for Mouse.
+  --Maximum_threads MAXIMUM_THREADS
+                        The maximum number of threads to use in the pipeline.
+                        By default, all available cores are used.
+  --Mitochondrial_Contigs MITOCHONDRIAL_CONTIGS
+                        Names of the Mitochondrial contigs in the provided
+                        Reference Genome. Fragments originating from contigs
+                        other than these are identified as 'nuclear fragments'
+                        in the ATACseq analysis pipeline.
+  --WTA_Only            Build a WTA only index, otherwise builds a WTA + ATAC
+                        index.

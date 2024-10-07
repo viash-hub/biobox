@@ -12,14 +12,16 @@ references:
 license: GPL-3.0 
 requirements:
   commands: [ salmon ]
-
+authors:
+  - __merge__: /src/_authors/sai_nirmayi_yasa.yaml
+    roles: [ author, maintainer ]
 argument_groups:
   - name: Inputs
     arguments:
       - name: --genome
         type: file
         description: | 
-          Genome of the organism to prepare the set of decoy sequences. Required to build decoy-aware transccriptome.
+          Genome of the organism to prepare the set of decoy sequences. Required to build decoy-aware transcriptome.
         required: false
         example: genome.fasta
       - name: --transcripts
