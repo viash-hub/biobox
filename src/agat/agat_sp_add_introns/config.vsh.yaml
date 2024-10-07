@@ -21,11 +21,10 @@ argument_groups:
   - name: Inputs
     arguments:
       - name: --gff
-        alternatives: [-f, --ref, -reffile]
+        alternatives: [-f, --ref, --reffile]
         description: Input GTF/GFF file.
         type: file
         required: true
-        direction: input
         example: input.gff
   - name: Outputs
     arguments:       
@@ -41,9 +40,9 @@ argument_groups:
       - name: --config
         alternatives: [-c]
         description: |
-          AGAT config file. By default AGAT takes the original agat_config.yaml shipped with AGAT. The `--config` option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
+          AGAT config file. By default AGAT takes the original agat_config.yaml shipped with AGAT. The `--config` option 
+          gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
         type: file
-        required: false
         example: custom_agat_config.yaml
 resources:
   - type: bash_script
