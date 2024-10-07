@@ -196,7 +196,7 @@ argument_groups:
           length of matching region. Default: 0.1 (10%).
         example: 0.1
       - name: --no_indels
-        type: boolean_false
+        type: boolean_true
         description: |
           Allow only mismatches in alignments.
 
@@ -218,7 +218,7 @@ argument_groups:
         description: |
           Interpret IUPAC wildcards in reads.
       - name: --no_match_adapter_wildcards
-        type: boolean_false
+        type: boolean_true
         description: |
           Do not interpret IUPAC wildcards in adapters.
       - name: --action
