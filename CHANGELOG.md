@@ -15,6 +15,10 @@
 
 ## MINOR CHANGES
 
+* `agat_convert_bed2gff`: change type of argument `inflate_off` from `boolean_false` to `boolean_true` (PR #160).
+
+* `cutadapt`: change type of argument `no_indels` and `no_match_adapter_wildcards` from `boolean_false` to `boolean_true` (PR #160).
+
 * Upgrade to Viash 0.9.0.
 
 # biobox 0.2.0
