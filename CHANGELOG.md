@@ -9,6 +9,9 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `agat`:
+  - `agat/agat_sp_add_introns`: add intron features to gtf/gff file without intron features (PR #104).
+
 ## BREAKING CHANGES
 
 * `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
@@ -53,6 +56,7 @@
   - `agat/agat_convert_sp_gff2tsv`: convert gtf/gff file into tabulated file (PR #102).
   - `agat/agat_convert_sp_gxf2gxf`: fixes and/or standardizes any GTF/GFF file into full sorted GTF/GFF file (PR #103).
 
+
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
@@ -86,8 +90,8 @@
     - `kallisto_index`: Create a kallisto index (PR #149).
     - `kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads (PR #152).
 
-
 * `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
+
 
 ## MINOR CHANGES
 
