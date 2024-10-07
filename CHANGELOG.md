@@ -9,6 +9,8 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `nanoplot`: Plotting tool for long read sequencing data and alignments (PR #95).
+
 ## BREAKING CHANGES
 
 * `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
@@ -184,8 +186,6 @@
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
-
-
 
 
 ## MINOR CHANGES
