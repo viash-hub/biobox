@@ -104,7 +104,7 @@ output_files=("snpEff_genes.txt" "snpEff_summary.html")
 # Check if any of the files do not exist
 for file in "${output_files[@]}"; do
     if [ ! -e "temp/$file" ]; then
-        echo "File $file does not exist in "temp" folder."
+        echo "File $file does not exist in 'temp' folder."
     fi
 done
 

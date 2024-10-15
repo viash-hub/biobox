@@ -31,14 +31,6 @@ unset_if_false=(
     par_only_reg
     par_only_protein
     par_strict
-)
-for par in ${unset_if_false[@]}; do
-    test_val="${!par}" # contains the value of the 'par'
-    [[ "$test_val" == "false" ]] && unset $par
-done
-
-# Unset flags if 'true'
-unset_if_true=(
     par_no_stats
     par_no_downstream
     par_no_intergenic
@@ -57,10 +49,11 @@ unset_if_true=(
     par_no_motif
     par_no_nextprot
 )
-for par in ${unset_if_true[@]}; do
-    test_val="${!par}"
-    [[ "$test_val" == "true" ]] && unset $par
+for par in ${unset_if_false[@]}; do
+    test_val="${!par}" # contains the value of the 'par'
+    [[ "$test_val" == "false" ]] && unset $par
 done
+
 
 # Run SnpEff
 snpEff \
@@ -138,17 +131,17 @@ directory_path=$(dirname "$absolute_path")
 # Move the automatically generated outputs to their locations
 if [ -z "$par_no_stats" ]; then
     if [ ! -z "$par_summary" ]; then
-    mv -fn snpEff_summary.html "$par_summary"
+        mv -n snpEff_summary.html "$par_summary"
     else
-    mv -fn snpEff_summary.html "$directory_path"
+        mv -n snpEff_summary.html "$directory_path"
     fi
-fi
+fi 
 
 if [ -z "$par_no_stats" ]; then
     if [ ! -z "$par_genes" ]; then
-    mv -fn snpEff_genes.txt "$par_genes"
+        mv -n snpEff_genes.txt "$par_genes"
     else
-    mv -fn snpEff_genes.txt "$directory_path"
+        mv -n snpEff_genes.txt "$directory_path"
     fi
 fi
 
