@@ -9,6 +9,8 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `nanoplot`: Plotting tool for long read sequencing data and alignments (PR #95).
+
 ## BREAKING CHANGES
 
 * `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
@@ -187,8 +189,6 @@
                            
 * `bbmap`:
     - `bbmap_bbsplit`: Split sequencing reads by mapping them to multiple references simultaneously (PR #138).
-
-
 
 
 ## MINOR CHANGES
