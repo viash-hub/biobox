@@ -3,12 +3,10 @@
 set -eo pipefail
 
 ## VIASH START
-meta_executable="$PWD/target/executable/nanoplot/nanoplot"
-meta_resources_dir="$PWD/src/nanoplot"
 ## VIASH END
 
 # Files at runtime (.gz, .pickle and .feather)
-wget "https://github.com/wdecoster/nanotest/archive/refs/heads/master.zip"
+wget https://github.com/wdecoster/nanotest/archive/refs/heads/master.zip
 unzip master.zip
 
 ###########################################################################
@@ -62,7 +60,7 @@ pushd test2 > /dev/null
 
 echo "> Run Test 2: multiple inputs (Fastq)"
 "$meta_executable" \
-  --fastq "$meta_resources_dir/test_data/test1.fastq" "$meta_resources_dir/test_data/test2.fastq" \
+  --fastq "$meta_resources_dir/test_data/test1.fastq;$meta_resources_dir/test_data/test2.fastq" \
   --outdir output
 
 # Check if output directory exists
@@ -109,7 +107,7 @@ echo "> Run Test 3: multiple options-1"
   --format jpg \
   --prefix biobox_ \
   --store \
-  --color yellow \
+  --color "yellow" \
   --info_in_report \
   --outdir output
 
