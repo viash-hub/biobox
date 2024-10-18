@@ -1,0 +1,105 @@
+functionality:
+  name: bowtie2_align
+  namespace: bowtie2
+  description: |
+    Align reads to a reference genome using Bowtie2.
+
+    Bowtie 2 is an ultrafast and memory-efficient tool for aligning sequencing reads to long reference sequences.
+  info:
+    keywords: [ "align", "map", "fasta", "fastq", "genome", "reference" ]
+    links:
+      homepage: http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+      repository: https://github.com/BenLangmead/bowtie2
+      documentation: http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
+    references:
+      doi: 10.1038/nmeth.1923
+  argument_groups:
+    - name: Inputs
+      arguments:
+        - name: -x
+          description: bowtie2 index file
+          type: file
+          required: true
+        - name: "-1"
+          description: "Files with #1 mates, paired with files in -2. Could be gzip'ed (extension: .gz) or bzip2'ed (extension: .bz2)."
+          type: file
+          multiple: true
+        - name: "-2"
+          description: "Files with #2 mates, paired with files in -1. Could be gzip'ed (extension: .gz) or bzip2'ed (extension: .bz2)."
+          type: file
+          multiple: true
+        - name: "-U"
+          description: "Files with unpaired reads. Could be gzip'ed (extension: .gz) or bzip2'ed (extension: .bz2)."
+          type: file
+          multiple: true
+        - name: --interleaved
+          description: "Files with interleaved paired-end FASTQ/FASTA reads. Could be gzip'ed (extension: .gz) or bzip2'ed (extension: .bz2)."
+          type: file
+        - name: -b
+          description: Files are unaligned BAM sorted by read name.
+          type: file
+          multiple: true
+        - name: -q
+          description: query input files are FASTQ .fq/.fastq. (default)
+          type: boolean_true
+        - name: --tab5
+          description: "query input files are TAB5 .tab5"
+          type: boolean_true
+        - name: --tab6
+          description: query input files are TAB6 .tab6
+          type: boolean_true
+        - name: --qseq
+          description: query input files are in Illumina's qseq format
+          type: boolean_true
+        - name: -f
+          description: query input files are (multi-)FASTA .fa/.mfa
+          type: boolean_true
+        - name: -r
+          description: query input files are raw one-sequence-per-line
+          type: boolean_true
+        - name: -F
+          description: | 
+            Query input files are continuous FASTA where reads are substrings (k-mers) extracted from the FASTA file and aligned at offsets 1, 1+i, 1+2i ... end of reference. format: k:<int>,i:<int>
+          type: string
+        - name: -c
+          description: -1, -2, -U are sequences themselves, not files
+          type: boolean_true
+        - name: --skip
+          alternatives: -s
+          description: skip the first <int> reads/pairs in the input
+          type: integer
+        - name: --upto
+          alternatives: -u
+          description: stop after first <int> reads/pairs (no limit)
+          type: integer
+        - name: --trim5
+          alternatives: "-5"
+          description: trim <int> bases from 5'/left end of reads (0)
+          type: integer
+          default: 0
+        - name: --trim3
+          alternatives: "-3"
+          description: trim <int> bases from 3'/right end of reads (0)
+          type: integer
+          default: 0
+        - name: --trim-to
+          description: "[3:|5:]<int> trim reads exceeding <int> bases from either 3' or 5' end. If the read end is not specified then it defaults to 3 (0)"
+          type: string
+        - name: phred
+        
+
+  resources:
+    - type: bash_script
+      path: script.sh
+  test_resources:
+    - type: bash_script
+      path: test.sh
+platforms:
+  - type: docker
+    image: quay.io/biocontainers/bowtie2:2.5.3--py310ha0a81b8_0
+    setup: 
+      - type: docker
+        run: |
+          version=$(bowtie2 --version | grep 'bowtie2-align-s version' | sed 's/.*version\s//') && \
+          echo "bowtie2: $version" > /var/software_versions.txt
+  - type: nextflow
