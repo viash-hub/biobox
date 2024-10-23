@@ -32,9 +32,15 @@ argument_groups:
   arguments:
   - name: "--output_dir"
     alternatives: ["-o"]
-    type: string
+    type: file
     description: Directory to write output to.
     required: true
+    direction: output
+  - name: "--log"
+    type: file
+    description: File containing log information from running kallisto quant
+    direction: output
+
 
 - name: "Options"
   arguments:

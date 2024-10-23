@@ -30,17 +30,17 @@ if [ ! -d "$par_build" ]; then
 fi
 
 if $par_only_build_index; then
-    if [ ${#refs[@]} -gt 1 ]; then
+    if [ "${#refs[@]}" -gt 1 ]; then
         bbsplit.sh \
             --ref_primary="$primary_ref" \
             "${refs[@]}" \
-            path=$par_build
+            path=$par_index
     else
         echo "ERROR: Please specify at least two reference fasta files."
     fi
 else
     IFS=";" read -ra input <<< "$par_input"
-    tmpdir=$(mktemp -d "$meta_temp_dir/$meta_functionality_name-XXXXXXXX")
+    tmpdir=$(mktemp -d "$meta_temp_dir/$meta_name-XXXXXXXX")
     index_files=''
     if [ -d "$par_build" ]; then
         index_files="path=$par_build"
@@ -51,7 +51,7 @@ else
     fi
 
     extra_args=""
-    if [ -n "$par_refstats" ]; then extra_args+=" --refstats $par_refstats"; fi
+    if [ -f "$par_refstats" ]; then extra_args+=" --refstats $par_refstats"; fi
     if [ -n "$par_ambiguous" ]; then extra_args+=" --ambiguous $par_ambiguous"; fi
     if [ -n "$par_ambiguous2" ]; then extra_args+=" --ambiguous2 $par_ambiguous2"; fi
     if [ -n "$par_minratio" ]; then extra_args+=" --minratio $par_minratio"; fi

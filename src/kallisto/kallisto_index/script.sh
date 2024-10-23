@@ -28,7 +28,7 @@ kallisto index \
     ${par_min_size:+--min-size "${par_min_size}"} \
     ${par_ec_max_size:+--ec-max-size "${par_ec_max_size}"} \
     ${par_d_list:+--d-list "${par_d_list}"} \
-    ${meta_cpus:+--cpu "${meta_cpus}"} \
+    ${meta_cpus:+--threads "${meta_cpus}"} \
     ${par_tmp:+--tmp "${par_tmp}"} \
     "${par_input}"
 

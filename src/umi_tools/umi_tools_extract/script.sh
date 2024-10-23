@@ -83,11 +83,3 @@ umi_tools extract \
     ${par_verbose:+--verbose "$par_verbose"} \
     ${par_error:+--error "$par_error"}
 
-
-if [ "$par_umi_discard_read" == 1 ]; then
-    # discard read 1
-    rm "$par_read1_out"
-elif [ "$par_umi_discard_read" == 2 ]; then
-    # discard read 2 (-f to bypass file existence check)
-    rm -f "$par_read2_out"
-fi

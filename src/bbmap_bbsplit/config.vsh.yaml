@@ -1,4 +1,4 @@
-namespace: "bbmap"
+# namespace: "bbmap"
 name: "bbmap_bbsplit"
 description: Split sequencing reads by mapping them to multiple references simultaneously.
 links:
@@ -30,7 +30,7 @@ argument_groups:
     type: boolean_true
     description: If set, only builds the index. Otherwise, mapping is performed.
   - name: "--build"
-    type: string
+    type: file
     description: |
       Designate index to use. Corresponds to the number specified when building the index.
       If building the index, this will be the build's id. If multiple references are indexed
@@ -95,6 +95,12 @@ argument_groups:
 
 - name: "Output"
   arguments:
+  - name: "--index"
+    type: file
+    description: |
+      Location to write the index.
+    direction: output
+    example: BBSplit_index
   - name: "--fastq_1"
     type: file
     description: |
