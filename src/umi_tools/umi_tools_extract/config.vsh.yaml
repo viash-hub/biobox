@@ -128,12 +128,6 @@ argument_groups:
         Method to use to determine read groups by subsuming those with similar UMIs. All methods start by identifying
         the reads with the same mapping position, but treat similar yet nonidentical UMIs differently. Default: `directional`
       example: "directional"
-    - name: --umi_discard_read
-      type: integer
-      choices: [0, 1, 2]
-      description: |
-        After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively. Default: `0`
-      example: 0
 
   - name: Common Options
     arguments:
@@ -144,7 +138,6 @@ argument_groups:
     - name: --log2stderr
       type: boolean_true
       description: Send logging information to stderr.
-      direction: output
     - name: --verbose
       type: integer
       description: Log level. The higher, the more output.
