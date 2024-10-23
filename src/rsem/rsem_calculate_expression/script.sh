@@ -16,7 +16,7 @@ fi
 IFS=";" read -ra input <<< $par_input
 
 INDEX=$(find -L $par_index -name "*.grp" | sed 's/\.grp$//')
-echo "$INDEX"
+
 unset_if_false=( par_paired par_quiet par_no_bam_output par_sampling_for_bam par_no_qualities 
                  par_alignments par_bowtie2 par_star par_hisat2_hca par_append_names 
                  par_single_cell_prior par_calc_pme par_calc_ci par_phred64_quals 
