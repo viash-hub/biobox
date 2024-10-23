@@ -56,7 +56,6 @@ fi
 sortmerna \
     $refs \
     $reads \
-    --workdir . \
     ${par_output:+--aligned "${par_output}"} \
     ${par_fastx:+--fastx} \
     ${par_other:+--other "${par_other}"} \

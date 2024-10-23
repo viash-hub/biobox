@@ -42,15 +42,17 @@ argument_groups:
     description: Sortmerna log file.
   - name: "--output"
     alternatives: ["--aligned"]
-    type: string
+    type: file
     description: |
       Directory and file prefix for aligned output. The appropriate extension: 
       (fasta|fastq|blast|sam|etc) is automatically added.
       If 'dir' is not specified, the output is created in the WORKDIR/out/.
       If 'pfx' is not specified, the prefix 'aligned' is used.
+    direction: output
   - name: "--other"
-    type: string
-    description: Create Non-aligned reads output file with this path/prefix. Must be used with fastx. 
+    type: file
+    description: Create Non-aligned reads output file with this path/prefix. Must be used with fastx.
+    direction: output
 
 - name: "Options"
   arguments:
@@ -276,15 +278,12 @@ test_resources:
   
 engines:
 - type: docker
-  image: ubuntu:22.04
+  image: quay.io/biocontainers/sortmerna:4.3.6--h9ee0642_0
   setup: 
     - type: docker
       run: |
-        apt-get update && \
-        apt-get install -y --no-install-recommends gzip cmake g++ wget && \
-        apt-get clean && \
-        wget --no-check-certificate https://github.com/sortmerna/sortmerna/releases/download/v4.3.6/sortmerna-4.3.6-Linux.sh && \
-        bash sortmerna-4.3.6-Linux.sh --skip-license
+        echo SortMeRNA: `sortmerna --version | sed -n 's/.*version \([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p'`
+
 runners: 
 - type: executable
 - type: nextflow 
