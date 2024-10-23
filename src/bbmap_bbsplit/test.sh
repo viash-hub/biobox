@@ -55,7 +55,7 @@ echo ">>> Building BBSplit index"
 "${meta_executable}" \
   --ref "genome.fasta;human.fa;sarscov2.fa" \
   --only_build_index \
-  --build "BBSplit_index" 
+  --index "BBSplit_index" 
 
 echo ">>> Check whether output exists"
 [ ! -d "BBSplit_index" ] && echo "BBSplit index does not exist!" && exit 1
