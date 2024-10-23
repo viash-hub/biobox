@@ -5,13 +5,6 @@
 
 set -eo pipefail
 
-function clean_up {
-    rm -rf "$tmpdir"
-}
-trap clean_up EXIT
-
-tmpdir=$(mktemp -d "$meta_temp_dir/$meta_functionality_name-XXXXXXXX")
-
 if [ "$par_strandedness" == 'forward' ]; then
     strandedness='--strandedness forward'
 elif [ "$par_strandedness" == 'reverse' ]; then
@@ -22,14 +15,14 @@ fi
 
 IFS=";" read -ra input <<< $par_input
 
-INDEX=$(find -L $meta_resources_dir/$par_index -name "*.grp" | sed 's/\.grp$//')
-
+INDEX=$(find -L $par_index -name "*.grp" | sed 's/\.grp$//')
+echo "$INDEX"
 unset_if_false=( par_paired par_quiet par_no_bam_output par_sampling_for_bam par_no_qualities 
                  par_alignments par_bowtie2 par_star par_hisat2_hca par_append_names 
                  par_single_cell_prior par_calc_pme par_calc_ci par_phred64_quals 
                  par_solexa_quals par_star_gzipped_read_file par_star_bzipped_read_file 
                  par_star_output_genome_bam par_estimate_rspd par_keep_intermediate_files 
-                 par_time par_run_pRSEM par_cap_stacked_chipseq_reads par_sort_bam_by_read_name )
+                 par_time par_run_pRSEM par_cap_stacked_chipseq_reads par_sort_bam_by_read_name par_sort_bam_by_coordinate )
 
 for par in ${unset_if_false[@]}; do
     test_val="${!par}"
@@ -60,12 +53,7 @@ rsem-calculate-expression \
     ${par_run_pRSEM:+--run-pRSEM} \
     ${par_cap_stacked_chipseq_reads:+--cap-stacked-chipseq-reads} \
     ${par_sort_bam_by_read_name:+--sort-bam-by-read-name} \
-    ${par_counts_gene:+--counts-gene "$par_counts_gene"} \
-    ${par_counts_transcripts:+--counts-transcripts "$par_counts_transcripts"} \
-    ${par_stat:+--stat "$par_stat"} \
-    ${par_bam_star:+--bam-star "$par_bam_star"} \
-    ${par_bam_genome:+--bam-genome "$par_bam_genome"} \
-    ${par_bam_transcript:+--bam-transcript "$par_bam_transcript"} \
+    ${par_sort_bam_by_coordinate:+--sort-bam-by-coordinate} \
     ${par_fai:+--fai "$par_fai"} \
     ${par_seed:+--seed "$par_seed"} \
     ${par_seed_length:+--seed-length "$par_seed_length"} \
@@ -101,3 +89,10 @@ rsem-calculate-expression \
     $INDEX \
     $par_id
    
+[[ -f "${par_id}.genes.results" ]] && mv "${par_id}.genes.results" $par_counts_gene
+[[ -f "${par_id}.isoforms.results" ]] && mv "${par_id}.isoforms.results" $par_counts_transcripts
+[[ -d "${par_id}.stat" ]] && mv "${par_id}.stat" $par_stat
+[[ -f "${par_id}.log" ]] && mv "${par_id}.log" $par_logs
+[[ -f "${par_id}.STAR.genome.bam" ]] && mv "${par_id}.STAR.genome.bam" $par_bam_star
+[[ -f "${par_id}.genome.bam" ]] && mv "${par_id}.genome.bam" $par_bam_genome
+[[ -f "${par_id}.transcript.bam" ]] && mv "${par_id}.transcript.bam" $par_bam_transcript
