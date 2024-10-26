@@ -28,7 +28,7 @@ echo ">> Check if output is empty"
 [ ! -s "output.txt" ] && echo "Output file output.txt is empty" && exit 1
 
 echo ">> Check if output matches expected output"
-diff "output.txt" "$test_dir/agat_sp_statistics_1.txt"
+diff "output.txt" "$test_dir/stats_out.txt"
 if [ $? -ne 0 ]; then
   echo "Output file output.txt does not match expected output"
   exit 1
