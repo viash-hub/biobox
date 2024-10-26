@@ -1,0 +1,13 @@
+```
+bedtools bed12tobed6 -h
+```
+
+Tool:    bedtools bed12tobed6 (aka bed12ToBed6)
+Version: v2.30.0
+Summary: Splits BED12 features into discrete BED6 features.
+
+Usage:   bedtools bed12tobed6 [OPTIONS] -i <bed12>
+
+Options: 
+	-n	Force the score to be the (1-based) block number from the BED12.
+
