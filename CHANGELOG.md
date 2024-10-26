@@ -11,9 +11,13 @@
 
 * `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
 
+* `bedtools`:
+   - `bedtools/bedtools_bamtobed`: Converts BAM alignments to BED6 or BEDPE format (PR #109).
+
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
 * `nanoplot`: Plotting tool for long read sequencing data and alignments (PR #95).
+
 
 ## BREAKING CHANGES
 
