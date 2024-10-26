@@ -1,0 +1,208 @@
+name: bedtools_genomecov
+namespace: bedtools
+description: |
+  Compute the coverage of a feature file among a genome.
+keywords: [genome coverage, BED, GFF, VCF, BAM]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/#
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/genomecov.html
+  repository: https://github.com/arq5x/bedtools2
+  issue_tracker: https://github.com/arq5x/bedtools2/issues
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: -i
+        type: file
+        direction: input
+        description: |
+          The input file (BED/GFF/VCF) to be used.
+        example: input.bed
+      
+      - name: --input_bam
+        alternatives: -ibam
+        type: file
+        description: |
+          The input file is in BAM format.
+          Note: BAM _must_ be sorted by positions.
+          '--genome' option is ignored if you use '--input_bam' option!
+
+      - name: --genome
+        alternatives: -g
+        type: file
+        direction: input
+        description: |
+          The genome file to be used.
+        example: genome.txt
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: | 
+          The output BED file. 
+        required: true
+        example: output.bed
+  
+  - name: Options
+    arguments:
+
+      - name: --depth
+        alternatives: -d
+        type: boolean_true
+        description: |
+          Report the depth at each genome position (with one-based coordinates).
+          Default behavior is to report a histogram.
+
+      - name: --depth_zero
+        alternatives: -dz
+        type: boolean_true
+        description: |
+          Report the depth at each genome position (with zero-based coordinates).
+          Reports only non-zero positions.
+          Default behavior is to report a histogram.
+
+      - name: --bed_graph
+        alternatives: -bg
+        type: boolean_true
+        description: |
+          Report depth in BedGraph format. For details, see:
+          genome.ucsc.edu/goldenPath/help/bedgraph.html
+
+      - name: --bed_graph_zero_coverage
+        alternatives: -bga
+        type: boolean_true
+        description: |
+          Report depth in BedGraph format, as above (-bg).
+          However with this option, regions with zero 
+          coverage are also reported. This allows one to
+          quickly extract all regions of a genome with 0 
+          coverage by applying: "grep -w 0$" to the output.
+
+      - name: --split
+        type: boolean_true
+        description: |
+          Treat "split" BAM or BED12 entries as distinct BED intervals.
+          when computing coverage.
+          For BAM files, this uses the CIGAR "N" and "D" operations 
+          to infer the blocks for computing coverage.
+          For BED12 files, this uses the BlockCount, BlockStarts, and BlockEnds
+          fields (i.e., columns 10,11,12).
+
+      - name: --ignore_deletion
+        alternatives: -ignoreD
+        type: boolean_true
+        description: |
+          Ignore local deletions (CIGAR "D" operations) in BAM entries
+          when computing coverage.
+
+      - name: --strand
+        type: string
+        choices: ["+", "-"]
+        description: |
+          Calculate coverage of intervals from a specific strand.
+          With BED files, requires at least 6 columns (strand is column 6). 
+
+      - name: --pair_end_coverage
+        alternatives: -pc
+        type: boolean_true
+        description: |
+          Calculate coverage of pair-end fragments.
+          Works for BAM files only
+
+      - name: --fragment_size
+        alternatives: -fs
+        type: boolean_true
+        description: |
+          Force to use provided fragment size instead of read length
+          Works for BAM files only
+
+      - name: --du
+        type: boolean_true
+        description: |
+          Change strand af the mate read (so both reads from the same strand) useful for strand specific
+          Works for BAM files only
+
+      - name: --five_prime
+        alternatives: -5
+        type: boolean_true
+        description: |
+          Calculate coverage of 5" positions (instead of entire interval).
+
+      - name: --three_prime
+        alternatives: -3
+        type: boolean_true
+        description: |
+          Calculate coverage of 3" positions (instead of entire interval).
+
+      - name: --max
+        type: integer
+        min: 0
+        description: |
+          Combine all positions with a depth >= max into
+          a single bin in the histogram. Irrelevant
+          for -d and -bedGraph
+          - (INTEGER)
+
+      - name: --scale
+        type: double
+        min: 0
+        description: |
+          Scale the coverage by a constant factor.
+          Each coverage value is multiplied by this factor before being reported.
+          Useful for normalizing coverage by, e.g., reads per million (RPM).
+          - Default is 1.0; i.e., unscaled.
+          - (FLOAT)
+
+      - name: --trackline
+        type: boolean_true
+        description: |
+          Adds a UCSC/Genome-Browser track line definition in the first line of the output.
+          - See here for more details about track line definition:
+                http://genome.ucsc.edu/goldenPath/help/bedgraph.html
+          - NOTE: When adding a trackline definition, the output BedGraph can be easily
+                uploaded to the Genome Browser as a custom track,
+                BUT CAN NOT be converted into a BigWig file (w/o removing the first line).
+      
+      - name: --trackopts
+        type: string
+        description: |
+          Writes additional track line definition parameters in the first line.
+          - Example:
+            -trackopts 'name="My Track" visibility=2 color=255,30,30'
+            Note the use of single-quotes if you have spaces in your parameters.
+          - (TEXT)
+        multiple: true
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: test_data
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bedtools, procps]
+      - type: docker
+        run: |
+          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
