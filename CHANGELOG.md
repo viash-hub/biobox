@@ -16,16 +16,17 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `rseqc`:
+  - `rseqc/bam_stat`: Generate statistics from a bam file (PR #155).
+
 * `nanoplot`: Plotting tool for long read sequencing data and alignments (PR #95).
-
-
-## BREAKING CHANGES
-
-* `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
 
 ## BUG FIXES
 
-* `cutadapt`: fix the the non-functional `action` parameter (PR #161).
+* `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
+
+* `cutadapt`: Fix the the non-functional `action` parameter (PR #161).
+
 
 ## MINOR CHANGES
 
