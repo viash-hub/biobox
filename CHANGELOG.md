@@ -4,6 +4,8 @@
 
 * `agat`:
   - `agat/agat_convert_genscan2gff`: convert a genscan file into a GFF file (PR #100).
+  - `agat_sp_statistics`: provides exhaustive statistics of a gft/gff file (PR #107).
+
 
 * `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
 
@@ -49,11 +51,15 @@
                 based on a provided sequence IDs or region coordinates file (PR #85).
 
 * `agat`:
+  - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
+  - `agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
   - `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
   - `agat/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
   - `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
   - `agat/agat_convert_sp_gff2tsv`: convert gtf/gff file into tabulated file (PR #102).
   - `agat/agat_convert_sp_gxf2gxf`: fixes and/or standardizes any GTF/GFF file into full sorted GTF/GFF file (PR #103).
+
 
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
@@ -90,6 +96,7 @@
 
 
 * `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
+
 
 ## MINOR CHANGES
 
