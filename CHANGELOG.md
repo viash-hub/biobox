@@ -4,8 +4,10 @@
 
 * `agat`:
   - `agat/agat_convert_genscan2gff`: convert a genscan file into a GFF file (PR #100).
+  - `agat/agat_sp_add_introns`: add intron features to gtf/gff file without intron features (PR #104).
+  - `agat/agat_sp_filter_feature_from_kill_list`: remove features in a GFF file based on a kill list (PR #105).
   - `agat/agat_sp_merge_annotations`: merge different gff annotation files in one (PR #106).
-
+  - `agat/agat_sp_statistics`: provides exhaustive statistics of a gft/gff file (PR #107).
 
 * `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
 
@@ -51,6 +53,9 @@
                 based on a provided sequence IDs or region coordinates file (PR #85).
 
 * `agat`:
+  - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
+  - `agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
   - `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
   - `agat/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
   - `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
@@ -90,7 +95,6 @@
 * `kallisto`:
     - `kallisto_index`: Create a kallisto index (PR #149).
     - `kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads (PR #152).
-
 
 * `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
 
