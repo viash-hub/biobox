@@ -13,6 +13,10 @@
 
 * `nanoplot`: Plotting tool for long read sequencing data and alignments (PR #95).
 
+* `agat`:
+  - `agat/agat_sp_add_introns`: add intron features to gtf/gff file without intron features (PR #104).
+
+
 ## BREAKING CHANGES
 
 * `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
@@ -93,7 +97,6 @@
 * `kallisto`:
     - `kallisto_index`: Create a kallisto index (PR #149).
     - `kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads (PR #152).
-
 
 * `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
 
