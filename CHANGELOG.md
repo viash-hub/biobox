@@ -9,8 +9,11 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `nanoplot`: Plotting tool for long read sequencing data and alignments (PR #95).
+
 * `agat`:
   - `agat/agat_sp_add_introns`: add intron features to gtf/gff file without intron features (PR #104).
+
 
 ## BREAKING CHANGES
 
@@ -188,8 +191,9 @@
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
-
-
+                           
+* `bbmap`:
+    - `bbmap_bbsplit`: Split sequencing reads by mapping them to multiple references simultaneously (PR #138).
 
 
 ## MINOR CHANGES
