@@ -17,6 +17,7 @@
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
 * `rseqc`:
+  - `rseqc/rseqc_inner_distance`: Calculate inner distance between read pairs (PR #159).
   - `rseqc/rseqc_inferexperiment`: Infer strandedness from sequencing reads (PR #158).
   - `rseqc/bam_stat`: Generate statistics from a bam file (PR #155).
 
