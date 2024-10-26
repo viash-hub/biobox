@@ -1,9 +1,8 @@
 name: agat_sp_merge_annotations
 namespace: agat
 description: |
-  Merge different gff annotation files into one. It uses the
-  AGAT parser that takes care of duplicated names and fixes other oddities
-  met in those files.
+  Merge different gff annotation files into one. It uses the AGAT parser that takes care of
+  duplicated names and fixes other oddities met in those files.
 keywords: [gene annotations, merge, gff]
 links:
   homepage: https://github.com/NBISweden/AGAT
@@ -28,13 +27,12 @@ argument_groups:
         type: file
         multiple: true
         required: true
-        direction: input
         example: input1.gff;input2.gff
   - name: Outputs
     arguments:       
       - name: --output
         alternatives: [-o, --out]
-        description: Output gff3 file where the gene incriminated will be write.
+        description: Output gff3 file where the gene incriminated will be writen.
         type: file
         direction: output
         required: true
@@ -44,9 +42,10 @@ argument_groups:
       - name: --config
         alternatives: [-c]
         description: |
-          AGAT config file. By default AGAT takes the original agat_config.yaml shipped with AGAT. The `--config` option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
+          AGAT config file. By default AGAT takes the original agat_config.yaml shipped with AGAT. 
+          The `--config` option gives you the possibility to use your own AGAT config file (located
+          elsewhere or named differently).
         type: file
-        required: false
         example: custom_agat_config.yaml
 resources:
   - type: bash_script
