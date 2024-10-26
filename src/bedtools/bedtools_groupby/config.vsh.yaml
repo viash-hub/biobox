@@ -1,0 +1,155 @@
+name: bedtools_groupby
+namespace: bedtools
+description: |
+  Summarizes a dataset column based upon common column groupings. 
+  Akin to the SQL "group by" command.
+keywords: [groupby, BED]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/groupby.html
+  repository: https://github.com/arq5x/bedtools2
+  homepage: https://bedtools.readthedocs.io/en/latest/#
+  issue_tracker: https://github.com/arq5x/bedtools2/issues
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: -i
+        type: file
+        direction: input
+        description: |
+          The input BED file to be used.
+        required: true
+        example: input_a.bed
+        
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: | 
+          The output groupby BED file. 
+        required: true
+        example: output.bed
+  
+  - name: Options
+    arguments:
+      - name: --groupby
+        alternatives: [-g, -grp]
+        type: string
+        description: |
+          Specify the columns (1-based) for the grouping.
+          The columns must be comma separated.
+          - Default: 1,2,3  
+        required: true 
+
+      - name: --column
+        alternatives: [-c, -opCols]
+        type: integer
+        description: |
+          Specify the column (1-based) that should be summarized.
+        required: true   
+
+      - name: --operation
+        alternatives: [-o, -ops]
+        type: string
+        description: |
+          Specify the operation that should be applied to opCol.
+          Valid operations:
+              sum, count, count_distinct, min, max,
+              mean, median, mode, antimode,
+              stdev, sstdev (sample standard dev.),
+              collapse (i.e., print a comma separated list (duplicates allowed)), 
+              distinct (i.e., print a comma separated list (NO duplicates allowed)), 
+              distinct_sort_num (as distinct, but sorted numerically, ascending), 
+              distinct_sort_num_desc (as distinct, but sorted numerically, descending), 
+              concat   (i.e., merge values into a single, non-delimited string), 
+              freqdesc (i.e., print desc. list of values:freq)
+              freqasc (i.e., print asc. list of values:freq)
+              first (i.e., print first value)
+              last (i.e., print last value)
+          
+          Default value: sum   
+
+          If there is only column, but multiple operations, all operations will be
+          applied on that column. Likewise, if there is only one operation, but
+          multiple columns, that operation will be applied to all columns.
+          Otherwise, the number of columns must match the the number of operations,
+          and will be applied in respective order.
+          E.g., "-c 5,4,6 -o sum,mean,count" will give the sum of column 5,
+          the mean of column 4, and the count of column 6.
+          The order of output columns will match the ordering given in the command.
+
+      - name: --full
+        type: boolean_true
+        description: |
+          Print all columns from input file. The first line in the group is used.
+          Default: print only grouped columns.
+
+      - name: --inheader
+        type: boolean_true
+        description: |
+          Input file has a header line - the first line will be ignored.
+
+      - name: --outheader
+        type: boolean_true
+        description: |
+          Print header line in the output, detailing the column names. 
+          If the input file has headers (-inheader), the output file
+          will use the input's column names.
+          If the input file has no headers, the output file
+          will use "col_1", "col_2", etc. as the column names.
+      
+      - name: --header
+        type: boolean_true
+        description: same as '-inheader -outheader'.
+
+      - name: --ignorecase
+        type: boolean_true
+        description: |
+          Group values regardless of upper/lower case.
+
+      - name: --precision
+        alternatives: -prec
+        type: integer
+        description: |
+          Sets the decimal precision for output. 
+        default: 5
+
+      - name: --delimiter
+        alternatives: -delim
+        type: string
+        description: |
+          Specify a custom delimiter for the collapse operations.
+        example: "|"
+        default: ","
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: debian:stable-slim
+    setup:
+      - type: apt
+        packages: [bedtools, procps]
+      - type: docker
+        run: |
+          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

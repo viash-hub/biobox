@@ -96,9 +96,9 @@ debug
 # Input arguments 
 ###########################################################
 echo ">> Parsing input arguments"
-[[ "$par_no_indels" == "true" ]] && unset par_no_indels
+[[ "$par_no_indels" == "false" ]] && unset par_no_indels
 [[ "$par_match_read_wildcards" == "false" ]] && unset par_match_read_wildcards
-[[ "$par_no_match_adapter_wildcards" == "true" ]] && unset par_no_match_adapter_wildcards
+[[ "$par_no_match_adapter_wildcards" == "false" ]] && unset par_no_match_adapter_wildcards
 [[ "$par_revcomp" == "false" ]] && unset par_revcomp
 
 input_args=$(echo \
@@ -108,7 +108,7 @@ input_args=$(echo \
   ${par_overlap:+--overlap "${par_overlap}"} \
   ${par_match_read_wildcards:+--match-read-wildcards} \
   ${par_no_match_adapter_wildcards:+--no-match-adapter-wildcards} \
-  ${par_action:+--action "${par_action}"} \
+  ${par_action:+--action="${par_action}"} \
   ${par_revcomp:+--revcomp} \
 )
 debug "Arguments to cutadapt:"
