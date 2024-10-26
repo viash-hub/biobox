@@ -231,6 +231,12 @@ Finally, add all other arguments to the config file. There are a few exceptions:
 
 * If the help lists defaults, do not add them as defaults but to the description. Example: `description: <Explanation of parameter>. Default: 10.`
 
+Note:
+  
+* Prefer using `boolean_true` over `boolean_false`. This avoids confusion when specifying values for this argument in a Nextflow workflow.
+  For example, consider the CLI option `--no-indels` for `cutadapt`. If the config for `cutadapt` would specify an argument `no_indels` of type `boolean_false`,
+  the script of the component must pass a `--no-indels` argument to `cutadapt` when `par_no_indels` is set to `false`. This becomes problematic setting a value for this argument using `fromState` in a nextflow workflow: with `fromState: ["no_indels": true]`, the value that gets passed to the script is `true` and the `--no-indels` flag would *not* be added to the options for `cutadapt`. This is inconsitent to what one might expect when interpreting `["no_indels": true]`.
+  When using `boolean_true`, the reasoning becomes simpler because its value no longer represents the effect of the argument, but wether or not the flag is set.
 
 ### Step 10: Add a Docker engine
 
