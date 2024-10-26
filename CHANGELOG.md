@@ -6,6 +6,7 @@
   - `agat/agat_convert_genscan2gff`: convert a genscan file into a GFF file (PR #100).
   - `agat/agat_sp_add_introns`: add intron features to gtf/gff file without intron features (PR #104).
   - `agat/agat_sp_filter_feature_from_kill_list`: remove features in a GFF file based on a kill list (PR #105).
+  - `agat/agat_sp_merge_annotations`: merge different gff annotation files in one (PR #106).
   - `agat/agat_sp_statistics`: provides exhaustive statistics of a gft/gff file (PR #107).
 
 * `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
