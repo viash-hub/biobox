@@ -4,20 +4,32 @@
 
 * `agat`:
   - `agat/agat_convert_genscan2gff`: convert a genscan file into a GFF file (PR #100).
+  - `agat/agat_sp_add_introns`: add intron features to gtf/gff file without intron features (PR #104).
+  - `agat/agat_sp_filter_feature_from_kill_list`: remove features in a GFF file based on a kill list (PR #105).
+  - `agat/agat_sp_merge_annotations`: merge different gff annotation files in one (PR #106).
+  - `agat/agat_sp_statistics`: provides exhaustive statistics of a gft/gff file (PR #107).
 
 * `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
 
+* `bedtools`:
+   - `bedtools/bedtools_bamtobed`: Converts BAM alignments to BED6 or BEDPE format (PR #109).
+
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
-## BREAKING CHANGES
+* `rseqc`:
+  - `rseqc/rseqc_inner_distance`: Calculate inner distance between read pairs (PR #159).
+  - `rseqc/rseqc_inferexperiment`: Infer strandedness from sequencing reads (PR #158).
+  - `rseqc/bam_stat`: Generate statistics from a bam file (PR #155).
 
-* `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
+* `nanoplot`: Plotting tool for long read sequencing data and alignments (PR #95).
 
 * `bbmap_bbsplit`: Move to namespace `bbmap` (PR #162).
 
 ## BUG FIXES
 
-* `cutadapt`: fix the the non-functional `action` parameter (PR #161).
+* `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
+
+* `cutadapt`: Fix the the non-functional `action` parameter (PR #161).
 
 * `bbmap_bbsplit`: Change argument type of `build` to `file` and add output argument `index` (PR #162).
 
@@ -61,11 +73,15 @@
                 based on a provided sequence IDs or region coordinates file (PR #85).
 
 * `agat`:
+  - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
+  - `agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
   - `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
   - `agat/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
   - `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
   - `agat/agat_convert_sp_gff2tsv`: convert gtf/gff file into tabulated file (PR #102).
   - `agat/agat_convert_sp_gxf2gxf`: fixes and/or standardizes any GTF/GFF file into full sorted GTF/GFF file (PR #103).
+
 
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
@@ -100,8 +116,8 @@
     - `kallisto_index`: Create a kallisto index (PR #149).
     - `kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads (PR #152).
 
-
 * `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
+
 
 ## MINOR CHANGES
 
@@ -201,8 +217,6 @@
                            
 * `bbmap`:
     - `bbmap_bbsplit`: Split sequencing reads by mapping them to multiple references simultaneously (PR #138).
-
-
 
 
 ## MINOR CHANGES
