@@ -265,8 +265,6 @@ argument_groups:
       Maximum number of positions to store for each unique L-mer. Set to 0 to store all positions. Default: '1000'
     example: 1000
   
-  
-
 resources:
   - type: bash_script
     path: script.sh
