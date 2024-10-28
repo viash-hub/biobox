@@ -1,4 +1,4 @@
-# namespace: "bbmap"
+namespace: "bbmap"
 name: "bbmap_bbsplit"
 description: Split sequencing reads by mapping them to multiple references simultaneously.
 links:
@@ -32,10 +32,7 @@ argument_groups:
   - name: "--build"
     type: file
     description: |
-      Designate index to use. Corresponds to the number specified when building the index.
-      If building the index, this will be the build's id. If multiple references are indexed
-      in the same directory, each needs a unique build ID. Default: 1.
-    example: "1"
+      Index to be used for mapping. 
   - name: "--qin"
     type: string
     description: |
@@ -166,3 +163,4 @@ engines:
 runners:
   - type: executable
   - type: nextflow
+  
