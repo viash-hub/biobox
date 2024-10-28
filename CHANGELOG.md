@@ -23,8 +23,6 @@
 
 * `nanoplot`: Plotting tool for long read sequencing data and alignments (PR #95).
 
-* `bbmap_bbsplit`: Move to namespace `bbmap` (PR #162).
-
 ## BUG FIXES
 
 * `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
@@ -50,6 +48,8 @@
 * `cutadapt`: change type of argument `no_indels` and `no_match_adapter_wildcards` from `boolean_false` to `boolean_true` (PR #160).
 
 * Upgrade to Viash 0.9.0.
+
+* `bbmap_bbsplit`: Move to namespace `bbmap` (PR #162).
 
 # biobox 0.2.0
 
