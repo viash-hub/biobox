@@ -18,6 +18,7 @@ par <- list(
 )
 ## VIASH END
 
+library(rlang)
 
 if (length(par) < 5) {
     stop("Usage: dupRadar.r <input.bam> <sample_id> <annotation.gtf> <strandDirection:0=unstranded/1=forward/2=reverse> <paired/single> <nbThreads> <R-package-location (optional)>", call.=FALSE)
@@ -27,11 +28,11 @@ if (length(par) < 5) {
 input_bam <- par$input
 output_prefix <- par$id
 annotation_gtf <- par$gtf_annotation
-stranded <- ifelse(is.null(par$strandedness), 0, as.integer(par$strandedness))
+stranded <- par$strandedness %||% 0L
 paired_end <- ifelse(par$paired, TRUE, FALSE)
 threads <- ifelse(is.null(par$threads), 1, as.integer(par$threads))
 
-output_dupmatrix <- ifelse(is.null(par$output_dupmatrix), paste0(output_prefix, "_dupMatrix.txt", sep=""), par$output_dupmatrix)
+output_dupmatrix <- par$output_dupmatrix %||% paste0(output_prefix, "_dupMatrix.txt")
 output_dup_intercept_mqc <- ifelse(is.null(par$output_dup_intercept_mqc), paste0(output_prefix, "_dup_intercept_mqc.txt", sep=""), par$output_dup_intercept_mqc)
 output_duprate_exp_boxplot <- ifelse(is.null(par$output_duprate_exp_boxplot), paste0(output_prefix, "_duprateExpBoxplot.pdf", sep=""), par$output_duprate_exp_boxplot)
 output_duprate_exp_densplot <- ifelse(is.null(par$output_duprate_exp_densplot), paste0(output_prefix, "_duprate_exp_densplot.pdf", sep=""), par$output_duprate_exp_densplot)
@@ -96,7 +97,7 @@ cat(
 
 # Create a multiqc file dupInt
 sample_name <- gsub("Aligned.sortedByCoord.out.markDups", "", output_prefix)
-line="#id: DupInt
+line <- "#id: DupInt
 #plot_type: 'generalstats'
 #pconfig:
 #    dupRadar_intercept:

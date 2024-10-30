@@ -93,7 +93,7 @@ engines:
         packages: [ r-base ]
       - type: r
         bioc: [ dupRadar ]
-        packages: [ parallel ]
+        packages: [ parallel, rlang ]
       - type: docker
         run: |
           echo "DupRadar: $(Rscript -e "library(dupRadar); cat(as.character(packageVersion('dupRadar')))")" > /var/software_versions.txt
