@@ -9,6 +9,11 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `cellranger`:
+  - `cellranger/cellranger_count`: Align fastq files using Cell Ranger count (PR #163).
+  - `cellranger/cellranger_mkref`: Build a Cell Ranger-compatible reference folder from user-supplied genome FASTA and gene GTF files (PR #164).
+
+
 ## BREAKING CHANGES
 
 * `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
