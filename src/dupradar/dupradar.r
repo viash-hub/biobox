@@ -8,13 +8,13 @@ par <- list(
   "strandedness" = 1,
   "paired" = TRUE,
   "threads" = 1,
-  "output_dupmatrix"="dup_matrix.txt",
-  "output_dup_intercept_mqc"="dup_intercept_mqc.txt",
-  "output_duprate_exp_boxplot"="duprate_exp_boxplot.pdf",
-  "output_duprate_exp_densplot"="duprate_exp_densityplot.pdf",
-  "output_duprate_exp_denscurve_mqc"="duprate_exp_density_curve_mqc.pdf",
-  "output_expression_histogram"="expression_hist.pdf",
-  "output_intercept_slope"="intercept_slope.txt"
+  "output_dupmatrix" = "dup_matrix.txt",
+  "output_dup_intercept_mqc" = "dup_intercept_mqc.txt",
+  "output_duprate_exp_boxplot" = "duprate_exp_boxplot.pdf",
+  "output_duprate_exp_densplot" = "duprate_exp_densityplot.pdf",
+  "output_duprate_exp_denscurve_mqc" = "duprate_exp_density_curve_mqc.pdf",
+  "output_expression_histogram" = "expression_hist.pdf",
+  "output_intercept_slope" = "intercept_slope.txt"
 )
 ## VIASH END
 
@@ -30,15 +30,15 @@ output_prefix <- par$id
 annotation_gtf <- par$gtf_annotation
 stranded <- par$strandedness %||% 0L
 paired_end <- ifelse(par$paired, TRUE, FALSE)
-threads <- ifelse(is.null(par$threads), 1, as.integer(par$threads))
+threads <- par$threads %||% 1L
 
 output_dupmatrix <- par$output_dupmatrix %||% paste0(output_prefix, "_dupMatrix.txt")
-output_dup_intercept_mqc <- ifelse(is.null(par$output_dup_intercept_mqc), paste0(output_prefix, "_dup_intercept_mqc.txt", sep=""), par$output_dup_intercept_mqc)
-output_duprate_exp_boxplot <- ifelse(is.null(par$output_duprate_exp_boxplot), paste0(output_prefix, "_duprateExpBoxplot.pdf", sep=""), par$output_duprate_exp_boxplot)
-output_duprate_exp_densplot <- ifelse(is.null(par$output_duprate_exp_densplot), paste0(output_prefix, "_duprate_exp_densplot.pdf", sep=""), par$output_duprate_exp_densplot)
-output_duprate_exp_denscurve_mqc <- ifelse(is.null(par$output_duprate_exp_denscurve_mqc), paste0(output_prefix, "_duprateExpDensCurve_mqc.txt", sep=""), par$output_duprate_exp_denscurve_mqc)
-output_expression_histogram <- ifelse(is.null(par$output_expression_histogram), paste0(output_prefix, "_expressionHist.pdf", sep=""), par$output_expression_histogram)
-output_intercept_slope <- ifelse(is.null(par$output_intercept_slope), paste0(output_prefix, "_intercept_slope.txt", sep=""), par$output_intercept_slope)
+output_dup_intercept_mqc <- par$output_dup_intercept_mqc %||% paste0(output_prefix, "_dup_intercept_mqc.txt")
+output_duprate_exp_boxplot <- par$output_duprate_exp_boxplot %||% paste0(output_prefix, "_duprateExpBoxplot.pdf")
+output_duprate_exp_densplot <- par$output_duprate_exp_densplot %||% paste0(output_prefix, "_duprate_exp_densplot.pdf")
+output_duprate_exp_denscurve_mqc <- par$output_duprate_exp_denscurve_mqc %||% paste0(output_prefix, "_duprateExpDensCurve_mqc.txt")
+output_expression_histogram <- par$output_expression_histogram %||% paste0(output_prefix, "_expressionHist.pdf")
+output_intercept_slope <- par$output_intercept_slope %||% paste0(output_prefix, "_intercept_slope.txt")
 
 bamRegex <- "(.+)\\.bam$"
 
@@ -116,18 +116,18 @@ print("write dup_intercept_mqc done")
 
 # Get numbers from dupRadar GLM
 curve_x <- sort(log10(dm$RPK))
-curve_y = 100*predict(fit$glm, data.frame(x=curve_x), type="response")
+curve_y <- 100*predict(fit$glm, data.frame(x=curve_x), type="response")
 # Remove all of the infinite values
 infs = which(curve_x %in% c(-Inf,Inf))
-curve_x = curve_x[-infs]
-curve_y = curve_y[-infs]
+curve_x <- curve_x[-infs]
+curve_y <- curve_y[-infs]
 # Reduce number of data points
 curve_x <- curve_x[seq(1, length(curve_x), 10)]
 curve_y <- curve_y[seq(1, length(curve_y), 10)]
 # Convert x values back to real counts
-curve_x = 10^curve_x
+curve_x <- 10^curve_x
 # Write to file
-line="#id: dupradar
+line <- "#id: dupradar
 #section_name: 'DupRadar'
 #section_href: 'bioconductor.org/packages/release/bioc/html/dupRadar.html'
 #description: \"provides duplication rate quality control for RNA-Seq datasets. Highly expressed genes can be expected to have a lot of duplicate reads, but high numbers of duplicates at low read counts can indicate low library complexity with technical duplication.
