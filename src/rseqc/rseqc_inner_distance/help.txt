@@ -1,0 +1,43 @@
+```
+inner_distance.py --help
+```
+
+Usage: inner_distance.py [options]
+
+Calculate the inner distance (insert size)  of RNA-seq fragments. 
+
+               RNA fragment
+ _________________||_________________
+|                                    |
+|                                    |
+||||||||||------------------||||||||||
+  read_1      insert_size     read_2
+
+fragment size = read_1 + insert_size + read_2
+
+
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -i INPUT_FILE, --input-file=INPUT_FILE
+                        Alignment file in BAM or SAM format.
+  -o OUTPUT_PREFIX, --out-prefix=OUTPUT_PREFIX
+                        Prefix of output files(s)
+  -r REF_GENE, --refgene=REF_GENE
+                        Reference gene model in BED format.
+  -k SAMPLESIZE, --sample-size=SAMPLESIZE
+                        Number of read-pairs used to estimate inner distance.
+                        default=1000000
+  -l LOWER_BOUND_SIZE, --lower-bound=LOWER_BOUND_SIZE
+                        Lower bound of inner distance (bp). This option is
+                        used for ploting histograme. default=-250
+  -u UPPER_BOUND_SIZE, --upper-bound=UPPER_BOUND_SIZE
+                        Upper bound of inner distance (bp). This option is
+                        used for plotting histogram. default=250
+  -s STEP_SIZE, --step=STEP_SIZE
+                        Step size (bp) of histograme. This option is used for
+                        plotting histogram. default=5
+  -q MAP_QUAL, --mapq=MAP_QUAL
+                        Minimum mapping quality (phred scaled) for an
+                        alignment to be called "uniquely mapped". default=30
