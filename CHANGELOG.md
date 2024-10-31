@@ -9,6 +9,9 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `cellranger`:
+  - `cellranger/cellranger_count`: Align fastq files using Cell Ranger count (PR #163).
+
 ## BREAKING CHANGES
 
 * `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
