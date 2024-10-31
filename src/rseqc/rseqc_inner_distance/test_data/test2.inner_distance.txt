@@ -1,0 +1,4 @@
+ERR5069949.29668	-4	sameTranscript=No,dist=genomic
+ERR5069949.114870	-45	sameTranscript=No,dist=genomic
+ERR5069949.147998	94	sameTranscript=No,dist=genomic
+ERR5069949.155944	-105	sameTranscript=No,dist=genomic
