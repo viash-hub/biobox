@@ -1,0 +1,96 @@
+```
+cellranger count --help
+```
+
+Count gene expression and/or feature barcode reads from a single sample and GEM well
+
+Usage: cellranger count [OPTIONS] --id <ID> --transcriptome <PATH> --create-bam <true|false>
+
+Options:
+      --id <ID>
+          A unique run id and output folder name [a-zA-Z0-9_-]+
+      --description <TEXT>
+          Sample description to embed in output files [default: ]
+      --transcriptome <PATH>
+          Path of folder containing 10x-compatible transcriptome reference
+      --fastqs <PATH>
+          Path to input FASTQ data
+      --project <TEXT>
+          Name of the project folder within a mkfastq or bcl2fastq-generated folder from which to pick
+          FASTQs
+      --sample <PREFIX>
+          Prefix of the filenames of FASTQs to select
+      --lanes <NUMS>
+          Only use FASTQs from selected lanes
+      --libraries <CSV>
+          CSV file declaring input library data sources
+      --feature-ref <CSV>
+          Feature reference CSV file, declaring Feature Barcode constructs and associated barcodes
+      --expect-cells <NUM>
+          Expected number of recovered cells, used as input to cell calling algorithm
+      --force-cells <NUM>
+          Force pipeline to use this number of cells, bypassing cell calling algorithm. [MINIMUM: 10]
+      --create-bam <true|false>
+          Enable or disable BAM file generation. Setting --create-bam=false reduces the total
+          computation time and the size of the output directory (BAM file not generated). We recommend
+          setting --create-bam=true if unsure. See https://10xgen.com/create-bam for additional
+          guidance [possible values: true, false]
+      --nosecondary
+          Disable secondary analysis, e.g. clustering. Optional
+      --r1-length <NUM>
+          Hard trim the input Read 1 to this length before analysis
+      --r2-length <NUM>
+          Hard trim the input Read 2 to this length before analysis
+      --include-introns <true|false>
+          Include intronic reads in count [default: true] [possible values: true, false]
+      --chemistry <CHEM>
+          Assay configuration. NOTE: by default the assay configuration is detected automatically,
+          which is the recommended mode. You usually will not need to specify a chemistry. Options
+          are: 'auto' for autodetection, 'threeprime' for Single Cell 3', 'fiveprime' for  Single Cell
+          5', 'SC3Pv1' or 'SC3Pv2' or 'SC3Pv3' or 'SC3Pv4' for Single Cell 3' v1/v2/v3/v4, 'SC3Pv3LT'
+          for Single Cell 3' v3 LT, 'SC3Pv3HT' for Single Cell 3' v3 HT, 'SC5P-PE' or 'SC5P-R2' or
+          'SC5P-R2-v3', 'SC5P-R2-OH-v3' for Single Cell 5', paired-end/R2-only, 'SC-FB' for Single
+          Cell Antibody-only 3' v2 or 5'. To analyze the GEX portion of multiome data, chemistry must
+          be set to 'ARC-v1'; 'ARC-v1' chemistry cannot be autodetected [default: auto]
+      --no-libraries
+          Proceed with processing using a --feature-ref but no Feature Barcode libraries specified
+          with the 'libraries' flag
+      --check-library-compatibility <true|false>
+          Whether to check for barcode compatibility between libraries. [default: true] [possible
+          values: true, false]
+      --dry
+          Do not execute the pipeline. Generate a pipeline invocation (.mro) file and stop
+      --jobmode <MODE>
+          Job manager to use. Valid options: local (default), sge, lsf, slurm or path to a .template
+          file. Search for help on "Cluster Mode" at support.10xgenomics.com for more details on
+          configuring the pipeline to use a compute cluster
+      --localcores <NUM>
+          Set max cores the pipeline may request at one time. Only applies to local jobs
+      --localmem <NUM>
+          Set max GB the pipeline may request at one time. Only applies to local jobs
+      --localvmem <NUM>
+          Set max virtual address space in GB for the pipeline. Only applies to local jobs
+      --mempercore <NUM>
+          Reserve enough threads for each job to ensure enough memory will be available, assuming each
+          core on your cluster has at least this much memory available. Only applies to cluster
+          jobmodes
+      --maxjobs <NUM>
+          Set max jobs submitted to cluster at one time. Only applies to cluster jobmodes
+      --jobinterval <NUM>
+          Set delay between submitting jobs to cluster, in ms. Only applies to cluster jobmodes
+      --overrides <PATH>
+          The path to a JSON file that specifies stage-level overrides for cores and memory.
+          Finer-grained than --localcores, --mempercore and --localmem. Consult
+          https://support.10xgenomics.com/ for an example override file
+      --output-dir <PATH>
+          Output the results to this directory
+      --uiport <PORT>
+          Serve web UI at http://localhost:PORT
+      --disable-ui
+          Do not serve the web UI
+      --noexit
+          Keep web UI running after pipestance completes or fails
+      --nopreflight
+          Skip preflight checks
+  -h, --help
+          Print help
