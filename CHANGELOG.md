@@ -65,6 +65,7 @@
   - `agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
   - `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
   - `agat/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat/agat_convert_mfannot2gff`: convert MFannot "masterfile" annotation to gff format (PR #112).
   - `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
   - `agat/agat_convert_sp_gff2tsv`: convert gtf/gff file into tabulated file (PR #102).
   - `agat/agat_convert_sp_gxf2gxf`: fixes and/or standardizes any GTF/GFF file into full sorted GTF/GFF file (PR #103).
