@@ -4,7 +4,7 @@
 ## VIASH END
 
 # unset flags
-[[ "$par_inflate_off" == "true" ]] && unset par_inflate_off
+[[ "$par_inflate_off" == "false" ]] && unset par_inflate_off
 [[ "$par_verbose" == "false" ]] && unset par_verbose
 
 # run agat_convert_sp_bed2gff.pl

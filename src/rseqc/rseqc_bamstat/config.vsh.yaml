@@ -1,0 +1,59 @@
+name: rseqc_bamstat
+namespace: rseqc
+keywords: [ rnaseq, genomics ]
+description: Generate statistics from a bam file.
+links:
+  homepage: https://rseqc.sourceforge.net/
+  documentation: https://rseqc.sourceforge.net/#bam-stat-py
+  issue_tracker: https://github.com/MonashBioinformaticsPlatform/RSeQC/issues
+  repository: https://github.com/MonashBioinformaticsPlatform/RSeQC
+references:
+  doi: 10.1093/bioinformatics/bts356
+license: GPL-3.0
+authors:
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+- name: "Input"
+  arguments: 
+  - name: "--input_file"
+    alternatives: -i
+    type: file 
+    required: true
+    description: Input alignment file in BAM or SAM format.
+  - name: "--mapq"
+    alternatives: -q
+    type: integer
+    example: 30 
+    description: |
+      Minimum mapping quality (phred scaled) to determine uniquely mapped reads. Default: '30'.
+    
+- name: "Output"
+  arguments: 
+  - name: "--output"
+    type: file
+    direction: output
+    description: Output file (txt) with mapping quality statistics.
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+  
+engines:
+- type: docker
+  image: python:3.10
+  setup:
+    - type: python
+      packages: [ RSeQC ]
+    - type: docker
+      run: |
+        echo "RSeQC bam_stat.py: $(bam_stat.py --version | cut -d' ' -f2-)" > /var/software_versions.txt
+runners: 
+- type: executable
+- type: nextflow
