@@ -1,0 +1,2 @@
+test - dupRadar Int (duprate at low read counts): 5.8262146393079e-11 
+test - dupRadar Sl (progression of the duplication rate): 0.999999999999966

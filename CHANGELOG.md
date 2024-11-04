@@ -17,6 +17,8 @@
 
 * `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
 
+* `dupradar`: Assessment of duplication rates in RNA-Seq datasets (PR #154).
+
 * `rseqc`:
   - `rseqc/rseqc_inner_distance`: Calculate inner distance between read pairs (PR #159).
   - `rseqc/rseqc_inferexperiment`: Infer strandedness from sequencing reads (PR #158).
@@ -29,6 +31,7 @@
 * `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
 
 * `cutadapt`: Fix the the non-functional `action` parameter (PR #161).
+
 
 ## MINOR CHANGES
 
