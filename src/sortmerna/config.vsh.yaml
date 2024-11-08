@@ -154,7 +154,7 @@ argument_groups:
   - name: "--N"
     type: integer
     description: |
-      Smith-Waterman penalty for ambiguous letters (N's) scored as --mismatch. Default: '-1'.\
+      Smith-Waterman penalty for ambiguous letters (N's) scored as --mismatch. Default: '-1'.
     example: -1
   - name: "--a"
     type: integer
@@ -164,7 +164,7 @@ argument_groups:
   - name: "--e"
     type: double
     description: |
-      E-value threshol4d. Default: '1'.
+      E-value threshold. Default: '1'.
     example: 1
   - name: "--F"
     type: boolean_true
