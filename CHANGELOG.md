@@ -30,6 +30,18 @@
 
 * `cutadapt`: Fix the the non-functional `action` parameter (PR #161).
 
+* `bbmap_bbsplit`: Change argument type of `build` to `file` and add output argument `index` (PR #162).
+
+* `kallisto/kallisto_index`: Fix command script to use `--threads` option (PR #162).
+
+* `kallisto/kallisto_quant`: Change type of argument `output_dir` to `file` and add output argument `log` (PR #162).
+
+* `rsem/rsem_calculate_expression`: Fix output handling (PR #162).
+
+* `sortmerna`: Change type pf argument `aligned` to `file`; update docker image; accept more than two reference files (PR #162).
+
+* `umi_tools/umi_tools_extract`: Remove `umi_discard_reads` option and change `log2stderr` to input argument (PR #162).
+
 ## MINOR CHANGES
 
 * `agat_convert_bed2gff`: change type of argument `inflate_off` from `boolean_false` to `boolean_true` (PR #160).
@@ -37,6 +49,8 @@
 * `cutadapt`: change type of argument `no_indels` and `no_match_adapter_wildcards` from `boolean_false` to `boolean_true` (PR #160).
 
 * Upgrade to Viash 0.9.0.
+
+* `bbmap_bbsplit`: Move to namespace `bbmap` (PR #162).
 
 # biobox 0.2.0
 

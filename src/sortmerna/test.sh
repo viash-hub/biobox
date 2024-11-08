@@ -31,7 +31,7 @@ rm -f rRNA_reads_fwd.fq.gz rRNA_reads_rev.fq.gz non_rRNA_reads_fwd.fq.gz non_rRN
 rm -rf kvdb/
 
 ################################################################################
-echo ">>> Testing for paired-end reads and --ref and --paired_out argumens"
+echo ">>> Testing for paired-end reads and --ref and --paired_out arguments"
 "$meta_executable" \
     --output "rRNA_reads" \
     --other "non_rRNA_reads" \

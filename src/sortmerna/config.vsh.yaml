@@ -42,15 +42,17 @@ argument_groups:
     description: Sortmerna log file.
   - name: "--output"
     alternatives: ["--aligned"]
-    type: string
+    type: file
     description: |
       Directory and file prefix for aligned output. The appropriate extension: 
       (fasta|fastq|blast|sam|etc) is automatically added.
       If 'dir' is not specified, the output is created in the WORKDIR/out/.
       If 'pfx' is not specified, the prefix 'aligned' is used.
+    direction: output
   - name: "--other"
-    type: string
-    description: Create Non-aligned reads output file with this path/prefix. Must be used with fastx. 
+    type: file
+    description: Create Non-aligned reads output file with this path/prefix. Must be used with fastx.
+    direction: output
 
 - name: "Options"
   arguments:
@@ -91,7 +93,7 @@ argument_groups:
     type: integer
     description: |
       search all alignments having the first INT longest LIS. LIS stands for Longest Increasing Subsequence, it is
-      computed using seeds’ positions to expand hits into longer matches prior to Smith-Waterman alignment. Default: '2'.
+      computed using seeds' positions to expand hits into longer matches prior to Smith-Waterman alignment. Default: '2'.
     example: 2
   - name: "--print_all_reads"
     type: boolean_true
@@ -152,7 +154,7 @@ argument_groups:
   - name: "--N"
     type: integer
     description: |
-      Smith-Waterman penalty for ambiguous letters (N’s) scored as --mismatch. Default: '-1'.\
+      Smith-Waterman penalty for ambiguous letters (N's) scored as --mismatch. Default: '-1'.
     example: -1
   - name: "--a"
     type: integer
@@ -207,7 +209,7 @@ argument_groups:
     - name: "--otu_map"
       type: boolean_true
       description: |
-        Output OTU map (input to QIIME’s make_otu_table.py).
+        Output OTU map (input to QIIME's make_otu_table.py).
 
 - name: "Advanced options"
   arguments:
@@ -226,7 +228,7 @@ argument_groups:
     description: |
       The number (or percentage if followed by %) of nucleotides to add to each edge of the alignment region on the
       reference sequence before performing Smith-Waterman alignment. Default: '4'.
-    example: 4
+    example: "4"
   - name: "--full_search"
     type: boolean_true
     description: |
@@ -263,8 +265,6 @@ argument_groups:
       Maximum number of positions to store for each unique L-mer. Set to 0 to store all positions. Default: '1000'
     example: 1000
   
-  
-
 resources:
   - type: bash_script
     path: script.sh
@@ -276,15 +276,12 @@ test_resources:
   
 engines:
 - type: docker
-  image: ubuntu:22.04
+  image: quay.io/biocontainers/sortmerna:4.3.6--h9ee0642_0
   setup: 
     - type: docker
       run: |
-        apt-get update && \
-        apt-get install -y --no-install-recommends gzip cmake g++ wget && \
-        apt-get clean && \
-        wget --no-check-certificate https://github.com/sortmerna/sortmerna/releases/download/v4.3.6/sortmerna-4.3.6-Linux.sh && \
-        bash sortmerna-4.3.6-Linux.sh --skip-license
+        echo SortMeRNA: `sortmerna --version | sed -n 's/.*version \([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p'`
+
 runners: 
 - type: executable
-- type: nextflow 
+- type: nextflow
