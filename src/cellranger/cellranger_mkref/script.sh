@@ -3,19 +3,19 @@
 set -eo pipefail
 
 ## VIASH START
-par_genome_fasta="resources_test/test_data/reference_small.fa.gz"
-par_transcriptome_gtf="resources_test/test_data/reference_small.gtf.gz"
-par_output="gencode_v41_annotation_cellranger.tar.gz"
+par_genome_fasta="test_data/reference_small.fa.gz"
+par_transcriptome_gtf="test_data/reference_small.gtf.gz"
+par_output="output.tar.gz"
 ## VIASH END
 
 # create temporary directory
-tmpdir=$(mktemp -d "$VIASH_TEMP/$meta_name-XXXXXXXX")
+tmpdir=$(mktemp -d "$meta_temp_dir/$meta_name-XXXXXXXX")
 function clean_up {
     rm -rf "$tmpdir"
 }
 trap clean_up EXIT
 
-# just to make sure
+# We change into the tempdir later, so we need absolute paths.
 par_genome_fasta=$(realpath $par_genome_fasta)
 par_transcriptome_gtf=$(realpath $par_transcriptome_gtf)
 par_output=$(realpath $par_output)
