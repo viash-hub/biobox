@@ -20,9 +20,6 @@
 * `cellranger`:
   - `cellranger/cellranger_mkref`: Build a Cell Ranger-compatible reference folder from user-supplied genome FASTA and gene GTF files (PR #164).
 
-
-## BREAKING CHANGES
-
 * `rseqc`:
   - `rseqc/rseqc_inner_distance`: Calculate inner distance between read pairs (PR #159).
   - `rseqc/rseqc_inferexperiment`: Infer strandedness from sequencing reads (PR #158).
