@@ -1,9 +1,7 @@
 name: agat_sp_add_intergenic_regions
 namespace: agat
 description: |
-    The script aims to add intergenic features (intergenic_region) to
-    gtf/gff file. The intergenic regions are deduced from gene features
-    (feature type gene from the 3rd column).
+    The script aims to add intergenic features (intergenic_region) to gtf/gff file. The intergenic regions are deduced from gene features (feature type gene from the 3rd column).
 keywords: [gene annotations, intergenic regions]
 links:
   homepage: https://github.com/NBISweden/AGAT
