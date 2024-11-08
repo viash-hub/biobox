@@ -1,10 +1,7 @@
 name: agat_sp_add_start_and_stop
 namespace: agat
 description: |
-  The script adds start and stop codons when a CDS feature exists. The
-  script looks at the nucleotide sequence and checks the presence of start
-  and stop codons. The script works even if the start or stop codon are
-  split over several CDS features.
+  The script adds start and stop codons when a CDS feature exists. The script looks at the nucleotide sequence and checks the presence of start and stop codons. The script works even if the start or stop codon are split over several CDS features.
 keywords: [gene annotations, CDS, GFF]
 links:
   homepage: https://github.com/NBISweden/AGAT
@@ -31,7 +28,7 @@ argument_groups:
         example: input.gff
       - name: --fasta
         alternatives: [--fa, -f]
-        description: Input fasta file. Needed to check that CDS sequences start by start codon and stop by stop codon.
+        description: Input fasta file. Required to check that CDS sequences start by start codon and stop by stop codon.
         type: file
         required: true
         direction: input
@@ -40,7 +37,7 @@ argument_groups:
     arguments:
       - name: --output
         alternatives: [--out, -o]
-        description: Output gff file updated.
+        description: Output gff file.
         type: file
         direction: output
         required: true
@@ -49,7 +46,7 @@ argument_groups:
     arguments:
       - name: --codon
         alternatives: [--ct, --table]
-        description: Codon table to use. [default 1]
+        description: Codon table to use. By default, codon table 1 is used, allowing for start codons TTG, CTG and ATG. Codon table 0 strictly uses ATG only as start codon. For further available codon tables, see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi#SG1.
         type: integer
         required: false
         example: 1
@@ -59,11 +56,11 @@ argument_groups:
         type: boolean_true
       - name: --ni
         alternatives: [--na]
-        description: no iupac / no ambiguous, avoid usage of IUPAC. By default IUPAC is used that means, NNN is seen as start and/or stop codon.
+        description: Avoid usage of IUPAC. By default IUPAC is used, meaning NNN is seen as start and/or stop codon.
         type: boolean_true
       - name: --verbose
         alternatives: [-v]
-        description: Verbose for debugging purpose.
+        description: Add verbosity.
         type: boolean_true
       - name: --config
         alternatives: [-c]
