@@ -32,7 +32,7 @@ cellranger mkref \
   --genome output \
   ${par_reference_version:+--ref-version $par_reference_version} \
   ${meta_cpus:+--nthreads $meta_cpus} \
-  ${meta_memory_gb:+--memgb $(($meta_memory_gb-2))} # always keep 2 gb for the OS itseld
+  ${meta_memory_gb:+--memgb $(($meta_memory_gb-2))} # always keep 2 gb for the OS itself
 
 echo "> Creating archive"
 tar --use-compress-program="pigz -k " -cf "$par_output" -C "$tmpdir/output" .
