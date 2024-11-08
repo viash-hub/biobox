@@ -1,0 +1,76 @@
+name: "rseqc_inferexperiment"
+namespace: "rseqc"
+description: |
+  Infer strandedness from sequencing reads
+links:
+  homepage: https://rseqc.sourceforge.net/
+  documentation: https://rseqc.sourceforge.net/#infer-experiment-py
+  issue_tracker: https://github.com/MonashBioinformaticsPlatform/RSeQC/issues
+  repository: https://github.com/MonashBioinformaticsPlatform/RSeQC
+references:
+  doi: 10.1093/bioinformatics/bts356
+license: GPL-3.0
+authors:
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+- name: "Input"
+  arguments: 
+  - name: "--input_file"
+    alternatives: ["-i"]
+    type: file 
+    required: true
+    description: input alignment file in BAM or SAM format
+  - name: "--refgene"
+    alternatives: ["-r"]
+    type: file 
+    required: true
+    description: Reference gene model in bed format
+  
+- name: "Output"
+  arguments: 
+  - name: "--output"
+    type: file
+    direction: output
+    required: true
+    description: Output file (txt) of strandness report.
+    example: $id.strandedness.txt
+
+- name: "Options"
+  arguments:
+    - name: "--sample_size"
+      alternatives: ["-s"]
+      type: integer
+      description: |
+        Number of reads sampled from SAM/BAM file. Default: 200000
+      example: 200000
+    - name: "--mapq"
+      alternatives: ["-q"]
+      type: integer
+      description: |
+        Minimum mapping quality (phred scaled) to determine uniquely mapped reads. Default: 30
+      example: 30
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: test_data
+
+engines:
+- type: docker
+  image: python:3.10
+  setup:
+    - type: python
+      packages: [ RSeQC ]
+    - type: docker
+      run: |
+        echo "RSeQC - infer_experiment.py: $(infer_experiment.py --version | cut -d' ' -f2)" > /var/software_versions.txt
+        
+runners: 
+- type: executable
+- type: nextflow
