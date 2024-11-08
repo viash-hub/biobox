@@ -20,7 +20,7 @@ echo "> Run $meta_name with test data and ni flag"
   --fasta "$test_dir/1.fa" \
   --output "$TMPDIR/output.gff" \
   --ni 
-    
+
 echo ">> Checking output"
 [ ! -f "$TMPDIR/output.gff" ] && echo "Output file output.gff does not exist" && exit 1
 
