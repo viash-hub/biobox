@@ -1,0 +1,21 @@
+```
+infer_eperiment.py --help
+```
+
+Usage: infer_experiment.py [options]
+
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -i INPUT_FILE, --input-file=INPUT_FILE
+                        Input alignment file in SAM or BAM format
+  -r REFGENE_BED, --refgene=REFGENE_BED
+                        Reference gene model in bed fomat.
+  -s SAMPLE_SIZE, --sample-size=SAMPLE_SIZE
+                        Number of reads sampled from SAM/BAM file.
+                        default=200000
+  -q MAP_QUAL, --mapq=MAP_QUAL
+                        Minimum mapping quality (phred scaled) for an
+                        alignment to be considered as "uniquely mapped".
+                        default=30

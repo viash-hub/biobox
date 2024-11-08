@@ -1,0 +1,165 @@
+namespace: "bbmap"
+name: "bbmap_bbsplit"
+description: Split sequencing reads by mapping them to multiple references simultaneously.
+links:
+  homepage: https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/
+  documentation: https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/
+  repository: https://github.com/BioInfoTools/BBMap/blob/master/sh/bbsplit.sh
+
+license: BBTools Copyright (c) 2014
+
+argument_groups:
+- name: "Input"
+  arguments:
+  - name: "--id"
+    type: string
+    description: Sample ID
+  - name: "--paired"
+    type: boolean_true
+    description: Paired fastq files or not?
+  - name: "--input"
+    type: file
+    multiple: true
+    description: Input fastq files, either one or two (paired), separated by ";".
+    example: reads.fastq
+  - name: "--ref"
+    type: file
+    multiple: true
+    description: Reference FASTA files, separated by ";". The primary reference should be specified first.
+  - name: "--only_build_index"
+    type: boolean_true
+    description: If set, only builds the index. Otherwise, mapping is performed.
+  - name: "--build"
+    type: file
+    description: |
+      Index to be used for mapping. 
+  - name: "--qin"
+    type: string
+    description: |
+      Set to 33 or 64 to specify input quality value ASCII offset. Automatically detected if
+      not specified.
+  - name: "--interleaved"
+    type: boolean_true
+    description: |
+      True forces paired/interleaved input; false forces single-ended mapping.
+      If not specified, interleaved status will be autodetected from read names.
+  - name: "--maxindel"
+    type: integer
+    description: |
+      Don't look for indels longer than this. Lower is faster. Set to >=100k for RNA-seq.
+    example: 20
+  - name: "--minratio"
+    type: double
+    description: |
+      Fraction of max alignment score required to keep a site. Higher is faster.
+    example: 0.56
+  - name: "--minhits"
+    type: integer
+    description: |
+      Minimum number of seed hits required for candidate sites. Higher is faster.
+    example: 1
+  - name: "--ambiguous"
+    type: string
+    description: |
+      Set behavior on ambiguously-mapped reads (with multiple top-scoring mapping locations).
+        * best    Use the first best site (Default)
+        * toss    Consider unmapped
+        * random  Select one top-scoring site randomly
+        * all     Retain all top-scoring sites.  Does not work yet with SAM output
+    choices: [best, toss, random, all]
+    example: best
+  - name: "--ambiguous2"
+    type: string
+    description: |
+      Set behavior only for reads that map ambiguously to multiple different references.
+      Normal 'ambiguous=' controls behavior on all ambiguous reads;
+      Ambiguous2 excludes reads that map ambiguously within a single reference.
+        * best    Use the first best site (Default)
+        * toss    Consider unmapped
+        * all     Write a copy to the output for each reference to which it maps
+        * split   Write a copy to the AMBIGUOUS_ output for each reference to which it maps
+    choices: [best, toss, all, split]
+    example: best
+  - name: "--qtrim"
+    type: string
+    description: |
+      Quality-trim ends to Q5 before mapping. Options are 'l' (left), 'r' (right), and 'lr' (both).
+    choices: [l, r, lr]
+  - name: "--untrim"
+    type: boolean_true
+    description: Undo trimming after mapping. Untrimmed bases will be soft-clipped in cigar strings.
+
+
+- name: "Output"
+  arguments:
+  - name: "--index"
+    type: file
+    description: |
+      Location to write the index.
+    direction: output
+    example: BBSplit_index
+  - name: "--fastq_1"
+    type: file
+    description: |
+      Output file for read 1.
+    direction: output
+    example: read_out1.fastq
+  - name: "--fastq_2"
+    type: file
+    description: |
+      Output file for read 2.
+    direction: output
+    example: read_out2.fastq
+  - name: "--sam2bam"
+    alternatives: ["--bs"]
+    type: file
+    description: |
+      Write a shell script to 'file' that will turn the sam output into a sorted, indexed bam file.
+    direction: output
+    example: script.sh
+  - name: "--scafstats"
+    type: file
+    description: |
+      Write statistics on how many reads mapped to which scaffold to this file.
+    direction: output
+    example: scaffold_stats.txt
+  - name: "--refstats"
+    type: file
+    description: |
+      Write statistics on how many reads were assigned to which reference to this file.
+      Unmapped reads whose mate mapped to a reference are considered assigned and will be counted.
+    direction: output
+    example: reference_stats.txt
+  - name: "--nzo"
+    type: boolean_true
+    description: Only print lines with nonzero coverage.
+  - name: "--bbmap_args"
+    type: string
+    description: |
+      Additional arguments from BBMap to pass to BBSplit.
+    
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  
+engines:
+- type: docker
+  image: ubuntu:22.04
+  setup:
+    - type: docker
+      run: | 
+        apt-get update && \
+        apt-get install -y build-essential openjdk-17-jdk wget tar && \
+        wget --no-check-certificate https://sourceforge.net/projects/bbmap/files/BBMap_39.01.tar.gz && \
+        tar xzf BBMap_39.01.tar.gz && \
+        cp -r bbmap/* /usr/local/bin
+    - type: docker
+      run: |
+        bbsplit.sh --version 2>&1 | awk '/BBMap version/{print "BBMAP:", $NF}' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow

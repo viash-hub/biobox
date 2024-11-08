@@ -1,5 +1,60 @@
 # biobox x.x.x
 
+## NEW FUNCTIONALITY
+
+* `agat`:
+  - `agat/agat_convert_genscan2gff`: convert a genscan file into a GFF file (PR #100).
+  - `agat/agat_sp_add_introns`: add intron features to gtf/gff file without intron features (PR #104).
+  - `agat/agat_sp_filter_feature_from_kill_list`: remove features in a GFF file based on a kill list (PR #105).
+  - `agat/agat_sp_merge_annotations`: merge different gff annotation files in one (PR #106).
+  - `agat/agat_sp_statistics`: provides exhaustive statistics of a gft/gff file (PR #107).
+  - `agat/agat_sq_stat_basic`: provide basic statistics of a gtf/gff file (PR #110).
+  - `agat/agat_sp_add_intergenic_regions`: add intergenic features (intergenic_region) to GTF/GFF file (PR #120).
+
+* `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
+
+* `bedtools`:
+   - `bedtools/bedtools_bamtobed`: Converts BAM alignments to BED6 or BEDPE format (PR #109).
+
+* `rsem/rsem_calculate_expression`: Calculate expression levels (PR #93).
+
+* `rseqc`:
+  - `rseqc/rseqc_inner_distance`: Calculate inner distance between read pairs (PR #159).
+  - `rseqc/rseqc_inferexperiment`: Infer strandedness from sequencing reads (PR #158).
+  - `rseqc/bam_stat`: Generate statistics from a bam file (PR #155).
+
+* `nanoplot`: Plotting tool for long read sequencing data and alignments (PR #95).
+
+## BUG FIXES
+
+* `falco`: Fix a typo in the `--reverse_complement` argument (PR #157).
+
+* `cutadapt`: Fix the the non-functional `action` parameter (PR #161).
+
+* `bbmap_bbsplit`: Change argument type of `build` to `file` and add output argument `index` (PR #162).
+
+* `kallisto/kallisto_index`: Fix command script to use `--threads` option (PR #162).
+
+* `kallisto/kallisto_quant`: Change type of argument `output_dir` to `file` and add output argument `log` (PR #162).
+
+* `rsem/rsem_calculate_expression`: Fix output handling (PR #162).
+
+* `sortmerna`: Change type pf argument `aligned` to `file`; update docker image; accept more than two reference files (PR #162).
+
+* `umi_tools/umi_tools_extract`: Remove `umi_discard_reads` option and change `log2stderr` to input argument (PR #162).
+
+## MINOR CHANGES
+
+* `agat_convert_bed2gff`: change type of argument `inflate_off` from `boolean_false` to `boolean_true` (PR #160).
+
+* `cutadapt`: change type of argument `no_indels` and `no_match_adapter_wildcards` from `boolean_false` to `boolean_true` (PR #160).
+
+* Upgrade to Viash 0.9.0.
+
+* `bbmap_bbsplit`: Move to namespace `bbmap` (PR #162).
+
+# biobox 0.2.0
+
 ## BREAKING CHANGES
 
 * `star/star_align_reads`: Change all arguments from `--camelCase` to `--snake_case` (PR #62).
@@ -20,9 +75,12 @@
                 based on a provided sequence IDs or region coordinates file (PR #85).
 
 * `agat`:
+  - `agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
+  - `agat_convert_bed2gff`: convert bed file to gff format (PR #97).
+  - `agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
   - `agat/agat_convert_sp_gff2gtf`: convert any GTF/GFF file into a proper GTF file (PR #76).
   - `agat/agat_convert_bed2gff`: convert bed file to gff format (PR #97).
-  - `agat/agat_sp_add_intergenic_regions`: add intergenic features (intergenic_region) to GTF/GFF file (PR #120).
+  - `agat/agat_convert_mfannot2gff`: convert MFannot "masterfile" annotation to gff format (PR #112).
   - `agat/agat_convert_embl2gff`: convert an EMBL file into GFF format (PR #99).
   - `agat/agat_convert_sp_gff2tsv`: convert gtf/gff file into tabulated file (PR #102).
   - `agat/agat_convert_sp_gxf2gxf`: fixes and/or standardizes any GTF/GFF file into full sorted GTF/GFF file (PR #103).
@@ -31,12 +89,38 @@
 * `bedtools`:
   - `bedtools/bedtools_intersect`: Allows one to screen for overlaps between two sets of genomic features (PR #94).
   - `bedtools/bedtools_sort`: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria (PR #98).
+  - `bedtools/bedtools_genomecov`: Compute the coverage of a feature file (bed/gff/vcf/bam) among a genome (PR #128).
+  - `bedtools/bedtools_groupby`: Summarizes a dataset column based upon common column groupings. Akin to the SQL "group by" command (PR #123).
+  - `bedtools/bedtools_merge`: Merges overlapping BED/GFF/VCF entries into a single interval (PR #118).
   - `bedtools/bedtools_bamtofastq`: Convert BAM alignments to FASTQ files (PR #101).
   - `bedtools/bedtools_bedtobam`: Converts genomic feature records (bed/gff/vcf) to BAM format (PR #111).
+  - `bedtools/bedtools_bed12tobed6`: Converts BED12 files to BED6 files (PR #140).
+  - `bedtools/bedtools_links`: Creates an HTML file with links to an instance of the UCSC Genome Browser for all features / intervals in a (bed/gff/vcf) file (PR #137).
  
 * `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74). 
 
 * `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
+
+* `bcftools`:
+  - `bcftools/bcftools_concat`: Concatenate or combine VCF/BCF files (PR #145).
+  - `bcftools/bcftools_norm`: Left-align and normalize indels, check if REF alleles match the reference, split multiallelic sites into multiple rows; recover multiallelics from multiple rows (PR #144).
+  - `bcftools/bcftools_annotate`: Add or remove annotations from a VCF/BCF file (PR #143).
+  - `bcftools/bcftools_stats`: Parses VCF or BCF and produces a txt stats file which can be plotted using plot-vcfstats (PR #142).
+  - `bcftools/bcftools_sort`: Sorts BCF/VCF files by position and other criteria (PR #141).
+
+* `fastqc`: High throughput sequence quality control analysis tool (PR #92).
+
+* `sortmerna`: Local sequence alignment tool for mapping, clustering, and filtering rRNA from
+  metatranscriptomic data (PR #146).
+
+* `fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #147).
+
+* `kallisto`:
+    - `kallisto_index`: Create a kallisto index (PR #149).
+    - `kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads (PR #152).
+
+* `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
+
 
 ## MINOR CHANGES
 
@@ -125,13 +209,18 @@
     - `samtools/samtools_fastq`: Converts a SAM/BAM/CRAM file to FASTA (PR #53).
 
 * `umi_tools`:
-    -`umi_tools/umi_tools_extract`: Flexible removal of UMI sequences from fastq reads (PR #71).
+    - `umi_tools/umi_tools_extract`: Flexible removal of UMI sequences from fastq reads (PR #71).
+    - `umi_tools/umi_tools_prepareforrsem`: Fix paired-end reads in name sorted BAM file to prepare for RSEM (PR #148).
 
 * `falco`: A C++ drop-in replacement of FastQC to assess the quality of sequence read data (PR #43).
 
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
+                           
+* `bbmap`:
+    - `bbmap_bbsplit`: Split sequencing reads by mapping them to multiple references simultaneously (PR #138).
+
 
 ## MINOR CHANGES
 

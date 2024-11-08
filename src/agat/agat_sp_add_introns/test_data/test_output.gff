@@ -1,0 +1,125 @@
+##gff-version 3
+##sequence-region   1 1 43270923
+#!genome-build RAP-DB IRGSP-1.0
+#!genome-version IRGSP-1.0
+#!genome-date 2015-10
+#!genome-build-accession GCA_001433935.1
+1	RAP-DB	chromosome	1	43270923	.	.	.	ID=chromosome:1;Alias=Chr1,AP014957.1,NC_029256.1
+1	irgsp	repeat_region	2000	2100	.	+	.	ID=fakeRepeat1
+1	irgsp	gene	2983	10815	.	+	.	ID=gene:Os01g0100100;biotype=protein_coding;description=RabGAP/TBC domain containing protein. (Os01t0100100-01);gene_id=Os01g0100100;logic_name=irgspv1.0-20170804-genes
+1	irgsp	mRNA	2983	10815	.	+	.	ID=transcript:Os01t0100100-01;Parent=gene:Os01g0100100;biotype=protein_coding;transcript_id=Os01t0100100-01
+1	irgsp	exon	2983	3268	.	+	.	ID=Os01t0100100-01.exon1;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon1;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon1;rank=1
+1	irgsp	exon	3354	3616	.	+	.	ID=Os01t0100100-01.exon2;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon2;constitutive=1;ensembl_end_phase=0;ensembl_phase=-1;exon_id=Os01t0100100-01.exon2;rank=2
+1	irgsp	exon	4357	4455	.	+	.	ID=Os01t0100100-01.exon3;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon3;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;exon_id=Os01t0100100-01.exon3;rank=3
+1	irgsp	exon	5457	5560	.	+	.	ID=Os01t0100100-01.exon4;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon4;constitutive=1;ensembl_end_phase=2;ensembl_phase=0;exon_id=Os01t0100100-01.exon4;rank=4
+1	irgsp	exon	7136	7944	.	+	.	ID=Os01t0100100-01.exon5;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon5;constitutive=1;ensembl_end_phase=1;ensembl_phase=2;exon_id=Os01t0100100-01.exon5;rank=5
+1	irgsp	exon	8028	8150	.	+	.	ID=Os01t0100100-01.exon6;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon6;constitutive=1;ensembl_end_phase=1;ensembl_phase=1;exon_id=Os01t0100100-01.exon6;rank=6
+1	irgsp	exon	8232	8320	.	+	.	ID=Os01t0100100-01.exon7;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon7;constitutive=1;ensembl_end_phase=0;ensembl_phase=1;exon_id=Os01t0100100-01.exon7;rank=7
+1	irgsp	exon	8408	8608	.	+	.	ID=Os01t0100100-01.exon8;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon8;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;exon_id=Os01t0100100-01.exon8;rank=8
+1	irgsp	exon	9210	9615	.	+	.	ID=Os01t0100100-01.exon9;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon9;constitutive=1;ensembl_end_phase=1;ensembl_phase=0;exon_id=Os01t0100100-01.exon9;rank=9
+1	irgsp	exon	10102	10187	.	+	.	ID=Os01t0100100-01.exon10;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon10;constitutive=1;ensembl_end_phase=0;ensembl_phase=1;exon_id=Os01t0100100-01.exon10;rank=10
+1	irgsp	exon	10274	10430	.	+	.	ID=Os01t0100100-01.exon11;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon11;constitutive=1;ensembl_end_phase=-1;ensembl_phase=0;exon_id=Os01t0100100-01.exon11;rank=11
+1	irgsp	exon	10504	10815	.	+	.	ID=Os01t0100100-01.exon12;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	CDS	3449	3616	.	+	0	ID=CDS:Os01t0100100-01;Parent=transcript:Os01t0100100-01;protein_id=Os01t0100100-01
+1	irgsp	CDS	4357	4455	.	+	0	ID=CDS:Os01t0100100-01;Parent=transcript:Os01t0100100-01;protein_id=Os01t0100100-01
+1	irgsp	CDS	5457	5560	.	+	0	ID=CDS:Os01t0100100-01;Parent=transcript:Os01t0100100-01;protein_id=Os01t0100100-01
+1	irgsp	CDS	7136	7944	.	+	1	ID=CDS:Os01t0100100-01;Parent=transcript:Os01t0100100-01;protein_id=Os01t0100100-01
+1	irgsp	CDS	8028	8150	.	+	2	ID=CDS:Os01t0100100-01;Parent=transcript:Os01t0100100-01;protein_id=Os01t0100100-01
+1	irgsp	CDS	8232	8320	.	+	2	ID=CDS:Os01t0100100-01;Parent=transcript:Os01t0100100-01;protein_id=Os01t0100100-01
+1	irgsp	CDS	8408	8608	.	+	0	ID=CDS:Os01t0100100-01;Parent=transcript:Os01t0100100-01;protein_id=Os01t0100100-01
+1	irgsp	CDS	9210	9615	.	+	0	ID=CDS:Os01t0100100-01;Parent=transcript:Os01t0100100-01;protein_id=Os01t0100100-01
+1	irgsp	CDS	10102	10187	.	+	2	ID=CDS:Os01t0100100-01;Parent=transcript:Os01t0100100-01;protein_id=Os01t0100100-01
+1	irgsp	CDS	10274	10297	.	+	0	ID=CDS:Os01t0100100-01;Parent=transcript:Os01t0100100-01;protein_id=Os01t0100100-01
+1	irgsp	five_prime_UTR	2983	3268	.	+	.	ID=agat-five_prime_utr-1;Parent=transcript:Os01t0100100-01
+1	irgsp	five_prime_UTR	3354	3448	.	+	.	ID=agat-five_prime_utr-2;Parent=transcript:Os01t0100100-01
+1	irgsp	intron	3269	3353	.	+	.	ID=intron_added-1;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	intron	3617	4356	.	+	.	ID=intron_added-2;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	intron	4456	5456	.	+	.	ID=intron_added-3;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	intron	5561	7135	.	+	.	ID=intron_added-4;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	intron	7945	8027	.	+	.	ID=intron_added-5;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	intron	8151	8231	.	+	.	ID=intron_added-6;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	intron	8321	8407	.	+	.	ID=intron_added-7;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	intron	8609	9209	.	+	.	ID=intron_added-8;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	intron	9616	10101	.	+	.	ID=intron_added-9;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	intron	10188	10273	.	+	.	ID=intron_added-10;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	intron	10431	10503	.	+	.	ID=intron_added-11;Parent=transcript:Os01t0100100-01;Name=Os01t0100100-01.exon12;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100100-01.exon12;rank=12
+1	irgsp	three_prime_UTR	10298	10430	.	+	.	ID=agat-three_prime_utr-1;Parent=transcript:Os01t0100100-01
+1	irgsp	three_prime_UTR	10504	10815	.	+	.	ID=agat-three_prime_utr-2;Parent=transcript:Os01t0100100-01
+1	irgsp	gene	11218	12435	.	+	.	ID=gene:Os01g0100200;biotype=protein_coding;description=Conserved hypothetical protein. (Os01t0100200-01);gene_id=Os01g0100200;logic_name=irgspv1.0-20170804-genes
+1	irgsp	mRNA	11218	12435	.	+	.	ID=transcript:Os01t0100200-01;Parent=gene:Os01g0100200;biotype=protein_coding;transcript_id=Os01t0100200-01
+1	irgsp	exon	11218	12060	.	+	.	ID=Os01t0100200-01.exon1;Parent=transcript:Os01t0100200-01;Name=Os01t0100200-01.exon1;constitutive=1;ensembl_end_phase=2;ensembl_phase=-1;exon_id=Os01t0100200-01.exon1;rank=1
+1	irgsp	exon	12152	12435	.	+	.	ID=Os01t0100200-01.exon2;Parent=transcript:Os01t0100200-01;Name=Os01t0100200-01.exon2;constitutive=1;ensembl_end_phase=-1;ensembl_phase=2;exon_id=Os01t0100200-01.exon2;rank=2
+1	irgsp	CDS	11798	12060	.	+	0	ID=CDS:Os01t0100200-01;Parent=transcript:Os01t0100200-01;protein_id=Os01t0100200-01
+1	irgsp	CDS	12152	12317	.	+	1	ID=CDS:Os01t0100200-01;Parent=transcript:Os01t0100200-01;protein_id=Os01t0100200-01
+1	irgsp	five_prime_UTR	11218	11797	.	+	.	ID=agat-five_prime_utr-3;Parent=transcript:Os01t0100200-01
+1	irgsp	intron	12061	12151	.	+	.	ID=intron_added-12;Parent=transcript:Os01t0100200-01;Name=Os01t0100200-01.exon2;constitutive=1;ensembl_end_phase=-1;ensembl_phase=2;exon_id=Os01t0100200-01.exon2;rank=2
+1	irgsp	three_prime_UTR	12318	12435	.	+	.	ID=agat-three_prime_utr-3;Parent=transcript:Os01t0100200-01
+1	irgsp	gene	11372	12284	.	-	.	ID=gene:Os01g0100300;biotype=protein_coding;description=Cytochrome P450 domain containing protein. (Os01t0100300-00);gene_id=Os01g0100300;logic_name=irgspv1.0-20170804-genes
+1	irgsp	mRNA	11372	12284	.	-	.	ID=transcript:Os01t0100300-00;Parent=gene:Os01g0100300;biotype=protein_coding;transcript_id=Os01t0100300-00
+1	irgsp	exon	11372	12042	.	-	.	ID=Os01t0100300-00.exon2;Parent=transcript:Os01t0100300-00;Name=Os01t0100300-00.exon2;constitutive=1;ensembl_end_phase=0;ensembl_phase=1;exon_id=Os01t0100300-00.exon2;rank=2
+1	irgsp	exon	12146	12284	.	-	.	ID=Os01t0100300-00.exon1;Parent=transcript:Os01t0100300-00;Name=Os01t0100300-00.exon1;constitutive=1;ensembl_end_phase=1;ensembl_phase=0;exon_id=Os01t0100300-00.exon1;rank=1
+1	irgsp	CDS	11372	12042	.	-	2	ID=CDS:Os01t0100300-00;Parent=transcript:Os01t0100300-00;protein_id=Os01t0100300-00
+1	irgsp	CDS	12146	12284	.	-	0	ID=CDS:Os01t0100300-00;Parent=transcript:Os01t0100300-00;protein_id=Os01t0100300-00
+1	irgsp	intron	12043	12145	.	-	.	ID=intron_added-13;Parent=transcript:Os01t0100300-00;Name=Os01t0100300-00.exon1;constitutive=1;ensembl_end_phase=1;ensembl_phase=0;exon_id=Os01t0100300-00.exon1;rank=1
+1	irgsp	gene	12721	15685	.	+	.	ID=gene:Os01g0100400;biotype=protein_coding;description=Similar to Pectinesterase-like protein. (Os01t0100400-01);gene_id=Os01g0100400;logic_name=irgspv1.0-20170804-genes
+1	irgsp	mRNA	12721	15685	.	+	.	ID=transcript:Os01t0100400-01;Parent=gene:Os01g0100400;biotype=protein_coding;transcript_id=Os01t0100400-01
+1	irgsp	exon	12721	13813	.	+	.	ID=Os01t0100400-01.exon1;Parent=transcript:Os01t0100400-01;Name=Os01t0100400-01.exon1;constitutive=1;ensembl_end_phase=2;ensembl_phase=-1;exon_id=Os01t0100400-01.exon1;rank=1
+1	irgsp	exon	13906	14271	.	+	.	ID=Os01t0100400-01.exon2;Parent=transcript:Os01t0100400-01;Name=Os01t0100400-01.exon2;constitutive=1;ensembl_end_phase=2;ensembl_phase=2;exon_id=Os01t0100400-01.exon2;rank=2
+1	irgsp	exon	14359	14437	.	+	.	ID=Os01t0100400-01.exon3;Parent=transcript:Os01t0100400-01;Name=Os01t0100400-01.exon3;constitutive=1;ensembl_end_phase=0;ensembl_phase=2;exon_id=Os01t0100400-01.exon3;rank=3
+1	irgsp	exon	14969	15171	.	+	.	ID=Os01t0100400-01.exon4;Parent=transcript:Os01t0100400-01;Name=Os01t0100400-01.exon4;constitutive=1;ensembl_end_phase=2;ensembl_phase=0;exon_id=Os01t0100400-01.exon4;rank=4
+1	irgsp	exon	15266	15685	.	+	.	ID=Os01t0100400-01.exon5;Parent=transcript:Os01t0100400-01;Name=Os01t0100400-01.exon5;constitutive=1;ensembl_end_phase=-1;ensembl_phase=2;exon_id=Os01t0100400-01.exon5;rank=5
+1	irgsp	CDS	12774	13813	.	+	0	ID=CDS:Os01t0100400-01;Parent=transcript:Os01t0100400-01;protein_id=Os01t0100400-01
+1	irgsp	CDS	13906	14271	.	+	1	ID=CDS:Os01t0100400-01;Parent=transcript:Os01t0100400-01;protein_id=Os01t0100400-01
+1	irgsp	CDS	14359	14437	.	+	1	ID=CDS:Os01t0100400-01;Parent=transcript:Os01t0100400-01;protein_id=Os01t0100400-01
+1	irgsp	CDS	14969	15171	.	+	0	ID=CDS:Os01t0100400-01;Parent=transcript:Os01t0100400-01;protein_id=Os01t0100400-01
+1	irgsp	CDS	15266	15359	.	+	1	ID=CDS:Os01t0100400-01;Parent=transcript:Os01t0100400-01;protein_id=Os01t0100400-01
+1	irgsp	five_prime_UTR	12721	12773	.	+	.	ID=agat-five_prime_utr-4;Parent=transcript:Os01t0100400-01
+1	irgsp	intron	13814	13905	.	+	.	ID=intron_added-14;Parent=transcript:Os01t0100400-01;Name=Os01t0100400-01.exon5;constitutive=1;ensembl_end_phase=-1;ensembl_phase=2;exon_id=Os01t0100400-01.exon5;rank=5
+1	irgsp	intron	14272	14358	.	+	.	ID=intron_added-15;Parent=transcript:Os01t0100400-01;Name=Os01t0100400-01.exon5;constitutive=1;ensembl_end_phase=-1;ensembl_phase=2;exon_id=Os01t0100400-01.exon5;rank=5
+1	irgsp	intron	14438	14968	.	+	.	ID=intron_added-16;Parent=transcript:Os01t0100400-01;Name=Os01t0100400-01.exon5;constitutive=1;ensembl_end_phase=-1;ensembl_phase=2;exon_id=Os01t0100400-01.exon5;rank=5
+1	irgsp	intron	15172	15265	.	+	.	ID=intron_added-17;Parent=transcript:Os01t0100400-01;Name=Os01t0100400-01.exon5;constitutive=1;ensembl_end_phase=-1;ensembl_phase=2;exon_id=Os01t0100400-01.exon5;rank=5
+1	irgsp	three_prime_UTR	15360	15685	.	+	.	ID=agat-three_prime_utr-4;Parent=transcript:Os01t0100400-01
+1	irgsp	gene	12808	13978	.	-	.	ID=gene:Os01g0100466;biotype=protein_coding;description=Hypothetical protein. (Os01t0100466-00);gene_id=Os01g0100466;logic_name=irgspv1.0-20170804-genes
+1	irgsp	mRNA	12808	13978	.	-	.	ID=transcript:Os01t0100466-00;Parent=gene:Os01g0100466;biotype=protein_coding;transcript_id=Os01t0100466-00
+1	irgsp	exon	12808	13782	.	-	.	ID=Os01t0100466-00.exon2;Parent=transcript:Os01t0100466-00;Name=Os01t0100466-00.exon2;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100466-00.exon2;rank=2
+1	irgsp	exon	13880	13978	.	-	.	ID=Os01t0100466-00.exon1;Parent=transcript:Os01t0100466-00;Name=Os01t0100466-00.exon1;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100466-00.exon1;rank=1
+1	irgsp	CDS	12869	13102	.	-	0	ID=CDS:Os01t0100466-00;Parent=transcript:Os01t0100466-00;protein_id=Os01t0100466-00
+1	irgsp	five_prime_UTR	13103	13782	.	-	.	ID=agat-five_prime_utr-5;Parent=transcript:Os01t0100466-00
+1	irgsp	five_prime_UTR	13880	13978	.	-	.	ID=agat-five_prime_utr-6;Parent=transcript:Os01t0100466-00
+1	irgsp	intron	13783	13879	.	-	.	ID=intron_added-18;Parent=transcript:Os01t0100466-00;Name=Os01t0100466-00.exon1;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100466-00.exon1;rank=1
+1	irgsp	three_prime_UTR	12808	12868	.	-	.	ID=agat-three_prime_utr-5;Parent=transcript:Os01t0100466-00
+1	irgsp	gene	16399	20144	.	+	.	ID=gene:Os01g0100500;biotype=protein_coding;description=Immunoglobulin-like domain containing protein. (Os01t0100500-01);gene_id=Os01g0100500;logic_name=irgspv1.0-20170804-genes
+1	irgsp	mRNA	16399	20144	.	+	.	ID=transcript:Os01t0100500-01;Parent=gene:Os01g0100500;biotype=protein_coding;transcript_id=Os01t0100500-01
+1	irgsp	exon	16399	16976	.	+	.	ID=Os01t0100500-01.exon1;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon1;constitutive=1;ensembl_end_phase=0;ensembl_phase=-1;exon_id=Os01t0100500-01.exon1;rank=1
+1	irgsp	exon	17383	17474	.	+	.	ID=Os01t0100500-01.exon2;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon2;constitutive=1;ensembl_end_phase=2;ensembl_phase=0;exon_id=Os01t0100500-01.exon2;rank=2
+1	irgsp	exon	17558	18258	.	+	.	ID=Os01t0100500-01.exon3;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon3;constitutive=1;ensembl_end_phase=1;ensembl_phase=2;exon_id=Os01t0100500-01.exon3;rank=3
+1	irgsp	exon	18501	18571	.	+	.	ID=Os01t0100500-01.exon4;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon4;constitutive=1;ensembl_end_phase=0;ensembl_phase=1;exon_id=Os01t0100500-01.exon4;rank=4
+1	irgsp	exon	18968	19057	.	+	.	ID=Os01t0100500-01.exon5;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon5;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;exon_id=Os01t0100500-01.exon5;rank=5
+1	irgsp	exon	19142	19321	.	+	.	ID=Os01t0100500-01.exon6;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon6;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;exon_id=Os01t0100500-01.exon6;rank=6
+1	irgsp	exon	19531	19629	.	+	.	ID=Os01t0100500-01.exon7;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon7;constitutive=1;ensembl_end_phase=-1;ensembl_phase=0;exon_id=Os01t0100500-01.exon7;rank=7
+1	irgsp	exon	19734	20144	.	+	.	ID=Os01t0100500-01.exon8;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon8;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100500-01.exon8;rank=8
+1	irgsp	CDS	16599	16976	.	+	0	ID=CDS:Os01t0100500-01;Parent=transcript:Os01t0100500-01;protein_id=Os01t0100500-01
+1	irgsp	CDS	17383	17474	.	+	0	ID=CDS:Os01t0100500-01;Parent=transcript:Os01t0100500-01;protein_id=Os01t0100500-01
+1	irgsp	CDS	17558	18258	.	+	1	ID=CDS:Os01t0100500-01;Parent=transcript:Os01t0100500-01;protein_id=Os01t0100500-01
+1	irgsp	CDS	18501	18571	.	+	2	ID=CDS:Os01t0100500-01;Parent=transcript:Os01t0100500-01;protein_id=Os01t0100500-01
+1	irgsp	CDS	18968	19057	.	+	0	ID=CDS:Os01t0100500-01;Parent=transcript:Os01t0100500-01;protein_id=Os01t0100500-01
+1	irgsp	CDS	19142	19321	.	+	0	ID=CDS:Os01t0100500-01;Parent=transcript:Os01t0100500-01;protein_id=Os01t0100500-01
+1	irgsp	CDS	19531	19593	.	+	0	ID=CDS:Os01t0100500-01;Parent=transcript:Os01t0100500-01;protein_id=Os01t0100500-01
+1	irgsp	five_prime_UTR	16399	16598	.	+	.	ID=agat-five_prime_utr-7;Parent=transcript:Os01t0100500-01
+1	irgsp	intron	16977	17382	.	+	.	ID=intron_added-19;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon8;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100500-01.exon8;rank=8
+1	irgsp	intron	17475	17557	.	+	.	ID=intron_added-20;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon8;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100500-01.exon8;rank=8
+1	irgsp	intron	18259	18500	.	+	.	ID=intron_added-21;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon8;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100500-01.exon8;rank=8
+1	irgsp	intron	18572	18967	.	+	.	ID=intron_added-22;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon8;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100500-01.exon8;rank=8
+1	irgsp	intron	19058	19141	.	+	.	ID=intron_added-23;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon8;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100500-01.exon8;rank=8
+1	irgsp	intron	19322	19530	.	+	.	ID=intron_added-24;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon8;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100500-01.exon8;rank=8
+1	irgsp	intron	19630	19733	.	+	.	ID=intron_added-25;Parent=transcript:Os01t0100500-01;Name=Os01t0100500-01.exon8;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0100500-01.exon8;rank=8
+1	irgsp	three_prime_UTR	19594	19629	.	+	.	ID=agat-three_prime_utr-6;Parent=transcript:Os01t0100500-01
+1	irgsp	three_prime_UTR	19734	20144	.	+	.	ID=agat-three_prime_utr-7;Parent=transcript:Os01t0100500-01
+1	irgsp	gene	22841	26892	.	+	.	ID=gene:Os01g0100600;biotype=protein_coding;description=Single-stranded nucleic acid binding R3H domain containing protein. (Os01t0100600-01);gene_id=Os01g0100600;logic_name=irgspv1.0-20170804-genes
+1	irgsp	mRNA	22841	26892	.	+	.	ID=transcript:Os01t0100600-01;Parent=gene:Os01g0100600;biotype=protein_coding;transcript_id=Os01t0100600-01
+1	irgsp	exon	22841	23281	.	+	.	ID=Os01t0100600-01.exon1;Parent=transcript:Os01t0100600-01;Name=Os01t0100600-01.exon1;constitutive=1;ensembl_end_phase=2;ensembl_phase=-1;exon_id=Os01t0100600-01.exon1;rank=1
+1	irgsp	exon	23572	26892	.	+	.	ID=Os01t0100600-01.exon2;Parent=transcript:Os01t0100600-01;Name=Os01t0100600-01.exon2;constitutive=1;ensembl_end_phase=2;ensembl_phase=2;exon_id=Os01t0100600-01.exon2;rank=2
+1	irgsp	CDS	23232	23281	.	+	0	ID=CDS:Os01t0100600-01;Parent=transcript:Os01t0100600-01;protein_id=Os01t0100600-01
+1	irgsp	five_prime_UTR	22841	23231	.	+	.	ID=agat-five_prime_utr-8;Parent=transcript:Os01t0100600-01
+1	irgsp	intron	23282	23571	.	+	.	ID=intron_added-26;Parent=transcript:Os01t0100600-01;Name=Os01t0100600-01.exon2;constitutive=1;ensembl_end_phase=2;ensembl_phase=2;exon_id=Os01t0100600-01.exon2;rank=2
+1	AGAT	three_prime_UTR	23572	26892	.	+	.	ID=agat-three_prime_utr-8;Parent=transcript:Os01t0100600-01;Name=Os01t0100600-01.exon1;constitutive=1;ensembl_end_phase=2;ensembl_phase=-1;exon_id=Os01t0100600-01.exon1;rank=1
