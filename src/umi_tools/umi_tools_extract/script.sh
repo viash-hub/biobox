@@ -82,4 +82,3 @@ umi_tools extract \
     ${par_log2stderr:+--log2stderr} \
     ${par_verbose:+--verbose "$par_verbose"} \
     ${par_error:+--error "$par_error"}
-

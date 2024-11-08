@@ -42,4 +42,3 @@ kallisto quant \
     ${par_seed:+--seed "${par_seed}"} \
     -o $par_output_dir \
     ${input[*]} 2> >(tee -a $par_log >&2)
-    

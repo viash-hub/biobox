@@ -93,7 +93,7 @@ argument_groups:
     type: integer
     description: |
       search all alignments having the first INT longest LIS. LIS stands for Longest Increasing Subsequence, it is
-      computed using seeds’ positions to expand hits into longer matches prior to Smith-Waterman alignment. Default: '2'.
+      computed using seeds' positions to expand hits into longer matches prior to Smith-Waterman alignment. Default: '2'.
     example: 2
   - name: "--print_all_reads"
     type: boolean_true
@@ -154,7 +154,7 @@ argument_groups:
   - name: "--N"
     type: integer
     description: |
-      Smith-Waterman penalty for ambiguous letters (N’s) scored as --mismatch. Default: '-1'.\
+      Smith-Waterman penalty for ambiguous letters (N's) scored as --mismatch. Default: '-1'.\
     example: -1
   - name: "--a"
     type: integer
@@ -164,7 +164,7 @@ argument_groups:
   - name: "--e"
     type: double
     description: |
-      E-value threshold. Default: '1'.
+      E-value threshol4d. Default: '1'.
     example: 1
   - name: "--F"
     type: boolean_true
@@ -209,7 +209,7 @@ argument_groups:
     - name: "--otu_map"
       type: boolean_true
       description: |
-        Output OTU map (input to QIIME’s make_otu_table.py).
+        Output OTU map (input to QIIME's make_otu_table.py).
 
 - name: "Advanced options"
   arguments:
@@ -228,7 +228,7 @@ argument_groups:
     description: |
       The number (or percentage if followed by %) of nucleotides to add to each edge of the alignment region on the
       reference sequence before performing Smith-Waterman alignment. Default: '4'.
-    example: 4
+    example: "4"
   - name: "--full_search"
     type: boolean_true
     description: |
@@ -284,4 +284,4 @@ engines:
 
 runners: 
 - type: executable
-- type: nextflow 
+- type: nextflow
