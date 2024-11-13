@@ -27,7 +27,7 @@
 
 * `nanoplot`: Plotting tool for long read sequencing data and alignments (PR #95).
 
-* `sgedemux`: demultiplexing sequencing data generated on Singular Genomics' sequencing instruments (PR #).
+* `sgedemux`: demultiplexing sequencing data generated on Singular Genomics' sequencing instruments (PR #166).
 
 ## BUG FIXES
 
