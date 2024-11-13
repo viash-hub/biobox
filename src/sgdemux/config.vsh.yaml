@@ -1,0 +1,212 @@
+name: sgdemux
+description: |
+  Demultiplex sequence data generated on Singular Genomics' sequencing instruments.
+keywords: ["demultiplex", "fastq"]
+links:
+  repository: https://github.com/Singular-Genomics/singular-demux
+license: Proprietairy
+requirements:
+  commands: [sgdemux]
+authors:
+  - __merge__: /src/_authors/dries_schaumont.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: Input
+    arguments:
+      - name: "--fastqs"
+        alternatives: [-f]
+        type: file
+        description: Path to the input FASTQs, or path prefix if not a file
+        required: true
+        multiple: true
+        example: sample1_r1.fq;sample1_r2.fq;sample2_r1.fq;sample2_r2.fq
+      - name: --sample_metadata
+        alternatives: ["-s"]
+        type: file
+        description: Path to the sample metadata CSV file including sample names and barcode sequences
+        required: true
+
+  - name: Output
+    arguments:
+      - name: "--sample_fastq"
+        direction: "output"
+        type: file
+        description: The directory containing demultiplexed sample FASTQ files.
+        required: true
+        example: "output/"
+      - name: "--metrics"
+        direction: "output"
+        type: file
+        required: false
+        description: |
+          Demultiplexing summary statisitcs:
+            - control_reads_omitted: The number of reads that were omitted for being control reads.
+            - failing_reads_omitted: The number of reads that were omitted for having failed QC.
+            - total_templates: The total number of template reads that were output.
+        example: metrics.tsv
+      - name: "--most_frequent_unmatched"
+        direction: output
+        type: file
+        required: false
+        description: |
+          It contains the (approximate) counts of the most prevelant observed barcode sequences
+          that did not match to one of the expected barcodes. Can only be created when 'most_unmatched_to_output'
+          is not set to 0.
+        example: most_frequent_unmatched.tsv
+      - name: "--sample_barcode_hop_metrics"
+        direction: output
+        type: file
+        required: false
+        description: |
+          File containing the frequently observed barcodes that are unexpected
+          combinations of expected barcodes in a dual-indexed run.
+        example: sample_barcode_hop_metrics.tsv
+      - name: --per_project_metrics
+        type: file
+        required: false
+        direction: output
+        description: |
+          Aggregates the metrics by project (aggregates the metrics across samples with the same project) and
+          has the same columns as `--metrics`. In this case, sample_ID will contain the project name (or None if no project is given).
+          THe barcode will contain all Ns. The undetermined sample will not be aggregated with any other sample.
+        example: per_project_metrics.tsv
+      - name: --per_sample_metrics
+        direction: output
+        type: file
+        required: false
+        description: |
+          Tab-separated file containing statistics per sample.
+        example: per_sample_metrics.tsv
+  - name: Arguments
+    arguments:
+      - name: --read_structures
+        alternatives: ["-r"]
+        type: string
+        description: Read structures, one per input FASTQ. Do not provide when using a path prefix for FASTQs
+        required: false
+        multiple: true
+      - name: --allowed_mismatches
+        alternatives: ["-m"]
+        type: integer
+        description: Number of allowed mismatches between the observed barcode and the expected barcode
+        example: 1
+      - name: --min_delta
+        alternatives: ["-d"]
+        type: integer
+        description:  The minimum allowed difference between an observed barcode and the second closest expected barcode
+        example: 2
+      - name: --free_ns
+        alternatives: ["-F"]
+        type: integer
+        description: Number of N's to allow in a barcode without counting against the allowed_mismatches
+        example: 1
+      - name: --max_no_calls
+        alternatives: ["-N"]
+        type: integer
+        description: |
+          Max no-calls (N's) in a barcode before it is considered unmatchable.
+          A barcode with total N's greater than 'max_no_call' will be considered unmatchable.
+        required:  false
+      - name: --quality_mask_threshold
+        type: integer
+        multiple: true
+        alternatives: [-M]
+        description: |
+          Mask template bases with quality scores less than specified value(s).
+          Sample barcode/index and UMI bases are never masked. If provided either a single value,
+          or one value per FASTQ must be provided.
+        required: false
+      - name: --filter_control_reads
+        alternatives: [-C]
+        type: boolean_true
+        description: Filter out control reads
+      - name: "--filter_failing_quality"
+        alternatives: [-Q]
+        type: boolean_true
+        description: |
+          Filter reads failing quality filter
+      - name: "--output_types"
+        alternatives: [-T]
+        multiple: true
+        type: string
+        description: |
+           The types of output FASTQs to write.
+           For each read structure, all segment types listed will be output to a FASTQ file.
+
+           These may be any of the following:
+            - `T` - Template bases
+            - `B` - Sample barcode bases
+            - `M` - Molecular barcode bases
+            - `S` - Skip bases
+        choices: ["T", "B", "S", "M"]
+        example: T
+      - name: --undetermined_sample_name
+        alternatives: ["-u"]
+        type: string
+        example: Undetermined
+        description: |
+          The sample name for undetermined reads (reads that do not match an expected barcode)
+      - name: --most_unmatched_to_output
+        alternatives: ["-U"]
+        type: integer
+        description: |
+          Output the most frequent "unmatched" barcodes up to this number.
+          If set to 0 unmatched barcodes will not be collected, improving overall performance.
+        example: 1000
+      - name: "--override_matcher"
+        type: string
+        description: |
+          If the sample barcodes are > 12 bp long, a cached hamming distance matcher is used.
+          If the barcodes are less than or equal to 12 bp long, all possible matches are precomputed.
+          This option allows for overriding that heuristic.
+        choices: [cached-hamming-distance, pre-compute]
+      - name: --skip_read_name_check
+        type: boolean_true
+        description: |
+          If this is true, then all the read names across FASTQs will not be enforced to be the same.
+          This may be useful when the read names are known to be the same and performance matters.
+          Regardless, the first read name in each FASTQ will always be checked.
+      - name: "--sample_barcode_in_fastq_header"
+        type: boolean_true
+        description: |
+          If this is true, then the sample barcode is expected to be in the FASTQ read header.
+          For dual indexed data, the barcodes must be `+` (plus) delimited.  Additionally, if true,
+          then neither index FASTQ files nor sample barcode segments in the read structure may be specified.
+      - name: "--metric_prefix"
+        type: string
+        description: |
+          Prepend this prefix to all output metric file names
+      - name: "--lane"
+        type: integer
+        multiple: true
+        alternatives: ["-l"]
+        description: |
+          Select a subset of lanes to demultiplex.  Will cause only samples and input FASTQs with
+          the given `Lane`(s) to be demultiplexed. Samples without a lane will be ignored, and
+          FASTQs without lane information will be ignored
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: test_data
+
+engines:
+- type: docker
+  image: continuumio/miniconda3:latest
+  setup:
+    - type: apt
+      packages:
+        - procps
+    - type: docker
+      run: |
+        conda install -c conda-forge -c bioconda sgdemux && \
+        echo "sgdemux: $(sgdemux --version | cut -d' ' -f2)" > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

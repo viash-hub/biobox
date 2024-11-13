@@ -1,0 +1,3 @@
+barcode_name	library_name	barcode	templates	perfect_matches	one_mismatch_matches	q20_bases	q30_bases	total_number_of_bases	fraction_matches	ratio_this_barcode_to_best_barcode	frac_q20_bases	frac_q30_bases	mean_index_base_quality
+None	None	NNNNNNNNNNNNNNNNNNNNNNNN	39120	38085	1035	11379704	10715554	11736000	0.978	1.0	0.9696407634628493	0.9130499318336741	34.25803723585549
+Undetermined	Undetermined	NNNNNNNNNNNNNNNNNNNNNNNN	880	0	0	248629	228186	264000	0.022	0.022494887525562373	0.9417765151515152	0.8643409090909091	32.029592803030305
