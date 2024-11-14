@@ -38,10 +38,32 @@ if [ "$par_most_unmatched_to_output" -eq "0" ] && [ ! -z "$par_most_frequent_unm
     exit 1
 fi
 
+# The sgdemux documentation recommends the following settings:
+#    1/3 of available threads for compression
+#    1/6 of available threads for writing
+#    1/6-1/3 of available threads for demultiplexing
+declare -A thread_settings=(["compression_threads"]="3"
+                            ["writing_threads"]="6"
+                            ["demultiplexing_threads"]="3"
+                           )
+if [ ! -z "$meta_cpus" ]; then
+    for setting_var in "${!thread_settings[@]}"; do
+        denominator=${thread_settings[$setting_var]}
+        result=$(( $meta_cpus / $denominator ))
+        if (( $result == 0 )); then
+            result=1
+        fi
+        declare $setting_var=$result
+    done
+fi
+
 args=(
     --fastqs ${fastqs[@]}
     --sample-metadata "$par_sample_metadata"
     --output-dir "$TMPDIR"
+    ${demultiplexing_threads:+--demux-threads $demultiplexing_threads}
+    ${writing_threads:+--writer-threads $writing_threads}
+    ${compression_threads:+--compressor-threads $compression_threads}
     ${par_allowed_mismatches:+--allowed-mismatches $par_allowed_mismatches}
     ${par_min_delta:+--min-delta $par_min_delta}
     ${par_free_ns:+--free-ns $par_free_ns}

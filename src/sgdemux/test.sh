@@ -34,7 +34,8 @@ mkdir "$sample_dir_test_1"
     --most_frequent_unmatched "$output_test1/most_frequent_unmatched.tsv" \
     --sample_barcode_hop_metrics "$output_test1/sample_barcode_hop_metrics.tsv" \
     --per_sample_metrics "$output_test1/per_sample_metrics.tsv" \
-    --per_project_metrics "$output_test1/per_project_metrics.tsv"
+    --per_project_metrics "$output_test1/per_project_metrics.tsv" \
+    ---cpus 1
     
 # Check for correct number of output FASTQ files
 readarray -d '' output_fastq < <(find "$sample_dir_test_1" -name "*.fastq.gz" -print0)
