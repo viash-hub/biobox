@@ -10,12 +10,6 @@ authors:
 argument_groups:
   - name: Inputs
     arguments:
-      - type: string
-        name: --id
-        required: true
-        description: A unique run id and output folder name
-        example: "visium_run_1"
-
       - type: file
         name: --transcriptome
         required: true
@@ -46,6 +40,14 @@ argument_groups:
         description: Single H&E brightfield image in TIFF or JPG format
         example: "brightfield.tif"
 
+  - name: Outputs
+    arguments:
+      - type: string
+        name: --id
+        required: true
+        description: A unique run id and output folder name
+        example: "visium_run_1"
+
   - name: Slide Information
     arguments:
       - type: string
@@ -71,6 +73,10 @@ argument_groups:
         description: Slide design file for offline use
         required: false
         example: "slide_design.gpr"
+
+      - type: boolean_true
+        name: --override_id
+        description: Overrides the slide serial number and capture area provided in the Cytassist image metadata
 
   - name: Image Options
     arguments:
@@ -111,11 +117,9 @@ argument_groups:
         description: Enable or disable BAM file generation
         default: true
 
-      - type: boolean
+      - type: boolean_true
         name: --nosecondary
-        required: false
         description: Disable secondary analysis (e.g., clustering)
-        default: false
 
       - type: integer
         name: --r1_length
