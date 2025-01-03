@@ -203,9 +203,9 @@ resources:
   - type: bash_script
     path: script.sh
 test_resources:
-  - type: python_script
-    path: test.py
-  - path: /src/spaceranger/spaceranger_count/test_data
+  - type: bash_script
+    path: test.sh
+  - path: test_data
 engines:
   - type: native
 runners:
