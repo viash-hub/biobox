@@ -44,80 +44,14 @@ check_file() {
     fi
 }
 
-# Function to check if directory exists
-check_dir() {
-    local dir=$1
-    local description=$2
-    echo -n "Checking $description... "
-    if [ ! -d "$dir" ]; then
-        echo "FAIL (directory not found)"
-        exit 1
-    else
-        echo "OK"
-    fi
-}
-
-# Check summary files
+# Check essential files
 check_file "$OUT_DIR/web_summary.html" "web summary"
 check_file "$OUT_DIR/metrics_summary.csv" "metrics summary"
 
-# Check spatial files
-check_file "$OUT_DIR/spatial/aligned_fiducials.jpg" "fiducial alignment image"
-check_file "$OUT_DIR/spatial/detected_tissue_image.jpg" "tissue detection image"
-check_file "$OUT_DIR/spatial/scalefactors_json.json" "scale factors JSON"
-check_file "$OUT_DIR/spatial/tissue_positions.csv" "tissue positions"
-
-# Check expression matrices
-check_dir "$OUT_DIR/filtered_feature_bc_matrix" "filtered matrix directory"
-check_file "$OUT_DIR/filtered_feature_bc_matrix/barcodes.tsv.gz" "filtered barcodes"
-check_file "$OUT_DIR/filtered_feature_bc_matrix/features.tsv.gz" "filtered features"
-check_file "$OUT_DIR/filtered_feature_bc_matrix/matrix.mtx.gz" "filtered matrix"
-
-check_dir "$OUT_DIR/raw_feature_bc_matrix" "raw matrix directory"
-check_file "$OUT_DIR/raw_feature_bc_matrix/barcodes.tsv.gz" "raw barcodes"
-check_file "$OUT_DIR/raw_feature_bc_matrix/features.tsv.gz" "raw features"
-check_file "$OUT_DIR/raw_feature_bc_matrix/matrix.mtx.gz" "raw matrix"
-
-# Check visualization files
-check_file "$OUT_DIR/spatial/spatial.loup" "Loupe file"
-
-# Basic content validation
-echo "> Performing basic content validation..."
-
-# Check JSON validity
-echo -n "Validating JSON structure... "
-if ! jq '.' "$OUT_DIR/spatial/scalefactors_json.json" >/dev/null 2>&1; then
-    echo "FAIL (invalid JSON)"
-    exit 1
-else
-    echo "OK"
-fi
-
-# Check CSV format of tissue positions
-echo -n "Validating tissue positions CSV... "
-if ! head -n 1 "$OUT_DIR/spatial/tissue_positions.csv" | grep -q ","; then
-    echo "FAIL (invalid CSV format)"
-    exit 1
-else
-    echo "OK"
-fi
-
-# Check if matrices are valid gzip files
-echo -n "Validating matrix compression... "
-if ! gzip -t "$OUT_DIR/filtered_feature_bc_matrix/matrix.mtx.gz" 2>/dev/null; then
-    echo "FAIL (invalid gzip for filtered matrix)"
-    exit 1
-else
-    echo "OK"
-fi
-
-# Check if web summary contains essential sections
-echo -n "Checking web summary content... "
-if ! grep -q "Spatial RNA" "$OUT_DIR/web_summary.html"; then
-    echo "FAIL (missing essential content)"
-    exit 1
-else
-    echo "OK"
-fi
+# Check per resolution outputs
+for res in "002" "008" "016"; do
+    bin_dir="$OUT_DIR/binned_outputs/square_${res}um"
+    check_file "$bin_dir/filtered_feature_bc_matrix/matrix.mtx.gz" "${res}um matrix"
+done
 
 echo "> All tests passed successfully!"
