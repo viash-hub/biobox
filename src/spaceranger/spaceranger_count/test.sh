@@ -21,7 +21,11 @@ echo "> Default test run"
     --lanes 1 \
     --slide H1-HBNMBMC \
     --area D1 \
-    --nosecondary
+    --nosecondary \
+    ---cpus 4 \
+    ---memory_gb 16 \
+    ---memory 18GB
+
 
 echo "> Checking outputs..."
 

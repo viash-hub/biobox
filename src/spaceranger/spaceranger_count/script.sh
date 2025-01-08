@@ -39,23 +39,4 @@ spaceranger count \
   ${par_sample:+--sample="$par_sample"} \
   ${par_lanes:+--lanes="$par_lanes"} \
   ${meta_cpus:+--localcores="$meta_cpus"} \
-  --localmem=16
-  # --localcores=4 \
-  # ${meta_memory_gb:+--localmem="$meta_memory_gb"}
-
-
-# spaceranger count \
-#   --id=test_count \
-#   --transcriptome=src/spaceranger/spaceranger_count/test_data/GRCh38 \
-#   --fastqs=src/spaceranger/spaceranger_count/test_data/subsampled_fastqs \
-#   --probe-set=src/spaceranger/spaceranger_count/test_data/Visium_HD_Human_Pancreas_probe_set.csv \
-#   --cytaimage=src/spaceranger/spaceranger_count/test_data/Visium_HD_Human_Pancreas_image.tif \
-#   --image=src/spaceranger/spaceranger_count/test_data/Visium_HD_Human_Pancreas_tissue_image.btf \
-#   --create-bam=false \
-#   --lanes=1 \
-#   --slide=H1-HBNMBMC \
-#   --area=D1 \
-#   --nosecondary \
-#   --localcores=4 \
-#   --localmem=16
-  # --custom-bin-size 16 \
+  ${meta_memory_gb:+--localmem=$(($meta_memory_gb-2))}
