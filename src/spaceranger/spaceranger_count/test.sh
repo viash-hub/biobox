@@ -23,7 +23,6 @@ echo "> Default test run"
     --area D1 \
     --nosecondary \
     ---cpus 4 \
-    ---memory_gb 16 \
     ---memory 18GB
 
 
