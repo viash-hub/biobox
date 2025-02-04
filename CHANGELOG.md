@@ -49,6 +49,8 @@
 
 * `umi_tools/umi_tools_extract`: Remove `umi_discard_reads` option and change `log2stderr` to input argument (PR #162).
 
+* `star/star_genome_generate`: Fix passing of optional sjdb parameters (PR #170).
+
 ## MINOR CHANGES
 
 * `agat_convert_bed2gff`: change type of argument `inflate_off` from `boolean_false` to `boolean_true` (PR #160).
