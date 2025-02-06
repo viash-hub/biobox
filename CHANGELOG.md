@@ -1,3 +1,9 @@
+# biobox 0.3.1
+
+## NEW FUNCTIONALITY
+
+* `bcl_convert`: add `force` argument (PR #).
+
 # biobox 0.3.0
 
 ## NEW FUNCTIONALITY

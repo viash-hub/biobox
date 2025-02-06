@@ -134,6 +134,13 @@ argument_groups:
         required: false
         description: Reports directory
         example: logs_dir
+      - name: "--force"
+        description: |
+          Allow destination diretory to already exist and overwrite files.
+        type: boolean
+        required: false
+        example: true
+
 
 # bcl-convert arguments not taken into account
 #   --force
