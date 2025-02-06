@@ -136,7 +136,7 @@ argument_groups:
         example: logs_dir
       - name: "--force"
         description: |
-          Allow destination diretory to already exist and overwrite files.
+          Allow destination directory to already exist and overwrite files.
         type: boolean
         required: false
         example: true
