@@ -1,0 +1,75 @@
+name: agat_convert_minimap2_bam2gff
+namespace: agat
+description: |
+  Convert output from minimap2 (bam or sam) into gff file. To
+  get bam from minimap2 use the following command: `minimap2 -ax splice:hq
+  genome.fa Asecodes_parviclava.nucest.fa | samtools sort -O BAM -o
+  output.bam`. 
+keywords: [gene annotations, GFF conversion, minimap2]
+links:
+  homepage: https://github.com/NBISweden/AGAT
+  documentation: https://agat.readthedocs.io/en/latest/tools/agat_convert_minimap2_bam2gff.html
+  issue_tracker: https://github.com/NBISweden/AGAT/issues
+  repository: https://github.com/NBISweden/AGAT
+references: 
+  doi: 10.5281/zenodo.3552717
+license: GPL-3.0
+requirements:
+  commands: [agat]
+authors:
+  - __merge__: /src/_authors/leila_paquay.yaml
+    roles: [ author, maintainer ]
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: [-i]
+        description: Input file in SAM (.sam extension) or BAM (.bam extension) format.
+        type: file
+        required: true
+        direction: input
+        example: input.sam
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: [-o, --out]
+        description: Output GFF file.
+        type: file
+        direction: output
+        required: true
+        example: output.gff
+  - name: Arguments
+    arguments:
+      - name: --bam
+        alternatives: [-b]
+        description: To force the use of the input file as a BAM file.
+        type: boolean_true
+      - name: --sam
+        alternatives: [-s]
+        description: To force the use of the input file as a SAM file.
+        type: boolean_true
+      - name: --config
+        alternatives: [-c]
+        description: |
+          AGAT config file. By default AGAT takes the original agat_config.yaml shipped with AGAT. The `--config` option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).        
+        type: file
+        required: false
+        example: custom_agat_config.yaml
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/agat:1.4.0--pl5321hdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          agat --version | sed 's/AGAT\s\(.*\)/agat: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
