@@ -1,0 +1,97 @@
+name: agat_sp_compare_two_annotations
+namespace: agat
+description: |
+  The script aims to compare two annotation of the same assembly. It
+  provides information about split/fusion of genes between the two
+  annotations. The most common cases are: 
+
+    * 1 => 0 ( gene uniq to file1) 
+    * 0 => 1 ( gene uniq to file2) 
+    * 1 => 1 ( 1 gene from file 1 overlaps only 1 gene from file2) 
+    * 1 => <many> ( 1 gene from file 1 overlaps <many> genes
+  from file2)
+    * => split case (with file 1 as reference) 
+    * <many> => 1 (<many> genes from file 1 overlap only 1 gene from file2)
+    * => fusion case (with file 1 as reference)
+
+  Then you can get more complex cases: 
+  
+    * <many> => <many> (<many> genes from file 1 overlap <many> genes from file2)
+
+  The script output a folder containing a report of number of different
+  cases as well as a file per case type listing per line the gene
+  feature's ID involved in each case.
+keywords: [gene annotations, GFF]
+links:
+  homepage: https://github.com/NBISweden/AGAT
+  documentation: https://agat.readthedocs.io/en/latest/tools/agat_sp_compare_two_annotations.html
+  issue_tracker: https://github.com/NBISweden/AGAT/issues
+  repository: https://github.com/NBISweden/AGAT
+references: 
+  doi: 10.5281/zenodo.3552717
+license: GPL-3.0
+requirements:
+  - commands: [agat]
+authors:
+  - __merge__: /src/_authors/leila_paquay.yaml
+    roles: [ author, maintainer ]
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --gff1
+        description: Input GTF/GFF file1.
+        type: file
+        required: true
+        direction: input
+        example: input1.gff
+      - name: --gff2
+        description: Input GTF/GFF file2.
+        type: file
+        required: true
+        direction: input
+        example: input2.gff
+  - name: Outputs
+    arguments:       
+      - name: --output_dir
+        alternatives: [-o, --out, --output]
+        description: |
+          Output folder. It contains a report that summarizes the type and number of cases, as well as a file per case type containing one case per line with the list of gene feature's ID (or other type of feature level1) from file1 then file2 separated by a |.
+        type: file
+        direction: output
+        required: true
+        example: output_folder
+  - name: Arguments
+    arguments:
+      - name: --debug
+        alternatives: [-d]
+        description: Debug option, makes it easier to follow what is going on for debugging purposes.
+        type: boolean_true
+      - name: --verbose
+        alternatives: [-v]
+        description: Verbose option, makes it easier to follow what is going on.
+        type: boolean_true
+      - name: --config
+        alternatives: [-c]
+        description: |
+          AGAT config file. By default AGAT takes the original agat_config.yaml shipped with AGAT. The `--config` option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
+        type: file
+        required: false
+        example: custom_config.yaml
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/agat:1.4.0--pl5321hdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          agat --version | sed 's/AGAT\s\(.*\)/agat: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
