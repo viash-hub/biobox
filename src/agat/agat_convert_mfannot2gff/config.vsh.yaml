@@ -12,9 +12,9 @@ links:
   repository: https://github.com/NBISweden/AGAT
 references: 
   doi: 10.5281/zenodo.3552717
-license: GPL-3.
+license: GPL-3.0
 requirements:
-  - command: [agat]
+  commands: ["agat_convert_mfannot2gff.pl"]
 authors:
   - __merge__: /src/_authors/leila_paquay.yaml
     roles: [ author, maintainer ]
