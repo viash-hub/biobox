@@ -1,0 +1,68 @@
+name: cellranger_mkref
+namespace: cellranger
+description: Build a Cell Ranger-compatible reference folder from user-supplied genome FASTA and gene GTF files.
+keywords: [ cellranger, single-cell, rna-seq, alignment, reference, gtf, fasta ]
+links:
+  documentation: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/advanced/references
+  repository: https://github.com/10XGenomics/cellranger/blob/main/lib/python/cellranger/reference_builder.py
+  homepage: https://www.10xgenomics.com/support/software/cell-ranger/latest
+  issue_tracker: https://github.com/10XGenomics/cellranger/issues
+references:
+  doi: 10.1038/ncomms14049
+license: Proprietary
+requirements:
+  commands: [cellranger, pigz, unpigz, tar]
+authors:
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author ]
+arguments:
+  # inputs
+  - type: file
+    name: --genome_fasta
+    required: true
+    description: Reference genome fasta.
+    example: genome_sequence.fa.gz
+  - type: file
+    name: --transcriptome_gtf
+    required: true
+    description: Reference transcriptome annotation.
+    example: transcriptome_annotation.gtf.gz
+  - type: string
+    name: "--reference_version"
+    required: false
+    description: "Optional reference version string to include with reference"
+  - type: file
+    name: --output
+    direction: output
+    required: true
+    description: Output folder
+    example: cellranger_reference
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: test_data
+
+engines:
+- type: docker
+  image: ghcr.io/data-intuitive/cellranger:8.0
+  setup:
+    - type: apt
+      packages:
+        - procps
+        - pigz
+  test_setup:
+    - type: apt
+      packages:
+        - seqkit
+    - type: docker
+      run: |
+        cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
+
+runners:
+- type: executable
+- type: nextflow
+  directives:
+    label: [ highmem, highcpu ]

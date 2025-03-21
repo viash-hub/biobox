@@ -1,0 +1,166 @@
+███████╗██╗███╗   ██╗ ██████╗ ██╗   ██╗██╗      █████╗ ██████╗
+██╔════╝██║████╗  ██║██╔════╝ ██║   ██║██║     ██╔══██╗██╔══██╗
+███████╗██║██╔██╗ ██║██║  ███╗██║   ██║██║     ███████║██████╔╝
+╚════██║██║██║╚██╗██║██║   ██║██║   ██║██║     ██╔══██║██╔══██╗
+███████║██║██║ ╚████║╚██████╔╝╚██████╔╝███████╗██║  ██║██║  ██║
+╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝
+
+ ██████╗ ███████╗███╗   ██╗ ██████╗ ███╗   ███╗██╗ ██████╗███████╗
+██╔════╝ ██╔════╝████╗  ██║██╔═══██╗████╗ ████║██║██╔════╝██╔════╝
+██║  ███╗█████╗  ██╔██╗ ██║██║   ██║██╔████╔██║██║██║     ███████╗
+██║   ██║██╔══╝  ██║╚██╗██║██║   ██║██║╚██╔╝██║██║██║     ╚════██║
+╚██████╔╝███████╗██║ ╚████║╚██████╔╝██║ ╚═╝ ██║██║╚██████╗███████║
+ ╚═════╝ ╚══════╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝     ╚═╝╚═╝ ╚═════╝╚══════╝
+
+Performs sample demultiplexing on block-compressed (BGZF) FASTQs.
+
+Input FASTQs must be block compressed (e.g. with `bgzip`).  A single bgzipped FASTQ file
+should be provided per instrument read.  One read structure should be provided per input FASTQ.
+
+Per-sample files with suffixes like _R1.fastq.gz will be written to the output directory specified with --output.
+
+The sample metadata file may be a Sample Sheet or a simple two-column CSV file with headers.
+The Sample Sheet may haave a `[Demux]` section for command line options, and must have a `[Data]`
+section for sample information.  The `Sample_ID` column must contain a unique, non-empty identifier
+for each sample.  Both `Index1_Sequence` and `Index2_Sequence` must be present with values for
+indexed runs.  For non-indexed runs, a single sample must be given with an empty value for the
+`Index1_Sequence` and `Index2_Sequence` columns.  For the simple two-column CSV, the
+`Sample_Barcode` column must contain the unique set of sample barcode bases for the sample(s).
+
+Example invocation:
+
+sgdemux \
+  --fastqs R1.fq.gz R2.fq.gz I1.fq.gz \
+  --read-structures +T +T 8B \
+  --sample-metadata samples.csv \
+  --output demuxed-fastqs/
+
+For complete documentation see: https://github.com/Singular-Genomics/singular-demux
+For support please contact: care@singulargenomics.com
+
+USAGE:
+    sgdemux [OPTIONS] --sample-metadata <SAMPLE_METADATA> --output-dir <OUTPUT_DIR>
+
+OPTIONS:
+    -f, --fastqs <FASTQS>...
+            Path to the input FASTQs, or path prefix if not a file
+
+    -s, --sample-metadata <SAMPLE_METADATA>
+            Path to the sample metadata
+
+    -r, --read-structures <READ_STRUCTURES>...
+            Read structures, one per input FASTQ. Do not provide when using a path prefix for FASTQs
+
+    -o, --output-dir <OUTPUT_DIR>
+            The directory to write outputs to.
+
+            This tool will overwrite existing files.
+
+    -m, --allowed-mismatches <ALLOWED_MISMATCHES>
+            Number of allowed mismatches between the observed barcode and the expected barcode
+
+            [default: 1]
+
+    -d, --min-delta <MIN_DELTA>
+            The minimum allowed difference between an observed barcode and the second closest expected barcode
+
+            [default: 2]
+
+    -F, --free-ns <FREE_NS>
+            Number of N's to allow in a barcode without counting against the allowed_mismatches
+
+            [default: 1]
+
+    -N, --max-no-calls <MAX_NO_CALLS>
+            Max no-calls (N's) in a barcode before it is considered unmatchable.
+
+            A barcode with total N's greater than `max_no_call` will be considered unmatchable.
+
+            [default: None]
+
+    -M, --quality-mask-threshold <QUALITY_MASK_THRESHOLD>...
+            Mask template bases with quality scores less than specified value(s).
+
+            Sample barcode/index and UMI bases are never masked. If provided either a single value, or one value per FASTQ must be provided.
+
+    -C, --filter-control-reads
+            Filter out control reads
+
+    -Q, --filter-failing-quality
+            Filter reads failing quality filter
+
+    -T, --output-types <OUTPUT_TYPES>
+            The types of output FASTQs to write.
+
+            These may be any of the following:
+            - `T` - Template bases
+            - `B` - Sample barcode bases
+            - `M` - Molecular barcode bases
+            - `S` - Skip bases
+
+            For each read structure, all segment types listed by `--output-types` will be output to a
+            FASTQ file.
+
+            [default: T]
+
+    -u, --undetermined-sample-name <UNDETERMINED_SAMPLE_NAME>
+            The sample name for undetermined reads (reads that do not match an expected barcode)
+
+            [default: Undetermined]
+
+    -U, --most-unmatched-to-output <MOST_UNMATCHED_TO_OUTPUT>
+            Output the most frequent "unmatched" barcodes up to this number.
+
+            If set to 0 unmatched barcodes will not be collected, improving overall performance.
+
+            [default: 1000]
+
+    -t, --demux-threads <DEMUX_THREADS>
+            Number of threads for demultiplexing.
+
+            The number of threads to use for the process of determining which input reads should be assigned to which sample.
+
+            [default: 4]
+
+        --compressor-threads <COMPRESSOR_THREADS>
+            Number of threads for compression the output reads.
+
+            The number of threads to use for compressing reads that are queued for writing.
+
+            [default: 12]
+
+        --writer-threads <WRITER_THREADS>
+            Number of threads for writing compressed reads to output.
+
+            The number of threads to have writing reads to their individual output files.
+
+            [default: 5]
+
+        --override-matcher <OVERRIDE_MATCHER>
+            Override the matcher heuristic.
+
+            If the sample barcodes are > 12 bp long, a cached hamming distance matcher is used. If the barcodes are less than or equal to 12 bp long, all possible matches are precomputed.
+
+            This option allows for overriding that heuristic.
+
+            [default: None]
+
+            [possible values: cached-hamming-distance, pre-compute]
+
+        --skip-read-name-check
+            If this is true, then all the read names across FASTQs will not be enforced to be the same. This may be useful when the read names are known to be the same and performance matters. Regardless, the first read name in each FASTQ will always be checked
+
+        --sample-barcode-in-fastq-header
+            If this is true, then the sample barcode is expected to be in the FASTQ read header.  For dual indexed data, the barcodes must be `+` (plus) delimited.  Additionally, if true, then neither index FASTQ files nor sample barcode segments in the read structure may be specified
+
+        --metric-prefix <METRIC_PREFIX>
+            Prepend this prefix to all output metric file names
+
+    -l, --lane <LANE>...
+            Select a subset of lanes to demultiplex.  Will cause only samples and input FASTQs with the given `Lane`(s) to be demultiplexed.  Samples without a lane will be ignored, and FASTQs without lane information will be ignored
+
+    -h, --help
+            Print help information
+
+    -V, --version
+            Print version information

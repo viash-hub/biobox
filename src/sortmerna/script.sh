@@ -37,16 +37,11 @@ if [[ ! -z "$par_ribo_database_manifest" ]]; then
 
 elif [[ ! -z "$par_ref" ]]; then
     IFS=";" read -ra ref <<< "$par_ref"
-    # check if length is 2 and par_paired is set to true
-    if [[ "${#ref[@]}" -eq 2 && "$par_paired" == "true" ]]; then
-        refs="--ref ${ref[0]} --ref ${ref[1]}"
-    # check if length is 1 and par_paired is set to false
-    elif [[ "${#ref[@]}" -eq 1 && "$par_paired" == "false" ]]; then
-            refs="--ref $par_ref"      
-    else # if one reference provided but paired is set to true:
-        echo "Two reference fasta files are required for paired-end reads"
-            exit 1
-    fi
+    for i in "${ref[@]}"
+    do
+        refs+="-ref $i "
+    done
+
 else 
     echo "No reference fasta file(s) provided"
     exit 1
