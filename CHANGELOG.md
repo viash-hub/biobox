@@ -4,6 +4,10 @@
 
 * `bcl_convert`: add `force` argument (PR #171).
 
+## MINOR CHANGES
+
+* Replace the deprecated use of the meta variable `functionality_name` by just `name` (PR #174).
+
 # biobox 0.3.0
 
 ## NEW FUNCTIONALITY
