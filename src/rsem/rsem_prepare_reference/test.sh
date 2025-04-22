@@ -3,7 +3,7 @@
 
 set -e pipefail
 
-echo ">>> Testing $meta_functionality_name"
+echo ">>> Testing $meta_name"
 
 cat > genome.fasta <<'EOF'
 >Sheila

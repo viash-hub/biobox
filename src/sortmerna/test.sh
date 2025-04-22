@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo ">>> Testing $meta_functionality_name"
+echo ">>> Testing $meta_name"
 
 find $meta_resources_dir/test_data/rRNA -type f > test_data/rrna-db.txt
 

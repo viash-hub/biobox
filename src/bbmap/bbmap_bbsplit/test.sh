@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo ">>> Test $meta_functionality_name"
+echo ">>> Test $meta_name"
 
 echo "> Prepare test data"
 

@@ -8,7 +8,7 @@ echo "> Prepare test data"
 echo ">> Fetching and preparing test data"
 fastq1="https://github.com/hartwigmedical/testdata/raw/master/100k_reads_hiseq/TESTX/TESTX_H7YRLADXX_S1_L001_R1_001.fastq.gz"
 fastq2="https://github.com/hartwigmedical/testdata/raw/master/100k_reads_hiseq/TESTX/TESTX_H7YRLADXX_S1_L001_R2_001.fastq.gz"
-TMPDIR=$(mktemp -d "$meta_temp_dir/$meta_functionality_name-XXXXXX")
+TMPDIR=$(mktemp -d "$meta_temp_dir/$meta_name-XXXXXX")
 function clean_up {
   [[ -d "$TMPDIR" ]] && rm -r "$TMPDIR"
 }

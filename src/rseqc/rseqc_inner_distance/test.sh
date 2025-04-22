@@ -12,7 +12,7 @@ output_plot_r="inner_distance_plot.r"
 output_freq="inner_distance_freq.txt"
 
 # Run executable
-echo "> Running $meta_functionality_name"
+echo "> Running $meta_name"
 
 "$meta_executable" \
     --input_file $input_bam \
@@ -48,7 +48,7 @@ diff "$output_dist" "$meta_resources_dir/test_data/test1.inner_distance.txt" || 
 rm "$output_stats" "$output_dist" "$output_plot" "$output_plot_r" "$output_freq"
 ################################################################################
 
-echo "> Running $meta_functionality_name with non-default parameters and default output file names"
+echo "> Running $meta_name with non-default parameters and default output file names"
 "$meta_executable" \
     --input_file $input_bam \
     --refgene $input_bed \

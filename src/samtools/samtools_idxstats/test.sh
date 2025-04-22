@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_dir="${meta_resources_dir}/test_data"
-echo ">>> Testing $meta_functionality_name"
+echo ">>> Testing $meta_name"
 
 "$meta_executable" \
   --bam "$test_dir/a.sorted.bam" \
@@ -22,7 +22,7 @@ rm "$test_dir/a.sorted.idxstats"
 
 ############################################################################################
 
-echo ">>> Testing $meta_functionality_name with singletons in the input"
+echo ">>> Testing $meta_name with singletons in the input"
 
 "$meta_executable" \
   --bam "$test_dir/test.paired_end.sorted.bam" \
