@@ -19,7 +19,7 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
-tmp_dir=$(mktemp -d -p "$meta_temp_dir" "${meta_functionality_name}_XXXXXX")
+tmp_dir=$(mktemp -d -p "$meta_temp_dir" "${meta_name}_XXXXXX")
 mkdir -p "$tmp_dir/temp"
 
 if [[ -f "$par_genome" ]] && [[ ! "$par_decoys" ]]; then

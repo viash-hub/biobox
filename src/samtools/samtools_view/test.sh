@@ -24,7 +24,7 @@ diff <(samtools view "$temp_dir/a.bam") <(samtools view "$test_dir/a.bam") || \
 
 ############################################################################################
 
-echo ">>> Test 2: ${meta_functionality_name} with CRAM format output"
+echo ">>> Test 2: ${meta_name} with CRAM format output"
 
 "$meta_executable" \
    --cram \
@@ -44,7 +44,7 @@ diff <(samtools view "$temp_dir/a.cram") <(samtools view "$test_dir/a.cram") || 
 
 ############################################################################################
 
-echo ">>> Test 3: ${meta_functionality_name} with --count option"
+echo ">>> Test 3: ${meta_name} with --count option"
 
 "$meta_executable" \
    --count \
@@ -63,7 +63,7 @@ diff "$temp_dir/a.count" "$test_dir/a.count" || \
 
 ############################################################################################
 
-echo ">>> Test 4: ${meta_functionality_name} including only the forward reads from read pairs"
+echo ">>> Test 4: ${meta_name} including only the forward reads from read pairs"
 
 "$meta_executable" \
    --output "$temp_dir/a.forward" \

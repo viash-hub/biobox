@@ -4,7 +4,7 @@ test_dir="${meta_resources_dir}/test_data"
 
 ############################################################################################
 
-echo ">>> Test 1: $meta_functionality_name"
+echo ">>> Test 1: $meta_name"
 "$meta_executable" \
   --input "$test_dir/test.paired_end.sorted.bam" \
   --bai "$test_dir/test.paired_end.sorted.bam.bai" \
@@ -26,7 +26,7 @@ rm "$test_dir/test.paired_end.sorted.txt"
 
 ############################################################################################
 
-echo ">>> Test 2: $meta_functionality_name with --remove_dups"
+echo ">>> Test 2: $meta_name with --remove_dups"
 "$meta_executable" \
   --remove_dups \
   --input "$test_dir/test.paired_end.sorted.bam" \
@@ -49,7 +49,7 @@ rm "$test_dir/test.d.paired_end.sorted.txt"
 
 ############################################################################################
 
-echo ">>> Test 3: $meta_functionality_name with --remove_overlaps"
+echo ">>> Test 3: $meta_name with --remove_overlaps"
 "$meta_executable" \
   --remove_overlaps \
   --input "$test_dir/test.paired_end.sorted.bam" \
