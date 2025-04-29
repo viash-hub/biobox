@@ -8,7 +8,7 @@
 
 * Replace the deprecated use of the meta variable `functionality_name` by just `name` (PR #174).
 
-* Bump viash to `0.9.4` (PR #).
+* Bump viash to `0.9.4` (PR #175).
 
 # biobox 0.3.0
 
