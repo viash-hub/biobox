@@ -7,7 +7,7 @@ links:
   issue_tracker: https://github.com/viash-hub/biobox/issues
   repository: https://github.com/viash-hub/biobox
 
-viash_version: 0.9.2
+viash_version: 0.9.4
 
 config_mods: |
   .requirements.commands := ['ps']
