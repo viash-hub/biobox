@@ -38,9 +38,9 @@ include:
 
 Viash components in biobox can be run in various ways:
 
-``` mermaid
+``` mermaid lang="mermaid"
 flowchart TD
-    A[Viash Hub] --> B(Viash Hub Launch)
+    A[biobox v0.3.0] --> B(Viash Hub Launch)
     A --> C(Viash CLI)
     A --> D(Nextflow CLI)
     A --> E(Seqera Cloud)
@@ -72,7 +72,7 @@ viash run vsh://biobox@v0.3.0/arriba -- \
 This will run the component with the specified input files and output
 the results to the specified output file.
 
-### 3. Via the Nextflow CLI
+### 3. Via the Nextflow CLI or Seqera Cloud
 
 You can run this component as a Nextflow pipeline.
 
