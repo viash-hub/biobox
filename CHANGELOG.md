@@ -10,6 +10,10 @@
 
 * Bump viash to `0.9.4` (PR #175).
 
+## DOCUMENTATION
+
+* Update README (PR #176).
+
 # biobox 0.3.0
 
 ## NEW FUNCTIONALITY
