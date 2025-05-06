@@ -3,6 +3,8 @@
 ## NEW FUNCTIONALITY
 
 * `bcl_convert`: add `force` argument (PR #171).
+* `cellranger/cellranger_count`: Align fastq files using Cell Ranger count (PR #163).
+
 
 ## MINOR CHANGES
 
