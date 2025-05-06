@@ -26,25 +26,31 @@ output_dir="${tmp_dir}/test1/"
 mkdir -p "${output_dir}"
 
 "${meta_executable}" \
-  --input "${input_dir}" \
-  --reference "${reference_dir}" \
+  --fastqs "${input_dir}" \
+  --transcriptome "${reference_dir}" \
   --output "${output_dir}" \
   --lanes 1
 
 [[ $? != 0 ]] && echo "Non zero exit code: $?" && exit 1
 [[ ! -f "${output_dir}/filtered_feature_bc_matrix.h5" ]] && echo "Output file could not be found!" && exit 1
+[[ -f "${output_dir}/possorted_genome_bam.bam" ]] && echo "Output file should not be found!" && exit 1
+[[ ! -d "${output_dir}/analysis" ]] && echo "Analysis output directory should exist!" && exit 1
 
 ## TEST 2: run with individual file input
 echo "Running ${meta_name} with individual file input"
 output_dir="${tmp_dir}/test2/"
 mkdir -p "${output_dir}"
 "${meta_executable}" \
-  --input "${input_dir}/tinygex_S1_L001_R1_001.fastq.gz" \
-  --input "${input_dir}/tinygex_S1_L001_R2_001.fastq.gz" \
-  --reference "${reference_dir}" \
-  --output "${output_dir}"
+  --fastqs "${input_dir}/tinygex_S1_L001_R1_001.fastq.gz" \
+  --fastqs "${input_dir}/tinygex_S1_L001_R2_001.fastq.gz" \
+  --transcriptome "${reference_dir}" \
+  --output "${output_dir}" \
+  --no_secondary \
+  --create_bam
 
 [[ $? != 0 ]] && echo "Non zero exit code: $?" && exit 1
 [[ ! -f "${output_dir}/filtered_feature_bc_matrix.h5" ]] && echo "Output file could not be found!" && exit 1
+[[ ! -f "${output_dir}/possorted_genome_bam.bam" ]] && echo "Output file could not be found!" && exit 1
+[[ -d "${output_dir}/analysis" ]] && echo "Analysis output directory should not exist!" && exit 1
 
 echo "All tests succeeded!"

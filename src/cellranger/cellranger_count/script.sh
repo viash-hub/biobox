@@ -3,8 +3,8 @@
 set -eo pipefail
 
 ## VIASH START
-par_input='/opt/cellranger-8.0.0/lib/python/cellranger-tiny-fastq'
-par_reference='/opt/cellranger-8.0.0/lib/python/cellranger-tiny-ref'
+par_fastqs='/opt/cellranger-8.0.0/lib/python/cellranger-tiny-fastq'
+par_transcriptome='/opt/cellranger-8.0.0/lib/python/cellranger-tiny-ref'
 par_output='test_data/bam'
 par_chemistry="auto"
 par_expect_cells="3000"
@@ -13,7 +13,7 @@ par_secondary_analysis="false"
 
 ## PROCESS INPUT FILES
 # We change into the tempdir later, so we need absolute paths.
-par_reference=$(realpath $par_reference)
+par_transcriptome=$(realpath $par_transcriptome)
 par_output=$(realpath $par_output)
 
 # create temporary directory
@@ -28,7 +28,7 @@ trap clean_up EXIT
 fastq_dir="$tmp_dir/fastqs"
 mkdir -p "$fastq_dir"
 IFS=";"
-for var in $par_input; do
+for var in $par_fastqs; do
   unset IFS
   abs_path=$(realpath $var)
   if [ -d "$abs_path" ]; then
@@ -39,17 +39,21 @@ for var in $par_input; do
 done
 
 # process reference
-if file "${par_reference}" | grep -q 'gzip compressed data'; then
-  echo "> Untarring genome"
+# Note: should we do this?
+if file "${par_transcriptome}" | grep -q 'gzip compressed data'; then
+  echo "> Untarring transcriptome"
   ref_dir="${tmp_dir}/reference"
-  mkdir -p "$ref_dir"
-  tar -xvf "${par_reference}" -C "$ref_dir"
-  par_reference="${ref_dir}"
+  mkdir -p "${ref_dir}"
+  tar -xvf "${par_transcriptome}" -C "${ref_dir}"
+  par_transcriptome="${ref_dir}"
 fi
 
 ## PROCESS PARAMETERS
 # unset flags
-[[ "$par_secondary_analysis" == "false" ]] && unset par_secondary_analysis
+[[ "$par_no_secondary" == "false" ]] && unset par_no_secondary
+[[ "$par_no_libraries" == "false" ]] && unset par_no_libraries
+[[ "$par_dry" == "false" ]] && unset par_dry
+
 
 # change ifs from ; to ,
 par_lanes=${par_lanes//;/,}
@@ -68,24 +72,33 @@ fi
 ## RUN CELLRANGER COUNT
 echo "> Running cellranger count"
 cd "$tmp_dir"
-id=myoutput
+id=run
 cellranger count \
   --id="$id" \
   --fastqs="${fastq_dir}" \
-  --transcriptome="${par_reference}" \
-  --include-introns="${par_include_introns}" \
+  --transcriptome="${par_transcriptome}" \
+  --disable-ui \
   ${meta_cpus:+"--localcores=${meta_cpus}"} \
   ${meta_memory_gb:+"--localmem=${meta_memory_gb}"} \
+  ${par_description:+"--description=${par_description}"} \
+  ${par_sample:+"--sample=${par_sample}"} \
+  ${par_lanes:+"--lanes=${par_lanes}"} \
+  ${par_libraries:+"--libraries=${par_libraries}"} \
+  ${par_feature_ref:+"--feature-ref=${par_feature_ref}"} \
   ${par_expect_cells:+"--expect-cells=${par_expect_cells}"} \
   ${par_force_cells:+"--force-cells=${par_force_cells}"} \
-  ${par_chemistry:+"--chemistry=${par_chemistry}"} \
-  ${par_generate_bam:+"--create-bam=${par_generate_bam}"} \
-  ${no_secondary_analysis:+--nosecondary} \
+  ${par_create_bam:+"--create-bam=${par_create_bam}"} \
+  ${par_no_secondary:+--nosecondary} \
   ${par_r1_length:+"--r1-length=${par_r1_length}"} \
   ${par_r2_length:+"--r2-length=${par_r2_length}"} \
-  ${par_lanes:+"--lanes=${par_lanes}"} \
-  ${par_library_compatibility_check:+"--check-library-compatibility=${par_library_compatibility_check}"}\
-  --disable-ui
+  ${par_include_introns:+--include-introns=${par_include_introns}} \
+  ${par_chemistry:+"--chemistry=${par_chemistry}"} \
+  ${par_no_libraries:+--no-libraries} \
+  ${par_check_library_compatibility:+"--check-library-compatibility=${par_check_library_compatibility}"} \
+  ${par_cell_annotation_model:+"--cell-annotation-model=${par_cell_annotation_model}"} \
+  ${par_min_cripser_umi:+"--min-cripser-umi=${par_min_cripser_umi}"} \
+  ${par_tenx_cloud_token:+"--tenx-cloud-token-path=${par_tenx_cloud_token}"} \
+  ${par_dry:+--dry-run}
 
 echo "> Copying output"
 if [ -d "$id/outs/" ]; then
