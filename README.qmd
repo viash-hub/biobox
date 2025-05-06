@@ -37,7 +37,7 @@ flowchart TD
 
 You can run this component directly from the Viash Hub [Launch interface](https://www.viash-hub.com/launch?package=biobox&version=v0.3.0&component=arriba&runner=Executable).
 
-![](docs/viash-hub.png)
+![](https://raw.githubusercontent.com/viash-hub/biobox/refs/heads/main/docs/viash-hub.png)
 
 ### 2. Via the Viash CLI
 
