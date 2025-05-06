@@ -2,40 +2,49 @@
 format: gfm
 ---
 ```{r setup, include=FALSE}
-project <- yaml::read_yaml("_viash.yaml")
-license <- paste0(project$links$repository, "/blob/main/LICENSE")
-contributing <- paste0(project$links$repository, "/blob/main/CONTRIBUTING.md")
+package <- yaml::read_yaml("_viash.yaml")
+license <- paste0(package$links$repository, "/blob/main/LICENSE")
+contributing <- paste0(package$links$repository, "/blob/main/CONTRIBUTING.md")
+
+pkg <- package$name
+ver <- if (!is.null(package$version)) package$version else "v0.3.1"
+comp <- "arriba"
 ```
-# 🌱📦 `r project$name`
+# 🌱📦 `r pkg`
 
-[![ViashHub](https://img.shields.io/badge/ViashHub-`r project$name`-7a4baa.svg)](https://www.viash-hub.com/packages/`r project$name`) 
-[![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2F`r project$name`-blue.svg)](`r project$links$repository`) 
-[![GitHub License](https://img.shields.io/github/license/viash-hub/`r project$name`.svg)](`r license`) 
-[![GitHub Issues](https://img.shields.io/github/issues/viash-hub/`r project$name`.svg)](`r project$links$issue_tracker`) 
-[![Viash version](https://img.shields.io/badge/Viash-v`r gsub("-", "--", project$viash_version)`-blue.svg)](https://viash.io)
+[![ViashHub](https://img.shields.io/badge/ViashHub-`r pkg`-7a4baa.svg)](https://www.viash-hub.com/packages/`r pkg`) 
+[![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2F`r pkg`-blue.svg)](`r package$links$repository`) 
+[![GitHub License](https://img.shields.io/github/license/viash-hub/`r pkg`.svg)](`r license`) 
+[![GitHub Issues](https://img.shields.io/github/issues/viash-hub/`r pkg`.svg)](`r package$links$issue_tracker`) 
+[![Viash version](https://img.shields.io/badge/Viash-v`r gsub("-", "--", package$viash_version)`-blue.svg)](https://viash.io)
 
-`r project$summary`
+`r package$summary`
 
 ## Introduction
 
-`r project$description`
+`r package$description`
 
 ## Example Usage
 
-Viash components in `r project$name` can be run in various ways:
+Viash components in `r pkg` can be run in various ways:
 
-```{mermaid}
-flowchart TD
-    A[biobox v0.3.0] --> B(Viash Hub Launch)
-    A --> C(Viash CLI)
-    A --> D(Nextflow CLI)
-    A --> E(Seqera Cloud)
-    A --> F(As a dependency)
+```{r mmd, echo=FALSE, results='asis'}
+cat(
+  "```mermaid\n",
+  "flowchart TD\n",
+  "    A[", pkg, " ", ver, "] --> B(Viash Hub Launch)\n",
+  "    A --> C(Viash CLI)\n",
+  "    A --> D(Nextflow CLI)\n",
+  "    A --> E(Seqera Cloud)\n",
+  "    A --> F(As a dependency)\n",
+  "```\n",
+  sep = ""
+)
 ```
 
 ### 1. Via the Viash Hub Launch interface
 
-You can run this component directly from the Viash Hub [Launch interface](https://www.viash-hub.com/launch?package=biobox&version=v0.3.0&component=arriba&runner=Executable).
+You can run this component directly from the Viash Hub [Launch interface](https://www.viash-hub.com/launch?package=`r pkg`&version=`r ver`&component=`r comp`&runner=Executable).
 
 ![](docs/viash-hub.png)
 
@@ -44,9 +53,9 @@ You can run this component directly from the Viash Hub [Launch interface](https:
 You can run this component directly from the command line using the Viash CLI.
 
 ```bash
-viash run vsh://biobox@v0.3.0/arriba -- --help
+viash run vsh://`r pkg`@`r ver`/`r comp` -- --help
 
-viash run vsh://biobox@v0.3.0/arriba -- \
+viash run vsh://`r pkg`@`r ver`/`r comp` -- \
   --bam path/to/input.bam \
   --genome path/to/genome.fa \
   --gene_annotation path/to/annotation.gtf \
@@ -60,9 +69,9 @@ This will run the component with the specified input files and output the result
 You can run this component as a Nextflow pipeline.
 
 ```bash
-nextflow run https://packages.viash-hub.com/vsh/biobox \
-  -revision v0.3.0 \
-  -main-script target/nextflow/arriba/main.nf \
+nextflow run https://packages.viash-hub.com/vsh/`r pkg` \
+  -revision `r ver` \
+  -main-script target/nextflow/`r comp`/main.nf \
   -latest -resume \
   -profile docker \
   --bam path/to/input.bam \
@@ -86,8 +95,8 @@ In your Viash config file (`config.vsh.yaml`), you can add this component as a d
 
 ```yaml
 dependencies:
-  - name: arriba
-    repository: vsh://biobox@v0.3.0
+  - name: `r comp`
+    repository: vsh://`r pkg`@`r ver`
 ```
 
 **Tip:** See the [Viash documentation](https://viash.io/guide/nextflow_vdsl3/create-a-pipeline.html#pipeline-as-a-component) for more details on how to use Viash components as a dependency in your own Nextflow workflows.
@@ -112,4 +121,3 @@ knitr::asis_output(
 ```
 
 See the [CONTRIBUTING](`r contributing`) file for more details.
-
