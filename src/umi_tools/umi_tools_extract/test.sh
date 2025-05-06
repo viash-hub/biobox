@@ -2,7 +2,7 @@
 
 test_dir="${meta_resources_dir}/test_data"
 
-echo ">>> Testing $meta_functionality_name"
+echo ">>> Testing $meta_name"
 
 ############################################################################################################
 

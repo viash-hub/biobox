@@ -7,7 +7,7 @@ mkdir -p "$out_dir"
 
 ############################################################################################
 
-echo ">>> Test 1: Basic usage of $meta_functionality_name with statistics output"
+echo ">>> Test 1: Basic usage of $meta_name with statistics output"
 
 "$meta_executable" \
   --paired \
@@ -34,7 +34,7 @@ diff "$out_dir/dedup_edit_distance.tsv" "$test_dir/dedup_edit_distance.tsv" || \
 
 ############################################################################################
 
-echo ">>> Test 2: $meta_functionality_name with random subset selection"
+echo ">>> Test 2: $meta_name with random subset selection"
 
 "$meta_executable" \
   --paired \
@@ -58,7 +58,7 @@ diff "$out_dir/deduped_fraction.sam" "$test_dir/deduped_fraction.sam" || \
 
 ############################################################################################
 
-echo ">>> Test 3: $meta_functionality_name with --method unique"
+echo ">>> Test 3: $meta_name with --method unique"
 
 "$meta_executable" \
   --paired \
