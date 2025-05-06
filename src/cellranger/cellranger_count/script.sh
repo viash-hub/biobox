@@ -11,22 +11,21 @@ par_expect_cells="3000"
 par_secondary_analysis="false"
 ## VIASH END
 
-# just to make sure paths are absolute
+## PROCESS INPUT FILES
+# We change into the tempdir later, so we need absolute paths.
 par_reference=$(realpath $par_reference)
 par_output=$(realpath $par_output)
 
 # create temporary directory
-tmpdir=$(mktemp -d "$meta_temp_dir/$meta_name-XXXXXXXX")
+tmp_dir=$(mktemp -d "$meta_temp_dir/$meta_name-XXXXXXXX")
 function clean_up {
-    rm -rf "$tmpdir"
+    rm -rf "$tmp_dir"
 }
 trap clean_up EXIT
 
-echo "test 1"
-
 # process inputs
 # for every fastq file found, make a symlink into the tempdir
-fastq_dir="$tmpdir/fastqs"
+fastq_dir="$tmp_dir/fastqs"
 mkdir -p "$fastq_dir"
 IFS=";"
 for var in $par_input; do
@@ -39,59 +38,60 @@ for var in $par_input; do
   fi
 done
 
-echo "test 2"
-echo "fastq_dir: $fastq_dir"
-echo "contents: $(ls $fastq_dir)"
-
 # process reference
-if file $par_reference | grep -q 'gzip compressed data'; then
-  echo "Untarring genome"
-  reference_dir="$tmpdir/fastqs"
-  mkdir -p "$reference_dir"
-  tar -xvf "$par_reference" -C "$reference_dir"
-  par_reference="$reference_dir"
+if file "${par_reference}" | grep -q 'gzip compressed data'; then
+  echo "> Untarring genome"
+  ref_dir="${tmp_dir}/reference"
+  mkdir -p "$ref_dir"
+  tar -xvf "${par_reference}" -C "$ref_dir"
+  par_reference="${ref_dir}"
 fi
 
-echo "test 3"
+## PROCESS PARAMETERS
+# unset flags
+[[ "$par_secondary_analysis" == "false" ]] && unset par_secondary_analysis
 
-# cd into tempdir
-cd "$tmpdir"
+# change ifs from ; to ,
+par_lanes=${par_lanes//;/,}
 
-no_secondary_analysis=""
-if [ "$par_secondary_analysis" == "false" ]; then
-  no_secondary_analysis="true"
+# if memory is defined, subtract 2GB from memory
+if [[ "$meta_memory_gb" != "" ]]; then
+  # if memory is less than 2gb, unset it
+  if [[ "$meta_memory_gb" -lt 2 ]]; then
+    unset meta_memory_gb
+  else
+    meta_memory_gb=$((meta_memory_gb-2))
+  fi
 fi
 
-echo "test 4" 
-
-IFS=","
+## RUN CELLRANGER COUNT
+echo "> Running cellranger count"
+cd "$tmp_dir"
 id=myoutput
 cellranger count \
   --id="$id" \
-  --fastqs="$fastq_dir" \
-  --transcriptome="$par_reference" \
-  --include-introns="$par_include_introns" \
-  ${meta_cpus:+--localcores=$meta_cpus} \
-  ${meta_memory_gb:+--localmem=$((meta_memory_gb-2))} \
-  ${par_expect_cells:+--expect-cells=$par_expect_cells} \
-  ${par_force_cells:+--force-cells=$par_force_cells} \
-  ${par_chemistry:+--chemistry="$par_chemistry"} \
-  ${par_generate_bam:+--create-bam=$par_generate_bam} \
+  --fastqs="${fastq_dir}" \
+  --transcriptome="${par_reference}" \
+  --include-introns="${par_include_introns}" \
+  ${meta_cpus:+"--localcores=${meta_cpus}"} \
+  ${meta_memory_gb:+"--localmem=${meta_memory_gb}"} \
+  ${par_expect_cells:+"--expect-cells=${par_expect_cells}"} \
+  ${par_force_cells:+"--force-cells=${par_force_cells}"} \
+  ${par_chemistry:+"--chemistry=${par_chemistry}"} \
+  ${par_generate_bam:+"--create-bam=${par_generate_bam}"} \
   ${no_secondary_analysis:+--nosecondary} \
-  ${par_r1_length:+--r1-length=$par_r1_length} \
-  ${par_r2_length:+--r2-length=$par_r2_length} \
-  ${par_lanes:+--lanes=${par_lanes[*]}} \
-  ${par_library_compatibility_check:+--check-library-compatibility=$par_library_compatibility_check}\
+  ${par_r1_length:+"--r1-length=${par_r1_length}"} \
+  ${par_r2_length:+"--r2-length=${par_r2_length}"} \
+  ${par_lanes:+"--lanes=${par_lanes}"} \
+  ${par_library_compatibility_check:+"--check-library-compatibility=${par_library_compatibility_check}"}\
   --disable-ui
-unset IFS
 
-echo "test 5"
-
-echo "Copying output"
+echo "> Copying output"
 if [ -d "$id/outs/" ]; then
-  if [ ! -d "$par_output" ]; then
-    mkdir -p "$par_output"
+  if [ ! -d "${par_output}" ]; then
+    mkdir -p "${par_output}"
   fi
-  cp -r "$id/outs/"* "$par_output"
-  rm -rf "$id"
+  mv "$id/outs/"* "${par_output}"
 fi
+
+exit 0
