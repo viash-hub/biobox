@@ -2,14 +2,14 @@
 
 # 🌱📦 biobox
 
-[![ViashHub](https://img.shields.io/badge/ViashHub-biobox-7a4baa.png)](https://www.viash-hub.com/packages/biobox)
-[![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2Fbiobox-blue.png)](https://github.com/viash-hub/biobox)
+[![ViashHub](https://img.shields.io/badge/ViashHub-biobox-7a4baa.svg)](https://www.viash-hub.com/packages/biobox)
+[![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2Fbiobox-blue.svg)](https://github.com/viash-hub/biobox)
 [![GitHub
-License](https://img.shields.io/github/license/viash-hub/biobox.png)](https://github.com/viash-hub/biobox/blob/main/LICENSE)
+License](https://img.shields.io/github/license/viash-hub/biobox.svg)](https://github.com/viash-hub/biobox/blob/main/LICENSE)
 [![GitHub
-Issues](https://img.shields.io/github/issues/viash-hub/biobox.png)](https://github.com/viash-hub/biobox/issues)
+Issues](https://img.shields.io/github/issues/viash-hub/biobox.svg)](https://github.com/viash-hub/biobox/issues)
 [![Viash
-version](https://img.shields.io/badge/Viash-v0.9.4-blue)](https://viash.io)
+version](https://img.shields.io/badge/Viash-v0.9.4-blue.svg)](https://viash.io)
 
 A curated collection of high-quality, standalone bioinformatics
 components built with [Viash](https://viash.io).
@@ -77,7 +77,7 @@ the results to the specified output file.
 You can run this component as a Nextflow pipeline.
 
 ``` bash
-nextflow run https://packages.viash-hub.com/vsh/biobox.git \
+nextflow run https://packages.viash-hub.com/vsh/biobox \
   -revision v0.3.0 \
   -main-script target/nextflow/arriba/main.nf \
   -latest -resume \
@@ -88,8 +88,18 @@ nextflow run https://packages.viash-hub.com/vsh/biobox.git \
   --publish_dir path/to/output
 ```
 
-Note: This will also work with Seqera Cloud or other Nextflow-compatible
-platforms.
+**Note:** Make sure that the [Nextflow
+SCM](https://www.nextflow.io/docs/latest/git.html#git-configuration) is
+set up properly. You can do this by adding the following lines to your
+`~/.nextflow/scm` file:
+
+``` groovy
+providers.vsh.platform = 'gitlab'
+providers.vsh.server = 'https://packages.viash-hub.com'
+```
+
+**Tip:** This will also work with Seqera Cloud or other
+Nextflow-compatible platforms.
 
 ### 4. As a dependency
 

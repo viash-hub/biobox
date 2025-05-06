@@ -8,11 +8,11 @@ contributing <- paste0(project$links$repository, "/blob/main/CONTRIBUTING.md")
 ```
 # 🌱📦 `r project$name`
 
-[![ViashHub](https://img.shields.io/badge/ViashHub-`r project$name`-7a4baa)](https://www.viash-hub.com/packages/`r project$name`) 
-[![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2F`r project$name`-blue)](`r project$links$repository`) 
-[![GitHub License](https://img.shields.io/github/license/viash-hub/`r project$name`)](`r license`) 
-[![GitHub Issues](https://img.shields.io/github/issues/viash-hub/`r project$name`)](`r project$links$issue_tracker`) 
-[![Viash version](https://img.shields.io/badge/Viash-v`r gsub("-", "--", project$viash_version)`-blue)](https://viash.io)
+[![ViashHub](https://img.shields.io/badge/ViashHub-`r project$name`-7a4baa.svg)](https://www.viash-hub.com/packages/`r project$name`) 
+[![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2F`r project$name`-blue.svg)](`r project$links$repository`) 
+[![GitHub License](https://img.shields.io/github/license/viash-hub/`r project$name`.svg)](`r license`) 
+[![GitHub Issues](https://img.shields.io/github/issues/viash-hub/`r project$name`.svg)](`r project$links$issue_tracker`) 
+[![Viash version](https://img.shields.io/badge/Viash-v`r gsub("-", "--", project$viash_version)`-blue.svg)](https://viash.io)
 
 `r project$summary`
 
@@ -60,7 +60,7 @@ This will run the component with the specified input files and output the result
 You can run this component as a Nextflow pipeline.
 
 ```bash
-nextflow run https://packages.viash-hub.com/vsh/biobox.git \
+nextflow run https://packages.viash-hub.com/vsh/biobox \
   -revision v0.3.0 \
   -main-script target/nextflow/arriba/main.nf \
   -latest -resume \
@@ -71,7 +71,14 @@ nextflow run https://packages.viash-hub.com/vsh/biobox.git \
   --publish_dir path/to/output
 ```
 
-Note: This will also work with Seqera Cloud or other Nextflow-compatible platforms.
+**Note:** Make sure that the [Nextflow SCM](https://www.nextflow.io/docs/latest/git.html#git-configuration) is set up properly. You can do this by adding the following lines to your `~/.nextflow/scm` file:
+
+```groovy
+providers.vsh.platform = 'gitlab'
+providers.vsh.server = 'https://packages.viash-hub.com'
+```
+
+**Tip:** This will also work with Seqera Cloud or other Nextflow-compatible platforms.
 
 ### 4. As a dependency
 
