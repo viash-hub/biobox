@@ -24,6 +24,7 @@ par_output=$(realpath $par_output)
 if [[ "$meta_memory_gb" != "" ]]; then
   # if memory is less than 2gb, unset it
   if [[ "$meta_memory_gb" -lt 2 ]]; then
+    echo "WARNING: Memory is less than 2GB, unsetting memory requirements"
     unset meta_memory_gb
   else
     meta_memory_gb=$((meta_memory_gb-2))
