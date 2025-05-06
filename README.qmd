@@ -46,7 +46,7 @@ cat(
 
 You can run this component directly from the Viash Hub [Launch interface](https://www.viash-hub.com/launch?package=`r pkg`&version=`r ver`&component=`r comp`&runner=Executable).
 
-![](https://raw.githubusercontent.com/`r package$organization`/`r pkg`/refs/heads/main/docs/viash-hub.png)
+![](https://raw.githubusercontent.com/viash-hub/`r pkg`/refs/heads/main/docs/viash-hub.png)
 
 ### 2. Via the Viash CLI
 
