@@ -1,10 +1,15 @@
+# biobox 0.3.2
+
+## MINOR CHANGES
+
+* Update README (PR #177).
+
 # biobox 0.3.1
 
 ## NEW FUNCTIONALITY
 
 * `bcl_convert`: add `force` argument (PR #171).
 * `cellranger/cellranger_count`: Align fastq files using Cell Ranger count (PR #163).
-
 
 ## MINOR CHANGES
 
