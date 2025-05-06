@@ -90,6 +90,8 @@ dependencies:
     repository: vsh://biobox@v0.3.0
 ```
 
+**Tip:** See the [Viash documentation](https://viash.io/guide/nextflow_vdsl3/create-a-pipeline.html#pipeline-as-a-component) for more details on how to use Viash components as a dependency in your own Nextflow workflows.
+
 ## Contributing
 
 Contributions are welcome! We aim to build a comprehensive collection of high-quality bioinformatics components. If you'd like to contribute, please follow these general steps:
