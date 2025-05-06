@@ -40,7 +40,7 @@ Viash components in biobox can be run in various ways:
 
 ``` mermaid lang="mermaid"
 flowchart TD
-    A[biobox v0.3.0] --> B(Viash Hub Launch)
+    A[biobox v0.3.1] --> B(Viash Hub Launch)
     A --> C(Viash CLI)
     A --> D(Nextflow CLI)
     A --> E(Seqera Cloud)
@@ -50,9 +50,9 @@ flowchart TD
 ### 1. Via the Viash Hub Launch interface
 
 You can run this component directly from the Viash Hub [Launch
-interface](https://www.viash-hub.com/launch?package=biobox&version=v0.3.0&component=arriba&runner=Executable).
+interface](https://www.viash-hub.com/launch?package=biobox&version=v0.3.1&component=arriba&runner=Executable).
 
-![](https://raw.githubusercontent.com/viash-hub/biobox/refs/heads/main/docs/viash-hub.png)
+![](https://raw.githubusercontent.com//biobox/refs/heads/main/docs/viash-hub.png)
 
 ### 2. Via the Viash CLI
 
@@ -60,9 +60,9 @@ You can run this component directly from the command line using the
 Viash CLI.
 
 ``` bash
-viash run vsh://biobox@v0.3.0/arriba -- --help
+viash run vsh://biobox@v0.3.1/arriba -- --help
 
-viash run vsh://biobox@v0.3.0/arriba -- \
+viash run vsh://biobox@v0.3.1/arriba -- \
   --bam path/to/input.bam \
   --genome path/to/genome.fa \
   --gene_annotation path/to/annotation.gtf \
@@ -78,7 +78,7 @@ You can run this component as a Nextflow pipeline.
 
 ``` bash
 nextflow run https://packages.viash-hub.com/vsh/biobox \
-  -revision v0.3.0 \
+  -revision v0.3.1 \
   -main-script target/nextflow/arriba/main.nf \
   -latest -resume \
   -profile docker \
@@ -109,7 +109,7 @@ component as a dependency:
 ``` yaml
 dependencies:
   - name: arriba
-    repository: vsh://biobox@v0.3.0
+    repository: vsh://biobox@v0.3.1
 ```
 
 **Tip:** See the [Viash
