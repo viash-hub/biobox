@@ -9,9 +9,13 @@ links:
   issue_tracker: https://github.com/10XGenomics/cellranger/issues
 references:
   doi: 10.1038/ncomms14049
-license: Copyright (c) 2023 10x Genomics
+license: Proprietary
+requirements:
+  commands: [cellranger]
 authors:
   - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author ]
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
     roles: [ author ]
 argument_groups:
   - name: Inputs
@@ -117,7 +121,6 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-
 engines:
   - type: docker
     image: quay.io/nf-core/cellranger:8.0.0
@@ -133,5 +136,3 @@ engines:
 runners:
   - type: executable
   - type: nextflow
-    directives:
-      label: [ highmem, highcpu ]
