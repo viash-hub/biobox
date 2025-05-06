@@ -1,3 +1,21 @@
+# biobox 0.3.1
+
+## NEW FUNCTIONALITY
+
+* `bcl_convert`: add `force` argument (PR #171).
+* `cellranger/cellranger_count`: Align fastq files using Cell Ranger count (PR #163).
+
+
+## MINOR CHANGES
+
+* Replace the deprecated use of the meta variable `functionality_name` by just `name` (PR #174).
+
+* Bump viash to `0.9.4` (PR #175).
+
+## DOCUMENTATION
+
+* Update README (PR #176).
+
 # biobox 0.3.0
 
 ## NEW FUNCTIONALITY
@@ -48,6 +66,8 @@
 * `sortmerna`: Change type pf argument `aligned` to `file`; update docker image; accept more than two reference files (PR #162).
 
 * `umi_tools/umi_tools_extract`: Remove `umi_discard_reads` option and change `log2stderr` to input argument (PR #162).
+
+* `star/star_genome_generate`: Fix passing of optional sjdb parameters (PR #170).
 
 ## MINOR CHANGES
 

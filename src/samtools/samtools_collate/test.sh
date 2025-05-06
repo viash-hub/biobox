@@ -5,7 +5,7 @@ out_dir="${meta_resources_dir}/out"
 
 ############################################################################################
 
-echo ">>> Test 1: $meta_functionality_name"
+echo ">>> Test 1: $meta_name"
 "$meta_executable" \
   --input "$test_dir/test.paired_end.sorted.bam" \
   --output "$out_dir/collated.bam"
@@ -23,7 +23,7 @@ diff <(samtools view "$out_dir/collated.bam") \
 
 ############################################################################################
 
-echo ">>> Test 2: $meta_functionality_name with --fast option"
+echo ">>> Test 2: $meta_name with --fast option"
 "$meta_executable" \
   --fast \
   --input "$test_dir/test.paired_end.sorted.bam" \
@@ -43,7 +43,7 @@ diff <(samtools view "$test_dir/fast_collated.bam") \
 
 ############################################################################################
 
-echo ">>> Test 3: $meta_functionality_name with compression"
+echo ">>> Test 3: $meta_name with compression"
 "$meta_executable" \
   --compression 8 \
   --input "$test_dir/test.paired_end.sorted.bam" \

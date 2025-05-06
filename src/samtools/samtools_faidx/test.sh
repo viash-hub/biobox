@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test_dir="${meta_resources_dir}/test_data"
-echo ">>> Testing $meta_functionality_name"
+echo ">>> Testing $meta_name"
 
 "$meta_executable" \
   --input "$test_dir/test.fasta" \
@@ -24,7 +24,7 @@ rm "$test_dir/test.fasta.fai"
 
 ####################################################################################################
 
-echo ">>> Test 2: ${meta_functionality_name} with bgzipped input"
+echo ">>> Test 2: ${meta_name} with bgzipped input"
 
 "$meta_executable" \
   --input "$test_dir/test.fasta.gz" \
@@ -49,7 +49,7 @@ rm "$test_dir/test.fasta.gz.gzi"
 
 ####################################################################################################
 
-echo ">>> Test 3: ${meta_functionality_name} with fastq input"
+echo ">>> Test 3: ${meta_name} with fastq input"
 
 "$meta_executable" \
   --input "$test_dir/test.fastq" \
@@ -69,7 +69,7 @@ rm "$test_dir/test.fastq.fai"
 
 ####################################################################################################
 
-echo ">>> Test 4: ${meta_functionality_name} with region file containing non-existent regions and 
+echo ">>> Test 4: ${meta_name} with region file containing non-existent regions and 
       specific fasta line wrap length"
 
 "$meta_executable" \

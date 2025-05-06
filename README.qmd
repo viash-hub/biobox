@@ -8,31 +8,94 @@ contributing <- paste0(project$links$repository, "/blob/main/CONTRIBUTING.md")
 ```
 # 🌱📦 `r project$name`
 
-[![ViashHub](https://img.shields.io/badge/ViashHub-`r project$name`-7a4baa)](https://web.viash-hub.com/packages/`r project$name`) 
-[![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2F`r project$name`-blue)](`r project$links$repository`) 
-[![GitHub License](https://img.shields.io/github/license/viash-hub/`r project$name`)](`r license`) 
-[![GitHub Issues](https://img.shields.io/github/issues/viash-hub/`r project$name`)](`r project$links$issue_tracker`) 
-[![Viash version](https://img.shields.io/badge/Viash-v`r gsub("-", "--", project$viash_version)`-blue)](https://viash.io)
+[![ViashHub](https://img.shields.io/badge/ViashHub-`r project$name`-7a4baa.svg)](https://www.viash-hub.com/packages/`r project$name`) 
+[![GitHub](https://img.shields.io/badge/GitHub-viash--hub%2F`r project$name`-blue.svg)](`r project$links$repository`) 
+[![GitHub License](https://img.shields.io/github/license/viash-hub/`r project$name`.svg)](`r license`) 
+[![GitHub Issues](https://img.shields.io/github/issues/viash-hub/`r project$name`.svg)](`r project$links$issue_tracker`) 
+[![Viash version](https://img.shields.io/badge/Viash-v`r gsub("-", "--", project$viash_version)`-blue.svg)](https://viash.io)
+
+`r project$summary`
+
+## Introduction
 
 `r project$description`
 
-## Objectives
+## Example Usage
 
-- **Reusability**: Facilitating the use of components across various projects and contexts.
-- **Reproducibility**: Ensuring that components are reproducible and can be easily shared.
-- **Best Practices**: Adhering to established standards in software development and bioinformatics.
+Viash components in `r project$name` can be run in various ways:
+
+```{mermaid}
+flowchart TD
+    A[biobox v0.3.0] --> B(Viash Hub Launch)
+    A --> C(Viash CLI)
+    A --> D(Nextflow CLI)
+    A --> E(Seqera Cloud)
+    A --> F(As a dependency)
+```
+
+### 1. Via the Viash Hub Launch interface
+
+You can run this component directly from the Viash Hub [Launch interface](https://www.viash-hub.com/launch?package=biobox&version=v0.3.0&component=arriba&runner=Executable).
+
+![](docs/viash-hub.png)
+
+### 2. Via the Viash CLI
+
+You can run this component directly from the command line using the Viash CLI.
+
+```bash
+viash run vsh://biobox@v0.3.0/arriba -- --help
+
+viash run vsh://biobox@v0.3.0/arriba -- \
+  --bam path/to/input.bam \
+  --genome path/to/genome.fa \
+  --gene_annotation path/to/annotation.gtf \
+  --fusions path/to/output.txt
+```
+
+This will run the component with the specified input files and output the results to the specified output file.
+
+### 3. Via the Nextflow CLI or Seqera Cloud
+
+You can run this component as a Nextflow pipeline.
+
+```bash
+nextflow run https://packages.viash-hub.com/vsh/biobox \
+  -revision v0.3.0 \
+  -main-script target/nextflow/arriba/main.nf \
+  -latest -resume \
+  -profile docker \
+  --bam path/to/input.bam \
+  --genome path/to/genome.fa \
+  --gene_annotation path/to/annotation.gtf \
+  --publish_dir path/to/output
+```
+
+**Note:** Make sure that the [Nextflow SCM](https://www.nextflow.io/docs/latest/git.html#git-configuration) is set up properly. You can do this by adding the following lines to your `~/.nextflow/scm` file:
+
+```groovy
+providers.vsh.platform = 'gitlab'
+providers.vsh.server = 'https://packages.viash-hub.com'
+```
+
+**Tip:** This will also work with Seqera Cloud or other Nextflow-compatible platforms.
+
+### 4. As a dependency
+
+In your Viash config file (`config.vsh.yaml`), you can add this component as a dependency:
+
+```yaml
+dependencies:
+  - name: arriba
+    repository: vsh://biobox@v0.3.0
+```
+
+**Tip:** See the [Viash documentation](https://viash.io/guide/nextflow_vdsl3/create-a-pipeline.html#pipeline-as-a-component) for more details on how to use Viash components as a dependency in your own Nextflow workflows.
 
 ## Contributing
 
-We encourage contributions from the community. To contribute:
+Contributions are welcome! We aim to build a comprehensive collection of high-quality bioinformatics components. If you'd like to contribute, please follow these general steps:
 
-1. **Fork the Repository**: Start by forking this repository to your account.
-2. **Develop Your Component**: Create your Viash component, ensuring it aligns with our best practices (detailed below).
-3. **Submit a Pull Request**: After testing your component, submit a pull request for review.
-
-## Contribution Guidelines
-
-The contribution guidelines describes which steps you should follow to contribute a component to this repository.
 
 ```{r echo=FALSE}
 lines <- readr::read_lines("CONTRIBUTING.md")
@@ -50,13 +113,3 @@ knitr::asis_output(
 
 See the [CONTRIBUTING](`r contributing`) file for more details.
 
-
-## Support and Community
-
-For support, questions, or to join our community:
-
-- **Issues**: Submit questions or issues via the [GitHub issue tracker](`r project$links$issue_tracker`).
-- **Discussions**: Join our discussions via [GitHub Discussions](`r project$links$repository`/discussions).
-
-## License
-This repository is licensed under an MIT license. See the [LICENSE](`r license`) file for details.

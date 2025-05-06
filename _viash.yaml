@@ -1,14 +1,25 @@
 name: biobox
-version: v0.3.0
+version: v0.3.1
+summary: |
+  A curated collection of high-quality, standalone bioinformatics components built with [Viash](https://viash.io).
 description: |
-  A collection of bioinformatics tools for working with sequence data.
+  `biobox` offers a suite of reliable bioinformatics components, similar to [nf-core/modules](https://github.com/nf-core/modules) and [snakemake-wrappers/bio](https://github.com/snakemake/snakemake-wrappers/tree/master/bio), but built using the [Viash](https://viash.io) framework.
+
+  This approach emphasizes **reusability**, **reproducibility**, and adherence to **best practices**. Key features of `biobox` components include:
+
+  * **Standalone & Nextflow Ready:** Run components directly via the command line or seamlessly integrate them into Nextflow workflows.
+  * **High Quality Standards:**
+      * Comprehensive documentation for components and parameters.
+      * Full exposure of underlying tool arguments.
+      * Containerized (Docker) for dependency management and reproducibility.
+      * Unit tested for verified functionality.
 license: MIT
 keywords: [bioinformatics, modules, sequencing]
 links:
   issue_tracker: https://github.com/viash-hub/biobox/issues
   repository: https://github.com/viash-hub/biobox
 
-viash_version: 0.9.0
+viash_version: 0.9.4
 
 config_mods: |
   .requirements.commands := ['ps']

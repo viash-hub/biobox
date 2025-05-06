@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo ">>> Testing $meta_functionality_name"
+echo ">>> Testing $meta_name"
 
 echo ">>> Test 1: Testing for paired-end reads"
 "$meta_executable" \

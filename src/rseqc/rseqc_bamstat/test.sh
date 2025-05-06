@@ -6,7 +6,7 @@ input_bam="sample.bam"
 output_summary="mapping_quality.txt"
 
 # run executable and tests
-echo "> Running $meta_functionality_name."
+echo "> Running $meta_name."
 
 "$meta_executable" \
     --input_file "$meta_resources_dir/test_data/$input_bam" \
@@ -29,7 +29,7 @@ echo ">>> Test 2: Test with non-default mapping quality threshold"
 output_summary="mapping_quality_mapq_50.txt"
 
 # run executable and tests
-echo "> Running $meta_functionality_name."
+echo "> Running $meta_name."
 
 "$meta_executable" \
     --input_file "$meta_resources_dir/test_data/$input_bam" \

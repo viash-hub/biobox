@@ -6,7 +6,7 @@ set -e
 ## VIASH END
 
 # create temporary directory
-tmp_dir=$(mktemp -d -p "$meta_temp_dir" "${meta_functionality_name}_XXXXXX")
+tmp_dir=$(mktemp -d -p "$meta_temp_dir" "${meta_name}_XXXXXX")
 mkdir -p "$tmp_dir/temp"
 
 # create detailed_results directory if variable is set and directory does not exist

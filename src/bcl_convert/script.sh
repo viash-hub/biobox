@@ -2,9 +2,13 @@
 
 set -eo pipefail
 
+[[ "$par_force" == "false" ]] && unset par_force
+
+
 $(which bcl-convert) \
  --bcl-input-directory "$par_bcl_input_directory" \
  --output-directory "$par_output_directory" \
+  ${par_force:+--force} \
   ${par_sample_sheet:+ --sample-sheet "$par_sample_sheet"} \
   ${par_run_info:+ --run-info "$par_run_info"} \
   ${par_bcl_only_lane:+ --bcl-only-lane "$par_bcl_only_lane"} \

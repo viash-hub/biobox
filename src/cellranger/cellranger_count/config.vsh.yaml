@@ -1,0 +1,178 @@
+name: cellranger_count
+namespace: cellranger
+summary: Align fastq files using Cell Ranger count.
+description: |
+  Count gene expression and/or feature barcode reads from a single sample and GEM well
+keywords: [cellranger, single-cell, rna-seq, alignment, count]
+links:
+  documentation: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/count
+  repository: https://github.com/10XGenomics/cellranger/blob/main/bin/sc_rna/count
+  homepage: https://www.10xgenomics.com/support/software/cell-ranger/latest
+  issue_tracker: https://github.com/10XGenomics/cellranger/issues
+references:
+  doi: 10.1038/ncomms14049
+license: Proprietary
+requirements:
+  commands: [cellranger]
+authors:
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [author]
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author]
+argument_groups:
+  - name: FASTQ inputs
+    arguments:
+      - name: --fastqs
+        type: file
+        required: true
+        multiple: true
+        example:
+          ["sample_S1_L001_R1_001.fastq.gz", "sample_S1_L001_R2_001.fastq.gz"]
+        description: The fastq.gz files to align. Can also be a single directory containing fastq.gz files.
+      # name: --project
+      # -> not included because it would conflict with our symlink processing of the input files
+      - name: --description
+        type: string
+        description: Sample description to embed in output files
+      - name: --sample
+        type: string
+        description: Prefix of the filenames of FASTQs to select
+        example: sample_S1
+      - name: --lanes
+        type: integer
+        description: Only use FASTQs from selected lanes.
+        example: [1, 2, 3]
+        multiple: true
+      - name: --libraries
+        type: file
+        description: CSV file declaring input library data sources
+        example: libraries.csv
+
+  - name: Reference inputs
+    arguments:
+      - name: --transcriptome
+        type: file
+        required: true
+        description: Path of folder containing 10x-compatible transcriptome reference. Can also be a `.tar.gz` file.
+        example: transcriptome.tar.gz
+      - name: --feature_ref
+        type: file
+        description: Feature reference CSV file, declaring Feature Barcode constructs and associated barcodes
+        example: feature_ref.csv
+
+  - name: Analysis settings
+    arguments:
+      - name: --expect_cells
+        type: integer
+        description: Expected number of recovered cells, used as input to cell calling algorithm.
+      - name: --force_cells
+        type: integer
+        description: |
+          Force pipeline to use this number of cells, bypassing cell calling algorithm. Minimum: 10.
+      - name: --r1_length
+        type: integer
+        description: Hard trim the input Read 1 to this length before analysis
+      - name: --r2_length
+        type: integer
+        description: Hard trim the input Read 2 to this length before analysis
+      - name: --include_introns
+        type: boolean_true
+        description: "Include intronic reads in count. Default: true."
+      - name: --chemistry
+        type: string
+        example: "auto"
+        description: |
+          Assay configuration.
+
+          NOTE: by default the assay configuration is detected automatically, which is the recommended mode. You usually will not need to specify a chemistry. 
+
+          Options are:
+
+          - `'auto'` for autodetection
+          - `'threeprime'` for Single Cell 3'
+          - `'fiveprime'` for Single Cell 5'
+          - `'SC3Pv1'` or `'SC3Pv2'` or `'SC3Pv3'` or `'SC3Pv4'` for
+          Single Cell 3' v1/v2/v3/v4
+          - `'SC3Pv3LT'` for Single Cell 3' v3 LT
+          - `'SC3Pv3HT'` for Single Cell 3' v3 HT
+          - `'SC5P-PE'` or `'SC5P-PE-v3'` or `'SC5P-R2'` or `'SC5P-R2-v3'` for Single Cell 5', paired-end/R2-only
+          - `'SC-FB'` for Single Cell Antibody-only 3' v2 or 5'
+
+          To analyze the GEX portion of multiome data, chemistry must be set to `'ARC-v1'`.
+
+          See the [10x Genomics FAQ](https://kb.10xgenomics.com/hc/en-us/articles/115003764132-How-does-Cell-Ranger-auto-detect-chemistry-) for more information on how chemistry is detected.
+      - name: --cell_annotation_model
+        type: string
+        description: |
+          Cell annotation model to use. Valid model names can be viewed by
+          running `cellranger cloud annotation models` or on the
+          [10x Genomics Support site](https://www.10xgenomics.com/support).
+
+          If "auto", uses the default model for the species.
+          If not provided, does not run cell annotation.
+      - name: --min_crispr_umi
+        type: integer
+        description: |
+          Minimum CRISPR UMI threshold. Default: 3.
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: The folder to store the alignment results.
+        required: true
+      - name: --create_bam
+        type: boolean_true
+        description: |
+          Enable or disable BAM file generation. Setting this to false
+          reduces the total computation time and the size of the output
+          directory (BAM file not generated). We recommend setting
+          it to true if unsure. See https://10xgen.com/create-bam for
+          additional guidance.
+      - name: "--no_secondary"
+        type: boolean_true
+        description: Disable secondary analysis, e.g. clustering.
+
+  - name: Additional arguments
+    arguments:
+      - name: --no_libraries
+        type: boolean_true
+        description: |
+          Proceed with processing using a `--feature_ref` but no Feature Barcode libraries specified with the 'libraries' flag.
+      - name: --check_library_compatibility
+        type: boolean_true
+        description: |
+          Whether to check for barcode compatibility between libraries.
+      - name: --tenx_cloud_token
+        type: file
+        description: |
+          The path to the 10x Cloud Analysis user token used to enable cell
+          annotation. If not provided, will default to the location stored
+          through cellranger cloud auth setup.
+      - name: --dry
+        type: boolean_true
+        description: |
+          Do not execute the pipeline. Generate a pipeline invocation (.mro) file and stop.
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+engines:
+  - type: docker
+    image: quay.io/nf-core/cellranger:8.0.0
+    setup:
+      - type: docker
+        run: |
+          DEBIAN_FRONTEND=noninteractive apt update && \
+          apt upgrade -y && apt install -y procps && rm -rf /var/lib/apt/lists/*
+      - type: docker
+        run: |
+          cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

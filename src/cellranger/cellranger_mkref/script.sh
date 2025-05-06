@@ -9,9 +9,9 @@ par_output="output.tar.gz"
 ## VIASH END
 
 # create temporary directory
-tmpdir=$(mktemp -d "$meta_temp_dir/$meta_name-XXXXXXXX")
+tmp_dir=$(mktemp -d "$meta_temp_dir/$meta_name-XXXXXXXX")
 function clean_up {
-    rm -rf "$tmpdir"
+    rm -rf "$tmp_dir"
 }
 trap clean_up EXIT
 
@@ -20,19 +20,31 @@ par_genome_fasta=$(realpath $par_genome_fasta)
 par_transcriptome_gtf=$(realpath $par_transcriptome_gtf)
 par_output=$(realpath $par_output)
 
+# if memory is defined, subtract 2GB from memory
+if [[ "$meta_memory_gb" != "" ]]; then
+  # if memory is less than 2gb, unset it
+  if [[ "$meta_memory_gb" -lt 2 ]]; then
+    echo "WARNING: Memory is less than 2GB, unsetting memory requirements"
+    unset meta_memory_gb
+  else
+    meta_memory_gb=$((meta_memory_gb-2))
+  fi
+fi
 
 echo "> Unzipping input files"
-unpigz -c "$par_genome_fasta" > "$tmpdir/genome.fa"
+unpigz -c "$par_genome_fasta" > "$tmp_dir/genome.fa"
 
 echo "> Building star index"
-cd "$tmpdir"
+cd "$tmp_dir"
 cellranger mkref \
-  --fasta "$tmpdir/genome.fa" \
+  --fasta "$tmp_dir/genome.fa" \
   --genes "$par_transcriptome_gtf" \
   --genome output \
   ${par_reference_version:+--ref-version $par_reference_version} \
   ${meta_cpus:+--nthreads $meta_cpus} \
-  ${meta_memory_gb:+--memgb $(($meta_memory_gb-2))} # always keep 2 gb for the OS itself
+  ${meta_memory_gb:+--memgb ${meta_memory_gb}}
 
 echo "> Creating archive"
-tar --use-compress-program="pigz -k " -cf "$par_output" -C "$tmpdir/output" .
+tar --use-compress-program="pigz -k " -cf "$par_output" -C "$tmp_dir/output" .
+
+exit 0
