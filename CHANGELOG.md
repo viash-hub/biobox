@@ -32,6 +32,7 @@
   - `agat/agat_sp_merge_annotations`: merge different gff annotation files in one (PR #106).
   - `agat/agat_sp_statistics`: provides exhaustive statistics of a gft/gff file (PR #107).
   - `agat/agat_sq_stat_basic`: provide basic statistics of a gtf/gff file (PR #110).
+  - `agat/agat_sp_add_intergenic_regions`: add intergenic features (intergenic_region) to GTF/GFF file (PR #120).
 
 * `bd_rhapsody/bd_rhapsody_sequence_analysis`: BD Rhapsody Sequence Analysis CWL pipeline (PR #96).
 
