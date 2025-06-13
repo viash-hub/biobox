@@ -1,0 +1,27 @@
+```
+docker run --rm -it quay.io/biocontainers/fq:0.12.0--h9ee0642_0 fq lint -h >> src/fq/fq_lint/help.txt
+```
+
+Validates a FASTQ file pair
+
+Usage: fq lint [OPTIONS] <R1_SRC> [R2_SRC]
+
+Arguments:
+  <R1_SRC>  Read 1 source. Accepts both raw and gzipped FASTQ inputs
+  [R2_SRC]  Read 2 source. Accepts both raw and gzipped FASTQ inputs
+
+Options:
+      --lint-mode <LINT_MODE>
+          Panic on first error or log all errors [default: panic] [possible values: panic, log]
+      --single-read-validation-level <SINGLE_READ_VALIDATION_LEVEL>
+          Only use single read validators up to a given level [default: high] [possible values: low, medium, high]
+      --paired-read-validation-level <PAIRED_READ_VALIDATION_LEVEL>
+          Only use paired read validators up to a given level [default: high] [possible values: low, medium, high]
+      --disable-validator <DISABLE_VALIDATOR>
+          Disable validators by code. Use multiple times to disable more than one
+      --record-definition-separator <RECORD_DEFINITION_SEPARATOR>
+          Define a record definition separator
+  -h, --help
+          Print help (see more with '--help')
+  -V, --version
+          Print version

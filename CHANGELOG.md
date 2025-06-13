@@ -1,5 +1,15 @@
 # biobox 0.3.2
 
+## NEW FUNCTIONALITY
+
+* `fq`:
+  - `fq/fq_lint`: Validate FASTQ files for common issues (PR #xxx).
+  - `fq/fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #xxx).
+
+## MAJOR CHANGES
+
+* `fq_subsample`: This component has been deprecated in favour of `fq/fq_subsample`, and will be removed in biobox 0.4.0 (PR #xxx).
+
 ## MINOR CHANGES
 
 * Update README (PR #177).
