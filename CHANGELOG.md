@@ -4,6 +4,8 @@
 
 * Update README (PR #177).
 
+* Add authors to package config and update author information (PR #180).
+
 # biobox 0.3.1
 
 ## NEW FUNCTIONALITY
