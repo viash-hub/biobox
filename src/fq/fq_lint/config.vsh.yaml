@@ -1,0 +1,72 @@
+name: fq_lint
+namespace: fq
+description: Validates a single or paired FASTQ file.
+keywords: [fastq, lint, validate, quality-control]
+links:
+  homepage: https://github.com/stjude-rust-labs/fq/blob/master/README.md
+  documentation: https://github.com/stjude-rust-labs/fq/blob/master/README.md
+  repository: https://github.com/stjude-rust-labs/fq
+license: MIT
+
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [ author, maintainer ]
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author ]
+
+argument_groups:
+- name: "Input"
+  description: "Input FASTQ files to validate."
+  arguments:
+  - name: "--input_1"
+    type: file
+    required: true
+    description: "Read 1 source. Accepts both raw and gzipped FASTQ inputs."
+    example: "reads_1.fastq.gz"
+  - name: "--input_2"
+    type: file
+    required: false
+    description: "Read 2 source. Accepts both raw and gzipped FASTQ inputs."
+    example: "reads_2.fastq.gz"
+
+- name: "Options"
+  description: "Validation parameters."
+  arguments:
+  - name: "--lint_mode"
+    type: string
+    default: "panic"
+    choices: ["panic", "log"]
+    description: "Panic on first error or log all errors."
+  - name: "--single_read_validation_level"
+    type: string
+    default: "high"
+    choices: ["low", "medium", "high"]
+    description: "Only use single read validators up to a given level."
+  - name: "--paired_read_validation_level"
+    type: string
+    default: "high"
+    choices: ["low", "medium", "high"]
+    description: "Only use paired read validators up to a given level."
+  - name: "--disable_validator"
+    type: string
+    multiple: true
+    description: "Disable validators by code. Use multiple times to disable more than one."
+  - name: "--record_definition_separator"
+    type: string
+    description: "Define a record definition separator."
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/fq:0.12.0--h9ee0642_0
+
+runners:
+  - type: executable
+  - type: nextflow
