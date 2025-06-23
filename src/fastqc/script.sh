@@ -34,6 +34,13 @@ function clean_up {
 }
 trap clean_up EXIT
 
+# Set output directory
+if [[ -n "$par_output_dir" ]]; then
+  output_dir="$par_output_dir"
+else
+  output_dir="$tmpdir"
+fi
+
 # Create input array 
 IFS=";" read -ra input <<< $par_input
 
@@ -53,34 +60,37 @@ fastqc \
   ${par_quiet:+--quiet} \
   ${meta_cpus:+--threads "$meta_cpus"} \
   ${meta_temp_dir:+--dir "$meta_temp_dir"} \
-  --outdir "${tmpdir}" \
+  --outdir "${output_dir}" \
   "${input[@]}"
  
-# Move output files
-for file in "${input[@]}"; do
-  # Removes everthing after the first dot of the basename
-  sample_name=$(basename "${file}" | sed 's/\..*$//')
-  if [[ -n "$par_html" ]]; then
-    input_html="${tmpdir}/${sample_name}_fastqc.html"
-    html_file="${par_html//\*/$sample_name}"
-    mv "$input_html" "$html_file"
-  fi
-  if [[ -n "$par_zip" ]]; then
-    input_zip="${tmpdir}/${sample_name}_fastqc.zip"
-    zip_file="${par_zip//\*/$sample_name}"
-    mv "$input_zip" "$zip_file"
-  fi
-  if [[ -n "$par_summary" ]]; then
-    summary_file="${tmpdir}/${sample_name}_fastqc/summary.txt"
-    new_summary="${par_summary//\*/$sample_name}"
-    mv "$summary_file" "$new_summary"
-  fi
-  if [[ -n "$par_data" ]]; then
-    data_file="${tmpdir}/${sample_name}_fastqc/fastqc_data.txt"
-    new_data="${par_data//\*/$sample_name}"
-    mv "$data_file" "$new_data"
-  fi
-  # Remove the extracted directory
-  rm -r "${tmpdir}/${sample_name}_fastqc"
-done
+# Check if par_output_dir isn't set and set source directory accordingly
+if [[ -z "$par_output_dir" ]]; then
+  # Move output files
+  for file in "${input[@]}"; do
+    # Removes everthing after the first dot of the basename
+    sample_name=$(basename "${file}" | sed 's/\..*$//')
+    if [[ -n "$par_html" ]]; then
+      input_html="${output_dir}/${sample_name}_fastqc.html"
+      html_file="${par_html//\*/$sample_name}"
+      cp "$input_html" "$html_file"
+    fi
+    if [[ -n "$par_zip" ]]; then
+      input_zip="${output_dir}/${sample_name}_fastqc.zip"
+      zip_file="${par_zip//\*/$sample_name}"
+      cp "$input_zip" "$zip_file"
+    fi
+    if [[ -n "$par_summary" ]]; then
+      summary_file="${output_dir}/${sample_name}_fastqc/summary.txt"
+      new_summary="${par_summary//\*/$sample_name}"
+      mv "$summary_file" "$new_summary"
+    fi
+    if [[ -n "$par_data" ]]; then
+      data_file="${output_dir}/${sample_name}_fastqc/fastqc_data.txt"
+      new_data="${par_data//\*/$sample_name}"
+      cp "$data_file" "$new_data"
+    fi
+    # Remove the extracted directory
+    rm -r "${tmpdir}/${sample_name}_fastqc"
+  done
+fi
 
