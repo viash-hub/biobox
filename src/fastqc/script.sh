@@ -7,8 +7,8 @@
 set -eo pipefail
 
 # Check if both outputs are empty, at least one must be passed.
-if [[ -z "$par_html" ]] && [[ -z "$par_zip" ]] && [[ -z "$par_summary" ]] && [[ -z "$par_data" ]]; then
-  echo "Error: At least one of the output arguments (--html, --zip, --summary, and --data) must be passed."
+if [[ -z "$par_outdir" ]] && [[ -z "$par_html" ]] && [[ -z "$par_zip" ]] && [[ -z "$par_summary" ]] && [[ -z "$par_data" ]]; then
+  echo "Error: At least one of the output arguments (--outdir, --html, --zip, --summary, and --data) must be passed."
   exit 1
 fi
 
@@ -35,8 +35,11 @@ function clean_up {
 trap clean_up EXIT
 
 # Set output directory
-if [[ -n "$par_output_dir" ]]; then
-  output_dir="$par_output_dir"
+if [[ -n "$par_outdir" ]]; then
+  if [[ ! -d "$par_outdir" ]]; then
+    mkdir -p "$par_outdir"
+  fi
+  output_dir="$par_outdir"
 else
   output_dir="$tmpdir"
 fi
@@ -63,34 +66,47 @@ fastqc \
   --outdir "${output_dir}" \
   "${input[@]}"
  
-# Check if par_output_dir isn't set and set source directory accordingly
-if [[ -z "$par_output_dir" ]]; then
-  # Move output files
-  for file in "${input[@]}"; do
-    # Removes everthing after the first dot of the basename
-    sample_name=$(basename "${file}" | sed 's/\..*$//')
-    if [[ -n "$par_html" ]]; then
-      input_html="${output_dir}/${sample_name}_fastqc.html"
+
+# Move output files
+for file in "${input[@]}"; do
+  # Removes everything after the first dot of the basename
+  sample_name=$(basename "${file}" | sed 's/\..*$//')
+  if [[ -n "$par_html" ]]; then
+    input_html="${output_dir}/${sample_name}_fastqc.html"
+    if [[ ! -f "$input_html" ]]; then
+      echo "WARNING: HTML file '$input_html' does not exist"
+    else
       html_file="${par_html//\*/$sample_name}"
       cp "$input_html" "$html_file"
     fi
-    if [[ -n "$par_zip" ]]; then
-      input_zip="${output_dir}/${sample_name}_fastqc.zip"
+  fi
+  if [[ -n "$par_zip" ]]; then
+    input_zip="${output_dir}/${sample_name}_fastqc.zip"
+    if [[ ! -f "$input_zip" ]]; then
+      echo "WARNING: ZIP file '$input_zip' does not exist"
+    else
       zip_file="${par_zip//\*/$sample_name}"
       cp "$input_zip" "$zip_file"
     fi
-    if [[ -n "$par_summary" ]]; then
-      summary_file="${output_dir}/${sample_name}_fastqc/summary.txt"
+  fi
+  if [[ -n "$par_summary" ]]; then
+    summary_file="${output_dir}/${sample_name}_fastqc/summary.txt"
+    if [[ ! -f "$summary_file" ]]; then
+      echo "WARNING: Summary file '$summary_file' does not exist"
+    else
       new_summary="${par_summary//\*/$sample_name}"
-      mv "$summary_file" "$new_summary"
+      cp "$summary_file" "$new_summary"
     fi
-    if [[ -n "$par_data" ]]; then
-      data_file="${output_dir}/${sample_name}_fastqc/fastqc_data.txt"
+  fi
+  if [[ -n "$par_data" ]]; then
+    data_file="${output_dir}/${sample_name}_fastqc/fastqc_data.txt"
+    if [[ ! -f "$data_file" ]]; then
+      echo "WARNING: Data file '$data_file' does not exist"
+    else
       new_data="${par_data//\*/$sample_name}"
       cp "$data_file" "$new_data"
     fi
-    # Remove the extracted directory
-    rm -r "${tmpdir}/${sample_name}_fastqc"
-  done
-fi
+  fi
+done
+
 

@@ -231,5 +231,39 @@ echo "- test succeeded -"
 
 popd > /dev/null
 
+# Test 6: Run fastqc with multiple inputs and outdir argument
+mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
+
+echo "-> Run Test6: two inputs, outdir argument"
+"$meta_executable" \
+  --input "../input_1.fq" \
+  --input "../input_2.fq" \
+  --outdir "results" \
+  --quiet
+
+ls -l
+ls -l results
+ls -l results/input_1_fastqc.html
+
+# File 1
+assert_file_exists "results/input_1_fastqc.html"
+assert_file_exists "results/input_1_fastqc.zip"
+assert_file_not_empty "results/input_1_fastqc.html"
+assert_file_not_empty "results/input_1_fastqc.zip"
+assert_file_exists "results/input_1_fastqc/fastqc_data.txt"
+assert_file_exists "results/input_1_fastqc/summary.txt"
+assert_identical_content "results/input_1_fastqc/summary.txt" "../expected_summary.txt"
+# File 2
+assert_file_exists "results/input_2_fastqc.html"
+assert_file_exists "results/input_2_fastqc.zip"
+assert_file_not_empty "results/input_2_fastqc.html"
+assert_file_not_empty "results/input_2_fastqc.zip"
+assert_file_exists "results/input_1_fastqc/fastqc_data.txt"
+assert_file_exists "results/input_2_fastqc/summary.txt"
+assert_identical_content "results/input_2_fastqc/summary.txt" "../expected_summary2.txt"
+echo "- test succeeded -"
+
+popd > /dev/null
+
 echo "All tests succeeded!"
 exit 0
