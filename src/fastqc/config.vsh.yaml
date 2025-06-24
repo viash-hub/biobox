@@ -33,7 +33,7 @@ argument_groups:
         direction: output
         description: |
           Output directory where the results will be saved.
-        example: ./results
+        example: results
 
       - name: --html
         type: file
