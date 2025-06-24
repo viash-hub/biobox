@@ -28,6 +28,13 @@ argument_groups:
       At least one of the output options (--html, --zip, --summary, --data) must be used.
     arguments:
 
+      - name: --outdir
+        type: file
+        direction: output
+        description: |
+          Output directory where the results will be saved.
+        example: results
+
       - name: --html
         type: file
         direction: output

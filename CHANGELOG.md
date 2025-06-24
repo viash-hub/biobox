@@ -16,6 +16,8 @@
 
 * Add authors to package config and update author information (PR #180).
 
+* `fastqc`: add `--outdir` argument (PR #181).
+
 # biobox 0.3.1
 
 ## NEW FUNCTIONALITY
