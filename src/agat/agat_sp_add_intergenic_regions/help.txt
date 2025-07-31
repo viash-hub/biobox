@@ -1,0 +1,66 @@
+```sh
+agat_sp_add_intergenic_regions.pl --help
+```
+
+ ------------------------------------------------------------------------------
+|   Another GFF Analysis Toolkit (AGAT) - Version: v1.4.0                      |
+|   https://github.com/NBISweden/AGAT                                          |
+|   National Bioinformatics Infrastructure Sweden (NBIS) - www.nbis.se         |
+ ------------------------------------------------------------------------------
+
+
+Name:
+    agat_sp_add_intergenic_regions.pl
+
+Description:
+    The script aims to add intergenic features (intergenic_region) to
+    gtf/gff file. The intergenic regions are deduced from gene features
+    (feature type gene from the 3rd column).
+
+Usage:
+        agat_sp_add_intergenic_regions.pl --gff infile --out outFile
+        agat_sp_add_intergenic_regions.pl --help
+
+Options:
+    --gff, -f or --ref
+            Input GTF/GFF file.
+
+    --out, --output or -o
+            Output file (default GFF3 - see config to modify output format).
+
+    -c or --config
+            String - Input agat config file. By default AGAT takes as input
+            agat_config.yaml file from the working directory if any,
+            otherwise it takes the orignal agat_config.yaml shipped with
+            AGAT. To get the agat_config.yaml locally type: "agat config
+            --expose". The --config option gives yo the possibility to use
+            your own AGAT config file (located elsewhere or named
+            differently).
+
+    -v or --verbose
+            Add verbosity
+
+    -h or --help
+            Display this helpful text.
+
+Feedback:
+  Did you find a bug?:
+    Do not hesitate to report bugs to help us keep track of the bugs and
+    their resolution. Please use the GitHub issue tracking system available
+    at this address:
+
+                https://github.com/NBISweden/AGAT/issues
+
+     Ensure that the bug was not already reported by searching under Issues.
+     If you're unable to find an (open) issue addressing the problem, open a new one.
+     Try as much as possible to include in the issue when relevant:
+     - a clear description,
+     - as much relevant information as possible,
+     - the command used,
+     - a data sample,
+     - an explanation of the expected behaviour that is not occurring.
+
+  Do you want to contribute?:
+    You are very welcome, visit this address for the Contributing
+    guidelines:
+    https://github.com/NBISweden/AGAT/blob/master/CONTRIBUTING.md
