@@ -1,0 +1,80 @@
+name: agat_sp_clipn_seqextremities_and_fixcoordinates
+namespace: agat
+description: |
+    The script aims to clip the N's extremities of the sequences. The
+    annotations from the sequence clipped are modified accordingly to stay
+    consistent.
+keywords: [gene annotations, GFF]
+links:
+  homepage: https://github.com/NBISweden/AGAT
+  documentation: https://agat.readthedocs.io/en/latest/tools/agat_sp_clipN_seqExtremities_and_fixCoordinates.html
+  issue_tracker: https://github.com/NBISweden/AGAT/issues
+  repository: https://github.com/NBISweden/AGAT
+references: 
+  doi: 10.5281/zenodo.3552717
+license: GPL-3.0
+requirements:
+  - commands: [agat]
+authors:
+  - __merge__: /src/_authors/leila_paquay.yaml
+    roles: [ author, maintainer ]
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --gff
+        alternatives: [-g, -ref]
+        description: Input GTF/GFF file.
+        type: file
+        required: true
+        direction: input
+        example: input.gff
+      - name: --fasta
+        alternatives: [-f]
+        description: Input fasta file.
+        type: file
+        required: true
+        direction: input
+        example: input.fasta
+  - name: Outputs
+    arguments:
+      - name: --output_fasta
+        alternatives: [--of]
+        description: Output fixed fasta file.
+        type: file
+        direction: output
+        required: true
+        example: output.fasta
+      - name: --output_gff
+        alternatives: [--og]
+        description: Output fixed GFF file.
+        type: file
+        direction: output
+        required: true
+        example: output_fixed.gff
+  - name: Arguments
+    arguments:
+      - name: --config
+        alternatives: [-c]
+        description: |
+          AGAT config file. By default AGAT takes the original agat_config.yaml shipped with AGAT. The `--config` option gives you the possibility to use your own AGAT config file (located elsewhere or named differently).
+        type: file
+        required: false
+        example: custom_agat_config.yaml
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+engines:
+  - type: docker
+    image: quay.io/biocontainers/agat:1.4.0--pl5321hdfd78af_0
+    setup:
+      - type: docker
+        run: |
+          agat --version | sed 's/AGAT\s\(.*\)/agat: "\1"/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
