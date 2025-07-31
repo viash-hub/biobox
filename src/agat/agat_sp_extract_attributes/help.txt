@@ -1,0 +1,88 @@
+```sh
+agat_sp_extract_attributes.pl --help
+```
+
+  ------------------------------------------------------------------------------
+|   Another GFF Analysis Toolkit (AGAT) - Version: v1.4.0                      |
+|   https://github.com/NBISweden/AGAT                                          |
+|   National Bioinformatics Infrastructure Sweden (NBIS) - www.nbis.se         |
+ ------------------------------------------------------------------------------
+
+
+Name:
+    agat_sp_extract_attributes.pl
+
+Description:
+    The script takes a gtf/gff file as input. The script allows to extract
+    choosen attributes of all or specific feature types. The 9th column of a
+    gff/gtf file contains a list of attributes. An attribute (gff3) looks
+    like that tag=value
+
+Usage:
+        agat_sp_extract_attributes.pl --gff file.gff  --att locus_tag,product,name -p level2,cds,exon [ -o outfile ]
+        agat_sp_extract_attributes.pl --help
+
+Options:
+    --gff or -f
+            Input GTF/GFF file.
+
+    -p, -t or -l
+            primary tag option, case insensitive, list. Allow to specied the
+            feature types that will be handled. You can specified a specific
+            feature by given its primary tag name (column 3) as: cds, Gene,
+            MrNa You can specify directly all the feature of a particular
+            level: level2=mRNA,ncRNA,tRNA,etc level3=CDS,exon,UTR,etc By
+            default all feature are taking in account. fill the option by
+            the value "all" will have the same behaviour.
+
+    --attribute, --att, -a
+            attribute tag. The value of the attribute tag specified will be
+            extracted from the feature type specified by the option -p. List
+            of attributes must be coma separated.
+
+    --merge or -m
+            By default the values of each attribute tag is writen in its
+            dedicated file. To write the values of all tags in only one file
+            use this option.
+
+    -d      By default when an attribute is not found for a feature, a dot
+            (.) is reported. If you don't want anything to be printed in
+            such case use this option.
+
+    -o , --output , --out or --outfile
+            Output GFF file. If no output file is specified, the output will
+            be written to STDOUT.
+
+    -c or --config
+            String - Input agat config file. By default AGAT takes as input
+            agat_config.yaml file from the working directory if any,
+            otherwise it takes the orignal agat_config.yaml shipped with
+            AGAT. To get the agat_config.yaml locally type: "agat config
+            --expose". The --config option gives you the possibility to use
+            your own AGAT config file (located elsewhere or named
+            differently).
+
+    -h or --help
+            Display this helpful text.
+
+Feedback:
+  Did you find a bug?:
+    Do not hesitate to report bugs to help us keep track of the bugs and
+    their resolution. Please use the GitHub issue tracking system available
+    at this address:
+
+                https://github.com/NBISweden/AGAT/issues
+
+     Ensure that the bug was not already reported by searching under Issues.
+     If you're unable to find an (open) issue addressing the problem, open a new one.
+     Try as much as possible to include in the issue when relevant:
+     - a clear description,
+     - as much relevant information as possible,
+     - the command used,
+     - a data sample,
+     - an explanation of the expected behaviour that is not occurring.
+
+  Do you want to contribute?:
+    You are very welcome, visit this address for the Contributing
+    guidelines:
+    https://github.com/NBISweden/AGAT/blob/master/CONTRIBUTING.md
