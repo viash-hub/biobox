@@ -1,0 +1,31 @@
+1	irgsp	gene	3234	6737	.	+	.	ID=gene:Os01g0105700;Name=basic helix-loop-helix protein 071;biotype=protein_coding;description=Basic helix-loop-helix dimerisation region bHLH domain containing protein. (Os01t0105700-01);gene_id=Os01g0105700;logic_name=irgspv1.0-20170804-genes
+1	irgsp	mRNA	3234	6737	.	+	.	ID=transcript:Os01t0105700-01;Parent=gene:Os01g0105700;biotype=protein_coding;transcript_id=Os01t0105700-01
+1	irgsp	five_prime_UTR	3234	3329	.	+	.	Parent=transcript:Os01t0105700-01
+1	irgsp	exon	3234	3472	.	+	.	Parent=transcript:Os01t0105700-01;Name=Os01t0105700-01.exon1;constitutive=1;ensembl_end_phase=2;ensembl_phase=-1;exon_id=Os01t0105700-01.exon1;rank=1
+1	irgsp	CDS	3330	3472	.	+	0	ID=CDS:Os01t0105700-01;Parent=transcript:Os01t0105700-01;protein_id=Os01t0105700-01
+1	irgsp	exon	3982	4510	.	+	.	Parent=transcript:Os01t0105700-01;Name=Os01t0105700-01.exon2;constitutive=1;ensembl_end_phase=0;ensembl_phase=2;exon_id=Os01t0105700-01.exon2;rank=2
+1	irgsp	CDS	3982	4510	.	+	1	ID=CDS:Os01t0105700-01;Parent=transcript:Os01t0105700-01;protein_id=Os01t0105700-01
+1	irgsp	exon	5573	5719	.	+	.	Parent=transcript:Os01t0105700-01;Name=Os01t0105700-01.exon3;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;exon_id=Os01t0105700-01.exon3;rank=3
+1	irgsp	CDS	5573	5719	.	+	0	ID=CDS:Os01t0105700-01;Parent=transcript:Os01t0105700-01;protein_id=Os01t0105700-01
+1	irgsp	exon	5835	5900	.	+	.	Parent=transcript:Os01t0105700-01;Name=Os01t0105700-01.exon4;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;exon_id=Os01t0105700-01.exon4;rank=4
+1	irgsp	CDS	5835	5900	.	+	0	ID=CDS:Os01t0105700-01;Parent=transcript:Os01t0105700-01;protein_id=Os01t0105700-01
+1	irgsp	exon	5994	6059	.	+	.	Parent=transcript:Os01t0105700-01;Name=Os01t0105700-01.exon5;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;exon_id=Os01t0105700-01.exon5;rank=5
+1	irgsp	CDS	5994	6059	.	+	0	ID=CDS:Os01t0105700-01;Parent=transcript:Os01t0105700-01;protein_id=Os01t0105700-01
+1	irgsp	exon	6172	6246	.	+	.	Parent=transcript:Os01t0105700-01;Name=Os01t0105700-01.exon6;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;exon_id=Os01t0105700-01.exon6;rank=6
+1	irgsp	CDS	6172	6246	.	+	0	ID=CDS:Os01t0105700-01;Parent=transcript:Os01t0105700-01;protein_id=Os01t0105700-01
+1	irgsp	CDS	6354	6491	.	+	0	ID=CDS:Os01t0105700-01;Parent=transcript:Os01t0105700-01;protein_id=Os01t0105700-01
+1	irgsp	exon	6354	6737	.	+	.	Parent=transcript:Os01t0105700-01;Name=Os01t0105700-01.exon7;constitutive=1;ensembl_end_phase=-1;ensembl_phase=0;exon_id=Os01t0105700-01.exon7;rank=7
+1	irgsp	three_prime_UTR	6495	6737	.	+	.	Parent=transcript:Os01t0105700-01
+1	irgsp	gene	6872	8843	.	-	.	ID=gene:Os01g0105800;Name=IRON-SULFUR CLUSTER PROTEIN 9;biotype=protein_coding;description=Similar to Iron sulfur assembly protein 1. (Os01t0105800-01);gene_id=Os01g0105800;logic_name=irgspv1.0-20170804-genes
+1	irgsp	mRNA	6872	8843	.	-	.	ID=transcript:Os01t0105800-01;Parent=gene:Os01g0105800;biotype=protein_coding;transcript_id=Os01t0105800-01
+1	irgsp	three_prime_UTR	6872	7124	.	-	.	Parent=transcript:Os01t0105800-01
+1	irgsp	exon	6872	7218	.	-	.	Parent=transcript:Os01t0105800-01;Name=Os01t0105800-01.exon4;constitutive=1;ensembl_end_phase=-1;ensembl_phase=2;exon_id=Os01t0105800-01.exon4;rank=4
+1	irgsp	CDS	7128	7218	.	-	1	ID=CDS:Os01t0105800-01;Parent=transcript:Os01t0105800-01;protein_id=Os01t0105800-01
+1	irgsp	exon	7297	7414	.	-	.	Parent=transcript:Os01t0105800-01;Name=Os01t0105800-01.exon3;constitutive=1;ensembl_end_phase=2;ensembl_phase=1;exon_id=Os01t0105800-01.exon3;rank=3
+1	irgsp	CDS	7297	7414	.	-	2	ID=CDS:Os01t0105800-01;Parent=transcript:Os01t0105800-01;protein_id=Os01t0105800-01
+1	irgsp	CDS	8398	8602	.	-	0	ID=CDS:Os01t0105800-01;Parent=transcript:Os01t0105800-01;protein_id=Os01t0105800-01
+1	irgsp	exon	8398	8627	.	-	.	Parent=transcript:Os01t0105800-01;Name=Os01t0105800-01.exon2;constitutive=1;ensembl_end_phase=1;ensembl_phase=-1;exon_id=Os01t0105800-01.exon2;rank=2
+1	irgsp	five_prime_UTR	8603	8627	.	-	.	Parent=transcript:Os01t0105800-01
+1	irgsp	exon	8704	8843	.	-	.	Parent=transcript:Os01t0105800-01;Name=Os01t0105800-01.exon1;constitutive=1;ensembl_end_phase=-1;ensembl_phase=-1;exon_id=Os01t0105800-01.exon1;rank=1
+1	irgsp	five_prime_UTR	8704	8843	.	-	.	Parent=transcript:Os01t0105800-01
+1	irgsp	three_prime_UTR	9521	9822	.	-	.	Parent=transcript:Os01t0105900-01
