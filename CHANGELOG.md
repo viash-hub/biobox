@@ -4,6 +4,11 @@
 
 * `fq_subsample`: This component has been removed in favour of `fq/fq_subsample` (PR #xxx).
 
+## NEW FUNCTIONALITY
+
+* `fq`:
+  - `fq/fq_filter`: Filter FASTQ files based on record names or sequence patterns (PR #xxx).
+
 # biobox 0.3.2
 
 ## NEW FUNCTIONALITY
