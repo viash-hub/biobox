@@ -1,3 +1,9 @@
+# biobox 0.4.0
+
+## BREAKING CHANGES
+
+* `fq_subsample`: This component has been removed in favour of `fq/fq_subsample` (PR #xxx).
+
 # biobox 0.3.2
 
 ## NEW FUNCTIONALITY
