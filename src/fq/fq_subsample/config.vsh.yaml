@@ -60,6 +60,10 @@ test_resources:
 engines:  
   - type: docker
     image: quay.io/biocontainers/fq:0.12.0--h9ee0642_0
+    setup:
+      - type: docker
+        run: |
+          fq -V | sed 's#fq \([0-9.]*\) .*#fq: \1#' > /var/software_versions.txt
 
 runners:
   - type: executable
