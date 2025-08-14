@@ -1,3 +1,15 @@
+# biobox 0.4.0
+
+## DOCUMENTATION
+
+* `CONTRIBUTING.md`: Update contributing guidelines with current best practices including )PR #xxx):
+  - Use `requirements.commands` to list required commands
+  - Use `__merge__` syntax for author information 
+  - Prefer generating test data in test scripts rather than storing static files
+  - Use array-based argument structure in runner scripts for better maintainability
+  - Updated Docker engine setup with proper version detection
+  - Enhanced test script patterns with helper functions and comprehensive validation
+
 # biobox 0.3.2
 
 ## NEW FUNCTIONALITY

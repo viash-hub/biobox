@@ -38,6 +38,11 @@ links:
 references: 
   doi: 12345/12345678.yz
 license: MIT/Apache-2.0/GPL-3.0/...
+requirements:
+  commands: [command1, command2]
+authors:
+  - __merge__: /src/_authors/author_name.yaml
+    roles: [author, maintainer]
 argument_groups:
   - name: Inputs
     arguments: <...>
@@ -51,10 +56,13 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - type: file
-    path: test_data
 engines:
-  - <...>
+  - type: docker
+    image: quay.io/biocontainers/xxx:version--build_string
+    setup:
+      - type: docker
+        run: |
+          xxx --version 2>&1 | head -1 | sed 's/.*version /xxx: /' > /var/software_versions.txt
 runners:
   - type: executable
   - type: nextflow
@@ -65,21 +73,65 @@ runners:
 Fill in the relevant metadata fields in the config. Here is an example of the metadata of an existing component.
 
 ```yaml
-name: arriba
-description: Detect gene fusions from RNA-Seq data
-keywords: [Gene fusion, RNA-Seq]
+name: bowtie2_build
+namespace: bowtie2
+description: |
+  Build Bowtie2 index files from reference sequences.
+  
+  The Bowtie2 index is based on the FM Index of Ferragina and Manzini, which in turn 
+  is based on the Burrows-Wheeler Transform. The algorithm used to build the index is 
+  based on the blockwise algorithm of Karkkainen.
+keywords: [Alignment, Indexing]
 links:
-  homepage: https://arriba.readthedocs.io/en/latest/
-  documentation: https://arriba.readthedocs.io/en/latest/
-  repository: https://github.com/suhrig/arriba
-  issue_tracker: https://github.com/suhrig/arriba/issues
+  homepage: https://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+  documentation: https://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
+  repository: https://github.com/BenLangmead/bowtie2
 references:
-  doi: 10.1101/gr.257246.119
-  bibtex: |
-    @article{
-      ... a bibtex entry in case the doi is not available ...
-    }
-license: MIT
+  doi: 10.1038/nmeth.1923
+license: GPL-3.0
+requirements:
+  commands: [bowtie2-build]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+```
+
+**Important notes:**
+
+* **Use `requirements.commands`**: Always specify the commands that your component requires in the `requirements.commands` field. This helps document dependencies and enables better validation.
+
+* **Use `__merge__` for authors**: Instead of specifying author details inline, use the `__merge__` syntax to reference author information from the `/src/_authors/` directory. This promotes consistency and maintainability.
+
+* **Author roles**: Specify appropriate roles for each author (`author`, `maintainer`, `contributor`, etc.).
+
+### Step 3.1: Specify requirements
+
+The `requirements` section documents the dependencies needed by your component:
+
+```yaml
+requirements:
+  commands: [bowtie2-build, bowtie2]
+```
+
+**Why specify commands:**
+- Documents which executables the component expects
+- Enables validation that the Docker container has required tools
+- Helps users understand dependencies
+- Facilitates automated testing and CI/CD
+
+**Examples:**
+```yaml
+# Single command
+requirements:
+  commands: [samtools]
+
+# Multiple commands
+requirements:
+  commands: [bwa, samtools, bgzip]
+
+# Commands with different names than the component
+requirements:
+  commands: [bowtie2-build]  # for bowtie2_build component
 ```
 
 ### Step 4: Find a suitable container
@@ -114,15 +166,50 @@ Notes:
   ```
 
 
-### Step 6: Create or fetch test data
+### Step 6: Create test data
 
-To help develop the component, it's interesting to have some test data available. In most cases, we can use the test data from the Snakemake wrappers. 
+**Best Practice: Generate test data in the test script rather than storing it in the repository.**
 
-To make sure we can reproduce the test data in the future, we store the command to fetch the test data in a file at `src/xxx/test_data/script.sh`.
+Instead of storing test data files in the repository or fetching them from external sources, it's preferred to generate test data programmatically within the test script. This approach:
+
+- Keeps the repository size small
+- Ensures reproducibility
+- Makes tests self-contained
+- Avoids external dependencies
+
+For example, create a function in your test script to generate minimal test data:
 
 ```bash
-cat <<EOF > src/xxx/test_data/script.sh
+# --- Helper function to create test FASTA ---
+create_test_fasta() {
+  file_path="$1"
+  
+  cat << 'EOF' > "$file_path"
+>chr1
+ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
+ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
+>chr2
+GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
+GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
+EOF
+}
 
+# Usage in test
+create_test_fasta "$TEMP_DIR/test_ref.fasta"
+```
+
+**When to use external test data:**
+
+Only use external test data if:
+- The tool requires very specific file formats that are difficult to generate
+- You need real-world data to validate complex algorithms
+- The test data is very small (<1KB)
+
+If you must use external test data, prefer copying from established sources like Snakemake wrappers:
+
+```bash
+# If absolutely necessary, document how to fetch test data
+cat <<EOF > src/xxx/test_data/script.sh
 # clone repo
 if [ ! -d /tmp/snakemake-wrappers ]; then
   git clone --depth 1 --single-branch --branch master https://github.com/snakemake/snakemake-wrappers /tmp/snakemake-wrappers
@@ -133,7 +220,7 @@ cp -r /tmp/snakemake-wrappers/bio/xxx/test/* src/xxx/test_data
 EOF
 ```
 
-The test data should be suitable for testing this component. Ensure that the test data is small enough: ideally <1KB, preferably <10KB, if need be <100KB.
+The test data should be suitable for testing this component. Ensure that external test data is small enough: ideally <1KB, preferably <10KB, if need be <100KB.
 
 ### Step 7: Add arguments for the input files
 
@@ -240,17 +327,27 @@ Note:
 
 ### Step 10: Add a Docker engine
 
-To ensure reproducibility of components, we require that all components are run in a Docker container. 
+To ensure reproducibility of components, we require that all components are run in a Docker container.
+
+**Preferred approach - Use biocontainers:**
 
 ```yaml
 engines:
   - type: docker
-    image: quay.io/biocontainers/xxx:0.1.0--py_0
+    image: quay.io/biocontainers/xxx:2.5.4--he96a11b_6
+    setup:
+      - type: docker
+        run: |
+          xxx --version 2>&1 | head -1 | sed 's/.*version /xxx: /' > /var/software_versions.txt
 ```
 
-The container should have your tool installed, as well as `ps`.
+**Key requirements:**
 
-If you didn't find a suitable container in the previous step, you can create a custom container. For example:
+1. **Use specific versions**: Always pin to specific versions with build strings (e.g., `2.5.4--he96a11b_6`)
+2. **Include version detection**: Add setup commands to create `/var/software_versions.txt`
+3. **Verify command availability**: Ensure the container has the required commands from `requirements.commands`
+
+**If no biocontainer exists, create a custom container:**
 
 ```yaml
 engines:
@@ -258,42 +355,28 @@ engines:
     image: python:3.10
     setup:
       - type: python
-        packages: numpy
+        packages: [numpy, scipy]
+      - type: docker
+        run: |
+          python --version | sed 's/Python /python: /' > /var/software_versions.txt
 ```
 
-For more information on how to do this, see the [documentation](https://viash.io/guide/component/add-dependencies.html#steps-for-creating-a-custom-docker-platform).
+**Recommended base containers:**
 
-Here is a list of base containers we can recommend:
+* **Bash**: [`bash`](https://hub.docker.com/_/bash), [`ubuntu`](https://hub.docker.com/_/ubuntu)
+* **C#**: [`ghcr.io/data-intuitive/dotnet-script`](https://github.com/data-intuitive/ghcr-dotnet-script/pkgs/container/dotnet-script)
+* **JavaScript**: [`node`](https://hub.docker.com/_/node)
+* **Python**: [`python`](https://hub.docker.com/_/python), [`nvcr.io/nvidia/pytorch`](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch)
+* **R**: [`eddelbuettel/r2u`](https://hub.docker.com/r/eddelbuettel/r2u), [`rocker/tidyverse`](https://hub.docker.com/r/rocker/tidyverse)
+* **Scala**: [`sbtscala/scala-sbt`](https://hub.docker.com/r/sbtscala/scala-sbt)
 
-* Bash: [`bash`](https://hub.docker.com/_/bash), [`ubuntu`](https://hub.docker.com/_/ubuntu)
-* C#: [`ghcr.io/data-intuitive/dotnet-script`](https://github.com/data-intuitive/ghcr-dotnet-script/pkgs/container/dotnet-script)
-* JavaScript: [`node`](https://hub.docker.com/_/node)
-* Python: [`python`](https://hub.docker.com/_/python), [`nvcr.io/nvidia/pytorch`](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch)
-* R: [`eddelbuettel/r2u`](https://hub.docker.com/r/eddelbuettel/r2u), [`rocker/tidyverse`](https://hub.docker.com/r/rocker/tidyverse)
-* Scala: [`sbtscala/scala-sbt`](https://hub.docker.com/r/sbtscala/scala-sbt)
+For more information on custom containers, see the [Viash documentation](https://viash.io/guide/component/add-dependencies.html#steps-for-creating-a-custom-docker-platform).
 
 ### Step 11: Write a runner script
 
 Next, we need to write a runner script that runs the tool with the input arguments. Create a Bash script named `src/xxx/script.sh` which runs the tool with the input arguments.
 
-```bash
-#!/bin/bash
-
-## VIASH START
-## VIASH END
-
-# unset flags
-[[ "$par_option" == "false" ]] && unset par_option
-
-xxx \
-  --input "$par_input" \
-  --output "$par_output" \
-  ${par_option:+--option}
-```
-
-When building a Viash component, Viash will automatically replace the `## VIASH START` and `## VIASH END` lines (and anything in between) with environment variables based on the arguments specified in the config.
-
-As an example, this is what the Bash script for the `arriba` component looks like:
+**Modern script structure using array-based arguments:**
 
 ```bash
 #!/bin/bash
@@ -301,60 +384,197 @@ As an example, this is what the Bash script for the `arriba` component looks lik
 ## VIASH START
 ## VIASH END
 
-# unset flags
-[[ "$par_skip_duplicate_marking" == "false" ]] && unset par_skip_duplicate_marking
-[[ "$par_extra_information" == "false" ]] && unset par_extra_information
-[[ "$par_fill_gaps" == "false" ]] && unset par_fill_gaps
+set -eo pipefail
 
-arriba \
-  -x "$par_bam" \
-  -a "$par_genome" \
-  -g "$par_gene_annotation" \
-  -o "$par_fusions" \
-  ${par_known_fusions:+-k "${par_known_fusions}"} \
-  ${par_blacklist:+-b "${par_blacklist}"} \
-  # ...
-  ${par_extra_information:+-X} \
-  ${par_fill_gaps:+-I}
+# unset flags
+[[ "$par_option1" == "false" ]] && unset par_option1
+[[ "$par_option2" == "false" ]] && unset par_option2
+
+# Build command arguments array
+cmd_args=(
+    --input "$par_input"
+    --output "$par_output"
+    ${par_option1:+--option1}
+    ${par_option2:+--option2}
+    ${par_threads:+--threads "$par_threads"}
+    ${par_memory:+--memory "$par_memory"}
+)
+
+# Execute command
+xxx "${cmd_args[@]}"
 ```
 
-Notes:
+**Key improvements in modern scripts:**
 
-* If your arguments can contain special variables (e.g. `$`), you can use quoting (need to find a documentation page for this) to make sure you can use the string as input. Example: `-x ${par_bam@Q}`.
+1. **Use `set -eo pipefail`**: Ensures the script fails fast on errors
+2. **Array-based arguments**: Use a single `cmd_args` array instead of repetitive `cmd_args+=()` calls
+3. **Conditional parameter inclusion**: Use `${var:+--flag "$var"}` for optional parameters
+4. **Proper quoting**: Use `"$var"` for variables that might contain spaces
 
-* Optional arguments can be passed to the command conditionally using Bash [parameter expansion](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html). For example: `${par_known_fusions:+-k ${par_known_fusions@Q}}`
+**Example from a real component:**
 
-* If your tool allows for multiple inputs using a separator other than `;` (which is the default Viash multiple separator), you can substitute these values with a command like: `par_disable_filters=$(echo $par_disable_filters | tr ';' ',')`.
+```bash
+#!/bin/bash
 
-* If you have a lot of boolean variables that you would like to unset when the value is `false`, you can avoid duplicate code by using the following syntax:
+## VIASH START
+## VIASH END
+
+set -eo pipefail
+
+# unset flags
+[[ "$par_large_index" == "false" ]] && unset par_large_index
+[[ "$par_noauto" == "false" ]] && unset par_noauto
+[[ "$par_packed" == "false" ]] && unset par_packed
+
+# Create output directory
+mkdir -p "$par_output"
+
+# Determine index basename
+if [ -n "$par_index_name" ]; then
+    index_basename="$par_index_name"
+else
+    index_basename=$(basename "$par_input" .fasta)
+fi
+
+# Build command arguments
+cmd_args=(
+    ${par_fasta:+-f}
+    ${par_cmdline:+-c}
+    ${par_large_index:+--large-index}
+    ${par_noauto:+-a}
+    ${par_packed:+-p}
+    ${par_bmax:+--bmax "$par_bmax"}
+    ${par_offrate:+-o "$par_offrate"}
+    "$par_input"
+    "$par_output/$index_basename"
+)
+
+# Execute bowtie2-build
+bowtie2-build "${cmd_args[@]}"
+```
+
+**Notes:**
+
+* If your arguments can contain special variables (e.g. `$`), you can use `${par_bam@Q}` for proper escaping.
+
+* Optional arguments can be passed conditionally using Bash [parameter expansion](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html): `${par_known_fusions:+-k "$par_known_fusions"}`
+
+* If your tool allows multiple inputs with custom separators, use: `par_disable_filters=$(echo $par_disable_filters | tr ';' ',')`
+
+* For many boolean variables, you can use a loop to avoid repetition:
 
 ```bash
 unset_if_false=(
     par_argument_1
     par_argument_2
     par_argument_3
-    par_argument_4
 )
 
-for par in ${unset_if_false[@]}; do
+for par in "${unset_if_false[@]}"; do
     test_val="${!par}"
     [[ "$test_val" == "false" ]] && unset $par
 done
 ```
 
-this code is equivalent to
-
-```bash
-[[ "$par_argument_1" == "false" ]] && unset par_argument_1
-[[ "$par_argument_2" == "false" ]] && unset par_argument_2
-[[ "$par_argument_3" == "false" ]] && unset par_argument_3
-[[ "$par_argument_4" == "false" ]] && unset par_argument_4
-```
-
 
 ### Step 12: Create test script
 
-If the unit test requires test resources, these should be provided in the `test_resources` section of the component. 
+**Best Practice: Generate test data within the test script instead of including static test resources.**
+
+The test script should be self-contained and generate its own test data rather than relying on external files. This keeps the repository lean and ensures reproducibility.
+
+```yaml
+test_resources:
+  - type: bash_script
+    path: test.sh
+```
+
+Create a test script at `src/xxx/test.sh` that:
+1. Generates its own test data
+2. Runs the component with the generated data
+3. Validates the output
+4. Uses proper error handling
+
+**Example test script structure:**
+
+```bash
+#!/bin/bash
+
+set -e
+
+TEMP_DIR="$meta_temp_dir"
+
+#############################################
+# helper functions
+assert_file_exists() {
+  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
+}
+assert_file_not_empty() {
+  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
+}
+assert_dir_exists() {
+  [ -d "$1" ] || { echo "Directory '$1' does not exist" && exit 1; }
+}
+assert_file_contains() {
+  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
+}
+#############################################
+
+# --- Helper function to create test data ---
+create_test_fasta() {
+  file_path="$1"
+  
+  cat << 'EOF' > "$file_path"
+>chr1
+ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
+>chr2
+GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
+EOF
+}
+
+# --- Test Case 1: Basic functionality ---
+echo ">>> Test 1: Basic functionality"
+create_test_fasta "$TEMP_DIR/input.fasta"
+
+echo ">> Running $meta_name..."
+"$meta_executable" \
+  --input "$TEMP_DIR/input.fasta" \
+  --output "$TEMP_DIR/output"
+
+echo ">> Checking output exists..."
+assert_dir_exists "$TEMP_DIR/output"
+
+echo ">> Checking output is not empty..."
+assert_file_not_empty "$TEMP_DIR/output/some_file"
+
+echo ">> Checking output content..."
+assert_file_contains "$TEMP_DIR/output/some_file" "expected_pattern"
+
+# --- Test Case 2: Edge cases ---
+echo ">>> Test 2: Edge case testing"
+# ... additional test cases
+
+echo "> All tests succeeded!"
+```
+
+**Key principles for test scripts:**
+
+1. **Generate test data**: Use functions to create minimal test data rather than storing files
+2. **Use `$meta_temp_dir`**: All temporary files should go in the provided temp directory
+3. **Test multiple scenarios**: Include basic functionality, edge cases, and error conditions
+4. **Validate outputs**: Always check that outputs exist, have expected content, and are not empty
+5. **Use helper functions**: Include assertion functions for common checks
+6. **Clear test structure**: Use descriptive echo statements to show test progress
+7. **Fail fast**: Use `set -e` and proper assertions that exit on failure
+
+**When you might need static test resources:**
+
+Only include static test files in `test_resources` if:
+- The tool requires very specific, complex file formats
+- Generating equivalent test data is impractical
+- You need real-world data to validate complex algorithms
+
+If you must use static test resources:
 
 ```yaml
 test_resources:
@@ -364,82 +584,52 @@ test_resources:
     path: test_data
 ```
 
-Create a test script at `src/xxx/test.sh` that runs the component with the test data. This script should run the component (available with `$meta_executable`) with the test data and check if the output is as expected. The script should exit with a non-zero exit code if the output is not as expected. For example:
-
-```bash
-#!/bin/bash
-
-set -e
-
-## VIASH START
-## VIASH END
-
-#############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_doesnt_exist() {
-  [ ! -f "$1" ] || { echo "File '$1' exists but shouldn't" && exit 1; }
-}
-assert_file_empty() {
-  [ ! -s "$1" ] || { echo "File '$1' is not empty but should be" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-assert_file_not_contains() {
-  grep -q "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
-}
-assert_file_contains_regex() {
-  grep -q -E "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-assert_file_not_contains_regex() {
-  grep -q -E "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
-}
-#############################################
-
-echo "> Run $meta_name with test data"
-"$meta_executable" \
-  --input "$meta_resources_dir/test_data/reads_R1.fastq" \
-  --output "output.txt" \
-  --option
-
-echo ">> Check if output exists"
-assert_file_exists "output.txt"
-
-echo ">> Check if output is empty"
-assert_file_not_empty "output.txt"
-
-echo ">> Check if output is correct"
-assert_file_contains "output.txt" "some expected output"
-
-echo "> All tests succeeded!"
-```
-
-Notes:
-
-* Do always check the contents of the output file. If the output is not deterministic, you can use regular expressions to check the output.
-
-* If possible, generate your own test data instead of copying it from an external resource.
-
 ### Step 13: Create a `/var/software_versions.txt` file
 
-For the sake of transparency and reproducibility, we require that the versions of the software used in the component are documented.
+For transparency and reproducibility, we require that software versions are documented in a standardized format.
 
-For now, this is managed by creating a file `/var/software_versions.txt` in the `setup` section of the Docker engine.
+This is managed by adding version detection commands to the `setup` section of the Docker engine:
 
 ```yaml
 engines:
   - type: docker
-    image: quay.io/biocontainers/xxx:0.1.0--py_0
+    image: quay.io/biocontainers/xxx:2.5.4--he96a11b_6
     setup:
       - type: docker
-        # note: /var/software_versions.txt should contain:
-        #   arriba: "2.4.0"
         run: |
-          echo "xxx: \"0.1.0\"" > /var/software_versions.txt
+          xxx --version 2>&1 | head -1 | sed 's/.*version /xxx: /' > /var/software_versions.txt
+```
+
+**Best practices for version detection:**
+
+1. **Use the most reliable version command**: Many tools support `--version`, some use `-v` or `version`
+2. **Handle stderr output**: Some tools output version info to stderr, so use `2>&1`
+3. **Extract clean version strings**: Use `sed` to create clean "tool: version" format
+4. **Test the version command**: Verify that your version extraction works with the specific tool
+
+**Common version extraction patterns:**
+
+```bash
+# For tools that output "Tool version X.Y.Z"
+tool --version 2>&1 | head -1 | sed 's/.*version /tool: /' > /var/software_versions.txt
+
+# For tools that output just the version number
+echo "tool: $(tool --version 2>&1 | head -1)" > /var/software_versions.txt
+
+# For tools with complex version output
+tool --version 2>&1 | grep -E "^[0-9]" | head -1 | sed 's/^/tool: /' > /var/software_versions.txt
+```
+
+**Example from bowtie2:**
+
+```yaml
+setup:
+  - type: docker
+    run: |
+      bowtie2-build --version 2>&1 | head -1 | sed 's/.*version /bowtie2-build: /' > /var/software_versions.txt
+```
+
+This ensures that the final `/var/software_versions.txt` contains entries like:
+```
+bowtie2-build: 2.5.4
 ```
