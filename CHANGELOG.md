@@ -2,7 +2,7 @@
 
 ## DOCUMENTATION
 
-* `CONTRIBUTING.md`: Update contributing guidelines with current best practices including )PR #xxx):
+* `CONTRIBUTING.md`: Update contributing guidelines with current best practices including (PR #185):
   - Use `requirements.commands` to list required commands
   - Use `__merge__` syntax for author information 
   - Prefer generating test data in test scripts rather than storing static files
