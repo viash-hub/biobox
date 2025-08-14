@@ -7,7 +7,8 @@ links:
   documentation: https://bio-bwa.sourceforge.net/bwa.shtml
   repository: https://github.com/lh3/bwa
 license: MIT
-
+requirements:
+  commands: [bwa]
 authors:
   - __merge__: /src/_authors/robrecht_cannoodt.yaml
     roles: [ author, maintainer ]
