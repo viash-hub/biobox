@@ -7,9 +7,15 @@ license <- paste0(package$links$repository, "/blob/main/LICENSE")
 contributing <- paste0(package$links$repository, "/blob/main/CONTRIBUTING.md")
 
 pkg <- package$name
-ver <- if (!is.null(package$version)) package$version else "v0.3.1"
-comp <- "arriba"
+ver <- if (!is.null(package$version)) package$version else "v0.4.0"
+comp <- "bowtie2_align"
+
+# Count components
+component_dirs <- list.dirs("src", recursive = FALSE, full.names = FALSE)
+component_dirs <- component_dirs[!startsWith(component_dirs, "_")]
+n_tools <- length(component_dirs)
 ```
+
 # 🌱📦 `r pkg`
 
 [![ViashHub](https://img.shields.io/badge/ViashHub-`r pkg`-7a4baa.svg)](https://www.viash-hub.com/packages/`r pkg`) 
@@ -18,106 +24,99 @@ comp <- "arriba"
 [![GitHub Issues](https://img.shields.io/github/issues/viash-hub/`r pkg`.svg)](`r package$links$issue_tracker`) 
 [![Viash version](https://img.shields.io/badge/Viash-v`r gsub("-", "--", package$viash_version)`-blue.svg)](https://viash.io)
 
-`r package$summary`
+**A curated collection of high-quality, production-ready bioinformatics components**
 
-## Introduction
+Built with [Viash](https://viash.io), `r pkg` provides reliable, containerized tools for genomics and bioinformatics workflows. Each component is thoroughly tested, fully documented, and designed for seamless integration into both standalone and Nextflow pipelines.
 
-`r package$description`
+## Why Choose `r pkg`?
 
-## Example Usage
+✅ **Production Ready**: All components are containerized with pinned versions and comprehensive testing  
+✅ **Nextflow Native**: Drop-in compatibility with Nextflow workflows  
+✅ **Complete Documentation**: Full parameter exposure with detailed help and examples  
+✅ **Quality Assured**: Unit tested with automated CI/CD validation  
+✅ **Modern Standards**: Built with current best practices and maintained dependencies  
 
-Viash components in `r pkg` can be run in various ways:
+## Featured Tools
+
+Our collection spans the complete bioinformatics pipeline:
+
+**Alignment & Mapping**: BWA, Bowtie2, STAR, Kallisto, Salmon  
+**Quality Control**: FastQC, Falco, MultiQC, Qualimap, NanoPlot  
+**Preprocessing**: Cutadapt, fastp, Trimgalore, UMI-tools  
+**Variant Calling**: BCFtools, LoFreq, SnpEff  
+**File Manipulation**: SAMtools, Bedtools, seqtk  
+**Assembly & Annotation**: BUSCO, AGAT, GFFread  
+**Single Cell**: CellRanger, BD Rhapsody  
+
+[View all components →](https://www.viash-hub.com/packages/`r pkg`)
+
+## Quick Start
+
+You can run Viash components from `r pkg` in several ways:
+
+**🌐 Via Viash Hub Web UI**: Interactive interface with documentation and examples  
+**⚡ As Standalone Executables**: Direct command-line execution  
+**🔄 Via Nextflow**: Local or cloud-based pipeline workflows  
+
+For detailed instructions on each method, visit the **[Viash Hub documentation →](https://viash-hub.com/packages/`r pkg`)** where each component page shows exactly how to run it in different environments.
 
 ```{r mmd, echo=FALSE, results='asis'}
 cat(
   "```mermaid\n",
-  "flowchart TD\n",
-  "    A[", pkg, " ", ver, "] --> B(Viash Hub Launch)\n",
-  "    A --> C(Viash CLI)\n",
-  "    A --> D(Nextflow CLI)\n",
-  "    A --> E(Seqera Cloud)\n",
-  "    A --> F(As a dependency)\n",
+  "flowchart LR\n",
+  "    A[", pkg, " Components] --> B[🌐 Web UI]\n",
+  "    A --> C[⚡ Standalone]\n",
+  "    A --> D[🔄 Nextflow Local]\n",
+  "    A --> E[☁️ Nextflow Cloud]\n",
+  "    \n",
+  "    style A fill:#7a4baa,color:#fff\n",
+  "    style B fill:#e1f5fe\n",
+  "    style C fill:#e8f5e8\n",
+  "    style D fill:#fff3e0\n",
+  "    style E fill:#f3e5f5\n",
   "```\n",
   sep = ""
 )
 ```
 
-### 1. Via the Viash Hub Launch interface
+You can run components directly from Viash Hub's launch interface. See [Viash Hub](https://www.viash-hub.com/packages/`r pkg`) for more information.
 
-You can run this component directly from the Viash Hub [Launch interface](https://www.viash-hub.com/launch?package=`r pkg`&version=`r ver`&component=`r comp`&runner=Executable).
-
-![](docs/viash-hub.png)
-
-### 2. Via the Viash CLI
-
-You can run this component directly from the command line using the Viash CLI.
-
-```bash
-viash run vsh://`r pkg`@`r ver`/`r comp` -- --help
-
-viash run vsh://`r pkg`@`r ver`/`r comp` -- \
-  --bam path/to/input.bam \
-  --genome path/to/genome.fa \
-  --gene_annotation path/to/annotation.gtf \
-  --fusions path/to/output.txt
-```
-
-This will run the component with the specified input files and output the results to the specified output file.
-
-### 3. Via the Nextflow CLI or Seqera Cloud
-
-You can run this component as a Nextflow pipeline.
-
-```bash
-nextflow run https://packages.viash-hub.com/vsh/`r pkg` \
-  -revision `r ver` \
-  -main-script target/nextflow/`r comp`/main.nf \
-  -latest -resume \
-  -profile docker \
-  --bam path/to/input.bam \
-  --genome path/to/genome.fa \
-  --gene_annotation path/to/annotation.gtf \
-  --publish_dir path/to/output
-```
-
-**Note:** Make sure that the [Nextflow SCM](https://www.nextflow.io/docs/latest/git.html#git-configuration) is set up properly. You can do this by adding the following lines to your `~/.nextflow/scm` file:
-
-```groovy
-providers.vsh.platform = 'gitlab'
-providers.vsh.server = 'https://packages.viash-hub.com'
-```
-
-**Tip:** This will also work with Seqera Cloud or other Nextflow-compatible platforms.
-
-### 4. As a dependency
-
-In your Viash config file (`config.vsh.yaml`), you can add this component as a dependency:
-
-```yaml
-dependencies:
-  - name: `r comp`
-    repository: vsh://`r pkg`@`r ver`
-```
-
-**Tip:** See the [Viash documentation](https://viash.io/guide/nextflow_vdsl3/create-a-pipeline.html#pipeline-as-a-component) for more details on how to use Viash components as a dependency in your own Nextflow workflows.
 
 ## Contributing
 
-Contributions are welcome! We aim to build a comprehensive collection of high-quality bioinformatics components. If you'd like to contribute, please follow these general steps:
+We welcome contributions! `r pkg` thrives on community input to expand our collection of high-quality bioinformatics components.
 
+### Quick Contribution Process
 
-```{r echo=FALSE}
-lines <- readr::read_lines("CONTRIBUTING.md")
+1. **Fork** the repository
+2. **Create** your component following our guidelines  
+3. **Test** thoroughly with `viash test`
+4. **Submit** a pull request
 
-index_start <- grep("^### Step [0-9]*:", lines)
+### What We're Looking For
 
-index_end <- c(index_start[-1] - 1, length(lines))
+- **Popular bioinformatics tools** missing from our collection
+- **Improvements** to existing components
+- **Bug fixes** and documentation enhancements
+- **Best practice** implementations
 
-name <- gsub("^### Step [0-9]*: *", "", lines[index_start])
+### Getting Started
 
-knitr::asis_output(
-  paste(paste0(" 1. ", name, "\n"), collapse = "")
-)
-```
+Check out our comprehensive guides:
 
-See the [CONTRIBUTING](`r contributing`) file for more details.
+- **[Contributing Guidelines](`r contributing`)** - Complete development guide
+- **[Component Standards](docs/COMPONENT_DEVELOPMENT.md)** - Quality requirements
+- **[Testing Guide](docs/TESTING.md)** - Validation best practices
+
+**New to Viash?** Start with our [beginner-friendly issues](https://github.com/viash-hub/biobox/labels/good%20first%20issue) or join our [community discussions](https://github.com/viash-hub/biobox/discussions).
+
+## Community & Support
+
+- **Documentation**: [Viash Documentation](https://viash.io)
+- **Discussions**: [GitHub Discussions](https://github.com/viash-hub/biobox/discussions)
+- **Issues**: [Bug Reports & Feature Requests](https://github.com/viash-hub/biobox/issues)
+- **Updates**: Follow [@viash_io](https://twitter.com/viash_io) for the latest news
+
+---
+
+**Ready to streamline your bioinformatics workflows?** [Get started with `r pkg` today →](https://www.viash-hub.com/packages/`r pkg`)

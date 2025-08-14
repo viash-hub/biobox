@@ -11,132 +11,116 @@ Issues](https://img.shields.io/github/issues/viash-hub/biobox.svg)](https://gith
 [![Viash
 version](https://img.shields.io/badge/Viash-v0.9.4-blue.svg)](https://viash.io)
 
-A curated collection of high-quality, standalone bioinformatics
-components built with [Viash](https://viash.io).
+**A curated collection of high-quality, production-ready bioinformatics
+components**
 
-## Introduction
+Built with [Viash](https://viash.io), biobox provides reliable,
+containerized tools for genomics and bioinformatics workflows. Each
+component is thoroughly tested, fully documented, and designed for
+seamless integration into both standalone and Nextflow pipelines.
 
-`biobox` offers a suite of reliable bioinformatics components, similar
-to [nf-core/modules](https://github.com/nf-core/modules) and
-[snakemake-wrappers/bio](https://github.com/snakemake/snakemake-wrappers/tree/master/bio),
-but built using the [Viash](https://viash.io) framework.
+## Why Choose biobox?
 
-This approach emphasizes **reusability**, **reproducibility**, and
-adherence to **best practices**. Key features of `biobox` components
-include:
+✅ **Production Ready**: All components are containerized with pinned
+versions and comprehensive testing  
+✅ **Nextflow Native**: Drop-in compatibility with Nextflow workflows  
+✅ **Complete Documentation**: Full parameter exposure with detailed
+help and examples  
+✅ **Quality Assured**: Unit tested with automated CI/CD validation  
+✅ **Modern Standards**: Built with current best practices and
+maintained dependencies
 
-- **Standalone & Nextflow Ready:** Run components directly via the
-  command line or seamlessly integrate them into Nextflow workflows.
-- **High Quality Standards:**
-  - Comprehensive documentation for components and parameters.
-  - Full exposure of underlying tool arguments.
-  - Containerized (Docker) for dependency management and
-    reproducibility.
-  - Unit tested for verified functionality.
+## Featured Tools
 
-## Example Usage
+Our collection spans the complete bioinformatics pipeline:
 
-Viash components in biobox can be run in various ways:
+**Alignment & Mapping**: BWA, Bowtie2, STAR, Kallisto, Salmon  
+**Quality Control**: FastQC, Falco, MultiQC, Qualimap, NanoPlot  
+**Preprocessing**: Cutadapt, fastp, Trimgalore, UMI-tools  
+**Variant Calling**: BCFtools, LoFreq, SnpEff  
+**File Manipulation**: SAMtools, Bedtools, seqtk  
+**Assembly & Annotation**: BUSCO, AGAT, GFFread  
+**Single Cell**: CellRanger, BD Rhapsody
 
-``` mermaid lang="mermaid"
-flowchart TD
-    A[biobox v0.3.1] --> B(Viash Hub Launch)
-    A --> C(Viash CLI)
-    A --> D(Nextflow CLI)
-    A --> E(Seqera Cloud)
-    A --> F(As a dependency)
+[View all components →](https://www.viash-hub.com/packages/biobox)
+
+## Quick Start
+
+You can run Viash components from biobox in several ways:
+
+**🌐 Via Viash Hub Web UI**: Interactive interface with documentation
+and examples  
+**⚡ As Standalone Executables**: Direct command-line execution  
+**🔄 Via Nextflow**: Local or cloud-based pipeline workflows
+
+For detailed instructions on each method, visit the **[Viash Hub
+documentation →](https://viash-hub.com/packages/biobox)** where each
+component page shows exactly how to run it in different environments.
+
+``` mermaid
+flowchart LR
+    A[biobox Components] --> B[🌐 Web UI]
+    A --> C[⚡ Standalone]
+    A --> D[🔄 Nextflow Local]
+    A --> E[☁️ Nextflow Cloud]
+    
+    style A fill:#7a4baa,color:#fff
+    style B fill:#e1f5fe
+    style C fill:#e8f5e8
+    style D fill:#fff3e0
+    style E fill:#f3e5f5
 ```
 
-### 1. Via the Viash Hub Launch interface
-
-You can run this component directly from the Viash Hub [Launch
-interface](https://www.viash-hub.com/launch?package=biobox&version=v0.3.1&component=arriba&runner=Executable).
-
-![](docs/viash-hub.png)
-
-### 2. Via the Viash CLI
-
-You can run this component directly from the command line using the
-Viash CLI.
-
-``` bash
-viash run vsh://biobox@v0.3.1/arriba -- --help
-
-viash run vsh://biobox@v0.3.1/arriba -- \
-  --bam path/to/input.bam \
-  --genome path/to/genome.fa \
-  --gene_annotation path/to/annotation.gtf \
-  --fusions path/to/output.txt
-```
-
-This will run the component with the specified input files and output
-the results to the specified output file.
-
-### 3. Via the Nextflow CLI or Seqera Cloud
-
-You can run this component as a Nextflow pipeline.
-
-``` bash
-nextflow run https://packages.viash-hub.com/vsh/biobox \
-  -revision v0.3.1 \
-  -main-script target/nextflow/arriba/main.nf \
-  -latest -resume \
-  -profile docker \
-  --bam path/to/input.bam \
-  --genome path/to/genome.fa \
-  --gene_annotation path/to/annotation.gtf \
-  --publish_dir path/to/output
-```
-
-**Note:** Make sure that the [Nextflow
-SCM](https://www.nextflow.io/docs/latest/git.html#git-configuration) is
-set up properly. You can do this by adding the following lines to your
-`~/.nextflow/scm` file:
-
-``` groovy
-providers.vsh.platform = 'gitlab'
-providers.vsh.server = 'https://packages.viash-hub.com'
-```
-
-**Tip:** This will also work with Seqera Cloud or other
-Nextflow-compatible platforms.
-
-### 4. As a dependency
-
-In your Viash config file (`config.vsh.yaml`), you can add this
-component as a dependency:
-
-``` yaml
-dependencies:
-  - name: arriba
-    repository: vsh://biobox@v0.3.1
-```
-
-**Tip:** See the [Viash
-documentation](https://viash.io/guide/nextflow_vdsl3/create-a-pipeline.html#pipeline-as-a-component)
-for more details on how to use Viash components as a dependency in your
-own Nextflow workflows.
+You can run components directly from Viash Hub’s launch interface. See
+[Viash Hub](https://www.viash-hub.com/packages/biobox) for more
+information.
 
 ## Contributing
 
-Contributions are welcome! We aim to build a comprehensive collection of
-high-quality bioinformatics components. If you’d like to contribute,
-please follow these general steps:
+We welcome contributions! biobox thrives on community input to expand
+our collection of high-quality bioinformatics components.
 
-1.  Find a component to contribute
-2.  Add config template
-3.  Fill in the metadata
-4.  Find a suitable container
-5.  Create help file
-6.  Create or fetch test data
-7.  Add arguments for the input files
-8.  Add arguments for the output files
-9.  Add arguments for the other arguments
-10. Add a Docker engine
-11. Write a runner script
-12. Create test script
-13. Create a `/var/software_versions.txt` file
+### Quick Contribution Process
 
-See the
-[CONTRIBUTING](https://github.com/viash-hub/biobox/blob/main/CONTRIBUTING.md)
-file for more details.
+1.  **Fork** the repository
+2.  **Create** your component following our guidelines  
+3.  **Test** thoroughly with `viash test`
+4.  **Submit** a pull request
+
+### What We’re Looking For
+
+- **Popular bioinformatics tools** missing from our collection
+- **Improvements** to existing components
+- **Bug fixes** and documentation enhancements
+- **Best practice** implementations
+
+### Getting Started
+
+Check out our comprehensive guides:
+
+- **[Contributing
+  Guidelines](https://github.com/viash-hub/biobox/blob/main/CONTRIBUTING.md)** -
+  Complete development guide
+- **[Component Standards](docs/COMPONENT_DEVELOPMENT.md)** - Quality
+  requirements
+- **[Testing Guide](docs/TESTING.md)** - Validation best practices
+
+**New to Viash?** Start with our [beginner-friendly
+issues](https://github.com/viash-hub/biobox/labels/good%20first%20issue)
+or join our [community
+discussions](https://github.com/viash-hub/biobox/discussions).
+
+## Community & Support
+
+- **Documentation**: [Viash Documentation](https://viash.io)
+- **Discussions**: [GitHub
+  Discussions](https://github.com/viash-hub/biobox/discussions)
+- **Issues**: [Bug Reports & Feature
+  Requests](https://github.com/viash-hub/biobox/issues)
+- **Updates**: Follow [@viash_io](https://twitter.com/viash_io) for the
+  latest news
+
+------------------------------------------------------------------------
+
+**Ready to streamline your bioinformatics workflows?** [Get started with
+biobox today →](https://www.viash-hub.com/packages/biobox)
