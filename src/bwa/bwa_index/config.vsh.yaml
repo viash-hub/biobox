@@ -1,0 +1,90 @@
+name: bwa_index
+namespace: bwa
+description: Index sequences in the FASTA format for BWA alignment.
+keywords: [alignment, indexing, BWA, reference]
+links:
+  homepage: https://bio-bwa.sourceforge.net/
+  documentation: https://bio-bwa.sourceforge.net/bwa.shtml
+  repository: https://github.com/lh3/bwa
+license: MIT
+
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [ author, maintainer ]
+
+argument_groups: 
+- name: "Input"
+  arguments: 
+  - name: "--input"
+    type: file
+    description: Input FASTA file to be indexed.
+    required: true
+    example: reference.fasta
+
+- name: "Output"
+  arguments: 
+  - name: "--output_amb"
+    type: file
+    direction: output
+    description: Output AMB file (text file describing ambiguous bases).
+    example: reference.fasta.amb
+  - name: "--output_ann"
+    type: file
+    direction: output
+    description: Output ANN file (text file describing annotations).
+    example: reference.fasta.ann
+  - name: "--output_bwt"
+    type: file
+    direction: output
+    description: Output BWT file (Burrows-Wheeler Transform).
+    example: reference.fasta.bwt
+  - name: "--output_pac"
+    type: file
+    direction: output
+    description: Output PAC file (packed sequence).
+    example: reference.fasta.pac
+  - name: "--output_sa"
+    type: file
+    direction: output
+    description: Output SA file (suffix array).
+    example: reference.fasta.sa
+
+- name: "Options"
+  arguments: 
+  - name: "--algorithm"
+    alternatives: -a
+    type: string
+    description: BWT construction algorithm. If not specified, BWA will choose automatically.
+    choices: [bwtsw, is, rb2]
+  - name: "--prefix"
+    alternatives: -p
+    type: string
+    description: Prefix of the index files. Default is same as input fasta name.
+  - name: "--block_size"
+    alternatives: -b
+    type: integer
+    description: Block size for the bwtsw algorithm (effective with -a bwtsw). Default is 10000000.
+  - name: "--use_64bit_names"
+    alternatives: ["-6"]
+    type: boolean_true
+    description: Index files named as <in.fasta>.64.* instead of <in.fasta>.*.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:  
+  - type: docker
+    image: quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8
+    setup:
+      - type: docker
+        run: |
+          bwa 2>&1 | grep "Version:" | sed 's/Version: /bwa: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
