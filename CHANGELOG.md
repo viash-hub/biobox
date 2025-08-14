@@ -8,6 +8,7 @@
 
 * `fq`:
   - `fq/fq_filter`: Filter FASTQ files based on record names or sequence patterns (PR #182).
+  - `fq/fq_generate`: Generate a random FASTQ file pair for testing and simulation purposes (PR #182).
 
 # biobox 0.3.2
 
