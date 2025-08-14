@@ -1,0 +1,71 @@
+name: fq_generate
+namespace: fq
+description: Generate a random FASTQ file pair for testing and simulation purposes.
+keywords: [FASTQ, generate, simulate, test-data]
+links:
+  homepage: https://github.com/stjude-rust-labs/fq
+  documentation: https://github.com/stjude-rust-labs/fq
+  repository: https://github.com/stjude-rust-labs/fq
+license: MIT
+requirements:
+  commands: [fq]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+- name: "Output"
+  arguments:
+  - name: "--r1_dst"
+    type: file
+    direction: output
+    description: Read 1 destination. Output will be gzipped if ends in `.gz`.
+    required: true
+    example: reads_R1.fastq.gz
+  - name: "--r2_dst"
+    type: file
+    direction: output
+    description: Read 2 destination. Output will be gzipped if ends in `.gz`.
+    required: true
+    example: reads_R2.fastq.gz
+
+- name: "Options"
+  arguments:
+  - name: "--seed"
+    alternatives: [-s]
+    type: integer
+    description: Seed to use for the random number generator.
+    example: 42
+  - name: "--record_count"
+    alternatives: [-n]
+    type: integer
+    description: Number of records to generate.
+    default: 10000
+    example: 10000
+  - name: "--read_length"
+    type: integer
+    description: Number of bases in the sequence.
+    default: 101
+    example: 101
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - type: file
+    path: help.txt
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+- type: docker
+  image: quay.io/biocontainers/fq:0.12.0--h9ee0642_0
+  setup:
+    - type: docker
+      run: |
+        fq --version | sed 's/^/fq: /' > /var/software_versions.txt
+
+runners:
+- type: executable
+- type: nextflow

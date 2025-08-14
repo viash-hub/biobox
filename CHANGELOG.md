@@ -1,3 +1,15 @@
+# biobox 0.4.0
+
+## BREAKING CHANGES
+
+* `fq_subsample` has been removed after its functionality was previously copied to `fq/fq_subsample`. Please use the latter instead. (PR #182).
+
+## NEW FUNCTIONALITY
+
+* `fq`:
+  - `fq/fq_filter`: Filter FASTQ files based on record names or sequence patterns (PR #182).
+  - `fq/fq_generate`: Generate a random FASTQ file pair for testing and simulation purposes (PR #182).
+
 # biobox 0.3.2
 
 ## NEW FUNCTIONALITY
