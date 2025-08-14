@@ -2,6 +2,10 @@
 
 ## NEW FUNCTIONALITY
 
+* `bwa`:
+  - `bwa/bwa_index`: Create BWA index files for reference genome alignment (PR #xxx).
+  - `bwa/bwa_mem`: BWA-MEM algorithm for sequence alignment supporting single-end and paired-end reads (PR #xxx).
+
 * `fq`:
   - `fq/fq_lint`: Validate FASTQ files for common issues (PR #179).
   - `fq/fq_subsample`: Sample a subset of records from single or paired FASTQ files (PR #179).
