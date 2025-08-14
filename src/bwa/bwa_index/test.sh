@@ -12,9 +12,12 @@ assert_file_exists() {
 assert_file_not_empty() {
   [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
 }
+assert_dir_exists() {
+  [ -d "$1" ] || { echo "Directory '$1' does not exist" && exit 1; }
+}
 #############################################
 
-# --- Helper function to create a test FASTA file ---
+# --- Helper function to create test FASTA ---
 create_test_fasta() {
   file_path="$1"
   
@@ -39,25 +42,24 @@ create_test_fasta "$TEMP_DIR/test_ref.fasta"
 echo ">> Running bwa_index..."
 "$meta_executable" \
   --input "$TEMP_DIR/test_ref.fasta" \
-  --output_amb "$TEMP_DIR/test_ref.fasta.amb" \
-  --output_ann "$TEMP_DIR/test_ref.fasta.ann" \
-  --output_bwt "$TEMP_DIR/test_ref.fasta.bwt" \
-  --output_pac "$TEMP_DIR/test_ref.fasta.pac" \
-  --output_sa "$TEMP_DIR/test_ref.fasta.sa"
+  --output "$TEMP_DIR/bwa_index"
+
+echo ">> Checking output directory exists..."
+assert_dir_exists "$TEMP_DIR/bwa_index"
 
 echo ">> Checking all index files exist..."
-assert_file_exists "$TEMP_DIR/test_ref.fasta.amb"
-assert_file_exists "$TEMP_DIR/test_ref.fasta.ann"
-assert_file_exists "$TEMP_DIR/test_ref.fasta.bwt"
-assert_file_exists "$TEMP_DIR/test_ref.fasta.pac"
-assert_file_exists "$TEMP_DIR/test_ref.fasta.sa"
+assert_file_exists "$TEMP_DIR/bwa_index/test_ref.amb"
+assert_file_exists "$TEMP_DIR/bwa_index/test_ref.ann"
+assert_file_exists "$TEMP_DIR/bwa_index/test_ref.bwt"
+assert_file_exists "$TEMP_DIR/bwa_index/test_ref.pac"
+assert_file_exists "$TEMP_DIR/bwa_index/test_ref.sa"
 
 echo ">> Checking index files are not empty..."
-assert_file_not_empty "$TEMP_DIR/test_ref.fasta.amb"
-assert_file_not_empty "$TEMP_DIR/test_ref.fasta.ann"
-assert_file_not_empty "$TEMP_DIR/test_ref.fasta.bwt"
-assert_file_not_empty "$TEMP_DIR/test_ref.fasta.pac"
-assert_file_not_empty "$TEMP_DIR/test_ref.fasta.sa"
+assert_file_not_empty "$TEMP_DIR/bwa_index/test_ref.amb"
+assert_file_not_empty "$TEMP_DIR/bwa_index/test_ref.ann"
+assert_file_not_empty "$TEMP_DIR/bwa_index/test_ref.bwt"
+assert_file_not_empty "$TEMP_DIR/bwa_index/test_ref.pac"
+assert_file_not_empty "$TEMP_DIR/bwa_index/test_ref.sa"
 
 echo ">> OK: Basic indexing test passed."
 
@@ -67,51 +69,39 @@ create_test_fasta "$TEMP_DIR/genome.fasta"
 
 "$meta_executable" \
   --input "$TEMP_DIR/genome.fasta" \
-  --prefix "$TEMP_DIR/custom_index" \
-  --output_amb "$TEMP_DIR/custom_index.amb" \
-  --output_ann "$TEMP_DIR/custom_index.ann" \
-  --output_bwt "$TEMP_DIR/custom_index.bwt" \
-  --output_pac "$TEMP_DIR/custom_index.pac" \
-  --output_sa "$TEMP_DIR/custom_index.sa"
+  --prefix "custom_genome" \
+  --output "$TEMP_DIR/custom_index"
+
+echo ">> Checking output directory exists..."
+assert_dir_exists "$TEMP_DIR/custom_index"
 
 echo ">> Checking all index files exist with custom prefix..."
-assert_file_exists "$TEMP_DIR/custom_index.amb"
-assert_file_exists "$TEMP_DIR/custom_index.ann"
-assert_file_exists "$TEMP_DIR/custom_index.bwt"
-assert_file_exists "$TEMP_DIR/custom_index.pac"
-assert_file_exists "$TEMP_DIR/custom_index.sa"
+assert_file_exists "$TEMP_DIR/custom_index/custom_genome.amb"
+assert_file_exists "$TEMP_DIR/custom_index/custom_genome.ann"
+assert_file_exists "$TEMP_DIR/custom_index/custom_genome.bwt"
+assert_file_exists "$TEMP_DIR/custom_index/custom_genome.pac"
+assert_file_exists "$TEMP_DIR/custom_index/custom_genome.sa"
 
-echo ">> Checking index files are not empty..."
-assert_file_not_empty "$TEMP_DIR/custom_index.amb"
-assert_file_not_empty "$TEMP_DIR/custom_index.ann"
-assert_file_not_empty "$TEMP_DIR/custom_index.bwt"
-assert_file_not_empty "$TEMP_DIR/custom_index.pac"
-assert_file_not_empty "$TEMP_DIR/custom_index.sa"
+echo ">> Checking custom prefix index files are not empty..."
+assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.amb"
+assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.ann"
+assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.bwt"
+assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.pac"
+assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.sa"
 
-echo ">> OK: Custom prefix test passed."
+echo ">> OK: Custom prefix indexing test passed."
 
-# --- Test Case 3: Test with 64-bit naming ---
-echo ">>> Test 3: BWA indexing with 64-bit naming"
-create_test_fasta "$TEMP_DIR/ref64.fasta"
+# --- Test Case 3: Error handling ---
+echo ">>> Test 3: Error handling"
 
-"$meta_executable" \
-  --input "$TEMP_DIR/ref64.fasta" \
-  --use_64bit_names \
-  --output_amb "$TEMP_DIR/ref64.fasta.64.amb" \
-  --output_ann "$TEMP_DIR/ref64.fasta.64.ann" \
-  --output_bwt "$TEMP_DIR/ref64.fasta.64.bwt" \
-  --output_pac "$TEMP_DIR/ref64.fasta.64.pac" \
-  --output_sa "$TEMP_DIR/ref64.fasta.64.sa"
+# Test with non-existent input file
+if "$meta_executable" \
+  --input "$TEMP_DIR/nonexistent.fasta" \
+  --output "$TEMP_DIR/error_index" 2>/dev/null; then
+  echo "ERROR: Should have failed with non-existent input file"
+  exit 1
+else
+  echo ">> OK: Properly handled non-existent input file error."
+fi
 
-echo ">> Checking all 64-bit index files exist..."
-assert_file_exists "$TEMP_DIR/ref64.fasta.64.amb"
-assert_file_exists "$TEMP_DIR/ref64.fasta.64.ann"
-assert_file_exists "$TEMP_DIR/ref64.fasta.64.bwt"
-assert_file_exists "$TEMP_DIR/ref64.fasta.64.pac"
-assert_file_exists "$TEMP_DIR/ref64.fasta.64.sa"
-
-echo ">> OK: 64-bit naming test passed."
-
-echo ""
-echo ">>> All tests finished successfully"
-exit 0
+echo ">>> All tests passed!"

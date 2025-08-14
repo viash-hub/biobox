@@ -24,31 +24,11 @@ argument_groups:
 
 - name: "Output"
   arguments: 
-  - name: "--output_amb"
+  - name: "--output"
     type: file
     direction: output
-    description: Output AMB file (text file describing ambiguous bases).
-    example: reference.fasta.amb
-  - name: "--output_ann"
-    type: file
-    direction: output
-    description: Output ANN file (text file describing annotations).
-    example: reference.fasta.ann
-  - name: "--output_bwt"
-    type: file
-    direction: output
-    description: Output BWT file (Burrows-Wheeler Transform).
-    example: reference.fasta.bwt
-  - name: "--output_pac"
-    type: file
-    direction: output
-    description: Output PAC file (packed sequence).
-    example: reference.fasta.pac
-  - name: "--output_sa"
-    type: file
-    direction: output
-    description: Output SA file (suffix array).
-    example: reference.fasta.sa
+    description: Output directory containing BWA index files (.amb, .ann, .bwt, .pac, .sa).
+    example: bwa_index/
 
 - name: "Options"
   arguments: 
