@@ -1,0 +1,59 @@
+name: fq_filter
+namespace: fq
+description: Filters a FASTQ file based on record names or sequence patterns.
+keywords: [fastq, filter, sequence]
+links:
+  homepage: https://github.com/stjude-rust-labs/fq/blob/master/README.md
+  documentation: https://github.com/stjude-rust-labs/fq/blob/master/README.md
+  repository: https://github.com/stjude-rust-labs/fq
+license: MIT
+requirements:
+  commands: [fq]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [ author, maintainer ]
+
+argument_groups: 
+- name: "Input"
+  arguments: 
+  - name: "--input"
+    type: file
+    description: FASTQ source file. Accepts both raw and gzipped FASTQ inputs.
+    required: true
+
+- name: "Output"
+  arguments: 
+  - name: "--output"
+    type: file
+    direction: output
+    description: Filtered FASTQ destination file. Output will be gzipped if ends in `.gz`.
+    required: true
+
+- name: "Options"
+  arguments: 
+  - name: "--names"
+    type: file
+    description: File containing allowlist of record names (one per line).
+  - name: "--sequence_pattern"
+    type: string
+    description: Keep records that have sequences that match the given regular expression.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:  
+  - type: docker
+    image: quay.io/biocontainers/fq:0.12.0--h9ee0642_0
+    setup:
+      - type: docker
+        run: |
+          fq -V | sed 's#fq \([0-9.]*\) .*#fq: \1#' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

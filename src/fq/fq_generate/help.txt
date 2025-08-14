@@ -1,0 +1,25 @@
+```
+docker run --rm quay.io/biocontainers/fq:0.12.0--h9ee0642_0 fq generate --help
+```
+
+Generates a random FASTQ file pair
+
+Usage: fq generate [OPTIONS] <R1_DST> <R2_DST>
+
+Arguments:
+  <R1_DST>  Read 1 destination. Output will be gzipped if ends in `.gz`
+  <R2_DST>  Read 2 destination. Output will be gzipped if ends in `.gz`
+
+Options:
+  -s, --seed <SEED>                  Seed to use for the random number generator
+  -n, --record-count <RECORD_COUNT>  Number of records to generate [default: 10000]
+      --read-length <READ_LENGTH>    Number of bases in the sequence [default: 101]
+  -h, --help                         Print help
+  -V, --version                      Print version
+
+Notes:
+- Generates paired-end FASTQ files with random sequences
+- Useful for testing bioinformatics pipelines
+- Output files are automatically gzipped if filenames end with .gz
+- Random sequences use all four nucleotides (A, T, G, C)
+- Quality scores are simulated to represent realistic sequencing data
