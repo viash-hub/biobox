@@ -41,7 +41,7 @@ argument_groups:
   - name: "--max_diff"
     alternatives: [-n]
     type: string
-    description: Max #diff (int) or missing prob under 0.02 err rate (float). Default is 0.04.
+    description: "Max #diff (int) or missing prob under 0.02 err rate (float). Default is 0.04."
     example: "0.04"
   - name: "--max_gap_opens"
     alternatives: [-o]
