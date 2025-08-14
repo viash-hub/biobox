@@ -2,7 +2,7 @@
 
 ## BREAKING CHANGES
 
-* `fq_subsample`: This component has been removed in favour of `fq/fq_subsample` (PR #182).
+* `fq_subsample` has been removed after its functionality was previously copied to `fq/fq_subsample`. Please use the latter instead. (PR #182).
 
 ## NEW FUNCTIONALITY
 
