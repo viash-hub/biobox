@@ -3,11 +3,11 @@
 ## NEW FUNCTIONALITY
 
 * `bwa`:
-  - `bwa/bwa_index`: Create BWA index files for reference genome alignment (PR #xxx).
-  - `bwa/bwa_mem`: BWA-MEM algorithm for sequence alignment supporting single-end and paired-end reads (PR #xxx).
-  - `bwa/bwa_aln`: BWA aln algorithm for aligning short sequence reads to a reference genome (PR #xxx).
-  - `bwa/bwa_samse`: BWA samse - generate single-end alignment in SAM format from BWA aln SAI files (PR #xxx).
-  - `bwa/bwa_sampe`: BWA sampe - generate paired-end alignment in SAM format from BWA aln SAI files (PR #xxx).
+  - `bwa/bwa_index`: Create BWA index files for reference genome alignment (PR #183).
+  - `bwa/bwa_mem`: BWA-MEM algorithm for sequence alignment supporting single-end and paired-end reads (PR #183).
+  - `bwa/bwa_aln`: BWA aln algorithm for aligning short sequence reads to a reference genome (PR #183).
+  - `bwa/bwa_samse`: BWA samse - generate single-end alignment in SAM format from BWA aln SAI files (PR #183).
+  - `bwa/bwa_sampe`: BWA sampe - generate paired-end alignment in SAM format from BWA aln SAI files (PR #183).
 
 * `fq`:
   - `fq/fq_lint`: Validate FASTQ files for common issues (PR #179).
