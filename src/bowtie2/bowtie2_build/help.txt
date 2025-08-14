@@ -1,0 +1,29 @@
+```
+bowtie2_build
+
+Build Bowtie2 index files from reference sequences.
+
+Usage:
+  bowtie2_build --input reference.fasta --output index_dir
+
+Examples:
+  # Basic index building
+  bowtie2_build --input reference.fasta --output bt2_index
+
+  # Build with custom index name
+  bowtie2_build --input genome.fasta --output indexes --index_name my_genome
+
+  # Build large index with custom parameters
+  bowtie2_build --input large_genome.fasta --output large_index --large_index --offrate 4
+
+  # Memory-optimized build
+  bowtie2_build --input reference.fasta --output index --packed --bmax 100000000
+
+The Bowtie2 index consists of multiple files:
+- .1.bt2, .2.bt2: Forward index
+- .3.bt2, .4.bt2: Reverse index (unless --noref is used)
+- .rev.1.bt2, .rev.2.bt2: Reverse complement index
+
+All index files will be created in the specified output directory with the
+same base name (either from --index_name or derived from the input filename).
+```

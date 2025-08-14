@@ -1,0 +1,32 @@
+```
+bowtie2_inspect
+
+Extract information from Bowtie2 index files.
+
+Usage:
+  bowtie2_inspect --index genome_index [options]
+
+Examples:
+  # Print FASTA sequences from index (default)
+  bowtie2_inspect --index /path/to/index/genome --output sequences.fasta
+
+  # Print summary information about the index
+  bowtie2_inspect --index genome_index --summary
+
+  # Print only reference sequence names
+  bowtie2_inspect --index genome_index --names --output names.txt
+
+  # Print sequences with custom line width
+  bowtie2_inspect --index genome_index --across 100 --output wide_sequences.fasta
+
+  # Verbose output for debugging
+  bowtie2_inspect --index genome_index --summary --verbose_inspect
+
+Output Modes:
+- Default: Print FASTA records of indexed sequences
+- --summary: Print index statistics and reference information
+- --names: Print only reference sequence names
+
+The index parameter should be the base name of the index files
+(e.g., "genome" for files genome.1.bt2, genome.2.bt2, etc.)
+```

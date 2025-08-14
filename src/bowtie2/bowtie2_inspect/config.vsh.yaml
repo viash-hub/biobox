@@ -1,0 +1,82 @@
+name: bowtie2_inspect
+namespace: bowtie2
+description: |
+  Extract information from Bowtie2 index files.
+  
+  By default, prints FASTA records of the indexed nucleotide sequences to
+  standard output. With -n, just prints names. With -s, just prints a summary of
+  the index parameters and sequences.
+keywords: [Alignment, Indexing, Inspection]
+links:
+  homepage: https://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+  documentation: https://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
+  repository: https://github.com/BenLangmead/bowtie2
+references:
+  doi: 10.1038/nmeth.1923
+license: GPL-3.0
+requirements:
+  commands: [bowtie2-inspect]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --index
+        type: string
+        description: bt2 filename minus trailing .1.bt2/.2.bt2
+        required: true
+        example: genome_index
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: Save output to filename (default stdout)
+        example: sequences.fasta
+
+  - name: Output Options
+    arguments:
+      - name: --summary
+        type: boolean_true
+        description: Print summary incl. ref names, lengths, index properties
+
+      - name: --names
+        type: boolean_true
+        description: Print reference sequence names only
+
+      - name: --across
+        type: integer
+        description: Number of characters across in FASTA output (default 60)
+        example: 80
+
+      - name: --verbose_inspect
+        type: boolean_true
+        description: Verbose output (for debugging)
+
+  - name: Index Options
+    arguments:
+      - name: --large_index
+        type: boolean_true
+        description: Force inspection of the 'large' index, even if a 'small' one is present
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bowtie2:2.5.4--he96a11b_6
+    setup:
+      - type: docker
+        run: |
+          bowtie2-inspect --help 2>&1 | head -1 | sed 's/.*version /bowtie2-inspect: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

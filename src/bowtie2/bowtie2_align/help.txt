@@ -1,0 +1,54 @@
+```
+bowtie2_align
+
+Align single-end and paired-end reads to a reference genome using Bowtie2.
+
+Usage:
+  # Single-end alignment
+  bowtie2_align --index genome_index --unpaired reads.fastq --output aligned.sam
+
+  # Paired-end alignment
+  bowtie2_align --index genome_index --mate1 reads_R1.fastq --mate2 reads_R2.fastq --output aligned.sam
+
+Examples:
+  # Basic single-end alignment
+  bowtie2_align --index /path/to/index/genome --unpaired reads.fastq.gz --output aligned.sam
+
+  # Paired-end alignment with fast preset
+  bowtie2_align --index genome_index --mate1 reads_R1.fastq.gz --mate2 reads_R2.fastq.gz --output aligned.sam --fast
+
+  # Local alignment with sensitive preset
+  bowtie2_align --index genome_index --unpaired reads.fastq --output aligned.sam --sensitive_local
+
+  # Multiple input files (comma-separated)
+  bowtie2_align --index genome_index --unpaired reads1.fq,reads2.fq,reads3.fq --output aligned.sam
+
+  # Paired-end with custom insert size and orientation
+  bowtie2_align --index genome_index --mate1 reads_R1.fastq --mate2 reads_R2.fastq --output aligned.sam --minins 50 --maxins 800 --fr
+
+  # Output unaligned reads
+  bowtie2_align --index genome_index --unpaired reads.fastq --output aligned.sam --un unaligned.fastq
+
+  # With read groups for downstream analysis
+  bowtie2_align --index genome_index --mate1 reads_R1.fastq --mate2 reads_R2.fastq --output aligned.sam --rg_id "sample1" --rg "SM:sample1"
+
+  # Very sensitive alignment with reporting multiple alignments
+  bowtie2_align --index genome_index --unpaired reads.fastq --output aligned.sam --very_sensitive --k 10
+
+Input Types:
+- Single-end: Use --unpaired
+- Paired-end: Use --mate1 and --mate2 together
+- Interleaved: Use --interleaved
+- BAM input: Use --bam_input
+
+Alignment Modes:
+- End-to-end (default): Entire read must align
+- Local (--local): Allows soft-clipping of read ends
+
+Presets:
+- --very_fast: Fastest, least sensitive
+- --fast: Fast, less sensitive  
+- --sensitive: Default balance
+- --very_sensitive: Slower, most sensitive
+- Add "_local" suffix for local alignment mode presets
+```

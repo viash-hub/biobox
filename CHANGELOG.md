@@ -1,3 +1,12 @@
+# biobox 0.4.0
+
+## NEW FUNCTIONALITY
+
+* `bowtie2`: Add support for Bowtie2 alignment and indexing (PR #xxx).
+  - `bowtie2/bowtie2_build`: Build Bowtie2 index files from reference sequences.
+  - `bowtie2/bowtie2_align`: Align single-end and paired-end reads using Bowtie2.
+  - `bowtie2/bowtie2_inspect`: Extract information from Bowtie2 index files.
+
 # biobox 0.3.2
 
 ## NEW FUNCTIONALITY
