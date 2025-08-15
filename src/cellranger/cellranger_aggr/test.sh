@@ -43,7 +43,7 @@ log "Using real cellranger test data"
 log "Running cellranger count to generate test samples"
 cd "${tmp_dir}"
 
-# Create first sample
+# Create first sample (dry run for quick MRO generation)
 cellranger count \
     --id="sample1" \
     --fastqs="${input_dir}" \
@@ -52,7 +52,7 @@ cellranger count \
     --disable-ui \
     --dry
 
-# Create second sample (same data, different ID)
+# Create second sample (dry run)
 cellranger count \
     --id="sample2" \
     --fastqs="${input_dir}" \
@@ -63,17 +63,17 @@ cellranger count \
 
 # Create aggregation CSV with dry run outputs
 log "Creating aggregation CSV file"
-echo "library_id,molecule_h5" > aggregation.csv
+echo "sample_id,molecule_h5" > aggregation.csv
 echo "sample1,${tmp_dir}/sample1/outs/molecule_info.h5" >> aggregation.csv
 echo "sample2,${tmp_dir}/sample2/outs/molecule_info.h5" >> aggregation.csv
 
-## TEST: Run cellranger aggr with dry flag
-log "Starting TEST: Running ${meta_name} with --dry flag"
+## TEST 1: Run cellranger aggr with dry flag
+log "Starting TEST 1: Running ${meta_name} with --dry flag"
 cd "${tmp_dir}"
 
 # For testing, just use a simple CSV with mock data since we're doing a dry run
 log "Creating simple test CSV with mock data"
-echo "library_id,molecule_h5" > simple_test.csv
+echo "sample_id,molecule_h5" > simple_test.csv
 echo "sample1,/fake/path/sample1/outs/molecule_info.h5" >> simple_test.csv
 echo "sample2,/fake/path/sample2/outs/molecule_info.h5" >> simple_test.csv
 
@@ -104,3 +104,55 @@ else
 fi
 
 print_test_summary "cellranger_aggr dry run test"
+
+## TEST 2: Run cellranger aggr with actual execution
+log "Starting TEST 2: Running ${meta_name} with actual execution"
+
+# First, we need to generate real count outputs for aggregation
+log "Generating real cellranger count outputs for aggregation test..."
+
+# Run cellranger count for sample 1 (actual run, no secondary analysis for speed)
+log "Running cellranger count for sample1..."
+cellranger count \
+    --id="count_sample1" \
+    --fastqs="$input_dir" \
+    --transcriptome="$reference_dir" \
+    --create-bam=false \
+    --disable-ui
+
+# Check that molecule_info.h5 was created
+check_file_exists "${tmp_dir}/count_sample1/outs/molecule_info.h5" "sample1 molecule_info.h5"
+
+# For sample2, we can reuse the same output but copy it to a different location
+# This simulates having two different samples for aggregation
+log "Creating sample2 output (reusing sample1 data)..."
+cp -r "${tmp_dir}/count_sample1" "${tmp_dir}/count_sample2"
+
+# Create aggregation CSV for actual run
+log "Creating aggregation CSV for actual run..."
+actual_aggr_csv="${tmp_dir}/actual_aggregation.csv"
+echo "sample_id,molecule_h5" > "$actual_aggr_csv"
+echo "sample1,${tmp_dir}/count_sample1/outs/molecule_info.h5" >> "$actual_aggr_csv"
+echo "sample2,${tmp_dir}/count_sample2/outs/molecule_info.h5" >> "$actual_aggr_csv"
+
+# Run actual aggregation
+aggr_output_dir="${tmp_dir}/actual_aggr_output"
+mkdir -p "$aggr_output_dir"
+
+log "Executing cellranger aggr with actual run..."
+"${meta_executable}" \
+    --id "actual_test_aggr" \
+    --csv "$actual_aggr_csv" \
+    --description "Actual aggregation test" \
+    --normalize "mapped" \
+    --output_dir "$aggr_output_dir"
+
+log "Validating actual run outputs..."
+check_file_exists "$aggr_output_dir/count/filtered_feature_bc_matrix.h5" "aggregated filtered feature matrix"
+check_file_exists "$aggr_output_dir/web_summary.html" "aggregation web summary"
+check_dir_exists "$aggr_output_dir/count/filtered_feature_bc_matrix" "aggregated filtered feature matrix directory"
+check_file_exists "$aggr_output_dir/aggregation.csv" "aggregation CSV copy"
+
+log "✅ TEST 2 completed successfully"
+
+print_test_summary "All cellranger_aggr tests"
