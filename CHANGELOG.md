@@ -12,6 +12,10 @@
   - `fq/fq_filter`: Filter FASTQ files based on record names or sequence patterns (PR #182).
   - `fq/fq_generate`: Generate a random FASTQ file pair for testing and simulation purposes (PR #182).
 
+## MINOR CHANGES
+
+* `arriba`: Updated to v2.5.0 and refactored script and tests based on latest contributing guidelines (PR #XXX).
+
 ## DOCUMENTATION
 
 * Major restructuring of the documentation pages (PR #185):
