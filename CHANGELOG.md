@@ -1,4 +1,6 @@
-# biobox 0.4.0
+# Unreleased
+
+<!-- Add new changes here before release -->
 
 ## BREAKING CHANGES
 
@@ -12,8 +14,15 @@
 
 ## DOCUMENTATION
 
-* `CONTRIBUTING.md`: Major restructuring to improve contributor experience (PR #185).
-* `README.md`: Update content (PR #185).
+* Major restructuring of the documentation pages (PR #185):
+  - `CONTRIBUTING.md`: Streamlined guide with detailed sections moved to dedicated docs/ guides.
+  - `README.md`: Streamlined content to guide people towards what they need.
+  - `docs/COMPONENT_DEVELOPMENT.md`: New comprehensive guide covering component creation process.
+  - `docs/SCRIPT_DEVELOPMENT.md`: New detailed guide for script development best practices.
+  - `docs/TESTING.md`: New comprehensive testing guide.
+  - `docs/DOCKER_GUIDE.md`: New Docker and engine best practices guide.
+
+* `.github/PULL_REQUEST_TEMPLATE.md`: Fixed repository references to point to correct biobox repository instead of base template (PR #185).
 
 # biobox 0.3.2
 

@@ -2,6 +2,17 @@
 
 This guide covers best practices for setting up Docker engines and managing dependencies in biobox components.
 
+## Table of Contents
+- [Preferred Approach: Biocontainers](#preferred-approach-biocontainers)
+- [Finding Biocontainers](#finding-biocontainers)
+- [Version Detection](#version-detection)
+- [Docker Run Syntax](#docker-run-syntax)
+- [Custom Containers](#custom-containers)
+- [Recommended Base Containers](#recommended-base-containers)
+- [Multi-tool Containers](#multi-tool-containers)
+- [Container Optimization](#container-optimization)
+- [Testing Docker Setup](#testing-docker-setup)
+
 ## Preferred Approach: Biocontainers
 
 ### Basic Setup

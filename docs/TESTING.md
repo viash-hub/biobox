@@ -2,6 +2,15 @@
 
 This guide covers best practices for writing comprehensive test scripts for biobox components.
 
+## Table of Contents
+- [Core Principles](#core-principles)
+- [Test Script Structure](#test-script-structure)
+- [Helper Functions](#helper-functions)
+- [Test Scenarios](#test-scenarios)
+- [Best Practices](#best-practices)
+- [Viash Testing Features](#viash-testing-features)
+- [When to Use Static Test Data](#when-to-use-static-test-data)
+
 ## Core Principles
 
 ### 1. Generate Test Data in Scripts

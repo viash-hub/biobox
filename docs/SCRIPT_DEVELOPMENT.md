@@ -2,6 +2,14 @@
 
 This guide covers best practices for writing runner scripts in biobox components.
 
+## Table of Contents
+- [Modern Script Structure](#modern-script-structure)
+- [Key Principles](#key-principles)
+- [Real-World Example](#real-world-example)
+- [Advanced Patterns](#advanced-patterns)
+- [Common Pitfalls](#common-pitfalls)
+- [Testing Your Script](#testing-your-script)
+
 ## Modern Script Structure
 
 ### Basic Template
