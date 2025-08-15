@@ -2,32 +2,28 @@
 
 This guide covers best practices for writing comprehensive test scripts for biobox components.
 
+> **📌 Important:** All new test scripts should use the **centralized test helpers** located at `src/_utils/test_helpers.sh`. This eliminates code duplication and ensures consistency across all components.
+
 ## Table of Contents
+
 - [Core Principles](#core-principles)
 - [Test Script Structure](#test-script-structure)
-- [Helper Functions](#helper-functions)
+- [Centralized Test Helpers](#centralized-test-helpers)
 - [Test Scenarios](#test-scenarios)
 - [Best Practices](#best-practices)
 - [Viash Testing Features](#viash-testing-features)
-- [When to Use Static Test Data](#when-to-use-static-test-data)
+- [Static Test Data](#static-test-data)
 
 ## Core Principles
 
 ### 1. Generate Test Data in Scripts
 
-**Preferred approach:**
+**Preferred approach:** Generate test data within the test script using the centralized helper functions.
+
 ```bash
-# Generate test data within the test script
-create_test_fasta() {
-  file_path="$1"
-  
-  cat << 'EOF' > "$file_path"
->chr1
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
->chr2
-GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
-EOF
-}
+# Generate test data using centralized helpers
+create_test_fasta "$meta_temp_dir/input.fasta" 3 50
+create_test_fastq "$meta_temp_dir/reads.fastq" 10 35
 ```
 
 **Avoid:**
@@ -43,6 +39,8 @@ Tests should be completely self-contained and not depend on external resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
 ```
 
 Only add static test files if absolutely necessary:
@@ -52,292 +50,367 @@ test_resources:
   - type: bash_script
     path: test.sh
   - type: file
+    path: /src/_utils/test_helpers.sh
+  - type: file
     path: test_data  # Only if data generation is impractical
 ```
 
 ## Test Script Structure
 
-### Basic Template
+### Configuration Setup
+
+Add the test helpers as a resource in your component configuration:
+
+```yaml
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
+```
+
+### Basic Test Template
 
 ```bash
 #!/bin/bash
 
-set -e
+## VIASH START
+## VIASH END
+
+# Source the centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
+
+# Initialize test environment with strict error handling
+setup_test_env
 
 #############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_dir_exists() {
-  [ -d "$1" ] || { echo "Directory '$1' does not exist" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-assert_file_not_contains() {
-  grep -q "$2" "$1" && { echo "File '$1' contains '$2' but shouldn't" && exit 1; }
-}
+# Test execution with centralized functions
 #############################################
 
-# --- Helper function to create test data ---
-create_test_fasta() {
-  file_path="$1"
-  
-  cat << 'EOF' > "$file_path"
->chr1
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
->chr2
-GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
-EOF
-}
+log "Starting tests for $meta_name"
 
 # --- Test Case 1: Basic functionality ---
-echo ">>> Test 1: Basic functionality"
-create_test_fasta "$meta_temp_dir/input.fasta"
+log "Starting TEST 1: Basic functionality"
 
-echo ">> Running $meta_name..."
+# Create and validate test data
+test_data_dir="$meta_temp_dir/test_data"
+mkdir -p "$test_data_dir"
+create_test_fasta "$test_data_dir/input.fasta" 3 50
+check_file_exists "$test_data_dir/input.fasta" "input FASTA file"
+
+log "Executing $meta_name with basic parameters..."
+"$meta_executable" \
+  --input "$test_data_dir/input.fasta" \
+  --output "$meta_temp_dir/test1"
+
+log "Validating TEST 1 outputs..."
+check_dir_exists "$meta_temp_dir/test1" "output directory"
+check_file_exists "$meta_temp_dir/test1/result.txt" "result file"
+check_file_not_empty "$meta_temp_dir/test1/result.txt" "result file"
+
+log "✅ TEST 1 completed successfully"
+
+# --- Test Case 2: Advanced parameters ---
+log "Starting TEST 2: Advanced parameters"
+
+# Create different test data
+create_test_fastq "$test_data_dir/input.fastq" 10 35
+check_file_exists "$test_data_dir/input.fastq" "input FASTQ file"
+
+log "Executing $meta_name with advanced parameters..."
+"$meta_executable" \
+  --input "$test_data_dir/input.fastq" \
+  --output "$meta_temp_dir/test2" \
+  --threads 2 \
+  --verbose
+
+log "Validating TEST 2 outputs..."
+check_file_exists "$meta_temp_dir/test2/advanced_result.txt" "advanced result file"
+check_file_contains "$meta_temp_dir/test2/advanced_result.txt" "expected_pattern" "advanced result file"
+
+log "✅ TEST 2 completed successfully"
+
+print_test_summary "All tests completed successfully"
+```
+
+## Centralized Test Helpers
+
+The centralized test helpers located at `src/_utils/test_helpers.sh` provide comprehensive testing functionality to ensure consistency across all biobox components.
+
+### Available Functions
+
+#### Logging Functions
+- `log "message"` - Log with timestamp
+- `log_warn "message"` - Warning message  
+- `log_error "message"` - Error message
+
+#### File/Directory Validation
+- `check_file_exists path "description"` - Verify file exists
+- `check_dir_exists path "description"` - Verify directory exists
+- `check_file_not_exists path "description"` - Verify file doesn't exist
+- `check_dir_not_exists path "description"` - Verify directory doesn't exist
+- `check_file_empty path "description"` - Verify file is empty
+- `check_file_not_empty path "description"` - Verify file is not empty
+
+#### Content Validation
+- `check_file_contains path "text" "description"` - Verify file contains text
+- `check_file_not_contains path "text" "description"` - Verify file doesn't contain text
+- `check_file_matches_regex path "pattern" "description"` - Verify file matches regex
+- `check_file_line_count path count "description"` - Verify line count
+
+#### Test Data Generation
+- `create_test_fasta path [num_seqs] [seq_length]` - Generate FASTA file
+- `create_test_fastq path [num_reads] [read_length]` - Generate FASTQ file
+- `create_test_gtf path [num_genes]` - Generate GTF file
+- `create_test_gff path [num_features]` - Generate GFF file
+- `create_test_bed path [num_intervals]` - Generate BED file
+- `create_test_csv path [num_rows]` - Generate CSV file
+- `create_test_tsv path [num_rows]` - Generate TSV file
+
+#### Utility Functions
+- `setup_test_env` - Initialize test environment with strict error handling
+- `print_test_summary "test_name"` - Print completion message
+
+### Usage Example
+
+```bash
+#!/bin/bash
+
+## VIASH START
+## VIASH END
+
+# Source centralized helpers
+source "$meta_resources_dir/test_helpers.sh"
+setup_test_env
+
+log "Starting tests for $meta_name"
+
+# Generate test data
+create_test_fasta "$meta_temp_dir/input.fasta" 3 50
+check_file_exists "$meta_temp_dir/input.fasta" "input FASTA file"
+
+# Run component
 "$meta_executable" \
   --input "$meta_temp_dir/input.fasta" \
-  --output "$meta_temp_dir/output"
+  --output "$meta_temp_dir/output.txt"
 
-echo ">> Checking output exists..."
-assert_dir_exists "$meta_temp_dir/output"
+# Validate output
+check_file_exists "$meta_temp_dir/output.txt" "result file"
+check_file_contains "$meta_temp_dir/output.txt" "expected_pattern" "result file"
 
-echo ">> Checking output is not empty..."
-assert_file_not_empty "$meta_temp_dir/output/result.txt"
-
-echo ">> Checking output content..."
-assert_file_contains "$meta_temp_dir/output/result.txt" "expected_pattern"
-
-echo "> All tests succeeded!"
-```
-
-## Helper Functions
-
-### Standard Assertions
-
-```bash
-# File existence
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-
-assert_file_not_exists() {
-  [ ! -f "$1" ] || { echo "File '$1' exists but shouldn't" && exit 1; }
-}
-
-# File content
-assert_file_empty() {
-  [ ! -s "$1" ] || { echo "File '$1' is not empty but should be" && exit 1; }
-}
-
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-
-# Content matching
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-
-assert_file_contains_regex() {
-  grep -q -E "$2" "$1" || { echo "File '$1' does not match regex '$2'" && exit 1; }
-}
-
-# Directory checks
-assert_dir_exists() {
-  [ -d "$1" ] || { echo "Directory '$1' does not exist" && exit 1; }
-}
-
-# Numeric comparisons
-assert_file_line_count() {
-  local expected="$2"
-  local actual=$(wc -l < "$1")
-  [ "$actual" -eq "$expected" ] || { 
-    echo "File '$1' has $actual lines, expected $expected" && exit 1; 
-  }
-}
-```
-
-### Data Generation Functions
-
-```bash
-# FASTA files
-create_test_fasta() {
-  local file_path="$1"
-  local num_seqs="${2:-2}"
-  local seq_length="${3:-64}"
-  
-  for i in $(seq 1 "$num_seqs"); do
-    echo ">seq$i" >> "$file_path"
-    # Generate random DNA sequence
-    head -c "$seq_length" < /dev/zero | tr '\0' 'A' >> "$file_path"
-    echo >> "$file_path"
-  done
-}
-
-# FASTQ files
-create_test_fastq() {
-  local file_path="$1"
-  local num_reads="${2:-4}"
-  
-  for i in $(seq 1 "$num_reads"); do
-    echo "@read$i" >> "$file_path"
-    echo "ATCGATCGATCGATCGATCGATCGATCGATCGATCG" >> "$file_path"
-    echo "+" >> "$file_path"
-    echo "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" >> "$file_path"
-  done
-}
-
-# GTF/GFF files
-create_test_gtf() {
-  local file_path="$1"
-  
-  cat << 'EOF' > "$file_path"
-chr1	test	gene	1000	2000	.	+	.	gene_id "gene1"
-chr1	test	exon	1000	1500	.	+	.	gene_id "gene1"; transcript_id "transcript1"
-chr1	test	exon	1600	2000	.	+	.	gene_id "gene1"; transcript_id "transcript1"
-EOF
-}
+print_test_summary "Basic functionality test"
 ```
 
 ## Test Scenarios
 
 ### 1. Basic Functionality
 
+Test the component with minimal, essential parameters:
+
 ```bash
-echo ">>> Test 1: Basic functionality"
-create_test_input "$meta_temp_dir/input.txt"
+log "Starting TEST 1: Basic functionality"
+
+create_test_fasta "$meta_temp_dir/input.fasta" 3 50
 
 "$meta_executable" \
-  --input "$meta_temp_dir/input.txt" \
+  --input "$meta_temp_dir/input.fasta" \
   --output "$meta_temp_dir/output.txt"
 
-assert_file_exists "$meta_temp_dir/output.txt"
-assert_file_not_empty "$meta_temp_dir/output.txt"
+check_file_exists "$meta_temp_dir/output.txt" "output file"
+check_file_not_empty "$meta_temp_dir/output.txt" "output file"
+
+log "✅ TEST 1 completed successfully"
 ```
 
 ### 2. Multiple Input Files
 
+Test with multiple input files or complex input scenarios:
+
 ```bash
-echo ">>> Test 2: Multiple input files"
-create_test_input "$meta_temp_dir/input1.txt"
-create_test_input "$meta_temp_dir/input2.txt"
+log "Starting TEST 2: Multiple input files"
+
+create_test_fasta "$meta_temp_dir/input1.fasta" 2 30
+create_test_fasta "$meta_temp_dir/input2.fasta" 2 30
 
 "$meta_executable" \
-  --input "$meta_temp_dir/input1.txt;$meta_temp_dir/input2.txt" \
+  --input "$meta_temp_dir/input1.fasta;$meta_temp_dir/input2.fasta" \
   --output "$meta_temp_dir/output.txt"
 
-assert_file_exists "$meta_temp_dir/output.txt"
+check_file_exists "$meta_temp_dir/output.txt" "merged output file"
+
+log "✅ TEST 2 completed successfully"
 ```
 
 ### 3. Optional Parameters
 
+Test with optional parameters and advanced features:
+
 ```bash
-echo ">>> Test 3: Optional parameters"
-create_test_input "$meta_temp_dir/input.txt"
+log "Starting TEST 3: Optional parameters"
+
+create_test_fastq "$meta_temp_dir/input.fastq" 10 35
 
 "$meta_executable" \
-  --input "$meta_temp_dir/input.txt" \
+  --input "$meta_temp_dir/input.fastq" \
   --output "$meta_temp_dir/output.txt" \
   --threads 2 \
   --verbose
 
-assert_file_exists "$meta_temp_dir/output.txt"
+check_file_exists "$meta_temp_dir/output.txt" "output file with options"
+check_file_contains "$meta_temp_dir/output.txt" "verbose" "verbose output"
+
+log "✅ TEST 3 completed successfully"
 ```
 
 ### 4. Edge Cases
 
-```bash
-echo ">>> Test 4: Empty input"
-touch "$meta_temp_dir/empty.txt"
+Test with edge cases like empty files or unusual inputs:
 
-"$meta_executable" \
-  --input "$meta_temp_dir/empty.txt" \
-  --output "$meta_temp_dir/output.txt" || {
-  echo "Expected failure with empty input"
-}
+```bash
+log "Starting TEST 4: Edge case - empty input"
+
+# Create empty input file
+touch "$meta_temp_dir/empty.fasta"
+
+# Test should handle empty input gracefully
+if "$meta_executable" \
+  --input "$meta_temp_dir/empty.fasta" \
+  --output "$meta_temp_dir/output.txt" 2>/dev/null; then
+  log_warn "Component succeeded with empty input - checking output"
+  check_file_exists "$meta_temp_dir/output.txt" "output file for empty input"
+else
+  log "Expected behavior: Component properly rejected empty input"
+fi
+
+log "✅ TEST 4 completed successfully"
 ```
 
 ### 5. Error Handling
 
+Test proper error handling for invalid inputs:
+
 ```bash
-echo ">>> Test 5: Error handling - non-existent input"
+log "Starting TEST 5: Error handling"
+
+# Test with non-existent input file
 if "$meta_executable" \
   --input "/non/existent/file.txt" \
   --output "$meta_temp_dir/output.txt" 2>/dev/null; then
-  echo "Expected error but command succeeded" && exit 1
+  log_error "Component should have failed with non-existent input"
+  exit 1
+else
+  log "✅ Component properly handled non-existent input file"
 fi
-echo ">> OK: Properly handled non-existent input file error."
+
+log "✅ TEST 5 completed successfully"
 ```
 
 ## Best Practices
 
-### 1. Use Temporary Directory
+### 1. Use Centralized Test Helpers
 
-Always use `$meta_temp_dir` for temporary files:
-
-```bash
-TEMP_DIR="$meta_temp_dir"
-create_test_input "$meta_temp_dir/input.txt"
-```
-
-### 2. Clear Test Output
-
-Use descriptive echo statements:
+Always use the centralized test helpers instead of defining functions individually:
 
 ```bash
-echo ">>> Test 1: Basic functionality"
-echo ">> Running $meta_name..."
-echo ">> Checking output exists..."
-echo ">> OK: Basic functionality test passed."
+# ✅ Recommended: Use centralized helpers
+source "$meta_resources_dir/test_helpers.sh"
+setup_test_env
+
+# ❌ NOT recommended: Defining functions individually
+set -euo pipefail
+log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [TEST] $*"; }
 ```
 
-### 3. Test Output Content
+### 2. Strict Error Handling
+
+The centralized helpers automatically provide strict error handling via `setup_test_env`:
+
+```bash
+# Automatically enabled by setup_test_env:
+set -euo pipefail  # Exit on errors, undefined variables, pipe failures
+export LC_ALL=C    # Consistent locale for reproducible results
+```
+
+### 3. Descriptive Validation
+
+Use descriptive validation functions with meaningful descriptions:
+
+```bash
+# ✅ Good: Descriptive validation
+check_file_exists "$output_file" "filtered feature matrix"
+check_file_not_exists "$bam_file" "BAM file (should be disabled by default)"
+check_file_contains "$result_file" "expected_pattern" "analysis results"
+
+# ❌ Less helpful: Basic validation without context
+check_file_exists "$output_file"
+```
+
+### 4. Organized Structure
+
+Use `$meta_temp_dir` and create organized test structure:
+
+```bash
+# Create organized test structure
+test_data_dir="$meta_temp_dir/test_data"
+test_output_dir="$meta_temp_dir/test_output"
+mkdir -p "$test_data_dir" "$test_output_dir"
+
+create_test_fasta "$test_data_dir/input.fasta" 3 50
+```
+
+### 5. Clear Test Output
+
+Use consistent logging with clear test boundaries:
+
+```bash
+log "Starting TEST 1: Basic functionality"
+log "Executing $meta_name with basic parameters..."
+log "Validating TEST 1 outputs..."
+log "✅ TEST 1 completed successfully"
+
+# Final summary
+print_test_summary "All tests completed successfully"
+```
+
+### 6. Comprehensive Content Validation
 
 Don't just check that files exist - validate their content:
 
 ```bash
-# Check specific content
-assert_file_contains "$meta_temp_dir/output.txt" "expected_result"
-
-# Check file format
-assert_file_contains_regex "$meta_temp_dir/output.gtf" "^chr[0-9X-Y]+\t.*\tgene\t"
-
-# Check line count
-assert_file_line_count "$meta_temp_dir/output.txt" 10
+# Check existence and content
+check_file_exists "$meta_temp_dir/output.txt" "analysis results"
+check_file_not_empty "$meta_temp_dir/output.txt" "analysis results"
+check_file_contains "$meta_temp_dir/output.txt" "Number of sequences" "result summary"
+check_file_line_count "$meta_temp_dir/output.txt" 10 "expected number of results"
 ```
 
-### 4. Test Multiple Scenarios
+### 7. Multiple Test Scenarios
 
-Include tests for:
-- Basic functionality
-- Optional parameters
-- Multiple inputs
-- Edge cases (empty files, etc.)
-- Error conditions
-- Different output formats
-
-### 5. Fail Fast
-
-Use `set -e` and proper assertions that exit immediately on failure:
+Include comprehensive test coverage:
 
 ```bash
-set -e  # Exit on any error
+# Test 1: Basic functionality
+log "Starting TEST 1: Basic functionality"
+# ... test implementation ...
+log "✅ TEST 1 completed successfully"
 
-# Each assertion should exit on failure
-assert_file_exists "$output_file"
+# Test 2: Advanced options
+log "Starting TEST 2: Advanced options"
+# ... test implementation ...
+log "✅ TEST 2 completed successfully"
+
+# Test 3: Edge cases
+log "Starting TEST 3: Edge case handling"
+# ... test implementation ...
+log "✅ TEST 3 completed successfully"
+
+print_test_summary "All tests completed successfully"
 ```
 
 ## Viash Testing Features
 
 ### Running Tests
 
-**Basic test execution:**
 ```bash
 # Test a single component
 viash test config.vsh.yaml
@@ -350,10 +423,7 @@ viash test config.vsh.yaml --setup build --verbose
 
 # Keep temporary files for debugging
 viash test config.vsh.yaml --keep true
-```
 
-**Namespace-level testing:**
-```bash
 # Test all components in parallel
 viash ns test --parallel
 
@@ -366,12 +436,21 @@ viash ns test -q alignment --parallel
 When running `viash test`, Viash automatically:
 
 1. **Creates temporary directory** (available as `$meta_temp_dir`)
-2. **Builds the main executable** 
+2. **Builds the main executable**
 3. **Builds/pulls Docker image** (if using Docker engine)
 4. **Iterates over all test scripts** in `test_resources`
 5. **Builds each test into executable** and runs it
 6. **Cleans up** temporary files (unless `--keep true`)
 7. **Returns exit code 0** if all tests succeed
+
+### Meta Variables in Tests
+
+Your test scripts automatically have access to important meta variables:
+
+- `$meta_executable` - Path to the built component executable
+- `$meta_temp_dir` - Temporary directory for test files (automatically cleaned up)
+- `$meta_name` - Component name for logging
+- `$meta_resources_dir` - Path to test resources
 
 ### Multiple Test Scripts
 
@@ -381,52 +460,12 @@ You can add multiple test scripts to cover different scenarios:
 test_resources:
   - type: bash_script
     path: test_basic.sh
-  - type: bash_script 
+  - type: bash_script
     path: test_edge_cases.sh
   - type: bash_script
     path: test_large_data.sh
-```
-
-**Important:** All test scripts must pass for the component to be considered tested successfully.
-
-### Testing Different Engines
-
-```bash
-# Test with specific engine
-viash test config.vsh.yaml --engine docker
-viash test config.vsh.yaml --engine native
-
-# Test with specific runner
-viash test config.vsh.yaml --runner executable
-viash test config.vsh.yaml --runner nextflow
-```
-
-### Meta Variables in Tests
-
-Your test scripts automatically have access to important meta variables:
-
-- **`$meta_executable`**: Path to the built component executable
-- **`$meta_temp_dir`**: Temporary directory for test files (automatically cleaned up)
-- **`$meta_name`**: Component name for logging
-- **`$meta_resources_dir`**: Path to test resources
-
-```bash
-#!/bin/bash
-
-## VIASH START
-## VIASH END
-
-set -e
-
-echo "Testing $meta_name"
-echo "Executable: $meta_executable"
-echo "Temp dir: $meta_temp_dir"
-
-# Create test data in temp directory
-create_test_data "$meta_temp_dir/input.txt"
-
-# Run the component
-"$meta_executable" --input "$meta_temp_dir/input.txt" --output "$meta_temp_dir/output.txt"
+  - type: file
+    path: /src/_utils/test_helpers.sh
 ```
 
 ### Advanced Testing Options
@@ -446,19 +485,52 @@ viash test config.vsh.yaml --keep true --verbose
 
 For more details, see the [Viash Unit Testing Documentation](https://viash.io/guide/component/unit-testing.html).
 
-## When to Use Static Test Data
+## Static Test Data
+
+### When to Use Static Test Data
 
 Only use static test files when:
-- The tool requires very specific, complex file formats
-- Generating equivalent test data is impractical
+
+- The tool requires very specific, complex file formats that are difficult to generate
+- Generating equivalent test data is impractical or overly complex
 - You need real-world data to validate complex algorithms
 - Test data is very small (<1KB preferred, <10KB maximum)
 
-If you must use static test data, document how it was created:
+### Guidelines for Static Test Data
+
+If you must use static test data:
+
+1. **Keep files small** - Prefer <1KB, maximum <10KB
+2. **Document the source** - How was it created?
+3. **Use minimal examples** - Strip down to essential features
+4. **Consider alternatives** - Can you generate equivalent data?
 
 ```bash
 # test_data/README.md
-# Test data source: https://github.com/example/source
-# Generated with: command --example --output test.txt
+# Test data for complex_tool component
+# Source: https://github.com/example/dataset
+# Generated with: tool --export-sample --format minimal
 # Date: 2025-01-01
+# Size: 847 bytes
+# Purpose: Tests complex file format parsing
+```
+
+### Referencing Static Test Data
+
+```yaml
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
+  - type: file
+    path: test_data
+```
+
+```bash
+# In your test script
+static_data="$meta_resources_dir/test_data/sample.complex"
+check_file_exists "$static_data" "static test data"
+
+"$meta_executable" --input "$static_data" --output "$meta_temp_dir/output.txt"
 ```
