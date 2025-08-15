@@ -1,0 +1,5 @@
+```
+docker run --rm quay.io/biocontainers/bwa:0.7.19--h577a1d6_1 bwa samse
+```
+
+Usage: bwa samse [-n max_occ] [-f out.sam] [-r RG_line] <prefix> <in.sai> <in.fq>
