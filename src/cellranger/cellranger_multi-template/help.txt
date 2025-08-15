@@ -1,0 +1,12 @@
+```
+docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger multi-template -h
+```
+
+Output a multi config CSV template
+
+Usage: cellranger multi-template [OPTIONS]
+
+Options:
+  -o, --output <CSV>  Optional output file path
+  -p, --parameters    Print multi config parameter options and descriptions
+  -h, --help          Print help
