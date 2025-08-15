@@ -60,7 +60,7 @@ test_resources:
 
 engines:  
   - type: docker
-    image: quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8
+    image: quay.io/biocontainers/bwa:0.7.19--h577a1d6_1
     setup:
       - type: docker
         run: |

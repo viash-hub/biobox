@@ -1,5 +1,5 @@
 ```
-docker run --rm quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8 bwa mem
+docker run --rm quay.io/biocontainers/bwa:0.7.19--h577a1d6_1 bwa mem
 ```
 
 Usage: bwa mem [options] <idxbase> <in1.fq> [in2.fq]
@@ -40,13 +40,16 @@ Input/output options:
        -H STR/FILE   insert STR to header if it starts with @; or insert lines in FILE [null]
        -o FILE       sam file to output results to [stdout]
        -j            treat ALT contigs as part of the primary assembly (i.e. ignore <idxbase>.alt file)
-       -5            for split alignment, take the alignment with the smallest coordinate as primary
+       -5            for split alignment, take the alignment with the smallest query (not genomic) coordinate as primary
        -q            don't modify mapQ of supplementary alignments
        -K INT        process INT input bases in each batch regardless of nThreads (for reproducibility) []
 
        -v INT        verbosity level: 1=error, 2=warning, 3=message, 4+=debugging [3]
        -T INT        minimum score to output [30]
-       -h INT[,INT]  if there are <INT hits with score >80% of the max score, output all in XA [5,200]
+       -h INT[,INT]  if there are <INT hits with score >80.00% of the max score, output all in XA [5,200]
+                     A second value may be given for alternate sequences.
+       -z FLOAT      The fraction of the max score to use with -h [0.800000].
+                     specify the mean, standard deviation (10% of the mean if absent), max
        -a            output all alignments for SE or unpaired PE
        -C            append FASTA/FASTQ comment to SAM output
        -V            output the reference FASTA header in the XR tag
@@ -57,6 +60,7 @@ Input/output options:
                      specify the mean, standard deviation (10% of the mean if absent), max
                      (4 sigma from the mean if absent) and min of the insert size distribution.
                      FR orientation only. [inferred]
+       -u            output XB instead of XA; XB is XA with the alignment score and mapping quality added.
 
 Note: Please read the man page for detailed description of the command line and options.
 

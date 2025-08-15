@@ -1,5 +1,5 @@
 ```
-docker run --rm quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8 bwa index
+docker run --rm quay.io/biocontainers/bwa:0.7.19--h577a1d6_1 bwa index
 ```
 
 Usage:   bwa index [options] <in.fasta>
@@ -10,4 +10,5 @@ Options: -a STR    BWT construction algorithm: bwtsw, is or rb2 [auto]
          -6        index files named as <in.fasta>.64.* instead of <in.fasta>.* 
 
 Warning: `-a bwtsw' does not work for short genomes, while `-a is' and
-         `-a div' do not work not for long genomes.
+         `-a div' do not work for long genomes.
+

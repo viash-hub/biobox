@@ -156,7 +156,7 @@ argument_groups:
   - name: "--primary_5prime"
     alternatives: ["-5"]
     type: boolean_true
-    description: For split alignment, take the alignment with the smallest coordinate as primary.
+    description: For split alignment, take the alignment with the smallest query (not genomic) coordinate as primary.
   - name: "--keep_mapq"
     alternatives: [-q]
     type: boolean_true
@@ -177,8 +177,13 @@ argument_groups:
     example: 30
   - name: "--max_hits_xa"
     type: string
-    description: If there are <INT hits with score >80% of the max score, output all in XA. Default is 5,200.
+    description: If there are <INT hits with score >80.00% of the max score, output all in XA. Default is 5,200.
     example: "5,200"
+  - name: "--score_fraction"
+    alternatives: [-z]
+    type: double
+    description: The fraction of the max score to use with -h. Default is 0.800000.
+    example: 0.8
   - name: "--output_all"
     alternatives: [-a]
     type: boolean_true
@@ -199,6 +204,10 @@ argument_groups:
     alternatives: [-M]
     type: boolean_true
     description: Mark shorter split hits as secondary.
+  - name: "--output_xb"
+    alternatives: [-u]
+    type: boolean_true
+    description: Output XB instead of XA; XB is XA with the alignment score and mapping quality added.
   - name: "--insert_size"
     alternatives: [-I]
     type: string
@@ -215,7 +224,7 @@ test_resources:
 
 engines:  
   - type: docker
-    image: quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8
+    image: quay.io/biocontainers/bwa:0.7.19--h577a1d6_1
     setup:
       - type: docker
         run: |

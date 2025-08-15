@@ -1,5 +1,5 @@
 ```
-docker run --rm quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8 bwa aln
+docker run --rm quay.io/biocontainers/bwa:0.7.19--h577a1d6_1 bwa aln
 ```
 
 Usage:   bwa aln [options] <prefix> <in.fq>
@@ -29,5 +29,3 @@ Options: -n NUM    max #diff (int) or missing prob under 0.02 err rate (float) [
          -2        use the 2nd read in a pair (effective with -b)
          -Y        filter Casava-filtered sequences
 
-Note: BWA aln is designed for short reads (typically < 100bp). For longer reads, 
-consider using BWA-MEM instead. Threading is controlled automatically via meta_cpus.
