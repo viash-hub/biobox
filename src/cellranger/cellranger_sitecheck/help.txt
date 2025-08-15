@@ -1,0 +1,4 @@
+```
+docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger sitecheck -h
+```
+
