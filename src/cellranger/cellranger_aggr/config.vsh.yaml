@@ -63,10 +63,8 @@ argument_groups:
         default: 3
 
       - name: --enable_tsne
-        type: string
+        type: boolean_true
         description: Enable t-SNE projection
-        default: "false"
-        choices: ["true", "false"]
 
   - name: Execution Options
     arguments:

@@ -78,12 +78,16 @@ echo "library_id,molecule_h5" > simple_test.csv
 echo "sample1,/fake/path/sample1/outs/molecule_info.h5" >> simple_test.csv
 echo "sample2,/fake/path/sample2/outs/molecule_info.h5" >> simple_test.csv
 
+output_dir="${tmp_dir}/test_output"
+mkdir -p "${output_dir}"
+
 "${meta_executable}" \
     --id "test_aggr" \
     --csv "simple_test.csv" \
     --description "Test aggregation" \
     --normalize "mapped" \
-    --dry
+    --dry \
+    --output_dir "${output_dir}"
 
 echo "Checking that dry run completed successfully"
 echo "Current directory contents:"
