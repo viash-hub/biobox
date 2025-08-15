@@ -7,7 +7,8 @@ links:
   documentation: https://github.com/stjude-rust-labs/fq/blob/master/README.md
   repository: https://github.com/stjude-rust-labs/fq
 license: MIT
-
+requirements:
+  commands: [fq]
 authors:
   - __merge__: /src/_authors/robrecht_cannoodt.yaml
     roles: [ author, maintainer ]
@@ -60,6 +61,10 @@ test_resources:
 engines:  
   - type: docker
     image: quay.io/biocontainers/fq:0.12.0--h9ee0642_0
+    setup:
+      - type: docker
+        run: |
+          fq -V | sed 's#fq \([0-9.]*\) .*#fq: \1#' > /var/software_versions.txt
 
 runners:
   - type: executable
