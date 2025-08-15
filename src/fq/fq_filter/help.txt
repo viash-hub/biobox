@@ -1,0 +1,22 @@
+```
+docker run --rm -it quay.io/biocontainers/fq:0.12.0--h9ee0642_0 fq filter -h >> src/fq/fq_filter/help.txt
+```
+
+Filters a FASTQ file
+
+Usage: fq filter [OPTIONS] --dsts <DSTS> [SRCS]...
+
+Arguments:
+  [SRCS]...  FASTQ sources
+
+Options:
+      --names <NAMES>
+          Allowlist of record names
+      --sequence-pattern <SEQUENCE_PATTERN>
+          Keep records that have sequences that match the given regular expression
+      --dsts <DSTS>
+          Filtered FASTQ destinations
+  -h, --help
+          Print help
+  -V, --version
+          Print version
