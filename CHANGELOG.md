@@ -1,3 +1,29 @@
+# Unreleased
+
+<!-- Add new changes here before release -->
+
+## BREAKING CHANGES
+
+* `fq_subsample` has been removed after its functionality was previously copied to `fq/fq_subsample`. Please use the latter instead. (PR #182).
+
+## NEW FUNCTIONALITY
+
+* `fq`:
+  - `fq/fq_filter`: Filter FASTQ files based on record names or sequence patterns (PR #182).
+  - `fq/fq_generate`: Generate a random FASTQ file pair for testing and simulation purposes (PR #182).
+
+## DOCUMENTATION
+
+* Major restructuring of the documentation pages (PR #185):
+  - `CONTRIBUTING.md`: Streamlined guide with detailed sections moved to dedicated docs/ guides.
+  - `README.md`: Streamlined content to guide people towards what they need.
+  - `docs/COMPONENT_DEVELOPMENT.md`: New comprehensive guide covering component creation process.
+  - `docs/SCRIPT_DEVELOPMENT.md`: New detailed guide for script development best practices.
+  - `docs/TESTING.md`: New comprehensive testing guide.
+  - `docs/DOCKER_GUIDE.md`: New Docker and engine best practices guide.
+
+* `.github/PULL_REQUEST_TEMPLATE.md`: Fixed repository references to point to correct biobox repository instead of base template (PR #185).
+
 # biobox 0.3.2
 
 ## NEW FUNCTIONALITY

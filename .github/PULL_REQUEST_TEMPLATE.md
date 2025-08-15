@@ -12,9 +12,9 @@ Closes #xxxx
 
 - [ ] I have performed a self-review of my code
 
-- [ ] Conforms to the [Contributing guidelines](https://github.com/viash-hub/base/blob/main/CONTRIBUTING.md)
+- [ ] Conforms to the [Contributing guidelines](https://github.com/viash-hub/biobox/blob/main/CONTRIBUTING.md)
 
-- [ ] Proposed changes are described in the [CHANGELOG.md](https://github.com/viash-hub/base/blob/main/CHANGELOG.md)
+- [ ] Proposed changes are described in the [CHANGELOG.md](https://github.com/viash-hub/biobox/blob/main/CHANGELOG.md)
 
 - [ ] I have tested my code with `viash ns test --parallel -q <name or namespace>`
 
