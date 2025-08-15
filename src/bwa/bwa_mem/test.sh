@@ -71,7 +71,7 @@ assert_file_not_empty "$TEMP_DIR/output_SE.sam"
 assert_file_contains "$TEMP_DIR/output_SE.sam" "@SQ"
 assert_file_contains "$TEMP_DIR/output_SE.sam" "@PG"
 # Count alignment records
-alignment_lines=$(grep -v "^@" "$TEMP_DIR/output_SE.sam" | wc -l)
+alignment_lines=$(grep -vc "^@" "$TEMP_DIR/output_SE.sam")
 echo "Found $alignment_lines alignment records in single-end output."
 
 echo ">> OK: Single-end alignment test passed."
@@ -93,7 +93,7 @@ assert_file_not_empty "$TEMP_DIR/output_PE.sam"
 assert_file_contains "$TEMP_DIR/output_PE.sam" "@SQ"
 assert_file_contains "$TEMP_DIR/output_PE.sam" "@PG"
 # Count alignment records
-alignment_lines=$(grep -v "^@" "$TEMP_DIR/output_PE.sam" | wc -l)
+alignment_lines=$(grep -vc "^@" "$TEMP_DIR/output_PE.sam")
 echo "Found $alignment_lines alignment records in paired-end output."
 
 echo ">> OK: Paired-end alignment test passed."

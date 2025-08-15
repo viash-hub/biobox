@@ -80,7 +80,7 @@ assert_file_contains "$TEMP_DIR/output.sam" "@SQ"
 assert_file_contains "$TEMP_DIR/output.sam" "@PG"
 
 # Count alignment records
-alignment_lines=$(grep -v "^@" "$TEMP_DIR/output.sam" | wc -l)
+alignment_lines=$(grep -vc "^@" "$TEMP_DIR/output.sam")
 echo "Found $alignment_lines alignment records in SAM output."
 
 echo ">> OK: BWA samse basic test passed."
