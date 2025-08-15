@@ -41,8 +41,8 @@ engines:
     image: quay.io/biocontainers/tool:version--build_string
     setup:
       - type: docker
-        run: |
-          tool --version 2>&1 | head -1 | sed 's/.*version /tool: /' > /var/software_versions.txt
+        run:
+          - tool --version 2>&1 | head -1 | sed 's/.*version /tool: /' > /var/software_versions.txt
 runners:
   - type: executable
   - type: nextflow

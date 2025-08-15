@@ -55,8 +55,6 @@ test_resources:
 
 set -e
 
-TEMP_DIR="$meta_temp_dir"
-
 #############################################
 # helper functions
 assert_file_exists() {
@@ -90,21 +88,21 @@ EOF
 
 # --- Test Case 1: Basic functionality ---
 echo ">>> Test 1: Basic functionality"
-create_test_fasta "$TEMP_DIR/input.fasta"
+create_test_fasta "$meta_temp_dir/input.fasta"
 
 echo ">> Running $meta_name..."
 "$meta_executable" \
-  --input "$TEMP_DIR/input.fasta" \
-  --output "$TEMP_DIR/output"
+  --input "$meta_temp_dir/input.fasta" \
+  --output "$meta_temp_dir/output"
 
 echo ">> Checking output exists..."
-assert_dir_exists "$TEMP_DIR/output"
+assert_dir_exists "$meta_temp_dir/output"
 
 echo ">> Checking output is not empty..."
-assert_file_not_empty "$TEMP_DIR/output/result.txt"
+assert_file_not_empty "$meta_temp_dir/output/result.txt"
 
 echo ">> Checking output content..."
-assert_file_contains "$TEMP_DIR/output/result.txt" "expected_pattern"
+assert_file_contains "$meta_temp_dir/output/result.txt" "expected_pattern"
 
 echo "> All tests succeeded!"
 ```
@@ -204,54 +202,54 @@ EOF
 
 ```bash
 echo ">>> Test 1: Basic functionality"
-create_test_input "$TEMP_DIR/input.txt"
+create_test_input "$meta_temp_dir/input.txt"
 
 "$meta_executable" \
-  --input "$TEMP_DIR/input.txt" \
-  --output "$TEMP_DIR/output.txt"
+  --input "$meta_temp_dir/input.txt" \
+  --output "$meta_temp_dir/output.txt"
 
-assert_file_exists "$TEMP_DIR/output.txt"
-assert_file_not_empty "$TEMP_DIR/output.txt"
+assert_file_exists "$meta_temp_dir/output.txt"
+assert_file_not_empty "$meta_temp_dir/output.txt"
 ```
 
 ### 2. Multiple Input Files
 
 ```bash
 echo ">>> Test 2: Multiple input files"
-create_test_input "$TEMP_DIR/input1.txt"
-create_test_input "$TEMP_DIR/input2.txt"
+create_test_input "$meta_temp_dir/input1.txt"
+create_test_input "$meta_temp_dir/input2.txt"
 
 "$meta_executable" \
-  --input "$TEMP_DIR/input1.txt;$TEMP_DIR/input2.txt" \
-  --output "$TEMP_DIR/output.txt"
+  --input "$meta_temp_dir/input1.txt;$meta_temp_dir/input2.txt" \
+  --output "$meta_temp_dir/output.txt"
 
-assert_file_exists "$TEMP_DIR/output.txt"
+assert_file_exists "$meta_temp_dir/output.txt"
 ```
 
 ### 3. Optional Parameters
 
 ```bash
 echo ">>> Test 3: Optional parameters"
-create_test_input "$TEMP_DIR/input.txt"
+create_test_input "$meta_temp_dir/input.txt"
 
 "$meta_executable" \
-  --input "$TEMP_DIR/input.txt" \
-  --output "$TEMP_DIR/output.txt" \
+  --input "$meta_temp_dir/input.txt" \
+  --output "$meta_temp_dir/output.txt" \
   --threads 2 \
   --verbose
 
-assert_file_exists "$TEMP_DIR/output.txt"
+assert_file_exists "$meta_temp_dir/output.txt"
 ```
 
 ### 4. Edge Cases
 
 ```bash
 echo ">>> Test 4: Empty input"
-touch "$TEMP_DIR/empty.txt"
+touch "$meta_temp_dir/empty.txt"
 
 "$meta_executable" \
-  --input "$TEMP_DIR/empty.txt" \
-  --output "$TEMP_DIR/output.txt" || {
+  --input "$meta_temp_dir/empty.txt" \
+  --output "$meta_temp_dir/output.txt" || {
   echo "Expected failure with empty input"
 }
 ```
@@ -262,7 +260,7 @@ touch "$TEMP_DIR/empty.txt"
 echo ">>> Test 5: Error handling - non-existent input"
 if "$meta_executable" \
   --input "/non/existent/file.txt" \
-  --output "$TEMP_DIR/output.txt" 2>/dev/null; then
+  --output "$meta_temp_dir/output.txt" 2>/dev/null; then
   echo "Expected error but command succeeded" && exit 1
 fi
 echo ">> OK: Properly handled non-existent input file error."
@@ -276,7 +274,7 @@ Always use `$meta_temp_dir` for temporary files:
 
 ```bash
 TEMP_DIR="$meta_temp_dir"
-create_test_input "$TEMP_DIR/input.txt"
+create_test_input "$meta_temp_dir/input.txt"
 ```
 
 ### 2. Clear Test Output
@@ -296,13 +294,13 @@ Don't just check that files exist - validate their content:
 
 ```bash
 # Check specific content
-assert_file_contains "$TEMP_DIR/output.txt" "expected_result"
+assert_file_contains "$meta_temp_dir/output.txt" "expected_result"
 
 # Check file format
-assert_file_contains_regex "$TEMP_DIR/output.gtf" "^chr[0-9X-Y]+\t.*\tgene\t"
+assert_file_contains_regex "$meta_temp_dir/output.gtf" "^chr[0-9X-Y]+\t.*\tgene\t"
 
 # Check line count
-assert_file_line_count "$TEMP_DIR/output.txt" 10
+assert_file_line_count "$meta_temp_dir/output.txt" 10
 ```
 
 ### 4. Test Multiple Scenarios
@@ -325,6 +323,119 @@ set -e  # Exit on any error
 # Each assertion should exit on failure
 assert_file_exists "$output_file"
 ```
+
+## Viash Testing Features
+
+### Running Tests
+
+**Basic test execution:**
+```bash
+# Test a single component
+viash test config.vsh.yaml
+
+# Test with specific resources
+viash test config.vsh.yaml --cpus 4 --memory 8GB
+
+# Test with specific setup strategy
+viash test config.vsh.yaml --setup build --verbose
+
+# Keep temporary files for debugging
+viash test config.vsh.yaml --keep true
+```
+
+**Namespace-level testing:**
+```bash
+# Test all components in parallel
+viash ns test --parallel
+
+# Test specific namespace
+viash ns test -q alignment --parallel
+```
+
+### Test Execution Flow
+
+When running `viash test`, Viash automatically:
+
+1. **Creates temporary directory** (available as `$meta_temp_dir`)
+2. **Builds the main executable** 
+3. **Builds/pulls Docker image** (if using Docker engine)
+4. **Iterates over all test scripts** in `test_resources`
+5. **Builds each test into executable** and runs it
+6. **Cleans up** temporary files (unless `--keep true`)
+7. **Returns exit code 0** if all tests succeed
+
+### Multiple Test Scripts
+
+You can add multiple test scripts to cover different scenarios:
+
+```yaml
+test_resources:
+  - type: bash_script
+    path: test_basic.sh
+  - type: bash_script 
+    path: test_edge_cases.sh
+  - type: bash_script
+    path: test_large_data.sh
+```
+
+**Important:** All test scripts must pass for the component to be considered tested successfully.
+
+### Testing Different Engines
+
+```bash
+# Test with specific engine
+viash test config.vsh.yaml --engine docker
+viash test config.vsh.yaml --engine native
+
+# Test with specific runner
+viash test config.vsh.yaml --runner executable
+viash test config.vsh.yaml --runner nextflow
+```
+
+### Meta Variables in Tests
+
+Your test scripts automatically have access to important meta variables:
+
+- **`$meta_executable`**: Path to the built component executable
+- **`$meta_temp_dir`**: Temporary directory for test files (automatically cleaned up)
+- **`$meta_name`**: Component name for logging
+- **`$meta_resources_dir`**: Path to test resources
+
+```bash
+#!/bin/bash
+
+## VIASH START
+## VIASH END
+
+set -e
+
+echo "Testing $meta_name"
+echo "Executable: $meta_executable"
+echo "Temp dir: $meta_temp_dir"
+
+# Create test data in temp directory
+create_test_data "$meta_temp_dir/input.txt"
+
+# Run the component
+"$meta_executable" --input "$meta_temp_dir/input.txt" --output "$meta_temp_dir/output.txt"
+```
+
+### Advanced Testing Options
+
+```bash
+# Test with different container setup strategies
+viash test config.vsh.yaml --setup cachedbuild  # Use cached layers (faster)
+viash test config.vsh.yaml --setup build        # Clean build from scratch
+viash test config.vsh.yaml --setup alwaysbuild  # Always rebuild container
+
+# Test with configuration modifications
+viash test config.vsh.yaml -c '.engines[0].image = "ubuntu:22.04"'
+
+# Test with debug mode for troubleshooting
+viash test config.vsh.yaml --keep true --verbose
+```
+
+For more details, see the [Viash Unit Testing Documentation](https://viash.io/guide/component/unit-testing.html).
 
 ## When to Use Static Test Data
 

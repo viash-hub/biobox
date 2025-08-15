@@ -24,8 +24,8 @@ cmd_args=(
     --output "$par_output"
     ${par_option1:+--option1}
     ${par_option2:+--option2}
-    ${par_threads:+--threads "$par_threads"}
-    ${par_memory:+--memory "$par_memory"}
+    ${meta_cpus:+--threads "$meta_cpus"}
+    ${meta_memory_gb:+--memory "${meta_memory_gb}G"}
 )
 
 # Execute command
@@ -68,7 +68,7 @@ Use Bash parameter expansion for optional parameters:
 
 ```bash
 # Include parameter only if variable is set and not empty
-${par_threads:+--threads "$par_threads"}
+${meta_cpus:+--threads "$meta_cpus"}
 
 # Include flag only if boolean is true (after unsetting false values)
 ${par_verbose:+--verbose}
@@ -95,7 +95,39 @@ for par in "${unset_if_false[@]}"; do
 done
 ```
 
-### 5. Proper Quoting
+### 5. Meta Variables Usage
+
+**Important:** Never use `par_threads`, `par_cores`, `par_cpus`, or `par_memory` parameters. Use Viash's built-in meta variables instead.
+
+**Available meta variables:**
+- `meta_cpus`: Number of CPU cores available
+- `meta_memory_*`: Memory limits in various units (b, kb, mb, gb, tb, pb, kib, mib, gib, tib, pib)
+- `meta_temp_dir`: Temporary directory for the component
+- `meta_resources_dir`: Path to component resources
+
+**Examples:**
+```bash
+# CPU cores with fallback
+${meta_cpus:+--threads "$meta_cpus"}
+${meta_cpus:+--cores "${meta_cpus:-1}"}
+
+# Memory with fallback and unit conversion
+${meta_memory_gb:+--memory "${meta_memory_gb}G"}
+${meta_memory_mb:+--max-memory "${meta_memory_mb:-1024}M"}
+
+# Temporary directory
+--tmp-dir "${meta_temp_dir:-/tmp}"
+```
+
+**Why use meta variables:**
+- Integrates seamlessly with workflow systems like Nextflow
+- Automatically managed by Viash runtime
+- Consistent across all components
+- Prevents parameter duplication and conflicts
+
+For complete details, see [Viash Variables Documentation](https://viash.io/guide/component/variables.html).
+
+### 6. Proper Quoting
 
 Always quote variables that might contain spaces or special characters:
 

@@ -139,6 +139,47 @@ Add all other arguments with these exceptions:
 **Boolean handling:**
 * Prefer using `boolean_true` over `boolean_false` to avoid confusion in Nextflow workflows
 
+## Meta Variables
+
+**Important:** Never add `threads`, `cores`, `cpus`, or `memory` as regular parameters. Instead, use Viash's built-in meta variables.
+
+### Available Meta Variables
+
+Viash provides several meta variables that are automatically available in your scripts:
+
+- **`meta_cpus`** (integer): Maximum number of logical CPUs the component can use
+- **`meta_memory_*`** (long): Maximum memory allocation in various units:
+  - `meta_memory_b`, `meta_memory_kb`, `meta_memory_mb`
+  - `meta_memory_gb`, `meta_memory_tb`, `meta_memory_pb`
+  - `meta_memory_kib`, `meta_memory_mib`, `meta_memory_gib`, `meta_memory_tib`, `meta_memory_pib`
+- **`meta_temp_dir`** (string): Temporary directory for the component
+- **`meta_resources_dir`** (string): Path to component resources
+- **`meta_name`** (string): Component name (useful for logging)
+- **`meta_executable`** (string): Path to the wrapped executable
+- **`meta_config`** (string): Path to the processed config YAML
+
+### Usage Example
+
+```bash
+# Use meta_cpus instead of a threads parameter
+./tool --threads ${meta_cpus:-1} --input $par_input --output $par_output
+
+# Use meta_memory_gb for memory-intensive tools
+./tool --memory ${meta_memory_gb:-8}G --input $par_input --output $par_output
+```
+
+### Setting Meta Values
+
+```bash
+# When running with viash
+viash run config.vsh.yaml --cpus 8 --memory 16GB -- --input file.txt
+
+# When using built executables
+./my_tool ---cpus 8 ---memory 16GB --input file.txt
+```
+
+For more details, see the [Viash Variables Documentation](https://viash.io/guide/component/variables.html).
+
 ## Implementation
 
 See [Script Development Guide](SCRIPT_DEVELOPMENT.md) for detailed script writing guidelines.
@@ -159,8 +200,8 @@ engines:
     image: quay.io/biocontainers/xxx:2.5.4--he96a11b_6
     setup:
       - type: docker
-        run: |
-          xxx --version 2>&1 | head -1 | sed 's/.*version /xxx: /' > /var/software_versions.txt
+        run:
+          - xxx --version 2>&1 | head -1 | sed 's/.*version /xxx: /' > /var/software_versions.txt
 ```
 
 **Common version extraction patterns:**

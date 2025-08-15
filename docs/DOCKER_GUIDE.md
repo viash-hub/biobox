@@ -12,8 +12,8 @@ engines:
     image: quay.io/biocontainers/bowtie2:2.5.4--he96a11b_6
     setup:
       - type: docker
-        run: |
-          bowtie2 --version 2>&1 | head -1 | sed 's/.*version /bowtie2: /' > /var/software_versions.txt
+        run:
+          - bowtie2 --version 2>&1 | head -1 | sed 's/.*version /bowtie2: /' > /var/software_versions.txt
 ```
 
 ### Key Requirements
@@ -84,6 +84,30 @@ docker run quay.io/biocontainers/tool:version bash -c "
 "
 ```
 
+## Docker Run Syntax
+
+### List vs Multiline Strings
+
+**Preferred: List format**
+```yaml
+run:
+  # Single commands
+  - command1 arg1 arg2
+  - command2 arg1 arg2
+  # Chained commands
+  - command1 && command2 && command3
+```
+
+**Alternative: Multiline strings (for complex commands)**
+```yaml
+run: |
+  command1 arg1 arg2 && \
+  command2 arg1 arg2 && \
+  command3 arg1 arg2
+```
+
+**Important:** Comments inside multiline strings (`run: |`) become Dockerfile `RUN` commands and will break the build. Use comments before the `run:` key or use the list format.
+
 ## Custom Containers
 
 ### When to Use Custom Containers
@@ -105,9 +129,9 @@ engines:
       - type: python
         packages: [numpy, pandas, scipy]
       - type: docker
-        run: |
-          pip install your-tool
-          echo "your-tool: $(your-tool --version)" > /var/software_versions.txt
+        run:
+          - pip install your-tool
+          - echo "your-tool: $(your-tool --version)" > /var/software_versions.txt
 ```
 
 ### R-based Tools
@@ -115,14 +139,14 @@ engines:
 ```yaml
 engines:
   - type: docker
-    image: eddelbuettel/r2u:22.04
+    image: rocker/r2u:24.04
     setup:
       - type: r
         cran: [devtools, BiocManager]
         bioc: [Biostrings, GenomicRanges]
       - type: docker
-        run: |
-          R --version | head -1 | sed 's/R version /R: /' > /var/software_versions.txt
+        run:
+          - R --version | head -1 | sed 's/R version /R: /' > /var/software_versions.txt
 ```
 
 ### Compilation from Source
@@ -135,14 +159,10 @@ engines:
       - type: apt
         packages: [build-essential, cmake, git, wget]
       - type: docker
-        run: |
-          # Download and compile tool
-          wget https://github.com/user/tool/archive/v1.0.tar.gz
-          tar -xzf v1.0.tar.gz
-          cd tool-1.0
-          make
-          make install
-          echo "tool: 1.0" > /var/software_versions.txt
+        run:
+          - wget https://github.com/user/tool/archive/v1.0.tar.gz && tar -xzf v1.0.tar.gz
+          - cd tool-1.0 && make && make install
+          - echo "tool: 1.0" > /var/software_versions.txt
 ```
 
 ## Recommended Base Containers
@@ -169,7 +189,7 @@ image: nvcr.io/nvidia/pytorch:23.08-py3
 #### R
 ```yaml
 # Fast package installation
-image: eddelbuettel/r2u:22.04
+image: rocker/r2u:24.04
 
 # Tidyverse included
 image: rocker/tidyverse:4.3.0
@@ -214,40 +234,17 @@ engines:
       - type: apt
         packages: [wget, curl, build-essential]
       - type: docker
-        run: |
+        run:
           # Install tool 1
-          wget https://tool1.com/download
-          install_tool1
-          
-          # Install tool 2
-          wget https://tool2.com/download
-          install_tool2
-          
+          - wget https://tool1.com/download && install_tool1
+          # Install tool 2  
+          - wget https://tool2.com/download && install_tool2
           # Create version file
-          echo "tool1: $(tool1 --version)" > /var/software_versions.txt
-          echo "tool2: $(tool2 --version)" >> /var/software_versions.txt
+          - echo "tool1: $(tool1 --version)" > /var/software_versions.txt
+          - echo "tool2: $(tool2 --version)" >> /var/software_versions.txt
 ```
 
 ## Container Optimization
-
-### Size Optimization
-
-```yaml
-setup:
-  - type: apt
-    packages: [wget, curl]
-  - type: docker
-    run: |
-      # Install tool
-      wget https://example.com/tool.tar.gz
-      tar -xzf tool.tar.gz
-      mv tool /usr/local/bin/
-      
-      # Clean up
-      rm -rf tool.tar.gz /tmp/* /var/tmp/*
-      apt-get clean
-      rm -rf /var/lib/apt/lists/*
-```
 
 ### Layer Efficiency
 
@@ -292,6 +289,22 @@ tool --version
 
 # Verify version file
 cat /var/software_versions.txt
+```
+
+### Viash Docker Debugging
+
+```bash
+# Inspect the generated Dockerfile
+viash run config.vsh.yaml -- ---dockerfile
+
+# Build with cached layers (faster)
+viash run config.vsh.yaml -- ---setup cachedbuild ---verbose
+
+# Build from scratch (clean build)
+viash run config.vsh.yaml -- ---setup build ---verbose
+
+# Enter interactive debugging session
+viash run config.vsh.yaml -- ---debug
 ```
 
 ### Common Issues
