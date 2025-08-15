@@ -66,73 +66,26 @@ viash build src/namespace/tool_name/config.vsh.yaml --setup cachedbuild
 
 ### Key Best Practices
 
-- **Generate test data** in test scripts (don't store static files)
-- **Use array-based arguments**: `cmd_args=(...)` instead of repetitive `cmd_args+=()`
-- **Use `__merge__`** for author info: `__merge__: /src/_authors/name.yaml`
-- **Specify requirements**: List all commands in `requirements.commands`
-- **Pin Docker versions**: Use specific versions with build strings
-- **Add version detection**: Create `/var/software_versions.txt`
+- **Follow modern standards**: Use current coding patterns and component structure
+- **Ensure reproducibility**: Pin versions and document dependencies clearly
+- **Generate test data**: Create self-contained tests that don't rely on external files
+- **Write clean code**: Use consistent naming and clear, maintainable scripts
 
-## Detailed Development Guides
+For detailed implementation guidelines, check out our development guides:
 
-For comprehensive instructions on each aspect of component development, see our detailed guides:
+## Development Guides
 
-<details>
-<summary><strong>Component Development Process</strong></summary>
+### 🔧 [Component Development Guide](docs/COMPONENT_DEVELOPMENT.md)
+How to create components: config templates, metadata, arguments, containers, help files, and Docker setup.
 
-See: **[Component Development Guide](docs/COMPONENT_DEVELOPMENT.md)**
+### 📝 [Script Development Guide](docs/SCRIPT_DEVELOPMENT.md) 
+Writing good scripts: array-based commands, error handling, conditional parameters, boolean flags, and parameter patterns.
 
-This guide covers:
-- Creating config templates
-- Adding metadata and arguments
-- Finding suitable containers
-- Generating help files
-- Setting up inputs/outputs
-- Docker engine configuration
+### ✅ [Testing Guide](docs/TESTING.md)
+Testing your components: self-contained tests, generating test data, output validation, and testing multiple scenarios.
 
-</details>
-
-<details>
-<summary><strong>Script Development Best Practices</strong></summary>
-
-See: **[Script Development Guide](docs/SCRIPT_DEVELOPMENT.md)**
-
-This guide covers:
-- Array-based command building
-- Error handling with `set -eo pipefail`
-- Conditional parameter inclusion
-- Boolean flag management
-- Parameter expansion patterns
-
-</details>
-
-<details>
-<summary><strong>Testing Guidelines</strong></summary>
-
-See: **[Testing Guide](docs/TESTING.md)**
-
-This guide covers:
-- Generating test data programmatically
-- Self-contained test design
-- Output validation techniques
-- Helper function patterns
-- Multi-scenario testing
-
-</details>
-
-<details>
-<summary><strong>Docker Configuration</strong></summary>
-
-See: **[Docker Guide](docs/DOCKER_GUIDE.md)**
-
-This guide covers:
-- Biocontainer selection
-- Version pinning strategies
-- Software version detection
-- Custom container creation
-- Container best practices
-
-</details>
+### 🐳 [Docker Guide](docs/DOCKER_GUIDE.md)
+Working with containers: choosing biocontainers, version pinning, detecting software versions, and container best practices.
 
 ## Contribution Process
 
@@ -143,16 +96,18 @@ This guide covers:
    viash test src/namespace/tool_name/config.vsh.yaml
    ```
 
-2. **Build successfully**: Verify the component builds without errors
-   ```bash
-   viash build src/namespace/tool_name/config.vsh.yaml --setup cachedbuild
-   ```
+2. **Add changelog entry**: Document your changes in `CHANGELOG.md` under the "Unreleased" section
 
-3. **Follow naming conventions**: Use `snake_case` for component names and arguments
+3. **Review your changes**: Check your code for:
+   - Consistent naming and coding conventions
+   - Clear, maintainable code structure
+   - Proper error handling and edge cases
+   - Complete documentation and helpful comments
 
-4. **Update documentation**: Add your component to relevant documentation if needed
-
-5. **Create a pull request**: Submit your changes with a clear description
+4. **Create a pull request**: Submit your changes.
+  - Include a clear description of the changes you've made
+  - Link to any relevant issues or discussions
+  - Review the changes critically before submitting the PR
 
 ### Review Process
 
