@@ -161,6 +161,7 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - path: /src/_utils/test_helpers.sh
 engines:
   - type: docker
     image: quay.io/nf-core/cellranger:9.0.1

@@ -1,58 +1,13 @@
 #!/bin/bash
 
-set -euo pipefail
-
 ## VIASH START
 ## VIASH END
 
-# Function to log messages with timestamp
-log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [TEST] $*"
-}
+# Include test helpers for enhanced logging and utilities
+source "${meta_resources_dir}/test_helpers.sh"
 
-# Function to check if file exists and exit with error if not
-check_file_exists() {
-    local file="$1"
-    local description="$2"
-    if [[ ! -f "$file" ]]; then
-        log "ERROR: $description not found at: $file"
-        exit 1
-    fi
-    log "✓ Found $description: $file"
-}
-
-# Function to check if directory exists and exit with error if not
-check_dir_exists() {
-    local dir="$1"
-    local description="$2"
-    if [[ ! -d "$dir" ]]; then
-        log "ERROR: $description not found at: $dir"
-        exit 1
-    fi
-    log "✓ Found $description: $dir"
-}
-
-# Function to check if file should NOT exist
-check_file_not_exists() {
-    local file="$1"
-    local description="$2"
-    if [[ -f "$file" ]]; then
-        log "ERROR: $description should not exist at: $file"
-        exit 1
-    fi
-    log "✓ Confirmed $description does not exist: $file"
-}
-
-# Function to check if directory should NOT exist
-check_dir_not_exists() {
-    local dir="$1"
-    local description="$2"
-    if [[ -d "$dir" ]]; then
-        log "ERROR: $description should not exist at: $dir"
-        exit 1
-    fi
-    log "✓ Confirmed $description does not exist: $dir"
-}
+# Set up test environment with enhanced error handling 
+setup_test_env
 
 # create temporary directory
 tmp_dir=$(mktemp -d "${meta_temp_dir}/${meta_name}-XXXXXXXX")
@@ -138,4 +93,4 @@ check_dir_not_exists "$test2_output_dir/analysis" "analysis output directory (sh
 
 log "✅ TEST 2 completed successfully"
 
-log "🎉 All tests succeeded!"
+print_test_summary "All cellranger_count tests"
