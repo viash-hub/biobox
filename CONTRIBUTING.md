@@ -53,6 +53,7 @@ runners:
 ```bash
 # Create component structure
 mkdir -p src/namespace/tool_name
+touch src/namespace/tool_name/{script.sh,test.sh,config.vsh.yaml}
 
 # Generate help file
 docker run container tool --help > src/namespace/tool_name/help.txt
@@ -101,7 +102,8 @@ Working with containers: choosing biocontainers, version pinning, detecting soft
 3. **Review your changes**: Check your code for:
    - Consistent naming and coding conventions
    - Clear, maintainable code structure
-   - Proper error handling and edge cases
+   - Proper error handling
+   - Robust edge case management
    - Complete documentation and helpful comments
 
 4. **Create a pull request**: Submit your changes.
@@ -136,7 +138,7 @@ A: Verify the Docker image exists, check syntax in config.vsh.yaml, and ensure a
 A: Check existing similar components for patterns, or ask in GitHub Discussions
 
 **Q: Can I create custom Docker containers?**  
-A: Yes, but prefer biocontainers when available. See the [Docker Guide](docs/DOCKER_GUIDE.md) for details.
+A: Yes, but biocontainers are preferred when available. See the [Docker Guide](docs/DOCKER_GUIDE.md) for details.
 
 ---
 

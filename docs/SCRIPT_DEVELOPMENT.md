@@ -3,14 +3,16 @@
 This guide covers best practices for writing runner scripts in biobox components.
 
 ## Table of Contents
-- [Modern Script Structure](#modern-script-structure)
+- [Script Structure and Template](#script-structure-and-template)
 - [Key Principles](#key-principles)
 - [Real-World Example](#real-world-example)
 - [Advanced Patterns](#advanced-patterns)
 - [Common Pitfalls](#common-pitfalls)
 - [Testing Your Script](#testing-your-script)
 
-## Modern Script Structure
+## Script Structure and Template
+
+All Viash component scripts follow a standard structure with best practices for error handling and parameter management.
 
 ### Basic Template
 
@@ -39,6 +41,29 @@ cmd_args=(
 # Execute command
 xxx "${cmd_args[@]}"
 ```
+
+### Understanding the Viash Code Block
+
+The `## VIASH START` and `## VIASH END` comments mark a special placeholder block where Viash injects runtime parameters and metadata when the component is executed.
+
+**At runtime**, Viash replaces this placeholder with:
+- `par_*` variables containing argument values (e.g., `par_input`, `par_output`)
+- `meta_*` variables containing runtime metadata (e.g., `meta_name`, `meta_cpus`, `meta_temp_dir`)
+
+**For debugging**, you can put example code between these markers to test your script locally:
+
+```bash
+## VIASH START
+par_input="test_input.txt"
+par_output="test_output.txt"
+par_verbose="true"
+meta_cpus="4"
+meta_memory_gb="8"
+meta_temp_dir="/tmp"
+## VIASH END
+```
+
+This allows you to run your script directly with `bash script.sh` during development.
 
 ## Key Principles
 
@@ -265,3 +290,5 @@ Always test your script with:
 - Parameters with spaces
 - Boolean true/false values
 - Edge cases specific to your tool
+
+See [Testing Guide](docs/TESTING.md) for extensive test best practices.
