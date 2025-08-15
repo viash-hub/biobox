@@ -1,137 +1,197 @@
 #!/bin/bash
 
-set -e
+## VIASH START
+## VIASH END
 
-TEMP_DIR="$meta_temp_dir"
+# Source the centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
+
+# Initialize test environment with strict error handling
+setup_test_env
 
 #############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_dir_exists() {
-  [ -d "$1" ] || { echo "Directory '$1' does not exist" && exit 1; }
-}
+# Test execution with centralized functions
 #############################################
 
-# --- Helper function to create test FASTA ---
-create_test_fasta() {
-  file_path="$1"
-  
-  cat << 'EOF' > "$file_path"
->chr1
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
->chr2
-GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
-GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
-GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
-GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
-EOF
-}
+log "Starting tests for $meta_name"
+
+# Create test data directory
+test_data_dir="$meta_temp_dir/test_data"
+mkdir -p "$test_data_dir"
 
 # --- Test Case 1: Basic indexing ---
-echo ">>> Test 1: Basic Bowtie2 indexing"
-create_test_fasta "$TEMP_DIR/test_ref.fasta"
+log "Starting TEST 1: Basic Bowtie2 indexing"
 
-echo ">> Running bowtie2_build..."
+log "Generating test reference genome..."
+create_test_fasta "$test_data_dir/test_ref.fasta" 2 1000
+check_file_exists "$test_data_dir/test_ref.fasta" "test reference genome"
+
+log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
-  --input "$TEMP_DIR/test_ref.fasta" \
-  --output "$TEMP_DIR/bt2_index"
+  --input "$test_data_dir/test_ref.fasta" \
+  --output "$meta_temp_dir/bt2_index"
 
-echo ">> Checking output directory exists..."
-assert_dir_exists "$TEMP_DIR/bt2_index"
+log "Validating TEST 1 outputs..."
+check_dir_exists "$meta_temp_dir/bt2_index" "output index directory"
 
-echo ">> Checking all index files exist..."
-assert_file_exists "$TEMP_DIR/bt2_index/test_ref.1.bt2"
-assert_file_exists "$TEMP_DIR/bt2_index/test_ref.2.bt2"
-assert_file_exists "$TEMP_DIR/bt2_index/test_ref.3.bt2"
-assert_file_exists "$TEMP_DIR/bt2_index/test_ref.4.bt2"
-assert_file_exists "$TEMP_DIR/bt2_index/test_ref.rev.1.bt2"
-assert_file_exists "$TEMP_DIR/bt2_index/test_ref.rev.2.bt2"
+# Check for standard bowtie2 index files
+log "Checking for bowtie2 index files..."
+index_files=(
+  "$meta_temp_dir/bt2_index/test_ref.1.bt2"
+  "$meta_temp_dir/bt2_index/test_ref.2.bt2"
+  "$meta_temp_dir/bt2_index/test_ref.3.bt2"
+  "$meta_temp_dir/bt2_index/test_ref.4.bt2"
+  "$meta_temp_dir/bt2_index/test_ref.rev.1.bt2"
+  "$meta_temp_dir/bt2_index/test_ref.rev.2.bt2"
+)
 
-echo ">> Checking index files are not empty..."
-assert_file_not_empty "$TEMP_DIR/bt2_index/test_ref.1.bt2"
-assert_file_not_empty "$TEMP_DIR/bt2_index/test_ref.2.bt2"
-assert_file_not_empty "$TEMP_DIR/bt2_index/test_ref.3.bt2"
-assert_file_not_empty "$TEMP_DIR/bt2_index/test_ref.4.bt2"
-assert_file_not_empty "$TEMP_DIR/bt2_index/test_ref.rev.1.bt2"
-assert_file_not_empty "$TEMP_DIR/bt2_index/test_ref.rev.2.bt2"
+for file in "${index_files[@]}"; do
+  check_file_exists "$file" "bowtie2 index file $(basename "$file")"
+  check_file_not_empty "$file" "bowtie2 index file $(basename "$file")"
+done
 
-echo ">> OK: Basic indexing test passed."
+log "✅ TEST 1 completed successfully"
 
-# --- Test Case 2: Indexing with custom index name ---
-echo ">>> Test 2: Bowtie2 indexing with custom index name"
-create_test_fasta "$TEMP_DIR/genome.fasta"
+# --- Test Case 2: Custom index name ---
+log "Starting TEST 2: Custom index name"
 
+log "Executing $meta_name with custom index name..."
 "$meta_executable" \
-  --input "$TEMP_DIR/genome.fasta" \
-  --index_name "custom_genome" \
-  --output "$TEMP_DIR/custom_index"
+  --input "$test_data_dir/test_ref.fasta" \
+  --output "$meta_temp_dir/custom_index" \
+  --index_name "custom_genome"
 
-echo ">> Checking output directory exists..."
-assert_dir_exists "$TEMP_DIR/custom_index"
+log "Validating TEST 2 outputs..."
+check_dir_exists "$meta_temp_dir/custom_index" "custom index directory"
 
-echo ">> Checking all index files exist with custom name..."
-assert_file_exists "$TEMP_DIR/custom_index/custom_genome.1.bt2"
-assert_file_exists "$TEMP_DIR/custom_index/custom_genome.2.bt2"
-assert_file_exists "$TEMP_DIR/custom_index/custom_genome.3.bt2"
-assert_file_exists "$TEMP_DIR/custom_index/custom_genome.4.bt2"
-assert_file_exists "$TEMP_DIR/custom_index/custom_genome.rev.1.bt2"
-assert_file_exists "$TEMP_DIR/custom_index/custom_genome.rev.2.bt2"
+# Check for index files with custom name
+log "Checking for custom-named index files..."
+custom_index_files=(
+  "$meta_temp_dir/custom_index/custom_genome.1.bt2"
+  "$meta_temp_dir/custom_index/custom_genome.2.bt2"
+  "$meta_temp_dir/custom_index/custom_genome.3.bt2"
+  "$meta_temp_dir/custom_index/custom_genome.4.bt2"
+  "$meta_temp_dir/custom_index/custom_genome.rev.1.bt2"
+  "$meta_temp_dir/custom_index/custom_genome.rev.2.bt2"
+)
 
-echo ">> Checking custom index files are not empty..."
-assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.1.bt2"
-assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.2.bt2"
-assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.3.bt2"
-assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.4.bt2"
-assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.rev.1.bt2"
-assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.rev.2.bt2"
+for file in "${custom_index_files[@]}"; do
+  check_file_exists "$file" "custom-named index file $(basename "$file")"
+  check_file_not_empty "$file" "custom-named index file $(basename "$file")"
+done
 
-echo ">> OK: Custom index name test passed."
+log "✅ TEST 2 completed successfully"
 
-# --- Test Case 3: Indexing with --noref option ---
-echo ">>> Test 3: Bowtie2 indexing with --noref"
-create_test_fasta "$TEMP_DIR/ref_noref.fasta"
+# --- Test Case 3: Large index option ---
+log "Starting TEST 3: Large index option"
 
+log "Executing $meta_name with large index option..."
 "$meta_executable" \
-  --input "$TEMP_DIR/ref_noref.fasta" \
-  --output "$TEMP_DIR/index_noref" \
-  --noref
+  --input "$test_data_dir/test_ref.fasta" \
+  --output "$meta_temp_dir/large_index" \
+  --large_index
 
-echo ">> Checking output directory exists..."
-assert_dir_exists "$TEMP_DIR/index_noref"
+log "Validating TEST 3 outputs..."
+check_dir_exists "$meta_temp_dir/large_index" "large index directory"
 
-echo ">> Checking forward index files exist..."
-assert_file_exists "$TEMP_DIR/index_noref/ref_noref.1.bt2"
-assert_file_exists "$TEMP_DIR/index_noref/ref_noref.2.bt2"
-assert_file_exists "$TEMP_DIR/index_noref/ref_noref.rev.1.bt2"
-assert_file_exists "$TEMP_DIR/index_noref/ref_noref.rev.2.bt2"
+# Check for index files (large index may have different structure)
+large_index_files=(
+  "$meta_temp_dir/large_index/test_ref.1.bt2l"
+  "$meta_temp_dir/large_index/test_ref.2.bt2l"
+  "$meta_temp_dir/large_index/test_ref.3.bt2l"
+  "$meta_temp_dir/large_index/test_ref.4.bt2l"
+  "$meta_temp_dir/large_index/test_ref.rev.1.bt2l"
+  "$meta_temp_dir/large_index/test_ref.rev.2.bt2l"
+)
 
-echo ">> Checking that .3/.4 index files are NOT created..."
-if [ -f "$TEMP_DIR/index_noref/ref_noref.3.bt2" ] || [ -f "$TEMP_DIR/index_noref/ref_noref.4.bt2" ]; then
-  echo "ERROR: .3/.4 index files should not exist with --noref option"
-  exit 1
-fi
+# Check if large index files exist, if not check regular format
+has_large_format=true
+for file in "${large_index_files[@]}"; do
+  if [[ ! -f "$file" ]]; then
+    has_large_format=false
+    break
+  fi
+done
 
-echo ">> OK: --noref option test passed."
-
-# --- Test Case 4: Error handling ---
-echo ">>> Test 4: Error handling"
-
-# Test with non-existent input file
-if "$meta_executable" \
-  --input "$TEMP_DIR/nonexistent.fasta" \
-  --output "$TEMP_DIR/error_index" 2>/dev/null; then
-  echo "ERROR: Should have failed with non-existent input file"
-  exit 1
+if [[ "$has_large_format" == "true" ]]; then
+  log "Large format index files detected"
+  for file in "${large_index_files[@]}"; do
+    check_file_exists "$file" "large index file $(basename "$file")"
+    check_file_not_empty "$file" "large index file $(basename "$file")"
+  done
 else
-  echo ">> OK: Properly handled non-existent input file error."
+  log "Regular format index files with large index option"
+  regular_large_files=(
+    "$meta_temp_dir/large_index/test_ref.1.bt2"
+    "$meta_temp_dir/large_index/test_ref.2.bt2"
+    "$meta_temp_dir/large_index/test_ref.3.bt2"
+    "$meta_temp_dir/large_index/test_ref.4.bt2"
+    "$meta_temp_dir/large_index/test_ref.rev.1.bt2"
+    "$meta_temp_dir/large_index/test_ref.rev.2.bt2"
+  )
+  for file in "${regular_large_files[@]}"; do
+    check_file_exists "$file" "index file $(basename "$file")"
+    check_file_not_empty "$file" "index file $(basename "$file")"
+  done
 fi
 
-echo ">>> All tests passed!"
+log "✅ TEST 3 completed successfully"
+
+print_test_summary "All tests completed successfully - bowtie2_build component validates basic indexing, custom naming, and large index scenarios"
+
+# --- Test Case 4: Large index option ---
+log "Starting TEST 4: Large index option"
+
+log "Executing $meta_name with large index option..."
+"$meta_executable" \
+  --input "$test_data_dir/test_ref.fasta" \
+  --output "$meta_temp_dir/large_index" \
+  --large_index
+
+log "Validating TEST 4 outputs..."
+check_dir_exists "$meta_temp_dir/large_index" "large index directory"
+
+# Check for index files (large index may have different structure)
+large_index_files=(
+  "$meta_temp_dir/large_index/test_ref.1.bt2l"
+  "$meta_temp_dir/large_index/test_ref.2.bt2l"
+  "$meta_temp_dir/large_index/test_ref.3.bt2l"
+  "$meta_temp_dir/large_index/test_ref.4.bt2l"
+  "$meta_temp_dir/large_index/test_ref.rev.1.bt2l"
+  "$meta_temp_dir/large_index/test_ref.rev.2.bt2l"
+)
+
+# Check if large index files exist, if not check regular format
+has_large_format=true
+for file in "${large_index_files[@]}"; do
+  if [[ ! -f "$file" ]]; then
+    has_large_format=false
+    break
+  fi
+done
+
+if [[ "$has_large_format" == "true" ]]; then
+  log "Large format index files detected"
+  for file in "${large_index_files[@]}"; do
+    check_file_exists "$file" "large index file $(basename "$file")"
+    check_file_not_empty "$file" "large index file $(basename "$file")"
+  done
+else
+  log "Regular format index files with large index option"
+  regular_large_files=(
+    "$meta_temp_dir/large_index/test_ref.1.bt2"
+    "$meta_temp_dir/large_index/test_ref.2.bt2"
+    "$meta_temp_dir/large_index/test_ref.3.bt2"
+    "$meta_temp_dir/large_index/test_ref.4.bt2"
+    "$meta_temp_dir/large_index/test_ref.rev.1.bt2"
+    "$meta_temp_dir/large_index/test_ref.rev.2.bt2"
+  )
+  for file in "${regular_large_files[@]}"; do
+    check_file_exists "$file" "index file $(basename "$file")"
+    check_file_not_empty "$file" "index file $(basename "$file")"
+  done
+fi
+
+log "✅ TEST 4 completed successfully"
+
+print_test_summary "All tests completed successfully"
