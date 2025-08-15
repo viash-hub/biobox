@@ -135,17 +135,11 @@ engines:
   - type: docker
     image: python:3.10-slim
     setup:
-      - type: apt
-        packages: [wget, curl]
       - type: python
         packages: 
         - numpy~=x.x.x
         - pandas~=x.x.x
         - scipy~=x.x.x
-      - type: docker
-        run:
-          - pip install your-tool
-          - echo "your-tool: $(your-tool --version)" > /var/software_versions.txt
 ```
 
 ### R-based Tools
@@ -158,9 +152,6 @@ engines:
       - type: r
         cran: [devtools, BiocManager]
         bioc: [Biostrings, GenomicRanges]
-      - type: docker
-        run:
-          - R --version | head -1 | sed 's/R version /R: /' > /var/software_versions.txt
 ```
 
 ### Compilation from Source
@@ -288,23 +279,6 @@ setup:
 
 ## Testing Docker Setup
 
-### Local Testing
-
-```bash
-# Build the container locally
-viash build config.vsh.yaml --setup cachedbuild
-
-# Test interactively
-docker run -it biobox/namespace/component:latest bash
-
-# Check installed tools
-which tool
-tool --version
-
-# Verify version file
-cat /var/software_versions.txt
-```
-
 ### Viash Docker Debugging
 
 ```bash
@@ -319,6 +293,13 @@ viash run config.vsh.yaml -- ---setup build ---verbose
 
 # Enter interactive debugging session
 viash run config.vsh.yaml -- ---debug
+
+# Check installed tools (inside container)
+which tool
+tool --version
+
+# Verify version file
+cat /var/software_versions.txt
 ```
 
 ### Common Issues
@@ -327,16 +308,3 @@ viash run config.vsh.yaml -- ---debug
 2. **Version detection fails**: Command syntax varies between tools
 3. **Permission issues**: Tools installed in wrong location
 4. **Missing dependencies**: Tool requires additional libraries
-
-### Debugging Commands
-
-```bash
-# Check what's installed
-docker run container_name which tool
-docker run container_name tool --help
-docker run container_name ls -la /usr/local/bin/
-
-# Check environment
-docker run container_name env
-docker run container_name echo $PATH
-```
