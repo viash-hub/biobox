@@ -1,0 +1,100 @@
+name: cellranger_aggr
+namespace: cellranger
+description: |
+  Aggregate data from multiple Cell Ranger runs into a single feature-barcode matrix 
+  and analysis. This is commonly used to combine samples from multiple 10x Genomics 
+  library preparations.
+keywords: [Single Cell, Aggregation, 10x Genomics]
+links:
+  homepage: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/aggregate
+  documentation: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/aggregate
+  repository: https://github.com/10XGenomics/cellranger
+license: 10x Genomics EULA
+requirements:
+  commands: [cellranger]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --id
+        type: string
+        description: A unique run id and output folder name [a-zA-Z0-9_-]+
+        required: true
+        example: aggr_sample
+
+      - name: --csv
+        type: file
+        description: Path of CSV file enumerating 'cellranger count/vdj/multi' outputs
+        required: true
+        example: aggregation.csv
+
+      - name: --description
+        type: string
+        description: Sample description to embed in output files
+        example: "Aggregated samples from experiment"
+
+  - name: Outputs
+    arguments:
+      - name: --output_dir
+        type: file
+        direction: output
+        description: Output the results to this directory
+        required: true
+        example: aggr_output
+
+  - name: Analysis Options
+    arguments:
+      - name: --normalize
+        type: string
+        description: Library depth normalization mode
+        default: mapped
+        choices: [mapped, none]
+
+      - name: --nosecondary
+        type: boolean_true
+        description: Disable secondary analysis, e.g. clustering
+
+      - name: --min_crispr_umi
+        type: integer
+        description: Minimum CRISPR UMI threshold
+        default: 3
+
+      - name: --enable_tsne
+        type: string
+        description: Enable t-SNE projection
+        default: "false"
+        choices: ["true", "false"]
+
+  - name: Execution Options
+    arguments:
+      - name: --dry
+        type: boolean_true
+        description: Do not execute the pipeline. Generate a pipeline invocation (.mro) file and stop
+
+      - name: --nopreflight
+        type: boolean_true
+        description: Skip preflight checks
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+
+engines:
+  - type: docker
+    image: quay.io/nf-core/cellranger:9.0.1
+    setup:
+      - type: docker
+        run:
+          - cellranger telemetry disable
+          - |
+            cellranger --version 2>&1 | head -1 | sed 's/cellranger /cellranger: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
