@@ -239,12 +239,20 @@ create_test_fastq() {
   
   for i in $(seq 1 "$num_reads"); do
     echo "@read$i" >> "$file_path"
-    # Generate random DNA sequence
-    head -c "$read_length" /dev/zero | tr '\0' 'A' | sed 's/A/ATCG/g' | head -c "$read_length" >> "$file_path"
+    # Generate random DNA sequence of exact length using bash
+    seq_line=""
+    for j in $(seq 1 "$read_length"); do
+      case $((RANDOM % 4)) in
+        0) seq_line+="A";;
+        1) seq_line+="T";;
+        2) seq_line+="C";;
+        3) seq_line+="G";;
+      esac
+    done
+    echo "$seq_line" >> "$file_path"
     echo "+" >> "$file_path"
-    # Generate quality scores (all high quality)
-    head -c "$read_length" /dev/zero | tr '\0' 'I' >> "$file_path"
-    echo >> "$file_path"
+    # Generate quality scores (all good quality, Phred+33 = ASCII 73)
+    printf "%*s\n" "$read_length" "" | tr ' ' 'I' >> "$file_path"
   done
   
   log "✓ Created test FASTQ file: $file_path"
