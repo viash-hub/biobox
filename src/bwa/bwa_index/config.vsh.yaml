@@ -33,16 +33,16 @@ argument_groups:
 - name: "Options"
   arguments: 
   - name: "--algorithm"
-    alternatives: -a
+    alternatives: [-a]
     type: string
     description: BWT construction algorithm. If not specified, BWA will choose automatically.
     choices: [bwtsw, is, rb2]
   - name: "--prefix"
-    alternatives: -p
+    alternatives: [-p]
     type: string
     description: Prefix of the index files. Default is same as input fasta name.
   - name: "--block_size"
-    alternatives: -b
+    alternatives: [-b]
     type: integer
     description: Block size for the bwtsw algorithm (effective with -a bwtsw). Default is 10000000.
   - name: "--use_64bit_names"
