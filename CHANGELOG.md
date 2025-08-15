@@ -14,7 +14,7 @@
 
 ## MINOR CHANGES
 
-* `arriba`: Updated to v2.5.0 and refactored script and tests based on latest contributing guidelines (PR #XXX).
+* `arriba`: Updated to v2.5.0 and refactored script and tests based on latest contributing guidelines (PR #187).
 
 ## DOCUMENTATION
 
