@@ -103,6 +103,18 @@ argument_groups:
         type: boolean_true
         description: Suppress verbose output.
 
+      - name: --verbose
+        type: boolean_true
+        description: Log the issued command.
+
+      - name: --debug
+        type: boolean_true
+        description: Use the debug binary; slower, assertions enabled.
+
+      - name: --sanitized
+        type: boolean_true
+        description: Use sanitized binary; slower, uses ASan and/or UBSan.
+
   - name: Input Format Options
     arguments:
       - name: --fasta

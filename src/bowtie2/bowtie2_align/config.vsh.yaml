@@ -33,13 +33,13 @@ argument_groups:
       - name: --mate1
         type: file
         multiple: true
-        description: Files with #1 mates, paired with files in --mate2.
+        description: "Files with #1 mates, paired with files in --mate2."
         example: reads_R1.fastq.gz
 
       - name: --mate2
         type: file
         multiple: true
-        description: Files with #2 mates, paired with files in --mate1.
+        description: "Files with #2 mates, paired with files in --mate1."
         example: reads_R2.fastq.gz
 
       - name: --unpaired
@@ -149,6 +149,16 @@ argument_groups:
         description: Trim <int> bases from 3'/right end of reads.
         example: 3
 
+      - name: --trim_to
+        type: string
+        description: "Trim reads exceeding <int> bases from either 3' or 5' end. Format: [3:|5:]<int>"
+        example: "3:100"
+
+      - name: --continuous_fasta
+        type: string
+        description: "Query input files are continuous FASTA where reads are k-mers. Format: k:<int>,i:<int>"
+        example: "k:25,i:1"
+
       - name: --phred33
         type: boolean_true
         description: Qualities are Phred+33 (default).
@@ -199,7 +209,7 @@ argument_groups:
     arguments:
       - name: --N
         type: integer
-        description: Max # mismatches in seed alignment; can be 0 or 1.
+        description: "Max # mismatches in seed alignment; can be 0 or 1."
         example: 1
 
       - name: --L
@@ -214,7 +224,7 @@ argument_groups:
 
       - name: --n_ceil
         type: string
-        description: Function for max # non-A/C/G/Ts permitted in aln.
+        description: "Function for max # non-A/C/G/Ts permitted in aln."
         example: "L,0,0.15"
 
       - name: --dpad
@@ -410,6 +420,11 @@ argument_groups:
       - name: --sam_append_comment
         type: boolean_true
         description: Append FASTA/FASTQ comment to SAM record.
+
+      - name: --sam_opt_config
+        type: string
+        description: "Use config to toggle SAM Optional fields. Example: '-MD,YP,-AS'"
+        example: "-MD,YP,-AS"
 
   - name: BAM Options
     arguments:

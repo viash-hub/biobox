@@ -9,6 +9,9 @@ set -eo pipefail
 [[ "$par_summary" == "false" ]] && unset par_summary
 [[ "$par_names" == "false" ]] && unset par_names
 [[ "$par_verbose_inspect" == "false" ]] && unset par_verbose_inspect
+[[ "$par_debug" == "false" ]] && unset par_debug
+[[ "$par_sanitized" == "false" ]] && unset par_sanitized
+[[ "$par_verbose" == "false" ]] && unset par_verbose
 [[ "$par_large_index" == "false" ]] && unset par_large_index
 
 # Build the command arguments
@@ -18,6 +21,9 @@ cmd_args=(
     ${par_names:+-n}
     ${par_across:+-a "$par_across"}
     ${par_verbose_inspect:+-v}
+    ${par_debug:+--debug}
+    ${par_sanitized:+--sanitized}
+    ${par_verbose:+--verbose}
     ${par_large_index:+--large-index}
 )
 

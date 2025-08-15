@@ -95,6 +95,8 @@ cmd_args=(
     ${par_upto:+-u "$par_upto"}
     ${par_trim5:+-5 "$par_trim5"}
     ${par_trim3:+-3 "$par_trim3"}
+    ${par_trim_to:+--trim-to "$par_trim_to"}
+    ${par_continuous_fasta:+-F "$par_continuous_fasta"}
     ${par_phred33:+--phred33}
     ${par_phred64:+--phred64}
     ${par_int_quals:+--int-quals}
@@ -157,6 +159,7 @@ cmd_args=(
     ${par_xeq:+--xeq}
     ${par_soft_clipped_unmapped_tlen:+--soft-clipped-unmapped-tlen}
     ${par_sam_append_comment:+--sam-append-comment}
+    ${par_sam_opt_config:+--sam-opt-config "$par_sam_opt_config"}
     ${par_align_paired_reads:+--align-paired-reads}
     ${par_preserve_tags:+--preserve-tags}
     ${meta_cpus:+-p "$meta_cpus"}

@@ -13,6 +13,9 @@ set -eo pipefail
 [[ "$par_noref" == "false" ]] && unset par_noref
 [[ "$par_justref" == "false" ]] && unset par_justref
 [[ "$par_quiet" == "false" ]] && unset par_quiet
+[[ "$par_verbose" == "false" ]] && unset par_verbose
+[[ "$par_debug" == "false" ]] && unset par_debug
+[[ "$par_sanitized" == "false" ]] && unset par_sanitized
 [[ "$par_fasta" == "false" ]] && unset par_fasta
 [[ "$par_cmdline" == "false" ]] && unset par_cmdline
 
@@ -48,6 +51,9 @@ cmd_args=(
     ${par_ftabchars:+-t "$par_ftabchars"}
     ${par_seed:+--seed "$par_seed"}
     ${par_quiet:+-q}
+    ${par_verbose:+--verbose}
+    ${par_debug:+--debug}
+    ${par_sanitized:+--sanitized}
     ${meta_cpus:+--threads "$meta_cpus"}
     "$par_input"
     "$index_path"
