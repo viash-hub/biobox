@@ -136,7 +136,7 @@ argument_groups:
 Add all other arguments with these exceptions:
 * Arguments related to CPU and memory requirements are handled separately
 * Version (`-v`, `--version`) or help (`-h`, `--help`) arguments should be excluded
-* If help lists defaults, add them to description rather than as defaults
+* If the help file lists defaults, add them to description rather than as defaults
 
 **Boolean handling:**
 * Prefer using `boolean_true` over `boolean_false` to avoid confusion in Nextflow workflows

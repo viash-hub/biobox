@@ -138,7 +138,10 @@ engines:
       - type: apt
         packages: [wget, curl]
       - type: python
-        packages: [numpy, pandas, scipy]
+        packages: 
+        - numpy~=x.x.x
+        - pandas~=x.x.x
+        - scipy~=x.x.x
       - type: docker
         run:
           - pip install your-tool

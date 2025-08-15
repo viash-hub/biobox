@@ -265,3 +265,5 @@ Always test your script with:
 - Parameters with spaces
 - Boolean true/false values
 - Edge cases specific to your tool
+
+See [Testing Guide](docs/TESTING.md) for extensive test best practices.
