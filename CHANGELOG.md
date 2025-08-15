@@ -12,6 +12,11 @@
   - `fq/fq_filter`: Filter FASTQ files based on record names or sequence patterns (PR #182).
   - `fq/fq_generate`: Generate a random FASTQ file pair for testing and simulation purposes (PR #182).
 
+* `bowtie2`: Add support for Bowtie2 alignment and indexing (PR #184).
+  - `bowtie2/bowtie2_build`: Build Bowtie2 index files from reference sequences.
+  - `bowtie2/bowtie2_align`: Align single-end and paired-end reads using Bowtie2.
+  - `bowtie2/bowtie2_inspect`: Extract information from Bowtie2 index files.
+
 ## DOCUMENTATION
 
 * Major restructuring of the documentation pages (PR #185):

@@ -1,0 +1,146 @@
+name: bowtie2_build
+namespace: bowtie2
+description: |
+  Build Bowtie2 index files from reference sequences.
+  
+  The Bowtie2 index is based on the FM Index of Ferragina and Manzini, which in turn 
+  is based on the Burrows-Wheeler Transform. The algorithm used to build the index is 
+  based on the blockwise algorithm of Karkkainen.
+keywords: [Alignment, Indexing]
+links:
+  homepage: https://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+  documentation: https://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
+  repository: https://github.com/BenLangmead/bowtie2
+references:
+  doi: 10.1038/nmeth.1923
+license: GPL-3.0
+requirements:
+  commands: [bowtie2-build]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        type: file
+        description: Input reference sequences in FASTA format. Can be a comma-separated list of files.
+        required: true
+        example: reference.fasta
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: Directory where the index files will be written.
+        required: true
+        example: bowtie2_index
+
+      - name: --index_name
+        type: string
+        description: Base name for the index files. If not provided, will use the input filename without extension.
+        example: my_reference
+
+  - name: Index Construction Options
+    arguments:
+      - name: --large_index
+        type: boolean_true
+        description: Force generated index to be 'large', even if reference has fewer than 4 billion nucleotides.
+
+      - name: --noauto
+        type: boolean_true
+        description: Disable automatic -p/--bmax/--dcv memory-fitting.
+
+      - name: --packed
+        type: boolean_true
+        description: Use packed strings internally; slower, less memory.
+
+      - name: --bmax
+        type: integer
+        description: Max bucket size for blockwise suffix-array builder.
+        example: 200000000
+
+      - name: --bmaxdivn
+        type: integer
+        description: Max bucket size as divisor of reference length.
+        example: 4
+
+      - name: --dcv
+        type: integer
+        description: Diff-cover period for blockwise (default 1024).
+        example: 1024
+
+      - name: --nodc
+        type: boolean_true
+        description: Disable diff-cover (algorithm becomes quadratic).
+
+      - name: --noref
+        type: boolean_true
+        description: Don't build .3/.4 index files.
+
+      - name: --justref
+        type: boolean_true
+        description: Just build .3/.4 index files.
+
+      - name: --offrate
+        type: integer
+        description: SA is sampled every 2^<int> BWT chars (default 5).
+        example: 5
+
+      - name: --ftabchars
+        type: integer
+        description: Number of chars consumed in initial lookup (default 10).
+        example: 10
+
+      - name: --seed
+        type: integer
+        description: Seed for random number generator.
+        example: 42
+
+      - name: --quiet
+        type: boolean_true
+        description: Suppress verbose output.
+
+      - name: --verbose
+        type: boolean_true
+        description: Log the issued command.
+
+      - name: --debug
+        type: boolean_true
+        description: Use the debug binary; slower, assertions enabled.
+
+      - name: --sanitized
+        type: boolean_true
+        description: Use sanitized binary; slower, uses ASan and/or UBSan.
+
+  - name: Input Format Options
+    arguments:
+      - name: --fasta
+        type: boolean_true
+        description: Reference files are FASTA (default).
+
+      - name: --cmdline
+        type: boolean_true
+        description: Reference sequences given on command line.
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bowtie2:2.5.4--he96a11b_6
+    setup:
+      - type: docker
+        run: |
+          bowtie2-build --version 2>&1 | head -1 | sed 's/.*version /bowtie2-build: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
