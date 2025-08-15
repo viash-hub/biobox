@@ -107,7 +107,9 @@ argument_groups:
 **Key principles:**
 * Argument names should be formatted in `--snake_case`
 * Input arguments can have `multiple: true` to allow multiple files
-* The description should be formatted in markdown
+* **Descriptions must be formatted in markdown** - they will be used downstream for rendering documentation
+* You can make minor changes to the formatting of arguments to improve clarity and better utilize markdown structure
+* Use markdown features like code blocks, lists, emphasis, and links to enhance readability
 
 ### Output Arguments
 
@@ -138,6 +140,54 @@ Add all other arguments with these exceptions:
 
 **Boolean handling:**
 * Prefer using `boolean_true` over `boolean_false` to avoid confusion in Nextflow workflows
+
+### Description Formatting Guidelines
+
+Argument descriptions should always be written in **markdown format** as they are used downstream for documentation rendering. Here are best practices:
+
+**Good markdown formatting examples:**
+
+```yaml
+description: |
+  Input FASTQ file containing reads. Supports compressed files (`.gz`, `.bz2`).
+  
+  **Supported formats:**
+  - FASTQ (`.fastq`, `.fq`)
+  - Compressed FASTQ (`.fastq.gz`, `.fq.gz`)
+  
+  See the [FASTQ format specification](https://en.wikipedia.org/wiki/FASTQ_format) for details.
+```
+
+```yaml
+description: |
+  Maximum number of mismatches allowed during alignment.
+  
+  **Default behavior:**
+  - For reads ≤50bp: 2 mismatches
+  - For reads >50bp: 3 mismatches
+  
+  Set to `0` for exact matches only.
+```
+
+**Formatting improvements you can make:**
+- Add code formatting for file extensions, parameters, and values
+- Use lists and bullet points for multiple options
+- Add emphasis with **bold** or *italic* text
+- Include links to external documentation
+- Structure complex descriptions with headers
+- Use code blocks for examples
+
+**Original tool help vs. improved description:**
+
+```
+# Original: "Input file in BAM format"
+# Improved:
+description: |
+  Input file in BAM format containing aligned sequences.
+  
+  The file must be coordinate-sorted and indexed. Use `samtools sort` 
+  and `samtools index` if needed.
+```
 
 ## Meta Variables
 
