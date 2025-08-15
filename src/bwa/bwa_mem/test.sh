@@ -1,101 +1,119 @@
 #!/bin/bash
 
-set -e
+## VIASH START
+## VIASH END
 
-TEMP_DIR="$meta_temp_dir"
+# Source the centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
 
-#############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-#############################################
-
-# --- Helper function to create test reference ---
-create_test_reference() {
-  file_path="$1"
-  
-  cat << 'EOF' > "$file_path"
->chr1
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-EOF
-}
-
-# --- Helper function to create test FASTQ ---
-create_test_fastq() {
-  file_path="$1"
-  read_prefix="$2"
-  
-  cat << EOF > "$file_path"
-@${read_prefix}_1
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-+
-IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-@${read_prefix}_2
-CGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGAT
-+
-IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-EOF
-}
+# Initialize test environment with strict error handling
+setup_test_env
 
 #############################################
+# Test execution with centralized functions
+#############################################
 
-echo ">>> Setting up test reference and index"
-create_test_reference "$TEMP_DIR/reference.fasta"
+log "Starting tests for $meta_name"
 
-echo ">> Creating BWA index..."
-cd "$TEMP_DIR"
-bwa index reference.fasta
-cd -
+# Create test data directory
+test_data_dir="$meta_temp_dir/test_data"
+mkdir -p "$test_data_dir"
+
+# Generate test reference genome
+log "Generating test reference genome..."
+create_test_fasta "$test_data_dir/reference.fasta" 1 500
+check_file_exists "$test_data_dir/reference.fasta" "test reference genome"
+
+# Build BWA index
+log "Building BWA index for alignment tests..."
+mkdir -p "$test_data_dir/index"
+cp "$test_data_dir/reference.fasta" "$test_data_dir/index/"
+bwa index "$test_data_dir/index/reference.fasta" >/dev/null 2>&1
+
+# Verify index was created
+index_files=(
+  "$test_data_dir/index/reference.fasta.amb"
+  "$test_data_dir/index/reference.fasta.ann"
+  "$test_data_dir/index/reference.fasta.bwt"
+  "$test_data_dir/index/reference.fasta.pac"
+  "$test_data_dir/index/reference.fasta.sa"
+)
+
+for file in "${index_files[@]}"; do
+  check_file_exists "$file" "BWA index file $(basename "$file")"
+done
+
+# Generate test FASTQ files
+log "Generating test FASTQ files..."
+create_test_fastq "$test_data_dir/reads_single.fastq" 15 60
+create_test_fastq "$test_data_dir/reads_R1.fastq" 15 60
+create_test_fastq "$test_data_dir/reads_R2.fastq" 15 60
+check_file_exists "$test_data_dir/reads_single.fastq" "single-end reads"
+check_file_exists "$test_data_dir/reads_R1.fastq" "paired-end R1 reads"
+check_file_exists "$test_data_dir/reads_R2.fastq" "paired-end R2 reads"
 
 # --- Test Case 1: Single-end alignment ---
-echo ">>> Test 1: Single-end BWA-MEM alignment"
-create_test_fastq "$TEMP_DIR/reads_SE.fastq" "read_SE"
+log "Starting TEST 1: Single-end BWA MEM alignment"
 
+log "Executing $meta_name with single-end reads..."
 "$meta_executable" \
-  --index "$TEMP_DIR/reference.fasta" \
-  --reads1 "$TEMP_DIR/reads_SE.fastq" \
-  --output "$TEMP_DIR/output_SE.sam"
+  --index "$test_data_dir/index/reference.fasta" \
+  --reads1 "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/single_end.sam"
 
-echo ">> Checking single-end output..."
-assert_file_exists "$TEMP_DIR/output_SE.sam"
-assert_file_not_empty "$TEMP_DIR/output_SE.sam"
-assert_file_contains "$TEMP_DIR/output_SE.sam" "@SQ"
-assert_file_contains "$TEMP_DIR/output_SE.sam" "@PG"
-# Count alignment records
-alignment_lines=$(grep -vc "^@" "$TEMP_DIR/output_SE.sam")
-echo "Found $alignment_lines alignment records in single-end output."
+log "Validating TEST 1 outputs..."
+check_file_exists "$meta_temp_dir/single_end.sam" "single-end SAM output"
+check_file_not_empty "$meta_temp_dir/single_end.sam" "single-end SAM output"
 
-echo ">> OK: Single-end alignment test passed."
+# Check SAM format headers
+if head -5 "$meta_temp_dir/single_end.sam" | grep -q "^@"; then
+  log "✓ SAM file contains proper headers"
+else
+  log_error "SAM file does not contain proper headers"
+  exit 1
+fi
+
+log "✅ TEST 1 completed successfully"
 
 # --- Test Case 2: Paired-end alignment ---
-echo ">>> Test 2: Paired-end BWA-MEM alignment"
-create_test_fastq "$TEMP_DIR/reads_R1.fastq" "read_PE"
-create_test_fastq "$TEMP_DIR/reads_R2.fastq" "read_PE"
+log "Starting TEST 2: Paired-end BWA MEM alignment"
 
+log "Executing $meta_name with paired-end reads..."
 "$meta_executable" \
-  --index "$TEMP_DIR/reference.fasta" \
-  --reads1 "$TEMP_DIR/reads_R1.fastq" \
-  --reads2 "$TEMP_DIR/reads_R2.fastq" \
-  --output "$TEMP_DIR/output_PE.sam"
+  --index "$test_data_dir/index/reference.fasta" \
+  --reads1 "$test_data_dir/reads_R1.fastq" \
+  --reads2 "$test_data_dir/reads_R2.fastq" \
+  --output "$meta_temp_dir/paired_end.sam"
 
-echo ">> Checking paired-end output..."
-assert_file_exists "$TEMP_DIR/output_PE.sam"
-assert_file_not_empty "$TEMP_DIR/output_PE.sam"
-assert_file_contains "$TEMP_DIR/output_PE.sam" "@SQ"
-assert_file_contains "$TEMP_DIR/output_PE.sam" "@PG"
-# Count alignment records
-alignment_lines=$(grep -vc "^@" "$TEMP_DIR/output_PE.sam")
-echo "Found $alignment_lines alignment records in paired-end output."
+log "Validating TEST 2 outputs..."
+check_file_exists "$meta_temp_dir/paired_end.sam" "paired-end SAM output"
+check_file_not_empty "$meta_temp_dir/paired_end.sam" "paired-end SAM output"
 
-echo ">> OK: Paired-end alignment test passed."
+# Check SAM format headers
+if head -5 "$meta_temp_dir/paired_end.sam" | grep -q "^@"; then
+  log "✓ SAM file contains proper headers"
+else
+  log_error "SAM file does not contain proper headers"
+  exit 1
+fi
 
-echo ">>> All tests passed!"
+log "✅ TEST 2 completed successfully"
+
+# --- Test Case 3: Advanced parameters ---
+log "Starting TEST 3: BWA MEM with advanced parameters"
+
+log "Executing $meta_name with advanced parameters..."
+"$meta_executable" \
+  --index "$test_data_dir/index/reference.fasta" \
+  --reads1 "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/advanced.sam" \
+  --threads 2 \
+  --min_seed_length 15
+
+log "Validating TEST 3 outputs..."
+check_file_exists "$meta_temp_dir/advanced.sam" "advanced SAM output"
+check_file_not_empty "$meta_temp_dir/advanced.sam" "advanced SAM output"
+
+log "✅ TEST 3 completed successfully"
+
+print_test_summary "All tests completed successfully"

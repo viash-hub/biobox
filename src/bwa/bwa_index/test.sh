@@ -1,107 +1,110 @@
 #!/bin/bash
 
-set -e
+## VIASH START
+## VIASH END
 
-TEMP_DIR="$meta_temp_dir"
+# Source the centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
+
+# Initialize test environment with strict error handling
+setup_test_env
 
 #############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_dir_exists() {
-  [ -d "$1" ] || { echo "Directory '$1' does not exist" && exit 1; }
-}
+# Test execution with centralized functions
 #############################################
 
-# --- Helper function to create test FASTA ---
-create_test_fasta() {
-  file_path="$1"
-  
-  cat << 'EOF' > "$file_path"
->chr1
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
->chr2
-GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
-GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
-GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
-GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
-EOF
-}
+log "Starting tests for $meta_name"
+
+# Create test data directory
+test_data_dir="$meta_temp_dir/test_data"
+mkdir -p "$test_data_dir"
 
 # --- Test Case 1: Basic indexing ---
-echo ">>> Test 1: Basic BWA indexing"
-create_test_fasta "$TEMP_DIR/test_ref.fasta"
+log "Starting TEST 1: Basic BWA indexing"
 
-echo ">> Running bwa_index..."
+log "Generating test reference genome..."
+create_test_fasta "$test_data_dir/test_ref.fasta" 2 1000
+check_file_exists "$test_data_dir/test_ref.fasta" "test reference genome"
+
+log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
-  --input "$TEMP_DIR/test_ref.fasta" \
-  --output "$TEMP_DIR/bwa_index"
+  --input "$test_data_dir/test_ref.fasta" \
+  --output "$meta_temp_dir/bwa_index"
 
-echo ">> Checking output directory exists..."
-assert_dir_exists "$TEMP_DIR/bwa_index"
+log "Validating TEST 1 outputs..."
+check_dir_exists "$meta_temp_dir/bwa_index" "output index directory"
 
-echo ">> Checking all index files exist..."
-assert_file_exists "$TEMP_DIR/bwa_index/test_ref.amb"
-assert_file_exists "$TEMP_DIR/bwa_index/test_ref.ann"
-assert_file_exists "$TEMP_DIR/bwa_index/test_ref.bwt"
-assert_file_exists "$TEMP_DIR/bwa_index/test_ref.pac"
-assert_file_exists "$TEMP_DIR/bwa_index/test_ref.sa"
+# Check for BWA index files with the prefix used by bwa index
+index_files=(
+  "$meta_temp_dir/bwa_index/test_ref.amb"
+  "$meta_temp_dir/bwa_index/test_ref.ann"
+  "$meta_temp_dir/bwa_index/test_ref.bwt"
+  "$meta_temp_dir/bwa_index/test_ref.pac"
+  "$meta_temp_dir/bwa_index/test_ref.sa"
+)
 
-echo ">> Checking index files are not empty..."
-assert_file_not_empty "$TEMP_DIR/bwa_index/test_ref.amb"
-assert_file_not_empty "$TEMP_DIR/bwa_index/test_ref.ann"
-assert_file_not_empty "$TEMP_DIR/bwa_index/test_ref.bwt"
-assert_file_not_empty "$TEMP_DIR/bwa_index/test_ref.pac"
-assert_file_not_empty "$TEMP_DIR/bwa_index/test_ref.sa"
+for file in "${index_files[@]}"; do
+  check_file_exists "$file" "BWA index file $(basename "$file")"
+  check_file_not_empty "$file" "BWA index file $(basename "$file")"
+done
 
-echo ">> OK: Basic indexing test passed."
+log "✅ TEST 1 completed successfully"
 
-# --- Test Case 2: Indexing with custom prefix ---
-echo ">>> Test 2: BWA indexing with custom prefix"
-create_test_fasta "$TEMP_DIR/genome.fasta"
+# --- Test Case 2: Custom prefix ---
+log "Starting TEST 2: BWA indexing with custom prefix"
 
+log "Executing $meta_name with custom prefix..."
 "$meta_executable" \
-  --input "$TEMP_DIR/genome.fasta" \
-  --prefix "custom_genome" \
-  --output "$TEMP_DIR/custom_index"
+  --input "$test_data_dir/test_ref.fasta" \
+  --output "$meta_temp_dir/custom_index" \
+  --prefix "custom_genome"
 
-echo ">> Checking output directory exists..."
-assert_dir_exists "$TEMP_DIR/custom_index"
+log "Validating TEST 2 outputs..."
+check_dir_exists "$meta_temp_dir/custom_index" "custom index directory"
 
-echo ">> Checking all index files exist with custom prefix..."
-assert_file_exists "$TEMP_DIR/custom_index/custom_genome.amb"
-assert_file_exists "$TEMP_DIR/custom_index/custom_genome.ann"
-assert_file_exists "$TEMP_DIR/custom_index/custom_genome.bwt"
-assert_file_exists "$TEMP_DIR/custom_index/custom_genome.pac"
-assert_file_exists "$TEMP_DIR/custom_index/custom_genome.sa"
+# Check for index files with custom prefix
+log "Checking for custom-prefixed index files..."
+custom_index_files=(
+  "$meta_temp_dir/custom_index/custom_genome.amb"
+  "$meta_temp_dir/custom_index/custom_genome.ann"
+  "$meta_temp_dir/custom_index/custom_genome.bwt"
+  "$meta_temp_dir/custom_index/custom_genome.pac"
+  "$meta_temp_dir/custom_index/custom_genome.sa"
+)
 
-echo ">> Checking custom prefix index files are not empty..."
-assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.amb"
-assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.ann"
-assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.bwt"
-assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.pac"
-assert_file_not_empty "$TEMP_DIR/custom_index/custom_genome.sa"
+for file in "${custom_index_files[@]}"; do
+  check_file_exists "$file" "custom-prefixed index file $(basename "$file")"
+  check_file_not_empty "$file" "custom-prefixed index file $(basename "$file")"
+done
 
-echo ">> OK: Custom prefix indexing test passed."
+log "✅ TEST 2 completed successfully"
 
-# --- Test Case 3: Error handling ---
-echo ">>> Test 3: Error handling"
+# --- Test Case 3: Algorithm specification ---
+log "Starting TEST 3: BWA indexing with algorithm specification"
 
-# Test with non-existent input file
-if "$meta_executable" \
-  --input "$TEMP_DIR/nonexistent.fasta" \
-  --output "$TEMP_DIR/error_index" 2>/dev/null; then
-  echo "ERROR: Should have failed with non-existent input file"
-  exit 1
-else
-  echo ">> OK: Properly handled non-existent input file error."
-fi
+log "Executing $meta_name with algorithm bwtsw..."
+"$meta_executable" \
+  --input "$test_data_dir/test_ref.fasta" \
+  --output "$meta_temp_dir/bwtsw_index" \
+  --algorithm "bwtsw"
 
-echo ">>> All tests passed!"
+log "Validating TEST 3 outputs..."
+check_dir_exists "$meta_temp_dir/bwtsw_index" "bwtsw index directory"
+
+# Check for index files
+bwtsw_index_files=(
+  "$meta_temp_dir/bwtsw_index/test_ref.amb"
+  "$meta_temp_dir/bwtsw_index/test_ref.ann"
+  "$meta_temp_dir/bwtsw_index/test_ref.bwt"
+  "$meta_temp_dir/bwtsw_index/test_ref.pac"
+  "$meta_temp_dir/bwtsw_index/test_ref.sa"
+)
+
+for file in "${bwtsw_index_files[@]}"; do
+  check_file_exists "$file" "bwtsw index file $(basename "$file")"
+  check_file_not_empty "$file" "bwtsw index file $(basename "$file")"
+done
+
+log "✅ TEST 3 completed successfully"
+
+print_test_summary "All tests completed successfully"

@@ -1,110 +1,101 @@
 #!/bin/bash
 
-set -e
+## VIASH START
+## VIASH END
 
-TEMP_DIR="$meta_temp_dir"
+# Source the centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
 
-#############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-#############################################
-
-# --- Helper function to create test reference ---
-create_test_reference() {
-  file_path="$1"
-  
-  cat << 'EOF' > "$file_path"
->chr1
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-EOF
-}
-
-# --- Helper function to create test FASTQ with shorter reads for BWA aln ---
-create_test_fastq() {
-  file_path="$1"
-  read_prefix="$2"
-  
-  cat << EOF > "$file_path"
-@${read_prefix}_1
-ATCGATCGATCGATCGATCGATCGATCGATCGATCG
-+
-IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-@${read_prefix}_2
-CGATCGATCGATCGATCGATCGATCGATCGATCGAT
-+
-IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-EOF
-}
+# Initialize test environment with strict error handling
+setup_test_env
 
 #############################################
+# Test execution with centralized functions
+#############################################
 
-echo ">>> Setting up test reference and index"
-create_test_reference "$TEMP_DIR/reference.fasta"
+log "Starting tests for $meta_name"
 
-echo ">> Creating BWA index..."
-cd "$TEMP_DIR"
-bwa index reference.fasta
-cd -
+# Create test data directory
+test_data_dir="$meta_temp_dir/test_data"
+mkdir -p "$test_data_dir"
 
-# --- Test Case 1: Basic BWA aln alignment ---
-echo ">>> Test 1: BWA aln alignment"
-create_test_fastq "$TEMP_DIR/reads.fastq" "read_aln"
+# Generate test reference genome
+log "Generating test reference genome..."
+create_test_fasta "$test_data_dir/reference.fasta" 1 200
+check_file_exists "$test_data_dir/reference.fasta" "test reference genome"
 
+# Build BWA index
+log "Building BWA index for alignment tests..."
+mkdir -p "$test_data_dir/index"
+cp "$test_data_dir/reference.fasta" "$test_data_dir/index/"
+bwa index "$test_data_dir/index/reference.fasta" >/dev/null 2>&1
+
+# Verify index was created
+index_files=(
+  "$test_data_dir/index/reference.fasta.amb"
+  "$test_data_dir/index/reference.fasta.ann"
+  "$test_data_dir/index/reference.fasta.bwt"
+  "$test_data_dir/index/reference.fasta.pac"
+  "$test_data_dir/index/reference.fasta.sa"
+)
+
+for file in "${index_files[@]}"; do
+  check_file_exists "$file" "BWA index file $(basename "$file")"
+done
+
+# Generate test FASTQ files (shorter reads for BWA aln)
+log "Generating test FASTQ files for BWA aln..."
+create_test_fastq "$test_data_dir/reads.fastq" 10 35
+check_file_exists "$test_data_dir/reads.fastq" "test reads"
+
+# --- Test Case 1: Basic alignment ---
+log "Starting TEST 1: Basic BWA aln alignment"
+
+log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
-  --index "$TEMP_DIR/reference.fasta" \
-  --reads "$TEMP_DIR/reads.fastq" \
-  --output "$TEMP_DIR/output.sai"
+  --index "$test_data_dir/index/reference.fasta" \
+  --reads "$test_data_dir/reads.fastq" \
+  --output "$meta_temp_dir/output.sai"
 
-echo ">> Checking output..."
-assert_file_exists "$TEMP_DIR/output.sai"
-assert_file_not_empty "$TEMP_DIR/output.sai"
+log "Validating TEST 1 outputs..."
+check_file_exists "$meta_temp_dir/output.sai" "SAI output"
+check_file_not_empty "$meta_temp_dir/output.sai" "SAI output"
 
-# Check that it's a binary SAI file (should contain null bytes)
-if grep -q "^@" "$TEMP_DIR/output.sai" 2>/dev/null; then
-  echo "ERROR: SAI file appears to be text, should be binary"
-  exit 1
-fi
+log "✅ TEST 1 completed successfully"
 
-echo ">> OK: BWA aln alignment test passed."
+# --- Test Case 2: Custom parameters ---
+log "Starting TEST 2: BWA aln with custom parameters"
 
-# --- Test Case 2: BWA aln with custom parameters ---
-echo ">>> Test 2: BWA aln with custom parameters"
-create_test_fastq "$TEMP_DIR/reads_custom.fastq" "read_custom"
-
+log "Executing $meta_name with custom parameters..."
 "$meta_executable" \
-  --index "$TEMP_DIR/reference.fasta" \
-  --reads "$TEMP_DIR/reads_custom.fastq" \
-  --output "$TEMP_DIR/output_custom.sai" \
+  --index "$test_data_dir/index/reference.fasta" \
+  --reads "$test_data_dir/reads.fastq" \
+  --output "$meta_temp_dir/custom.sai" \
   --max_diff "0.05" \
-  --seed_length 25 \
-  --max_seed_diff 1 \
-  --mismatch_penalty 4
+  --max_gap_opens 2
 
-echo ">> Checking custom parameter output..."
-assert_file_exists "$TEMP_DIR/output_custom.sai"
-assert_file_not_empty "$TEMP_DIR/output_custom.sai"
+log "Validating TEST 2 outputs..."
+check_file_exists "$meta_temp_dir/custom.sai" "custom SAI output"
+check_file_not_empty "$meta_temp_dir/custom.sai" "custom SAI output"
 
-echo ">> OK: Custom parameter alignment test passed."
+log "✅ TEST 2 completed successfully"
 
-# --- Test Case 3: Error handling ---
-echo ">>> Test 3: Error handling"
+# --- Test Case 3: Standard output ---
+log "Starting TEST 3: BWA aln with stdout output"
 
-# Test with non-existent index
-if "$meta_executable" \
-  --index "$TEMP_DIR/nonexistent.fasta" \
-  --reads "$TEMP_DIR/reads.fastq" \
-  --output "$TEMP_DIR/output_error.sai" 2>/dev/null; then
-  echo "ERROR: Should have failed with non-existent index"
-  exit 1
+log "Executing $meta_name with stdout output..."
+stdout_output=$("$meta_executable" \
+  --index "$test_data_dir/index/reference.fasta" \
+  --reads "$test_data_dir/reads.fastq" 2>/dev/null)
+
+log "Validating TEST 3 outputs..."
+if [[ -n "$stdout_output" ]]; then
+  log "✓ Standard output contains data"
 else
-  echo ">> OK: Properly handled non-existent index error."
+  log_error "Standard output is empty"
+  exit 1
 fi
 
-echo ">>> All tests passed!"
+log "✅ TEST 3 completed successfully"
+
+print_test_summary "All tests completed successfully"

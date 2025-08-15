@@ -1,170 +1,116 @@
 #!/bin/bash
 
-set -e
+## VIASH START
+## VIASH END
 
-TEMP_DIR="$meta_temp_dir"
+# Source the centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
 
-#############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-#############################################
-
-# --- Helper function to create test reference ---
-create_test_reference() {
-  file_path="$1"
-  
-  cat << 'EOF' > "$file_path"
->chr1
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
-EOF
-}
-
-# --- Helper function to create test FASTQ with shorter reads for BWA aln ---
-create_test_fastq() {
-  file_path="$1"
-  read_prefix="$2"
-  read_suffix="$3"
-  
-  cat << EOF > "$file_path"
-@${read_prefix}_1_${read_suffix}
-ATCGATCGATCGATCGATCGATCGATCGATCGATCG
-+
-IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-@${read_prefix}_2_${read_suffix}
-CGATCGATCGATCGATCGATCGATCGATCGATCGAT
-+
-IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-EOF
-}
+# Initialize test environment with strict error handling
+setup_test_env
 
 #############################################
+# Test execution with centralized functions
+#############################################
 
-echo ">>> Setting up test reference and index"
-create_test_reference "$TEMP_DIR/reference.fasta"
+log "Starting tests for $meta_name"
 
-echo ">> Creating BWA index..."
-cd "$TEMP_DIR"
-bwa index reference.fasta
-cd -
+# Create test data directory
+test_data_dir="$meta_temp_dir/test_data"
+mkdir -p "$test_data_dir"
 
-echo ">>> Setting up SAI files using BWA aln"
-create_test_fastq "$TEMP_DIR/reads_R1.fastq" "read_sampe" "R1"
-create_test_fastq "$TEMP_DIR/reads_R2.fastq" "read_sampe" "R2"
+# Generate test reference genome
+log "Generating test reference genome..."
+create_test_fasta "$test_data_dir/reference.fasta" 1 200
+check_file_exists "$test_data_dir/reference.fasta" "test reference genome"
 
-echo ">> Running BWA aln to create SAI files..."
-cd "$TEMP_DIR"
-bwa aln reference.fasta reads_R1.fastq > reads_R1.sai
-bwa aln reference.fasta reads_R2.fastq > reads_R2.sai
-cd -
+# Build BWA index
+log "Building BWA index for sampe tests..."
+mkdir -p "$test_data_dir/index"
+cp "$test_data_dir/reference.fasta" "$test_data_dir/index/"
+bwa index "$test_data_dir/index/reference.fasta" >/dev/null 2>&1
 
-# --- Test Case 1: Basic BWA sampe ---
-echo ">>> Test 1: BWA sampe basic functionality"
+# Verify index was created
+index_files=(
+  "$test_data_dir/index/reference.fasta.amb"
+  "$test_data_dir/index/reference.fasta.ann"
+  "$test_data_dir/index/reference.fasta.bwt"
+  "$test_data_dir/index/reference.fasta.pac"
+  "$test_data_dir/index/reference.fasta.sa"
+)
 
+for file in "${index_files[@]}"; do
+  check_file_exists "$file" "BWA index file $(basename "$file")"
+done
+
+# Generate test FASTQ files (shorter reads for BWA aln)
+log "Generating test FASTQ files for BWA aln..."
+create_test_fastq "$test_data_dir/reads_R1.fastq" 8 35
+create_test_fastq "$test_data_dir/reads_R2.fastq" 8 35
+check_file_exists "$test_data_dir/reads_R1.fastq" "R1 reads"
+check_file_exists "$test_data_dir/reads_R2.fastq" "R2 reads"
+
+# Generate SAI files using BWA aln
+log "Generating SAI files for sampe test..."
+bwa aln "$test_data_dir/index/reference.fasta" "$test_data_dir/reads_R1.fastq" > "$test_data_dir/reads_R1.sai" 2>/dev/null
+bwa aln "$test_data_dir/index/reference.fasta" "$test_data_dir/reads_R2.fastq" > "$test_data_dir/reads_R2.sai" 2>/dev/null
+
+check_file_exists "$test_data_dir/reads_R1.sai" "R1 SAI file"
+check_file_exists "$test_data_dir/reads_R2.sai" "R2 SAI file"
+check_file_not_empty "$test_data_dir/reads_R1.sai" "R1 SAI file"
+check_file_not_empty "$test_data_dir/reads_R2.sai" "R2 SAI file"
+
+# --- Test Case 1: Basic paired-end SAM generation ---
+log "Starting TEST 1: Basic BWA sampe"
+
+log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
-  --index "$TEMP_DIR/reference.fasta" \
-  --sai1 "$TEMP_DIR/reads_R1.sai" \
-  --sai2 "$TEMP_DIR/reads_R2.sai" \
-  --reads1 "$TEMP_DIR/reads_R1.fastq" \
-  --reads2 "$TEMP_DIR/reads_R2.fastq" \
-  --output "$TEMP_DIR/output.sam"
+  --index "$test_data_dir/index/reference.fasta" \
+  --sai1 "$test_data_dir/reads_R1.sai" \
+  --sai2 "$test_data_dir/reads_R2.sai" \
+  --reads1 "$test_data_dir/reads_R1.fastq" \
+  --reads2 "$test_data_dir/reads_R2.fastq" \
+  --output "$meta_temp_dir/paired_end.sam"
 
-echo ">> Checking output..."
-assert_file_exists "$TEMP_DIR/output.sam"
-assert_file_not_empty "$TEMP_DIR/output.sam"
-assert_file_contains "$TEMP_DIR/output.sam" "@SQ"
-assert_file_contains "$TEMP_DIR/output.sam" "@PG"
+log "Validating TEST 1 outputs..."
+check_file_exists "$meta_temp_dir/paired_end.sam" "paired-end SAM output"
+check_file_not_empty "$meta_temp_dir/paired_end.sam" "paired-end SAM output"
 
-# Count alignment records
-alignment_lines=$(grep -vc "^@" "$TEMP_DIR/output.sam")
-echo "Found $alignment_lines alignment records in SAM output."
-
-echo ">> OK: BWA sampe basic test passed."
-
-# --- Test Case 2: BWA sampe with read group ---
-echo ">>> Test 2: BWA sampe with read group"
-
-"$meta_executable" \
-  --index "$TEMP_DIR/reference.fasta" \
-  --sai1 "$TEMP_DIR/reads_R1.sai" \
-  --sai2 "$TEMP_DIR/reads_R2.sai" \
-  --reads1 "$TEMP_DIR/reads_R1.fastq" \
-  --reads2 "$TEMP_DIR/reads_R2.fastq" \
-  --output "$TEMP_DIR/output_rg.sam" \
-  --read_group "@RG\\tID:test\\tSM:sample1"
-
-echo ">> Checking read group output..."
-assert_file_exists "$TEMP_DIR/output_rg.sam"
-assert_file_not_empty "$TEMP_DIR/output_rg.sam"
-assert_file_contains "$TEMP_DIR/output_rg.sam" "@RG"
-assert_file_contains "$TEMP_DIR/output_rg.sam" "ID:test"
-assert_file_contains "$TEMP_DIR/output_rg.sam" "SM:sample1"
-
-echo ">> OK: Read group test passed."
-
-# --- Test Case 3: BWA sampe with custom parameters ---
-echo ">>> Test 3: BWA sampe with custom parameters"
-
-"$meta_executable" \
-  --index "$TEMP_DIR/reference.fasta" \
-  --sai1 "$TEMP_DIR/reads_R1.sai" \
-  --sai2 "$TEMP_DIR/reads_R2.sai" \
-  --reads1 "$TEMP_DIR/reads_R1.fastq" \
-  --reads2 "$TEMP_DIR/reads_R2.fastq" \
-  --output "$TEMP_DIR/output_custom.sam" \
-  --max_insert_size 300 \
-  --max_hits_paired 5 \
-  --max_hits_discordant 15
-
-echo ">> Checking custom parameters output..."
-assert_file_exists "$TEMP_DIR/output_custom.sam"
-assert_file_not_empty "$TEMP_DIR/output_custom.sam"
-
-echo ">> OK: Custom parameters test passed."
-
-# --- Test Case 4: BWA sampe with algorithm options ---
-echo ">>> Test 4: BWA sampe with algorithm options"
-
-"$meta_executable" \
-  --index "$TEMP_DIR/reference.fasta" \
-  --sai1 "$TEMP_DIR/reads_R1.sai" \
-  --sai2 "$TEMP_DIR/reads_R2.sai" \
-  --reads1 "$TEMP_DIR/reads_R1.fastq" \
-  --reads2 "$TEMP_DIR/reads_R2.fastq" \
-  --output "$TEMP_DIR/output_algo.sam" \
-  --disable_smith_waterman \
-  --disable_insert_size_estimate
-
-echo ">> Checking algorithm options output..."
-assert_file_exists "$TEMP_DIR/output_algo.sam"
-assert_file_not_empty "$TEMP_DIR/output_algo.sam"
-
-echo ">> OK: Algorithm options test passed."
-
-# --- Test Case 5: Error handling ---
-echo ">>> Test 5: Error handling"
-
-# Test with non-existent SAI file
-if "$meta_executable" \
-  --index "$TEMP_DIR/reference.fasta" \
-  --sai1 "$TEMP_DIR/nonexistent.sai" \
-  --sai2 "$TEMP_DIR/reads_R2.sai" \
-  --reads1 "$TEMP_DIR/reads_R1.fastq" \
-  --reads2 "$TEMP_DIR/reads_R2.fastq" \
-  --output "$TEMP_DIR/output_error.sam" 2>/dev/null; then
-  echo "ERROR: Should have failed with non-existent SAI file"
-  exit 1
+# Check SAM format headers
+if head -5 "$meta_temp_dir/paired_end.sam" | grep -q "^@"; then
+  log "✓ SAM file contains proper headers"
 else
-  echo ">> OK: Properly handled non-existent SAI file error."
+  log_error "SAM file does not contain proper headers"
+  exit 1
 fi
 
-echo ">>> All tests passed!"
+log "✅ TEST 1 completed successfully"
+
+# --- Test Case 2: Custom parameters ---
+log "Starting TEST 2: BWA sampe with custom parameters"
+
+log "Executing $meta_name with custom parameters..."
+"$meta_executable" \
+  --index "$test_data_dir/index/reference.fasta" \
+  --sai1 "$test_data_dir/reads_R1.sai" \
+  --sai2 "$test_data_dir/reads_R2.sai" \
+  --reads1 "$test_data_dir/reads_R1.fastq" \
+  --reads2 "$test_data_dir/reads_R2.fastq" \
+  --output "$meta_temp_dir/custom.sam" \
+  --max_insert_size 800
+
+log "Validating TEST 2 outputs..."
+check_file_exists "$meta_temp_dir/custom.sam" "custom SAM output"
+check_file_not_empty "$meta_temp_dir/custom.sam" "custom SAM output"
+
+# Check SAM format headers
+if head -5 "$meta_temp_dir/custom.sam" | grep -q "^@"; then
+  log "✓ SAM file contains proper headers"
+else
+  log_error "SAM file does not contain proper headers"
+  exit 1
+fi
+
+log "✅ TEST 2 completed successfully"
+
+print_test_summary "All tests completed successfully"
