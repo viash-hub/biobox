@@ -1,0 +1,25 @@
+```
+docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger mkgtf -h
+```
+
+Genes GTF tool for 10x Genomics Cell Ranger.
+
+Filter user-supplied GTF files for use as Cell Ranger-compatible
+genes files for mkref tool.
+
+The commands below should be preceded by 'cellranger':
+
+Usage:
+    mkgtf <input_gtf> <output_gtf> [--attribute=KEY:VALUE...]
+    mkgtf -h | --help | --version
+
+Arguments:
+    input_gtf           Path to input genes GTF file.
+    output_gtf          Path to filtered output genes GTF file.
+
+Options:
+    --attribute=<key:value>
+                        Key-value pair in attributes field to be kept in the GTF
+                            file.
+    -h --help           Show this message.
+    --version           Show version.
