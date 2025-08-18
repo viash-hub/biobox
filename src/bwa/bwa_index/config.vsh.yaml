@@ -1,0 +1,74 @@
+name: bwa_index
+namespace: bwa
+description: Index sequences in the FASTA format for BWA alignment.
+keywords: [alignment, indexing, BWA, reference]
+links:
+  homepage: https://bio-bwa.sourceforge.net/
+  documentation: https://bio-bwa.sourceforge.net/bwa.shtml
+  repository: https://github.com/lh3/bwa
+license: MIT
+requirements:
+  commands: [bwa]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [ author, maintainer ]
+  - __merge__: /src/_authors/toni_verbeiren.yaml
+    roles: [ reviewer ]
+
+argument_groups: 
+- name: "Input"
+  arguments: 
+  - name: "--input"
+    type: file
+    description: Input FASTA file to be indexed.
+    required: true
+    example: reference.fasta
+
+- name: "Output"
+  arguments: 
+  - name: "--output"
+    type: file
+    direction: output
+    description: Output directory containing BWA index files (.amb, .ann, .bwt, .pac, .sa).
+    example: bwa_index/
+
+- name: "Options"
+  arguments: 
+  - name: "--algorithm"
+    alternatives: [-a]
+    type: string
+    description: BWT construction algorithm. If not specified, BWA will choose automatically.
+    choices: [bwtsw, is, rb2]
+  - name: "--prefix"
+    alternatives: [-p]
+    type: string
+    description: Prefix of the index files. Default is same as input fasta name.
+  - name: "--block_size"
+    alternatives: [-b]
+    type: integer
+    description: Block size for the bwtsw algorithm (effective with -a bwtsw). Default is 10000000.
+  - name: "--use_64bit_names"
+    alternatives: ["-6"]
+    type: boolean_true
+    description: Index files named as <in.fasta>.64.* instead of <in.fasta>.*.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:  
+  - type: docker
+    image: quay.io/biocontainers/bwa:0.7.19--h577a1d6_1
+    setup:
+      - type: docker
+        run: |
+          bwa 2>&1 | grep "Version:" | sed 's/Version: /bwa: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
