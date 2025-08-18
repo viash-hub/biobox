@@ -18,7 +18,7 @@
   - `bwa/bwa_aln`: BWA aln algorithm for aligning short sequence reads to a reference genome.
   - `bwa/bwa_samse`: BWA samse - generate single-end alignment in SAM format from BWA aln SAI files.
   - `bwa/bwa_sampe`: BWA sampe - generate paired-end alignment in SAM format from BWA aln SAI files.
-  - 
+
 * `bowtie2`: Add support for Bowtie2 alignment and indexing (PR #184).
   - `bowtie2/bowtie2_build`: Build Bowtie2 index files from reference sequences.
   - `bowtie2/bowtie2_align`: Align single-end and paired-end reads using Bowtie2.
