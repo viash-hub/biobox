@@ -1,0 +1,21 @@
+```
+docker run --rm quay.io/biocontainers/bwa:0.7.19--h577a1d6_1 bwa sampe
+```
+
+Usage:   bwa sampe [options] <prefix> <in1.sai> <in2.sai> <in1.fq> <in2.fq>
+
+Options: -a INT   maximum insert size [500]
+         -o INT   maximum occurrences for one end [100000]
+         -n INT   maximum hits to output for paired reads [3]
+         -N INT   maximum hits to output for discordant pairs [10]
+         -c FLOAT prior of chimeric rate (lower bound) [1.0e-05]
+         -f FILE  sam file to output results to [stdout]
+         -r STR   read group header line such as `@RG\tID:foo\tSM:bar' [null]
+         -P       preload index into memory (for base-space reads only)
+         -s       disable Smith-Waterman for the unmapped mate
+         -A       disable insert size estimate (force -s)
+
+Notes: 1. For SOLiD reads, <in1.fq> corresponds R3 reads and <in2.fq> to F3.
+       2. For reads shorter than 30bp, applying a smaller -o is recommended to
+          to get a sensible speed at the cost of pairing accuracy.
+

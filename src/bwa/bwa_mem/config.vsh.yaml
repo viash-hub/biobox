@@ -1,0 +1,238 @@
+name: bwa_mem
+namespace: bwa
+description: BWA-MEM algorithm for aligning sequence reads to a reference genome.
+keywords: [alignment, BWA, BWA-MEM, mapping]
+links:
+  homepage: https://bio-bwa.sourceforge.net/
+  documentation: https://bio-bwa.sourceforge.net/bwa.shtml
+  repository: https://github.com/lh3/bwa
+license: MIT
+requirements:
+  commands: [bwa]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [ author, maintainer ]
+  - __merge__: /src/_authors/toni_verbeiren.yaml
+    roles: [ reviewer ]
+
+argument_groups: 
+- name: "Input"
+  arguments: 
+  - name: "--index"
+    type: file
+    description: BWA index base name (prefix of .amb, .ann, .bwt, .pac, .sa files).
+    required: true
+    example: reference.fasta
+  - name: "--reads1"
+    type: file
+    description: Input FASTQ file with first reads in pair (R1) or single-end reads.
+    required: true
+    example: reads_R1.fastq
+  - name: "--reads2"
+    type: file
+    description: Input FASTQ file with second reads in pair (R2). Optional for single-end.
+    example: reads_R2.fastq
+
+- name: "Output"
+  arguments: 
+  - name: "--output"
+    alternatives: [-o]
+    type: file
+    direction: output
+    description: Output SAM file. If not specified, output goes to stdout.
+    example: output.sam
+
+- name: "Algorithm Options"
+  arguments: 
+  - name: "--min_seed_length"
+    alternatives: [-k]
+    type: integer
+    description: Minimum seed length. Default is 19.
+    example: 19
+  - name: "--band_width"
+    alternatives: [-w]
+    type: integer
+    description: Band width for banded alignment. Default is 100.
+    example: 100
+  - name: "--dropoff"
+    alternatives: [-d]
+    type: integer
+    description: Off-diagonal X-dropoff. Default is 100.
+    example: 100
+  - name: "--reseed_ratio"
+    alternatives: [-r]
+    type: double
+    description: Look for internal seeds inside a seed longer than {-k} * FLOAT. Default is 1.5.
+    example: 1.5
+  - name: "--seed_occurrence"
+    alternatives: [-y]
+    type: integer
+    description: Seed occurrence for the 3rd round seeding. Default is 20.
+    example: 20
+  - name: "--skip_seeds"
+    alternatives: [-c]
+    type: integer
+    description: Skip seeds with more than INT occurrences. Default is 500.
+    example: 500
+  - name: "--chain_drop"
+    alternatives: [-D]
+    type: double
+    description: Drop chains shorter than FLOAT fraction of the longest overlapping chain. Default is 0.50.
+    example: 0.50
+  - name: "--seeded_bases"
+    alternatives: [-W]
+    type: integer
+    description: Discard a chain if seeded bases shorter than INT. Default is 0.
+    example: 0
+  - name: "--mate_rescue"
+    alternatives: [-m]
+    type: integer
+    description: Perform at most INT rounds of mate rescues for each read. Default is 50.
+    example: 50
+  - name: "--skip_mate_rescue"
+    alternatives: [-S]
+    type: boolean_true
+    description: Skip mate rescue.
+  - name: "--skip_pairing"
+    alternatives: [-P]
+    type: boolean_true
+    description: Skip pairing; mate rescue performed unless -S also in use.
+
+- name: "Scoring Options"
+  arguments:
+  - name: "--match_score"
+    alternatives: [-A]
+    type: integer
+    description: Score for a sequence match. Default is 1.
+    example: 1
+  - name: "--mismatch_penalty"
+    alternatives: [-B]
+    type: integer
+    description: Penalty for a mismatch. Default is 4.
+    example: 4
+  - name: "--gap_open_penalty"
+    alternatives: [-O]
+    type: string
+    description: Gap open penalties for deletions and insertions. Default is 6,6.
+    example: "6,6"
+  - name: "--gap_extend_penalty"
+    alternatives: [-E]
+    type: string
+    description: Gap extension penalty. Default is 1,1.
+    example: "1,1"
+  - name: "--clipping_penalty"
+    alternatives: [-L]
+    type: string
+    description: Penalty for 5'- and 3'-end clipping. Default is 5,5.
+    example: "5,5"
+  - name: "--unpaired_penalty"
+    alternatives: [-U]
+    type: integer
+    description: Penalty for an unpaired read pair. Default is 17.
+    example: 17
+  - name: "--read_type"
+    alternatives: [-x]
+    type: string
+    description: Read type preset (pacbio, ont2d, intractg).
+    choices: [pacbio, ont2d, intractg]
+
+- name: "Input/Output Options"
+  arguments:
+  - name: "--smart_pairing"
+    alternatives: [-p]
+    type: boolean_true
+    description: Smart pairing (ignoring in2.fq).
+  - name: "--read_group"
+    alternatives: [-R]
+    type: string
+    description: Read group header line such as '@RG\tID:foo\tSM:bar'.
+    example: "@RG\tID:sample1\tSM:sample1"
+  - name: "--header"
+    alternatives: [-H]
+    type: string
+    description: Insert STR to header if it starts with @; or insert lines in FILE.
+  - name: "--ignore_alt"
+    alternatives: [-j]
+    type: boolean_true
+    description: Treat ALT contigs as part of the primary assembly.
+  - name: "--primary_5prime"
+    alternatives: ["-5"]
+    type: boolean_true
+    description: For split alignment, take the alignment with the smallest query (not genomic) coordinate as primary.
+  - name: "--keep_mapq"
+    alternatives: [-q]
+    type: boolean_true
+    description: Don't modify mapQ of supplementary alignments.
+  - name: "--batch_size"
+    alternatives: [-K]
+    type: integer
+    description: Process INT input bases in each batch regardless of nThreads.
+  - name: "--verbosity"
+    alternatives: [-v]
+    type: integer
+    description: Verbosity level (1=error, 2=warning, 3=message, 4+=debugging). Default is 3.
+    choices: [1, 2, 3, 4]
+  - name: "--min_score"
+    alternatives: [-T]
+    type: integer
+    description: Minimum score to output. Default is 30.
+    example: 30
+  - name: "--max_hits_xa"
+    type: string
+    description: If there are <INT hits with score >80.00% of the max score, output all in XA. Default is 5,200.
+    example: "5,200"
+  - name: "--score_fraction"
+    alternatives: [-z]
+    type: double
+    description: The fraction of the max score to use with -h. Default is 0.800000.
+    example: 0.8
+  - name: "--output_all"
+    alternatives: [-a]
+    type: boolean_true
+    description: Output all alignments for SE or unpaired PE.
+  - name: "--append_comment"
+    alternatives: [-C]
+    type: boolean_true
+    description: Append FASTA/FASTQ comment to SAM output.
+  - name: "--output_ref_header"
+    alternatives: [-V]
+    type: boolean_true
+    description: Output the reference FASTA header in the XR tag.
+  - name: "--soft_clipping"
+    alternatives: [-Y]
+    type: boolean_true
+    description: Use soft clipping for supplementary alignments.
+  - name: "--mark_secondary"
+    alternatives: [-M]
+    type: boolean_true
+    description: Mark shorter split hits as secondary.
+  - name: "--output_xb"
+    alternatives: [-u]
+    type: boolean_true
+    description: Output XB instead of XA; XB is XA with the alignment score and mapping quality added.
+  - name: "--insert_size"
+    alternatives: [-I]
+    type: string
+    description: Specify the mean, standard deviation, max and min of the insert size distribution.
+    example: "500,50,800,100"
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:  
+  - type: docker
+    image: quay.io/biocontainers/bwa:0.7.19--h577a1d6_1
+    setup:
+      - type: docker
+        run: |
+          bwa 2>&1 | grep "Version:" | sed 's/Version: /bwa: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
