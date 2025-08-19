@@ -1,0 +1,149 @@
+name: bedtools_makewindows
+namespace: bedtools
+
+description: |
+  Create adjacent or sliding windows across a genome or BED file.
+  
+  This tool generates genomic windows either across entire chromosomes (using a genome file)
+  or within specific intervals (using a BED file). Windows can be fixed-size or variable-size,
+  and can be non-overlapping (adjacent) or overlapping (sliding). Useful for creating
+  genomic bins for analysis, tiling genomes, or generating sliding windows for statistics.
+
+keywords: [genomics, intervals, windows, tiling, sliding, binning, genome, segments]
+links:
+  homepage: https://bedtools.readthedocs.io/
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/makewindows.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+
+requirements:
+  commands: [bedtools]
+
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Input Options
+    arguments:
+      - name: --genome
+        alternatives: [-g]
+        type: file
+        description: |
+          Genome file defining chromosome names and sizes.
+          
+          **Format:** Tab-delimited file with chromosome name and size
+          **Example line:** chr1  249250621
+          **Usage:** Windows will be created for each chromosome in the file
+          **Sources:** samtools faidx output or UCSC Table Browser
+        example: genome.txt
+      
+      - name: --input
+        alternatives: [-b]
+        type: file
+        description: |
+          BED file with genomic intervals.
+          
+          **Format:** BED file with chrom, start, end fields (minimum)
+          **Usage:** Windows will be created for each interval in the file
+          **Alternative:** Use instead of genome file to create windows within specific regions
+        example: intervals.bed
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: |
+          Output file with generated windows.
+          
+          **Format:** BED format with chromosome, start, end coordinates
+          **Optional:** Fourth column with window names (if ID naming option used)
+          **Sorting:** Output is sorted by chromosome and start position
+        required: true
+        example: windows.bed
+
+  - name: Window Size Options
+    arguments:
+      - name: --window_size
+        alternatives: [-w]
+        type: integer
+        description: |
+          Fixed window size in base pairs.
+          
+          **Effect:** Divide input intervals into fixed-sized windows
+          **Units:** Base pairs (nucleotides)
+          **Usage:** Cannot be used with --num_windows
+          **Example:** 1000000 creates 1MB windows
+        example: 1000000
+        
+      - name: --step_size
+        alternatives: [-s]
+        type: integer
+        description: |
+          Step size for sliding windows in base pairs.
+          
+          **Default:** Same as window size (non-overlapping windows)
+          **Effect:** Distance between start positions of consecutive windows  
+          **Usage:** Must be used with --window_size
+          **Overlap:** Window size minus step size gives overlap amount
+          **Example:** With -w 1000 -s 500, creates 500bp overlapping windows
+        example: 500000
+        
+      - name: --num_windows
+        alternatives: [-n]
+        type: integer
+        description: |
+          Number of windows to create per input interval.
+          
+          **Effect:** Divide each interval into fixed number of windows
+          **Result:** Window sizes vary to fit exactly within each interval
+          **Usage:** Cannot be used with --window_size
+          **Example:** 10 creates 10 equal-sized windows per interval
+        example: 1000
+
+  - name: ID Naming Options
+    arguments:
+      - name: --id_type
+        alternatives: [-i]
+        type: string
+        description: |
+          Add name column with specified ID type.
+          
+          **Options:**
+          - `src`: Use source interval's name (requires named input intervals)
+          - `winnum`: Use window number as ID (1, 2, 3, ...)
+          - `srcwinnum`: Combine source name with window number (name_1, name_2, ...)
+          
+          **Default:** No name column (3 columns: chrom, start, end)
+          **With option:** 4 columns including name column
+        choices: ["src", "winnum", "srcwinnum"]
+        example: "winnum"
+        
+      - name: --reverse
+        type: boolean_true
+        description: |
+          Reverse window numbering order.
+          
+          **Effect:** Report windows in decreasing numerical order
+          **Usage:** Only applies when --id_type includes window numbering
+          **Example:** With 3 windows, output 3, 2, 1 instead of 1, 2, 3
+          **Default:** false (ascending order)
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
