@@ -93,3 +93,7 @@ engines:
       - type: docker
         run: |
           bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
