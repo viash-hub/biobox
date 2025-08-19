@@ -131,5 +131,4 @@ if ! grep -q "[-]" "$meta_temp_dir/output5.bed"; then
 fi
 log "✅ TEST 5 completed successfully"
 
-cleanup_test_env
 log "🎉 All bedtools_closest tests completed successfully!"

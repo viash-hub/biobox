@@ -146,5 +146,4 @@ if [ "$total_complement_size" -ne "$total_genome_size" ]; then
 fi
 log "✅ TEST 5 completed successfully"
 
-cleanup_test_env
 log "🎉 All bedtools_complement tests completed successfully!"

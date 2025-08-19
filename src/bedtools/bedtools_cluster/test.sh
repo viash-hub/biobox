@@ -150,5 +150,5 @@ if [ $chr2_min_cluster -le $chr1_max_cluster ]; then
 fi
 log "✅ TEST 5 completed successfully"
 
-cleanup_test_env
+
 log "🎉 All bedtools_cluster tests completed successfully!"

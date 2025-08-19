@@ -126,5 +126,4 @@ else
 fi
 log "✅ TEST 5 completed successfully"
 
-cleanup_test_env
 log "🎉 All bedtools_bedpetobam tests completed successfully!"
