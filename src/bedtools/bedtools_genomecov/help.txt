@@ -1,16 +1,19 @@
 ```bash
-bedtools genomecov
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools genomecov -h
 ```
 
 Tool:    bedtools genomecov (aka genomeCoverageBed)
-Version: v2.30.0
+Version: v2.31.1
 Summary: Compute the coverage of a feature file among a genome.
 
-Usage: bedtools genomecov [OPTIONS] -i <bed/gff/vcf> -g <genome>
+Usage: bedtools genomecov [OPTIONS] -i <bed/gff/vcf> -g <genome> OR -ibam <bam/cram>
 
 Options: 
 	-ibam		The input file is in BAM format.
 			Note: BAM _must_ be sorted by position
+
+	-g		Provide a genome file to define chromosome lengths.
+			Note:Required when not using -ibam option.
 
 	-d		Report the depth at each genome position (with one-based coordinates).
 			Default behavior is to report a histogram.
@@ -92,10 +95,20 @@ Notes:
 	(3) The input BAM (-ibam) file must be sorted by position.
 	 A "samtools sort <BAM>" should suffice.
 
-Tips: 
+Tip 1. Use samtools faidx to create a genome file from a FASTA: 
+	One can the samtools faidx command to index a FASTA file.
+	The resulting .fai index is suitable as a genome file, 
+	as bedtools will only look at the first two, relevant columns
+	of the .fai file.
+
+	For example:
+	samtools faidx GRCh38.fa
+	bedtools genomecov -i my.bed -g GRCh38.fa.fai
+
+Tip 2. Use UCSC Table Browser to create a genome file: 
 	One can use the UCSC Genome Browser's MySQL database to extract
 	chromosome sizes. For example, H. sapiens:
 
 	mysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \
-	"select chrom, size from hg19.chromInfo" > hg19.genome
+	"select chrom, size from hg19.chromInfo"  > hg19.genome
 
