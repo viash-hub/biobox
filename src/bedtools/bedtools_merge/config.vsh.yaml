@@ -23,6 +23,8 @@ requirements:
   commands: [bedtools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [author]
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
     roles: [author, maintainer]
 
 argument_groups:
@@ -198,7 +200,6 @@ test_resources:
     path: test.sh
   - type: file
     path: /src/_utils/test_helpers.sh
-  - path: test_data
 
 engines:
   - type: docker

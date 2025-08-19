@@ -18,7 +18,9 @@ requirements:
   commands: [bedtools]
 authors:
   - __merge__: /src/_authors/dries_schaumont.yaml
-    roles: [ author, maintainer ]
+    roles: [author, maintainer]
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author]
 
 argument_groups:
   - name: Input arguments

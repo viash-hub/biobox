@@ -22,7 +22,7 @@ license: MIT
 requirements:
   commands: [bedtools]
 authors:
-  - __merge__: /src/_authors/theodoro_gasperin.yaml
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
     roles: [author, maintainer]
 
 argument_groups:
