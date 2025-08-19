@@ -1,0 +1,140 @@
+name: bedtools_annotate
+namespace: bedtools
+description: |
+  Annotates the depth and breadth of coverage of features from multiple files.
+  
+  This tool analyzes how intervals in the input file are covered by features
+  from one or more annotation files. It reports either the fraction of each
+  interval covered, the count of overlapping features, or both metrics.
+  
+  **Default behavior:** Reports fraction of each input interval covered by features
+  **Multiple files:** Can process multiple annotation files simultaneously
+  **Strand options:** Supports same-strand, opposite-strand, or strand-agnostic analysis
+
+keywords: [Annotate, Coverage, Overlap, BED, GFF, VCF]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/annotate.html
+  repository: https://github.com/arq5x/bedtools2
+  homepage: https://bedtools.readthedocs.io/en/latest/
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/theodoro_gasperin.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: [-i]
+        type: file
+        description: |
+          Input file in BED, GFF, or VCF format to be annotated.
+          
+          Each interval in this file will be analyzed for coverage by
+          features from the annotation files.
+        required: true
+        example: intervals.bed
+
+      - name: --files
+        type: file
+        multiple: true
+        description: |
+          One or more annotation files for coverage analysis.
+          
+          **Format:** BED, GFF, or VCF files containing features to analyze
+          **Multiple files:** Use space-separated list or multiple --files flags
+          **Processing:** Each file analyzed separately with results in columns
+        required: true
+        example: ["annotations1.bed", "annotations2.bed"]
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: |
+          Output file with annotation results.
+          
+          Contains input intervals with additional columns showing coverage
+          statistics from each annotation file.
+        required: true
+        example: annotated_intervals.bed
+
+  - name: Options
+    arguments:
+      - name: --names
+        type: string
+        multiple: true
+        description: |
+          Descriptive names for each annotation file.
+          
+          **Usage:** One name per file in same order as --files
+          **Header:** Names appear in output header line
+          **Format:** Space-separated list or multiple --names flags
+        example: ["ChIP-seq_peaks", "DNA_methylation"]
+
+      - name: --counts
+        type: boolean_true
+        description: |
+          Report count of overlapping features instead of coverage fraction.
+          
+          **Default output:** Fraction of input interval covered (0.0-1.0)
+          **With --counts:** Integer count of overlapping features
+          **Use case:** When feature count is more relevant than coverage area
+
+      - name: --both
+        type: boolean_true
+        description: |
+          Report both feature counts and coverage fractions.
+          
+          **Output format:** Count followed by fraction for each annotation file
+          **Columns:** Doubles the number of result columns
+          **Use case:** Comprehensive analysis requiring both metrics
+
+      - name: --strand
+        alternatives: [-s]
+        type: boolean_true
+        description: |
+          Require same strandedness for overlap detection.
+          
+          Only count overlaps between features on the same strand.
+          Features on opposite strands are ignored.
+          
+          **Default:** Strand-agnostic analysis
+
+      - name: --different_strand
+        alternatives: [-S]
+        type: boolean_true
+        description: |
+          Require different strandedness for overlap detection.
+          
+          Only count overlaps between features on opposite strands.
+          Features on the same strand are ignored.
+          
+          **Default:** Strand-agnostic analysis
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run:
+          - "bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt"
+
+runners:
+  - type: executable
+  - type: nextflow
