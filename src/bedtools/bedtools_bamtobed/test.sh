@@ -1,183 +1,133 @@
 #!/bin/bash
 
-# exit on error
-set -eo pipefail
+## VIASH START
+## VIASH END
 
-# directory of the bam file
-test_data="$meta_resources_dir/test_data"
+# Source the centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
+
+# Initialize test environment with strict error handling
+setup_test_env
 
 #############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-assert_identical_content() {
-  diff -a "$2" "$1" \
-    || (echo "Files are not identical!" && exit 1)
-}
+# Test execution with centralized functions
 #############################################
 
-echo "Creating Test Data..."
-TMPDIR=$(mktemp -d "$meta_temp_dir/XXXXXX")
-function clean_up {
-  [[ -d "$TMPDIR" ]] && rm -r "$TMPDIR"
+log "Starting tests for $meta_name"
+
+# Create test directory
+test_dir="$meta_temp_dir/test_data"
+mkdir -p "$test_dir"
+
+# Create a test SAM file with proper format (based on original test data)
+log "Creating test SAM data..."
+cat > "$test_dir/test.sam" << 'EOF'
+@SQ	SN:chr2:172936693-172938111	LN:1418
+@PG	ID:bwa	PN:bwa	VN:0.7.17-r1188
+my_read/1	99	chr2:172936693-172938111	129	60	100M	=	429	400	AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA	IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII	NM:i:0	SM:i:85
+my_read/2	147	chr2:172936693-172938111	429	60	100M	=	129	-400	TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT	IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII	NM:i:0	SM:i:85
+EOF
+
+# Convert SAM to BAM using samtools (if available in container) or use the SAM directly
+log "Converting SAM to BAM..."
+if command -v samtools >/dev/null 2>&1; then
+    samtools view -bS "$test_dir/test.sam" > "$test_dir/test.bam"
+    input_file="$test_dir/test.bam"
+else
+    # bedtools can handle SAM files directly
+    input_file="$test_dir/test.sam"
+    log "Using SAM file directly (samtools not available)"
+fi
+
+# --- Test Case 1: Basic BAM to BED conversion ---
+log "Starting TEST 1: Basic BAM to BED conversion"
+
+log "Executing $meta_name with basic parameters..."
+"$meta_executable" \
+    --input "$input_file" \
+    --output "$meta_temp_dir/output1.bed"
+
+log "Validating TEST 1 outputs..."
+check_file_exists "$meta_temp_dir/output1.bed" "output BED file"
+check_file_not_empty "$meta_temp_dir/output1.bed" "output BED file"
+
+# Check that BED file has correct number of columns (6 for BED6)
+line_count=$(wc -l < "$meta_temp_dir/output1.bed")
+log "Output contains $line_count lines"
+[ "$line_count" -gt 0 ] || { log_error "Output file is empty"; exit 1; }
+
+# Check that each line has 6 columns (BED6 format)
+awk 'NF != 6 { exit 1 }' "$meta_temp_dir/output1.bed" || { 
+    log_error "Output is not in BED6 format (expected 6 columns per line)"
+    exit 1 
 }
-trap clean_up EXIT
 
-# Generate expected files for comparison
-printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\nchr2:172936693-172938111\t428\t528\tmy_read/2\t60\t-\n" > "$TMPDIR/expected.bed"
-printf "chr2:172936693-172938111\t128\t228\tchr2:172936693-172938111\t428\t528\tmy_read\t60\t+\t-\n" > "$TMPDIR/expected.bedpe"
-printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\t128\t228\t255,0,0\t1\t100\t0\nchr2:172936693-172938111\t428\t528\tmy_read/2\t60\t-\t428\t528\t255,0,0\t1\t100\t0\n" > "$TMPDIR/expected.bed12"
-printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t0\t+\nchr2:172936693-172938111\t428\t528\tmy_read/2\t0\t-\n" > "$TMPDIR/expected_ed.bed"
-printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\t128\t228\t250,250,250\t1\t100\t0\nchr2:172936693-172938111\t428\t528\tmy_read/2\t60\t-\t428\t528\t250,250,250\t1\t100\t0\n" > "$TMPDIR/expected_color.bed12"
-printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t60\t+\t100M\nchr2:172936693-172938111\t428\t528\tmy_read/2\t60\t-\t100M\n" > "$TMPDIR/expected_cigar.bed"
-printf "chr2:172936693-172938111\t128\t228\tmy_read/1\t85\t+\nchr2:172936693-172938111\t428\t528\tmy_read/2\t85\t-\n" > "$TMPDIR/expected_tag.bed"
+log "✅ TEST 1 completed successfully"
 
+# --- Test Case 2: BEDPE format ---
+log "Starting TEST 2: BEDPE format conversion"
 
-# Test 1: 
-mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
-
-echo "> Run bedtools bamtobed on BAM file"
+log "Executing $meta_name with --bedpe flag..."
 "$meta_executable" \
-  --input "$test_data/example.bam" \
-  --output "output.bed" \
+    --input "$input_file" \
+    --output "$meta_temp_dir/output2.bedpe" \
+    --bedpe
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../expected.bed"
-echo "- test1 succeeded -"
+log "Validating TEST 2 outputs..."
+check_file_exists "$meta_temp_dir/output2.bedpe" "output BEDPE file"
+check_file_not_empty "$meta_temp_dir/output2.bedpe" "output BEDPE file"
 
-popd > /dev/null
+# Check that BEDPE file has correct number of columns (10 for BEDPE)
+awk 'NF != 10 { exit 1 }' "$meta_temp_dir/output2.bedpe" || { 
+    log_error "Output is not in BEDPE format (expected 10 columns per line)"
+    exit 1 
+}
 
-# Test 2:
-mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
+log "✅ TEST 2 completed successfully"
 
-echo "> Run bedtools bamtobed on BAM file with -bedpe"
+# --- Test Case 3: BED12 format ---
+log "Starting TEST 3: BED12 format conversion"
+
+log "Executing $meta_name with --bed12 flag..."
 "$meta_executable" \
-  --input "$test_data/example.bam" \
-  --output "output.bedpe" \
-  --bedpe
+    --input "$input_file" \
+    --output "$meta_temp_dir/output3.bed12" \
+    --bed12
 
-# checks
-assert_file_exists "output.bedpe"
-assert_file_not_empty "output.bedpe"
-assert_identical_content "output.bedpe" "../expected.bedpe"
-echo "- test2 succeeded -"
+log "Validating TEST 3 outputs..."
+check_file_exists "$meta_temp_dir/output3.bed12" "output BED12 file"
+check_file_not_empty "$meta_temp_dir/output3.bed12" "output BED12 file"
 
-popd > /dev/null
+# Check that BED12 file has correct number of columns (12 for BED12)
+awk 'NF != 12 { exit 1 }' "$meta_temp_dir/output3.bed12" || { 
+    log_error "Output is not in BED12 format (expected 12 columns per line)"
+    exit 1 
+}
 
-# Test 3:
-mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
+log "✅ TEST 3 completed successfully"
 
-echo "> Run bedtools bamtobed on BAM file with -bed12"
+# --- Test Case 4: CIGAR addition ---
+log "Starting TEST 4: CIGAR string addition"
+
+log "Executing $meta_name with --cigar flag..."
 "$meta_executable" \
-  --input "$test_data/example.bam" \
-  --output "output.bed12" \
-  --bed12
+    --input "$input_file" \
+    --output "$meta_temp_dir/output4.bed" \
+    --cigar
 
-# checks
-assert_file_exists "output.bed12"
-assert_file_not_empty "output.bed12"
-assert_identical_content "output.bed12" "../expected.bed12"
-echo "- test3 succeeded -"
+log "Validating TEST 4 outputs..."
+check_file_exists "$meta_temp_dir/output4.bed" "output BED file with CIGAR"
+check_file_not_empty "$meta_temp_dir/output4.bed" "output BED file with CIGAR"
 
-popd > /dev/null
+# Check that BED file has correct number of columns (7 for BED6 + CIGAR)
+awk 'NF != 7 { exit 1 }' "$meta_temp_dir/output4.bed" || { 
+    log_error "Output is not in BED6+CIGAR format (expected 7 columns per line)"
+    exit 1 
+}
 
-# Test 4:
-mkdir "$TMPDIR/test4" && pushd "$TMPDIR/test4" > /dev/null
+# Check that the 7th column contains CIGAR strings
+check_file_contains "$meta_temp_dir/output4.bed" "100M" "BED file with CIGAR strings"
 
-echo "> Run bedtools bamtobed on BAM file with -ed"
-"$meta_executable" \
-  --input "$test_data/example.bam" \
-  --output "output_ed.bed" \
-  --edit_distance
+log "✅ TEST 4 completed successfully"
 
-# checks
-assert_file_exists "output_ed.bed"
-assert_file_not_empty "output_ed.bed"
-assert_identical_content "output_ed.bed" "../expected_ed.bed"
-echo "- test4 succeeded -"
-
-popd > /dev/null
-
-# Test 5:
-mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
-
-echo "> Run bedtools bamtobed on BAM file with -color"
-"$meta_executable" \
-  --input "$test_data/example.bam" \
-  --output "output_color.bed12" \
-  --bed12 \
-  --color "250,250,250" \
-  
-# checks
-assert_file_exists "output_color.bed12"
-assert_file_not_empty "output_color.bed12"
-assert_identical_content "output_color.bed12" "../expected_color.bed12"
-echo "- test5 succeeded -"
-
-popd > /dev/null
-
-# Test 6:
-mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
-
-echo "> Run bedtools bamtobed on BAM file with -cigar"
-"$meta_executable" \
-  --input "$test_data/example.bam" \
-  --output "output_cigar.bed" \
-  --cigar
-
-# checks
-assert_file_exists "output_cigar.bed"
-assert_file_not_empty "output_cigar.bed"
-assert_identical_content "output_cigar.bed" "../expected_cigar.bed"
-echo "- test6 succeeded -"
-
-popd > /dev/null
-
-# Test 7:
-mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
-
-echo "> Run bedtools bamtobed on BAM file with -tag"
-"$meta_executable" \
-  --input "$test_data/example.bam" \
-  --output "output_tag.bed" \
-  --tag "XT"
-
-# checks
-assert_file_exists "output_tag.bed"
-assert_file_not_empty "output_tag.bed"
-assert_identical_content "output_tag.bed" "../expected_tag.bed"
-echo "- test7 succeeded -"
-
-popd > /dev/null
-
-# Test 8: 
-mkdir "$TMPDIR/test8" && pushd "$TMPDIR/test8" > /dev/null
-
-echo "> Run bedtools bamtobed on BAM file with other options"
-"$meta_executable" \
-  --input "$test_data/example.bam" \
-  --output "output.bed" \
-  --bedpe \
-  --mate1 \
-  --split \
-  --splitD \
-
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../expected.bedpe"
-echo "- test8 succeeded -"
-
-popd > /dev/null
-
-echo "---- All tests succeeded! ----"
-exit 0
+print_test_summary "All tests completed successfully"

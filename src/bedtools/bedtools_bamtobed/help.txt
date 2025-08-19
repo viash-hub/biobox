@@ -1,9 +1,9 @@
 ```bash
-bedtools bamtobed
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools bamtobed -h
 ```
 
 Tool:    bedtools bamtobed (aka bamToBed)
-Version: v2.30.0
+Version: v2.31.1
 Summary: Converts BAM alignments to BED6 or BEDPE format.
 
 Usage:   bedtools bamtobed [OPTIONS] -i <bam> 
