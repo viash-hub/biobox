@@ -1,12 +1,21 @@
 name: bedtools_merge
 namespace: bedtools
-description: | 
-  Merges overlapping BED/GFF/VCF entries into a single interval.
+description: |
+  Merges overlapping BED/GFF/VCF entries into single intervals.
+  
+  This tool combines overlapping or book-ended features in BED, GFF, or VCF
+  files into single merged intervals. It provides extensive options for
+  controlling merge behavior, including strand-specific merging, distance
+  thresholds, and aggregation operations on additional columns.
+  
+  **Default behavior:** Merges overlapping and adjacent features regardless of strand
+  **Input requirements:** Input file must be sorted by chromosome and start position
+
+keywords: [Merge, Overlapping, BED, GFF, VCF, Intervals]
 links:
   documentation: https://bedtools.readthedocs.io/en/latest/content/tools/merge.html
   repository: https://github.com/arq5x/bedtools2
-  homepage: https://bedtools.readthedocs.io/en/latest/#
-  issue_tracker: https://github.com/arq5x/bedtools2/issues
+  homepage: https://bedtools.readthedocs.io/en/latest/
 references:
   doi: 10.1093/bioinformatics/btq033
 license: MIT
@@ -14,127 +23,171 @@ requirements:
   commands: [bedtools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [author, maintainer]
 
 argument_groups:
   - name: Inputs
     arguments:
       - name: --input
-        alternatives: -i
+        alternatives: [-i]
         type: file
-        description: Input file (BED/GFF/VCF) to be merged.
+        description: |
+          Input file in BED, GFF, or VCF format to be merged.
+          
+          **Requirements:**
+          - File must be sorted by chromosome and start position
+          - Use `bedtools sort` if input is not sorted
+          
+          **Supported formats:** BED, GFF, VCF, or BAM (with --bed flag)
         required: true
+        example: intervals.bed
     
   - name: Outputs
     arguments:
       - name: --output
         type: file
         direction: output
-        description: Output merged file BED to be written.
+        description: |
+          Output file containing merged intervals.
+          
+          The output will contain merged intervals in BED format, with
+          additional columns included if aggregation operations are specified
+          via --columns and --operation parameters.
         required: true
+        example: merged_intervals.bed
 
   - name: Options
     arguments:
       - name: --strand
-        alternatives: -s
+        alternatives: [-s]
         type: boolean_true
-        description: | 
-          Force strandedness. That is, only merge features
-          that are on the same strand.
-          - By default, merging is done without respect to strand.
+        description: |
+          Force strandedness for merging operations.
+          
+          Only merge features that are on the same strand. Features on
+          opposite strands will be treated as separate and not merged,
+          even if they overlap.
+          
+          **Default:** Merging ignores strand information
 
       - name: --specific_strand
-        alternatives: -S
+        alternatives: [-S]
         type: string
         choices: ["+", "-"]
-        description: | 
-          Force merge for one specific strand only.
-          Follow with + or - to force merge from only
-          the forward or reverse strand, respectively.
-          - By default, merging is done without respect to strand.
+        description: |
+          Merge features from one specific strand only.
+          
+          **Options:**
+          - "+" : Merge only forward strand features
+          - "-" : Merge only reverse strand features
+          
+          Features from the opposite strand will be ignored entirely.
+        example: "+"
 
       - name: --distance
-        alternatives: -d
+        alternatives: [-d]
         type: integer
-        description: | 
-          Maximum distance between features allowed for features
-          to be merged.
-          - Def. 0. That is, overlapping & book-ended features are merged.
-          - (INTEGER)
-          - Note: negative values enforce the number of b.p. required for overlap.
+        description: |
+          Maximum distance between features for merging.
+          
+          **Positive values:** Features within this distance will be merged
+          **Negative values:** Minimum overlap required (in base pairs)
+          **Zero (default):** Only overlapping and book-ended features merge
+          
+          **Examples:**
+          - `-d 100` : Merge features within 100bp of each other
+          - `-d -50` : Require at least 50bp overlap to merge
+        default: 0
+        example: 100
 
       - name: --columns
-        alternatives: -c
-        type: integer
-        description: | 
-          Specify columns from the B file to map onto intervals in A.
-          Default: 5.
-          Multiple columns can be specified in a comma-delimited list.
+        alternatives: [-c]
+        type: string
+        description: |
+          Columns to aggregate during merging operations.
+          
+          Specify which columns from the input file should be included
+          in the merged output with aggregation operations applied.
+          
+          **Format:** Single column (e.g., "5") or comma-separated list (e.g., "4,5,6")
+          **Column numbering:** 1-indexed (column 1 = chromosome, etc.)
+        example: "4,5,6"
 
       - name: --operation
-        alternatives: -o
+        alternatives: [-o]
         type: string
-        description: | 
-          Specify the operation that should be applied to -c.
-          Valid operations:
-              sum, min, max, absmin, absmax,
-              mean, median, mode, antimode
-              stdev, sstdev
-              collapse (i.e., print a delimited list (duplicates allowed)), 
-              distinct (i.e., print a delimited list (NO duplicates allowed)), 
-              distinct_sort_num (as distinct, sorted numerically, ascending),
-              distinct_sort_num_desc (as distinct, sorted numerically, desscending),
-              distinct_only (delimited list of only unique values),
-              count
-              count_distinct (i.e., a count of the unique values in the column), 
-              first (i.e., just the first value in the column), 
-              last (i.e., just the last value in the column), 
-          Default: sum
-          Multiple operations can be specified in a comma-delimited list.
-
-          If there is only column, but multiple operations, all operations will be
-          applied on that column. Likewise, if there is only one operation, but
-          multiple columns, that operation will be applied to all columns.
-          Otherwise, the number of columns must match the the number of operations,
-          and will be applied in respective order.
-          E.g., "-c 5,4,6 -o sum,mean,count" will give the sum of column 5,
-          the mean of column 4, and the count of column 6.
-          The order of output columns will match the ordering given in the command.
+        description: |
+          Aggregation operations to apply to specified columns.
+          
+          **Numerical operations:**
+          - sum, min, max, mean, median, mode
+          - absmin, absmax, stdev, sstdev
+          
+          **List operations:**
+          - collapse (comma-separated list with duplicates)
+          - distinct (comma-separated unique values)
+          - distinct_sort_num (unique values, numerically sorted)
+          
+          **Count operations:**
+          - count (number of values)
+          - count_distinct (number of unique values)
+          
+          **Positional operations:**
+          - first (first value), last (last value)
+          
+          **Multiple operations:** Use comma-separated list (e.g., "sum,mean,count")
+        example: "mean,count"
       
       - name: --delimiter
-        alternatives: -delim
+        alternatives: [-delim]
         type: string
-        description: | 
-          Specify a custom delimiter for the collapse operations.
-        example: "|"
+        description: |
+          Custom delimiter for collapse/distinct operations.
+          
+          Character or string used to separate values in list-type
+          operations like collapse, distinct, etc.
         default: ","
+        example: "|"
 
       - name: --precision
-        alternatives: -prec
+        alternatives: [-prec]
         type: integer
-        description: | 
-          Sets the decimal precision for output (Default: 5).
-      
+        description: |
+          Decimal precision for numerical output values.
+          
+          Controls the number of decimal places displayed for
+          floating-point results from numerical operations.
+        default: 5
+        example: 3
+
       - name: --bed
         type: boolean_true
-        description: | 
-          If using BAM input, write output as BED.
+        description: |
+          Output in BED format when using BAM input.
+          
+          When the input file is in BAM format, this flag ensures
+          the output is written in standard BED format instead of
+          the default BAM-specific output format.
 
       - name: --header
         type: boolean_true
-        description: | 
-          Print the header from the A file prior to results.
+        description: |
+          Include header from input file in output.
+          
+          Preserves and prints any header lines from the input file
+          (e.g., GFF version lines, VCF headers) before the merged results.
 
       - name: --no_buffer
-        alternatives: -nobuf
+        alternatives: [-nobuf]
         type: boolean_true
-        description: | 
-          Disable buffered output. Using this option will cause each line
-          of output to be printed as it is generated, rather than saved
-          in a buffer. This will make printing large output files 
-          noticeably slower, but can be useful in conjunction with
-          other software tools and scripts that need to process one
-          line of bedtools output at a time.
+        description: |
+          Disable buffered output for real-time processing.
+          
+          **Default behavior:** Output is buffered for efficiency
+          **With --no_buffer:** Each line printed immediately as generated
+          
+          **Use cases:** Real-time processing, piping to other tools
+          **Performance:** Slower for large files but enables streaming
 
 resources:
   - type: bash_script
@@ -143,17 +196,17 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
   - path: test_data
 
 engines:
   - type: docker
-    image: debian:stable-slim
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
     setup:
-      - type: apt
-        packages: [bedtools, procps]
       - type: docker
-        run: |
-          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+        run:
+          - "bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt"
 
 runners:
   - type: executable

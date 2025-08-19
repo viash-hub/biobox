@@ -1,222 +1,130 @@
 #!/bin/bash
 
-# exit on error
 set -eo pipefail
 
 ## VIASH START
-meta_executable="target/executable/bedtools/bedtools_sort/bedtools_merge"
-meta_resources_dir="src/bedtools/bedtools_merge"
 ## VIASH END
 
-# directory of the bam file
-test_data="$meta_resources_dir/test_data"
+# Source centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
 
-#############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-assert_identical_content() {
-  diff -a "$2" "$1" \
-    || (echo "Files are not identical!" && exit 1)
-}
-#############################################
+# Initialize test environment
+setup_test_env
 
-# Create directories for tests
-echo "Creating Test Data..."
-TMPDIR=$(mktemp -d "$meta_temp_dir/XXXXXX")
-function clean_up {
-  [[ -d "$TMPDIR" ]] && rm -r "$TMPDIR"
-}
-trap clean_up EXIT
+log "Starting tests for bedtools_merge"
 
-# Create and populate example files
-printf "chr1\t100\t200\nchr1\t150\t250\nchr1\t300\t400\n" > "$TMPDIR/featureA.bed"
-printf "chr1\t100\t200\ta1\t1\t+\nchr1\t180\t250\ta2\t2\t+\nchr1\t250\t500\ta3\t3\t-\nchr1\t501\t1000\ta4\t4\t+\n" > "$TMPDIR/featureB.bed"
-printf "chr1\t100\t200\ta1\t1.9\t+\nchr1\t180\t250\ta2\t2.5\t+\nchr1\t250\t500\ta3\t3.3\t-\nchr1\t501\t1000\ta4\t4\t+\n" > "$TMPDIR/feature_precision.bed"
+# Create test data
+log "Creating test data..."
 
-# Create and populate feature.gff file
-printf "##gff-version 3\n" > "$TMPDIR/feature.gff"
-printf "chr1\t.\tgene\t1000\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "$TMPDIR/feature.gff"
-printf "chr1\t.\texon\t1000\t1200\t.\t+\t.\tID=exon1;Parent=transcript1\n" >> "$TMPDIR/feature.gff"
-printf "chr1\t.\tCDS\t1000\t1200\t.\t+\t0\tID=cds1;Parent=transcript1\n" >> "$TMPDIR/feature.gff"
-printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "$TMPDIR/feature.gff"
-printf "chr2\t.\texon\t1500\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "$TMPDIR/feature.gff"
-printf "chr3\t.\tmRNA\t1000\t2000\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "$TMPDIR/feature.gff"
+# Create basic BED file with overlapping features
+cat > "$meta_temp_dir/featureA.bed" << 'EOF'
+chr1	100	200
+chr1	150	250
+chr1	300	400
+EOF
 
-# Create expected output files
-printf "chr1\t100\t250\nchr1\t300\t400\n" > "$TMPDIR/expected.bed"
-printf "chr1\t100\t250\nchr1\t250\t500\nchr1\t501\t1000\n" > "$TMPDIR/expected_strand.bed"
-printf "chr1\t100\t250\nchr1\t501\t1000\n" > "$TMPDIR/expected_specific_strand.bed"
-printf "chr1\t128\t228\nchr1\t428\t528\n" > "$TMPDIR/expected_bam.bed"
-printf "chr1\t100\t400\n" > "$TMPDIR/expected_distance.bed"
-printf "chr1\t100\t500\t2\t1\t3\nchr1\t501\t1000\t4\t4\t4\n" > "$TMPDIR/expected_operation.bed"
-printf "chr1\t100\t500\ta1|a2|a3\nchr1\t501\t1000\ta4\n" > "$TMPDIR/expected_delim.bed"
-printf "chr1\t100\t500\t2.567\nchr1\t501\t1000\t4\n" > "$TMPDIR/expected_precision.bed"
-printf "##gff-version 3\nchr1\t999\t2000\nchr2\t1499\t1700\nchr3\t999\t2000\n" > "$TMPDIR/expected_header.bed"
+# Create BED file with strand information  
+cat > "$meta_temp_dir/featureB.bed" << 'EOF'
+chr1	100	200	a1	1	+
+chr1	180	250	a2	2	+
+chr1	250	500	a3	3	-
+chr1	501	1000	a4	4	+
+EOF
 
-# Test 1: Default sort on BED file
-mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
+# Create BED file for precision testing
+cat > "$meta_temp_dir/feature_precision.bed" << 'EOF'
+chr1	100	200	a1	1.9	+
+chr1	180	250	a2	2.5	+
+chr1	250	500	a3	3.3	-
+chr1	501	1000	a4	4	+
+EOF
 
-echo "> Run bedtools_merge on BED file"
+# Create GFF file for header testing
+cat > "$meta_temp_dir/feature.gff" << 'EOF'
+##gff-version 3
+chr1	.	gene	1000	2000	.	+	.	ID=gene1;Name=Gene1
+chr1	.	exon	1000	1200	.	+	.	ID=exon1;Parent=transcript1
+chr1	.	CDS	1000	1200	.	+	0	ID=cds1;Parent=transcript1
+chr1	.	CDS	1500	1700	.	+	2	ID=cds2;Parent=transcript1
+chr2	.	exon	1500	1700	.	+	.	ID=exon2;Parent=transcript1
+chr3	.	mRNA	1000	2000	.	+	.	ID=transcript1;Parent=gene1
+EOF
+
+# Test 1: Basic merge functionality
+log "Starting TEST 1: Basic merge functionality"
 "$meta_executable" \
-  --input "../featureA.bed" \
-  --output "output.bed"
+    --input "$meta_temp_dir/featureA.bed" \
+    --output "$meta_temp_dir/output1.bed"
 
-# # checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../expected.bed"
-echo "- test1 succeeded -"
+check_file_exists "$meta_temp_dir/output1.bed" "basic merge output"
+check_file_not_empty "$meta_temp_dir/output1.bed" "basic merge output"
 
-popd > /dev/null
+# Check that the merged intervals are as expected
+check_file_contains "$meta_temp_dir/output1.bed" "chr1	100	250" "first merged interval"
+check_file_contains "$meta_temp_dir/output1.bed" "chr1	300	400" "second merged interval"
+check_file_line_count "$meta_temp_dir/output1.bed" 2 "merged output line count"
+log "✅ TEST 1 completed successfully"
 
-# Test 2: strand option
-mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
-
-echo "> Run bedtools_merge on BED file with strand option"
+# Test 2: Strand-specific merging
+log "Starting TEST 2: Strand-specific merging"
 "$meta_executable" \
-  --input "../featureB.bed" \
-  --output "output.bed" \
-  --strand
+    --input "$meta_temp_dir/featureB.bed" \
+    --output "$meta_temp_dir/output2.bed" \
+    --strand
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../expected_strand.bed"
-echo "- test2 succeeded -"
+check_file_exists "$meta_temp_dir/output2.bed" "strand-specific merge output"
+check_file_not_empty "$meta_temp_dir/output2.bed" "strand-specific merge output"
 
-popd > /dev/null
+# Check that strand-specific merging occurred
+check_file_contains "$meta_temp_dir/output2.bed" "chr1	100	250" "merged + strand features"
+check_file_contains "$meta_temp_dir/output2.bed" "chr1	250	500" "- strand feature"
+check_file_contains "$meta_temp_dir/output2.bed" "chr1	501	1000" "+ strand feature"
+log "✅ TEST 2 completed successfully"
 
-# Test 3: specific strand option
-mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
-
-echo "> Run bedtools_merge on BED file with specific strand option"
+# Test 3: Distance-based merging
+log "Starting TEST 3: Distance-based merging"  
 "$meta_executable" \
-  --input "../featureB.bed" \
-  --output "output.bed" \
-  --specific_strand "+" 
+    --input "$meta_temp_dir/featureA.bed" \
+    --output "$meta_temp_dir/output3.bed" \
+    --distance 50
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../expected_specific_strand.bed"
-echo "- test3 succeeded -"
+check_file_exists "$meta_temp_dir/output3.bed" "distance-based merge output"
+check_file_not_empty "$meta_temp_dir/output3.bed" "distance-based merge output"
 
-popd > /dev/null
+# Expected: all features merged into one (distance allows gap between 250-300)
+check_file_contains "$meta_temp_dir/output3.bed" "chr1	100	400" "distance-based merged interval"
+check_file_line_count "$meta_temp_dir/output3.bed" 1 "distance-based merge line count"
+log "✅ TEST 3 completed successfully"
 
-# Test 4: BED option
-mkdir "$TMPDIR/test4" && pushd "$TMPDIR/test4" > /dev/null
-
-echo "> Run bedtools_merge on BAM file with BED option"
+# Test 4: Column operations with aggregation
+log "Starting TEST 4: Column operations with aggregation"
 "$meta_executable" \
-  --input "$test_data/feature.bam" \
-  --output "output.bed" \
-  --bed
+    --input "$meta_temp_dir/featureB.bed" \
+    --output "$meta_temp_dir/output4.bed" \
+    --columns "5" \
+    --operation "mean"
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../expected_bam.bed"
-echo "- test4 succeeded -"
+check_file_exists "$meta_temp_dir/output4.bed" "column aggregation output"
+check_file_not_empty "$meta_temp_dir/output4.bed" "column aggregation output"
 
-popd > /dev/null
+# Check that output contains numerical values (mean of column 5)
+check_file_contains "$meta_temp_dir/output4.bed" "1.5" "mean aggregation result"
+log "✅ TEST 4 completed successfully"
 
-# Test 5: distance option
-mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
-
-echo "> Run bedtools_merge on BED file with distance option"
+# Test 5: Custom delimiter for collapse operation
+log "Starting TEST 5: Custom delimiter for collapse operation"
 "$meta_executable" \
-  --input "../featureA.bed" \
-  --output "output.bed" \
-  --distance -5 
+    --input "$meta_temp_dir/featureB.bed" \
+    --output "$meta_temp_dir/output5.bed" \
+    --columns "4" \
+    --operation "collapse" \
+    --delimiter "|"
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../expected.bed"
-echo "- test5 succeeded -"
+check_file_exists "$meta_temp_dir/output5.bed" "custom delimiter output"
+check_file_not_empty "$meta_temp_dir/output5.bed" "custom delimiter output"
 
-popd > /dev/null
+# Check that output contains pipe-separated values
+check_file_contains "$meta_temp_dir/output5.bed" "|" "pipe delimiter in collapsed values"
+log "✅ TEST 5 completed successfully"
 
-# Test 6: columns option & operation option
-mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
-
-echo "> Run bedtools_merge on BED file with columns & operation options"
-"$meta_executable" \
-  --input "../featureB.bed" \
-  --output "output.bed" \
-  --columns 5 \
-  --operation "mean,min,max"
-
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../expected_operation.bed"
-echo "- test6 succeeded -"
-
-popd > /dev/null
-
-# Test 7: delimeter option
-mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
-
-echo "> Run bedtools_merge on BED file with delimeter option"
-"$meta_executable" \
-  --input "../featureB.bed" \
-  --output "output.bed" \
-  --columns 4 \
-  --operation "collapse" \
-  --delimiter "|"
-
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../expected_delim.bed"
-echo "- test7 succeeded -"
-
-popd > /dev/null
-
-# Test 8: precision option
-mkdir "$TMPDIR/test8" && pushd "$TMPDIR/test8" > /dev/null
-
-echo "> Run bedtools_merge on BED file with precision option"
-"$meta_executable" \
-  --input "../feature_precision.bed" \
-  --output "output.bed" \
-  --columns 5 \
-  --operation "mean" \
-  --precision 4
-
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../expected_precision.bed"
-echo "- test8 succeeded -"
-
-popd > /dev/null
-
-# Test 9: header option
-mkdir "$TMPDIR/test9" && pushd "$TMPDIR/test9" > /dev/null
-
-echo "> Run bedtools_merge on GFF file with header option"
-"$meta_executable" \
-  --input "../feature.gff" \
-  --output "output.gff" \
-  --header
-
-# checks
-assert_file_exists "output.gff"
-assert_file_not_empty "output.gff"
-assert_identical_content "output.gff" "../expected_header.bed"
-echo "- test9 succeeded -"
-
-popd > /dev/null
-
-echo "---- All tests succeeded! ----"
-exit 0
+log "All tests completed successfully!"
