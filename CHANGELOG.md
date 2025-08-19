@@ -12,6 +12,18 @@
   - `fq/fq_filter`: Filter FASTQ files based on record names or sequence patterns (PR #182).
   - `fq/fq_generate`: Generate a random FASTQ file pair for testing and simulation purposes (PR #182).
 
+* `bwa`: Added BWA support for single-end and paired-end read alignment (PR #183).
+  - `bwa/bwa_index`: Create BWA index files for reference genome alignment.
+  - `bwa/bwa_mem`: BWA-MEM algorithm for sequence alignment supporting single-end and paired-end reads.
+  - `bwa/bwa_aln`: BWA aln algorithm for aligning short sequence reads to a reference genome.
+  - `bwa/bwa_samse`: BWA samse - generate single-end alignment in SAM format from BWA aln SAI files.
+  - `bwa/bwa_sampe`: BWA sampe - generate paired-end alignment in SAM format from BWA aln SAI files.
+
+* `bowtie2`: Add support for Bowtie2 alignment and indexing (PR #184).
+  - `bowtie2/bowtie2_build`: Build Bowtie2 index files from reference sequences.
+  - `bowtie2/bowtie2_align`: Align single-end and paired-end reads using Bowtie2.
+  - `bowtie2/bowtie2_inspect`: Extract information from Bowtie2 index files.
+
 ## MINOR CHANGES
 
 * `arriba`: Updated to v2.5.0 and refactored script and tests based on latest contributing guidelines (PR #187).

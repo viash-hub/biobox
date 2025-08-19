@@ -1,0 +1,24 @@
+```
+docker run --rm quay.io/biocontainers/bowtie2:2.5.4--he96a11b_6 bowtie2-inspect -h
+```
+
+Bowtie 2 version 2.5.4 by Ben Langmead (langmea@cs.jhu.edu, www.cs.jhu.edu/~langmea)
+Usage: bowtie2-inspect [options]* <bt2_base>
+  <bt2_base>         bt2 filename minus trailing .1.bt2/.2.bt2
+
+  By default, prints FASTA records of the indexed nucleotide sequences to
+  standard out.  With -n, just prints names.  With -s, just prints a summary of
+  the index parameters and sequences.
+
+Options:
+  --large-index      force inspection of the 'large' index, even if a
+                     'small' one is present.
+  --debug            use the debug binary; slower, assertions enabled
+  --sanitized        use sanitized binary; slower, uses ASan and/or UBSan
+  --verbose          log the issued command
+  -a/--across <int>  Number of characters across in FASTA output (default: 60)
+  -n/--names         Print reference sequence names only
+  -s/--summary       Print summary incl. ref names, lengths, index properties
+  -o/--output        Save output to filename (default stdout)
+  -v/--verbose       Verbose output (for debugging)
+  -h/--help          print this and message quit

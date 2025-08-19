@@ -1,0 +1,483 @@
+name: bowtie2_align
+namespace: bowtie2
+description: |
+  Align single-end and paired-end reads to a reference genome using Bowtie2.
+  
+  Bowtie2 is an ultrafast and memory-efficient tool for aligning sequencing reads
+  to long reference sequences. It is particularly good at aligning reads of about
+  50 up to 100s of characters, and particularly good at aligning to relatively
+  long (e.g. mammalian) genomes.
+keywords: [Alignment, Sequencing]
+links:
+  homepage: https://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+  documentation: https://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
+  repository: https://github.com/BenLangmead/bowtie2
+references:
+  doi: 10.1038/nmeth.1923
+license: GPL-3.0
+requirements:
+  commands: [bowtie2]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --index
+        type: string
+        description: Index filename prefix (minus trailing .X.bt2).
+        required: true
+        example: genome_index
+
+      - name: --mate1
+        type: file
+        multiple: true
+        description: "Files with #1 mates, paired with files in --mate2."
+        example: reads_R1.fastq.gz
+
+      - name: --mate2
+        type: file
+        multiple: true
+        description: "Files with #2 mates, paired with files in --mate1."
+        example: reads_R2.fastq.gz
+
+      - name: --unpaired
+        type: file
+        multiple: true
+        description: Files with unpaired reads.
+        example: reads.fastq.gz
+
+      - name: --interleaved
+        type: file
+        multiple: true
+        description: Files with interleaved paired-end FASTQ/FASTA reads.
+        example: interleaved.fastq.gz
+
+      - name: --bam_input
+        type: file
+        multiple: true
+        description: Files are unaligned BAM sorted by read name.
+        example: unaligned.bam
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: File for SAM output (default stdout).
+        required: true
+        example: aligned.sam
+
+      - name: --un
+        type: file
+        direction: output
+        description: Write unpaired reads that didn't align to file.
+        example: unaligned.fastq
+
+      - name: --al
+        type: file
+        direction: output
+        description: Write unpaired reads that aligned at least once to file.
+        example: aligned.fastq
+
+      - name: --un_conc
+        type: file
+        direction: output
+        description: Write pairs that didn't align concordantly to file.
+        example: unaligned_pairs.fastq
+
+      - name: --al_conc
+        type: file
+        direction: output
+        description: Write pairs that aligned concordantly at least once to file.
+        example: aligned_pairs.fastq
+
+      - name: --met_file
+        type: file
+        direction: output
+        description: Send metrics to file.
+        example: metrics.txt
+
+  - name: Input Format Options
+    arguments:
+      - name: --fastq
+        type: boolean_true
+        description: Query input files are FASTQ .fq/.fastq (default).
+
+      - name: --tab5
+        type: boolean_true
+        description: Query input files are TAB5 .tab5.
+
+      - name: --tab6
+        type: boolean_true
+        description: Query input files are TAB6 .tab6.
+
+      - name: --qseq
+        type: boolean_true
+        description: Query input files are in Illumina's qseq format.
+
+      - name: --fasta
+        type: boolean_true
+        description: Query input files are (multi-)FASTA .fa/.mfa.
+
+      - name: --raw
+        type: boolean_true
+        description: Query input files are raw one-sequence-per-line.
+
+      - name: --cmdline
+        type: boolean_true
+        description: <m1>, <m2>, <r> are sequences themselves, not files.
+
+      - name: --skip
+        type: integer
+        description: Skip the first <int> reads/pairs in the input.
+        example: 1000
+
+      - name: --upto
+        type: integer
+        description: Stop after first <int> reads/pairs.
+        example: 10000
+
+      - name: --trim5
+        type: integer
+        description: Trim <int> bases from 5'/left end of reads.
+        example: 5
+
+      - name: --trim3
+        type: integer
+        description: Trim <int> bases from 3'/right end of reads.
+        example: 3
+
+      - name: --trim_to
+        type: string
+        description: "Trim reads exceeding <int> bases from either 3' or 5' end. Format: [3:|5:]<int>"
+        example: "3:100"
+
+      - name: --continuous_fasta
+        type: string
+        description: "Query input files are continuous FASTA where reads are k-mers. Format: k:<int>,i:<int>"
+        example: "k:25,i:1"
+
+      - name: --phred33
+        type: boolean_true
+        description: Qualities are Phred+33 (default).
+
+      - name: --phred64
+        type: boolean_true
+        description: Qualities are Phred+64.
+
+      - name: --int_quals
+        type: boolean_true
+        description: Qualities encoded as space-delimited integers.
+
+  - name: Alignment Presets
+    arguments:
+      - name: --very_fast
+        type: boolean_true
+        description: Same as -D 5 -R 1 -N 0 -L 22 -i S,0,2.50.
+
+      - name: --fast
+        type: boolean_true
+        description: Same as -D 10 -R 2 -N 0 -L 22 -i S,0,2.50.
+
+      - name: --sensitive
+        type: boolean_true
+        description: Same as -D 15 -R 2 -N 0 -L 22 -i S,1,1.15 (default).
+
+      - name: --very_sensitive
+        type: boolean_true
+        description: Same as -D 20 -R 3 -N 0 -L 20 -i S,1,0.50.
+
+      - name: --very_fast_local
+        type: boolean_true
+        description: Same as -D 5 -R 1 -N 0 -L 25 -i S,1,2.00.
+
+      - name: --fast_local
+        type: boolean_true
+        description: Same as -D 10 -R 2 -N 0 -L 22 -i S,1,1.75.
+
+      - name: --sensitive_local
+        type: boolean_true
+        description: Same as -D 15 -R 2 -N 0 -L 20 -i S,1,0.75.
+
+      - name: --very_sensitive_local
+        type: boolean_true
+        description: Same as -D 20 -R 3 -N 0 -L 20 -i S,1,0.50.
+
+  - name: Alignment Options
+    arguments:
+      - name: --N
+        type: integer
+        description: "Max # mismatches in seed alignment; can be 0 or 1."
+        example: 1
+
+      - name: --L
+        type: integer
+        description: Length of seed substrings; must be >3, <32.
+        example: 22
+
+      - name: --i
+        type: string
+        description: Interval between seed substrings w/r/t read len.
+        example: "S,1,1.15"
+
+      - name: --n_ceil
+        type: string
+        description: "Function for max # non-A/C/G/Ts permitted in aln."
+        example: "L,0,0.15"
+
+      - name: --dpad
+        type: integer
+        description: Include <int> extra ref chars on sides of DP table.
+        example: 15
+
+      - name: --gbar
+        type: integer
+        description: Disallow gaps within <int> nucs of read extremes.
+        example: 4
+
+      - name: --ignore_quals
+        type: boolean_true
+        description: Treat all quality values as 30 on Phred scale.
+
+      - name: --nofw
+        type: boolean_true
+        description: Do not align forward (original) version of read.
+
+      - name: --norc
+        type: boolean_true
+        description: Do not align reverse-complement version of read.
+
+      - name: --no_1mm_upfront
+        type: boolean_true
+        description: Do not allow 1 mismatch alignments before attempting to scan for the optimal seeded alignments.
+
+      - name: --end_to_end
+        type: boolean_true
+        description: Entire read must align; no clipping (default).
+
+      - name: --local
+        type: boolean_true
+        description: Local alignment; ends might be soft clipped.
+
+  - name: Scoring Options
+    arguments:
+      - name: --ma
+        type: integer
+        description: Match bonus (0 for --end-to-end, 2 for --local).
+        example: 2
+
+      - name: --mp
+        type: string
+        description: Max penalty for mismatch; lower qual = lower penalty.
+        example: "6"
+
+      - name: --np
+        type: integer
+        description: Penalty for non-A/C/G/Ts in read/ref.
+        example: 1
+
+      - name: --rdg
+        type: string
+        description: Read gap open, extend penalties.
+        example: "5,3"
+
+      - name: --rfg
+        type: string
+        description: Reference gap open, extend penalties.
+        example: "5,3"
+
+      - name: --score_min
+        type: string
+        description: Min acceptable alignment score w/r/t read length.
+        example: "L,-0.6,-0.6"
+
+  - name: Reporting Options
+    arguments:
+      - name: --k
+        type: integer
+        description: Report up to <int> alns per read; MAPQ not meaningful.
+        example: 10
+
+      - name: --all
+        type: boolean_true
+        description: Report all alignments; very slow, MAPQ not meaningful.
+
+  - name: Effort Options
+    arguments:
+      - name: --D
+        type: integer
+        description: Give up extending after <int> failed extends in a row.
+        example: 15
+
+      - name: --R
+        type: integer
+        description: For reads w/ repetitive seeds, try <int> sets of seeds.
+        example: 2
+
+  - name: Paired-end Options
+    arguments:
+      - name: --minins
+        type: integer
+        description: Minimum fragment length.
+        example: 0
+
+      - name: --maxins
+        type: integer
+        description: Maximum fragment length.
+        example: 500
+
+      - name: --fr
+        type: boolean_true
+        description: -1, -2 mates align fw/rev (default).
+
+      - name: --rf
+        type: boolean_true
+        description: -1, -2 mates align rev/fw.
+
+      - name: --ff
+        type: boolean_true
+        description: -1, -2 mates align fw/fw.
+
+      - name: --no_mixed
+        type: boolean_true
+        description: Suppress unpaired alignments for paired reads.
+
+      - name: --no_discordant
+        type: boolean_true
+        description: Suppress discordant alignments for paired reads.
+
+      - name: --dovetail
+        type: boolean_true
+        description: Concordant when mates extend past each other.
+
+      - name: --no_contain
+        type: boolean_true
+        description: Not concordant when one mate alignment contains other.
+
+      - name: --no_overlap
+        type: boolean_true
+        description: Not concordant when mates overlap at all.
+
+  - name: SAM Output Options
+    arguments:
+      - name: --time
+        type: boolean_true
+        description: Print wall-clock time taken by search phases.
+
+      - name: --quiet
+        type: boolean_true
+        description: Print nothing to stderr except serious errors.
+
+      - name: --met_stderr
+        type: boolean_true
+        description: Send metrics to stderr.
+
+      - name: --met
+        type: integer
+        description: Report internal counters & metrics every <int> secs.
+        example: 1
+
+      - name: --no_unal
+        type: boolean_true
+        description: Suppress SAM records for unaligned reads.
+
+      - name: --no_head
+        type: boolean_true
+        description: Suppress header lines, i.e. lines starting with @.
+
+      - name: --no_sq
+        type: boolean_true
+        description: Suppress @SQ header lines.
+
+      - name: --rg_id
+        type: string
+        description: "Set read group id, reflected in @RG line and RG:Z: opt field."
+        example: "sample1"
+
+      - name: --rg
+        type: string
+        description: Add <text> ("lab:value") to @RG line of SAM header.
+        example: "SM:sample1"
+
+      - name: --omit_sec_seq
+        type: boolean_true
+        description: Put '*' in SEQ and QUAL fields for secondary alignments.
+
+      - name: --sam_no_qname_trunc
+        type: boolean_true
+        description: Suppress standard behavior of truncating readname at first whitespace.
+
+      - name: --xeq
+        type: boolean_true
+        description: Use '='/'X', instead of 'M,' to specify matches/mismatches in SAM record.
+
+      - name: --soft_clipped_unmapped_tlen
+        type: boolean_true
+        description: Exclude soft-clipped bases when reporting TLEN.
+
+      - name: --sam_append_comment
+        type: boolean_true
+        description: Append FASTA/FASTQ comment to SAM record.
+
+      - name: --sam_opt_config
+        type: string
+        description: "Use config to toggle SAM Optional fields. Example: '-MD,YP,-AS'"
+        example: "-MD,YP,-AS"
+
+  - name: BAM Options
+    arguments:
+      - name: --align_paired_reads
+        type: boolean_true
+        description: Align paired-end reads instead of unpaired BAM reads.
+
+      - name: --preserve_tags
+        type: boolean_true
+        description: Preserve tags from the original BAM record.
+
+  - name: Performance Options
+    arguments:
+      - name: --reorder
+        type: boolean_true
+        description: Force SAM output order to match order of input reads.
+
+      - name: --mm
+        type: boolean_true
+        description: Use memory-mapped I/O for index; many 'bowtie's can share.
+
+  - name: Other Options
+    arguments:
+      - name: --qc_filter
+        type: boolean_true
+        description: Filter out reads that are bad according to QSEQ filter.
+
+      - name: --seed
+        type: integer
+        description: Seed for random number generator.
+        example: 42
+
+      - name: --non_deterministic
+        type: boolean_true
+        description: Seed rand. gen. arbitrarily instead of using read attributes.
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bowtie2:2.5.4--he96a11b_6
+    setup:
+      - type: docker
+        run: |
+          bowtie2 --version 2>&1 | head -1 | sed 's/.*version /bowtie2: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
