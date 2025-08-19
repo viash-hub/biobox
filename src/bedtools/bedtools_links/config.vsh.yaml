@@ -1,14 +1,19 @@
 name: bedtools_links
 namespace: bedtools
-description: | 
-  Creates an HTML file with links to an instance of the UCSC Genome Browser for all features / intervals in a file. 
-  This is useful for cases when one wants to manually inspect through a large set of annotations or features.
-keywords: [Links, BED, GFF, VCF]
+description: |
+  This tool generates an HTML page containing links to the UCSC Genome Browser
+  for each feature/interval in the input file. This is particularly useful for
+  manually inspecting large sets of genomic annotations or features through
+  the browser interface.
+  
+  **Default behavior:** Links point to human genome (hg18) on the main UCSC site
+  **Customization:** Supports custom mirror sites and different organisms/builds
+
+keywords: [HTML, Links, UCSC, Browser, BED, GFF, VCF]
 links:
   documentation: https://bedtools.readthedocs.io/en/latest/content/tools/links.html
   repository: https://github.com/arq5x/bedtools2
-  homepage: https://bedtools.readthedocs.io/en/latest/#
-  issue_tracker: https://github.com/arq5x/bedtools2/issues
+  homepage: https://bedtools.readthedocs.io/en/latest/
 references:
   doi: 10.1093/bioinformatics/btq033
 license: MIT
@@ -16,57 +21,78 @@ requirements:
   commands: [bedtools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [author, maintainer]
 
 argument_groups:
   - name: Inputs
     arguments:
       - name: --input
-        alternatives: -i
+        alternatives: [-i]
         type: file
-        description: Input file (bed/gff/vcf).
+        description: |
+          Input file in BED, GFF, or VCF format containing genomic intervals.
+          
+          Each feature/interval will be converted to a clickable link pointing
+          to the UCSC Genome Browser. File format is auto-detected based on
+          content and extension.
         required: true
+        example: intervals.bed
     
   - name: Outputs
     arguments:
       - name: --output
-        alternatives: -o
+        alternatives: [-o]
         type: file
         direction: output
-        description: Output HTML file to be written.
+        description: |
+          Output HTML file containing clickable browser links.
+          
+          The generated HTML page will contain one link per input feature,
+          formatted for easy navigation to the UCSC Genome Browser.
+        required: true
+        example: browser_links.html
 
   - name: Options
-    description: |
-      By default, the links created will point to human (hg18) UCSC browser.
-      If you have a local mirror, you can override this behavior by supplying
-      the -base, -org, and -db options.
-
-      For example, if the URL of your local mirror for mouse MM9 is called: 
-      http://mymirror.myuniversity.edu, then you would use the following:
-      --base_url http://mymirror.myuniversity.edu
-      --organism mouse
-      --database mm9
     arguments:
       - name: --base_url
-        alternatives: -base
+        alternatives: [-base]
         type: string
-        description: | 
-          The “basename” for the UCSC browser.
-        default: http://genome.ucsc.edu
+        description: |
+          Base URL for the UCSC Genome Browser instance.
+          
+          **Default:** http://genome.ucsc.edu (official UCSC site)
+          **Custom mirrors:** Use your institution's mirror URL
+          **Example:** http://mymirror.myuniversity.edu
+        example: "http://genome.ucsc.edu"
       
       - name: --organism
-        alternatives: -org
+        alternatives: [-org]
         type: string
-        description: | 
-          The organism (e.g. mouse, human). 
-        default: human
+        description: |
+          Target organism for genome browser links.
+          
+          **Common values:**
+          - human (default)
+          - mouse
+          - rat
+          - fly
+          - worm
+          
+          Must match organism names used by your UCSC browser instance.
+        example: "human"
 
       - name: --database
-        alternatives: -db
+        alternatives: [-db]
         type: string
-        description: | 
-          The genome build. 
-        default: hg18
+        description: |
+          Genome assembly/build identifier.
+          
+          **Human examples:** hg19, hg38, hg18 (default)
+          **Mouse examples:** mm9, mm10, mm39
+          **Other:** Assembly names as recognized by UCSC browser
+          
+          Must correspond to available assemblies for the specified organism.
+        example: "hg18"
       
 resources:
   - type: bash_script
@@ -75,16 +101,16 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
 
 engines:
   - type: docker
-    image: debian:stable-slim
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
     setup:
-      - type: apt
-        packages: [bedtools, procps]
       - type: docker
-        run: |
-          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+        run:
+          - "bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt"
 
 runners:
   - type: executable

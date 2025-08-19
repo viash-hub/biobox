@@ -1,9 +1,9 @@
-```
-bedtools links -h
+```bash
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools links -h
 ```
 
 Tool:    bedtools links (aka linksBed)
-Version: v2.30.0
+Version: v2.31.1
 Summary: Creates HTML links to an UCSC Genome Browser from a feature file.
 
 Usage:   bedtools links [OPTIONS] -i <bed/gff/vcf> > out.html
