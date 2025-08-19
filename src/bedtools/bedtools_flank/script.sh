@@ -1,18 +1,20 @@
 #!/bin/bash
 
-set -eo pipefail
-
 ## VIASH START
 ## VIASH END
 
-# Build command arguments
-args=(-i "$par_input" -g "$par_genome")
+set -eo pipefail
 
-# Add flanking distance options (mutually exclusive groups)
+# unset flags
+[[ "$par_strand" == "false" ]] && unset par_strand
+[[ "$par_percent" == "false" ]] && unset par_percent
+[[ "$par_header" == "false" ]] && unset par_header
+
+# Validate flanking distance options (mutually exclusive groups)
 if [ -n "$par_both" ]; then
-    args+=(-b "$par_both")
+    flanking_args=(-b "$par_both")
 elif [ -n "$par_left" ] && [ -n "$par_right" ]; then
-    args+=(-l "$par_left" -r "$par_right")
+    flanking_args=(-l "$par_left" -r "$par_right")
 elif [ -n "$par_left" ] || [ -n "$par_right" ]; then
     echo "Error: --left and --right must be used together" >&2
     exit 1
@@ -21,19 +23,15 @@ else
     exit 1
 fi
 
-# Add behavioral options
-if [ "$par_strand" = "true" ]; then
-    args+=(-s)
-fi
-
-if [ "$par_percent" = "true" ]; then
-    args+=(-pct)
-fi
-
-# Add output options
-if [ "$par_header" = "true" ]; then
-    args+=(-header)
-fi
+# Build command arguments array
+cmd_args=(
+    -i "$par_input"
+    -g "$par_genome"
+    "${flanking_args[@]}"
+    ${par_strand:+-s}
+    ${par_percent:+-pct}
+    ${par_header:+-header}
+)
 
 # Execute bedtools flank
-bedtools flank "${args[@]}" > "$par_output"
+bedtools flank "${cmd_args[@]}" > "$par_output"

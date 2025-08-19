@@ -1,68 +1,48 @@
 #!/bin/bash
 
-set -eo pipefail
-
 ## VIASH START
 ## VIASH END
 
-# Build command arguments
-args=(-a "$par_input_a" -b "$par_input_b" -g "$par_genome")
+set -eo pipefail
 
-# Add overlap options
-if [ "$par_merge_overlaps" = "true" ]; then
-    args+=(-m)
-fi
+# unset flags
+unset_if_false=(
+    par_merge_overlaps
+    par_reciprocal
+    par_either
+    par_same_strand
+    par_opposite_strand
+    par_split
+    par_bed_output
+    par_header
+    par_no_name_check
+    par_no_buffer
+)
 
-if [ -n "$par_min_overlap_a" ]; then
-    args+=(-f "$par_min_overlap_a")
-fi
+for par in "${unset_if_false[@]}"; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
 
-if [ -n "$par_min_overlap_b" ]; then
-    args+=(-F "$par_min_overlap_b")
-fi
-
-if [ "$par_reciprocal" = "true" ]; then
-    args+=(-r)
-fi
-
-if [ "$par_either" = "true" ]; then
-    args+=(-e)
-fi
-
-# Add strand options
-if [ "$par_same_strand" = "true" ]; then
-    args+=(-s)
-fi
-
-if [ "$par_opposite_strand" = "true" ]; then
-    args+=(-S)
-fi
-
-# Add format options
-if [ "$par_split" = "true" ]; then
-    args+=(-split)
-fi
-
-if [ "$par_bed_output" = "true" ]; then
-    args+=(-bed)
-fi
-
-if [ "$par_header" = "true" ]; then
-    args+=(-header)
-fi
-
-# Add advanced options
-if [ "$par_no_name_check" = "true" ]; then
-    args+=(-nonamecheck)
-fi
-
-if [ "$par_no_buffer" = "true" ]; then
-    args+=(-nobuf)
-fi
-
-if [ -n "$par_io_buffer" ]; then
-    args+=(-iobuf "$par_io_buffer")
-fi
+# Build command arguments array
+cmd_args=(
+    -a "$par_input_a"
+    -b "$par_input_b"
+    -g "$par_genome"
+    ${par_merge_overlaps:+-m}
+    ${par_min_overlap_a:+-f "$par_min_overlap_a"}
+    ${par_min_overlap_b:+-F "$par_min_overlap_b"}
+    ${par_reciprocal:+-r}
+    ${par_either:+-e}
+    ${par_same_strand:+-s}
+    ${par_opposite_strand:+-S}
+    ${par_split:+-split}
+    ${par_bed_output:+-bed}
+    ${par_header:+-header}
+    ${par_no_name_check:+-nonamecheck}
+    ${par_no_buffer:+-nobuf}
+    ${par_io_buffer:+-iobuf "$par_io_buffer"}
+)
 
 # Execute bedtools fisher
-bedtools fisher "${args[@]}" > "$par_output"
+bedtools fisher "${cmd_args[@]}" > "$par_output"
