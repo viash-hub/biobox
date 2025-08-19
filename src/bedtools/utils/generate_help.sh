@@ -61,7 +61,7 @@ for SUBCOMMAND in "${SUBCOMMANDS[@]}"; do
   echo "Generating help for $TOOL $SUBCOMMAND"
 
   DEST="src/$TOOL/${TOOL}_$SUBCOMMAND/help.txt"
-  CMD="docker run --rm \"$DOCKER_IMAGE\" \"$TOOL\" \"$SUBCOMMAND\" -h"
+  CMD="docker run --rm $DOCKER_IMAGE $TOOL $SUBCOMMAND -h"
 
   # skip if help doesn't already exist
   if [ ! -f "$DEST" ]; then
