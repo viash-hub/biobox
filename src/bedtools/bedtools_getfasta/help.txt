@@ -1,0 +1,30 @@
+```bash
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools getfasta -h
+```
+
+Tool:    bedtools getfasta (aka fastaFromBed)
+Version: v2.31.1
+Summary: Extract DNA sequences from a fasta file based on feature coordinates.
+
+Usage:   bedtools getfasta [OPTIONS] -fi <fasta> -bed <bed/gff/vcf>
+
+Options: 
+	-fi		Input FASTA file
+	-fo		Output file (opt., default is STDOUT
+	-bed		BED/GFF/VCF file of ranges to extract from -fi
+	-name		Use the name field and coordinates for the FASTA header
+	-name+		(deprecated) Use the name field and coordinates for the FASTA header
+	-nameOnly	Use the name field for the FASTA header
+	-split		Given BED12 fmt., extract and concatenate the sequences
+			from the BED "blocks" (e.g., exons)
+	-tab		Write output in TAB delimited format.
+	-bedOut		Report extract sequences in a tab-delimited BED format instead of in FASTA format.
+			- Default is FASTA format.
+	-s		Force strandedness. If the feature occupies the antisense,
+			strand, the sequence will be reverse complemented.
+			- By default, strand information is ignored.
+	-fullHeader	Use full fasta header.
+			- By default, only the word before the first space or tab 
+			is used.
+	-rna	The FASTA is RNA not DNA. Reverse complementation handled accordingly.
+
