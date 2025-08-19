@@ -20,13 +20,9 @@ license: MIT
 requirements:
   commands: [bedtools]
 
-engines:
-  - type: docker
-    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
-    setup:
-      - type: docker
-        run: |
-          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
 
 argument_groups:
   - name: Inputs
@@ -90,7 +86,10 @@ test_resources:
     path: test.sh
   - path: /src/_utils/test_helpers.sh
 
-authors:
-  - name: Robrecht Cannoodt
-    email: rcannood@gmail.com
-    roles: [author]
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
