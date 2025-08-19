@@ -1,13 +1,15 @@
 name: bedtools_bamtofastq
 namespace: bedtools
 description: | 
-  Conversion tool for extracting FASTQ records from sequence alignments in BAM format.
-keywords: [Conversion ,BAM, FASTQ]
+  Convert BAM alignments to FASTQ files.
+  
+  This tool extracts FASTQ records from sequence alignments in BAM format,
+  supporting both single-end and paired-end data extraction.
+keywords: [Conversion, BAM, FASTQ]
 links:
   documentation: https://bedtools.readthedocs.io/en/latest/content/tools/bamtofastq.html
   repository: https://github.com/arq5x/bedtools2
-  homepage: https://bedtools.readthedocs.io/en/latest/#
-  issue_tracker: https://github.com/arq5x/bedtools2/issues
+  homepage: https://bedtools.readthedocs.io/en/latest/
 references:
   doi: 10.1093/bioinformatics/btq033
 license: MIT
@@ -15,40 +17,60 @@ requirements:
   commands: [bedtools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [author, maintainer]
 
 argument_groups:
   - name: Inputs
     arguments:
       - name: --input
-        alternatives: -i
+        alternatives: [-i]
         type: file
-        description: Input BAM file to be converted to FASTQ.
+        description: |
+          Input BAM file to be converted to FASTQ.
+          
+          **Requirements:**
+          - Must be in BAM format
+          - For paired-end output, should be sorted by query name
         required: true
+        example: input.bam
     
   - name: Outputs
     arguments:
       - name: --fastq
-        alternatives: -fq
+        alternatives: [-fq]
         direction: output
         type: file
-        description: Output FASTQ file.
+        description: |
+          Output FASTQ file for single-end data or first mate in paired-end data.
+          
+          **Output format:** Standard FASTQ format with sequence and quality scores
         required: true
+        example: output.fastq
       
       - name: --fastq2
-        alternatives: -fq2
+        alternatives: [-fq2]
         type: file
         direction: output
         description: |
-          FASTQ for second end. Used if BAM contains paired-end data.
-          BAM should be sorted by query name is creating paired FASTQ.
+          Output FASTQ file for second mate in paired-end data.
+          
+          **Usage:**
+          - Required only for paired-end BAM files
+          - BAM should be sorted by query name for proper pairing
+          - If omitted, only first mates or single-end reads are extracted
+        example: output_R2.fastq
          
   - name: Options
     arguments:
       - name: --tags
         type: boolean_true
         description: |
-          Create FASTQ based on the mate info in the BAM R2 and Q2 tags.
+          Create FASTQ based on mate information in BAM R2 and Q2 tags.
+          
+          **Usage:**
+          - Uses R2 tag for second mate sequence
+          - Uses Q2 tag for second mate quality scores
+          - Alternative to requiring coordinate-sorted paired BAM
 
 resources:
   - type: bash_script
@@ -57,17 +79,16 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - path: test_data
+  - type: file
+    path: /src/_utils/test_helpers.sh
 
 engines:
   - type: docker
-    image: debian:stable-slim
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
     setup:
-      - type: apt
-        packages: [bedtools, procps]
       - type: docker
-        run: |
-          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+        run:
+          - "bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt"
 
 runners:
   - type: executable
