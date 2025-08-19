@@ -3,7 +3,9 @@
 ## VIASH START
 ## VIASH END
 
-# Unset parameters
+set -eo pipefail
+
+# Unset false flags to prevent them from being passed to bedtools
 unset_if_false=(
     par_sizeA
     par_sizeD
@@ -19,8 +21,9 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
-# Execute bedtools sort with the provided arguments
+# Execute bedtools sort
 bedtools sort \
+    -i "$par_input" \
     ${par_sizeA:+-sizeA} \
     ${par_sizeD:+-sizeD} \
     ${par_chrThenSizeA:+-chrThenSizeA} \
@@ -30,5 +33,4 @@ bedtools sort \
     ${par_genome:+-g "$par_genome"} \
     ${par_faidx:+-faidx "$par_faidx"} \
     ${par_header:+-header} \
-    -i "$par_input" \
     > "$par_output"
