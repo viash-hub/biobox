@@ -1,0 +1,128 @@
+name: bedtools_maskfasta
+namespace: bedtools
+description: |
+  Mask regions in a FASTA file based on genomic coordinates.
+  
+  bedtools maskfasta masks sequences in a FASTA file based on coordinates defined 
+  in a BED/GFF/VCF file. Masked regions can be replaced with Ns (hard masking), 
+  converted to lowercase (soft masking), or replaced with custom characters.
+  
+  This tool is commonly used for:
+  - Masking repetitive elements or low-quality regions
+  - Creating masked reference genomes for alignment
+  - Removing specific genomic features from sequences
+  - Preparing sequences for downstream analysis
+
+keywords: [genomics, fasta, masking, sequences, bed]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/maskfasta.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/maskfasta.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input_fasta
+        alternatives: [-fi]
+        type: file
+        description: |
+          Input FASTA file to mask.
+          
+          **Format:** FASTA format with nucleotide sequences
+          **Content:** Reference sequences or assembled contigs
+          **Usage:** Sequences will be masked at coordinates specified in the BED file
+          **Requirements:** Must contain sequences referenced in the BED file
+        required: true
+        example: reference_genome.fasta
+
+      - name: --input_bed
+        alternatives: [-bed]
+        type: file
+        description: |
+          BED/GFF/VCF file specifying regions to mask.
+          
+          **Format:** BED, GFF, or VCF file with genomic coordinates
+          **Content:** Coordinates of regions to mask in the FASTA file
+          **Usage:** Each interval defines a region to be masked
+          **Requirements:** Chromosome names must match FASTA headers
+        required: true
+        example: regions_to_mask.bed
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        alternatives: [-fo]
+        type: file
+        description: |
+          Output FASTA file with masked sequences.
+          
+          **Format:** FASTA format with masked sequences
+          **Content:** Same sequences as input with specified regions masked
+          **Masking:** Regions replaced with Ns, lowercase, or custom characters
+        required: true
+        direction: output
+        example: masked_genome.fasta
+
+  - name: Masking Options
+    arguments:
+      - name: --soft_mask
+        alternatives: [-soft]
+        type: boolean_true
+        description: |
+          Use soft masking (lowercase bases) instead of hard masking (Ns).
+          
+          **Default:** Hard masking with N characters
+          **Soft masking:** Converts masked regions to lowercase letters
+          **Usage:** Preserves sequence information while indicating masked regions
+          **Applications:** Useful for some alignment tools that recognize soft masking
+
+      - name: --mask_character
+        alternatives: [-mc]
+        type: string
+        description: |
+          Custom character to use for masking instead of N.
+          
+          **Default:** N (hard masking) or lowercase (soft masking)
+          **Usage:** Replace masked regions with specified character
+          **Example:** X, -, or any single character
+          **Note:** Overrides soft masking when specified
+        example: "X"
+
+      - name: --full_header
+        alternatives: [-fullHeader]
+        type: boolean_true
+        description: |
+          Use complete FASTA headers in output.
+          
+          **Default:** Use only text before first space/tab in header
+          **Full header:** Preserves entire header line including descriptions
+          **Usage:** Maintains complete sequence annotations and metadata
+          **Applications:** Important when headers contain essential information
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
