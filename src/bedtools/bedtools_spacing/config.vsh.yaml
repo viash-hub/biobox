@@ -1,0 +1,134 @@
+name: bedtools_spacing
+namespace: bedtools
+description: |
+  Calculate gaps between adjacent genomic intervals within each chromosome.
+  
+  bedtools spacing analyzes sorted genomic intervals and reports the gap length 
+  between each interval and its predecessor on the same chromosome. The gap distances 
+  are added as an additional column to the output, providing insight into the spatial 
+  distribution of features.
+  
+  This tool is commonly used for:
+  - Analyzing spacing patterns in genomic features
+  - Quality control of interval datasets and their density
+  - Identifying clustering or regular spacing in genomic data
+  - Preprocessing for downstream spatial analysis
+  - Detecting overlapping or adjacent intervals in datasets
+  - Statistical analysis of genomic feature distribution
+
+keywords: [genomics, intervals, spacing, gaps, distance, distribution, clustering]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/spacing.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/spacing.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: [-i]
+        type: file
+        description: |
+          Input file containing genomic intervals for spacing analysis.
+          
+          **Format:** BED, GFF, VCF, or BAM file
+          **Content:** Genomic intervals to analyze for gap spacing
+          **Requirements:** Must be sorted by chromosome and start coordinate (sort -k1,1 -k2,2n)
+          **Output:** Original intervals with gap distances appended as last column
+        required: true
+        example: sorted_features.bed
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with gap spacing information appended.
+          
+          **Format:** Same format as input with additional spacing column
+          **Content:** Original intervals plus gap distances in the last column
+          **Gap values:** 
+          - "." for first interval on each chromosome
+          - "0" for adjacent intervals 
+          - "-1" for overlapping intervals
+          - Positive integers for gap sizes
+        required: true
+        direction: output
+        example: intervals_with_spacing.bed
+
+  - name: Format Options
+    arguments:
+      - name: --output_bed
+        alternatives: [-bed]
+        type: boolean_true
+        description: |
+          Convert BAM input to BED format output.
+          
+          **Usage:** Only applicable when input is BAM format
+          **Effect:** Output genomic coordinates in BED format instead of maintaining BAM format
+          **Applications:** Converting alignment data to interval format with spacing information
+          **Default:** false (maintain input format)
+
+      - name: --include_header
+        alternatives: [-header]
+        type: boolean_true
+        description: |
+          Include the original file header in output.
+          
+          **Usage:** Preserves metadata and format information from input
+          **Applications:** Maintaining file structure and annotations
+          **Formats:** Particularly relevant for VCF and GFF files
+          **Default:** false (no header included)
+
+  - name: Performance Options
+    arguments:
+      - name: --no_buffer
+        alternatives: [-nobuf]
+        type: boolean_true
+        description: |
+          Disable output buffering for real-time processing.
+          
+          **Effect:** Each line printed immediately instead of buffered
+          **Trade-off:** Slower output but enables real-time processing
+          **Applications:** Pipeline integration, streaming analysis
+          **Default:** false (buffered output for performance)
+
+      - name: --input_buffer
+        alternatives: [-iobuf]
+        type: string
+        description: |
+          Amount of memory to allocate for input buffer.
+          
+          **Format:** Integer with optional K/M/G suffix
+          **Examples:** "1G", "512M", "2048K"
+          **Usage:** Larger buffers can improve I/O performance for large files
+          **Note:** Currently has no effect with compressed files
+        example: 1G
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
