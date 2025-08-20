@@ -57,10 +57,10 @@ check_file_exists "$meta_temp_dir/input.bam" "input BAM file"
 log "TEST 1: Basic tagging with single BED file"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/input.bam" \
-    --files "$meta_temp_dir/genes.bed" \
-    --labels "GENE" \
-    --output "$meta_temp_dir/tagged_basic.bam"
+  --input "$meta_temp_dir/input.bam" \
+  --files "$meta_temp_dir/genes.bed" \
+  --labels "GENE" \
+  --output "$meta_temp_dir/tagged_basic.bam"
 
 check_file_exists "$meta_temp_dir/tagged_basic.bam" "basic tagged output"
 check_file_not_empty "$meta_temp_dir/tagged_basic.bam" "basic tagged output"
@@ -72,11 +72,11 @@ log "✓ Basic tagging test passed"
 log "TEST 2: Custom tag name"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/input.bam" \
-    --files "$meta_temp_dir/genes.bed" \
-    --labels "GENE" \
-    --output "$meta_temp_dir/tagged_custom.bam" \
-    --tag_name "XG"
+  --input "$meta_temp_dir/input.bam" \
+  --files "$meta_temp_dir/genes.bed" \
+  --labels "GENE" \
+  --output "$meta_temp_dir/tagged_custom.bam" \
+  --tag_name "XG"
 
 check_file_exists "$meta_temp_dir/tagged_custom.bam" "custom tag output"
 check_file_not_empty "$meta_temp_dir/tagged_custom.bam" "custom tag output"
@@ -88,10 +88,10 @@ log "✓ Custom tag name test passed"
 log "TEST 3: Multiple annotation files with names"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/input.bam" \
-    --files "$meta_temp_dir/genes.bed;$meta_temp_dir/enhancers.bed" \
-    --output "$meta_temp_dir/tagged_names.bam" \
-    --use_names
+  --input "$meta_temp_dir/input.bam" \
+  --files "$meta_temp_dir/genes.bed;$meta_temp_dir/enhancers.bed" \
+  --output "$meta_temp_dir/tagged_names.bam" \
+  --use_names
 
 check_file_exists "$meta_temp_dir/tagged_names.bam" "names tagged output"
 check_file_not_empty "$meta_temp_dir/tagged_names.bam" "names tagged output"
@@ -103,10 +103,10 @@ log "✓ Multiple files with names test passed"
 log "TEST 4: Include scores option"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/input.bam" \
-    --files "$meta_temp_dir/genes.bed" \
-    --output "$meta_temp_dir/tagged_scores.bam" \
-    --use_scores
+  --input "$meta_temp_dir/input.bam" \
+  --files "$meta_temp_dir/genes.bed" \
+  --output "$meta_temp_dir/tagged_scores.bam" \
+  --use_scores
 
 check_file_exists "$meta_temp_dir/tagged_scores.bam" "scores tagged output"
 check_file_not_empty "$meta_temp_dir/tagged_scores.bam" "scores tagged output"
@@ -118,11 +118,11 @@ log "✓ Include scores test passed"
 log "TEST 5: Overlap mode testing"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/input.bam" \
-    --files "$meta_temp_dir/genes.bed" \
-    --labels "GENE" \
-    --output "$meta_temp_dir/tagged_overlap.bam" \
-    --min_overlap 0.5
+  --input "$meta_temp_dir/input.bam" \
+  --files "$meta_temp_dir/genes.bed" \
+  --labels "GENE" \
+  --output "$meta_temp_dir/tagged_overlap.bam" \
+  --min_overlap 0.5
 
 check_file_exists "$meta_temp_dir/tagged_overlap.bam" "overlap tagged output"
 check_file_not_empty "$meta_temp_dir/tagged_overlap.bam" "overlap tagged output"
@@ -134,14 +134,14 @@ log "✓ Overlap mode test passed"
 log "TEST 6: Error handling - Missing input file"
 
 if "$meta_executable" \
-    --input "/nonexistent/file.bam" \
-    --files "$meta_temp_dir/genes.bed" \
-    --labels "GENE" \
-    --output "$meta_temp_dir/error_test.bam" 2>/dev/null; then
-    log "✗ Should have failed with missing input file"
-    exit 1
+  --input "/nonexistent/file.bam" \
+  --files "$meta_temp_dir/genes.bed" \
+  --labels "GENE" \
+  --output "$meta_temp_dir/error_test.bam" 2>/dev/null; then
+  log "✗ Should have failed with missing input file"
+  exit 1
 else
-    log "✓ Correctly handled missing input file"
+  log "✓ Correctly handled missing input file"
 fi
 
 ####################################################################################################
@@ -149,14 +149,14 @@ fi
 log "TEST 7: Error handling - Missing annotation file"
 
 if "$meta_executable" \
-    --input "$meta_temp_dir/input.bam" \
-    --files "/nonexistent/file.bed" \
-    --labels "GENE" \
-    --output "$meta_temp_dir/error_test.bam" 2>/dev/null; then
-    log "✗ Should have failed with missing annotation file"
-    exit 1
+  --input "$meta_temp_dir/input.bam" \
+  --files "/nonexistent/file.bed" \
+  --labels "GENE" \
+  --output "$meta_temp_dir/error_test.bam" 2>/dev/null; then
+  log "✗ Should have failed with missing annotation file"
+  exit 1
 else
-    log "✓ Correctly handled missing annotation file"
+  log "✓ Correctly handled missing annotation file"
 fi
 
 ####################################################################################################
@@ -164,13 +164,13 @@ fi
 log "TEST 8: Error handling - Missing output parameter"
 
 if "$meta_executable" \
-    --input "$meta_temp_dir/input.bam" \
-    --files "$meta_temp_dir/genes.bed" \
-    --labels "GENE" 2>/dev/null; then
-    log "✗ Should have failed without output parameter"
-    exit 1
+  --input "$meta_temp_dir/input.bam" \
+  --files "$meta_temp_dir/genes.bed" \
+  --labels "GENE" 2>/dev/null; then
+  log "✗ Should have failed without output parameter"
+  exit 1
 else
-    log "✓ Correctly handled missing output parameter"
+  log "✓ Correctly handled missing output parameter"
 fi
 
 ####################################################################################################

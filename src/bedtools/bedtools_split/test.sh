@@ -38,10 +38,10 @@ check_file_exists "$meta_temp_dir/input.bed" "input BED file"
 log "TEST 1: Basic split into 2 files"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --number 2 \
-    --output_dir "$meta_temp_dir" \
-    --prefix "split_2"
+  --input "$meta_temp_dir/input.bed" \
+  --number 2 \
+  --output_dir "$meta_temp_dir" \
+  --prefix "split_2"
 
 # bedtools split creates files with format: prefix.00001.bed, prefix.00002.bed, etc.
 check_file_exists "$meta_temp_dir/split_2.00001.bed" "first split file"
@@ -54,10 +54,10 @@ total_input=$(wc -l < "$meta_temp_dir/input.bed")
 total_output=$(($(wc -l < "$meta_temp_dir/split_2.00001.bed") + $(wc -l < "$meta_temp_dir/split_2.00002.bed")))
 
 if [ "$total_input" -eq "$total_output" ]; then
-    log "✓ All records preserved in split files ($total_output)"
+  log "✓ All records preserved in split files ($total_output)"
 else
-    log "✗ Record count mismatch: input=$total_input, output=$total_output"
-    exit 1
+  log "✗ Record count mismatch: input=$total_input, output=$total_output"
+  exit 1
 fi
 
 ####################################################################################################
@@ -65,11 +65,11 @@ fi
 log "TEST 2: Split into 3 files with size algorithm"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --number 3 \
-    --output_dir "$meta_temp_dir" \
-    --prefix "split_3_size" \
-    --algorithm "size"
+  --input "$meta_temp_dir/input.bed" \
+  --number 3 \
+  --output_dir "$meta_temp_dir" \
+  --prefix "split_3_size" \
+  --algorithm "size"
 
 check_file_exists "$meta_temp_dir/split_3_size.00001.bed" "first file (size algorithm)"
 check_file_exists "$meta_temp_dir/split_3_size.00002.bed" "second file (size algorithm)"
@@ -77,20 +77,20 @@ check_file_exists "$meta_temp_dir/split_3_size.00003.bed" "third file (size algo
 
 # Verify all files have content
 for i in {1..3}; do
-    file_num=$(printf "%05d" $i)
-    check_file_not_empty "$meta_temp_dir/split_3_size.$file_num.bed" "file $i (size algorithm)"
+  file_num=$(printf "%05d" $i)
+  check_file_not_empty "$meta_temp_dir/split_3_size.$file_num.bed" "file $i (size algorithm)"
 done
 
 # Count total lines
 total_output=$(($(wc -l < "$meta_temp_dir/split_3_size.00001.bed") + \
-                $(wc -l < "$meta_temp_dir/split_3_size.00002.bed") + \
-                $(wc -l < "$meta_temp_dir/split_3_size.00003.bed")))
+          $(wc -l < "$meta_temp_dir/split_3_size.00002.bed") + \
+          $(wc -l < "$meta_temp_dir/split_3_size.00003.bed")))
 
 if [ "$total_input" -eq "$total_output" ]; then
-    log "✓ All records preserved with size algorithm ($total_output)"
+  log "✓ All records preserved with size algorithm ($total_output)"
 else
-    log "✗ Record count mismatch with size algorithm: input=$total_input, output=$total_output"
-    exit 1
+  log "✗ Record count mismatch with size algorithm: input=$total_input, output=$total_output"
+  exit 1
 fi
 
 ####################################################################################################
@@ -98,11 +98,11 @@ fi
 log "TEST 3: Split into 3 files with simple algorithm"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --number 3 \
-    --output_dir "$meta_temp_dir" \
-    --prefix "split_3_simple" \
-    --algorithm "simple"
+  --input "$meta_temp_dir/input.bed" \
+  --number 3 \
+  --output_dir "$meta_temp_dir" \
+  --prefix "split_3_simple" \
+  --algorithm "simple"
 
 check_file_exists "$meta_temp_dir/split_3_simple.00001.bed" "first file (simple algorithm)"
 check_file_exists "$meta_temp_dir/split_3_simple.00002.bed" "second file (simple algorithm)"
@@ -116,23 +116,23 @@ file3_lines=$(wc -l < "$meta_temp_dir/split_3_simple.00003.bed")
 total_simple=$((file1_lines + file2_lines + file3_lines))
 
 if [ "$total_input" -eq "$total_simple" ]; then
-    log "✓ All records preserved with simple algorithm ($total_simple)"
-    log "  File 1: $file1_lines lines, File 2: $file2_lines lines, File 3: $file3_lines lines"
+  log "✓ All records preserved with simple algorithm ($total_simple)"
+  log "  File 1: $file1_lines lines, File 2: $file2_lines lines, File 3: $file3_lines lines"
 else
-    log "✗ Record count mismatch with simple algorithm: input=$total_input, output=$total_simple"
-    exit 1
+  log "✗ Record count mismatch with simple algorithm: input=$total_input, output=$total_simple"
+  exit 1
 fi
 
 # Check that files have roughly equal numbers of records (within 1-2 of each other)
 expected_per_file=$((total_input / 3))
 for lines in $file1_lines $file2_lines $file3_lines; do
-    diff=$((lines - expected_per_file))
-    if [ ${diff#-} -le 2 ]; then  # abs(diff) <= 2
-        continue
-    else
-        log "✗ Simple algorithm distribution not balanced: expected ~$expected_per_file, got $lines"
-        exit 1
-    fi
+  diff=$((lines - expected_per_file))
+  if [ ${diff#-} -le 2 ]; then  # abs(diff) <= 2
+      continue
+  else
+      log "✗ Simple algorithm distribution not balanced: expected ~$expected_per_file, got $lines"
+      exit 1
+  fi
 done
 log "✓ Simple algorithm produces balanced distribution"
 
@@ -141,9 +141,9 @@ log "✓ Simple algorithm produces balanced distribution"
 log "TEST 4: Split with default prefix"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --number 2 \
-    --output_dir "$meta_temp_dir"
+  --input "$meta_temp_dir/input.bed" \
+  --number 2 \
+  --output_dir "$meta_temp_dir"
 
 # When no prefix specified, bedtools uses "_split" as default prefix
 check_file_exists "$meta_temp_dir/_split.00001.bed" "first file (default prefix)"
@@ -157,30 +157,30 @@ log "TEST 5: Parameter validation"
 log "Testing required parameter validation"
 
 if "$meta_executable" \
-    --number 2 \
-    --output_dir "$meta_temp_dir" 2>/dev/null; then
-    log "✗ Should have failed without --input parameter"
-    exit 1
+  --number 2 \
+  --output_dir "$meta_temp_dir" 2>/dev/null; then
+  log "✗ Should have failed without --input parameter"
+  exit 1
 else
-    log "✓ Correctly requires --input parameter"
+  log "✓ Correctly requires --input parameter"
 fi
 
 if "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --output_dir "$meta_temp_dir" 2>/dev/null; then
-    log "✗ Should have failed without --number parameter"
-    exit 1
+  --input "$meta_temp_dir/input.bed" \
+  --output_dir "$meta_temp_dir" 2>/dev/null; then
+  log "✗ Should have failed without --number parameter"
+  exit 1
 else
-    log "✓ Correctly requires --number parameter"
+  log "✓ Correctly requires --number parameter"
 fi
 
 if "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --number 2 2>/dev/null; then
-    log "✗ Should have failed without --output_dir parameter"
-    exit 1
+  --input "$meta_temp_dir/input.bed" \
+  --number 2 2>/dev/null; then
+  log "✗ Should have failed without --output_dir parameter"
+  exit 1
 else
-    log "✓ Correctly requires --output_dir parameter"
+  log "✓ Correctly requires --output_dir parameter"
 fi
 
 ####################################################################################################
@@ -189,15 +189,15 @@ log "TEST 6: Algorithm parameter validation"
 
 # Test invalid algorithm
 if "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --number 2 \
-    --output_dir "$meta_temp_dir" \
-    --prefix "invalid_test" \
-    --algorithm "invalid" 2>/dev/null; then
-    log "✗ Should have failed with invalid algorithm"
-    exit 1
+  --input "$meta_temp_dir/input.bed" \
+  --number 2 \
+  --output_dir "$meta_temp_dir" \
+  --prefix "invalid_test" \
+  --algorithm "invalid" 2>/dev/null; then
+  log "✗ Should have failed with invalid algorithm"
+  exit 1
 else
-    log "✓ Correctly rejects invalid algorithm"
+  log "✓ Correctly rejects invalid algorithm"
 fi
 
 ####################################################################################################
@@ -206,14 +206,14 @@ log "TEST 7: File validation"
 
 # Test with non-existent files
 if "$meta_executable" \
-    --input "/nonexistent/file.bed" \
-    --number 2 \
-    --output_dir "$meta_temp_dir" \
-    --prefix "test" 2>/dev/null; then
-    log "✗ Should have failed with non-existent input file"
-    exit 1
+  --input "/nonexistent/file.bed" \
+  --number 2 \
+  --output_dir "$meta_temp_dir" \
+  --prefix "test" 2>/dev/null; then
+  log "✗ Should have failed with non-existent input file"
+  exit 1
 else
-    log "✓ Properly handles non-existent input files"
+  log "✓ Properly handles non-existent input files"
 fi
 
 ####################################################################################################
@@ -225,23 +225,23 @@ touch "$meta_temp_dir/empty.bed"
 
 # bedtools split will give a warning but should not fail
 "$meta_executable" \
-    --input "$meta_temp_dir/empty.bed" \
-    --number 2 \
-    --output_dir "$meta_temp_dir" \
-    --prefix "empty_test"
+  --input "$meta_temp_dir/empty.bed" \
+  --number 2 \
+  --output_dir "$meta_temp_dir" \
+  --prefix "empty_test"
 
 # For empty input, bedtools split doesn't create any output files
 # This is expected behavior - we just verify the command doesn't crash
 if [ ! -f "$meta_temp_dir/empty_test.00001.bed" ]; then
-    log "✓ Empty input correctly produces no output files (expected behavior)"
+  log "✓ Empty input correctly produces no output files (expected behavior)"
 else
-    # If files were created, they should be empty
-    if [ ! -s "$meta_temp_dir/empty_test.00001.bed" ] && [ ! -s "$meta_temp_dir/empty_test.00002.bed" ]; then
-        log "✓ Empty input produces empty split files"
-    else
-        log "✗ Empty input handling failed"
-        exit 1
-    fi
+  # If files were created, they should be empty
+  if [ ! -s "$meta_temp_dir/empty_test.00001.bed" ] && [ ! -s "$meta_temp_dir/empty_test.00002.bed" ]; then
+      log "✓ Empty input produces empty split files"
+  else
+      log "✗ Empty input handling failed"
+      exit 1
+  fi
 fi
 
 ####################################################################################################
@@ -254,10 +254,10 @@ chr1	100	200	single_feature	100	+
 EOF
 
 "$meta_executable" \
-    --input "$meta_temp_dir/single.bed" \
-    --number 3 \
-    --output_dir "$meta_temp_dir" \
-    --prefix "single_test"
+  --input "$meta_temp_dir/single.bed" \
+  --number 3 \
+  --output_dir "$meta_temp_dir" \
+  --prefix "single_test"
 
 # When input has fewer records than requested files, bedtools split only creates
 # as many files as needed. With 1 record and 3 files requested, only 1 file is created.
@@ -266,17 +266,17 @@ check_file_not_empty "$meta_temp_dir/single_test.00001.bed" "single record split
 
 # Verify the single record is in the first file
 if [ "$(wc -l < "$meta_temp_dir/single_test.00001.bed")" -eq 1 ]; then
-    log "✓ Single record correctly placed in first split file"
+  log "✓ Single record correctly placed in first split file"
 else
-    log "✗ Single record split failed"
-    exit 1
+  log "✗ Single record split failed"
+  exit 1
 fi
 
 # Check that no additional files were created (this is expected behavior)
 if [ ! -f "$meta_temp_dir/single_test.00002.bed" ] && [ ! -f "$meta_temp_dir/single_test.00003.bed" ]; then
-    log "✓ No unnecessary empty files created for single record"
+  log "✓ No unnecessary empty files created for single record"
 else
-    log "✓ Additional files created (may be empty, which is also acceptable)"
+  log "✓ Additional files created (may be empty, which is also acceptable)"
 fi
 
 ####################################################################################################
@@ -284,32 +284,32 @@ fi
 log "TEST 10: Large number split test"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --number 5 \
-    --output_dir "$meta_temp_dir" \
-    --prefix "split_5"
+  --input "$meta_temp_dir/input.bed" \
+  --number 5 \
+  --output_dir "$meta_temp_dir" \
+  --prefix "split_5"
 
 # Should create 5 files
 for i in {1..5}; do
-    file_num=$(printf "%05d" $i)
-    check_file_exists "$meta_temp_dir/split_5.$file_num.bed" "split file $i"
+  file_num=$(printf "%05d" $i)
+  check_file_exists "$meta_temp_dir/split_5.$file_num.bed" "split file $i"
 done
 
 # Count total records
 total_split5=0
 for i in {1..5}; do
-    file_num=$(printf "%05d" $i)
-    if [ -s "$meta_temp_dir/split_5.$file_num.bed" ]; then
-        lines=$(wc -l < "$meta_temp_dir/split_5.$file_num.bed")
-        total_split5=$((total_split5 + lines))
-    fi
+  file_num=$(printf "%05d" $i)
+  if [ -s "$meta_temp_dir/split_5.$file_num.bed" ]; then
+      lines=$(wc -l < "$meta_temp_dir/split_5.$file_num.bed")
+      total_split5=$((total_split5 + lines))
+  fi
 done
 
 if [ "$total_input" -eq "$total_split5" ]; then
-    log "✓ All records preserved when splitting into 5 files ($total_split5)"
+  log "✓ All records preserved when splitting into 5 files ($total_split5)"
 else
-    log "✗ Record count mismatch for 5-way split: input=$total_input, output=$total_split5"
-    exit 1
+  log "✗ Record count mismatch for 5-way split: input=$total_input, output=$total_split5"
+  exit 1
 fi
 
 ####################################################################################################

@@ -33,8 +33,8 @@ log "Starting TEST 1: Basic BAM to FASTQ conversion"
 
 log "Executing $meta_name with single-end BAM..."
 "$meta_executable" \
-    --input "$test_dir/test.sam" \
-    --fastq "$meta_temp_dir/output1.fastq"
+  --input "$test_dir/test.sam" \
+  --fastq "$meta_temp_dir/output1.fastq"
 
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/output1.fastq" "output FASTQ file"
@@ -59,9 +59,9 @@ log "Starting TEST 2: BAM to FASTQ with --tags option"
 # since creating BAM with R2/Q2 tags would be complex
 log "Executing $meta_name with --tags flag..."
 "$meta_executable" \
-    --input "$test_dir/test.sam" \
-    --fastq "$meta_temp_dir/output2.fastq" \
-    --tags
+  --input "$test_dir/test.sam" \
+  --fastq "$meta_temp_dir/output2.fastq" \
+  --tags
 
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/output2.fastq" "output FASTQ file with tags"
@@ -74,9 +74,9 @@ log "Starting TEST 3: Test secondary output parameter"
 # Test that the fastq2 parameter is accepted (even if no paired reads are present)
 log "Executing $meta_name with --fastq2 parameter..."
 "$meta_executable" \
-    --input "$test_dir/test.sam" \
-    --fastq "$meta_temp_dir/output3_R1.fastq" \
-    --fastq2 "$meta_temp_dir/output3_R2.fastq"
+  --input "$test_dir/test.sam" \
+  --fastq "$meta_temp_dir/output3_R1.fastq" \
+  --fastq2 "$meta_temp_dir/output3_R2.fastq"
 
 log "Validating TEST 3 outputs..."
 check_file_exists "$meta_temp_dir/output3_R1.fastq" "primary FASTQ file"

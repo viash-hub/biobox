@@ -44,9 +44,9 @@ EOF
 # Test 1: Basic BEDPE to BAM conversion
 log "Starting TEST 1: Basic BEDPE to BAM conversion"
 "$meta_executable" \
-    --input "$meta_temp_dir/intervals.bedpe" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --output "$meta_temp_dir/output1.bam"
+  --input "$meta_temp_dir/intervals.bedpe" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --output "$meta_temp_dir/output1.bam"
 
 check_file_exists "$meta_temp_dir/output1.bam" "basic BAM output"
 check_file_not_empty "$meta_temp_dir/output1.bam" "basic BAM output"
@@ -57,10 +57,10 @@ log "✅ TEST 1 completed successfully"
 # Test 2: BAM conversion with custom MAPQ
 log "Starting TEST 2: BAM conversion with custom MAPQ"
 "$meta_executable" \
-    --input "$meta_temp_dir/intervals.bedpe" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --mapq 60 \
-    --output "$meta_temp_dir/output2.bam"
+  --input "$meta_temp_dir/intervals.bedpe" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --mapq 60 \
+  --output "$meta_temp_dir/output2.bam"
 
 check_file_exists "$meta_temp_dir/output2.bam" "MAPQ BAM output"
 check_file_not_empty "$meta_temp_dir/output2.bam" "MAPQ BAM output"
@@ -69,10 +69,10 @@ log "✅ TEST 2 completed successfully"
 # Test 3: Uncompressed BAM output
 log "Starting TEST 3: Uncompressed BAM output"
 "$meta_executable" \
-    --input "$meta_temp_dir/intervals.bedpe" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --ubam \
-    --output "$meta_temp_dir/output3.bam"
+  --input "$meta_temp_dir/intervals.bedpe" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --ubam \
+  --output "$meta_temp_dir/output3.bam"
 
 check_file_exists "$meta_temp_dir/output3.bam" "uncompressed BAM output"
 check_file_not_empty "$meta_temp_dir/output3.bam" "uncompressed BAM output"
@@ -81,16 +81,16 @@ check_file_not_empty "$meta_temp_dir/output3.bam" "uncompressed BAM output"
 compressed_size=$(stat -c%s "$meta_temp_dir/output1.bam")
 uncompressed_size=$(stat -c%s "$meta_temp_dir/output3.bam")
 if [ $uncompressed_size -lt $compressed_size ]; then
-    log "Warning: Uncompressed BAM is smaller than compressed - may indicate issue or very small dataset"
+  log "Warning: Uncompressed BAM is smaller than compressed - may indicate issue or very small dataset"
 fi
 log "✅ TEST 3 completed successfully"
 
 # Test 4: More detailed BEDPE file conversion
 log "Starting TEST 4: Detailed BEDPE file conversion"
 "$meta_executable" \
-    --input "$meta_temp_dir/detailed.bedpe" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --output "$meta_temp_dir/output4.bam"
+  --input "$meta_temp_dir/detailed.bedpe" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --output "$meta_temp_dir/output4.bam"
 
 check_file_exists "$meta_temp_dir/output4.bam" "detailed BAM output"
 check_file_not_empty "$meta_temp_dir/output4.bam" "detailed BAM output"
@@ -98,31 +98,31 @@ check_file_not_empty "$meta_temp_dir/output4.bam" "detailed BAM output"
 # Check file size is reasonable for 5 BEDPE pairs (10 alignments)
 detailed_size=$(stat -c%s "$meta_temp_dir/output4.bam")
 if [ $detailed_size -lt 200 ]; then
-    log_error "BAM file seems too small for 5 BEDPE pairs: $detailed_size bytes"
-    exit 1
+  log_error "BAM file seems too small for 5 BEDPE pairs: $detailed_size bytes"
+  exit 1
 fi
 log "✅ TEST 4 completed successfully"
 
 # Test 5: Verify BAM structure with samtools (if available)
 log "Starting TEST 5: BAM structure verification"
 if command -v samtools &> /dev/null; then
-    # Check BAM header
-    if samtools view -H "$meta_temp_dir/output1.bam" | grep -q "@SQ"; then
-        log "✓ BAM header contains sequence dictionary"
-    else
-        log_error "BAM header missing sequence dictionary"
-        exit 1
-    fi
-    
-    # Count alignments (should be double the BEDPE pairs since each pair creates 2 alignments)
-    alignment_count=$(samtools view -c "$meta_temp_dir/output1.bam")
-    if [ $alignment_count -eq 8 ]; then
-        log "✓ BAM contains expected number of alignments: $alignment_count (4 BEDPE pairs = 8 alignments)"
-    else
-        log "ℹ️  Expected 8 alignments (4 BEDPE pairs), got $alignment_count"
-    fi
+  # Check BAM header
+  if samtools view -H "$meta_temp_dir/output1.bam" | grep -q "@SQ"; then
+      log "✓ BAM header contains sequence dictionary"
+  else
+      log_error "BAM header missing sequence dictionary"
+      exit 1
+  fi
+  
+  # Count alignments (should be double the BEDPE pairs since each pair creates 2 alignments)
+  alignment_count=$(samtools view -c "$meta_temp_dir/output1.bam")
+  if [ $alignment_count -eq 8 ]; then
+      log "✓ BAM contains expected number of alignments: $alignment_count (4 BEDPE pairs = 8 alignments)"
+  else
+      log "ℹ️  Expected 8 alignments (4 BEDPE pairs), got $alignment_count"
+  fi
 else
-    log "ℹ️  samtools not available, skipping BAM structure verification"
+  log "ℹ️  samtools not available, skipping BAM structure verification"
 fi
 log "✅ TEST 5 completed successfully"
 

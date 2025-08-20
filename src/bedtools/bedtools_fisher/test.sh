@@ -53,10 +53,10 @@ EOF
 # TEST 1: Basic Fisher's exact test
 log "Starting TEST 1: Basic Fisher's exact test"
 "$meta_executable" \
-    --input_a "$meta_temp_dir/intervals_a.bed" \
-    --input_b "$meta_temp_dir/intervals_b.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --output "$meta_temp_dir/fisher_basic.txt"
+  --input_a "$meta_temp_dir/intervals_a.bed" \
+  --input_b "$meta_temp_dir/intervals_b.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --output "$meta_temp_dir/fisher_basic.txt"
 
 check_file_exists "$meta_temp_dir/fisher_basic.txt" "basic fisher output"
 check_file_not_empty "$meta_temp_dir/fisher_basic.txt" "basic fisher output"
@@ -65,12 +65,12 @@ log "✅ TEST 1 completed successfully"
 # TEST 2: Fisher test with minimum overlap fraction
 log "Starting TEST 2: Fisher test with overlap fractions"
 "$meta_executable" \
-    --input_a "$meta_temp_dir/intervals_a.bed" \
-    --input_b "$meta_temp_dir/intervals_b.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --min_overlap_a 0.5 \
-    --min_overlap_b 0.3 \
-    --output "$meta_temp_dir/fisher_fractions.txt"
+  --input_a "$meta_temp_dir/intervals_a.bed" \
+  --input_b "$meta_temp_dir/intervals_b.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --min_overlap_a 0.5 \
+  --min_overlap_b 0.3 \
+  --output "$meta_temp_dir/fisher_fractions.txt"
 
 check_file_exists "$meta_temp_dir/fisher_fractions.txt" "fisher with fractions output"
 check_file_not_empty "$meta_temp_dir/fisher_fractions.txt" "fisher with fractions output"
@@ -79,12 +79,12 @@ log "✅ TEST 2 completed successfully"
 # TEST 3: Fisher test with reciprocal overlap
 log "Starting TEST 3: Fisher test with reciprocal overlap"
 "$meta_executable" \
-    --input_a "$meta_temp_dir/intervals_a.bed" \
-    --input_b "$meta_temp_dir/intervals_b.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --min_overlap_a 0.4 \
-    --reciprocal \
-    --output "$meta_temp_dir/fisher_reciprocal.txt"
+  --input_a "$meta_temp_dir/intervals_a.bed" \
+  --input_b "$meta_temp_dir/intervals_b.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --min_overlap_a 0.4 \
+  --reciprocal \
+  --output "$meta_temp_dir/fisher_reciprocal.txt"
 
 check_file_exists "$meta_temp_dir/fisher_reciprocal.txt" "fisher reciprocal output"
 check_file_not_empty "$meta_temp_dir/fisher_reciprocal.txt" "fisher reciprocal output"
@@ -93,11 +93,11 @@ log "✅ TEST 3 completed successfully"
 # TEST 4: Fisher test with merged intervals
 log "Starting TEST 4: Fisher test with merged overlapping intervals"
 "$meta_executable" \
-    --input_a "$meta_temp_dir/intervals_a.bed" \
-    --input_b "$meta_temp_dir/intervals_c.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --merge_overlaps \
-    --output "$meta_temp_dir/fisher_merged.txt"
+  --input_a "$meta_temp_dir/intervals_a.bed" \
+  --input_b "$meta_temp_dir/intervals_c.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --merge_overlaps \
+  --output "$meta_temp_dir/fisher_merged.txt"
 
 check_file_exists "$meta_temp_dir/fisher_merged.txt" "fisher merged output"
 check_file_not_empty "$meta_temp_dir/fisher_merged.txt" "fisher merged output"
@@ -106,13 +106,13 @@ log "✅ TEST 4 completed successfully"
 # TEST 5: Fisher test with either overlap condition
 log "Starting TEST 5: Fisher test with either overlap condition"
 "$meta_executable" \
-    --input_a "$meta_temp_dir/intervals_a.bed" \
-    --input_b "$meta_temp_dir/intervals_b.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --min_overlap_a 0.8 \
-    --min_overlap_b 0.2 \
-    --either \
-    --output "$meta_temp_dir/fisher_either.txt"
+  --input_a "$meta_temp_dir/intervals_a.bed" \
+  --input_b "$meta_temp_dir/intervals_b.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --min_overlap_a 0.8 \
+  --min_overlap_b 0.2 \
+  --either \
+  --output "$meta_temp_dir/fisher_either.txt"
 
 check_file_exists "$meta_temp_dir/fisher_either.txt" "fisher either condition output"
 check_file_not_empty "$meta_temp_dir/fisher_either.txt" "fisher either condition output"

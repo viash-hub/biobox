@@ -65,8 +65,8 @@ EOF
 # Test 1: Basic chromosome and position sorting
 log "Starting TEST 1: Basic chromosome and position sorting"
 "$meta_executable" \
-    --input "$meta_temp_dir/unsorted.bed" \
-    --output "$meta_temp_dir/output1.bed"
+  --input "$meta_temp_dir/unsorted.bed" \
+  --output "$meta_temp_dir/output1.bed"
 
 check_file_exists "$meta_temp_dir/output1.bed" "basic sort output"
 check_file_not_empty "$meta_temp_dir/output1.bed" "basic sort output"
@@ -82,9 +82,9 @@ log "✅ TEST 1 completed successfully"
 # Test 2: Size-based sorting (ascending)
 log "Starting TEST 2: Size-based sorting (ascending)"
 "$meta_executable" \
-    --input "$meta_temp_dir/mixed_chroms.bed" \
-    --output "$meta_temp_dir/output2.bed" \
-    --sizeA
+  --input "$meta_temp_dir/mixed_chroms.bed" \
+  --output "$meta_temp_dir/output2.bed" \
+  --sizeA
 
 check_file_exists "$meta_temp_dir/output2.bed" "size ascending sort output"  
 check_file_not_empty "$meta_temp_dir/output2.bed" "size ascending sort output"
@@ -96,9 +96,9 @@ log "✅ TEST 2 completed successfully"
 # Test 3: Size-based sorting (descending)
 log "Starting TEST 3: Size-based sorting (descending)"
 "$meta_executable" \
-    --input "$meta_temp_dir/mixed_chroms.bed" \
-    --output "$meta_temp_dir/output3.bed" \
-    --sizeD
+  --input "$meta_temp_dir/mixed_chroms.bed" \
+  --output "$meta_temp_dir/output3.bed" \
+  --sizeD
 
 check_file_exists "$meta_temp_dir/output3.bed" "size descending sort output"
 check_file_not_empty "$meta_temp_dir/output3.bed" "size descending sort output"  
@@ -110,9 +110,9 @@ log "✅ TEST 3 completed successfully"
 # Test 4: Chromosome then size ascending
 log "Starting TEST 4: Chromosome then size ascending"
 "$meta_executable" \
-    --input "$meta_temp_dir/mixed_chroms.bed" \
-    --output "$meta_temp_dir/output4.bed" \
-    --chrThenSizeA
+  --input "$meta_temp_dir/mixed_chroms.bed" \
+  --output "$meta_temp_dir/output4.bed" \
+  --chrThenSizeA
 
 check_file_exists "$meta_temp_dir/output4.bed" "chr then size asc output"
 check_file_not_empty "$meta_temp_dir/output4.bed" "chr then size asc output"
@@ -124,9 +124,9 @@ log "✅ TEST 4 completed successfully"
 # Test 5: Score-based sorting (chromosome then score ascending)
 log "Starting TEST 5: Score-based sorting (chromosome then score ascending)"
 "$meta_executable" \
-    --input "$meta_temp_dir/with_scores.bed" \
-    --output "$meta_temp_dir/output5.bed" \
-    --chrThenScoreA
+  --input "$meta_temp_dir/with_scores.bed" \
+  --output "$meta_temp_dir/output5.bed" \
+  --chrThenScoreA
 
 check_file_exists "$meta_temp_dir/output5.bed" "chr then score asc output"
 check_file_not_empty "$meta_temp_dir/output5.bed" "chr then score asc output"
@@ -138,9 +138,9 @@ log "✅ TEST 5 completed successfully"
 # Test 6: Custom genome ordering
 log "Starting TEST 6: Custom genome ordering"
 "$meta_executable" \
-    --input "$meta_temp_dir/with_scores.bed" \
-    --output "$meta_temp_dir/output6.bed" \
-    --genome "$meta_temp_dir/genome_order.txt"
+  --input "$meta_temp_dir/with_scores.bed" \
+  --output "$meta_temp_dir/output6.bed" \
+  --genome "$meta_temp_dir/genome_order.txt"
 
 check_file_exists "$meta_temp_dir/output6.bed" "custom genome order output"
 check_file_not_empty "$meta_temp_dir/output6.bed" "custom genome order output"
@@ -152,9 +152,9 @@ log "✅ TEST 6 completed successfully"
 # Test 7: Header preservation
 log "Starting TEST 7: Header preservation"
 "$meta_executable" \
-    --input "$meta_temp_dir/with_header.bed" \
-    --output "$meta_temp_dir/output7.bed" \
-    --header
+  --input "$meta_temp_dir/with_header.bed" \
+  --output "$meta_temp_dir/output7.bed" \
+  --header
 
 check_file_exists "$meta_temp_dir/output7.bed" "header preservation output"
 check_file_not_empty "$meta_temp_dir/output7.bed" "header preservation output"

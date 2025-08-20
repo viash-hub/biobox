@@ -53,8 +53,8 @@ EOF
 # Test 1: Basic merge functionality
 log "Starting TEST 1: Basic merge functionality"
 "$meta_executable" \
-    --input "$meta_temp_dir/featureA.bed" \
-    --output "$meta_temp_dir/output1.bed"
+  --input "$meta_temp_dir/featureA.bed" \
+  --output "$meta_temp_dir/output1.bed"
 
 check_file_exists "$meta_temp_dir/output1.bed" "basic merge output"
 check_file_not_empty "$meta_temp_dir/output1.bed" "basic merge output"
@@ -68,9 +68,9 @@ log "✅ TEST 1 completed successfully"
 # Test 2: Strand-specific merging
 log "Starting TEST 2: Strand-specific merging"
 "$meta_executable" \
-    --input "$meta_temp_dir/featureB.bed" \
-    --output "$meta_temp_dir/output2.bed" \
-    --strand
+  --input "$meta_temp_dir/featureB.bed" \
+  --output "$meta_temp_dir/output2.bed" \
+  --strand
 
 check_file_exists "$meta_temp_dir/output2.bed" "strand-specific merge output"
 check_file_not_empty "$meta_temp_dir/output2.bed" "strand-specific merge output"
@@ -84,9 +84,9 @@ log "✅ TEST 2 completed successfully"
 # Test 3: Distance-based merging
 log "Starting TEST 3: Distance-based merging"  
 "$meta_executable" \
-    --input "$meta_temp_dir/featureA.bed" \
-    --output "$meta_temp_dir/output3.bed" \
-    --distance 50
+  --input "$meta_temp_dir/featureA.bed" \
+  --output "$meta_temp_dir/output3.bed" \
+  --distance 50
 
 check_file_exists "$meta_temp_dir/output3.bed" "distance-based merge output"
 check_file_not_empty "$meta_temp_dir/output3.bed" "distance-based merge output"
@@ -99,10 +99,10 @@ log "✅ TEST 3 completed successfully"
 # Test 4: Column operations with aggregation
 log "Starting TEST 4: Column operations with aggregation"
 "$meta_executable" \
-    --input "$meta_temp_dir/featureB.bed" \
-    --output "$meta_temp_dir/output4.bed" \
-    --columns "5" \
-    --operation "mean"
+  --input "$meta_temp_dir/featureB.bed" \
+  --output "$meta_temp_dir/output4.bed" \
+  --columns "5" \
+  --operation "mean"
 
 check_file_exists "$meta_temp_dir/output4.bed" "column aggregation output"
 check_file_not_empty "$meta_temp_dir/output4.bed" "column aggregation output"
@@ -114,11 +114,11 @@ log "✅ TEST 4 completed successfully"
 # Test 5: Custom delimiter for collapse operation
 log "Starting TEST 5: Custom delimiter for collapse operation"
 "$meta_executable" \
-    --input "$meta_temp_dir/featureB.bed" \
-    --output "$meta_temp_dir/output5.bed" \
-    --columns "4" \
-    --operation "collapse" \
-    --delimiter "|"
+  --input "$meta_temp_dir/featureB.bed" \
+  --output "$meta_temp_dir/output5.bed" \
+  --columns "4" \
+  --operation "collapse" \
+  --delimiter "|"
 
 check_file_exists "$meta_temp_dir/output5.bed" "custom delimiter output"
 check_file_not_empty "$meta_temp_dir/output5.bed" "custom delimiter output"

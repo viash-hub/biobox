@@ -35,11 +35,11 @@ log "Starting TEST 1: Basic grouping by chromosome with sum"
 
 log "Executing $meta_name with basic grouping..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --groupby 1 \
-    --column 5 \
-    --operation sum \
-    --output "$meta_temp_dir/output1.txt"
+  --input "$test_dir/test.bed" \
+  --groupby 1 \
+  --column 5 \
+  --operation sum \
+  --output "$meta_temp_dir/output1.txt"
 
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/output1.txt" "grouped output file"
@@ -54,11 +54,11 @@ log "Starting TEST 2: Group by chromosome and strand with mean"
 
 log "Executing $meta_name with multiple column grouping..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --groupby 1,6 \
-    --column 5 \
-    --operation mean \
-    --output "$meta_temp_dir/output2.txt"
+  --input "$test_dir/test.bed" \
+  --groupby 1,6 \
+  --column 5 \
+  --operation mean \
+  --output "$meta_temp_dir/output2.txt"
 
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/output2.txt" "multi-column grouped output"
@@ -73,11 +73,11 @@ log "Starting TEST 3: Group by chromosome with count operation"
 
 log "Executing $meta_name with count operation..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --groupby 1 \
-    --column 5 \
-    --operation count \
-    --output "$meta_temp_dir/output3.txt"
+  --input "$test_dir/test.bed" \
+  --groupby 1 \
+  --column 5 \
+  --operation count \
+  --output "$meta_temp_dir/output3.txt"
 
 log "Validating TEST 3 outputs..."
 check_file_exists "$meta_temp_dir/output3.txt" "count output file"
@@ -93,11 +93,11 @@ log "Starting TEST 4: Group by chromosome with min operation"
 
 log "Executing $meta_name with min operation..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --groupby 1 \
-    --column 5 \
-    --operation min \
-    --output "$meta_temp_dir/output4.txt"
+  --input "$test_dir/test.bed" \
+  --groupby 1 \
+  --column 5 \
+  --operation min \
+  --output "$meta_temp_dir/output4.txt"
 
 log "Validating TEST 4 outputs..."
 check_file_exists "$meta_temp_dir/output4.txt" "min output file"
@@ -109,12 +109,12 @@ log "Starting TEST 5: Group with full output and header"
 
 log "Executing $meta_name with full output options..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --groupby 1 \
-    --column 5 \
-    --operation sum \
-    --full \
-    --output "$meta_temp_dir/output5.txt"
+  --input "$test_dir/test.bed" \
+  --groupby 1 \
+  --column 5 \
+  --operation sum \
+  --full \
+  --output "$meta_temp_dir/output5.txt"
 
 log "Validating TEST 5 outputs..."
 check_file_exists "$meta_temp_dir/output5.txt" "full output file"

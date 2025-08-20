@@ -18,7 +18,7 @@ unset_if_false=(
 
 for par in "${unset_if_false[@]}"; do
   test_val="${!par}"
-  [[ "$test_val" == "false" ]] && unset $par
+  [[ "$test_val" == "false" ]] && unset "$par"
 done
 
 # Execute bedtools sort

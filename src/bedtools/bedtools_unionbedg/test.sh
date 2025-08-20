@@ -41,8 +41,8 @@ EOF
 log "TEST 1: Basic union of two BEDGRAPH files"
 
 "$meta_executable" \
-    --files "$meta_temp_dir/sample1.bedgraph;$meta_temp_dir/sample2.bedgraph" \
-    --output "$meta_temp_dir/union_basic.bedgraph"
+  --files "$meta_temp_dir/sample1.bedgraph;$meta_temp_dir/sample2.bedgraph" \
+  --output "$meta_temp_dir/union_basic.bedgraph"
 
 check_file_exists "$meta_temp_dir/union_basic.bedgraph" "basic union output"
 check_file_not_empty "$meta_temp_dir/union_basic.bedgraph" "basic union output"
@@ -54,19 +54,19 @@ log "✓ Basic union test passed"
 log "TEST 2: Union with header option"
 
 "$meta_executable" \
-    --files "$meta_temp_dir/sample1.bedgraph;$meta_temp_dir/sample2.bedgraph" \
-    --output "$meta_temp_dir/union_header.bedgraph" \
-    --header
+  --files "$meta_temp_dir/sample1.bedgraph;$meta_temp_dir/sample2.bedgraph" \
+  --output "$meta_temp_dir/union_header.bedgraph" \
+  --header
 
 check_file_exists "$meta_temp_dir/union_header.bedgraph" "union output with header"
 check_file_not_empty "$meta_temp_dir/union_header.bedgraph" "union output with header"
 
 # Check that header line is present (should start with 'chrom')
 if head -1 "$meta_temp_dir/union_header.bedgraph" | grep -q "chrom"; then
-    log "✓ Header line correctly added"
+  log "✓ Header line correctly added"
 else
-    log "✗ Header line missing or incorrect"
-    exit 1
+  log "✗ Header line missing or incorrect"
+  exit 1
 fi
 
 log "✓ Header option test passed"
@@ -76,8 +76,8 @@ log "✓ Header option test passed"
 log "TEST 3: Union with multiple files"
 
 "$meta_executable" \
-    --files "$meta_temp_dir/sample1.bedgraph;$meta_temp_dir/sample2.bedgraph;$meta_temp_dir/sample3.bedgraph" \
-    --output "$meta_temp_dir/union_multiple.bedgraph"
+  --files "$meta_temp_dir/sample1.bedgraph;$meta_temp_dir/sample2.bedgraph;$meta_temp_dir/sample3.bedgraph" \
+  --output "$meta_temp_dir/union_multiple.bedgraph"
 
 check_file_exists "$meta_temp_dir/union_multiple.bedgraph" "multiple files union output"
 check_file_not_empty "$meta_temp_dir/union_multiple.bedgraph" "multiple files union output"
@@ -86,10 +86,10 @@ check_file_not_empty "$meta_temp_dir/union_multiple.bedgraph" "multiple files un
 expected_columns=6
 actual_columns=$(head -1 "$meta_temp_dir/union_multiple.bedgraph" | wc -w)
 if [ "$actual_columns" -eq "$expected_columns" ]; then
-    log "✓ Output has correct number of columns ($actual_columns)"
+  log "✓ Output has correct number of columns ($actual_columns)"
 else
-    log "✗ Expected $expected_columns columns, got $actual_columns"
-    exit 1
+  log "✗ Expected $expected_columns columns, got $actual_columns"
+  exit 1
 fi
 
 log "✓ Multiple files test passed"
@@ -99,12 +99,12 @@ log "✓ Multiple files test passed"
 log "TEST 4: Error handling - Missing input files"
 
 if "$meta_executable" \
-    --files "/nonexistent/file1.bedgraph" "/nonexistent/file2.bedgraph" \
-    --output "$meta_temp_dir/error_test.bedgraph" 2>/dev/null; then
-    log "✗ Should have failed with missing input files"
-    exit 1
+  --files "/nonexistent/file1.bedgraph" "/nonexistent/file2.bedgraph" \
+  --output "$meta_temp_dir/error_test.bedgraph" 2>/dev/null; then
+  log "✗ Should have failed with missing input files"
+  exit 1
 else
-    log "✓ Correctly handled missing input files"
+  log "✓ Correctly handled missing input files"
 fi
 
 ####################################################################################################
@@ -112,11 +112,11 @@ fi
 log "TEST 5: Error handling - Missing output parameter"
 
 if "$meta_executable" \
-    --files "$meta_temp_dir/sample1.bedgraph" "$meta_temp_dir/sample2.bedgraph" 2>/dev/null; then
-    log "✗ Should have failed without output parameter"
-    exit 1
+  --files "$meta_temp_dir/sample1.bedgraph" "$meta_temp_dir/sample2.bedgraph" 2>/dev/null; then
+  log "✗ Should have failed without output parameter"
+  exit 1
 else
-    log "✓ Correctly handled missing output parameter"
+  log "✓ Correctly handled missing output parameter"
 fi
 
 ####################################################################################################

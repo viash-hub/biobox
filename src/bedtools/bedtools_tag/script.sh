@@ -24,8 +24,8 @@ fi
 # Labels are required unless using names/scores/intervals options
 if [ -n "${par_labels:-}" ]; then
   if [ ${#files_array[@]} -ne ${#labels_array[@]} ]; then
-      echo "Error: Number of files (${#files_array[@]}) must match number of labels (${#labels_array[@]})" >&2
-      exit 1
+    echo "Error: Number of files (${#files_array[@]}) must match number of labels (${#labels_array[@]})" >&2
+    exit 1
   fi
 elif [ -z "${par_use_names:-}" ] && [ -z "${par_use_scores:-}" ] && [ -z "${par_use_intervals:-}" ]; then
   echo "Error: Must provide --labels unless using --use_names, --use_scores, or --use_intervals" >&2

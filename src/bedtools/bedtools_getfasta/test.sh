@@ -39,9 +39,9 @@ log "Starting TEST 1: Basic FASTA sequence extraction"
 
 log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
-    --input_bed "$test_dir/test.bed" \
-    --input_fasta "$test_dir/test.fa" \
-    --output "$meta_temp_dir/output1.fasta"
+  --input_bed "$test_dir/test.bed" \
+  --input_fasta "$test_dir/test.fa" \
+  --output "$meta_temp_dir/output1.fasta"
 
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/output1.fasta" "output FASTA file"
@@ -55,10 +55,10 @@ log "Starting TEST 2: FASTA extraction with --name option"
 
 log "Executing $meta_name with --name option..."
 "$meta_executable" \
-    --input_bed "$test_dir/test.bed" \
-    --input_fasta "$test_dir/test.fa" \
-    --name \
-    --output "$meta_temp_dir/output2.fasta"
+  --input_bed "$test_dir/test.bed" \
+  --input_fasta "$test_dir/test.fa" \
+  --name \
+  --output "$meta_temp_dir/output2.fasta"
 
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/output2.fasta" "output FASTA file with names"
@@ -72,10 +72,10 @@ log "Starting TEST 3: FASTA extraction with --name_only option"
 
 log "Executing $meta_name with --name_only option..."
 "$meta_executable" \
-    --input_bed "$test_dir/test.bed" \
-    --input_fasta "$test_dir/test.fa" \
-    --name_only \
-    --output "$meta_temp_dir/output3.fasta"
+  --input_bed "$test_dir/test.bed" \
+  --input_fasta "$test_dir/test.fa" \
+  --name_only \
+  --output "$meta_temp_dir/output3.fasta"
 
 log "Validating TEST 3 outputs..."
 check_file_exists "$meta_temp_dir/output3.fasta" "output FASTA file with name only"
@@ -89,11 +89,11 @@ log "Starting TEST 4: Tab-delimited output with --tab option"
 
 log "Executing $meta_name with --tab option..."
 "$meta_executable" \
-    --input_bed "$test_dir/test.bed" \
-    --input_fasta "$test_dir/test.fa" \
-    --name_only \
-    --tab \
-    --output "$meta_temp_dir/output4.txt"
+  --input_bed "$test_dir/test.bed" \
+  --input_fasta "$test_dir/test.fa" \
+  --name_only \
+  --tab \
+  --output "$meta_temp_dir/output4.txt"
 
 log "Validating TEST 4 outputs..."
 check_file_exists "$meta_temp_dir/output4.txt" "tab-delimited output file"
@@ -107,10 +107,10 @@ log "Starting TEST 5: BED output format with --bed_out option"
 
 log "Executing $meta_name with --bed_out option..."
 "$meta_executable" \
-    --input_bed "$test_dir/test.bed" \
-    --input_fasta "$test_dir/test.fa" \
-    --bed_out \
-    --output "$meta_temp_dir/output5.bed"
+  --input_bed "$test_dir/test.bed" \
+  --input_fasta "$test_dir/test.fa" \
+  --bed_out \
+  --output "$meta_temp_dir/output5.bed"
 
 log "Validating TEST 5 outputs..."
 check_file_exists "$meta_temp_dir/output5.bed" "BED output file"

@@ -41,9 +41,9 @@ EOF
 # Test 1: Basic annotation with coverage fractions
 log "Starting TEST 1: Basic annotation with coverage fractions"
 "$meta_executable" \
-    --input "$meta_temp_dir/intervals.bed" \
-    --files "$meta_temp_dir/annotation1.bed;$meta_temp_dir/annotation2.bed" \
-    --output "$meta_temp_dir/output1.bed"
+  --input "$meta_temp_dir/intervals.bed" \
+  --files "$meta_temp_dir/annotation1.bed;$meta_temp_dir/annotation2.bed" \
+  --output "$meta_temp_dir/output1.bed"
 
 check_file_exists "$meta_temp_dir/output1.bed" "basic annotation output"
 check_file_not_empty "$meta_temp_dir/output1.bed" "basic annotation output"
@@ -56,10 +56,10 @@ log "✅ TEST 1 completed successfully"
 # Test 2: Annotation with feature counts
 log "Starting TEST 2: Annotation with feature counts"
 "$meta_executable" \
-    --input "$meta_temp_dir/intervals.bed" \
-    --files "$meta_temp_dir/annotation1.bed;$meta_temp_dir/annotation2.bed" \
-    --output "$meta_temp_dir/output2.bed" \
-    --counts
+  --input "$meta_temp_dir/intervals.bed" \
+  --files "$meta_temp_dir/annotation1.bed;$meta_temp_dir/annotation2.bed" \
+  --output "$meta_temp_dir/output2.bed" \
+  --counts
 
 check_file_exists "$meta_temp_dir/output2.bed" "count annotation output"
 check_file_not_empty "$meta_temp_dir/output2.bed" "count annotation output"
@@ -71,10 +71,10 @@ log "✅ TEST 2 completed successfully"
 # Test 3: Annotation with both counts and fractions
 log "Starting TEST 3: Annotation with both counts and fractions"
 "$meta_executable" \
-    --input "$meta_temp_dir/intervals.bed" \
-    --files "$meta_temp_dir/annotation1.bed" \
-    --output "$meta_temp_dir/output3.bed" \
-    --both
+  --input "$meta_temp_dir/intervals.bed" \
+  --files "$meta_temp_dir/annotation1.bed" \
+  --output "$meta_temp_dir/output3.bed" \
+  --both
 
 check_file_exists "$meta_temp_dir/output3.bed" "both metrics output"
 check_file_not_empty "$meta_temp_dir/output3.bed" "both metrics output"
@@ -87,10 +87,10 @@ log "✅ TEST 3 completed successfully"
 # Test 4: Annotation with custom names
 log "Starting TEST 4: Annotation with custom names"
 "$meta_executable" \
-    --input "$meta_temp_dir/intervals.bed" \
-    --files "$meta_temp_dir/annotation1.bed;$meta_temp_dir/annotation2.bed" \
-    --names "ChIP_peaks;DNA_meth" \
-    --output "$meta_temp_dir/output4.bed"
+  --input "$meta_temp_dir/intervals.bed" \
+  --files "$meta_temp_dir/annotation1.bed;$meta_temp_dir/annotation2.bed" \
+  --names "ChIP_peaks;DNA_meth" \
+  --output "$meta_temp_dir/output4.bed"
 
 check_file_exists "$meta_temp_dir/output4.bed" "named annotation output"
 check_file_not_empty "$meta_temp_dir/output4.bed" "named annotation output"
@@ -101,10 +101,10 @@ log "✅ TEST 4 completed successfully"
 # Test 5: Strand-specific annotation (same strand)
 log "Starting TEST 5: Strand-specific annotation (same strand)"
 "$meta_executable" \
-    --input "$meta_temp_dir/intervals.bed" \
-    --files "$meta_temp_dir/annotation1.bed" \
-    --output "$meta_temp_dir/output5.bed" \
-    --strand
+  --input "$meta_temp_dir/intervals.bed" \
+  --files "$meta_temp_dir/annotation1.bed" \
+  --output "$meta_temp_dir/output5.bed" \
+  --strand
 
 check_file_exists "$meta_temp_dir/output5.bed" "strand-specific annotation output"
 check_file_not_empty "$meta_temp_dir/output5.bed" "strand-specific annotation output"

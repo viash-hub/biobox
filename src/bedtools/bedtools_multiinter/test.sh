@@ -46,10 +46,10 @@ EOF
 
 log "TEST 1: Basic multiinter functionality"
 "$meta_executable" \
-    --input "$meta_temp_dir/file1.bed" \
-    --input "$meta_temp_dir/file2.bed" \
-    --input "$meta_temp_dir/file3.bed" \
-    --output "$meta_temp_dir/test1_output.bed"
+  --input "$meta_temp_dir/file1.bed" \
+  --input "$meta_temp_dir/file2.bed" \
+  --input "$meta_temp_dir/file3.bed" \
+  --output "$meta_temp_dir/test1_output.bed"
 
 check_file_exists "$meta_temp_dir/test1_output.bed" "basic multiinter output"
 check_file_not_empty "$meta_temp_dir/test1_output.bed" "basic multiinter result"
@@ -58,9 +58,9 @@ check_file_not_empty "$meta_temp_dir/test1_output.bed" "basic multiinter result"
 # The output should have columns: chr, start, end, plus one column per input file (3 files = 3+ columns)
 num_columns=$(head -1 "$meta_temp_dir/test1_output.bed" | awk '{print NF}')
 if [ "$num_columns" -lt 6 ]; then  # chr, start, end + at least 3 file columns
-    log "ERROR: Output should have at least 6 columns (chr, start, end + 3 file columns), found $num_columns"
-    head -3 "$meta_temp_dir/test1_output.bed"
-    exit 1
+  log "ERROR: Output should have at least 6 columns (chr, start, end + 3 file columns), found $num_columns"
+  head -3 "$meta_temp_dir/test1_output.bed"
+  exit 1
 fi
 log "✓ Output has correct number of columns ($num_columns) for 3 input files"
 
@@ -68,11 +68,11 @@ log "✓ Output has correct number of columns ($num_columns) for 3 input files"
 
 log "TEST 2: With header (simple test)"
 "$meta_executable" \
-    --input "$meta_temp_dir/file1.bed" \
-    --input "$meta_temp_dir/file2.bed" \
-    --input "$meta_temp_dir/file3.bed" \
-    --header \
-    --output "$meta_temp_dir/test2_output.bed"
+  --input "$meta_temp_dir/file1.bed" \
+  --input "$meta_temp_dir/file2.bed" \
+  --input "$meta_temp_dir/file3.bed" \
+  --header \
+  --output "$meta_temp_dir/test2_output.bed"
 
 check_file_exists "$meta_temp_dir/test2_output.bed" "multiinter output with header"
 # bedtools multiinter uses 'chr' not 'chrom' in the header
@@ -82,12 +82,12 @@ check_file_contains "$meta_temp_dir/test2_output.bed" "chr" "header line"
 
 log "TEST 2b: Multiple names with header - test parameter passing"
 "$meta_executable" \
-    --input "$meta_temp_dir/file1.bed" \
-    --input "$meta_temp_dir/file2.bed" \
-    --input "$meta_temp_dir/file3.bed" \
-    --names "Sample_A" "Sample_B" "Sample_C" \
-    --header \
-    --output "$meta_temp_dir/test2b_output.bed"
+  --input "$meta_temp_dir/file1.bed" \
+  --input "$meta_temp_dir/file2.bed" \
+  --input "$meta_temp_dir/file3.bed" \
+  --names "Sample_A" "Sample_B" "Sample_C" \
+  --header \
+  --output "$meta_temp_dir/test2b_output.bed"
 
 check_file_exists "$meta_temp_dir/test2b_output.bed" "multiinter output with custom names"
 check_file_not_empty "$meta_temp_dir/test2b_output.bed" "custom names result"
@@ -100,12 +100,12 @@ log "✓ Component accepts names parameter and produces output (names may not ap
 
 log "TEST 3: Empty regions with genome file"
 "$meta_executable" \
-    --input "$meta_temp_dir/file1.bed" \
-    --input "$meta_temp_dir/file2.bed" \
-    --input "$meta_temp_dir/file3.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --empty \
-    --output "$meta_temp_dir/test3_output.bed"
+  --input "$meta_temp_dir/file1.bed" \
+  --input "$meta_temp_dir/file2.bed" \
+  --input "$meta_temp_dir/file3.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --empty \
+  --output "$meta_temp_dir/test3_output.bed"
 
 check_file_exists "$meta_temp_dir/test3_output.bed" "multiinter output with empty regions"
 check_file_not_empty "$meta_temp_dir/test3_output.bed" "empty regions result"
@@ -114,11 +114,11 @@ check_file_not_empty "$meta_temp_dir/test3_output.bed" "empty regions result"
 
 log "TEST 4: Custom filler text"
 "$meta_executable" \
-    --input "$meta_temp_dir/file1.bed" \
-    --input "$meta_temp_dir/file2.bed" \
-    --input "$meta_temp_dir/file3.bed" \
-    --filler "N/A" \
-    --output "$meta_temp_dir/test4_output.bed"
+  --input "$meta_temp_dir/file1.bed" \
+  --input "$meta_temp_dir/file2.bed" \
+  --input "$meta_temp_dir/file3.bed" \
+  --filler "N/A" \
+  --output "$meta_temp_dir/test4_output.bed"
 
 check_file_exists "$meta_temp_dir/test4_output.bed" "multiinter output with custom filler"
 
@@ -126,11 +126,11 @@ check_file_exists "$meta_temp_dir/test4_output.bed" "multiinter output with cust
 
 log "TEST 5: Clustering algorithm"
 "$meta_executable" \
-    --input "$meta_temp_dir/file1.bed" \
-    --input "$meta_temp_dir/file2.bed" \
-    --input "$meta_temp_dir/file3.bed" \
-    --cluster \
-    --output "$meta_temp_dir/test5_output.bed"
+  --input "$meta_temp_dir/file1.bed" \
+  --input "$meta_temp_dir/file2.bed" \
+  --input "$meta_temp_dir/file3.bed" \
+  --cluster \
+  --output "$meta_temp_dir/test5_output.bed"
 
 check_file_exists "$meta_temp_dir/test5_output.bed" "multiinter output with clustering"
 
@@ -138,11 +138,11 @@ check_file_exists "$meta_temp_dir/test5_output.bed" "multiinter output with clus
 
 log "TEST 6: Two input files only - verify multiple inputs work with different counts"
 "$meta_executable" \
-    --input "$meta_temp_dir/file1.bed" \
-    --input "$meta_temp_dir/file2.bed" \
-    --names "Dataset1" "Dataset2" \
-    --header \
-    --output "$meta_temp_dir/test6_output.bed"
+  --input "$meta_temp_dir/file1.bed" \
+  --input "$meta_temp_dir/file2.bed" \
+  --names "Dataset1" "Dataset2" \
+  --header \
+  --output "$meta_temp_dir/test6_output.bed"
 
 check_file_exists "$meta_temp_dir/test6_output.bed" "multiinter output with 2 files"
 check_file_not_empty "$meta_temp_dir/test6_output.bed" "two-file result"
@@ -150,9 +150,9 @@ check_file_not_empty "$meta_temp_dir/test6_output.bed" "two-file result"
 # Verify output has correct columns for 2 files (chr, start, end + additional columns)
 num_columns_2files=$(head -1 "$meta_temp_dir/test6_output.bed" | awk '{print NF}')
 if [ "$num_columns_2files" -lt 5 ]; then
-    log "ERROR: Output for 2 files should have at least 5 columns, found $num_columns_2files"
-    head -1 "$meta_temp_dir/test6_output.bed"
-    exit 1
+  log "ERROR: Output for 2 files should have at least 5 columns, found $num_columns_2files"
+  head -1 "$meta_temp_dir/test6_output.bed"
+  exit 1
 fi
 log "✓ Two-file input works correctly with $num_columns_2files columns"
 

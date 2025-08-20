@@ -51,8 +51,8 @@ EOF
 # Test 1: Basic clustering of overlapping intervals
 log "Starting TEST 1: Basic clustering of overlapping intervals"
 "$meta_executable" \
-    --input "$meta_temp_dir/overlapping.bed" \
-    --output "$meta_temp_dir/output1.bed"
+  --input "$meta_temp_dir/overlapping.bed" \
+  --output "$meta_temp_dir/output1.bed"
 
 check_file_exists "$meta_temp_dir/output1.bed" "basic clustering output"
 check_file_not_empty "$meta_temp_dir/output1.bed" "basic clustering output"
@@ -62,23 +62,23 @@ check_file_line_count "$meta_temp_dir/output1.bed" 7 "basic clustering line coun
 input_cols=$(head -1 "$meta_temp_dir/overlapping.bed" | awk '{print NF}')
 output_cols=$(head -1 "$meta_temp_dir/output1.bed" | awk '{print NF}')
 if [ $output_cols -ne $((input_cols + 1)) ]; then
-    log_error "Expected $((input_cols + 1)) columns in output, got $output_cols"
-    exit 1
+  log_error "Expected $((input_cols + 1)) columns in output, got $output_cols"
+  exit 1
 fi
 
 # Check that overlapping intervals get the same cluster ID
 if ! grep -q "	1$" "$meta_temp_dir/output1.bed"; then
-    log_error "Expected cluster ID 1 in output"
-    exit 1
+  log_error "Expected cluster ID 1 in output"
+  exit 1
 fi
 log "✅ TEST 1 completed successfully"
 
 # Test 2: Distance-based clustering
 log "Starting TEST 2: Distance-based clustering"
 "$meta_executable" \
-    --input "$meta_temp_dir/nearby.bed" \
-    --distance 100 \
-    --output "$meta_temp_dir/output2.bed"
+  --input "$meta_temp_dir/nearby.bed" \
+  --distance 100 \
+  --output "$meta_temp_dir/output2.bed"
 
 check_file_exists "$meta_temp_dir/output2.bed" "distance clustering output"
 check_file_not_empty "$meta_temp_dir/output2.bed" "distance clustering output"
@@ -92,9 +92,9 @@ log "✅ TEST 2 completed successfully"
 # Test 3: Strand-specific clustering
 log "Starting TEST 3: Strand-specific clustering"
 "$meta_executable" \
-    --input "$meta_temp_dir/stranded.bed" \
-    --strand \
-    --output "$meta_temp_dir/output3.bed"
+  --input "$meta_temp_dir/stranded.bed" \
+  --strand \
+  --output "$meta_temp_dir/output3.bed"
 
 check_file_exists "$meta_temp_dir/output3.bed" "strand clustering output"
 check_file_not_empty "$meta_temp_dir/output3.bed" "strand clustering output"
@@ -105,17 +105,17 @@ check_file_line_count "$meta_temp_dir/output3.bed" 6 "strand clustering line cou
 pos_cluster=$(grep "pos1" "$meta_temp_dir/output3.bed" | awk '{print $NF}')
 neg_cluster=$(grep "neg1" "$meta_temp_dir/output3.bed" | awk '{print $NF}')
 if [ "$pos_cluster" = "$neg_cluster" ]; then
-    log_error "Expected different cluster IDs for + and - strand overlapping features"
-    exit 1
+  log_error "Expected different cluster IDs for + and - strand overlapping features"
+  exit 1
 fi
 log "✅ TEST 3 completed successfully"
 
 # Test 4: Large distance clustering
 log "Starting TEST 4: Large distance clustering"
 "$meta_executable" \
-    --input "$meta_temp_dir/nearby.bed" \
-    --distance 1000 \
-    --output "$meta_temp_dir/output4.bed"
+  --input "$meta_temp_dir/nearby.bed" \
+  --distance 1000 \
+  --output "$meta_temp_dir/output4.bed"
 
 check_file_exists "$meta_temp_dir/output4.bed" "large distance clustering output"
 check_file_not_empty "$meta_temp_dir/output4.bed" "large distance clustering output"
@@ -124,7 +124,7 @@ check_file_line_count "$meta_temp_dir/output4.bed" 7 "large distance clustering 
 # With distance 1000, most chr1 intervals should cluster together
 chr1_clusters=$(grep "^chr1" "$meta_temp_dir/output4.bed" | awk '{print $NF}' | sort -u | wc -l)
 if [ $chr1_clusters -gt 2 ]; then
-    log "Warning: Expected few clusters on chr1 with distance 1000, got $chr1_clusters"
+  log "Warning: Expected few clusters on chr1 with distance 1000, got $chr1_clusters"
 fi
 log "✅ TEST 4 completed successfully"
 
@@ -132,8 +132,8 @@ log "✅ TEST 4 completed successfully"
 log "Starting TEST 5: Multiple chromosome handling"
 # This test uses the overlapping.bed which has both chr1 and chr2
 "$meta_executable" \
-    --input "$meta_temp_dir/overlapping.bed" \
-    --output "$meta_temp_dir/output5.bed"
+  --input "$meta_temp_dir/overlapping.bed" \
+  --output "$meta_temp_dir/output5.bed"
 
 check_file_exists "$meta_temp_dir/output5.bed" "multi-chromosome output"
 check_file_not_empty "$meta_temp_dir/output5.bed" "multi-chromosome output"
@@ -146,7 +146,7 @@ check_file_contains "$meta_temp_dir/output5.bed" "chr2" "chr2 features present"
 chr1_max_cluster=$(grep "^chr1" "$meta_temp_dir/output5.bed" | awk '{print $NF}' | sort -n | tail -1)
 chr2_min_cluster=$(grep "^chr2" "$meta_temp_dir/output5.bed" | awk '{print $NF}' | sort -n | head -1)
 if [ $chr2_min_cluster -le $chr1_max_cluster ]; then
-    log "ℹ️  Note: Cluster IDs may continue across chromosomes (cluster numbering: chr1 max=$chr1_max_cluster, chr2 min=$chr2_min_cluster)"
+  log "ℹ️  Note: Cluster IDs may continue across chromosomes (cluster numbering: chr1 max=$chr1_max_cluster, chr2 min=$chr2_min_cluster)"
 fi
 log "✅ TEST 5 completed successfully"
 

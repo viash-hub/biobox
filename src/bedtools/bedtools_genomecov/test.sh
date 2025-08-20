@@ -42,9 +42,9 @@ log "Starting TEST 1: Basic coverage histogram"
 
 log "Executing $meta_name with default histogram output..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --genome "$test_dir/test.genome" \
-    --output "$meta_temp_dir/output1.txt"
+  --input "$test_dir/test.bed" \
+  --genome "$test_dir/test.genome" \
+  --output "$meta_temp_dir/output1.txt"
 
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/output1.txt" "histogram output file"
@@ -57,8 +57,8 @@ log "Histogram contains $line_count lines"
 
 # Check that it contains expected format
 head -1 "$meta_temp_dir/output1.txt" | awk 'NF != 5 { exit 1 }' || {
-    log_error "Histogram format incorrect (expected 5 columns)"
-    exit 1
+  log_error "Histogram format incorrect (expected 5 columns)"
+  exit 1
 }
 
 log "✅ TEST 1 completed successfully"
@@ -68,10 +68,10 @@ log "Starting TEST 2: BedGraph format output"
 
 log "Executing $meta_name with BedGraph format..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --genome "$test_dir/test.genome" \
-    --output "$meta_temp_dir/output2.bg" \
-    --bed_graph
+  --input "$test_dir/test.bed" \
+  --genome "$test_dir/test.genome" \
+  --output "$meta_temp_dir/output2.bg" \
+  --bed_graph
 
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/output2.bg" "BedGraph output file"
@@ -79,14 +79,14 @@ check_file_not_empty "$meta_temp_dir/output2.bg" "BedGraph output file"
 
 # Check BedGraph format (chromosome, start, end, depth)
 head -1 "$meta_temp_dir/output2.bg" | awk 'NF != 4 { exit 1 }' || {
-    log_error "BedGraph format incorrect (expected 4 columns)"
-    exit 1
+  log_error "BedGraph format incorrect (expected 4 columns)"
+  exit 1
 }
 
 # Check that coordinates make sense (start < end)
 awk '$2 >= $3 { print "Invalid coordinates: " $0; exit 1 }' "$meta_temp_dir/output2.bg" || {
-    log_error "Invalid BedGraph coordinates found"
-    exit 1
+  log_error "Invalid BedGraph coordinates found"
+  exit 1
 }
 
 log "✅ TEST 2 completed successfully"
@@ -96,10 +96,10 @@ log "Starting TEST 3: Per-base depth output"
 
 log "Executing $meta_name with per-base depth..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --genome "$test_dir/test.genome" \
-    --output "$meta_temp_dir/output3.depth" \
-    --depth
+  --input "$test_dir/test.bed" \
+  --genome "$test_dir/test.genome" \
+  --output "$meta_temp_dir/output3.depth" \
+  --depth
 
 log "Validating TEST 3 outputs..."
 check_file_exists "$meta_temp_dir/output3.depth" "depth output file"
@@ -107,8 +107,8 @@ check_file_not_empty "$meta_temp_dir/output3.depth" "depth output file"
 
 # Check depth format (chromosome, position, depth)
 head -1 "$meta_temp_dir/output3.depth" | awk 'NF != 3 { exit 1 }' || {
-    log_error "Depth format incorrect (expected 3 columns)"
-    exit 1
+  log_error "Depth format incorrect (expected 3 columns)"
+  exit 1
 }
 
 log "✅ TEST 3 completed successfully"
@@ -118,10 +118,10 @@ log "Starting TEST 4: BedGraph with zero coverage"
 
 log "Executing $meta_name with BedGraph including zero coverage..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --genome "$test_dir/test.genome" \
-    --output "$meta_temp_dir/output4.bga" \
-    --bed_graph_zero_coverage
+  --input "$test_dir/test.bed" \
+  --genome "$test_dir/test.genome" \
+  --output "$meta_temp_dir/output4.bga" \
+  --bed_graph_zero_coverage
 
 log "Validating TEST 4 outputs..."
 check_file_exists "$meta_temp_dir/output4.bga" "BedGraph+zero output file"
@@ -134,9 +134,9 @@ log "BedGraph lines: $bg_size, BedGraph+zero lines: $bga_size"
 
 # Check that we can find zero coverage regions
 if grep -q "	0$" "$meta_temp_dir/output4.bga"; then
-    log "✓ Found zero coverage regions in output"
+  log "✓ Found zero coverage regions in output"
 else
-    log "Note: No zero coverage regions found (this may be expected with test data)"
+  log "Note: No zero coverage regions found (this may be expected with test data)"
 fi
 
 log "✅ TEST 4 completed successfully"
@@ -152,10 +152,10 @@ EOF
 
 log "Executing $meta_name with strand-specific coverage..."
 "$meta_executable" \
-    --input "$test_dir/strand.bed" \
-    --genome "$test_dir/test.genome" \
-    --output "$meta_temp_dir/output5.txt" \
-    --strand "+"
+  --input "$test_dir/strand.bed" \
+  --genome "$test_dir/test.genome" \
+  --output "$meta_temp_dir/output5.txt" \
+  --strand "+"
 
 log "Validating TEST 5 outputs..."
 check_file_exists "$meta_temp_dir/output5.txt" "strand-specific output file"

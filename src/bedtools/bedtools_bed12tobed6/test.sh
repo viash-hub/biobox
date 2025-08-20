@@ -32,8 +32,8 @@ log "Starting TEST 1: Basic BED12 to BED6 conversion"
 
 log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
-    --input "$test_dir/test.bed12" \
-    --output "$meta_temp_dir/output1.bed6"
+  --input "$test_dir/test.bed12" \
+  --output "$meta_temp_dir/output1.bed6"
 
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/output1.bed6" "output BED6 file"
@@ -41,8 +41,8 @@ check_file_not_empty "$meta_temp_dir/output1.bed6" "output BED6 file"
 
 # Check that BED6 file has correct number of columns (6 columns)
 awk 'NF != 6 { exit 1 }' "$meta_temp_dir/output1.bed6" || { 
-    log_error "Output is not in BED6 format (expected 6 columns per line)"
-    exit 1 
+  log_error "Output is not in BED6 format (expected 6 columns per line)"
+  exit 1 
 }
 
 # Check that we have more BED6 entries than BED12 entries (due to block splitting)
@@ -51,8 +51,8 @@ bed6_lines=$(wc -l < "$meta_temp_dir/output1.bed6")
 log "Input BED12: $bed12_lines lines, Output BED6: $bed6_lines lines"
 
 [ "$bed6_lines" -gt "$bed12_lines" ] || { 
-    log_error "Expected more BED6 lines than BED12 lines due to block splitting"
-    exit 1 
+  log_error "Expected more BED6 lines than BED12 lines due to block splitting"
+  exit 1 
 }
 
 # Check that gene names are preserved
@@ -66,9 +66,9 @@ log "Starting TEST 2: BED12 to BED6 with block numbering"
 
 log "Executing $meta_name with --n_score flag..."
 "$meta_executable" \
-    --input "$test_dir/test.bed12" \
-    --output "$meta_temp_dir/output2.bed6" \
-    --n_score
+  --input "$test_dir/test.bed12" \
+  --output "$meta_temp_dir/output2.bed6" \
+  --n_score
 
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/output2.bed6" "output BED6 file with block numbers"
@@ -76,8 +76,8 @@ check_file_not_empty "$meta_temp_dir/output2.bed6" "output BED6 file with block 
 
 # Check that BED6 file has correct number of columns
 awk 'NF != 6 { exit 1 }' "$meta_temp_dir/output2.bed6" || { 
-    log_error "Output is not in BED6 format (expected 6 columns per line)"
-    exit 1 
+  log_error "Output is not in BED6 format (expected 6 columns per line)"
+  exit 1 
 }
 
 # Check that scores are block numbers (should contain "1", "2", "3" for gene1 with 3 blocks)
@@ -97,8 +97,8 @@ EOF
 
 log "Executing $meta_name with single-block BED12..."
 "$meta_executable" \
-    --input "$test_dir/single_block.bed12" \
-    --output "$meta_temp_dir/output3.bed6"
+  --input "$test_dir/single_block.bed12" \
+  --output "$meta_temp_dir/output3.bed6"
 
 log "Validating TEST 3 outputs..."
 check_file_exists "$meta_temp_dir/output3.bed6" "single-block BED6 output"
@@ -107,8 +107,8 @@ check_file_not_empty "$meta_temp_dir/output3.bed6" "single-block BED6 output"
 # Should have exactly one line (single block)
 single_lines=$(wc -l < "$meta_temp_dir/output3.bed6")
 [ "$single_lines" -eq 1 ] || { 
-    log_error "Expected exactly 1 line for single-block BED12, got $single_lines"
-    exit 1 
+  log_error "Expected exactly 1 line for single-block BED12, got $single_lines"
+  exit 1 
 }
 
 # Check that it contains the expected gene name

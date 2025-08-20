@@ -47,9 +47,9 @@ log "Starting TEST 1: Basic BED to BAM conversion"
 
 log "Executing $meta_name with basic BED file..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --genome "$test_dir/test.genome" \
-    --output "$meta_temp_dir/output1.bam"
+  --input "$test_dir/test.bed" \
+  --genome "$test_dir/test.genome" \
+  --output "$meta_temp_dir/output1.bam"
 
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/output1.bam" "output BAM file"
@@ -57,15 +57,15 @@ check_file_not_empty "$meta_temp_dir/output1.bam" "output BAM file"
 
 # Check if it's a valid BAM file by reading header
 if command -v samtools >/dev/null 2>&1; then
-    samtools view -H "$meta_temp_dir/output1.bam" > "$meta_temp_dir/header1.txt" 2>/dev/null || true
-    if [ -s "$meta_temp_dir/header1.txt" ]; then
-        check_file_contains "$meta_temp_dir/header1.txt" "@HD" "BAM header"
-        log "✓ Valid BAM format detected"
-    else
-        log "Note: Cannot validate BAM format (samtools not available or BAM corrupt)"
-    fi
+  samtools view -H "$meta_temp_dir/output1.bam" > "$meta_temp_dir/header1.txt" 2>/dev/null || true
+  if [ -s "$meta_temp_dir/header1.txt" ]; then
+      check_file_contains "$meta_temp_dir/header1.txt" "@HD" "BAM header"
+      log "✓ Valid BAM format detected"
+  else
+      log "Note: Cannot validate BAM format (samtools not available or BAM corrupt)"
+  fi
 else
-    log "Note: samtools not available for BAM validation"
+  log "Note: samtools not available for BAM validation"
 fi
 
 log "✅ TEST 1 completed successfully"
@@ -75,10 +75,10 @@ log "Starting TEST 2: BED12 to BAM conversion"
 
 log "Executing $meta_name with BED12 format..."
 "$meta_executable" \
-    --input "$test_dir/test.bed12" \
-    --genome "$test_dir/test.genome" \
-    --output "$meta_temp_dir/output2.bam" \
-    --bed12
+  --input "$test_dir/test.bed12" \
+  --genome "$test_dir/test.genome" \
+  --output "$meta_temp_dir/output2.bam" \
+  --bed12
 
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/output2.bam" "BED12 output BAM file"
@@ -91,10 +91,10 @@ log "Starting TEST 3: Custom mapping quality"
 
 log "Executing $meta_name with custom mapping quality..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --genome "$test_dir/test.genome" \
-    --output "$meta_temp_dir/output3.bam" \
-    --map_quality 30
+  --input "$test_dir/test.bed" \
+  --genome "$test_dir/test.genome" \
+  --output "$meta_temp_dir/output3.bam" \
+  --map_quality 30
 
 log "Validating TEST 3 outputs..."
 check_file_exists "$meta_temp_dir/output3.bam" "output BAM with custom MAPQ"
@@ -107,10 +107,10 @@ log "Starting TEST 4: Uncompressed BAM output"
 
 log "Executing $meta_name with uncompressed BAM..."
 "$meta_executable" \
-    --input "$test_dir/test.bed" \
-    --genome "$test_dir/test.genome" \
-    --output "$meta_temp_dir/output4.bam" \
-    --uncompress_bam
+  --input "$test_dir/test.bed" \
+  --genome "$test_dir/test.genome" \
+  --output "$meta_temp_dir/output4.bam" \
+  --uncompress_bam
 
 log "Validating TEST 4 outputs..."
 check_file_exists "$meta_temp_dir/output4.bam" "uncompressed BAM file"

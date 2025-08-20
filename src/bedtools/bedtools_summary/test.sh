@@ -44,28 +44,28 @@ check_file_exists "$meta_temp_dir/genome.txt" "genome file"
 log "TEST 1: Basic summary statistics"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --output "$meta_temp_dir/basic_summary.txt"
+  --input "$meta_temp_dir/input.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --output "$meta_temp_dir/basic_summary.txt"
 
 check_file_exists "$meta_temp_dir/basic_summary.txt" "basic summary output"
 check_file_not_empty "$meta_temp_dir/basic_summary.txt" "basic summary output"
 
 # Check that output contains statistical information
 if [ -s "$meta_temp_dir/basic_summary.txt" ]; then
-    log "✓ Summary statistics generated successfully"
+  log "✓ Summary statistics generated successfully"
 else
-    log "✗ Summary statistics generation failed"
-    exit 1
+  log "✗ Summary statistics generation failed"
+  exit 1
 fi
 
 # Verify output has reasonable content (should be text with statistics)
 line_count=$(wc -l < "$meta_temp_dir/basic_summary.txt")
 if [ "$line_count" -gt 0 ]; then
-    log "✓ Summary output contains $line_count lines of statistics"
+  log "✓ Summary output contains $line_count lines of statistics"
 else
-    log "✗ Summary output is unexpectedly empty"
-    exit 1
+  log "✗ Summary output is unexpectedly empty"
+  exit 1
 fi
 
 ####################################################################################################
@@ -76,11 +76,11 @@ log "TEST 2: Output format verification"
 if grep -q "chrom" "$meta_temp_dir/basic_summary.txt" && \
    grep -q "num_ivls" "$meta_temp_dir/basic_summary.txt" && \
    grep -q "total_ivl_bp" "$meta_temp_dir/basic_summary.txt"; then
-    log "✓ Summary output contains expected column headers"
+  log "✓ Summary output contains expected column headers"
 else
-    log "✗ Summary output format verification failed"
-    cat "$meta_temp_dir/basic_summary.txt"
-    exit 1
+  log "✗ Summary output format verification failed"
+  cat "$meta_temp_dir/basic_summary.txt"
+  exit 1
 fi
 
 # Check that both per-chromosome and summary ('all') lines are present
@@ -88,11 +88,11 @@ if grep -q "chr1" "$meta_temp_dir/basic_summary.txt" && \
    grep -q "chr2" "$meta_temp_dir/basic_summary.txt" && \
    grep -q "chr3" "$meta_temp_dir/basic_summary.txt" && \
    grep -q "all" "$meta_temp_dir/basic_summary.txt"; then
-    log "✓ Output contains both per-chromosome and summary statistics"
+  log "✓ Output contains both per-chromosome and summary statistics"
 else
-    log "✗ Output format does not match expected structure"
-    cat "$meta_temp_dir/basic_summary.txt"
-    exit 1
+  log "✗ Output format does not match expected structure"
+  cat "$meta_temp_dir/basic_summary.txt"
+  exit 1
 fi
 
 ####################################################################################################
@@ -102,11 +102,11 @@ log "TEST 3: Statistical values verification"
 # Verify that statistical values are reasonable
 # We have 8 intervals total in our test data
 if grep -q "all.*8" "$meta_temp_dir/basic_summary.txt"; then
-    log "✓ Correct total number of intervals reported"
+  log "✓ Correct total number of intervals reported"
 else
-    log "✗ Total interval count is incorrect"
-    cat "$meta_temp_dir/basic_summary.txt"
-    exit 1
+  log "✗ Total interval count is incorrect"
+  cat "$meta_temp_dir/basic_summary.txt"
+  exit 1
 fi
 
 # Check that chromosome-specific counts are correct
@@ -114,11 +114,11 @@ fi
 if grep "^chr1" "$meta_temp_dir/basic_summary.txt" | grep -q "4" && \
    grep "^chr2" "$meta_temp_dir/basic_summary.txt" | grep -q "3" && \
    grep "^chr3" "$meta_temp_dir/basic_summary.txt" | grep -q "1"; then
-    log "✓ Per-chromosome interval counts are correct"
+  log "✓ Per-chromosome interval counts are correct"
 else
-    log "✗ Per-chromosome counts are incorrect"
-    cat "$meta_temp_dir/basic_summary.txt"
-    exit 1
+  log "✗ Per-chromosome counts are incorrect"
+  cat "$meta_temp_dir/basic_summary.txt"
+  exit 1
 fi
 
 ####################################################################################################
@@ -132,9 +132,9 @@ chr1	500	700	feature2	200	+
 EOF
 
 "$meta_executable" \
-    --input "$meta_temp_dir/single_chr.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --output "$meta_temp_dir/single_chr_summary.txt"
+  --input "$meta_temp_dir/single_chr.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --output "$meta_temp_dir/single_chr_summary.txt"
 
 check_file_exists "$meta_temp_dir/single_chr_summary.txt" "single chromosome summary output"
 check_file_not_empty "$meta_temp_dir/single_chr_summary.txt" "single chromosome summary output"
@@ -143,10 +143,10 @@ check_file_not_empty "$meta_temp_dir/single_chr_summary.txt" "single chromosome 
 expected_lines=3
 actual_lines=$(wc -l < "$meta_temp_dir/single_chr_summary.txt")
 if [ "$actual_lines" -eq "$expected_lines" ]; then
-    log "✓ Single chromosome summary has correct structure ($actual_lines lines)"
+  log "✓ Single chromosome summary has correct structure ($actual_lines lines)"
 else
-    log "✗ Single chromosome summary structure unexpected: got $actual_lines lines, expected $expected_lines"
-    cat "$meta_temp_dir/single_chr_summary.txt"
+  log "✗ Single chromosome summary structure unexpected: got $actual_lines lines, expected $expected_lines"
+  cat "$meta_temp_dir/single_chr_summary.txt"
 fi
 
 ####################################################################################################
@@ -161,9 +161,9 @@ chr2	200	400
 EOF
 
 "$meta_executable" \
-    --input "$meta_temp_dir/simple.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --output "$meta_temp_dir/simple_summary.txt"
+  --input "$meta_temp_dir/simple.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --output "$meta_temp_dir/simple_summary.txt"
 
 check_file_exists "$meta_temp_dir/simple_summary.txt" "simple format summary output"
 check_file_not_empty "$meta_temp_dir/simple_summary.txt" "simple format summary output"
@@ -178,30 +178,30 @@ log "TEST 6: Parameter validation"
 log "Testing required parameter validation"
 
 if "$meta_executable" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --output "$meta_temp_dir/test.txt" 2>/dev/null; then
-    log "✗ Should have failed without --input parameter"
-    exit 1
+  --genome "$meta_temp_dir/genome.txt" \
+  --output "$meta_temp_dir/test.txt" 2>/dev/null; then
+  log "✗ Should have failed without --input parameter"
+  exit 1
 else
-    log "✓ Correctly requires --input parameter"
+  log "✓ Correctly requires --input parameter"
 fi
 
 if "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --output "$meta_temp_dir/test.txt" 2>/dev/null; then
-    log "✗ Should have failed without --genome parameter"
-    exit 1
+  --input "$meta_temp_dir/input.bed" \
+  --output "$meta_temp_dir/test.txt" 2>/dev/null; then
+  log "✗ Should have failed without --genome parameter"
+  exit 1
 else
-    log "✓ Correctly requires --genome parameter"
+  log "✓ Correctly requires --genome parameter"
 fi
 
 if "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --genome "$meta_temp_dir/genome.txt" 2>/dev/null; then
-    log "✗ Should have failed without --output parameter"
-    exit 1
+  --input "$meta_temp_dir/input.bed" \
+  --genome "$meta_temp_dir/genome.txt" 2>/dev/null; then
+  log "✗ Should have failed without --output parameter"
+  exit 1
 else
-    log "✓ Correctly requires --output parameter"
+  log "✓ Correctly requires --output parameter"
 fi
 
 ####################################################################################################
@@ -210,24 +210,24 @@ log "TEST 7: File validation"
 
 # Test with non-existent input file
 if "$meta_executable" \
-    --input "/nonexistent/file.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --output "$meta_temp_dir/test.txt" 2>/dev/null; then
-    log "✗ Should have failed with non-existent input file"
-    exit 1
+  --input "/nonexistent/file.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --output "$meta_temp_dir/test.txt" 2>/dev/null; then
+  log "✗ Should have failed with non-existent input file"
+  exit 1
 else
-    log "✓ Properly handles non-existent input files"
+  log "✓ Properly handles non-existent input files"
 fi
 
 # Test with non-existent genome file
 if "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --genome "/nonexistent/genome.txt" \
-    --output "$meta_temp_dir/test.txt" 2>/dev/null; then
-    log "✗ Should have failed with non-existent genome file"
-    exit 1
+  --input "$meta_temp_dir/input.bed" \
+  --genome "/nonexistent/genome.txt" \
+  --output "$meta_temp_dir/test.txt" 2>/dev/null; then
+  log "✗ Should have failed with non-existent genome file"
+  exit 1
 else
-    log "✓ Properly handles non-existent genome files"
+  log "✓ Properly handles non-existent genome files"
 fi
 
 ####################################################################################################
@@ -238,18 +238,18 @@ log "TEST 8: Empty input handling"
 touch "$meta_temp_dir/empty.bed"
 
 "$meta_executable" \
-    --input "$meta_temp_dir/empty.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --output "$meta_temp_dir/empty_summary.txt"
+  --input "$meta_temp_dir/empty.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --output "$meta_temp_dir/empty_summary.txt"
 
 check_file_exists "$meta_temp_dir/empty_summary.txt" "empty input summary output"
 
 # Empty input should still produce some output (likely zeros or headers)
 if [ -f "$meta_temp_dir/empty_summary.txt" ]; then
-    log "✓ Empty input produces valid output file"
+  log "✓ Empty input produces valid output file"
 else
-    log "✗ Empty input handling failed"
-    exit 1
+  log "✗ Empty input handling failed"
+  exit 1
 fi
 
 ####################################################################################################
@@ -262,9 +262,9 @@ chr1	500	800	single_feature	100	+
 EOF
 
 "$meta_executable" \
-    --input "$meta_temp_dir/single.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --output "$meta_temp_dir/single_summary.txt"
+  --input "$meta_temp_dir/single.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --output "$meta_temp_dir/single_summary.txt"
 
 check_file_exists "$meta_temp_dir/single_summary.txt" "single interval summary output"
 check_file_not_empty "$meta_temp_dir/single_summary.txt" "single interval summary output"
@@ -284,13 +284,13 @@ EOF
 
 # This should fail gracefully
 if "$meta_executable" \
-    --input "$meta_temp_dir/input.bed" \
-    --genome "$meta_temp_dir/bad_genome.txt" \
-    --output "$meta_temp_dir/test_bad.txt" 2>/dev/null; then
-    log "✗ Should have failed with malformed genome file"
-    exit 1
+  --input "$meta_temp_dir/input.bed" \
+  --genome "$meta_temp_dir/bad_genome.txt" \
+  --output "$meta_temp_dir/test_bad.txt" 2>/dev/null; then
+  log "✗ Should have failed with malformed genome file"
+  exit 1
 else
-    log "✓ Properly handles malformed genome files"
+  log "✓ Properly handles malformed genome files"
 fi
 
 ####################################################################################################
@@ -322,9 +322,9 @@ chr3	450	500	f20	300	+
 EOF
 
 "$meta_executable" \
-    --input "$meta_temp_dir/large.bed" \
-    --genome "$meta_temp_dir/genome.txt" \
-    --output "$meta_temp_dir/large_summary.txt"
+  --input "$meta_temp_dir/large.bed" \
+  --genome "$meta_temp_dir/genome.txt" \
+  --output "$meta_temp_dir/large_summary.txt"
 
 check_file_exists "$meta_temp_dir/large_summary.txt" "large dataset summary output"
 check_file_not_empty "$meta_temp_dir/large_summary.txt" "large dataset summary output"
@@ -340,22 +340,22 @@ basic_size=$(wc -c < "$meta_temp_dir/basic_summary.txt")
 single_size=$(wc -c < "$meta_temp_dir/single_summary.txt")
 
 if [ "$basic_size" -gt 0 ] && [ "$single_size" -gt 0 ]; then
-    log "✓ All outputs have consistent non-zero size"
+  log "✓ All outputs have consistent non-zero size"
 else
-    log "✗ Output size consistency check failed"
-    log "  Basic summary: $basic_size bytes"
-    log "  Single interval: $single_size bytes"
-    exit 1
+  log "✗ Output size consistency check failed"
+  log "  Basic summary: $basic_size bytes"
+  log "  Single interval: $single_size bytes"
+  exit 1
 fi
 
 # Verify all test outputs exist and are readable
 for output_file in basic_summary.txt single_chr_summary.txt simple_summary.txt; do
-    if [ -r "$meta_temp_dir/$output_file" ]; then
-        log "✓ Output file $output_file is readable"
-    else
-        log "✗ Output file $output_file is not readable"
-        exit 1
-    fi
+  if [ -r "$meta_temp_dir/$output_file" ]; then
+      log "✓ Output file $output_file is readable"
+  else
+      log "✗ Output file $output_file is not readable"
+      exit 1
+  fi
 done
 
 ####################################################################################################

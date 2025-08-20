@@ -44,9 +44,9 @@ check_file_exists "$meta_temp_dir/input_b.bed" "input file B"
 log "TEST 1: Basic subtraction (partial overlap removal)"
 
 "$meta_executable" \
-    --input_a "$meta_temp_dir/input_a.bed" \
-    --input_b "$meta_temp_dir/input_b.bed" \
-    --output "$meta_temp_dir/basic_subtract.bed"
+  --input_a "$meta_temp_dir/input_a.bed" \
+  --input_b "$meta_temp_dir/input_b.bed" \
+  --output "$meta_temp_dir/basic_subtract.bed"
 
 check_file_exists "$meta_temp_dir/basic_subtract.bed" "basic subtraction output"
 check_file_not_empty "$meta_temp_dir/basic_subtract.bed" "basic subtraction output"
@@ -55,20 +55,20 @@ check_file_not_empty "$meta_temp_dir/basic_subtract.bed" "basic subtraction outp
 # chr1 100-200 overlaps with 150-175, should create two intervals: 100-150 and 175-200
 if grep -q "chr1	100	150	feature1	100	+" "$meta_temp_dir/basic_subtract.bed" && \
    grep -q "chr1	175	200	feature1	100	+" "$meta_temp_dir/basic_subtract.bed"; then
-    log "✓ Partial overlap correctly creates split intervals"
+  log "✓ Partial overlap correctly creates split intervals"
 else
-    log "✗ Partial overlap handling failed"
-    cat "$meta_temp_dir/basic_subtract.bed"
-    exit 1
+  log "✗ Partial overlap handling failed"
+  cat "$meta_temp_dir/basic_subtract.bed"
+  exit 1
 fi
 
 # Check that feature2 (300-400) overlapping with repeat2 (350-450) creates interval 300-350
 if grep -q "chr1	300	350	feature2	200	+" "$meta_temp_dir/basic_subtract.bed"; then
-    log "✓ Partial overlap at end correctly handled"
+  log "✓ Partial overlap at end correctly handled"
 else
-    log "✗ End overlap handling failed"
-    cat "$meta_temp_dir/basic_subtract.bed"
-    exit 1
+  log "✗ End overlap handling failed"
+  cat "$meta_temp_dir/basic_subtract.bed"
+  exit 1
 fi
 
 ####################################################################################################
@@ -88,9 +88,9 @@ chr1	550	580	partial1	50	.
 EOF
 
 "$meta_executable" \
-    --input_a "$meta_temp_dir/input_a2.bed" \
-    --input_b "$meta_temp_dir/input_b2.bed" \
-    --output "$meta_temp_dir/complete_overlap.bed"
+  --input_a "$meta_temp_dir/input_a2.bed" \
+  --input_b "$meta_temp_dir/input_b2.bed" \
+  --output "$meta_temp_dir/complete_overlap.bed"
 
 check_file_exists "$meta_temp_dir/complete_overlap.bed" "complete overlap output"
 
@@ -101,11 +101,11 @@ if ! grep -q "chr1	100	200" "$meta_temp_dir/complete_overlap.bed" && \
    grep -q "chr1	300	400	small2	200	+" "$meta_temp_dir/complete_overlap.bed" && \
    grep -q "chr1	500	550	small3	300	+" "$meta_temp_dir/complete_overlap.bed" && \
    grep -q "chr1	580	600	small3	300	+" "$meta_temp_dir/complete_overlap.bed"; then
-    log "✓ Complete and partial overlap handling works correctly"
+  log "✓ Complete and partial overlap handling works correctly"
 else
-    log "✗ Complete/partial overlap handling failed"
-    cat "$meta_temp_dir/complete_overlap.bed"
-    exit 1
+  log "✗ Complete/partial overlap handling failed"
+  cat "$meta_temp_dir/complete_overlap.bed"
+  exit 1
 fi
 
 ####################################################################################################
@@ -113,10 +113,10 @@ fi
 log "TEST 3: Remove entire feature (-A option)"
 
 "$meta_executable" \
-    --input_a "$meta_temp_dir/input_a.bed" \
-    --input_b "$meta_temp_dir/input_b.bed" \
-    --output "$meta_temp_dir/remove_entire.bed" \
-    --remove_entire
+  --input_a "$meta_temp_dir/input_a.bed" \
+  --input_b "$meta_temp_dir/input_b.bed" \
+  --output "$meta_temp_dir/remove_entire.bed" \
+  --remove_entire
 
 check_file_exists "$meta_temp_dir/remove_entire.bed" "remove entire output"
 
@@ -128,11 +128,11 @@ if ! grep -q "chr1	100	200" "$meta_temp_dir/remove_entire.bed" && \
    ! grep -q "chr2	100	300" "$meta_temp_dir/remove_entire.bed" && \
    ! grep -q "chr2	400	500" "$meta_temp_dir/remove_entire.bed" && \
    grep -q "chr1	700	800	feature4	400	-" "$meta_temp_dir/remove_entire.bed"; then
-    log "✓ Remove entire feature (-A) works correctly"
+  log "✓ Remove entire feature (-A) works correctly"
 else
-    log "✗ Remove entire feature (-A) failed"
-    cat "$meta_temp_dir/remove_entire.bed"
-    exit 1
+  log "✗ Remove entire feature (-A) failed"
+  cat "$meta_temp_dir/remove_entire.bed"
+  exit 1
 fi
 
 ####################################################################################################
@@ -140,10 +140,10 @@ fi
 log "TEST 4: Minimum overlap fraction (-f option)"
 
 "$meta_executable" \
-    --input_a "$meta_temp_dir/input_a.bed" \
-    --input_b "$meta_temp_dir/input_b.bed" \
-    --output "$meta_temp_dir/min_overlap.bed" \
-    --min_overlap_a 0.5
+  --input_a "$meta_temp_dir/input_a.bed" \
+  --input_b "$meta_temp_dir/input_b.bed" \
+  --output "$meta_temp_dir/min_overlap.bed" \
+  --min_overlap_a 0.5
 
 check_file_exists "$meta_temp_dir/min_overlap.bed" "minimum overlap output"
 
@@ -152,11 +152,11 @@ check_file_exists "$meta_temp_dir/min_overlap.bed" "minimum overlap output"
 # chr1 300-400 (length 100): repeat2 350-450 overlaps 50bp = 50% >= 50%, subtraction occurs
 if grep -q "chr1	100	200	feature1	100	+" "$meta_temp_dir/min_overlap.bed" && \
    grep -q "chr1	300	350	feature2	200	+" "$meta_temp_dir/min_overlap.bed"; then
-    log "✓ Minimum overlap fraction (-f) works correctly"
+  log "✓ Minimum overlap fraction (-f) works correctly"
 else
-    log "✗ Minimum overlap fraction (-f) failed"
-    cat "$meta_temp_dir/min_overlap.bed"
-    exit 1
+  log "✗ Minimum overlap fraction (-f) failed"
+  cat "$meta_temp_dir/min_overlap.bed"
+  exit 1
 fi
 
 ####################################################################################################
@@ -177,10 +177,10 @@ chr1	550	575	minus_repeat2	100	-
 EOF
 
 "$meta_executable" \
-    --input_a "$meta_temp_dir/strand_a.bed" \
-    --input_b "$meta_temp_dir/strand_b.bed" \
-    --output "$meta_temp_dir/strand_specific.bed" \
-    --same_strand
+  --input_a "$meta_temp_dir/strand_a.bed" \
+  --input_b "$meta_temp_dir/strand_b.bed" \
+  --output "$meta_temp_dir/strand_specific.bed" \
+  --same_strand
 
 check_file_exists "$meta_temp_dir/strand_specific.bed" "strand-specific output"
 
@@ -193,11 +193,11 @@ if grep -q "chr1	100	150	plus1	100	+" "$meta_temp_dir/strand_specific.bed" && \
    grep -q "chr1	300	350	minus1	200	-" "$meta_temp_dir/strand_specific.bed" && \
    grep -q "chr1	375	400	minus1	200	-" "$meta_temp_dir/strand_specific.bed" && \
    grep -q "chr1	500	600	plus2	300	+" "$meta_temp_dir/strand_specific.bed"; then
-    log "✓ Strand-specific subtraction (-s) works correctly"
+  log "✓ Strand-specific subtraction (-s) works correctly"
 else
-    log "✗ Strand-specific subtraction (-s) failed"
-    cat "$meta_temp_dir/strand_specific.bed"
-    exit 1
+  log "✗ Strand-specific subtraction (-s) failed"
+  cat "$meta_temp_dir/strand_specific.bed"
+  exit 1
 fi
 
 ####################################################################################################
@@ -205,10 +205,10 @@ fi
 log "TEST 6: Write overlap information (-wo option)"
 
 "$meta_executable" \
-    --input_a "$meta_temp_dir/input_a.bed" \
-    --input_b "$meta_temp_dir/input_b.bed" \
-    --output "$meta_temp_dir/overlap_info.bed" \
-    --write_overlap_counts
+  --input_a "$meta_temp_dir/input_a.bed" \
+  --input_b "$meta_temp_dir/input_b.bed" \
+  --output "$meta_temp_dir/overlap_info.bed" \
+  --write_overlap_counts
 
 check_file_exists "$meta_temp_dir/overlap_info.bed" "overlap info output"
 check_file_not_empty "$meta_temp_dir/overlap_info.bed" "overlap info output"
@@ -219,11 +219,11 @@ input_cols=$(head -1 "$meta_temp_dir/input_a.bed" | awk '{print NF}')
 output_cols=$(head -1 "$meta_temp_dir/overlap_info.bed" | awk '{print NF}')
 
 if [ "$output_cols" -gt "$input_cols" ]; then
-    log "✓ Overlap information (-wo) adds additional columns"
+  log "✓ Overlap information (-wo) adds additional columns"
 else
-    log "✗ Overlap information (-wo) format incorrect"
-    cat "$meta_temp_dir/overlap_info.bed"
-    exit 1
+  log "✗ Overlap information (-wo) format incorrect"
+  cat "$meta_temp_dir/overlap_info.bed"
+  exit 1
 fi
 
 ####################################################################################################
@@ -243,20 +243,20 @@ chr1	150	175	repeat1	50	.
 EOF
 
 "$meta_executable" \
-    --input_a "$meta_temp_dir/with_header_a.bed" \
-    --input_b "$meta_temp_dir/with_header_b.bed" \
-    --output "$meta_temp_dir/header_test.bed" \
-    --include_header
+  --input_a "$meta_temp_dir/with_header_a.bed" \
+  --input_b "$meta_temp_dir/with_header_b.bed" \
+  --output "$meta_temp_dir/header_test.bed" \
+  --include_header
 
 check_file_exists "$meta_temp_dir/header_test.bed" "header test output"
 
 # Check that header lines are preserved
 if grep -q "# BED file header A" "$meta_temp_dir/header_test.bed"; then
-    log "✓ Header preservation works correctly"
+  log "✓ Header preservation works correctly"
 else
-    log "✗ Header preservation failed"
-    cat "$meta_temp_dir/header_test.bed"
-    exit 1
+  log "✗ Header preservation failed"
+  cat "$meta_temp_dir/header_test.bed"
+  exit 1
 fi
 
 ####################################################################################################
@@ -267,30 +267,30 @@ log "TEST 8: Parameter validation"
 log "Testing required parameter validation"
 
 if "$meta_executable" \
-    --input_b "$meta_temp_dir/input_b.bed" \
-    --output "$meta_temp_dir/test.bed" 2>/dev/null; then
-    log "✗ Should have failed without --input_a parameter"
-    exit 1
+  --input_b "$meta_temp_dir/input_b.bed" \
+  --output "$meta_temp_dir/test.bed" 2>/dev/null; then
+  log "✗ Should have failed without --input_a parameter"
+  exit 1
 else
-    log "✓ Correctly requires --input_a parameter"
+  log "✓ Correctly requires --input_a parameter"
 fi
 
 if "$meta_executable" \
-    --input_a "$meta_temp_dir/input_a.bed" \
-    --output "$meta_temp_dir/test.bed" 2>/dev/null; then
-    log "✗ Should have failed without --input_b parameter"
-    exit 1
+  --input_a "$meta_temp_dir/input_a.bed" \
+  --output "$meta_temp_dir/test.bed" 2>/dev/null; then
+  log "✗ Should have failed without --input_b parameter"
+  exit 1
 else
-    log "✓ Correctly requires --input_b parameter"
+  log "✓ Correctly requires --input_b parameter"
 fi
 
 if "$meta_executable" \
-    --input_a "$meta_temp_dir/input_a.bed" \
-    --input_b "$meta_temp_dir/input_b.bed" 2>/dev/null; then
-    log "✗ Should have failed without --output parameter"
-    exit 1
+  --input_a "$meta_temp_dir/input_a.bed" \
+  --input_b "$meta_temp_dir/input_b.bed" 2>/dev/null; then
+  log "✗ Should have failed without --output parameter"
+  exit 1
 else
-    log "✓ Correctly requires --output parameter"
+  log "✓ Correctly requires --output parameter"
 fi
 
 ####################################################################################################
@@ -299,23 +299,23 @@ log "TEST 9: File validation"
 
 # Test with non-existent files
 if "$meta_executable" \
-    --input_a "/nonexistent/file_a.bed" \
-    --input_b "$meta_temp_dir/input_b.bed" \
-    --output "$meta_temp_dir/test.bed" 2>/dev/null; then
-    log "✗ Should have failed with non-existent input_a file"
-    exit 1
+  --input_a "/nonexistent/file_a.bed" \
+  --input_b "$meta_temp_dir/input_b.bed" \
+  --output "$meta_temp_dir/test.bed" 2>/dev/null; then
+  log "✗ Should have failed with non-existent input_a file"
+  exit 1
 else
-    log "✓ Properly handles non-existent input_a files"
+  log "✓ Properly handles non-existent input_a files"
 fi
 
 if "$meta_executable" \
-    --input_a "$meta_temp_dir/input_a.bed" \
-    --input_b "/nonexistent/file_b.bed" \
-    --output "$meta_temp_dir/test.bed" 2>/dev/null; then
-    log "✗ Should have failed with non-existent input_b file"
-    exit 1
+  --input_a "$meta_temp_dir/input_a.bed" \
+  --input_b "/nonexistent/file_b.bed" \
+  --output "$meta_temp_dir/test.bed" 2>/dev/null; then
+  log "✗ Should have failed with non-existent input_b file"
+  exit 1
 else
-    log "✓ Properly handles non-existent input_b files"
+  log "✓ Properly handles non-existent input_b files"
 fi
 
 ####################################################################################################
@@ -328,25 +328,25 @@ touch "$meta_temp_dir/empty_b.bed"
 
 # Empty A file should produce empty output
 "$meta_executable" \
-    --input_a "$meta_temp_dir/empty_a.bed" \
-    --input_b "$meta_temp_dir/input_b.bed" \
-    --output "$meta_temp_dir/empty_a_output.bed"
+  --input_a "$meta_temp_dir/empty_a.bed" \
+  --input_b "$meta_temp_dir/input_b.bed" \
+  --output "$meta_temp_dir/empty_a_output.bed"
 
 check_file_exists "$meta_temp_dir/empty_a_output.bed" "empty A input test output"
 
 if [ ! -s "$meta_temp_dir/empty_a_output.bed" ]; then
-    log "✓ Empty input A produces empty output"
+  log "✓ Empty input A produces empty output"
 else
-    log "✗ Empty input A handling failed"
-    cat "$meta_temp_dir/empty_a_output.bed"
-    exit 1
+  log "✗ Empty input A handling failed"
+  cat "$meta_temp_dir/empty_a_output.bed"
+  exit 1
 fi
 
 # Empty B file should preserve all A intervals
 "$meta_executable" \
-    --input_a "$meta_temp_dir/input_a.bed" \
-    --input_b "$meta_temp_dir/empty_b.bed" \
-    --output "$meta_temp_dir/empty_b_output.bed"
+  --input_a "$meta_temp_dir/input_a.bed" \
+  --input_b "$meta_temp_dir/empty_b.bed" \
+  --output "$meta_temp_dir/empty_b_output.bed"
 
 check_file_exists "$meta_temp_dir/empty_b_output.bed" "empty B input test output"
 
@@ -355,10 +355,10 @@ input_lines=$(wc -l < "$meta_temp_dir/input_a.bed")
 output_lines=$(wc -l < "$meta_temp_dir/empty_b_output.bed")
 
 if [ "$input_lines" -eq "$output_lines" ]; then
-    log "✓ Empty input B preserves all A intervals ($output_lines lines)"
+  log "✓ Empty input B preserves all A intervals ($output_lines lines)"
 else
-    log "✗ Empty input B handling failed: expected $input_lines, got $output_lines"
-    exit 1
+  log "✗ Empty input B handling failed: expected $input_lines, got $output_lines"
+  exit 1
 fi
 
 ####################################################################################################
@@ -380,9 +380,9 @@ chr1	650	750	distant4	150	.
 EOF
 
 "$meta_executable" \
-    --input_a "$meta_temp_dir/no_overlap_a.bed" \
-    --input_b "$meta_temp_dir/no_overlap_b.bed" \
-    --output "$meta_temp_dir/no_overlap_output.bed"
+  --input_a "$meta_temp_dir/no_overlap_a.bed" \
+  --input_b "$meta_temp_dir/no_overlap_b.bed" \
+  --output "$meta_temp_dir/no_overlap_output.bed"
 
 check_file_exists "$meta_temp_dir/no_overlap_output.bed" "no overlap output"
 
@@ -391,10 +391,10 @@ input_lines=$(wc -l < "$meta_temp_dir/no_overlap_a.bed")
 output_lines=$(wc -l < "$meta_temp_dir/no_overlap_output.bed")
 
 if [ "$input_lines" -eq "$output_lines" ]; then
-    log "✓ No overlap scenario preserves all intervals ($output_lines lines)"
+  log "✓ No overlap scenario preserves all intervals ($output_lines lines)"
 else
-    log "✗ No overlap handling failed: expected $input_lines, got $output_lines"
-    exit 1
+  log "✗ No overlap handling failed: expected $input_lines, got $output_lines"
+  exit 1
 fi
 
 ####################################################################################################
@@ -413,9 +413,9 @@ chr1	350	400	repeat3	100	.
 EOF
 
 "$meta_executable" \
-    --input_a "$meta_temp_dir/multi_overlap_a.bed" \
-    --input_b "$meta_temp_dir/multi_overlap_b.bed" \
-    --output "$meta_temp_dir/multi_overlap_output.bed"
+  --input_a "$meta_temp_dir/multi_overlap_a.bed" \
+  --input_b "$meta_temp_dir/multi_overlap_b.bed" \
+  --output "$meta_temp_dir/multi_overlap_output.bed"
 
 check_file_exists "$meta_temp_dir/multi_overlap_output.bed" "multiple overlap output"
 check_file_not_empty "$meta_temp_dir/multi_overlap_output.bed" "multiple overlap output"
@@ -425,11 +425,11 @@ expected_intervals=4
 actual_intervals=$(wc -l < "$meta_temp_dir/multi_overlap_output.bed")
 
 if [ "$actual_intervals" -eq "$expected_intervals" ]; then
-    log "✓ Multiple overlapping B intervals create correct number of output intervals ($actual_intervals)"
+  log "✓ Multiple overlapping B intervals create correct number of output intervals ($actual_intervals)"
 else
-    log "✗ Multiple overlap handling failed: expected $expected_intervals, got $actual_intervals"
-    cat "$meta_temp_dir/multi_overlap_output.bed"
-    exit 1
+  log "✗ Multiple overlap handling failed: expected $expected_intervals, got $actual_intervals"
+  cat "$meta_temp_dir/multi_overlap_output.bed"
+  exit 1
 fi
 
 ####################################################################################################

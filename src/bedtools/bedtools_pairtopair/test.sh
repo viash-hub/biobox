@@ -42,9 +42,9 @@ EOF
 
 log "TEST 1: Basic pairtopair functionality (default: both)"
 "$meta_executable" \
-    --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
-    --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
-    --output "$meta_temp_dir/test1_output.bedpe"
+  --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
+  --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
+  --output "$meta_temp_dir/test1_output.bedpe"
 
 check_file_exists "$meta_temp_dir/test1_output.bedpe" "basic pairtopair output"
 check_file_not_empty "$meta_temp_dir/test1_output.bedpe" "basic pairtopair result"
@@ -57,10 +57,10 @@ log "✓ Found $num_both pairs where both ends overlap (default behavior)"
 
 log "TEST 2: Either end overlap"
 "$meta_executable" \
-    --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
-    --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
-    --type "either" \
-    --output "$meta_temp_dir/test2_output.bedpe"
+  --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
+  --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
+  --type "either" \
+  --output "$meta_temp_dir/test2_output.bedpe"
 
 check_file_exists "$meta_temp_dir/test2_output.bedpe" "either end overlap output"
 check_file_not_empty "$meta_temp_dir/test2_output.bedpe" "either end overlap result"
@@ -70,19 +70,19 @@ log "✓ Found $num_either pairs where either end overlaps"
 
 # Either should typically find more or equal overlaps than both
 if [ "$num_either" -ge "$num_both" ]; then
-    log "✓ Logic check passed: either ($num_either) >= both ($num_both)"
+  log "✓ Logic check passed: either ($num_either) >= both ($num_both)"
 else
-    log "WARNING: either ($num_either) < both ($num_both) - unusual but possible with specific data"
+  log "WARNING: either ($num_either) < both ($num_both) - unusual but possible with specific data"
 fi
 
 ####################################################################################################
 
 log "TEST 3: Neither end overlap"
 "$meta_executable" \
-    --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
-    --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
-    --type "neither" \
-    --output "$meta_temp_dir/test3_output.bedpe"
+  --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
+  --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
+  --type "neither" \
+  --output "$meta_temp_dir/test3_output.bedpe"
 
 check_file_exists "$meta_temp_dir/test3_output.bedpe" "neither end overlap output"
 
@@ -93,10 +93,10 @@ log "✓ Found $num_neither pairs where neither end overlaps"
 
 log "TEST 4: Not both overlap"
 "$meta_executable" \
-    --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
-    --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
-    --type "notboth" \
-    --output "$meta_temp_dir/test4_output.bedpe"
+  --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
+  --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
+  --type "notboth" \
+  --output "$meta_temp_dir/test4_output.bedpe"
 
 check_file_exists "$meta_temp_dir/test4_output.bedpe" "notboth overlap output"
 
@@ -107,10 +107,10 @@ log "✓ Found $num_notboth pairs where not both ends overlap"
 
 log "TEST 5: Minimum overlap threshold"
 "$meta_executable" \
-    --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
-    --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
-    --min_overlap 0.5 \
-    --output "$meta_temp_dir/test5_output.bedpe"
+  --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
+  --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
+  --min_overlap 0.5 \
+  --output "$meta_temp_dir/test5_output.bedpe"
 
 check_file_exists "$meta_temp_dir/test5_output.bedpe" "minimum overlap output"
 
@@ -119,19 +119,19 @@ log "✓ Found $num_min_overlap pairs with minimum 50% overlap"
 
 # Higher overlap threshold should result in fewer or equal matches
 if [ "$num_min_overlap" -le "$num_both" ]; then
-    log "✓ Logic check passed: 50% overlap ($num_min_overlap) <= default overlap ($num_both)"
+  log "✓ Logic check passed: 50% overlap ($num_min_overlap) <= default overlap ($num_both)"
 else
-    log "WARNING: 50% overlap ($num_min_overlap) > default overlap ($num_both) - unusual"
+  log "WARNING: 50% overlap ($num_min_overlap) > default overlap ($num_both) - unusual"
 fi
 
 ####################################################################################################
 
 log "TEST 6: With slop extension"
 "$meta_executable" \
-    --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
-    --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
-    --slop 50 \
-    --output "$meta_temp_dir/test6_output.bedpe"
+  --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
+  --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
+  --slop 50 \
+  --output "$meta_temp_dir/test6_output.bedpe"
 
 check_file_exists "$meta_temp_dir/test6_output.bedpe" "slop extension output"
 
@@ -140,19 +140,19 @@ log "✓ Found $num_slop pairs with 50bp slop extension"
 
 # Slop should typically increase the number of overlaps
 if [ "$num_slop" -ge "$num_both" ]; then
-    log "✓ Logic check passed: with slop ($num_slop) >= without slop ($num_both)"
+  log "✓ Logic check passed: with slop ($num_slop) >= without slop ($num_both)"
 else
-    log "WARNING: with slop ($num_slop) < without slop ($num_both) - unusual but possible"
+  log "WARNING: with slop ($num_slop) < without slop ($num_both) - unusual but possible"
 fi
 
 ####################################################################################################
 
 log "TEST 7: Ignore strand"
 "$meta_executable" \
-    --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
-    --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
-    --ignore_strand \
-    --output "$meta_temp_dir/test7_output.bedpe"
+  --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
+  --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
+  --ignore_strand \
+  --output "$meta_temp_dir/test7_output.bedpe"
 
 check_file_exists "$meta_temp_dir/test7_output.bedpe" "ignore strand output"
 
@@ -176,10 +176,10 @@ chr2	80	120	chr2	250	350	shared_name2	200	-	-
 EOF
 
 "$meta_executable" \
-    --bedpe_a "$meta_temp_dir/dataset_a_names.bedpe" \
-    --bedpe_b "$meta_temp_dir/dataset_b_names.bedpe" \
-    --require_different_names \
-    --output "$meta_temp_dir/test8_output.bedpe"
+  --bedpe_a "$meta_temp_dir/dataset_a_names.bedpe" \
+  --bedpe_b "$meta_temp_dir/dataset_b_names.bedpe" \
+  --require_different_names \
+  --output "$meta_temp_dir/test8_output.bedpe"
 
 check_file_exists "$meta_temp_dir/test8_output.bedpe" "require different names output"
 
@@ -190,11 +190,11 @@ log "✓ Found $num_diff_names pairs with different names requirement"
 
 log "TEST 9: Strand-based slop"
 "$meta_executable" \
-    --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
-    --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
-    --slop 30 \
-    --strand_slop \
-    --output "$meta_temp_dir/test9_output.bedpe"
+  --bedpe_a "$meta_temp_dir/dataset_a.bedpe" \
+  --bedpe_b "$meta_temp_dir/dataset_b.bedpe" \
+  --slop 30 \
+  --strand_slop \
+  --output "$meta_temp_dir/test9_output.bedpe"
 
 check_file_exists "$meta_temp_dir/test9_output.bedpe" "strand-based slop output"
 
@@ -208,24 +208,24 @@ log "TEST 10: Parameter validation"
 log "Testing required parameter validation"
 
 if "$meta_executable" --bedpe_b "$meta_temp_dir/dataset_b.bedpe" --output "$meta_temp_dir/test.bedpe" 2>/dev/null; then
-    log "✗ Should have failed without --bedpe_a parameter"
-    exit 1
+  log "✗ Should have failed without --bedpe_a parameter"
+  exit 1
 else
-    log "✓ Correctly requires --bedpe_a parameter"
+  log "✓ Correctly requires --bedpe_a parameter"
 fi
 
 if "$meta_executable" --bedpe_a "$meta_temp_dir/dataset_a.bedpe" --output "$meta_temp_dir/test.bedpe" 2>/dev/null; then
-    log "✗ Should have failed without --bedpe_b parameter"
-    exit 1
+  log "✗ Should have failed without --bedpe_b parameter"
+  exit 1
 else
-    log "✓ Correctly requires --bedpe_b parameter"
+  log "✓ Correctly requires --bedpe_b parameter"
 fi
 
 if "$meta_executable" --bedpe_a "$meta_temp_dir/dataset_a.bedpe" --bedpe_b "$meta_temp_dir/dataset_b.bedpe" 2>/dev/null; then
-    log "✗ Should have failed without --output parameter"
-    exit 1
+  log "✗ Should have failed without --output parameter"
+  exit 1
 else
-    log "✓ Correctly requires --output parameter"
+  log "✓ Correctly requires --output parameter"
 fi
 
 ####################################################################################################

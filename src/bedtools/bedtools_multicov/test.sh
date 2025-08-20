@@ -40,35 +40,35 @@ log "TEST 1: Parameter validation - component structure test"
 # This will fail if BAM files are invalid, but that's expected behavior
 
 if "$meta_executable" \
-    --bams "$meta_temp_dir/sample1.bam;$meta_temp_dir/sample2.bam" \
-    --bed "$meta_temp_dir/regions.bed" \
-    --output "$meta_temp_dir/test_output.bed" 2>/dev/null; then
-    log "Component executed successfully (unexpected with mock BAM files)"
+  --bams "$meta_temp_dir/sample1.bam;$meta_temp_dir/sample2.bam" \
+  --bed "$meta_temp_dir/regions.bed" \
+  --output "$meta_temp_dir/test_output.bed" 2>/dev/null; then
+  log "Component executed successfully (unexpected with mock BAM files)"
 else
-    log "✓ Component correctly handled invalid BAM files (expected behavior)"
+  log "✓ Component correctly handled invalid BAM files (expected behavior)"
 fi
 
 # Test that required parameters are enforced
 log "Testing required parameter validation"
 if "$meta_executable" --bed "$meta_temp_dir/regions.bed" --output "$meta_temp_dir/test.bed" 2>/dev/null; then
-    log "✗ Should have failed without --bams parameter"
-    exit 1
+  log "✗ Should have failed without --bams parameter"
+  exit 1
 else
-    log "✓ Correctly requires --bams parameter"
+  log "✓ Correctly requires --bams parameter"
 fi
 
 if "$meta_executable" --bams "$meta_temp_dir/sample1.bam" --output "$meta_temp_dir/test.bed" 2>/dev/null; then
-    log "✗ Should have failed without --bed parameter"
-    exit 1
+  log "✗ Should have failed without --bed parameter"
+  exit 1
 else
-    log "✓ Correctly requires --bed parameter"
+  log "✓ Correctly requires --bed parameter"
 fi
 
 if "$meta_executable" --bams "$meta_temp_dir/sample1.bam" --bed "$meta_temp_dir/regions.bed" 2>/dev/null; then
-    log "✗ Should have failed without --output parameter"
-    exit 1
+  log "✗ Should have failed without --output parameter"
+  exit 1
 else
-    log "✓ Correctly requires --output parameter"
+  log "✓ Correctly requires --output parameter"
 fi
 
 ####################################################################################################
@@ -92,15 +92,15 @@ ln -s "$temp_script" "$(dirname "$temp_script")/bedtools"
 
 # Test with boolean parameters
 if "$meta_executable" \
-    --bams "$meta_temp_dir/sample1.bam" \
-    --bed "$meta_temp_dir/regions.bed" \
-    --output "$meta_temp_dir/boolean_test.bed" \
-    --reciprocal \
-    --same_strand \
-    --include_duplicates 2>&1 | grep -q "reciprocal.*same.*duplicates\|duplicates.*reciprocal\|same.*reciprocal"; then
-    log "✓ Boolean parameters properly processed"
+  --bams "$meta_temp_dir/sample1.bam" \
+  --bed "$meta_temp_dir/regions.bed" \
+  --output "$meta_temp_dir/boolean_test.bed" \
+  --reciprocal \
+  --same_strand \
+  --include_duplicates 2>&1 | grep -q "reciprocal.*same.*duplicates\|duplicates.*reciprocal\|same.*reciprocal"; then
+  log "✓ Boolean parameters properly processed"
 else
-    log "✓ Boolean parameter processing test completed"
+  log "✓ Boolean parameter processing test completed"
 fi
 
 # Clean up mock
@@ -124,12 +124,12 @@ echo -e "\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\x03" > "$meta_temp_dir/sample3.bam
 
 # Test with 3 BAM files
 if "$meta_executable" \
-    --bams "$meta_temp_dir/sample1.bam;$meta_temp_dir/sample2.bam;$meta_temp_dir/sample3.bam" \
-    --bed "$meta_temp_dir/regions.bed" \
-    --output "$meta_temp_dir/multi_bam_test.bed" 2>/dev/null; then
-    log "Multiple BAM handling succeeded (unexpected)"
+  --bams "$meta_temp_dir/sample1.bam;$meta_temp_dir/sample2.bam;$meta_temp_dir/sample3.bam" \
+  --bed "$meta_temp_dir/regions.bed" \
+  --output "$meta_temp_dir/multi_bam_test.bed" 2>/dev/null; then
+  log "Multiple BAM handling succeeded (unexpected)"
 else
-    log "✓ Multiple BAM files properly processed by script"
+  log "✓ Multiple BAM files properly processed by script"
 fi
 
 log "TEST 5: File existence validation"
@@ -137,12 +137,12 @@ log "TEST 5: File existence validation"
 log "Testing file validation"
 
 if "$meta_executable" \
-    --bams "/nonexistent/file.bam" \
-    --bed "$meta_temp_dir/regions.bed" \
-    --output "$meta_temp_dir/test.bed" 2>/dev/null; then
-    log "Should have failed with non-existent BAM file"
+  --bams "/nonexistent/file.bam" \
+  --bed "$meta_temp_dir/regions.bed" \
+  --output "$meta_temp_dir/test.bed" 2>/dev/null; then
+  log "Should have failed with non-existent BAM file"
 else
-    log "✓ Properly handles non-existent input files"
+  log "✓ Properly handles non-existent input files"
 fi
 
 ####################################################################################################

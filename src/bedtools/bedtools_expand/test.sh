@@ -45,9 +45,9 @@ EOF
 # Test 1: Basic single column expansion
 log "Starting TEST 1: Basic single column expansion"
 "$meta_executable" \
-    --input "$meta_temp_dir/simple.bed" \
-    --columns "4" \
-    --output "$meta_temp_dir/output1.bed"
+  --input "$meta_temp_dir/simple.bed" \
+  --columns "4" \
+  --output "$meta_temp_dir/output1.bed"
 
 check_file_exists "$meta_temp_dir/output1.bed" "single column expansion output"
 check_file_not_empty "$meta_temp_dir/output1.bed" "single column expansion output"
@@ -64,9 +64,9 @@ log "✅ TEST 1 completed successfully"
 # Test 2: Multi-column expansion
 log "Starting TEST 2: Multi-column expansion"
 "$meta_executable" \
-    --input "$meta_temp_dir/multi_column.bed" \
-    --columns "4,5" \
-    --output "$meta_temp_dir/output2.bed"
+  --input "$meta_temp_dir/multi_column.bed" \
+  --columns "4,5" \
+  --output "$meta_temp_dir/output2.bed"
 
 check_file_exists "$meta_temp_dir/output2.bed" "multi-column expansion output"
 check_file_not_empty "$meta_temp_dir/output2.bed" "multi-column expansion output"
@@ -81,9 +81,9 @@ log "✅ TEST 2 completed successfully"
 # Test 3: No expansion needed (single values)
 log "Starting TEST 3: Single values (no expansion needed)"
 "$meta_executable" \
-    --input "$meta_temp_dir/no_expansion.bed" \
-    --columns "4" \
-    --output "$meta_temp_dir/output3.bed"
+  --input "$meta_temp_dir/no_expansion.bed" \
+  --columns "4" \
+  --output "$meta_temp_dir/output3.bed"
 
 check_file_exists "$meta_temp_dir/output3.bed" "no expansion output"
 check_file_not_empty "$meta_temp_dir/output3.bed" "no expansion output"
@@ -97,9 +97,9 @@ log "✅ TEST 3 completed successfully"
 # Test 4: Different column positions
 log "Starting TEST 4: Different column positions"
 "$meta_executable" \
-    --input "$meta_temp_dir/multi_column.bed" \
-    --columns "5" \
-    --output "$meta_temp_dir/output4.bed"
+  --input "$meta_temp_dir/multi_column.bed" \
+  --columns "5" \
+  --output "$meta_temp_dir/output4.bed"
 
 check_file_exists "$meta_temp_dir/output4.bed" "column 5 expansion output"
 check_file_not_empty "$meta_temp_dir/output4.bed" "column 5 expansion output"
@@ -118,9 +118,9 @@ chr1	100	200	1,2,3,4,5,6,7,8,9,10
 EOF
 
 "$meta_executable" \
-    --input "$meta_temp_dir/large.bed" \
-    --columns "4" \
-    --output "$meta_temp_dir/output5.bed"
+  --input "$meta_temp_dir/large.bed" \
+  --columns "4" \
+  --output "$meta_temp_dir/output5.bed"
 
 check_file_exists "$meta_temp_dir/output5.bed" "large expansion output"
 check_file_not_empty "$meta_temp_dir/output5.bed" "large expansion output"
@@ -128,10 +128,10 @@ check_file_line_count "$meta_temp_dir/output5.bed" 10 "large expansion line coun
 
 # Check that all values are expanded
 for i in {1..10}; do
-    if ! grep -q "chr1	100	200	$i$" "$meta_temp_dir/output5.bed"; then
-        log_error "Expected value $i not found in large expansion"
-        exit 1
-    fi
+  if ! grep -q "chr1	100	200	$i$" "$meta_temp_dir/output5.bed"; then
+      log_error "Expected value $i not found in large expansion"
+      exit 1
+  fi
 done
 log "✅ TEST 5 completed successfully"
 

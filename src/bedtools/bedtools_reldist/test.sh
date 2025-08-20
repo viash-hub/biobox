@@ -41,9 +41,9 @@ EOF
 
 log "TEST 1: Basic relative distance calculation (summary mode)"
 "$meta_executable" \
-    --bed_a "$meta_temp_dir/features_a.bed" \
-    --bed_b "$meta_temp_dir/features_b.bed" \
-    --output "$meta_temp_dir/test1_output.txt"
+  --bed_a "$meta_temp_dir/features_a.bed" \
+  --bed_b "$meta_temp_dir/features_b.bed" \
+  --output "$meta_temp_dir/test1_output.txt"
 
 check_file_exists "$meta_temp_dir/test1_output.txt" "basic reldist output"
 check_file_not_empty "$meta_temp_dir/test1_output.txt" "basic reldist result"
@@ -51,20 +51,20 @@ check_file_not_empty "$meta_temp_dir/test1_output.txt" "basic reldist result"
 # Check that output contains distribution information
 num_lines=$(wc -l < "$meta_temp_dir/test1_output.txt")
 if [ "$num_lines" -gt 0 ]; then
-    log "✓ Generated summary distribution with $num_lines lines"
+  log "✓ Generated summary distribution with $num_lines lines"
 else
-    log "ERROR: Empty output file"
-    exit 1
+  log "ERROR: Empty output file"
+  exit 1
 fi
 
 ####################################################################################################
 
 log "TEST 2: Detailed relative distance for each interval"
 "$meta_executable" \
-    --bed_a "$meta_temp_dir/features_a.bed" \
-    --bed_b "$meta_temp_dir/features_b.bed" \
-    --detail \
-    --output "$meta_temp_dir/test2_output.txt"
+  --bed_a "$meta_temp_dir/features_a.bed" \
+  --bed_b "$meta_temp_dir/features_b.bed" \
+  --detail \
+  --output "$meta_temp_dir/test2_output.txt"
 
 check_file_exists "$meta_temp_dir/test2_output.txt" "detailed reldist output"
 check_file_not_empty "$meta_temp_dir/test2_output.txt" "detailed reldist result"
@@ -77,9 +77,9 @@ log "✓ Detail mode produced $num_detail_lines lines for $num_features_a input 
 
 # Verify that the detail output has the expected format
 if head -1 "$meta_temp_dir/test2_output.txt" | grep -q -E '^chr[0-9]+\s+[0-9]+\s+[0-9]+'; then
-    log "✓ Detail output has expected format (starts with genomic coordinates)"
+  log "✓ Detail output has expected format (starts with genomic coordinates)"
 else
-    log "WARNING: Detail output format may differ from expected"
+  log "WARNING: Detail output format may differ from expected"
 fi
 
 ####################################################################################################
@@ -100,9 +100,9 @@ chr4	300	400	ref4	100	+
 EOF
 
 "$meta_executable" \
-    --bed_a "$meta_temp_dir/multi_chrom_a.bed" \
-    --bed_b "$meta_temp_dir/multi_chrom_b.bed" \
-    --output "$meta_temp_dir/test3_output.txt"
+  --bed_a "$meta_temp_dir/multi_chrom_a.bed" \
+  --bed_b "$meta_temp_dir/multi_chrom_b.bed" \
+  --output "$meta_temp_dir/test3_output.txt"
 
 check_file_exists "$meta_temp_dir/test3_output.txt" "multi-chromosome output"
 check_file_not_empty "$meta_temp_dir/test3_output.txt" "multi-chromosome result"
@@ -125,9 +125,9 @@ chr1	1250	1300	ref3	100	+
 EOF
 
 "$meta_executable" \
-    --bed_a "$meta_temp_dir/single_chrom_a.bed" \
-    --bed_b "$meta_temp_dir/single_chrom_b.bed" \
-    --output "$meta_temp_dir/test4_output.txt"
+  --bed_a "$meta_temp_dir/single_chrom_a.bed" \
+  --bed_b "$meta_temp_dir/single_chrom_b.bed" \
+  --output "$meta_temp_dir/test4_output.txt"
 
 check_file_exists "$meta_temp_dir/test4_output.txt" "single chromosome output"
 check_file_not_empty "$meta_temp_dir/test4_output.txt" "single chromosome result"
@@ -148,10 +148,10 @@ chr1	550	650	ref2	100	+
 EOF
 
 "$meta_executable" \
-    --bed_a "$meta_temp_dir/overlap_a.bed" \
-    --bed_b "$meta_temp_dir/overlap_b.bed" \
-    --detail \
-    --output "$meta_temp_dir/test5_output.txt"
+  --bed_a "$meta_temp_dir/overlap_a.bed" \
+  --bed_b "$meta_temp_dir/overlap_b.bed" \
+  --detail \
+  --output "$meta_temp_dir/test5_output.txt"
 
 check_file_exists "$meta_temp_dir/test5_output.txt" "overlapping features output"
 check_file_not_empty "$meta_temp_dir/test5_output.txt" "overlapping features result"
@@ -163,15 +163,15 @@ log "✓ Overlapping features analysis completed"
 log "TEST 6: Compare summary vs detailed output"
 # Run the same analysis in both modes and verify consistency
 "$meta_executable" \
-    --bed_a "$meta_temp_dir/features_a.bed" \
-    --bed_b "$meta_temp_dir/features_b.bed" \
-    --output "$meta_temp_dir/test6_summary.txt"
+  --bed_a "$meta_temp_dir/features_a.bed" \
+  --bed_b "$meta_temp_dir/features_b.bed" \
+  --output "$meta_temp_dir/test6_summary.txt"
 
 "$meta_executable" \
-    --bed_a "$meta_temp_dir/features_a.bed" \
-    --bed_b "$meta_temp_dir/features_b.bed" \
-    --detail \
-    --output "$meta_temp_dir/test6_detail.txt"
+  --bed_a "$meta_temp_dir/features_a.bed" \
+  --bed_b "$meta_temp_dir/features_b.bed" \
+  --detail \
+  --output "$meta_temp_dir/test6_detail.txt"
 
 check_file_exists "$meta_temp_dir/test6_summary.txt" "summary comparison output"
 check_file_exists "$meta_temp_dir/test6_detail.txt" "detail comparison output"
@@ -188,24 +188,24 @@ log "TEST 7: Parameter validation"
 log "Testing required parameter validation"
 
 if "$meta_executable" --bed_b "$meta_temp_dir/features_b.bed" --output "$meta_temp_dir/test.txt" 2>/dev/null; then
-    log "✗ Should have failed without --bed_a parameter"
-    exit 1
+  log "✗ Should have failed without --bed_a parameter"
+  exit 1
 else
-    log "✓ Correctly requires --bed_a parameter"
+  log "✓ Correctly requires --bed_a parameter"
 fi
 
 if "$meta_executable" --bed_a "$meta_temp_dir/features_a.bed" --output "$meta_temp_dir/test.txt" 2>/dev/null; then
-    log "✗ Should have failed without --bed_b parameter"
-    exit 1
+  log "✗ Should have failed without --bed_b parameter"
+  exit 1
 else
-    log "✓ Correctly requires --bed_b parameter"
+  log "✓ Correctly requires --bed_b parameter"
 fi
 
 if "$meta_executable" --bed_a "$meta_temp_dir/features_a.bed" --bed_b "$meta_temp_dir/features_b.bed" 2>/dev/null; then
-    log "✗ Should have failed without --output parameter"
-    exit 1
+  log "✗ Should have failed without --output parameter"
+  exit 1
 else
-    log "✓ Correctly requires --output parameter"
+  log "✓ Correctly requires --output parameter"
 fi
 
 ####################################################################################################
@@ -213,19 +213,19 @@ fi
 log "TEST 8: Output format validation"
 # Verify the output format is consistent and parseable
 "$meta_executable" \
-    --bed_a "$meta_temp_dir/features_a.bed" \
-    --bed_b "$meta_temp_dir/features_b.bed" \
-    --detail \
-    --output "$meta_temp_dir/test8_output.txt"
+  --bed_a "$meta_temp_dir/features_a.bed" \
+  --bed_b "$meta_temp_dir/features_b.bed" \
+  --detail \
+  --output "$meta_temp_dir/test8_output.txt"
 
 check_file_exists "$meta_temp_dir/test8_output.txt" "format validation output"
 
 # Check that each line can be parsed (basic format check)
 if ! awk 'NF >= 1' "$meta_temp_dir/test8_output.txt" >/dev/null 2>&1; then
-    log "ERROR: Output format appears to be malformed"
-    exit 1
+  log "ERROR: Output format appears to be malformed"
+  exit 1
 else
-    log "✓ Output format validation passed"
+  log "✓ Output format validation passed"
 fi
 
 ####################################################################################################
