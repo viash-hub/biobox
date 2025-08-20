@@ -11,11 +11,11 @@ set -eo pipefail
 
 # Build command arguments array
 cmd_args=(
-    -i "$par_input"
-    -g "$par_genome"
-    ${par_map_quality:+-mapq "$par_map_quality"}
-    ${par_bed12:+-bed12}
-    ${par_uncompress_bam:+-ubam}
+  -i "$par_input"
+  -g "$par_genome"
+  ${par_map_quality:+-mapq "$par_map_quality"}
+  ${par_bed12:+-bed12}
+  ${par_uncompress_bam:+-ubam}
 )
 
 # Execute bedtools bedtobam

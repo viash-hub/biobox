@@ -10,9 +10,9 @@ set -eo pipefail
 
 # Build command arguments array
 cmd_args=(
-    -a "$par_bed_a"
-    -b "$par_bed_b"
-    ${par_detail:+-detail}
+  -a "$par_bed_a"
+  -b "$par_bed_b"
+  ${par_detail:+-detail}
 )
 
 # Execute bedtools reldist

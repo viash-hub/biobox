@@ -11,12 +11,12 @@ set -eo pipefail
 
 # Build command arguments array
 cmd_args=(
-    -fi "$par_input_fasta"
-    -bed "$par_input_bed"
-    -fo "$par_output"
-    ${par_mask_character:+-mc "$par_mask_character"}
-    ${par_soft_mask:+-soft}
-    ${par_full_header:+-fullHeader}
+  -fi "$par_input_fasta"
+  -bed "$par_input_bed"
+  -fo "$par_output"
+  ${par_mask_character:+-mc "$par_mask_character"}
+  ${par_soft_mask:+-soft}
+  ${par_full_header:+-fullHeader}
 )
 
 # Execute bedtools maskfasta

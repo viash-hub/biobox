@@ -13,8 +13,8 @@ IFS=';' read -ra files_array <<< "$par_files"
 
 # Build command arguments array
 cmd_args=(
-    ${par_header:+-header}
-    -i "${files_array[@]}"
+  ${par_header:+-header}
+  -i "${files_array[@]}"
 )
 
 # Execute bedtools unionbedg and redirect output to the specified output file

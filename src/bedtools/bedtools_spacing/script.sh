@@ -12,11 +12,11 @@ set -eo pipefail
 
 # Build command arguments array
 cmd_args=(
-    -i "$par_input"
-    ${par_output_bed:+-bed}
-    ${par_include_header:+-header}
-    ${par_no_buffer:+-nobuf}
-    ${par_input_buffer:+-iobuf "$par_input_buffer"}
+  -i "$par_input"
+  ${par_output_bed:+-bed}
+  ${par_include_header:+-header}
+  ${par_no_buffer:+-nobuf}
+  ${par_input_buffer:+-iobuf "$par_input_buffer"}
 )
 
 # Execute bedtools spacing

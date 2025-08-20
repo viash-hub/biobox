@@ -10,8 +10,8 @@ set -eo pipefail
 
 # Build command arguments array
 cmd_args=(
-    -i "$par_input"
-    ${par_n_score:+-n}
+  -i "$par_input"
+  ${par_n_score:+-n}
 )
 
 # Execute bedtools bed12tobed6

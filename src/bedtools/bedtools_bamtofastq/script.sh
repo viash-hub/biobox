@@ -10,10 +10,10 @@ set -eo pipefail
 
 # Build command arguments array
 cmd_args=(
-    -i "$par_input"
-    -fq "$par_fastq"
-    ${par_fastq2:+-fq2 "$par_fastq2"}
-    ${par_tags:+-tags}
+  -i "$par_input"
+  -fq "$par_fastq"
+  ${par_fastq2:+-fq2 "$par_fastq2"}
+  ${par_tags:+-tags}
 )
 
 # Execute bedtools bamtofastq

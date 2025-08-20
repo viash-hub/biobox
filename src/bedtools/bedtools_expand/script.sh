@@ -7,8 +7,8 @@ set -eo pipefail
 
 # Build command arguments array
 cmd_args=(
-    -i "$par_input"
-    -c "$par_columns"
+  -i "$par_input"
+  -c "$par_columns"
 )
 
 # Execute bedtools expand

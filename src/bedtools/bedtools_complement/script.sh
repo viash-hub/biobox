@@ -1,21 +1,16 @@
 #!/bin/bash
 
-set -eo pipefail
-
 ## VIASH START
 ## VIASH END
 
-# Unset variables that are false
-unset_if_false=( par_limit_chromosomes )
+set -eo pipefail
 
-for par in ${unset_if_false[@]}; do
-    test_val="${!par}"
-    [[ "$test_val" == "false" ]] && unset $par
-done
+# unset flags
+[[ "$par_limit_chromosomes" == "false" ]] && unset par_limit_chromosomes
 
 # Execute bedtools complement
 bedtools complement \
-    -i "$par_input" \
-    -g "$par_genome" \
-    ${par_limit_chromosomes:+-L} \
-    > "$par_output"
+  -i "$par_input" \
+  -g "$par_genome" \
+  ${par_limit_chromosomes:+-L} \
+  > "$par_output"

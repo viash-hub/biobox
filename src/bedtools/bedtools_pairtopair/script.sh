@@ -12,14 +12,14 @@ set -eo pipefail
 
 # Build command arguments array
 cmd_args=(
-    -a "$par_bedpe_a"
-    -b "$par_bedpe_b"
-    ${par_min_overlap:+-f "$par_min_overlap"}
-    ${par_type:+-type "$par_type"}
-    ${par_slop:+-slop "$par_slop"}
-    ${par_strand_slop:+-ss}
-    ${par_ignore_strand:+-is}
-    ${par_require_different_names:+-rdn}
+  -a "$par_bedpe_a"
+  -b "$par_bedpe_b"
+  ${par_min_overlap:+-f "$par_min_overlap"}
+  ${par_type:+-type "$par_type"}
+  ${par_slop:+-slop "$par_slop"}
+  ${par_strand_slop:+-ss}
+  ${par_ignore_strand:+-is}
+  ${par_require_different_names:+-rdn}
 )
 
 # Execute bedtools pairtopair

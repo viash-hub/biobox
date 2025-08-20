@@ -1,22 +1,20 @@
 #!/bin/bash
 
-set -eo pipefail
-
 ## VIASH START
 ## VIASH END
 
-# Unset variables that are false
-unset_if_false=( par_ubam )
+set -eo pipefail
 
-for par in ${unset_if_false[@]}; do
-    test_val="${!par}"
-    [[ "$test_val" == "false" ]] && unset $par
-done
+# unset flags
+[[ "$par_ubam" == "false" ]] && unset par_ubam
+
+# Build command arguments array
+cmd_args=(
+  -i "$par_input"
+  -g "$par_genome"
+  ${par_mapq:+-mapq "$par_mapq"}
+  ${par_ubam:+-ubam}
+)
 
 # Execute bedtools bedpetobam
-bedtools bedpetobam \
-    -i "$par_input" \
-    -g "$par_genome" \
-    ${par_mapq:+-mapq "$par_mapq"} \
-    ${par_ubam:+-ubam} \
-    > "$par_output"
+bedtools bedpetobam "${cmd_args[@]}" > "$par_output"

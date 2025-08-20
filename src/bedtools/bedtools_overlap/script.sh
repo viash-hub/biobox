@@ -7,8 +7,8 @@ set -eo pipefail
 
 # Build command arguments array
 cmd_args=(
-    -i "$par_input"
-    -cols "$par_cols"
+  -i "$par_input"
+  -cols "$par_cols"
 )
 
 # Execute bedtools overlap
