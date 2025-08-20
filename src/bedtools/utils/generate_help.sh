@@ -63,11 +63,6 @@ for SUBCOMMAND in "${SUBCOMMANDS[@]}"; do
   DEST="src/$TOOL/${TOOL}_$SUBCOMMAND/help.txt"
   CMD="docker run --rm $DOCKER_IMAGE $TOOL $SUBCOMMAND -h"
 
-  # skip if help doesn't already exist
-  if [ ! -f "$DEST" ]; then
-    continue
-  fi
-
   # create dir if not exists
   mkdir -p "$(dirname "$DEST")"
 
