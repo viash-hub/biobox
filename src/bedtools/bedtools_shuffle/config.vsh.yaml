@@ -1,0 +1,220 @@
+name: bedtools_shuffle
+namespace: bedtools
+description: |
+  Randomly shuffle the genomic locations of intervals while preserving their size and structure.
+  
+  bedtools shuffle randomly relocates genomic intervals to new positions within the genome
+  while maintaining their original size and other attributes. This tool is essential for 
+  creating randomized control datasets that preserve interval characteristics but eliminate
+  positional bias.
+  
+  This tool is commonly used for:
+  - Generating null distributions for statistical testing
+  - Creating randomized control datasets for enrichment analysis
+  - Testing positional significance of genomic features
+  - Removing spatial clustering bias from interval datasets
+  - Permutation testing in comparative genomics
+  - Background generation for motif discovery and regulatory analysis
+
+keywords: [genomics, intervals, shuffle, random, permutation, controls, statistics]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/shuffle.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/shuffle.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: [-i]
+        type: file
+        description: |
+          Input file containing genomic intervals to shuffle.
+          
+          **Format:** BED, GFF, VCF, or BEDPE file
+          **Content:** Genomic intervals that will be randomly relocated
+          **Preservation:** Interval sizes and attributes are maintained
+          **Usage:** Each interval will be moved to a random genomic position
+        required: true
+        example: features.bed
+
+      - name: --genome
+        alternatives: [-g]
+        type: file
+        description: |
+          Genome file defining chromosome sizes for shuffling boundaries.
+          
+          **Format:** Tab-delimited text file with chromosome names and sizes
+          **Content:** Each line contains: <chromName><TAB><chromSize>
+          **Usage:** Defines valid coordinate space for random placement
+          **Creation:** Can be generated with 'samtools faidx' or UCSC Table Browser
+          **Example format:**
+            chr1    249250621
+            chr2    243199373
+        required: true
+        example: hg19.genome
+
+      - name: --exclude
+        alternatives: [-excl]
+        type: file
+        description: |
+          BED/GFF/VCF file defining regions where shuffled intervals should NOT be placed.
+          
+          **Format:** BED, GFF, or VCF file with forbidden regions
+          **Content:** Genomic intervals to avoid during shuffling (e.g., gaps, repeats)
+          **Usage:** Shuffled intervals will avoid overlapping these regions
+          **Applications:** Exclude centromeres, gaps, repetitive elements
+          **Interaction:** Cannot be used together with --include
+        example: gaps.bed
+
+      - name: --include
+        alternatives: [-incl]
+        type: file
+        description: |
+          BED/GFF/VCF file defining regions where shuffled intervals should be placed.
+          
+          **Format:** BED, GFF, or VCF file with allowed regions
+          **Content:** Genomic intervals where shuffling is permitted (e.g., genes, accessible chromatin)
+          **Usage:** Shuffled intervals will only be placed within these regions
+          **Effect:** Disables --chrom_first option
+          **Interaction:** Cannot be used together with --exclude
+        example: accessible_regions.bed
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file containing shuffled genomic intervals.
+          
+          **Format:** Same format as input file
+          **Content:** Original intervals with randomized genomic coordinates
+          **Preservation:** Interval sizes and non-coordinate attributes maintained
+        required: true
+        direction: output
+        example: shuffled_features.bed
+
+  - name: Shuffling Options
+    arguments:
+      - name: --keep_chromosome
+        alternatives: [-chrom]
+        type: boolean_true
+        description: |
+          Keep shuffled intervals on their original chromosomes.
+          
+          **Effect:** Intervals are randomly repositioned only within their source chromosome
+          **Default:** false (intervals can move to any chromosome)
+          **Usage:** Preserves chromosome-specific distributions
+          **Note:** Automatically enables --chrom_first option
+        
+      - name: --chrom_first
+        alternatives: [-chromFirst]
+        type: boolean_true
+        description: |
+          Select chromosome first, then random position within that chromosome.
+          
+          **Effect:** Results in uniform distribution across chromosomes regardless of size
+          **Default:** false (positions chosen from entire genome space)
+          **Usage:** Prevents bias toward larger chromosomes
+          **Disabled by:** --include option
+
+      - name: --seed
+        type: integer
+        description: |
+          Integer seed for random number generation.
+          
+          **Usage:** Ensures reproducible shuffling results
+          **Range:** Any integer value
+          **Default:** Automatically chosen seed (non-reproducible)
+          **Applications:** Reproducible research, testing, validation
+        example: 12345
+
+  - name: Overlap Control
+    arguments:
+      - name: --max_overlap
+        alternatives: [-f]
+        type: double
+        description: |
+          Maximum allowed overlap with excluded regions as fraction of interval length.
+          
+          **Range:** 0.0 to 1.0
+          **Default:** 1E-9 (essentially no overlap allowed)
+          **Usage:** Tolerance for overlap with --exclude regions
+          **Example:** 0.10 allows up to 10% overlap with excluded regions
+          **Interaction:** Cannot be used with --include
+        example: 0.1
+
+      - name: --no_overlapping
+        alternatives: [-noOverlapping]
+        type: boolean_true
+        description: |
+          Prevent shuffled intervals from overlapping with each other.
+          
+          **Effect:** Ensures no two shuffled intervals overlap
+          **Applications:** Creating non-redundant control datasets
+          **Performance:** May require more placement attempts
+          **Default:** false (overlaps allowed)
+
+      - name: --max_tries
+        alternatives: [-maxTries]
+        type: integer
+        description: |
+          Maximum attempts to find valid placement for each interval.
+          
+          **Default:** 1000
+          **Usage:** Limits computation time when valid placements are scarce
+          **Applications:** Highly constrained shuffling with many restrictions
+          **Failure:** Intervals that cannot be placed after max tries are dropped
+        example: 5000
+
+  - name: Format Options
+    arguments:
+      - name: --bedpe_format
+        alternatives: [-bedpe]
+        type: boolean_true
+        description: |
+          Treat input file as BEDPE format (paired-end intervals).
+          
+          **Usage:** For paired-end sequencing data or interaction data
+          **Effect:** Shuffles paired intervals as units
+          **Format:** BEDPE format with paired genomic coordinates
+          **Default:** false (standard BED/GFF/VCF format)
+
+      - name: --allow_beyond_chrom_end
+        alternatives: [-allowBeyondChromEnd]
+        type: boolean_true
+        description: |
+          Allow shuffled intervals to extend beyond chromosome boundaries.
+          
+          **Effect:** If interval cannot fit entirely, end coordinate set to chromosome length
+          **Default:** false (intervals must fit entirely within chromosomes)
+          **Applications:** When preserving interval start positions is more important
+          **Trade-off:** May alter interval sizes for intervals near chromosome ends
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
