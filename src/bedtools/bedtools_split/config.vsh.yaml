@@ -1,0 +1,129 @@
+name: bedtools_split
+namespace: bedtools
+description: |
+  Split a BED file into multiple output files using different algorithms.
+  
+  bedtools split divides a single BED file into multiple smaller BED files 
+  based on the specified number of output files and splitting algorithm. This 
+  is useful for parallelizing analysis workflows, creating balanced datasets, 
+  or distributing genomic intervals across multiple processing units.
+  
+  This tool is commonly used for:
+  - Parallelizing genomic analysis workflows by splitting input data
+  - Creating balanced datasets for distributed computing
+  - Dividing large BED files for memory-efficient processing
+  - Preparing input files for parallel execution frameworks
+  - Load balancing genomic intervals across multiple processes
+  - Creating subsets of genomic data for testing or validation
+
+keywords: [genomics, intervals, split, parallel, distribute, workflow, bed]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/split.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/split.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: [-i]
+        type: file
+        description: |
+          Input BED file to split into multiple files.
+          
+          **Format:** BED file with genomic intervals
+          **Content:** Genomic intervals to be distributed across output files
+          **Requirements:** Standard BED format with at least 3 columns (chr, start, end)
+          **Memory:** File contents are loaded into memory during processing
+          **Size limits:** Available system memory determines maximum input size
+        required: true
+        example: large_intervals.bed
+
+  - name: Outputs
+    arguments:
+      - name: --number
+        alternatives: [-n]
+        type: integer
+        description: |
+          Number of output files to create from the input BED file.
+          
+          **Range:** Positive integer (typically 2 or more)
+          **Distribution:** Input intervals will be distributed across this many files
+          **Naming:** Output files numbered sequentially with 5-digit padding (prefix.00001.bed, prefix.00002.bed, etc.)
+          **Algorithm dependency:** Distribution method depends on selected algorithm
+        required: true
+        example: 4
+
+      - name: --prefix
+        alternatives: [-p]
+        type: string
+        description: |
+          Prefix for output BED filenames.
+          
+          **Default:** "split" (creates split.00001.bed, split.00002.bed, etc.)
+          **Pattern:** Files named as "{prefix}.{5-digit-number}.bed"
+          **Directory:** Files created in current working directory unless path specified
+          **Examples:** "sample" → sample.00001.bed, sample.00002.bed
+        example: my_dataset
+
+      - name: --output_dir
+        type: string
+        description: |
+          Directory where output files should be created.
+          
+          **Usage:** Specify target directory for all split output files
+          **Creation:** Directory will be created if it doesn't exist
+          **Path:** Can be relative or absolute path
+          **Required:** Must be specified for output file placement
+        required: true
+        example: /path/to/output/
+
+  - name: Algorithm Options
+    arguments:
+      - name: --algorithm
+        alternatives: [-a]
+        type: string
+        choices: ["size", "simple"]
+        description: |
+          Algorithm used to split the BED file data.
+          
+          **size (default):** Uses heuristic algorithm to group intervals so all 
+          output files contain approximately the same total number of base pairs.
+          Best for balanced genomic coverage across files.
+          
+          **simple:** Routes records so each file has approximately equal number 
+          of intervals (like Unix split command). Best for balanced record counts
+          regardless of interval sizes.
+          
+          **Trade-offs:**
+          - size: Balanced coverage, variable record counts
+          - simple: Balanced record counts, variable coverage
+        example: size
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
