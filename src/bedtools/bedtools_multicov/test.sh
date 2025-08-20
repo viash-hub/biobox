@@ -40,7 +40,7 @@ log "TEST 1: Parameter validation - component structure test"
 # This will fail if BAM files are invalid, but that's expected behavior
 
 if "$meta_executable" \
-    --bams "$meta_temp_dir/sample1.bam" "$meta_temp_dir/sample2.bam" \
+    --bams "$meta_temp_dir/sample1.bam;$meta_temp_dir/sample2.bam" \
     --bed "$meta_temp_dir/regions.bed" \
     --output "$meta_temp_dir/test_output.bed" 2>/dev/null; then
     log "Component executed successfully (unexpected with mock BAM files)"
@@ -124,7 +124,7 @@ echo -e "\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\x03" > "$meta_temp_dir/sample3.bam
 
 # Test with 3 BAM files
 if "$meta_executable" \
-    --bams "$meta_temp_dir/sample1.bam" "$meta_temp_dir/sample2.bam" "$meta_temp_dir/sample3.bam" \
+    --bams "$meta_temp_dir/sample1.bam;$meta_temp_dir/sample2.bam;$meta_temp_dir/sample3.bam" \
     --bed "$meta_temp_dir/regions.bed" \
     --output "$meta_temp_dir/multi_bam_test.bed" 2>/dev/null; then
     log "Multiple BAM handling succeeded (unexpected)"

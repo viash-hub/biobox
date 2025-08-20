@@ -12,11 +12,19 @@ set -eo pipefail
 [[ "$par_use_scores" == "false" ]] && unset par_use_scores
 [[ "$par_use_intervals" == "false" ]] && unset par_use_intervals
 
+# Convert semicolon-separated files to array
+IFS=';' read -ra files_array <<< "$par_files"
+
+# Convert semicolon-separated labels to array if provided
+if [ -n "${par_labels:-}" ]; then
+    IFS=';' read -ra labels_array <<< "$par_labels"
+fi
+
 # Validate that if labels are provided, files and labels have the same length
 # Labels are required unless using names/scores/intervals options
 if [ -n "${par_labels:-}" ]; then
-    if [ ${#par_files[@]} -ne ${#par_labels[@]} ]; then
-        echo "Error: Number of files (${#par_files[@]}) must match number of labels (${#par_labels[@]})" >&2
+    if [ ${#files_array[@]} -ne ${#labels_array[@]} ]; then
+        echo "Error: Number of files (${#files_array[@]}) must match number of labels (${#labels_array[@]})" >&2
         exit 1
     fi
 elif [ -z "${par_use_names:-}" ] && [ -z "${par_use_scores:-}" ] && [ -z "${par_use_intervals:-}" ]; then
@@ -27,8 +35,8 @@ fi
 # Build command arguments array
 cmd_args=(
     -i "$par_input"
-    -files "${par_files[@]}"
-    ${par_labels:+-labels "${par_labels[@]}"}
+    -files "${files_array[@]}"
+    ${par_labels:+-labels "${labels_array[@]}"}
     ${par_min_overlap:+-f "$par_min_overlap"}
     ${par_same_strand:+-s}
     ${par_opposite_strand:+-S}

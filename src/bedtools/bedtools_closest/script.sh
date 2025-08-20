@@ -23,9 +23,12 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
+# Convert semicolon-separated input_b files to array
+IFS=';' read -ra input_b_array <<< "$par_input_b"
+
 # Build input B arguments array
 input_b_args=()
-for file in "${par_input_b[@]}"; do
+for file in "${input_b_array[@]}"; do
     input_b_args+=(-b "$file")
 done
 

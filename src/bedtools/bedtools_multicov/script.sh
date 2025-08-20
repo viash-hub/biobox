@@ -14,9 +14,12 @@ set -eo pipefail
 [[ "$par_proper_pairs_only" == "false" ]] && unset par_proper_pairs_only
 [[ "$par_split" == "false" ]] && unset par_split
 
+# Convert semicolon-separated bams to array
+IFS=';' read -ra bams_array <<< "$par_bams"
+
 # Build command arguments array
 cmd_args=(
-    -bams "${par_bams[@]}"
+    -bams "${bams_array[@]}"
     -bed "$par_bed"
     ${par_min_overlap:+-f "$par_min_overlap"}
     ${par_reciprocal:+-r}

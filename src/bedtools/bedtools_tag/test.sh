@@ -89,7 +89,7 @@ log "TEST 3: Multiple annotation files with names"
 
 "$meta_executable" \
     --input "$meta_temp_dir/input.bam" \
-    --files "$meta_temp_dir/genes.bed" "$meta_temp_dir/enhancers.bed" \
+    --files "$meta_temp_dir/genes.bed;$meta_temp_dir/enhancers.bed" \
     --output "$meta_temp_dir/tagged_names.bam" \
     --use_names
 

@@ -42,7 +42,7 @@ EOF
 log "Starting TEST 1: Basic annotation with coverage fractions"
 "$meta_executable" \
     --input "$meta_temp_dir/intervals.bed" \
-    --files "$meta_temp_dir/annotation1.bed" "$meta_temp_dir/annotation2.bed" \
+    --files "$meta_temp_dir/annotation1.bed;$meta_temp_dir/annotation2.bed" \
     --output "$meta_temp_dir/output1.bed"
 
 check_file_exists "$meta_temp_dir/output1.bed" "basic annotation output"
@@ -57,7 +57,7 @@ log "✅ TEST 1 completed successfully"
 log "Starting TEST 2: Annotation with feature counts"
 "$meta_executable" \
     --input "$meta_temp_dir/intervals.bed" \
-    --files "$meta_temp_dir/annotation1.bed" "$meta_temp_dir/annotation2.bed" \
+    --files "$meta_temp_dir/annotation1.bed;$meta_temp_dir/annotation2.bed" \
     --output "$meta_temp_dir/output2.bed" \
     --counts
 
@@ -88,8 +88,8 @@ log "✅ TEST 3 completed successfully"
 log "Starting TEST 4: Annotation with custom names"
 "$meta_executable" \
     --input "$meta_temp_dir/intervals.bed" \
-    --files "$meta_temp_dir/annotation1.bed" "$meta_temp_dir/annotation2.bed" \
-    --names "ChIP_peaks" "DNA_meth" \
+    --files "$meta_temp_dir/annotation1.bed;$meta_temp_dir/annotation2.bed" \
+    --names "ChIP_peaks;DNA_meth" \
     --output "$meta_temp_dir/output4.bed"
 
 check_file_exists "$meta_temp_dir/output4.bed" "named annotation output"

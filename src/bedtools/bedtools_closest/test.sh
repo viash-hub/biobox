@@ -131,4 +131,43 @@ if ! grep -q "[-]" "$meta_temp_dir/output5.bed"; then
 fi
 log "✅ TEST 5 completed successfully"
 
+####################################################################################################
+
+log "Starting TEST 6: Multiple database files"
+
+# Create second database file with different features
+cat > "$meta_temp_dir/database2.bed" << 'EOF'
+chr1	300	400	enhancer1	10	+
+chr1	500	600	enhancer2	20	+
+chr2	150	250	enhancer3	15	-
+chr2	350	450	enhancer4	25	-
+EOF
+
+# Test multiple databases
+"$meta_executable" \
+    --input_a "$meta_temp_dir/queries.bed" \
+    --input_b "$meta_temp_dir/database.bed;$meta_temp_dir/database2.bed" \
+    --output "$meta_temp_dir/output6.bed"
+
+check_file_exists "$meta_temp_dir/output6.bed" "multiple database output"
+check_file_not_empty "$meta_temp_dir/output6.bed" "multiple database output"
+
+# Check that we have results from multiple databases (should have database IDs)
+line_count=$(wc -l < "$meta_temp_dir/output6.bed")
+if [ "$line_count" -lt 4 ]; then
+    log "❌ Expected at least 4 lines for multiple databases, got $line_count"
+    exit 1
+fi
+
+# Check for database ID column (7th column should contain database numbers)
+if ! cut -f7 "$meta_temp_dir/output6.bed" | grep -E "^[12]$" > /dev/null; then
+    log "❌ Expected database IDs (1, 2) in 7th column"
+    log "Actual output:"
+    cat "$meta_temp_dir/output6.bed"
+    exit 1
+fi
+
+log "✓ Found multiple database output with database IDs"
+log "✅ TEST 6 completed successfully"
+
 log "🎉 All bedtools_closest tests completed successfully!"
