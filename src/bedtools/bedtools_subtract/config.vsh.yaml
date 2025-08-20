@@ -1,0 +1,302 @@
+name: bedtools_subtract
+namespace: bedtools
+description: |
+  Remove the portion(s) of genomic intervals that are overlapped by other features.
+  
+  bedtools subtract removes portions of intervals in file A that overlap with intervals 
+  in file B. By default, only the overlapping portions are removed, leaving the 
+  non-overlapping parts of A intervals. This is essential for genomic analysis tasks 
+  like removing repetitive elements, excluding known variants, or filtering out 
+  unwanted regions from interval datasets.
+  
+  This tool is commonly used for:
+  - Removing repetitive elements or low-complexity regions from analysis
+  - Excluding known polymorphic sites from variant calling regions
+  - Filtering out blacklisted genomic regions from ChIP-seq peaks
+  - Creating clean interval sets by removing overlapping annotations
+  - Generating non-overlapping genomic windows for analysis
+  - Quality control by removing problematic genomic regions
+
+keywords: [genomics, intervals, subtract, remove, overlap, filter, exclusion]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/subtract.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/subtract.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input_a
+        alternatives: [-a]
+        type: file
+        description: |
+          Input file A containing genomic intervals to subtract from.
+          
+          **Format:** BED, GFF, or VCF file with genomic coordinates
+          **Content:** Intervals from which overlapping portions will be removed
+          **Usage:** This is the primary input file that will be modified
+          **Requirements:** Standard genomic interval format
+          **Output:** Modified intervals with overlapping regions removed
+        required: true
+        example: target_regions.bed
+
+      - name: --input_b
+        alternatives: [-b]
+        type: file
+        description: |
+          Input file B containing genomic intervals to subtract.
+          
+          **Format:** BED, GFF, or VCF file with genomic coordinates  
+          **Content:** Intervals that will be removed from file A
+          **Usage:** Regions in this file will be subtracted from input_a intervals
+          **Requirements:** Standard genomic interval format
+          **Effect:** Any overlap with these intervals will be removed from A
+        required: true
+        example: repetitive_elements.bed
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with subtracted intervals.
+          
+          **Format:** Same format as input file A
+          **Content:** Modified intervals from A with B regions removed
+          **Behavior:** Only non-overlapping portions of A intervals are retained
+          **Special cases:** Intervals completely overlapped by B are omitted entirely
+        required: true
+        direction: output
+        example: filtered_regions.bed
+
+  - name: Overlap Options
+    arguments:
+      - name: --min_overlap_a
+        alternatives: [-f]
+        type: double
+        description: |
+          Minimum overlap required as a fraction of A interval.
+          
+          **Default:** 1E-9 (essentially 1 base pair)
+          **Range:** 0.0 to 1.0
+          **Usage:** B must overlap at least this fraction of A for subtraction
+          **Example:** 0.5 requires B to overlap at least 50% of A interval
+        example: 0.1
+
+      - name: --min_overlap_b
+        alternatives: [-F]
+        type: double
+        description: |
+          Minimum overlap required as a fraction of B interval.
+          
+          **Default:** 1E-9 (essentially 1 base pair)
+          **Range:** 0.0 to 1.0
+          **Usage:** A must overlap at least this fraction of B for subtraction
+          **Example:** 0.3 requires A to overlap at least 30% of B interval
+        example: 0.1
+
+      - name: --reciprocal
+        alternatives: [-r]
+        type: boolean_true
+        description: |
+          Require that the fraction overlap be reciprocal for A AND B.
+          
+          **Usage:** Both A and B must overlap each other by the specified fractions
+          **Example:** With -f 0.9, B must overlap 90% of A AND A must overlap 90% of B
+          **Effect:** More stringent overlap requirement than -f or -F alone
+          **Default:** false (only one-way overlap required)
+
+      - name: --either_overlap
+        alternatives: [-e]
+        type: boolean_true
+        description: |
+          Require that the minimum fraction be satisfied for A OR B.
+          
+          **Usage:** Either the -f fraction OR the -F fraction must be satisfied
+          **Example:** With -f 0.9 and -F 0.1, either 90% of A OR 10% of B must be covered
+          **Default:** false (both fractions must be satisfied if both specified)
+
+  - name: Strand Options
+    arguments:
+      - name: --same_strand
+        alternatives: [-s]
+        type: boolean_true
+        description: |
+          Require same strandedness for overlap detection.
+          
+          **Usage:** Only subtract B intervals that overlap A on the same strand
+          **Applications:** Strand-specific analysis, gene annotation filtering
+          **Default:** false (overlaps reported without respect to strand)
+
+      - name: --opposite_strand
+        alternatives: [-S]
+        type: boolean_true
+        description: |
+          Require different strandedness for overlap detection.
+          
+          **Usage:** Only subtract B intervals that overlap A on the opposite strand
+          **Applications:** Antisense filtering, strand-specific exclusions
+          **Default:** false (overlaps reported without respect to strand)
+
+  - name: Subtraction Behavior
+    arguments:
+      - name: --remove_entire
+        alternatives: [-A]
+        type: boolean_true
+        description: |
+          Remove entire feature if any overlap is found.
+          
+          **Behavior:** Instead of partial subtraction, remove entire A interval if any overlap with B
+          **Usage:** Binary filtering - intervals are either kept completely or removed completely
+          **Applications:** Quality filtering, blacklist exclusion
+          **Default:** false (only overlapping portions are subtracted)
+
+      - name: --remove_if_all_overlap
+        alternatives: [-N]
+        type: boolean_true
+        description: |
+          Remove entire feature based on sum of all B feature overlaps.
+          
+          **Usage:** Same as -A but considers cumulative overlap from multiple B features
+          **Behavior:** Remove A if total overlap from all B features meets threshold
+          **Applications:** Complex filtering based on multiple overlapping annotations
+          **Requires:** Used with -f option for fraction threshold
+
+  - name: Output Format Options
+    arguments:
+      - name: --write_original_b
+        alternatives: [-wb]
+        type: boolean_true
+        description: |
+          Write the original entry in B for each overlap.
+          
+          **Output:** Each A interval followed by overlapping B intervals
+          **Usage:** Track which B features caused the subtraction
+          **Restrictions:** Overlap filtering by -f and -r still applies
+          **Applications:** Detailed overlap reporting, annotation tracking
+
+      - name: --write_overlap_counts
+        alternatives: [-wo]
+        type: boolean_true
+        description: |
+          Write original A and B entries plus the number of base pairs of overlap.
+          
+          **Output:** A interval, B interval, and overlap count in base pairs
+          **Usage:** Quantify the extent of overlap between features
+          **Filtering:** Only A features with overlap are reported
+          **Applications:** Overlap statistics, coverage analysis
+
+      - name: --output_bed
+        alternatives: [-bed]
+        type: boolean_true
+        description: |
+          Convert BAM input to BED format output.
+          
+          **Usage:** Only applicable when input is BAM format
+          **Effect:** Output genomic coordinates in BED format
+          **Applications:** Converting alignment data to interval format
+
+      - name: --include_header
+        alternatives: [-header]
+        type: boolean_true
+        description: |
+          Print the header from the A file prior to results.
+          
+          **Usage:** Preserves metadata and format information from input
+          **Applications:** Maintaining file structure and annotations
+          **Formats:** Particularly relevant for VCF and GFF files
+
+  - name: Performance Options
+    arguments:
+      - name: --use_split
+        alternatives: [-split]
+        type: boolean_true
+        description: |
+          Treat "split" BAM or BED12 entries as distinct BED intervals.
+          
+          **Usage:** Split complex entries into individual intervals
+          **Applications:** Detailed analysis of spliced alignments or multi-part features
+          **Formats:** Applies to BAM alignments and BED12 format
+
+      - name: --sorted_input
+        alternatives: [-sorted]
+        type: boolean_true
+        description: |
+          Use the "chromsweep" algorithm for sorted input.
+          
+          **Requirements:** Input must be sorted by chromosome then start coordinate
+          **Performance:** Much faster for large sorted files
+          **Usage:** Optimize processing for pre-sorted genomic data
+          **Sort command:** sort -k1,1 -k2,2n input.bed
+
+      - name: --genome_file
+        alternatives: [-g]
+        type: file
+        description: |
+          Genome file to enforce consistent chromosome sort order.
+          
+          **Format:** Tab-delimited file with chromosome names and lengths
+          **Usage:** Only applies when used with -sorted option
+          **Purpose:** Ensure consistent chromosome ordering across input files
+          **Example:** chr1\t249250621
+        example: genome.txt
+
+      - name: --no_name_check
+        alternatives: [-nonamecheck]
+        type: boolean_true
+        description: |
+          Don't throw error for different chromosome naming conventions.
+          
+          **Usage:** For sorted data with mixed naming (e.g., "chr1" vs "chr01")
+          **Applications:** Working with data from different sources
+          **Safety:** Allows processing despite naming inconsistencies
+
+      - name: --no_buffer
+        alternatives: [-nobuf]
+        type: boolean_true
+        description: |
+          Disable output buffering for real-time processing.
+          
+          **Effect:** Each line printed immediately instead of buffered
+          **Trade-off:** Slower output but enables real-time processing
+          **Applications:** Pipeline integration, streaming analysis
+
+      - name: --input_buffer
+        alternatives: [-iobuf]
+        type: string
+        description: |
+          Amount of memory to allocate for input buffer.
+          
+          **Format:** Integer with optional K/M/G suffix
+          **Examples:** "1G", "512M", "2048K"
+          **Usage:** Larger buffers can improve I/O performance for large files
+          **Note:** Currently has no effect with compressed files
+        example: 1G
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
