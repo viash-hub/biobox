@@ -65,6 +65,52 @@ meta_temp_dir="/tmp"
 
 This allows you to run your script directly with `bash script.sh` during development.
 
+## Code Style Guidelines
+
+### Indentation
+
+**Use 2-space indentation consistently throughout your scripts:**
+
+```bash
+# Correct - 2 spaces
+unset_if_false=(
+  par_verbose
+  par_quiet
+  par_force
+)
+
+for par in "${unset_if_false[@]}"; do
+  test_val="${!par}"
+  [[ "$test_val" == "false" ]] && unset $par
+done
+
+cmd_args=(
+  --input "$par_input"
+  --output "$par_output"
+  ${par_verbose:+--verbose}
+)
+```
+
+```bash
+# Incorrect - 4 spaces or tabs
+unset_if_false=(
+    par_verbose
+    par_quiet
+    par_force
+)
+
+for par in "${unset_if_false[@]}"; do
+    test_val="${!par}"
+    [[ "$test_val" == "false" ]] && unset $par
+done
+```
+
+**Why 2 spaces:**
+- Consistent with other biobox components
+- Better readability in terminal and code editors
+- Reduces line width for complex nested structures
+- Standard practice in many shell script projects
+
 ## Key Principles
 
 ### 1. Error Handling
@@ -115,11 +161,23 @@ Unset boolean parameters that are "false":
 # Single parameter
 [[ "$par_verbose" == "false" ]] && unset par_verbose
 
-# Multiple parameters using loop
+# For multiple parameters, you can use either approach:
+
+# Option 1: Individual approach (recommended for 1-4 parameters)
+[[ "$par_verbose" == "false" ]] && unset par_verbose
+[[ "$par_quiet" == "false" ]] && unset par_quiet
+[[ "$par_force" == "false" ]] && unset par_force
+[[ "$par_recursive" == "false" ]] && unset par_recursive
+
+# Option 2: Loop approach (recommended for 5+ parameters)
 unset_if_false=(
     par_verbose
     par_quiet
     par_force
+    par_recursive
+    par_follow_symlinks
+    par_ignore_case
+    par_preserve_permissions
 )
 
 for par in "${unset_if_false[@]}"; do
@@ -127,6 +185,17 @@ for par in "${unset_if_false[@]}"; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 ```
+
+**When to use which approach:**
+
+- **Individual approach**: Recommended for 1-4 boolean parameters, clearer and more direct
+- **Loop approach**: Recommended for many parameters (5+), reduces code duplication
+
+The individual approach is preferred for fewer parameters because:
+- Each parameter is explicit and easy to find
+- No variable indirection complexity (`${!par}`)
+- Simple to add/remove individual parameters
+- More readable at a glance
 
 ### 5. Meta Variables Usage
 
@@ -171,6 +240,77 @@ Always quote variables that might contain spaces or special characters:
 
 # For special characters, use @Q expansion
 --pattern "${par_pattern@Q}"
+```
+
+### 7. Multiple Parameter Values
+
+When using arguments with `multiple: true` in your Viash configuration, values are passed as semicolon-separated strings that need to be split into bash arrays.
+
+#### In script.sh - Converting to Arrays
+
+```bash
+# Convert semicolon-separated values to bash array
+IFS=';' read -ra files_array <<< "$par_files"
+
+# Example: Use in command arguments
+cmd_args=(
+    -i "$par_input"
+    -files "${files_array[@]}"
+    -o "$par_output"
+)
+
+# Execute command
+bedtools annotate "${cmd_args[@]}"
+```
+
+#### In test.sh - Passing Multiple Values
+
+When testing components with `multiple: true` parameters, you can use either format:
+
+```bash
+# Method 1: Repeated flags (recommended for readability)
+"$meta_executable" \
+    --input "$meta_temp_dir/query.bed" \
+    --files "$meta_temp_dir/db1.bed" \
+    --files "$meta_temp_dir/db2.bed" \
+    --output "$meta_temp_dir/result.bed"
+
+# Method 2: Semicolon-separated values  
+"$meta_executable" \
+    --input "$meta_temp_dir/query.bed" \
+    --files "$meta_temp_dir/db1.bed;$meta_temp_dir/db2.bed" \
+    --output "$meta_temp_dir/result.bed"
+```
+
+Both methods work identically - Viash automatically converts repeated flags to semicolon-separated strings internally.
+
+#### Complete Example
+
+```bash
+#!/bin/bash
+
+## VIASH START  
+## VIASH END
+
+set -eo pipefail
+
+# Convert semicolon-separated files to array
+IFS=';' read -ra files_array <<< "$par_files"
+
+# Convert semicolon-separated names to array if provided
+if [[ -n "${par_names}" ]]; then
+    IFS=';' read -ra names_array <<< "$par_names"
+fi
+
+# Build command arguments array
+cmd_args=(
+    -i "$par_input"
+    ${par_names:+-names "${names_array[@]}"}
+    -files "${files_array[@]}"
+)
+
+# Execute command
+bedtools annotate "${cmd_args[@]}" > "$par_output"
 ```
 
 ## Real-World Example
