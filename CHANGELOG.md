@@ -24,6 +24,10 @@
   - `bowtie2/bowtie2_align`: Align single-end and paired-end reads using Bowtie2.
   - `bowtie2/bowtie2_inspect`: Extract information from Bowtie2 index files.
 
+## MINOR CHANGES
+
+* `arriba`: Updated to v2.5.0 and refactored script and tests based on latest contributing guidelines (PR #187).
+
 ## DOCUMENTATION
 
 * Major restructuring of the documentation pages (PR #185):
