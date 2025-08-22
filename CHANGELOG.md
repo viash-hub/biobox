@@ -60,8 +60,6 @@
 
 ## MAJOR CHANGES
 
-* `bases2fastq`: Updated component with comprehensive argument support and latest practices (PR #190).
-
 * `bedtools`: Enhanced 11 existing bedtools components with improved functionality and standardized interfaces (PR #188):
   - `bedtools/bedtools_bamtobed`: Enhanced with additional output format options
   - `bedtools/bedtools_bamtofastq`: Improved paired-end read handling  
@@ -74,6 +72,10 @@
   - `bedtools/bedtools_links`: Improved link generation functionality
   - `bedtools/bedtools_merge`: Enhanced merging options and distance parameters
   - `bedtools/bedtools_sort`: Standardized sorting options
+
+## MINOR CHANGES
+
+* `bases2fastq`: Updated component with comprehensive argument support and latest practices (PR #190).
 
 ## DOCUMENTATION
 
