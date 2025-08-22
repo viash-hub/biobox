@@ -84,9 +84,6 @@ echo "> Running bases2fastq with arguments: ${args[@]}"
 bases2fastq ${args[@]}
 echo "> Done running sgdemux"
 
-echo "> Output folder:"
-tree "$TMPDIR"
-
 echo "> Moving FASTQ files into final output directory"
 mkdir -p "$par_output_directory/"
 mv "$TMPDIR"/Samples/* --target-directory="$par_output_directory"
