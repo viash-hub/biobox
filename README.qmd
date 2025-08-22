@@ -70,10 +70,10 @@ cat(
   "    A --> E[☁️ Nextflow Cloud]\n",
   "    \n",
   "    style A fill:#7a4baa,color:#fff\n",
-  "    style B fill:#e1f5fe\n",
-  "    style C fill:#e8f5e8\n",
-  "    style D fill:#fff3e0\n",
-  "    style E fill:#f3e5f5\n",
+  "    style B fill:#e1f5fe,color:#000\n",
+  "    style C fill:#e8f5e8,color:#000\n",
+  "    style D fill:#fff3e0,color:#000\n",
+  "    style E fill:#f3e5f5,color:#000\n",
   "```\n",
   sep = ""
 )
@@ -115,7 +115,6 @@ Check out our comprehensive guides:
 - **Documentation**: [Viash Documentation](https://viash.io)
 - **Discussions**: [GitHub Discussions](https://github.com/viash-hub/biobox/discussions)
 - **Issues**: [Bug Reports & Feature Requests](https://github.com/viash-hub/biobox/issues)
-- **Updates**: Follow [@viash_io](https://twitter.com/viash_io) for the latest news
 
 ---
 
