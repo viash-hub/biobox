@@ -218,7 +218,7 @@ test_resources:
 
 engines:
 - type: docker
-  image: elembio/bases2fastq:2
+  image: elembio/bases2fastq:2.2
   setup:
     - type: docker
       run: |

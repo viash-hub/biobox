@@ -1,5 +1,5 @@
 ```
-docker run --rm docker.io/elembio/bases2fastq:2 bases2fastq -h
+docker run --rm docker.io/elembio/bases2fastq:2.2 bases2fastq -h
 ```
 
 Usage: bases2fastq [OPTIONS] ANALYSIS_DIRECTORY OUTPUT_DIRECTORY
