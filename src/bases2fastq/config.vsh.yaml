@@ -222,7 +222,7 @@ engines:
   setup:
     - type: docker
       run: |
-        bases2fastq --version 2>&1 | head -1 | sed 's/.*version /bases2fastq: /' > /var/software_versions.txt
+        bases2fastq --version 2>&1 | head -1 | sed 's/.*version \([0-9\\.]*\).*/bases2fastq: \1/' > /var/software_versions.txt
 
 runners:
   - type: executable
