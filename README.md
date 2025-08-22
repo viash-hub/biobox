@@ -65,10 +65,10 @@ flowchart LR
     A --> E[☁️ Nextflow Cloud]
     
     style A fill:#7a4baa,color:#fff
-    style B fill:#e1f5fe
-    style C fill:#e8f5e8
-    style D fill:#fff3e0
-    style E fill:#f3e5f5
+    style B fill:#e1f5fe,color:#000
+    style C fill:#e8f5e8,color:#000
+    style D fill:#fff3e0,color:#000
+    style E fill:#f3e5f5,color:#000
 ```
 
 You can run components directly from Viash Hub’s launch interface. See
@@ -117,8 +117,6 @@ discussions](https://github.com/viash-hub/biobox/discussions).
   Discussions](https://github.com/viash-hub/biobox/discussions)
 - **Issues**: [Bug Reports & Feature
   Requests](https://github.com/viash-hub/biobox/issues)
-- **Updates**: Follow [@viash_io](https://twitter.com/viash_io) for the
-  latest news
 
 ------------------------------------------------------------------------
 
