@@ -1,9 +1,9 @@
 ```bash
-bedtools groupby
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools groupby -h
 ```
 
 Tool:    bedtools groupby 
-Version: v2.30.0
+Version: v2.31.1
 Summary: Summarizes a dataset column based upon
 	 common column groupings. Akin to the SQL "group by" command.
 

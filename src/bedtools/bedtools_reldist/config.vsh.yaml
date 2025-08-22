@@ -1,0 +1,111 @@
+name: bedtools_reldist
+namespace: bedtools
+description: |
+  Calculate the relative distance distribution between two feature files.
+  
+  bedtools reldist computes the distribution of relative distances between features 
+  in two genomic datasets. This tool is useful for understanding spatial relationships 
+  and clustering patterns between different types of genomic features.
+  
+  The tool calculates relative distances by measuring how close features in dataset A 
+  are to the nearest features in dataset B, normalized by the distance between adjacent 
+  features in dataset B. This provides insights into whether features cluster together 
+  more than expected by chance.
+  
+  This tool is commonly used for:
+  - Analyzing spatial clustering of genomic features
+  - Comparing distributions of regulatory elements
+  - Quality control of feature calling algorithms
+  - Statistical analysis of genomic co-localization
+  - Studying relationships between different genomic annotations
+  - Identifying non-random spatial patterns in genomic data
+
+keywords: [genomics, distance, distribution, spatial-analysis, clustering, statistics, colocalization]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/reldist.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/reldist.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --bed_a
+        alternatives: [-a]
+        type: file
+        description: |
+          First input BED/GFF/VCF file with genomic features.
+          
+          **Format:** BED, GFF, or VCF file with genomic coordinates
+          **Content:** Primary feature set for distance calculation
+          **Usage:** Distances will be calculated FROM these features TO features in dataset B
+          **Requirements:** Standard genomic coordinate format
+        required: true
+        example: "peaks.bed"
+
+      - name: --bed_b
+        alternatives: [-b]
+        type: file
+        description: |
+          Second input BED/GFF/VCF file with genomic features.
+          
+          **Format:** BED, GFF, or VCF file with genomic coordinates
+          **Content:** Reference feature set for distance calculation
+          **Usage:** Distances will be calculated TO these features FROM features in dataset A
+          **Requirements:** Standard genomic coordinate format
+        required: true
+        example: "genes.bed"
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with relative distance analysis results.
+          
+          **Format:** Tab-delimited text file
+          **Content:** Either summary statistics or detailed per-interval distances
+          **Summary mode:** Distribution bins and frequencies
+          **Detail mode:** Individual relative distances for each interval in dataset A
+        required: true
+        direction: output
+        example: "relative_distances.txt"
+
+  - name: Options
+    arguments:
+      - name: --detail
+        type: boolean_true
+        description: |
+          Report the relative distance for each interval in dataset A.
+          
+          **Default:** Summary mode (distribution statistics)
+          **Detail mode:** Individual relative distance for each feature in A
+          **Usage:** Provides granular distance information for downstream analysis
+          **Output:** One line per feature in dataset A with its relative distance
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

@@ -1,0 +1,22 @@
+```bash
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools maskfasta -h
+```
+
+Tool:    bedtools maskfasta (aka maskFastaFromBed)
+Version: v2.31.1
+Summary: Mask a fasta file based on feature coordinates.
+
+Usage:   bedtools maskfasta [OPTIONS] -fi <fasta> -fo <fasta> -bed <bed/gff/vcf>
+
+Options:
+	-fi		Input FASTA file
+	-bed		BED/GFF/VCF file of ranges to mask in -fi
+	-fo		Output FASTA file
+	-soft		Enforce "soft" masking.
+			Mask with lower-case bases, instead of masking with Ns.
+	-mc		Replace masking character.
+			Use another character, instead of masking with Ns.
+	-fullHeader	Use full fasta header.
+			By default, only the word before the first space or tab
+			is used.
+

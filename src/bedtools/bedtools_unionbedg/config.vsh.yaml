@@ -1,0 +1,90 @@
+name: bedtools_unionbedg
+namespace: bedtools
+description: |
+  Combine multiple BEDGRAPH files into a single file reporting the union of all intervals.
+  
+  bedtools unionbedg combines multiple BEDGRAPH files into a single file, reporting the union 
+  of all intervals and their values across files. For each genomic position, it reports the 
+  values from each input file, using '0' for positions not covered in a particular file.
+  
+  This tool is commonly used for:
+  - Combining coverage tracks from multiple samples
+  - Creating unified coverage matrices for comparative analysis
+  - Merging signal tracks for visualization
+  - Preparing data for multi-sample analysis workflows
+
+keywords: [genomics, bedgraph, union, intervals, coverage, merge]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/unionbedg.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/unionbedg.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --files
+        alternatives: [-i]
+        type: file
+        multiple: true
+        description: |
+          Input BEDGRAPH files to combine into a union.
+          
+          **Format:** BEDGRAPH files with chromosome, start, end, and value columns
+          **Content:** Genomic intervals with associated numeric values (coverage, scores, etc.)
+          **Usage:** All intervals from all files will be combined into a unified output
+          **Requirements:** Files should use consistent chromosome naming
+          **Output:** Union of all intervals with values from each input file
+        required: true
+        example: ["sample1.bedgraph", "sample2.bedgraph", "sample3.bedgraph"]
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file containing the union of all input BEDGRAPH intervals.
+          
+          **Format:** BEDGRAPH format with additional value columns for each input file
+          **Content:** Union of intervals with values from all input files
+          **Columns:** Chromosome, start, end, followed by one value column per input file
+          **Missing values:** Positions not covered in a file are represented as '0'
+        required: true
+        direction: output
+        example: union_coverage.bedgraph
+
+  - name: Options
+    arguments:
+      - name: --header
+        type: boolean_true
+        description: |
+          Write header line with input file names to the output.
+          
+          **Usage:** Adds a header line showing the source of each value column
+          **Format:** Header contains input filenames corresponding to value columns
+          **Default:** false (no header written)
+          **Applications:** Useful for tracking which column corresponds to which input file
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow

@@ -1,0 +1,26 @@
+```bash
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools split -h
+```
+
+Tool:    bedtools split
+Version: v2.31.1
+Summary: Split a Bed file.
+
+Usage:   bedtools split [OPTIONS] -i <bed> -n number-of-files
+
+Options: 
+	-i|--input (file)	BED input file (req'd).
+	-n|--number (int)	Number of files to create (req'd).
+	-p|--prefix (string)	Output BED file prefix.
+	-a|--algorithm (string) Algorithm used to split data.
+		* size (default): uses a heuristic algorithm to group the items
+		  so all files contain the ~ same number of bases
+		* simple : route records such that each split file has
+		  approximately equal records (like Unix split).
+
+	-h|--help		Print help (this screen).
+	-v|--version		Print version.
+
+
+Note: This programs stores the input BED records in memory.
+

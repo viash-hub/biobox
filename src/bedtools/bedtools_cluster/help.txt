@@ -1,0 +1,20 @@
+```bash
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools cluster -h
+```
+
+Tool:    bedtools cluster
+Version: v2.31.1
+Summary: Clusters overlapping/nearby BED/GFF/VCF intervals.
+
+Usage:   bedtools cluster [OPTIONS] -i <bed/gff/vcf>
+
+Options: 
+	-s	Force strandedness.  That is, only merge features
+		that are the same strand.
+		- By default, merging is done without respect to strand.
+
+	-d	Maximum distance between features allowed for features
+		to be merged.
+		- Def. 0. That is, overlapping & book-ended features are merged.
+		- (INTEGER)
+

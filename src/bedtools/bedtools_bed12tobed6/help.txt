@@ -1,9 +1,9 @@
-```
-bedtools bed12tobed6 -h
+```bash
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools bed12tobed6 -h
 ```
 
 Tool:    bedtools bed12tobed6 (aka bed12ToBed6)
-Version: v2.30.0
+Version: v2.31.1
 Summary: Splits BED12 features into discrete BED6 features.
 
 Usage:   bedtools bed12tobed6 [OPTIONS] -i <bed12>

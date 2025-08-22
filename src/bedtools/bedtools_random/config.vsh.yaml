@@ -1,0 +1,123 @@
+name: bedtools_random
+namespace: bedtools
+description: |
+  Generate random intervals among a genome.
+  
+  bedtools random generates a specified number of random intervals with a defined length 
+  across a reference genome. This tool is useful for creating random genomic regions for 
+  statistical analysis, generating null datasets for enrichment testing, or creating 
+  control datasets for comparative genomics studies.
+  
+  This tool is commonly used for:
+  - Creating random control regions for enrichment analysis
+  - Generating null datasets for statistical testing
+  - Producing background intervals for comparative studies
+  - Creating random sampling of genomic space
+  - Building control datasets for machine learning applications
+  - Testing genomic analysis pipelines with known random data
+
+keywords: [genomics, random, intervals, simulation, control, sampling, null-dataset]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/random.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/random.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --genome
+        alternatives: [-g]
+        type: file
+        description: |
+          Genome file with chromosome names and sizes.
+          
+          **Format:** Tab-delimited file with chromosome information
+          **Content:** Each line contains: <chromName><TAB><chromSize>
+          **Requirements:** Chromosome names and their corresponding sizes in base pairs
+          **Creation:** Can be generated using `samtools faidx` on FASTA files
+          **Example:** chr1<TAB>249250621
+        required: true
+        example: "genome.txt"
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with generated random intervals.
+          
+          **Format:** 6-column format (chrom, start, end, name, score, strand)
+          **Content:** Randomly placed intervals across the specified genome
+          **Coordinates:** 0-based start, 1-based end (standard BED format)
+          **Additional columns:** Sequential name, score (interval length), random strand
+          **Ordering:** Intervals are not necessarily sorted by position
+        required: true
+        direction: output
+        example: "random_intervals.bed"
+
+  - name: Options
+    arguments:
+      - name: --length
+        alternatives: [-l]
+        type: integer
+        description: |
+          Length of the intervals to generate in base pairs.
+          
+          **Default:** 100
+          **Usage:** All generated intervals will have this fixed length
+          **Range:** Positive integer values
+          **Considerations:** Length should be reasonable relative to chromosome sizes
+        default: 100
+        example: 1000
+
+      - name: --number
+        alternatives: [-n]
+        type: integer
+        description: |
+          Number of intervals to generate.
+          
+          **Default:** 1,000,000
+          **Usage:** Total number of random intervals to create
+          **Range:** Positive integer values
+          **Considerations:** Large numbers may take longer to generate and require more memory
+        default: 1000000
+        example: 10000
+
+      - name: --seed
+        type: integer
+        description: |
+          Integer seed for random number generation.
+          
+          **Default:** Automatically chosen seed (non-deterministic)
+          **Usage:** Provides reproducible results when the same seed is used
+          **Range:** Any integer value
+          **Applications:** Essential for reproducible analyses and testing
+        example: 12345
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

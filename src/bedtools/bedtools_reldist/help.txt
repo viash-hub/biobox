@@ -1,0 +1,13 @@
+```bash
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools reldist -h
+```
+
+Tool:    bedtools reldist
+Version: v2.31.1
+Summary: Calculate the relative distance distribution b/w two feature files.
+
+Usage:   bedtools reldist [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>
+
+Options: 
+	-detail	Report the relativedistance for each interval in A
+

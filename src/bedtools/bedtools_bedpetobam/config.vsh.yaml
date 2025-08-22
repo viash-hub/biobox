@@ -1,0 +1,108 @@
+name: bedtools_bedpetobam
+namespace: bedtools
+description: |
+  Convert BEDPE (paired-end BED) intervals to BAM format.
+  
+  This tool converts genomic paired-end interval data into BAM alignment format,
+  where each BEDPE record becomes a pair of BAM alignment records representing
+  the paired-end reads.
+
+keywords: [genomics, intervals, format conversion, BAM, BEDPE, paired-end]
+links:
+  homepage: https://bedtools.readthedocs.io/
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/bedpetobam.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+
+requirements:
+  commands: [bedtools]
+
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: [-i]
+        type: file
+        description: |
+          Input file in BEDPE format.
+          
+          **BEDPE format:** Tab-delimited with 10 columns:
+          chrom1, start1, end1, chrom2, start2, end2, name, score, strand1, strand2
+          
+          **Requirements:** Represents paired-end genomic intervals
+          **Coordinate system:** 0-based coordinates
+        required: true
+        example: intervals.bedpe
+
+      - name: --genome
+        alternatives: [-g]
+        type: file
+        description: |
+          Genome file defining chromosome names and sizes.
+          
+          **Format:** Tab-delimited file with chromosome name and size
+          **Example line:** chr1  249250621
+          **Purpose:** Required for BAM header creation
+        required: true
+        example: genome.txt
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: |
+          Output BAM file.
+          
+          Contains converted BEDPE intervals as paired BAM alignment records
+          suitable for visualization and downstream analysis of paired-end data.
+        required: true
+        example: intervals.bam
+
+  - name: BAM Options
+    arguments:
+      - name: --mapq
+        type: integer
+        description: |
+          Set the mapping quality for BAM records.
+          
+          **Range:** 0-255 (typical values)
+          **Default:** 255 (maximum quality)
+          **Purpose:** MAPQ field in BAM format
+        default: 255
+        example: 60
+
+      - name: --ubam
+        type: boolean_true
+        description: |
+          Write uncompressed BAM output.
+          
+          **Default:** Compressed BAM output
+          **Use case:** When compression is not needed or causes issues
+          **File size:** Significantly larger output files
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

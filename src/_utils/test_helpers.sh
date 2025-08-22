@@ -374,11 +374,6 @@ setup_test_env() {
   log "Using temporary directory: ${meta_temp_dir:-$PWD}"
 }
 
-# Clean up function (optional, since viash handles temp directory cleanup)
-cleanup_test_env() {
-  log "Test cleanup completed"
-}
-
 # Print test summary
 print_test_summary() {
   local test_name="${1:-Test}"
