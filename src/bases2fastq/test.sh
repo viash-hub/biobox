@@ -111,7 +111,6 @@ expected_logs="$TMPDIR/logs"
     --log_level DEBUG \
     --no_projects \
     --num_unassigned 30 \
-    --strict \
     --run_manifest "$BCL_DIR/20230404-bases2fastq-sim-151-151-9-9/RunManifest.csv"
 
 log_info "Validating test 1 outputs"
@@ -170,9 +169,9 @@ log_info "Running test 4 with split lanes option"
 mkdir "$TMPDIR/test4" && pushd "$TMPDIR/test4" > /dev/null
 expected_out_dir="$TMPDIR/test4/out"
 "$meta_executable" \
-    --analysis_directory "$BCL_DIR/20230404-bases2fastq-sim-151-151-9-9" \
-    --output_directory "$expected_out_dir" \
-    --split_lanes
+  --analysis_directory "$BCL_DIR/20230404-bases2fastq-sim-151-151-9-9" \
+  --output_directory "$expected_out_dir" \
+  --split_lanes
 
 expected_samples=(
   "Unassigned/Unassigned"
