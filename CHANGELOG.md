@@ -73,6 +73,10 @@
   - `bedtools/bedtools_merge`: Enhanced merging options and distance parameters
   - `bedtools/bedtools_sort`: Standardized sorting options
 
+## MINOR CHANGES
+
+* `bases2fastq`: Updated component with comprehensive argument support and latest practices (PR #190).
+
 ## DOCUMENTATION
 
 * Major restructuring of the documentation pages (PR #185):

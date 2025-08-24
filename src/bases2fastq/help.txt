@@ -1,40 +1,51 @@
+```
+docker run --rm docker.io/elembio/bases2fastq:2.2 bases2fastq -h
+```
 
 Usage: bases2fastq [OPTIONS] ANALYSIS_DIRECTORY OUTPUT_DIRECTORY
 
 positional arguments:
-        ANALYSIS_DIRECTORY              Location of analysis directory
-        OUTPUT_DIRECTORY                Location to save output
+        ANALYSIS_DIRECTORY                Location of analysis directory
+        OUTPUT_DIRECTORY                  Location to save output
 
 optional arguments:
-        --chemistry-version VERSION     Run parameters override, chemistry version.
-        --demux-only, -d                Generate demux files and indexing stats without generating FASTQ
-        --detect-adapters               Detect adapters sequences, overriding any sequences present in run manifest.
-        --error-on-missing              Terminate execution for a missing file (by default, missing files are skipped and execution continues). Also set by --strict.
-        --exclude-tile, -e SELECTION    Regex matching tile names to exclude. This flag can be specified multiple times. (e.g. L1.*C0[23]S.)
-        --filter-mask MASK              Run parameters override, custom pass filter mask.
-        --flowcell-id FLOWCELL_ID       Run parameters override, flowcell ID.
-        --force-index-orientation       Do not attempt to find orientation for I1/I2 reads (reverse complement). Use orientation given in run manifest.
-        --group-fastq                   Group all FASTQ/stats/metrics for a project are in the project folder (default false)
-        --help, -h                      Display this usage statement
-        --i1-cycles NUM_CYCLES          Run parameters override, I1 cycles.
-        --i2-cycles NUM_CYCLES          Run parameters override, I2 cycles.
-        --include-tile, -i SELECTION    Regex matching tile names to include. This flag can be specified multiple times. (e.g. L1.*C0[23]S.)
-        --input-remote, NAME            Rclone remote name for remote ANALYSIS_DIRECTORY
-        --kit-configuration KIT_CONFIG  Run parameters override, kit configuration.
-        --legacy-fastq                  Legacy naming for FASTQ files (e.g. SampleName_S1_L001_R1_001.fastq.gz)
-        --log-level, -l LEVEL           Severity level for logging. i.e. DEBUG, INFO, WARNING, ERROR (default INFO)
-        --no-error-on-invalid           Skip invalid files and continue execution (by default, execution is terminated for an invalid file). Overridden by --strict options.
-        --no-projects                   Disable project directories (default false)
-        --num-threads, -p NUMBER        Number of threads (default 1)
-        --num-unassigned NUMBER         Max Number of unassigned sequences to report. Must be <= 1000 (default 30)
-        --output-remote, NAME           Rclone remote name for remote OUTPUT_DIRECTORY
-        --preparation-workflow WORKFLOW Run parameters override, preparation workflow.
-        --qc-only                       Quickly generate run stats for single tile without generating FASTQ. Use --include-tile/--exclude-tile to define custom tile set.
-        --r1-cycles NUM_CYCLES          Run parameters override, R1 cycles.
-        --r2-cycles NUM_CYCLES          Run parameters override, R2 cycles.
-        --run-manifest, -r PATH         Location of run manifest to use instead of default RunManifest.csv found in analysis directory
-        --settings SELECTION            Run manifest settings override. This option may be specified multiple times.
-        --skip-qc-report SELECTION      Do not generate HTML QC report.
-        --split-lanes                   Split FASTQ files by lane
-        --strict, -s                    In strict mode any invalid or missing input file will terminate execution (overrides no-error-on-invalid and sets --error-on-missing)
-        --version, -v                   Display bases2fastq version
+        --chemistry-version VERSION       Run parameters override, chemistry version.
+        --demux-only, -d                  Generate demux files and indexing stats without generating FASTQ
+        --detect-adapters                 Detect adapters sequences, overriding any sequences present in run manifest.
+        --error-on-missing                Terminate execution for a missing file (by default, missing files are skipped and execution continues).
+        --exclude-tile, -e SELECTION      Regex matching tile names to exclude. This flag can be specified multiple times. (e.g. L1.*C0[23]S.)
+        --filter-mask MASK                Run parameters override, custom pass filter mask.
+        --flowcell-id FLOWCELL_ID         Run parameters override, flowcell ID.
+        --force-index-orientation         Do not attempt to find orientation for I1/I2 reads (reverse complement). Use orientation given in run manifest.
+        --group-fastq                     Group all FASTQ/stats/metrics for a project are in the project folder (default false)
+        --help, -h                        Display this usage statement
+        --i1-cycles NUM_CYCLES            Run parameters override, I1 cycles.
+        --i2-cycles NUM_CYCLES            Run parameters override, I2 cycles.
+        --include-tile, -i SELECTION      Regex matching tile names to include. This flag can be specified multiple times. (e.g. L1.*C0[23]S.)
+        --input-remote, NAME              Rclone remote name for remote ANALYSIS_DIRECTORY
+        --kit-configuration KIT_CONFIG    Run parameters override, kit configuration.
+        --legacy-fastq                    Legacy naming for FASTQ files (e.g. SampleName_S1_L001_R1_001.fastq.gz)
+        --log-level, -l LEVEL             Severity level for logging. i.e. DEBUG, INFO, WARNING, ERROR (default INFO)
+        --no-error-on-invalid             Skip invalid files and continue execution (by default, execution is terminated for an invalid file).
+        --no-projects                     Disable project directories (default false)
+        --num-threads, -p NUMBER          Number of threads (default 1)
+        --num-unassigned NUMBER           Max Number of unassigned sequences to report. (default 30)
+        --output-remote, NAME             Rclone remote name for remote OUTPUT_DIRECTORY
+        --preparation-workflow WORKFLOW   Run parameters override, preparation workflow.
+        --qc-only                         Quickly generate run stats for single tile without generating FASTQ. Use --include-tile/--exclude-tile to define custom tile set.
+        --r1-cycles NUM_CYCLES            Run parameters override, R1 cycles.
+        --r2-cycles NUM_CYCLES            Run parameters override, R2 cycles.
+        --run-manifest, -r PATH           Location of run manifest to use instead of default RunManifest.csv found in analysis directory
+        --settings SELECTION              Run manifest settings override. This option may be specified multiple times.
+        --skip-multi-qc                   Do not generate MultiQC HTML report.
+        --skip-qc-report                  Do not generate HTML QC report.
+        --split-lanes                     Split FASTQ files by lane
+        --version, -v                     Display bases2fastq version
+
+cyto-fastq optional arguments:
+        --batch BATCH                     Restrict cyto-fastq generation to batch(es) that match comma delimited list (e.g. --batch B01,B02,B03).
+        --cyto-fastq-mask MASK            Cycle mask for cyto fastq generation. This flag can be specified multiple times.
+        --panel PANEL                     Local or remote path to panel JSON
+        --per-target-fastq                Create per-target fastq for each cell assignment target site in each DISS batch according to FastqMasks in TargetCellAssignmentManifest.
+        --tca-manifest PATH               Location of TargetCellAssignmentManifest to use instead of default csv found in analysis directory
+        --well, -v                        Restrict cyto-fastq generation to well location(s) that match comma delimited list (e.g. --well A1,A2,B2)
