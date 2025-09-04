@@ -1,14 +1,15 @@
-```
-bcftools sort
+```bash
+docker run --rm quay.io/biocontainers/bcftools:1.22--h3a4d415_1 bcftools sort --help 2>&1 | grep -v unrecognized
 ```
 
 About:   Sort VCF/BCF file.
 Usage:   bcftools sort [OPTIONS] <FILE.vcf>
 
 Options:
-    -m, --max-mem FLOAT[kMG]       maximum memory to use [768M]
-    -o, --output FILE              output file name [stdout]
-    -O, --output-type b|u|z|v      b: compressed BCF, u: uncompressed BCF, z: compressed VCF, v: uncompressed VCF [v]
+    -m, --max-mem FLOAT[kMG]       Maximum memory to use [768M]
+    -o, --output FILE              Output file name [stdout]
     -O, --output-type u|b|v|z[0-9] u/b: un/compressed BCF, v/z: un/compressed VCF, 0-9: compression level [v]
-    -T, --temp-dir DIR             temporary files [/tmp/bcftools.XXXXXX]
+    -T, --temp-dir DIR             Temporary files [/tmp/bcftools.XXXXXX]
+    -v, --verbosity INT            Verbosity level
+    -W, --write-index[=FMT]        Automatically index the output files [off]
 

@@ -1,5 +1,5 @@
-```
-bcftools norm -h
+```bash
+docker run --rm quay.io/biocontainers/bcftools:1.22--h3a4d415_1 bcftools norm --help 2>&1 | grep -v unrecognized
 ```
 
 About:   Left-align and normalize indels; check if REF alleles match the reference;
@@ -13,10 +13,14 @@ Options:
     -c, --check-ref e|w|x|s         Check REF alleles and exit (e), warn (w), exclude (x), or set (s) bad sites [e]
     -D, --remove-duplicates         Remove duplicate lines of the same type.
     -d, --rm-dup TYPE               Remove duplicate snps|indels|both|all|exact
+    -e, --exclude EXPR              Do not normalize records for which the expression is true (see man page for details)
     -f, --fasta-ref FILE            Reference sequence
         --force                     Try to proceed even if malformed tags are encountered. Experimental, use at your own risk
+    -g, --gff-annot FILE            Follow HGVS 3'rule and right-align variants in transcripts on the forward strand
+    -i, --include EXPR              Normalize only records for which the expression is true (see man page for details)
         --keep-sum TAG,..           Keep vector sum constant when splitting multiallelics (see github issue #360)
     -m, --multiallelics -|+TYPE     Split multiallelics (-) or join biallelics (+), type: snps|indels|both|any [both]
+        --multi-overlaps 0|.        Fill in the reference (0) or missing (.) allele when splitting multiallelics [0]
         --no-version                Do not append version and command line to the header
     -N, --do-not-normalize          Do not normalize indels (with -m or -c s)
         --old-rec-tag STR           Annotate modified records with INFO/STR indicating the original variant
@@ -26,11 +30,14 @@ Options:
     -R, --regions-file FILE         Restrict to regions listed in a file
         --regions-overlap 0|1|2     Include if POS in the region (0), record overlaps (1), variant overlaps (2) [1]
     -s, --strict-filter             When merging (-m+), merged site is PASS only if all sites being merged PASS
+    -S, --sort METHOD               Sort order: chr_pos,lex [chr_pos]
     -t, --targets REGION            Similar to -r but streams rather than index-jumps
     -T, --targets-file FILE         Similar to -R but streams rather than index-jumps
         --targets-overlap 0|1|2     Include if POS in the region (0), record overlaps (1), variant overlaps (2) [0]
-        --threads INT               Use multithreading with <int> worker threads [0]
+        --threads INT               Use multithreading with INT worker threads [0]
+    -v, --verbosity INT             Verbosity level
     -w, --site-win INT              Buffer for sorting lines which changed position during realignment [1000]
+    -W, --write-index[=FMT]         Automatically index the output files [off]
 
 Examples:
    # normalize and left-align indels
