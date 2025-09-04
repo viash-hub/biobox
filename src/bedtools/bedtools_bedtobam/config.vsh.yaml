@@ -1,12 +1,15 @@
 name: bedtools_bedtobam
 namespace: bedtools
-description: Converts feature records (bed/gff/vcf) to BAM format.
+description: |
+  Converts feature records to BAM format.
+  
+  Converts genomic intervals from BED, GFF, or VCF formats into BAM format,
+  creating aligned sequence records that can be used with standard BAM tools.
 keywords: [Converts, BED, GFF, VCF, BAM]
 links:
   documentation: https://bedtools.readthedocs.io/en/latest/content/tools/bedtobam.html
   repository: https://github.com/arq5x/bedtools2
-  homepage: https://bedtools.readthedocs.io/en/latest/#
-  issue_tracker: https://github.com/arq5x/bedtools2/issues
+  homepage: https://bedtools.readthedocs.io/en/latest/
 references:
   doi: 10.1093/bioinformatics/btq033
 license: MIT
@@ -14,41 +17,65 @@ requirements:
   commands: [bedtools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [author]
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
 
 argument_groups:
   - name: Inputs
     arguments:
       - name: --input
-        alternatives: -i
+        alternatives: [-i]
         type: file
-        description: Input file (bed/gff/vcf).
+        description: |
+          Input genomic intervals file in BED, GFF, or VCF format.
+          
+          **Requirements:**
+          - BED files must be at least BED4 format (requires name field)
+          - File must contain valid genomic coordinates
         required: true
+        example: input.bed
       
       - name: --genome
-        alternatives: -g
+        alternatives: [-g]
         type: file
         description: | 
-          Input genome file.
-          NOTE: This is not a fasta file. This is a two-column tab-delimited file
-          where the first column is the chromosome name and the second their sizes.
+          Genome file defining chromosome names and sizes.
+          
+          **Format:** Two-column tab-delimited file:
+          ```
+          chr1    249250621
+          chr2    243199373
+          ```
+          
+          **Note:** This is NOT a FASTA file. Use `samtools faidx` to create from FASTA if needed.
         required: true
+        example: hg19.genome
     
   - name: Outputs
     arguments:
       - name: --output
-        alternatives: -o
+        alternatives: [-o]
         type: file
         direction: output
-        description: Output BAM file to be written.
+        description: |
+          Output BAM file containing converted genomic intervals.
+          
+          **Format:** Standard BAM format (compressed by default)
+        required: true
+        example: output.bam
 
   - name: Options
     arguments:
       - name: --map_quality
-        alternatives: -mapq
+        alternatives: [-mapq]
         type: integer
         description: | 
-          Set the mappinq quality for the BAM records.
+          Set the mapping quality for the BAM records.
+          
+          **Range:** 0-255 (higher values indicate better quality)
+          
+          **Default:** 255 (maximum quality)
         min: 0
         max: 255
         default: 255
@@ -56,14 +83,21 @@ argument_groups:
       - name: --bed12
         type: boolean_true
         description: | 
-          The BED file is in BED12 format. The BAM CIGAR
-          string will reflect BED "blocks".
+          Process BED file as BED12 format with blocked intervals.
+          
+          **Features:**
+          - BAM CIGAR string reflects BED blocks (exons/introns)
+          - Useful for representing spliced alignments
+          - Requires BED12 format input
 
       - name: --uncompress_bam
-        alternatives: -ubam
+        alternatives: [-ubam]
         type: boolean_true
         description: | 
-          Write uncompressed BAM output. Default writes compressed BAM.
+          Write uncompressed BAM output.
+          
+          **Default behavior:** Writes compressed BAM
+          **Use case:** When downstream tools require uncompressed format
       
 resources:
   - type: bash_script
@@ -72,19 +106,16 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
 
 engines:
   - type: docker
-    image: debian:stable-slim
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
     setup:
-      - type: apt
-        packages: [bedtools, procps]
       - type: docker
-        run: |
-          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
-    test_setup:  
-      - type: apt  
-        packages: [samtools]
+        run:
+          - "bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt"
 
 runners:
   - type: executable

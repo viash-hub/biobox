@@ -1,74 +1,144 @@
 name: bedtools_sort
 namespace: bedtools
-description: Sorts a feature file (bed/gff/vcf) by chromosome and other criteria.
-keywords: [sort, BED, GFF, VCF]
+description: |
+  Sorts genomic feature files by chromosome and other criteria.
+  
+  This tool provides flexible sorting options for BED, GFF, and VCF files,
+  including chromosome-based sorting, feature size sorting, score-based sorting,
+  and custom chromosome ordering using genome files.
+  
+  **Default behavior:** Sorts by chromosome name, then by start position
+  **Custom ordering:** Use --genome or --faidx to specify chromosome order
+
+keywords: [Sort, Sorting, BED, GFF, VCF, Chromosome]
 links:
   documentation: https://bedtools.readthedocs.io/en/latest/content/tools/sort.html
   repository: https://github.com/arq5x/bedtools2
+  homepage: https://bedtools.readthedocs.io/en/latest/
 references:
   doi: 10.1093/bioinformatics/btq033
-license: GPL-2.0, MIT
+license: MIT
 requirements:
   commands: [bedtools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [author]
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
 
 argument_groups:
   - name: Inputs
     arguments:
       - name: --input
-        alternatives: -i
+        alternatives: [-i]
         type: file
-        description: Input file (bed/gff/vcf) to be sorted.
+        description: |
+          Input genomic feature file to be sorted.
+          
+          **Supported formats:** BED, GFF, VCF
+          **Requirements:** File should contain valid genomic intervals
+          **Note:** File does not need to be pre-sorted
         required: true
+        example: unsorted_features.bed
     
   - name: Outputs
     arguments:
       - name: --output
-        alternatives: -o
+        alternatives: [-o]
         type: file
         direction: output
-        description: Output sorted file (bed/gff/vcf) to be written.
+        description: |
+          Output file containing sorted genomic features.
+          
+          The output will be in the same format as the input file,
+          with features sorted according to the specified criteria.
+        required: true
+        example: sorted_features.bed
 
   - name: Options
     arguments:
       - name: --sizeA
         type: boolean_true
-        description: Sort by feature size in ascending order.
+        description: |
+          Sort by feature size in ascending order.
+          
+          Features are sorted by their span (end - start) from smallest
+          to largest, regardless of chromosome location.
       
       - name: --sizeD
         type: boolean_true
-        description: Sort by feature size in descending order.
+        description: |
+          Sort by feature size in descending order.
+          
+          Features are sorted by their span (end - start) from largest
+          to smallest, regardless of chromosome location.
 
       - name: --chrThenSizeA 
         type: boolean_true
-        description: Sort by chrom (asc), then feature size (asc).
+        description: |
+          Sort by chromosome, then by feature size (ascending).
+          
+          **Primary sort:** Chromosome name (lexicographic)
+          **Secondary sort:** Feature size (smallest to largest)
       
       - name: --chrThenSizeD
         type: boolean_true
-        description: Sort by chrom (asc), then feature size (desc).
+        description: |
+          Sort by chromosome, then by feature size (descending).
+          
+          **Primary sort:** Chromosome name (lexicographic)  
+          **Secondary sort:** Feature size (largest to smallest)
 
       - name: --chrThenScoreA
         type: boolean_true
-        description: Sort by chrom (asc), then score (asc).
+        description: |
+          Sort by chromosome, then by score (ascending).
+          
+          **Primary sort:** Chromosome name (lexicographic)
+          **Secondary sort:** Score field (lowest to highest)
+          **Requirements:** Input must have score column (typically column 5 in BED)
 
       - name: --chrThenScoreD
         type: boolean_true
-        description: Sort by chrom (asc), then score (desc).
+        description: |
+          Sort by chromosome, then by score (descending).
+          
+          **Primary sort:** Chromosome name (lexicographic)
+          **Secondary sort:** Score field (highest to lowest)  
+          **Requirements:** Input must have score column (typically column 5 in BED)
 
       - name: --genome
-        alternatives: -g
+        alternatives: [-g]
         type: file
-        description: Sort according to the chromosomes declared in "genome.txt"
+        description: |
+          Custom chromosome ordering file.
+          
+          Text file with one chromosome name per line, defining the desired
+          chromosome order. Features will be sorted according to this order
+          rather than lexicographic sorting.
+          
+          **Format:** One chromosome name per line (e.g., "chr1", "chr2", etc.)
+        example: genome_order.txt
 
       - name: --faidx
         type: file
-        description: Sort according to the chromosomes declared in "names.txt"
+        description: |
+          FASTA index file for chromosome ordering.
+          
+          Uses a FASTA index file (.fai) to determine chromosome order.
+          The chromosomes will be sorted according to their order in the
+          index file.
+          
+          **Format:** Standard samtools faidx output format
+        example: reference.fa.fai
 
       - name: --header
         type: boolean_true
-        description: Print the header from the A file prior to results.
+        description: |
+          Preserve header lines in output.
+          
+          Header lines (starting with '#' or other format-specific prefixes)
+          from the input file will be printed before the sorted features.
       
 resources:
   - type: bash_script
@@ -77,16 +147,16 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
 
 engines:
   - type: docker
-    image: debian:stable-slim
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
     setup:
-      - type: apt
-        packages: [bedtools, procps]
       - type: docker
-        run: |
-          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+        run:
+          - "bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt"
 
 runners:
   - type: executable

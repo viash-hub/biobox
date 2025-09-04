@@ -1,35 +1,18 @@
 #!/bin/bash
 
-# exit on error
 set -eo pipefail
 
-#############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-assert_identical_content() {
-  diff -a "$2" "$1" \
-    || (echo "Files are not identical!" && exit 1)
-}
-#############################################
+# Source centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
 
-# Create directories for tests
-echo "Creating Test Data..."
-TMPDIR=$(mktemp -d "$meta_temp_dir/XXXXXX")
-function clean_up {
-  [[ -d "$TMPDIR" ]] && rm -r "$TMPDIR"
-}
-trap clean_up EXIT
+# Setup test environment with strict error handling
+setup_test_env
 
-# Create test data
-cat <<EOF > "$TMPDIR/genes.bed"
+log "Starting tests for bedtools_links"
+
+# Create test BED data
+log "Creating test BED data..."
+cat > "$meta_temp_dir/genes.bed" << 'EOF'
 chr21	9928613	10012791	uc002yip.1	0	-
 chr21	9928613	10012791	uc002yiq.1	0	-
 chr21	9928613	10012791	uc002yir.1	0	-
@@ -42,57 +25,59 @@ chr21	10080031	10081687	uc002yiw.1	0	-
 chr21	10081660	10120796	uc002yix.2	0	-
 EOF
 
-# Test 1: Default Use
-mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
+#############################
+# Test 1: Basic HTML generation
+#############################
+log "Starting TEST 1: Basic HTML generation"
 
-echo "> Run bedtools_links on BED file"
+log "Executing bedtools_links with default parameters..."
 "$meta_executable" \
-  --input "../genes.bed" \
-  --output "genes.html"
+  --input "$meta_temp_dir/genes.bed" \
+  --output "$meta_temp_dir/output1.html"
 
-# checks
-assert_file_exists "genes.html"
-assert_file_not_empty "genes.html"
-assert_file_contains "genes.html" "uc002yip.1"
-echo "- test1 succeeded -"
+log "Validating TEST 1 outputs..."
+check_file_exists "$meta_temp_dir/output1.html" "HTML output"
+check_file_not_empty "$meta_temp_dir/output1.html" "HTML output"
+check_file_contains "$meta_temp_dir/output1.html" "uc002yip.1" "HTML output"
 
-popd > /dev/null
+log "✅ TEST 1 completed successfully"
 
-# Test 2: Base URL
-mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
+#############################
+# Test 2: Custom base URL
+#############################
+log "Starting TEST 2: Custom base URL"
 
-echo "> Run bedtools_links with base option"
+log "Executing bedtools_links with custom base URL..."
 "$meta_executable" \
-  --input "../genes.bed" \
-  --output "genes.html" \
+  --input "$meta_temp_dir/genes.bed" \
+  --output "$meta_temp_dir/output2.html" \
   --base_url "http://genome.ucsc.edu"
 
-# checks
-assert_file_exists "genes.html"
-assert_file_not_empty "genes.html"
-assert_file_contains "genes.html" "uc002yip.1"
-echo "- test2 succeeded -"
+log "Validating TEST 2 outputs..."
+check_file_exists "$meta_temp_dir/output2.html" "HTML output with custom base URL"
+check_file_not_empty "$meta_temp_dir/output2.html" "HTML output with custom base URL"
+check_file_contains "$meta_temp_dir/output2.html" "uc002yip.1" "HTML output with custom base URL"
 
-popd > /dev/null
+log "✅ TEST 2 completed successfully"
 
-# Test 3: Organism and Genome Database Build
-mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
+#############################
+# Test 3: Custom organism and database
+#############################
+log "Starting TEST 3: Custom organism and database"
 
-echo "> Run bedtools_links with organism option and genome database build"
+log "Executing bedtools_links with custom organism and database..."
 "$meta_executable" \
-  --input "../genes.bed" \
-  --output "genes.html" \
+  --input "$meta_temp_dir/genes.bed" \
+  --output "$meta_temp_dir/output3.html" \
   --base_url "http://genome.ucsc.edu" \
   --organism "mouse" \
   --database "mm9"
 
-# checks
-assert_file_exists "genes.html"
-assert_file_not_empty "genes.html"
-assert_file_contains "genes.html" "uc002yip.1"
-echo "- test3 succeeded -"
+log "Validating TEST 3 outputs..."
+check_file_exists "$meta_temp_dir/output3.html" "HTML output with mouse/mm9"
+check_file_not_empty "$meta_temp_dir/output3.html" "HTML output with mouse/mm9"
+check_file_contains "$meta_temp_dir/output3.html" "uc002yip.1" "HTML output with mouse/mm9"
 
-popd > /dev/null
+log "✅ TEST 3 completed successfully"
 
-echo "---- All tests succeeded! ----"
-exit 0
+log "All tests completed successfully!"

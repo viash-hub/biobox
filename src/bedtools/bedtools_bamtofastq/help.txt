@@ -1,9 +1,9 @@
 ```bash
-bedtools bamtofastq
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools bamtofastq -h
 ```
 
 Tool:    bedtools bamtofastq (aka bamToFastq)
-Version: v2.30.0
+Version: v2.31.1
 Summary: Convert BAM alignments to FASTQ files. 
 
 Usage:   bamToFastq [OPTIONS] -i <BAM> -fq <FQ> 

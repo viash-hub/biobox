@@ -2,12 +2,14 @@ name: bedtools_genomecov
 namespace: bedtools
 description: |
   Compute the coverage of a feature file among a genome.
-keywords: [genome coverage, BED, GFF, VCF, BAM]
+  
+  Calculates genome-wide coverage statistics from BED, GFF, VCF, or BAM files.
+  Can produce coverage histograms, per-base depth, or BedGraph format output.
+keywords: [genome coverage, BED, GFF, VCF, BAM, depth, histogram, bedgraph]
 links:
-  homepage: https://bedtools.readthedocs.io/en/latest/#
+  homepage: https://bedtools.readthedocs.io/en/latest/
   documentation: https://bedtools.readthedocs.io/en/latest/content/tools/genomecov.html
   repository: https://github.com/arq5x/bedtools2
-  issue_tracker: https://github.com/arq5x/bedtools2/issues
 references:
   doi: 10.1093/bioinformatics/btq033
 license: MIT
@@ -15,33 +17,54 @@ requirements:
   commands: [bedtools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [author]
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
 
 argument_groups:
   - name: Inputs
     arguments:
       - name: --input
-        alternatives: -i
+        alternatives: [-i]
         type: file
         direction: input
         description: |
-          The input file (BED/GFF/VCF) to be used.
+          Input genomic intervals file in BED, GFF, or VCF format.
+          
+          **Supported formats:**
+          - BED format (standard genomic intervals)
+          - GFF/GTF format (gene annotations)
+          - VCF format (variant calls)
+          
+          **Note:** Required when not using `--input_bam`
         example: input.bed
       
       - name: --input_bam
-        alternatives: -ibam
+        alternatives: [-ibam]
         type: file
         description: |
-          The input file is in BAM format.
-          Note: BAM _must_ be sorted by positions.
-          '--genome' option is ignored if you use '--input_bam' option!
+          Input BAM file for coverage calculation.
+          
+          **Requirements:**
+          - BAM file must be sorted by position
+          - When using BAM input, `--genome` option is ignored
+          - Coordinates are determined from BAM header
+        example: input.bam
 
       - name: --genome
-        alternatives: -g
+        alternatives: [-g]
         type: file
         direction: input
         description: |
-          The genome file to be used.
+          Genome file defining chromosome names and sizes.
+          
+          **Format:** Two-column tab-delimited file:
+          ```
+          chr1    248956422
+          chr2    242193529
+          ```
+          
+          **Note:** Required when using `--input`, ignored when using `--input_bam`
         example: genome.txt
     
   - name: Outputs
@@ -50,44 +73,59 @@ argument_groups:
         type: file
         direction: output
         description: | 
-          The output BED file. 
+          Output file containing coverage information.
+          
+          **Output formats depend on options:**
+          - **Default:** Coverage histogram (depth vs count)
+          - **With `--depth`:** Per-base depth (1-based coordinates)
+          - **With `--bed_graph`:** BedGraph format for genome browsers
         required: true
-        example: output.bed
+        example: coverage.txt
   
   - name: Options
     arguments:
 
       - name: --depth
-        alternatives: -d
+        alternatives: [-d]
         type: boolean_true
         description: |
-          Report the depth at each genome position (with one-based coordinates).
-          Default behavior is to report a histogram.
+          Report the depth at each genome position with 1-based coordinates.
+          
+          **Output format:** `chromosome position depth`
+          
+          **Default behavior:** Reports coverage histogram instead
 
       - name: --depth_zero
-        alternatives: -dz
+        alternatives: [-dz]
         type: boolean_true
         description: |
-          Report the depth at each genome position (with zero-based coordinates).
-          Reports only non-zero positions.
-          Default behavior is to report a histogram.
+          Report depth at each genome position with 0-based coordinates.
+          
+          **Features:**
+          - Only reports positions with non-zero coverage
+          - Uses 0-based coordinate system
+          - More memory efficient than `--depth`
 
       - name: --bed_graph
-        alternatives: -bg
+        alternatives: [-bg]
         type: boolean_true
         description: |
-          Report depth in BedGraph format. For details, see:
-          genome.ucsc.edu/goldenPath/help/bedgraph.html
+          Report depth in BedGraph format for genome browser visualization.
+          
+          **Output format:** `chromosome start end depth`
+          
+          See [BedGraph specification](https://genome.ucsc.edu/goldenPath/help/bedgraph.html) for details.
 
       - name: --bed_graph_zero_coverage
-        alternatives: -bga
+        alternatives: [-bga]
         type: boolean_true
         description: |
-          Report depth in BedGraph format, as above (-bg).
-          However with this option, regions with zero 
-          coverage are also reported. This allows one to
-          quickly extract all regions of a genome with 0 
-          coverage by applying: "grep -w 0$" to the output.
+          Report depth in BedGraph format including zero-coverage regions.
+          
+          **Features:**
+          - Same as `--bed_graph` but includes regions with 0 coverage
+          - Useful for finding uncovered regions: `grep -w 0$ output.bg`
+          - Generates larger output files
 
       - name: --split
         type: boolean_true
@@ -134,13 +172,13 @@ argument_groups:
           Works for BAM files only
 
       - name: --five_prime
-        alternatives: -5
+        alternatives: ["-5"]
         type: boolean_true
         description: |
           Calculate coverage of 5" positions (instead of entire interval).
 
       - name: --three_prime
-        alternatives: -3
+        alternatives: ["-3"]
         type: boolean_true
         description: |
           Calculate coverage of 3" positions (instead of entire interval).
@@ -191,17 +229,16 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - path: test_data
+  - type: file
+    path: /src/_utils/test_helpers.sh
 
 engines:
   - type: docker
-    image: debian:stable-slim
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
     setup:
-      - type: apt
-        packages: [bedtools, procps]
       - type: docker
-        run: |
-          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+        run:
+          - "bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt"
 
 runners:
   - type: executable

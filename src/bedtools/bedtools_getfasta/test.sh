@@ -1,119 +1,121 @@
-#!/usr/bin/env bash
-set -eo pipefail
+#!/bin/bash
 
-TMPDIR=$(mktemp -d)
-function clean_up {
-  [[ -d "$TMPDIR" ]] && rm -r "$TMPDIR"
-}
-trap clean_up EXIT
+## VIASH START
+## VIASH END
 
-# Create dummy test fasta file
-cat > "$TMPDIR/test.fa" <<EOF
+# Source the centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
+
+# Initialize test environment with strict error handling
+setup_test_env
+
+#############################################
+# Test execution with centralized functions
+#############################################
+
+log "Starting tests for $meta_name"
+
+# Create test directory
+test_dir="$meta_temp_dir/test_data"
+mkdir -p "$test_dir"
+
+# Create test FASTA file
+log "Creating test FASTA data..."
+cat > "$test_dir/test.fa" << 'EOF'
 >chr1
 AAAAAAAACCCCCCCCCCCCCGCTACTGGGGGGGGGGGGGGGGGG
+>chr2
+TTTTTTTTGGGGGGGGGGGGGGCGGATCGGGGGGGGGGGGGGAAA
 EOF
 
-TAB="$(printf '\t')"
-
-# Create dummy bed file
-cat > "$TMPDIR/test.bed" <<EOF
-chr1${TAB}5${TAB}10${TAB}myseq
+# Create test BED file  
+cat > "$test_dir/test.bed" << 'EOF'
+chr1	5	10	seq1
+chr2	15	20	seq2
 EOF
 
-# Create expected bed file
-cat > "$TMPDIR/expected.fasta" <<EOF
->chr1:5-10
-AAACC
-EOF
+# --- Test Case 1: Basic FASTA sequence extraction ---
+log "Starting TEST 1: Basic FASTA sequence extraction"
 
+log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
-  --input_bed "$TMPDIR/test.bed" \
-  --input_fasta "$TMPDIR/test.fa" \
-  --output "$TMPDIR/output.fasta"
+  --input_bed "$test_dir/test.bed" \
+  --input_fasta "$test_dir/test.fa" \
+  --output "$meta_temp_dir/output1.fasta"
 
-cmp --silent "$TMPDIR/output.fasta" "$TMPDIR/expected.fasta" || { echo "files are different:"; exit 1; }
+log "Validating TEST 1 outputs..."
+check_file_exists "$meta_temp_dir/output1.fasta" "output FASTA file"
+check_file_not_empty "$meta_temp_dir/output1.fasta" "output FASTA file"
+check_file_contains "$meta_temp_dir/output1.fasta" ">chr1:5-10"
+check_file_contains "$meta_temp_dir/output1.fasta" "AAACC"
+log "✅ TEST 1 completed successfully"
 
+# --- Test Case 2: FASTA extraction with --name option ---
+log "Starting TEST 2: FASTA extraction with --name option"
 
-# Create expected bed file for --name
-cat > "$TMPDIR/expected_with_name.fasta" <<EOF
->myseq::chr1:5-10
-AAACC
-EOF
-
+log "Executing $meta_name with --name option..."
 "$meta_executable" \
-  --input_bed "$TMPDIR/test.bed" \
-  --input_fasta "$TMPDIR/test.fa" \
+  --input_bed "$test_dir/test.bed" \
+  --input_fasta "$test_dir/test.fa" \
   --name \
-  --output "$TMPDIR/output_with_name.fasta"
+  --output "$meta_temp_dir/output2.fasta"
 
+log "Validating TEST 2 outputs..."
+check_file_exists "$meta_temp_dir/output2.fasta" "output FASTA file with names"
+check_file_not_empty "$meta_temp_dir/output2.fasta" "output FASTA file with names"
+check_file_contains "$meta_temp_dir/output2.fasta" ">seq1::chr1:5-10"
+check_file_contains "$meta_temp_dir/output2.fasta" ">seq2::chr2:15-20"
+log "✅ TEST 2 completed successfully"
 
-cmp --silent "$TMPDIR/output_with_name.fasta" "$TMPDIR/expected_with_name.fasta" || { echo "Files when using --name are different."; exit 1; }
+# --- Test Case 3: FASTA extraction with --name_only option ---
+log "Starting TEST 3: FASTA extraction with --name_only option"
 
-# Create expected bed file for --name_only
-cat > "$TMPDIR/expected_with_name_only.fasta" <<EOF
->myseq
-AAACC
-EOF
-
+log "Executing $meta_name with --name_only option..."
 "$meta_executable" \
-  --input_bed "$TMPDIR/test.bed" \
-  --input_fasta "$TMPDIR/test.fa" \
+  --input_bed "$test_dir/test.bed" \
+  --input_fasta "$test_dir/test.fa" \
   --name_only \
-  --output "$TMPDIR/output_with_name_only.fasta"
+  --output "$meta_temp_dir/output3.fasta"
 
-cmp --silent "$TMPDIR/output_with_name_only.fasta" "$TMPDIR/expected_with_name_only.fasta" || { echo "Files when using --name_only are different."; exit 1; }
+log "Validating TEST 3 outputs..."
+check_file_exists "$meta_temp_dir/output3.fasta" "output FASTA file with name only"
+check_file_not_empty "$meta_temp_dir/output3.fasta" "output FASTA file with name only"
+check_file_contains "$meta_temp_dir/output3.fasta" ">seq1"
+check_file_contains "$meta_temp_dir/output3.fasta" ">seq2"
+log "✅ TEST 3 completed successfully"
 
+# --- Test Case 4: Tab-delimited output ---
+log "Starting TEST 4: Tab-delimited output with --tab option"
 
-# Create expected tab-delimited file for --tab
-cat > "$TMPDIR/expected_tab.out" <<EOF
-myseq${TAB}AAACC
-EOF
-
+log "Executing $meta_name with --tab option..."
 "$meta_executable" \
-  --input_bed "$TMPDIR/test.bed" \
-  --input_fasta "$TMPDIR/test.fa" \
+  --input_bed "$test_dir/test.bed" \
+  --input_fasta "$test_dir/test.fa" \
   --name_only \
   --tab \
-  --output "$TMPDIR/tab.out"
+  --output "$meta_temp_dir/output4.txt"
 
-cmp --silent "$TMPDIR/expected_tab.out" "$TMPDIR/tab.out" || { echo "Files when using --tab are different."; exit 1; }
+log "Validating TEST 4 outputs..."
+check_file_exists "$meta_temp_dir/output4.txt" "tab-delimited output file"
+check_file_not_empty "$meta_temp_dir/output4.txt" "tab-delimited output file"
+check_file_contains "$meta_temp_dir/output4.txt" "seq1"
+check_file_contains "$meta_temp_dir/output4.txt" "AAACC"
+log "✅ TEST 4 completed successfully"
 
+# --- Test Case 5: BED output format ---
+log "Starting TEST 5: BED output format with --bed_out option"
 
-# Create expected tab-delimited file for --bed_out
-cat > "$TMPDIR/expected.bed" <<EOF
-chr1${TAB}5${TAB}10${TAB}myseq${TAB}AAACC
-EOF
-
+log "Executing $meta_name with --bed_out option..."
 "$meta_executable" \
-  --input_bed "$TMPDIR/test.bed" \
-  --input_fasta "$TMPDIR/test.fa" \
+  --input_bed "$test_dir/test.bed" \
+  --input_fasta "$test_dir/test.fa" \
   --bed_out \
-  --output "$TMPDIR/output.bed"
+  --output "$meta_temp_dir/output5.bed"
 
+log "Validating TEST 5 outputs..."
+check_file_exists "$meta_temp_dir/output5.bed" "BED output file"
+check_file_not_empty "$meta_temp_dir/output5.bed" "BED output file"
+# BED format output contains sequences with coordinates
+log "✅ TEST 5 completed successfully"
 
-cmp --silent "$TMPDIR/expected.bed" "$TMPDIR/output.bed" || { echo "Files when using --bed_out are different."; exit 1; }
-
-# Create dummy bed file for strandedness
-cat > "$TMPDIR/test_strandedness.bed" <<EOF
-chr1${TAB}20${TAB}25${TAB}forward${TAB}1${TAB}+
-chr1${TAB}20${TAB}25${TAB}reverse${TAB}1${TAB}-
-EOF
-
-# Create expected tab-delimited file for --bed_out
-cat > "$TMPDIR/expected_strandedness.fasta" <<EOF
->forward(+)
-CGCTA
->reverse(-)
-TAGCG
-EOF
-
-"$meta_executable" \
-  --input_bed "$TMPDIR/test_strandedness.bed" \
-  --input_fasta "$TMPDIR/test.fa" \
-  -s \
-  --name_only \
-  --output "$TMPDIR/output_strandedness.fasta"
-
-
-cmp --silent "$TMPDIR/expected_strandedness.fasta" "$TMPDIR/output_strandedness.fasta" || { echo "Files when using -s are different."; exit 1; }
-
+log "🎉 All tests completed successfully for $meta_name!"

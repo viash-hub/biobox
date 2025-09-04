@@ -1,0 +1,42 @@
+```bash
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools igv -h
+```
+
+Tool:    bedtools igv (aka bedToIgv)
+Version: v2.31.1
+Summary: Creates a batch script to create IGV images 
+         at each interval defined in a BED/GFF/VCF file.
+
+Usage:   bedtools igv [OPTIONS] -i <bed/gff/vcf>
+
+Options: 
+	-path	The full path to which the IGV snapshots should be written.
+		(STRING) Default: ./
+
+	-sess	The full path to an existing IGV session file to be 
+		loaded prior to taking snapshots.
+
+		(STRING) Default is for no session to be loaded.
+
+	-sort	The type of BAM sorting you would like to apply to each image. 
+		Options: base, position, strand, quality, sample, and readGroup
+		Default is to apply no sorting at all.
+
+	-clps	Collapse the aligned reads prior to taking a snapshot. 
+		Default is to no collapse.
+
+	-name	Use the "name" field (column 4) for each image's filename. 
+		Default is to use the "chr:start-pos.ext".
+
+	-slop	Number of flanking base pairs on the left & right of the image.
+		- (INT) Default = 0.
+
+	-img	The type of image to be created. 
+		Options: png, eps, svg
+		Default is png.
+
+Notes: 
+	(1)  The resulting script is meant to be run from within IGV.
+	(2)  Unless you use the -sess option, it is assumed that prior to 
+		running the script, you've loaded the proper genome and tracks.
+

@@ -1,0 +1,245 @@
+name: bedtools_coverage
+namespace: bedtools
+description: |
+  Calculate coverage of genomic intervals from one file over intervals in another.
+  
+  This tool reports the depth and breadth of coverage of features from file B
+  over the intervals in file A. It provides detailed coverage statistics including
+  overlap counts, covered bases, and coverage fractions.
+
+keywords: [genomics, intervals, coverage, depth, breadth, overlap, statistics]
+links:
+  homepage: https://bedtools.readthedocs.io/
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/coverage.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+
+requirements:
+  commands: [bedtools]
+
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input_a
+        alternatives: [-a]
+        type: file
+        description: |
+          Query intervals file in BED, GFF, or VCF format.
+          
+          **Purpose:** Intervals for which coverage will be calculated
+          **BED format:** Standard genomic interval format
+          **GFF format:** Gene feature format with annotations
+          **VCF format:** Variant call format
+        required: true
+        example: target_regions.bed
+
+      - name: --input_b
+        alternatives: [-b]
+        type: file
+        multiple: true
+        description: |
+          Coverage source file(s) in BED, GFF, VCF, or BAM format.
+          
+          **Purpose:** Features that provide coverage over query intervals
+          **Multiple files:** Can specify multiple coverage sources
+          **BAM support:** Binary alignment files for sequencing coverage
+        required: true
+        example: ["alignments.bam", "features.bed"]
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: |
+          Output file with coverage statistics.
+          
+          **Default output:** For each interval in A, reports:
+          1. Number of overlapping features from B
+          2. Number of bases in A with non-zero coverage
+          3. Length of interval in A
+          4. Fraction of bases in A with non-zero coverage
+        required: true
+        example: coverage_stats.txt
+
+  - name: Coverage Reporting
+    arguments:
+      - name: --histogram
+        alternatives: [-hist]
+        type: boolean_true
+        description: |
+          Report coverage histogram for each feature and summary.
+          
+          **Output format:** depth, bases at depth, feature size, percentage
+          **Use case:** Detailed coverage distribution analysis
+
+      - name: --depth_per_position
+        alternatives: [-d]
+        type: boolean_true
+        description: |
+          Report depth at each position in each interval.
+          
+          **Output:** One-based positions with coverage depth
+          **Use case:** Position-specific coverage analysis
+          **Note:** Generates large output for long intervals
+
+      - name: --counts_only
+        alternatives: [-counts]
+        type: boolean_true
+        description: |
+          Only report overlap counts, no fractions.
+          
+          **Simplified output:** Just the number of overlapping features
+          **Use case:** When only overlap counts are needed
+
+      - name: --mean_depth
+        alternatives: [-mean]
+        type: boolean_true
+        description: |
+          Report mean coverage depth for each interval.
+          
+          **Output:** Average depth across all positions in interval
+          **Use case:** Summary coverage statistics
+
+  - name: Strand Options
+    arguments:
+      - name: --same_strand
+        alternatives: [-s]
+        type: boolean_true
+        description: |
+          Require same strandedness for overlaps.
+          
+          **Default:** Overlaps reported regardless of strand
+          **When enabled:** Only count overlaps on same strand
+
+      - name: --different_strand
+        alternatives: [-S]
+        type: boolean_true
+        description: |
+          Require different strandedness for overlaps.
+          
+          **Default:** Overlaps reported regardless of strand
+          **When enabled:** Only count overlaps on opposite strand
+
+  - name: Overlap Requirements
+    arguments:
+      - name: --min_overlap_a
+        alternatives: [-f]
+        type: double
+        description: |
+          Minimum overlap required as fraction of A.
+          
+          **Range:** 0.0 to 1.0
+          **Default:** 1E-9 (essentially 1bp)
+          **Example:** 0.50 requires 50% of A to be overlapped
+        example: 0.5
+
+      - name: --min_overlap_b
+        alternatives: [-F]
+        type: double
+        description: |
+          Minimum overlap required as fraction of B.
+          
+          **Range:** 0.0 to 1.0
+          **Default:** 1E-9 (essentially 1bp)
+          **Example:** 0.80 requires 80% of B to overlap A
+        example: 0.8
+
+      - name: --reciprocal
+        alternatives: [-r]
+        type: boolean_true
+        description: |
+          Require reciprocal minimum fraction for A AND B.
+          
+          **Requires:** Both -f and -F fractions to be satisfied
+          **Use case:** Stringent overlap requirements
+
+      - name: --either
+        alternatives: [-e]
+        type: boolean_true
+        description: |
+          Require minimum fraction for A OR B (not both).
+          
+          **Default:** Both -f and -F must be satisfied
+          **When enabled:** Either fraction requirement is sufficient
+
+  - name: Format Options
+    arguments:
+      - name: --split
+        type: boolean_true
+        description: |
+          Treat split BAM/BED12 entries as distinct intervals.
+          
+          **BAM:** Handle spliced alignments as separate blocks
+          **BED12:** Process each block independently
+
+      - name: --bed_output
+        alternatives: [-bed]
+        type: boolean_true
+        description: |
+          Write output in BED format when using BAM input.
+          
+          **Default:** BAM input produces BAM-style output
+          **When enabled:** Force BED format output
+
+      - name: --header
+        type: boolean_true
+        description: |
+          Print header from input A file before results.
+          
+          **Use case:** Preserve metadata from input file
+
+  - name: Performance Options
+    arguments:
+      - name: --sorted
+        type: boolean_true
+        description: |
+          Use chromsweep algorithm for sorted input.
+          
+          **Requirements:** Input must be sorted by chromosome and position
+          **Performance:** Faster processing for large files
+
+      - name: --genome
+        alternatives: [-g]
+        type: file
+        description: |
+          Genome file for consistent chromosome ordering.
+          
+          **Format:** Tab-delimited chromosome names and sizes
+          **Use case:** Ensure consistent sort order with -sorted option
+        example: genome.txt
+
+      - name: --no_name_check
+        alternatives: [-nonamecheck]
+        type: boolean_true
+        description: |
+          Don't error on different chromosome naming conventions.
+          
+          **Example:** Allows mixing "chr1" and "chr01"
+          **Use case:** Working with files from different sources
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

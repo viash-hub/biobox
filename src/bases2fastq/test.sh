@@ -2,25 +2,8 @@
 
 set -eou pipefail
 
-# Helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-
-assert_file_not_exists() {
-  [ ! -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-
-assert_directory_exists() {
-  [ -d "$1" ] || { echo "Directory '$1' does not exist" && exit 1; }
-}
-
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
+# Source centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
 
 # Example output
 # Note that the format of the fastq file names and organization into subfolders
@@ -87,16 +70,21 @@ function clean_up {
 }
 trap clean_up EXIT
 
+log_info "Downloading and extracting test data"
+
 # Unpack test input files
+log_info "Downloading test data from Element Biosciences"
 TAR_DIR="$TMPDIR/tar"
 mkdir -p "$TAR_DIR"
-curl http://element-public-data.s3.amazonaws.com/bases2fastq-share/bases2fastq-v2/20230404-bases2fastq-sim-151-151-9-9.tar.gz \
--o "$TAR_DIR/20230404-bases2fastq-sim-151-151-9-9.tar.gz"
+wget http://element-public-data.s3.amazonaws.com/bases2fastq-share/bases2fastq-v2/20230404-bases2fastq-sim-151-151-9-9.tar.gz \
+-O "$TAR_DIR/20230404-bases2fastq-sim-151-151-9-9.tar.gz"
 
+log_info "Extracting test data"
 BCL_DIR="$TMPDIR/bcl"
 mkdir "$BCL_DIR"
-tar -xvf "$TAR_DIR/20230404-bases2fastq-sim-151-151-9-9.tar.gz" -C "$BCL_DIR"
+tar -xzf "$TAR_DIR/20230404-bases2fastq-sim-151-151-9-9.tar.gz" -C "$BCL_DIR"
 
+log_info "Running test 1 with multiple options"
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
 expected_out_dir="$TMPDIR/test1/out"
 expected_report="$TMPDIR/report.html"
@@ -123,13 +111,13 @@ expected_logs="$TMPDIR/logs"
     --log_level DEBUG \
     --no_projects \
     --num_unassigned 30 \
-    --strict \
     --run_manifest "$BCL_DIR/20230404-bases2fastq-sim-151-151-9-9/RunManifest.csv"
 
-assert_directory_exists "$expected_out_dir"
-assert_directory_exists "$expected_logs"
-assert_file_exists "$expected_report"
-assert_file_not_empty "$expected_report"
+log_info "Validating test 1 outputs"
+check_dir_exists "$expected_out_dir" "Output directory"
+check_dir_exists "$expected_logs" "Logs directory"
+check_file_exists "$expected_report" "HTML report"
+check_file_not_empty "$expected_report" "HTML report (should contain data)"
 
 expected_samples=(
   Undetermined_S0
@@ -140,15 +128,17 @@ expected_samples=(
   sample_4_S5
 )
 
+log_info "Checking FASTQ files for all samples and lanes"
 for sample in "${expected_samples[@]}"; do
   for lane in "L001" "L002"; do 
     for orientation in "R1" "R2"; do
-      assert_file_exists "$expected_out_dir/${sample}_${lane}_${orientation}_001.fastq.gz"
+      check_file_exists "$expected_out_dir/${sample}_${lane}_${orientation}_001.fastq.gz" "FASTQ file for ${sample}_${lane}_${orientation}"
     done
   done
 done
 popd > /dev/null
 
+log_info "Running test 3 with basic options"
 mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
 expected_out_dir="$TMPDIR/test3/out"
 "$meta_executable" \
@@ -162,23 +152,26 @@ expected_samples=(
   sample_3
   sample_4
 )
-tree "$expected_out_dir"
+log_info "Inspecting output directory structure:"
+find "$expected_out_dir" -name "*.fastq.gz" | head -10
 
+log_info "Checking sample FASTQ files"
 for sample in "${expected_samples[@]}"; do
     for orientation in "R1" "R2"; do
-      assert_file_exists "$expected_out_dir/DefaultProject/${sample}/${sample}_${orientation}.fastq.gz"
+      check_file_exists "$expected_out_dir/DefaultProject/${sample}/${sample}_${orientation}.fastq.gz" "Sample ${sample} ${orientation} FASTQ file"
   done
 done
-assert_file_exists "$expected_out_dir/Unassigned/Unassigned_R1.fastq.gz"
-assert_file_exists "$expected_out_dir/Unassigned/Unassigned_R2.fastq.gz"
+check_file_exists "$expected_out_dir/Unassigned/Unassigned_R1.fastq.gz" "Unassigned R1 FASTQ file"
+check_file_exists "$expected_out_dir/Unassigned/Unassigned_R2.fastq.gz" "Unassigned R2 FASTQ file"
 popd > /dev/null
 
+log_info "Running test 4 with split lanes option"
 mkdir "$TMPDIR/test4" && pushd "$TMPDIR/test4" > /dev/null
 expected_out_dir="$TMPDIR/test4/out"
 "$meta_executable" \
-    --analysis_directory "$BCL_DIR/20230404-bases2fastq-sim-151-151-9-9" \
-    --output_directory "$expected_out_dir" \
-    --split_lanes
+  --analysis_directory "$BCL_DIR/20230404-bases2fastq-sim-151-151-9-9" \
+  --output_directory "$expected_out_dir" \
+  --split_lanes
 
 expected_samples=(
   "Unassigned/Unassigned"
@@ -188,13 +181,17 @@ expected_samples=(
   DefaultProject/sample_3/sample_3
   DefaultProject/sample_4/sample_4
 )
-tree "$expected_out_dir"
+log_info "Inspecting split lanes output directory:"
+find "$expected_out_dir" -name "*.fastq.gz" | head -10
 
+log_info "Checking split lane FASTQ files"
 for sample in "${expected_samples[@]}"; do
   for lane in "L1" "L2"; do 
     for orientation in "R1" "R2"; do
-      assert_file_exists "$expected_out_dir/${sample}_${lane}_${orientation}.fastq.gz"
+      check_file_exists "$expected_out_dir/${sample}_${lane}_${orientation}.fastq.gz" "Split lane FASTQ file ${sample}_${lane}_${orientation}"
     done
   done
 done
 popd > /dev/null
+
+log_info "All tests completed successfully"

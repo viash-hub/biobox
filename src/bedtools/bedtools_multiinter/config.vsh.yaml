@@ -1,0 +1,146 @@
+name: bedtools_multiinter
+namespace: bedtools
+description: |
+  Identify common intervals among multiple BED/GFF/VCF files.
+  
+  bedtools multiinter finds regions that are shared across multiple interval files and 
+  reports statistics about the overlaps. It can identify intervals that are present in 
+  all files, some files, or generate a matrix showing which intervals are found in which files.
+  
+  This tool is commonly used for:
+  - Finding consensus regions across multiple datasets
+  - Identifying tissue-specific or condition-specific intervals
+  - Creating intersection matrices for comparative analysis
+  - Merging annotations from multiple sources
+  - Quality control of peak calling across replicates
+
+keywords: [genomics, intervals, intersection, multi-file, bed, gff, vcf, consensus]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/multiinter.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/multiinter.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: [-i]
+        type: file
+        multiple: true
+        description: |
+          Input BED/GFF/VCF files to intersect.
+          
+          **Format:** BED, GFF, or VCF files with genomic coordinates
+          **Content:** Intervals to find intersections between
+          **Requirements:** Each file must be sorted by chromosome and start position
+          **Usage:** Intersections will be calculated across all provided files
+          **Output:** Results show which intervals are shared between files
+        required: true
+        example: ["file1.bed", "file2.bed", "file3.bed"]
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with intersection results.
+          
+          **Format:** Tab-delimited file showing intersection statistics
+          **Content:** Intervals and which files they appear in
+          **Columns:** Chromosome, start, end, plus indicator columns for each input file
+        required: true
+        direction: output
+        example: "intersections.bed"
+
+  - name: Options
+    arguments:
+      - name: --cluster
+        type: boolean_true
+        description: |
+          Invoke Ryan Layer's clustering algorithm.
+          
+          **Effect:** Uses advanced clustering for overlapping intervals
+          **Usage:** Alternative algorithm for intersection detection
+          **Default:** false (uses standard intersection algorithm)
+
+      - name: --header
+        type: boolean_true
+        description: |
+          Print a header line with column names.
+          
+          **Content:** Chromosome, start, end plus names of each input file
+          **Usage:** Makes output easier to interpret and parse
+          **Default:** false (no header printed)
+
+      - name: --names
+        type: string
+        multiple: true
+        description: |
+          List of names to describe each input file.
+          
+          **Format:** One name per input file, in the same order
+          **Usage:** These names appear in the header line (requires --header)
+          **Length:** Must match the number of input files
+          **Default:** Files are numbered sequentially if not provided
+        example: ["Sample1", "Sample2", "Sample3"]
+
+      - name: --genome
+        alternatives: [-g]
+        type: file
+        description: |
+          Genome file for calculating empty regions.
+          
+          **Format:** Tab-delimited file with chromosome names and lengths
+          **Content:** One line per chromosome: <chrom_name><tab><chrom_length>
+          **Usage:** Required for --empty option to work
+          **Purpose:** Defines chromosome boundaries for empty region calculation
+        example: "genome.txt"
+
+      - name: --empty
+        type: boolean_true
+        description: |
+          Report empty regions without values in all files.
+          
+          **Requirements:** Must be used with --genome option
+          **Purpose:** Shows intervals where no input files have overlapping features
+          **Usage:** Useful for finding gaps in coverage across all datasets
+          **Default:** false (only reports regions with overlaps)
+
+      - name: --filler
+        type: string
+        description: |
+          Text to use when representing intervals with no value.
+          
+          **Default:** "0"
+          **Usage:** Customize the placeholder for empty intersections
+          **Examples:** "N/A", ".", "NULL"
+          **Context:** Appears in output when intervals have no overlapping features
+        default: "0"
+        example: "N/A"
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow

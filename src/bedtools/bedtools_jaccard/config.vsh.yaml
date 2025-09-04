@@ -1,0 +1,227 @@
+name: bedtools_jaccard
+namespace: bedtools
+
+description: |
+  Calculate Jaccard similarity statistic between two genomic feature files.
+  
+  The Jaccard index measures similarity between finite sample sets, defined as
+  the size of the intersection divided by the size of the union. Values range
+  from 0 (no intersection) to 1 (identical sets). This tool calculates the
+  Jaccard statistic for genomic intervals, providing a quantitative measure
+  of overlap between two interval sets.
+
+keywords: [genomics, intervals, jaccard, similarity, statistics, overlap, intersection, union]
+links:
+  homepage: https://bedtools.readthedocs.io/
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+
+requirements:
+  commands: [bedtools]
+
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input_a
+        alternatives: [-a]
+        type: file
+        description: |
+          First input file for Jaccard comparison.
+          
+          **Format:** BED, GFF, VCF file with genomic intervals
+          **Requirement:** Must be sorted by chromosome, then start position
+          **Usage:** File A for Jaccard similarity calculation
+        required: true
+        example: intervals_a.bed
+      
+      - name: --input_b
+        alternatives: [-b]
+        type: file
+        description: |
+          Second input file for Jaccard comparison.
+          
+          **Format:** BED, GFF, VCF file with genomic intervals
+          **Requirement:** Must be sorted by chromosome, then start position
+          **Usage:** File B for Jaccard similarity calculation
+        required: true
+        example: intervals_b.bed
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: |
+          Output file with Jaccard similarity statistics.
+          
+          **Format:** Tab-delimited with intersection, union, and Jaccard values
+          **Columns:** intersection, union, jaccard
+          **Range:** Jaccard values from 0.0 to 1.0
+        required: true
+        example: jaccard_results.txt
+
+  - name: Overlap Options
+    arguments:
+      - name: --min_overlap_a
+        alternatives: [-f]
+        type: double
+        description: |
+          Minimum overlap required as fraction of A.
+          
+          **Range:** 0.0 to 1.0
+          **Default:** 1E-9 (effectively 1bp)
+          **Example:** 0.50 requires 50% of A to be overlapped
+        example: 0.5
+        
+      - name: --min_overlap_b
+        alternatives: [-F]
+        type: double
+        description: |
+          Minimum overlap required as fraction of B.
+          
+          **Range:** 0.0 to 1.0
+          **Default:** 1E-9 (effectively 1bp)
+          **Example:** 0.50 requires 50% of B to be overlapped
+        example: 0.5
+        
+      - name: --reciprocal
+        alternatives: [-r]
+        type: boolean_true
+        description: |
+          Require reciprocal overlap for A overlapping B.
+          
+          **Requirement:** Must be used solely with -f (min_overlap_a)
+          **Effect:** Requires B overlaps specified fraction of A AND A overlaps same fraction of B
+          **Example:** With -f 0.90 -r, requires B overlaps 90% of A AND A overlaps 90% of B
+          **Default:** false
+          
+      - name: --either
+        alternatives: [-e]
+        type: boolean_true
+        description: |
+          Require minimum fraction satisfied for A OR B.
+          
+          **Effect:** Only one of -f or -F thresholds needs to be satisfied
+          **Alternative:** Without -e, both fractions must be satisfied
+          **Default:** false (both required)
+
+  - name: Strand Options
+    arguments:
+      - name: --same_strand
+        alternatives: [-s]
+        type: boolean_true
+        description: |
+          Require same strandedness for overlaps.
+          
+          **Effect:** Only consider overlaps on the same strand
+          **Default:** false (strand-independent)
+          
+      - name: --opposite_strand
+        alternatives: [-S]
+        type: boolean_true
+        description: |
+          Require different strandedness for overlaps.
+          
+          **Effect:** Only consider overlaps on opposite strands
+          **Default:** false (strand-independent)
+          **Note:** May have issues in some bedtools versions requiring strand specification
+
+  - name: Format Options
+    arguments:
+      - name: --split
+        type: boolean_true
+        description: |
+          Treat split BAM or BED12 entries as distinct intervals.
+          
+          **Effect:** Split multi-block entries into individual intervals
+          **Usage:** For BAM alignments with gaps or BED12 entries
+          **Default:** false
+          
+      - name: --bed_output
+        alternatives: [--bed]
+        type: boolean_true
+        description: |
+          Write output in BED format when using BAM input.
+          
+          **Effect:** Forces BED output format for BAM inputs
+          **Default:** false
+          
+      - name: --header
+        type: boolean_true
+        description: |
+          Print header from file A prior to results.
+          
+          **Effect:** Includes original header from input file A
+          **Default:** false
+
+  - name: Advanced Options
+    arguments:
+      - name: --genome
+        alternatives: [-g]
+        type: file
+        description: |
+          Genome file for consistent chromosome sorting.
+          
+          **Format:** Tab-delimited file with chromosome name and size
+          **Usage:** Only applies when used with sorted data
+          **Purpose:** Enforces consistent chromosome sort order
+        example: genome.txt
+        
+      - name: --no_name_check
+        alternatives: [--nonamecheck]
+        type: boolean_true
+        description: |
+          Skip chromosome naming convention checks for sorted data.
+          
+          **Effect:** Allows different naming (e.g., "chr1" vs "chr01")
+          **Usage:** For files with inconsistent chromosome naming
+          **Default:** false (strict checking)
+          
+      - name: --no_buffer
+        alternatives: [--nobuf]
+        type: boolean_true
+        description: |
+          Disable buffered output.
+          
+          **Effect:** Print each line immediately instead of buffering
+          **Usage:** For real-time processing or piping
+          **Trade-off:** Slower performance but immediate output
+          **Default:** false (buffered output)
+          
+      - name: --io_buffer
+        alternatives: [--iobuf]
+        type: string
+        description: |
+          Specify input buffer memory size.
+          
+          **Format:** Integer with optional K/M/G suffix
+          **Example:** "128M" for 128 megabytes
+          **Note:** No effect with compressed files
+        example: "128M"
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

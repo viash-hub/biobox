@@ -24,9 +24,61 @@
   - `bowtie2/bowtie2_align`: Align single-end and paired-end reads using Bowtie2.
   - `bowtie2/bowtie2_inspect`: Extract information from Bowtie2 index files.
 
+* `bedtools`: Major expansion with 32 new components providing comprehensive genomic interval analysis (PR #188):
+  - `bedtools/bedtools_annotate`: Annotate coverage based on overlaps with interval files
+  - `bedtools/bedtools_bedpetobam`: Convert BEDPE to BAM format
+  - `bedtools/bedtools_closest`: Find closest features between two interval files
+  - `bedtools/bedtools_cluster`: Cluster nearby intervals
+  - `bedtools/bedtools_complement`: Report intervals not covered by features
+  - `bedtools/bedtools_coverage`: Compute coverage of features
+  - `bedtools/bedtools_expand`: Expand blocked BED features
+  - `bedtools/bedtools_fisher`: Compute Fisher's exact test for overlaps
+  - `bedtools/bedtools_flank`: Create flanking intervals around features
+  - `bedtools/bedtools_igv`: Create IGV batch scripts for visualization
+  - `bedtools/bedtools_jaccard`: Compute Jaccard statistic between interval sets
+  - `bedtools/bedtools_makewindows`: Make windows across genome or intervals
+  - `bedtools/bedtools_map`: Map values from overlapping intervals
+  - `bedtools/bedtools_maskfasta`: Mask FASTA sequences using intervals
+  - `bedtools/bedtools_multicov`: Count coverage across multiple BAM files
+  - `bedtools/bedtools_multiinter`: Identify common intervals across multiple files
+  - `bedtools/bedtools_overlap`: Compute overlaps between paired-end reads and intervals
+  - `bedtools/bedtools_pairtobed`: Find overlaps between paired-end reads and intervals
+  - `bedtools/bedtools_pairtopair`: Find overlaps between paired-end read sets
+  - `bedtools/bedtools_random`: Generate random intervals
+  - `bedtools/bedtools_reldist`: Compute relative distances between features
+  - `bedtools/bedtools_sample`: Sample random subsets of intervals
+  - `bedtools/bedtools_shift`: Shift intervals by specified amounts
+  - `bedtools/bedtools_shuffle`: Shuffle intervals while preserving size
+  - `bedtools/bedtools_slop`: Extend intervals by specified amounts
+  - `bedtools/bedtools_spacing`: Report spacing between intervals
+  - `bedtools/bedtools_split`: Split BED12 features into individual intervals
+  - `bedtools/bedtools_subtract`: Remove overlapping features
+  - `bedtools/bedtools_summary`: Summarize interval statistics
+  - `bedtools/bedtools_tag`: Tag BAM alignments with overlapping intervals
+  - `bedtools/bedtools_unionbedg`: Combine multiple BEDGRAPH files
+  - `bedtools/bedtools_window`: Find overlapping features within specified windows
+
+## MAJOR CHANGES
+
+* `bedtools`: Enhanced 11 existing bedtools components with improved functionality and standardized interfaces (PR #188):
+  - `bedtools/bedtools_bamtobed`: Enhanced with additional output format options
+  - `bedtools/bedtools_bamtofastq`: Improved paired-end read handling  
+  - `bedtools/bedtools_bed12tobed6`: Standardized parameter handling
+  - `bedtools/bedtools_bedtobam`: Enhanced genome file support
+  - `bedtools/bedtools_genomecov`: Added scale and split options
+  - `bedtools/bedtools_getfasta`: Improved FASTA extraction features
+  - `bedtools/bedtools_groupby`: Enhanced grouping and operation options
+  - `bedtools/bedtools_intersect`: Expanded intersection mode support
+  - `bedtools/bedtools_links`: Improved link generation functionality
+  - `bedtools/bedtools_merge`: Enhanced merging options and distance parameters
+  - `bedtools/bedtools_sort`: Standardized sorting options
+
 ## MINOR CHANGES
 
+* `bases2fastq`: Updated component with comprehensive argument support and latest practices (PR #190).
+
 * `arriba`: Updated to v2.5.0 and refactored script and tests based on latest contributing guidelines (PR #187).
+
 
 ## DOCUMENTATION
 

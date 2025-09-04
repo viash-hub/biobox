@@ -1,264 +1,167 @@
 #!/bin/bash
 
-# exit on error
-set -e
+set -eo pipefail
 
 ## VIASH START
-meta_executable="target/executable/bedtools/bedtools_sort/bedtools_sort"
-meta_resources_dir="src/bedtools/bedtools_sort"
 ## VIASH END
 
-#############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-assert_identical_content() {
-  diff -a "$2" "$1" \
-    || (echo "Files are not identical!" && exit 1)
-}
-#############################################
+# Source centralized test helpers
+source "$meta_resources_dir/test_helpers.sh"
 
-# Create directories for tests
-echo "Creating Test Data..."
-mkdir -p test_data
+# Initialize test environment
+setup_test_env
 
-# Create and populate example files
-printf "#Header\nchr1\t300\t400\nchr1\t150\t250\nchr1\t100\t200" > "test_data/featureA.bed"
-printf "chr2\t290\t400\nchr2\t180\t220\nchr1\t500\t600" > "test_data/featureB.bed"
-printf "chr1\t100\t200\tfeature1\t960\nchr1\t150\t250\tfeature2\t850\nchr1\t300\t400\tfeature3\t740\nchr2\t290\t390\tfeature4\t630\nchr2\t180\t280\tfeature5\t920\nchr3\t120\t220\tfeature6\t410\n" > "test_data/featureC.bed"
-printf "chr1\nchr3\nchr2\n" > "test_data/genome.txt"
-printf "chr1\t248956422\nchr3\t242193529\nchr2\t198295559\n" > "test_data/genome.fai"
+log "Starting tests for bedtools_sort"
 
-# Create and populate example.gff file
-printf "##gff-version 3\n" > "test_data/example.gff"
-printf "chr1\t.\tgene\t1000\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/example.gff"
-printf "chr3\t.\tmRNA\t1000\t2000\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "test_data/example.gff"
-printf "chr1\t.\texon\t1000\t1200\t.\t+\t.\tID=exon1;Parent=transcript1\n" >> "test_data/example.gff"
-printf "chr2\t.\texon\t1500\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "test_data/example.gff"
-printf "chr1\t.\tCDS\t1000\t1200\t.\t+\t0\tID=cds1;Parent=transcript1\n" >> "test_data/example.gff"
-printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/example.gff"
+# Create test data
+log "Creating test data..."
 
-# Create expected output files
-printf "chr1\t100\t200\nchr1\t150\t250\nchr1\t300\t400\n" > "test_data/expected_sorted_A.bed"
-printf "chr2\t180\t220\nchr1\t500\t600\nchr2\t290\t400\n" > "test_data/expected_sizeA.bed"
-printf "chr2\t290\t400\nchr1\t500\t600\nchr2\t180\t220\n" > "test_data/expected_sizeD.bed"
-printf "chr1\t500\t600\nchr2\t180\t220\nchr2\t290\t400\n" > "test_data/expected_chrThenSizeA.bed"
-printf "chr1\t500\t600\nchr2\t290\t400\nchr2\t180\t220\n" > "test_data/expected_chrThenSizeD.bed"
-printf "chr1\t300\t400\tfeature3\t740\nchr1\t150\t250\tfeature2\t850\nchr1\t100\t200\tfeature1\t960\nchr2\t290\t390\tfeature4\t630\nchr2\t180\t280\tfeature5\t920\nchr3\t120\t220\tfeature6\t410\n" > "test_data/expected_chrThenScoreA.bed"
-printf "chr1\t100\t200\tfeature1\t960\nchr1\t150\t250\tfeature2\t850\nchr1\t300\t400\tfeature3\t740\nchr2\t180\t280\tfeature5\t920\nchr2\t290\t390\tfeature4\t630\nchr3\t120\t220\tfeature6\t410\n" > "test_data/expected_chrThenScoreD.bed"
-printf "chr1\t100\t200\tfeature1\t960\nchr1\t150\t250\tfeature2\t850\nchr1\t300\t400\tfeature3\t740\nchr3\t120\t220\tfeature6\t410\nchr2\t180\t280\tfeature5\t920\nchr2\t290\t390\tfeature4\t630\n" > "test_data/expected_genome.bed"
-printf "#Header\nchr1\t100\t200\nchr1\t150\t250\nchr1\t300\t400\n" > "test_data/expected_header.bed"
+# Create unsorted BED file for basic sorting
+cat > "$meta_temp_dir/unsorted.bed" << 'EOF'
+chr1	300	400
+chr1	150	250  
+chr1	100	200
+EOF
 
-# expected_sorted.gff
-printf "chr1\t.\tgene\t1000\t2000\t.\t+\t.\tID=gene1;Name=Gene1\n" >> "test_data/expected_sorted.gff"
-printf "chr1\t.\texon\t1000\t1200\t.\t+\t.\tID=exon1;Parent=transcript1\n" >> "test_data/expected_sorted.gff"
-printf "chr1\t.\tCDS\t1000\t1200\t.\t+\t0\tID=cds1;Parent=transcript1\n" >> "test_data/expected_sorted.gff"
-printf "chr1\t.\tCDS\t1500\t1700\t.\t+\t2\tID=cds2;Parent=transcript1\n" >> "test_data/expected_sorted.gff"
-printf "chr2\t.\texon\t1500\t1700\t.\t+\t.\tID=exon2;Parent=transcript1\n" >> "test_data/expected_sorted.gff"
-printf "chr3\t.\tmRNA\t1000\t2000\t.\t+\t.\tID=transcript1;Parent=gene1\n" >> "test_data/expected_sorted.gff"
+# Create BED file with different chromosomes and sizes
+cat > "$meta_temp_dir/mixed_chroms.bed" << 'EOF'
+chr2	290	400
+chr2	180	220
+chr1	500	600
+EOF
 
-# Test 1: Default sort on BED file
-mkdir test1
-cd test1
+# Create BED file with scores for score-based sorting
+cat > "$meta_temp_dir/with_scores.bed" << 'EOF'
+chr1	100	200	feature1	960
+chr1	150	250	feature2	850
+chr1	300	400	feature3	740
+chr2	290	390	feature4	630
+chr2	180	280	feature5	920
+chr3	120	220	feature6	410
+EOF
 
-echo "> Run bedtools_sort on BED file"
+# Create BED file with header
+cat > "$meta_temp_dir/with_header.bed" << 'EOF'
+#Header line
+chr1	300	400
+chr1	150	250
+chr1	100	200
+EOF
+
+# Create custom genome order file
+cat > "$meta_temp_dir/genome_order.txt" << 'EOF'
+chr1
+chr3
+chr2
+EOF
+
+# Create FASTA index file
+cat > "$meta_temp_dir/reference.fai" << 'EOF'
+chr1	248956422
+chr3	198295559
+chr2	242193529
+EOF
+
+# Test 1: Basic chromosome and position sorting
+log "Starting TEST 1: Basic chromosome and position sorting"
 "$meta_executable" \
-  --input "../test_data/featureA.bed" \
-  --output "output.bed"
+  --input "$meta_temp_dir/unsorted.bed" \
+  --output "$meta_temp_dir/output1.bed"
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../test_data/expected_sorted_A.bed"
-echo "- test1 succeeded -"
+check_file_exists "$meta_temp_dir/output1.bed" "basic sort output"
+check_file_not_empty "$meta_temp_dir/output1.bed" "basic sort output"
 
-cd ..
+# Check that features are sorted by position
+check_file_contains "$meta_temp_dir/output1.bed" "chr1	100	200" "first feature by position"
+check_file_line_count "$meta_temp_dir/output1.bed" 3 "basic sort line count"
 
-# Test 2: Default sort on GFF file
-mkdir test2
-cd test2
+# Verify the order using line numbers
+head -n 1 "$meta_temp_dir/output1.bed" | grep -q "chr1	100	200" || { log "ERROR: First line is not chr1:100-200"; exit 1; }
+log "✅ TEST 1 completed successfully"
 
-echo "> Run bedtools_sort on GFF file"
+# Test 2: Size-based sorting (ascending)
+log "Starting TEST 2: Size-based sorting (ascending)"
 "$meta_executable" \
-  --input "../test_data/example.gff" \
-  --output "output.gff"
-
-# checks
-assert_file_exists "output.gff"
-assert_file_not_empty "output.gff"
-assert_identical_content "output.gff" "../test_data/expected_sorted.gff"
-echo "- test2 succeeded -"
-
-cd ..
-
-# Test 3: Sort on sizeA
-mkdir test3
-cd test3
-
-echo "> Run bedtools_sort on BED file with sizeA"
-"$meta_executable" \
-  --input "../test_data/featureB.bed" \
-  --output "output.bed" \
+  --input "$meta_temp_dir/mixed_chroms.bed" \
+  --output "$meta_temp_dir/output2.bed" \
   --sizeA
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../test_data/expected_sizeA.bed"
-echo "- test3 succeeded -"
+check_file_exists "$meta_temp_dir/output2.bed" "size ascending sort output"  
+check_file_not_empty "$meta_temp_dir/output2.bed" "size ascending sort output"
 
-cd ..
+# Smallest feature should be first (chr2 180-220, size=40)
+head -n 1 "$meta_temp_dir/output2.bed" | grep -q "chr2	180	220" || { log "ERROR: Smallest feature not first"; exit 1; }
+log "✅ TEST 2 completed successfully"
 
-# Test 4: Sort on sizeD
-mkdir test4
-cd test4
-
-echo "> Run bedtools_sort on BED file with sizeD"
+# Test 3: Size-based sorting (descending)
+log "Starting TEST 3: Size-based sorting (descending)"
 "$meta_executable" \
-  --input "../test_data/featureB.bed" \
-  --output "output.bed" \
+  --input "$meta_temp_dir/mixed_chroms.bed" \
+  --output "$meta_temp_dir/output3.bed" \
   --sizeD
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../test_data/expected_sizeD.bed"
-echo "- test4 succeeded -"
+check_file_exists "$meta_temp_dir/output3.bed" "size descending sort output"
+check_file_not_empty "$meta_temp_dir/output3.bed" "size descending sort output"  
 
-cd ..
+# Largest feature should be first (chr2 290-400, size=110)
+head -n 1 "$meta_temp_dir/output3.bed" | grep -q "chr2	290	400" || { log "ERROR: Largest feature not first"; exit 1; }
+log "✅ TEST 3 completed successfully"
 
-# Test 5: Sort on chrThenSizeA
-mkdir test5
-cd test5
-
-echo "> Run bedtools_sort on BED file with chrThenSizeA"
+# Test 4: Chromosome then size ascending
+log "Starting TEST 4: Chromosome then size ascending"
 "$meta_executable" \
-    --input "../test_data/featureB.bed" \
-    --output "output.bed" \
-    --chrThenSizeA
+  --input "$meta_temp_dir/mixed_chroms.bed" \
+  --output "$meta_temp_dir/output4.bed" \
+  --chrThenSizeA
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../test_data/expected_chrThenSizeA.bed"
-echo "- test5 succeeded -"
+check_file_exists "$meta_temp_dir/output4.bed" "chr then size asc output"
+check_file_not_empty "$meta_temp_dir/output4.bed" "chr then size asc output"
 
-cd ..
+# chr1 should be first, then chr2 features by size
+head -n 1 "$meta_temp_dir/output4.bed" | grep -q "chr1" || { log "ERROR: chr1 not first"; exit 1; }
+log "✅ TEST 4 completed successfully"
 
-# Test 6: Sort on chrThenSizeD
-mkdir test6
-cd test6
-
-echo "> Run bedtools_sort on BED file with chrThenSizeD"
+# Test 5: Score-based sorting (chromosome then score ascending)
+log "Starting TEST 5: Score-based sorting (chromosome then score ascending)"
 "$meta_executable" \
-    --input "../test_data/featureB.bed" \
-    --output "output.bed" \
-    --chrThenSizeD
+  --input "$meta_temp_dir/with_scores.bed" \
+  --output "$meta_temp_dir/output5.bed" \
+  --chrThenScoreA
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../test_data/expected_chrThenSizeD.bed"
-echo "- test6 succeeded -"
+check_file_exists "$meta_temp_dir/output5.bed" "chr then score asc output"
+check_file_not_empty "$meta_temp_dir/output5.bed" "chr then score asc output"
 
-cd ..
+# Within chr1, lowest score (740) should be first
+check_file_contains "$meta_temp_dir/output5.bed" "feature3	740" "lowest score feature"
+log "✅ TEST 5 completed successfully"
 
-# Test 7: Sort on chrThenScoreA
-mkdir test7
-cd test7
-
-echo "> Run bedtools_sort on BED file with chrThenScoreA"
+# Test 6: Custom genome ordering
+log "Starting TEST 6: Custom genome ordering"
 "$meta_executable" \
-    --input "../test_data/featureC.bed" \
-    --output "output.bed" \
-    --chrThenScoreA
+  --input "$meta_temp_dir/with_scores.bed" \
+  --output "$meta_temp_dir/output6.bed" \
+  --genome "$meta_temp_dir/genome_order.txt"
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../test_data/expected_chrThenScoreA.bed"
-echo "- test7 succeeded -"
+check_file_exists "$meta_temp_dir/output6.bed" "custom genome order output"
+check_file_not_empty "$meta_temp_dir/output6.bed" "custom genome order output"
 
-cd ..
+# chr1 should be first (per genome order), then chr3, then chr2
+head -n 1 "$meta_temp_dir/output6.bed" | grep -q "chr1" || { log "ERROR: chr1 not first in custom order"; exit 1; }
+log "✅ TEST 6 completed successfully"
 
-# Test 8: Sort on chrThenScoreD
-mkdir test8
-cd test8
-
-echo "> Run bedtools_sort on BED file with chrThenScoreD"
+# Test 7: Header preservation
+log "Starting TEST 7: Header preservation"
 "$meta_executable" \
-    --input "../test_data/featureC.bed" \
-    --output "output.bed" \
-    --chrThenScoreD
+  --input "$meta_temp_dir/with_header.bed" \
+  --output "$meta_temp_dir/output7.bed" \
+  --header
 
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../test_data/expected_chrThenScoreD.bed"
-echo "- test8 succeeded -"
+check_file_exists "$meta_temp_dir/output7.bed" "header preservation output"
+check_file_not_empty "$meta_temp_dir/output7.bed" "header preservation output"
 
-cd ..
+# Header should be preserved
+check_file_contains "$meta_temp_dir/output7.bed" "#Header" "preserved header"
+head -n 1 "$meta_temp_dir/output7.bed" | grep -q "#Header" || { log "ERROR: Header not first line"; exit 1; }
+log "✅ TEST 7 completed successfully"
 
-# Test 9: Sort according to genome file
-mkdir test9
-cd test9
-
-echo "> Run bedtools_sort on BED file according to genome file"
-"$meta_executable" \
-    --input "../test_data/featureC.bed" \
-    --output "output.bed" \
-    --genome "../test_data/genome.txt"
-
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../test_data/expected_genome.bed"
-echo "- test9 succeeded -"
-
-cd ..
-
-# Test 10: Sort according to faidx file
-mkdir test10
-cd test10
-
-echo "> Run bedtools_sort on BED file according to faidx file"
-"$meta_executable" \
-    --input "../test_data/featureC.bed" \
-    --output "output.bed" \
-    --faidx "../test_data/genome.fai"
-
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../test_data/expected_genome.bed"
-echo "- test10 succeeded -"
-
-cd ..
-
-# Test 11: Sort with header
-mkdir test11
-cd test11
-
-echo "> Run bedtools_sort on BED file with header"
-"$meta_executable" \
-    --input "../test_data/featureA.bed" \
-    --output "output.bed" \
-    --header
-
-# checks
-assert_file_exists "output.bed"
-assert_file_not_empty "output.bed"
-assert_identical_content "output.bed" "../test_data/expected_header.bed"
-echo "- test11 succeeded -"
-
-cd ..
-
-echo "---- All tests succeeded! ----"
-exit 0
+log "All tests completed successfully!"

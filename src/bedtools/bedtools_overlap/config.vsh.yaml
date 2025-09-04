@@ -1,0 +1,97 @@
+name: bedtools_overlap
+namespace: bedtools
+description: |
+  Compute the amount of overlap or distance between genomic features.
+  
+  bedtools overlap computes the amount of overlap (positive values) or distance 
+  (negative values) between genome features and reports the result at the end of 
+  the same line. This tool is useful for quantifying the precise overlap between 
+  features from different datasets or for measuring distances between nearby elements.
+  
+  This tool is commonly used for:
+  - Quantifying overlap between ChIP-seq peaks and genes
+  - Measuring distances between regulatory elements
+  - Computing precise overlap metrics for comparative genomics
+  - Quality control of feature intersection analyses
+  - Post-processing results from bedtools window operations
+
+keywords: [genomics, overlap, distance, features, intersection, quantification]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/overlap.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/overlap.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: [-i]
+        type: file
+        description: |
+          Input file containing genomic features for overlap computation.
+          
+          **Format:** Tab-delimited file (typically from bedtools window output)
+          **Content:** Lines with genomic coordinates for which overlap should be computed
+          **Usage:** Each line should contain start/end coordinates for two features
+          **Requirements:** Must contain the specified columns for coordinate extraction
+          **Special:** Use "stdin" for piped input from other bedtools commands
+        required: true
+        example: "windowed_features.bed"
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with overlap/distance values appended.
+          
+          **Format:** Same as input with additional overlap column
+          **Content:** Original lines plus computed overlap (positive) or distance (negative)
+          **Values:** Positive numbers indicate overlap, negative indicate distance
+          **Position:** Overlap value is appended as the last column
+        required: true
+        direction: output
+        example: "features_with_overlap.bed"
+
+  - name: Options
+    arguments:
+      - name: --cols
+        type: string
+        description: |
+          Specify columns (1-based) for start and end coordinates of features.
+          
+          **Format:** Comma-separated list: start1,end1,start2,end2
+          **Usage:** Defines which columns contain the coordinates for overlap calculation
+          **Order:** Must be in the exact order: start1,end1,start2,end2
+          **Example:** "2,3,6,7" for typical bedtools window output
+          **Requirements:** All specified columns must exist in the input
+        required: true
+        example: "2,3,6,7"
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
