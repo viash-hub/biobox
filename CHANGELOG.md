@@ -77,6 +77,9 @@
 
 * `bases2fastq`: Updated component with comprehensive argument support and latest practices (PR #190).
 
+* `arriba`: Updated to v2.5.0 and refactored script and tests based on latest contributing guidelines (PR #187).
+
+
 ## DOCUMENTATION
 
 * Major restructuring of the documentation pages (PR #185):
