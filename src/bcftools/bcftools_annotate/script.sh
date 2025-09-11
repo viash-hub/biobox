@@ -45,8 +45,9 @@ bcftools annotate \
     ${par_rename_chromosomes:+--rename-chrs "$par_rename_chromosomes"} \
     ${par_samples:+-s "$par_samples"} \
     ${par_single_overlaps:+--single-overlaps} \
-    ${par_threads:+--threads "$par_threads"} \
     ${par_remove:+-x "$par_remove"} \
+    ${par_verbosity:+-v "$par_verbosity"} \
+    ${meta_cpus:+--threads "$meta_cpus"} \
     -o $par_output \
     $par_input
     
