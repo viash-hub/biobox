@@ -8,6 +8,11 @@
 
 ## NEW FUNCTIONALITY
 
+* Developer tools: Added GitHub Copilot integration (PR #192):
+  - `.github/copilot-instructions.md`: Complete coding assistant guide with biobox patterns, examples, and best practices
+  - `.github/prompts/update-viash-component.prompt.md`: Step-by-step prompt for updating existing components
+  - `.github/prompts/add-viash-component.prompt.md`: Comprehensive prompt for creating new components from scratch
+
 * `fq`:
   - `fq/fq_filter`: Filter FASTQ files based on record names or sequence patterns (PR #182).
   - `fq/fq_generate`: Generate a random FASTQ file pair for testing and simulation purposes (PR #182).
