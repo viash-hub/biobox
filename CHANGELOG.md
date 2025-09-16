@@ -79,11 +79,11 @@
   - `bedtools/bedtools_sort`: Standardized sorting options
 
 * `bcftools`: Updated components to version 1.22 (PR #193):
-  * `bcftools_annotate`: Updated parameters, main script, tests overhaul.
-  * `bcftools_concat`: Updated parameters, main script, tests overhaul.
-  * `bcftools_norm`: Updated parameters, main script, tests overhaul.
-  * `bcftools_sort`: Updated parameters, main script, tests overhaul.
-  * `bcftools_stats`: Updated parameters, main script, tests overhaul.
+  * `bcftools_annotate`: Updated container, parameters, main script, tests overhaul.
+  * `bcftools_concat`: Updated container, parameters, main script, tests overhaul.
+  * `bcftools_norm`: Updated container, parameters, main script, tests overhaul.
+  * `bcftools_sort`: Updated container, parameters, main script, tests overhaul.
+  * `bcftools_stats`: Updated container, parameters, main script, tests overhaul.
 
 ## MINOR CHANGES
 
