@@ -1,6 +1,6 @@
 # Test files from SnpEff examples
 if [ ! -f snpEff_latest_core.zip ]; then
-    wget https://snpeff.blob.core.windows.net/versions/snpEff_latest_core.zip
+    wget https://snpeff.odsp.astrazeneca.com/versions/snpEff_latest_core.zip
 fi
 
 if [ ! -d snpEff ]; then

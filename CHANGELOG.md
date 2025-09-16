@@ -84,6 +84,8 @@
 
 * `arriba`: Updated to v2.5.0 and refactored script and tests based on latest contributing guidelines (PR #187).
 
+* `snpeff` has been updated to version `5.2f` (PR #)
+
 
 ## DOCUMENTATION
 

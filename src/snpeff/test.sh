@@ -14,7 +14,7 @@ pushd test1 > /dev/null # cd test1 (stack)
 
 echo "> Run Test 1: required parameters"
 "$meta_executable" \
-  --genome_version GRCh37.75 \
+  --genome_version GRCh38.86 \
   --input "$meta_resources_dir/test_data/cancer.vcf" \
   --output out.vcf
 
@@ -48,7 +48,7 @@ pushd test2 > /dev/null
 
 echo "> Run Test 2: different input + options"
 "$meta_executable" \
-  --genome_version GRCh37.75 \
+  --genome_version GRCh38.86 \
   --input "$meta_resources_dir/test_data/test.vcf" \
   --interval "$meta_resources_dir/test_data/my_annotations.bed" \
   --no_stats \
@@ -87,7 +87,7 @@ mkdir temp
 
 echo "> Run Test 3: move output files"
 "$meta_executable" \
-  --genome_version GRCh37.75 \
+  --genome_version GRCh38.86 \
   --input "$meta_resources_dir/test_data/test.vcf" \
   --output output.vcf \
   --summary temp \
