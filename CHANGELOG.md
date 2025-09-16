@@ -78,12 +78,12 @@
   - `bedtools/bedtools_merge`: Enhanced merging options and distance parameters
   - `bedtools/bedtools_sort`: Standardized sorting options
 
-* `bcftools`: Updated components to version 1.22 (PR #193):
-  * `bcftools_annotate`: Updated container, parameters, main script, tests overhaul.
-  * `bcftools_concat`: Updated container, parameters, main script, tests overhaul.
-  * `bcftools_norm`: Updated container, parameters, main script, tests overhaul.
-  * `bcftools_sort`: Updated container, parameters, main script, tests overhaul.
-  * `bcftools_stats`: Updated container, parameters, main script, tests overhaul.
+* `bcftools`: Updated components to version 1.22 with comprehensive improvements including enhanced argument coverage, improved script patterns, biobox standard compliance, and comprehensive testing overhaul (PR #193):
+  * `bcftools_annotate`: Added `--verbosity` parameter; updated to use `meta_cpus` instead of `--threads` parameter
+  * `bcftools_concat`: Renamed `--compact_PS` to `--compact_ps`, `--remove_duplicates` to `--rm_dups`, `--min_PQ` to `--min_pq`; added `--remove_duplicates`, `--drop_genotypes`, `--verbosity`, `--write_index` parameters; updated to use `meta_cpus` instead of `--threads` parameter
+  * `bcftools_norm`: Renamed `--remove_duplicates` to `--rm_dup`, added `--remove_duplicates_flag` as boolean alias; added `--exclude`, `--include`, `--gff_annot`, `--multi_overlaps`, `--sort`, `--verbosity`, `--write_index` parameters; updated to use `meta_cpus` instead of `--threads` parameter
+  * `bcftools_sort`: Removed `--max_mem` and `--temp_dir` parameters (now use `meta_memory_mb` and `meta_temp_dir` respectively); added `--verbosity`, `--write_index` parameters
+  * `bcftools_stats`: Renamed `--allele_frequency_bins` to `--af_bins`, `--allele_frequency_bins_file` removed, `--allele_frequency_tag` to `--af_tag`, `--fasta_reference` to `--fasta_ref`, `--split_by_ID` to `--split_by_id`, `--targets_overlaps` to `--targets_overlap`
 
 ## MINOR CHANGES
 
