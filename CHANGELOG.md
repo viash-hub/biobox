@@ -6,7 +6,7 @@
 
 * `fq_subsample` has been removed after its functionality was previously copied to `fq/fq_subsample`. Please use the latter instead. (PR #182).
 
-* `snpeff` has been deprecated. Please use `snpeff/snpeff_ann` as this is the default subcommand when running `snpEff` (PR #194)
+* `snpeff` has been removed. Please use `snpeff/snpeff_ann` (which is a functional copy of `snpeff`) as this is the default subcommand when running this tool (PR #194)
 
 
 ## NEW FUNCTIONALITY
