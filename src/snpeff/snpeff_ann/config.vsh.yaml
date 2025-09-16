@@ -1,4 +1,4 @@
-name: snpeff
+name: snpeff_ann
 description: |
   Genetic variant annotation, and functional effect prediction toolbox. 
   It annotates and predicts the effects of genetic variants on genes and 
@@ -23,7 +23,7 @@ argument_groups:
       - name: --genome_version
         type: string
         description: Reference genome version.
-        example: GRCh37.75
+        example: GRCh38.86
         required: true
   - name: Outputs
     arguments:
