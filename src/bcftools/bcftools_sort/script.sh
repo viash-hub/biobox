@@ -3,14 +3,20 @@
 ## VIASH START
 ## VIASH END
 
-# Exit on error
 set -eo pipefail
 
-# Execute bedtools bamtofastq with the provided arguments
-bcftools sort \
-    -o "$par_output" \
-    ${par_output_type:+-O "$par_output_type"} \
-    ${meta_memory_mb:+-m "${meta_memory_mb}M"} \
-    ${meta_temp_dir:+-T "$meta_temp_dir"} \
-    $par_input \
+# Build command array
+cmd_args=(
+  bcftools sort
+  ${par_max_mem:+--max-mem "$par_max_mem"}
+  ${par_output_type:+--output-type "$par_output_type"}
+  ${par_temp_dir:+--temp-dir "$par_temp_dir"}
+  ${par_verbosity:+--verbosity "$par_verbosity"}
+  ${par_write_index:+--write-index="$par_write_index"}
+  ${par_output:+--output "$par_output"}
+  "$par_input"
+)
+
+# Execute command
+"${cmd_args[@]}"
 

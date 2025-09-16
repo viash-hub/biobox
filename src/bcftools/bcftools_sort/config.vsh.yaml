@@ -1,7 +1,7 @@
 name: bcftools_sort
 namespace: bcftools
 description: | 
-  Sorts VCF/BCF files.
+  Sort VCF/BCF file.
 keywords: [Sort, VCF, BCF]
 links:
   homepage: https://samtools.github.io/bcftools/
@@ -15,39 +15,87 @@ requirements:
   commands: [bcftools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [author]
 
 argument_groups:
   - name: Inputs
     arguments:
       - name: --input
-        alternatives: -i
         type: file
-        description: Input VCF/BCF file.
+        description: |
+          Input VCF/BCF file to sort.
+          
+          The file to be sorted by genomic coordinates.
         required: true
+        example: "input.vcf.gz"
     
   - name: Outputs
     arguments:
       - name: --output
-        alternatives: -o
+        alternatives: [-o]
         direction: output
         type: file
-        description: Output sorted VCF/BCF file.
+        description: |
+          Write output to a file.
+          
+          If not specified, output goes to standard output.
         required: true
+        example: "sorted.vcf.gz"
          
   - name: Options
     arguments:
-      - name: --output_type
-        alternatives: -O
+      - name: --max_mem
+        alternatives: [-m]
         type: string
-        choices: [b, u, z, v]
-        description: | 
-          Compresses or uncompresses the output.
-          The options are:
-            b: compressed BCF, 
-            u: uncompressed BCF, 
-            z: compressed VCF, 
-            v: uncompressed VCF.        
+        description: |
+          Maximum memory to use.
+          
+          **Format:** FLOAT[kMG] where k/M/G specify units.
+          **Default:** 768M
+        example: "1G"
+        
+      - name: --output_type
+        alternatives: [-O]
+        type: string
+        description: |
+          Output file type.
+          
+          **Options:**
+          - u: uncompressed BCF
+          - b: compressed BCF  
+          - v: uncompressed VCF
+          - z: compressed VCF
+          - 0-9: compression level for compressed formats
+          
+          **Default:** v (uncompressed VCF)
+        example: "z"
+        
+      - name: --temp_dir
+        alternatives: [-T]
+        type: string
+        description: |
+          Directory for temporary files.
+          
+          **Default:** /tmp/bcftools.XXXXXX
+        example: "/tmp/sort_temp"
+        
+      - name: --verbosity
+        alternatives: [-v]
+        type: integer
+        description: |
+          Verbosity level.
+          
+          Higher values increase verbosity of output messages.
+        example: 1
+        
+      - name: --write_index
+        alternatives: [-W]
+        type: string
+        description: |
+          Automatically index the output files.
+          
+          **Format:** Specify index format or use default.
+        example: "tbi"        
 
 resources:
   - type: bash_script
@@ -56,17 +104,15 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - path: test_data
+  - path: /src/_utils/test_helpers.sh
 
 engines:
   - type: docker
-    image: debian:stable-slim
+    image: quay.io/biocontainers/bcftools:1.22--h3a4d415_1
     setup:
-      - type: apt
-        packages: [bcftools, procps]
       - type: docker
         run: |
-          echo "bcftools: \"$(bcftools --version | grep 'bcftools' | sed -n 's/^bcftools //p')\"" > /var/software_versions.txt
+          bcftools --version 2>&1 | head -1 | sed 's/bcftools /bcftools: /' > /var/software_versions.txt
 
 runners:
   - type: executable
