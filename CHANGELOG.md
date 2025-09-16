@@ -6,6 +6,9 @@
 
 * `fq_subsample` has been removed after its functionality was previously copied to `fq/fq_subsample`. Please use the latter instead. (PR #182).
 
+* `snpeff` has been removed. Please use `snpeff/snpeff_ann` (which is a functional copy of `snpeff`) as this is the default subcommand when running this tool (PR #194)
+
+
 ## NEW FUNCTIONALITY
 
 * `fq`: Added two new components for FASTQ file processing (PR #182):
@@ -90,6 +93,8 @@
 * `bases2fastq`: Updated component with comprehensive argument support and latest practices (PR #190).
 
 * `arriba`: Updated to v2.5.0 and refactored script and tests based on latest contributing guidelines (PR #187).
+
+* `snpeff` has been updated to version `5.2f` (PR #194)
 
 # BUG FIXES
 

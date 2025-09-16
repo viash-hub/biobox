@@ -56,7 +56,7 @@ done
 
 
 # Run SnpEff
-snpEff \
+snpEff ann \
     ${par_chr:+-chr "$par_chr"} \
     ${par_classic:+-classic} \
     ${par_csv_stats:+-csvStats "$par_csv_stats"} \

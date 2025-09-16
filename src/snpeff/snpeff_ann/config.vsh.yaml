@@ -1,4 +1,5 @@
-name: snpeff
+name: snpeff_ann
+namespace: snpeff
 description: |
   Genetic variant annotation, and functional effect prediction toolbox. 
   It annotates and predicts the effects of genetic variants on genes and 
@@ -23,7 +24,7 @@ argument_groups:
       - name: --genome_version
         type: string
         description: Reference genome version.
-        example: GRCh37.75
+        example: GRCh38.86
         required: true
   - name: Outputs
     arguments:
@@ -278,6 +279,7 @@ argument_groups:
 resources:
   - type: bash_script
     path: script.sh
+  - path: config.patch
 test_resources:
   - type: bash_script
     path: test.sh
@@ -285,8 +287,21 @@ test_resources:
     path: test_data
 engines:
   - type: docker
-    image: quay.io/staphb/snpeff:5.2a
+    image: quay.io/staphb/snpeff:5.2f
     setup:
+      - type: docker
+        # Apply a partial patch from this commit
+        # https://github.com/pcingola/SnpEff/commit/6339f6cab984bd5f35b81a77e05c517be5d112a6
+        # This updates the repositories where to download the references from
+        # At the time of writing this comment, these changes were not included in a release.
+        # This patch can be removed in an upcomming release.
+        copy: ["config.patch /opt/config.patch"]
+      - type: apt
+        packages: 
+          - git
+      - type: docker
+        run: |
+          bash -c "pushd /snpEff && git apply /opt/config.patch && popd"
       - type: docker
         run: |
           version=$(snpEff -version) && \
