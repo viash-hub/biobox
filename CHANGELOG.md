@@ -84,6 +84,9 @@
 
 * `arriba`: Updated to v2.5.0 and refactored script and tests based on latest contributing guidelines (PR #187).
 
+# BUG FIXES
+
+* Fix the `commands` property from components being overwritten by the global configuration (which only included `ps`) (PR #196).
 
 ## DOCUMENTATION
 
