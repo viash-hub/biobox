@@ -78,6 +78,13 @@
   - `bedtools/bedtools_merge`: Enhanced merging options and distance parameters
   - `bedtools/bedtools_sort`: Standardized sorting options
 
+* `bcftools`: Updated components to version 1.22 (PR #193):
+  * `bcftools_annotate`: Updated parameters, main script, tests overhaul.
+  * `bcftools_concat`: Updated parameters, main script, tests overhaul.
+  * `bcftools_norm`: Updated parameters, main script, tests overhaul.
+  * `bcftools_sort`: Updated parameters, main script, tests overhaul.
+  * `bcftools_stats`: Updated parameters, main script, tests overhaul.
+
 ## MINOR CHANGES
 
 * `bases2fastq`: Updated component with comprehensive argument support and latest practices (PR #190).
