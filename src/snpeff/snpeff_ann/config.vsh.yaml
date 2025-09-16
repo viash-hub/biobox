@@ -1,4 +1,5 @@
 name: snpeff_ann
+namespace: snpeff
 description: |
   Genetic variant annotation, and functional effect prediction toolbox. 
   It annotates and predicts the effects of genetic variants on genes and 
