@@ -44,16 +44,6 @@ argument_groups:
          
   - name: Options
     arguments:
-      - name: --max_mem
-        alternatives: [-m]
-        type: string
-        description: |
-          Maximum memory to use.
-          
-          **Format:** FLOAT[kMG] where k/M/G specify units.
-          **Default:** 768M
-        example: "1G"
-        
       - name: --output_type
         alternatives: [-O]
         type: string
@@ -69,15 +59,6 @@ argument_groups:
           
           **Default:** v (uncompressed VCF)
         example: "z"
-        
-      - name: --temp_dir
-        alternatives: [-T]
-        type: string
-        description: |
-          Directory for temporary files.
-          
-          **Default:** /tmp/bcftools.XXXXXX
-        example: "/tmp/sort_temp"
         
       - name: --verbosity
         alternatives: [-v]

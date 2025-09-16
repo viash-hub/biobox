@@ -114,11 +114,10 @@ log "TEST 3 passed"
 log "Starting TEST 4: Memory limit parameter"
 cd "$meta_temp_dir"
 
-# Test with memory limit (reuse test data)
+# Test with memory limit via viash run (meta_memory_mb will be set automatically)
 "$meta_executable" \
   --input "unsorted.vcf" \
-  --output "sorted_mem.vcf" \
-  --max_mem "500M"
+  --output "sorted_mem.vcf"
 
 # Verify output
 check_file_exists "sorted_mem.vcf"
@@ -129,14 +128,10 @@ log "TEST 4 passed"
 log "Starting TEST 5: Custom temporary directory"
 cd "$meta_temp_dir"
 
-# Create temp directory
-mkdir -p "custom_temp"
-
-# Test with custom temp directory (reuse test data)
+# Test temp directory handling (meta_temp_dir will be set automatically)
 "$meta_executable" \
   --input "unsorted.vcf" \
-  --output "sorted_temp.vcf" \
-  --temp_dir "custom_temp"
+  --output "sorted_temp.vcf"
 
 # Verify output
 check_file_exists "sorted_temp.vcf"
