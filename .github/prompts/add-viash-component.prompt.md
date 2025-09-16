@@ -60,7 +60,7 @@ name: {component_name}           # from folder name (snake_case)
 namespace: {namespace}           # from parent folder
 description: |
   {tool_description_with_links_and_examples}
-keywords: [bioinformatics, {domain}]
+keywords: [bioinformatics, {domain}, {tool}, {additional_keywords}] # additional keywords could be input/output file formats, methods, or other relevant terms
 links:
   - repository: {tool_repo_url}
   - documentation: {docs_url}
@@ -101,6 +101,8 @@ runners:
   - type: executable
   - type: nextflow
 ```
+
+
 
 **Actions**:
 
