@@ -32,6 +32,8 @@ description: |                            # markdown with examples
   Brief tool description with [documentation](https://example.com) and usage examples
 authors:
   - __merge__: /src/_authors/name.yaml    # reference author files
+requirements:                            # add if tool needs specific CLI commands
+  commands: [tool_name]                  # list of required command-line tools
 argument_groups:                          # organize by: inputs, outputs, options
   - name: inputs
     arguments:
@@ -41,8 +43,6 @@ argument_groups:                          # organize by: inputs, outputs, option
           Input description with example: `input.vcf`
         required: true
         multiple: false                  # set true for arrays/lists
-requirements:                            # add if tool needs specific CLI commands
-  commands: [tool_name]                  # list of required command-line tools
 resources:
   - type: bash_script
     path: script.sh

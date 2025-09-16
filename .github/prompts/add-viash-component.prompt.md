@@ -64,6 +64,8 @@ keywords: [bioinformatics, {domain}, {tool}, {additional_keywords}] # additional
 links:
   - repository: {tool_repo_url}
   - documentation: {docs_url}
+requirements:                            # add if tool needs specific CLI commands
+  commands: [{cli_tool}]                 # list of required command-line tools
 authors:
   - __merge__: /src/_authors/{author_name}.yaml
 argument_groups:
@@ -83,8 +85,6 @@ argument_groups:
   - name: "Options"
     arguments:
       # Tool-specific options here
-requirements:                            # add if tool needs specific CLI commands
-  commands: [{cli_tool}]                 # list of required command-line tools
 resources:
   - type: bash_script
     path: script.sh
