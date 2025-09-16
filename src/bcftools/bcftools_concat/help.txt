@@ -1,8 +1,6 @@
+```bash
+docker run --rm quay.io/biocontainers/bcftools:1.22--h3a4d415_1 bcftools concat --help 2>&1 | grep -v unrecognized
 ```
-bcftools concat -h
-```
-
-concat: option requires an argument -- 'h'
 
 About:   Concatenate or combine VCF/BCF files. All source files must have the same sample
          columns appearing in the same order. The program can be used, for example, to
@@ -19,6 +17,7 @@ Options:
    -d, --rm-dups STRING           Output duplicate records present in multiple files only once: <snps|indels|both|all|exact>
    -D, --remove-duplicates        Alias for -d exact
    -f, --file-list FILE           Read the list of files from a file.
+   -G, --drop-genotypes           Drop individual genotype information.
    -l, --ligate                   Ligate phased VCFs by matching phase at overlapping haplotypes
        --ligate-force             Ligate even non-overlapping chunks, keep all sites
        --ligate-warn              Drop sites in imperfect overlaps
@@ -32,5 +31,6 @@ Options:
    -R, --regions-file FILE        Restrict to regions listed in a file
        --regions-overlap 0|1|2    Include if POS in the region (0), record overlaps (1), variant overlaps (2) [1]
        --threads INT              Use multithreading with <int> worker threads [0]
-   -v, --verbose 0|1              Set verbosity level [1]
+   -v, --verbosity INT            Set verbosity level
+   -W, --write-index[=FMT]        Automatically index the output files [off]
 

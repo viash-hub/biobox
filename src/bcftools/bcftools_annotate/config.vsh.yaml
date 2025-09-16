@@ -223,6 +223,12 @@ argument_groups:
           To remove all INFO tags except "FOO" and "BAR", use "^INFO/FOO,INFO/BAR" (and similarly for FORMAT and FILTER). 
           "INFO" can be abbreviated to "INF" and "FORMAT" to "FMT".
 
+      - name: --verbosity
+        alternatives: -v
+        type: integer
+        description: | 
+          Verbosity level.
+
 resources:
   - type: bash_script
     path: script.sh
@@ -230,19 +236,15 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - path: /src/_utils/test_helpers.sh
 
 engines:
   - type: docker
-    image: debian:stable-slim
+    image: quay.io/biocontainers/bcftools:1.22--h3a4d415_1
     setup:
-      - type: apt
-        packages: [bcftools, procps]
       - type: docker
         run: |
           echo "bcftools: \"$(bcftools --version | grep 'bcftools' | sed -n 's/^bcftools //p')\"" > /var/software_versions.txt
-    test_setup:  
-      - type: apt  
-        packages: [tabix]
 
 runners:
   - type: executable

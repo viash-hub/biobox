@@ -6,27 +6,11 @@
 # Exit on error
 set -eo pipefail
 
-#test_data="$meta_resources_dir/test_data"
-
-#############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-assert_identical_content() {
-  diff -a "$2" "$1" \
-    || (echo "Files are not identical!" && exit 1)
-}
-#############################################
+# Source test helpers
+source "$meta_resources_dir/test_helpers.sh"
 
 # Create directories for tests
-echo "Creating Test Data..."
+log "Creating Test Data..."
 TMPDIR=$(mktemp -d "$meta_temp_dir/XXXXXX")
 function clean_up {
   [[ -d "$TMPDIR" ]] && rm -r "$TMPDIR"
@@ -70,24 +54,24 @@ EOF
 # Test 1: Remove ID annotations
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
 
-echo "> Run bcftools_annotate remove annotations"
+log "Test 1: Remove ID annotations"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
   --remove "ID" \
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "1	752567	.	A	C"
-echo "- test1 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "1	752567	.	A	C" "VCF with removed ID"
+log "✓ Test 1 passed"
 
 popd > /dev/null
 
 # Test 2: Annotate with -a, -c and -h options
 mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
 
-echo "> Run bcftools_annotate with -a, -c and -h options"
+log "Test 2: Annotate with -a, -c and -h options"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
@@ -97,85 +81,85 @@ echo "> Run bcftools_annotate with -a, -c and -h options"
   --mark_sites "BAR" \
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" $(echo -e "1\t752567\tllama\tA\tC\t.\t.\tBAR=12345\tFOO\tFooValue1")
-echo "- test2 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" $(echo -e "1\t752567\tllama\tA\tC\t.\t.\tBAR=12345\tFOO\tFooValue1") "annotated VCF content"
+log "✓ Test 2 passed"
 
 popd > /dev/null
 
-# Test 3: 
+# Test 3: Set ID option
 mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
 
-echo "> Run bcftools_annotate with --set_id option"
+log "Test 3: Set ID option"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
   --set_id "+'%CHROM\_%POS\_%REF\_%FIRST_ALT'" \
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "'1_752722_G_A'"
-echo "- test3 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "'1_752722_G_A'" "VCF with set ID"
+log "✓ Test 3 passed"
 
 popd > /dev/null
 
-# Test 4:
+# Test 4: Rename annotations
 mkdir "$TMPDIR/test4" && pushd "$TMPDIR/test4" > /dev/null
 
-echo "> Run bcftools_annotate with --rename-annotations option"
+log "Test 4: Rename annotations"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
   --rename_annotations "../rename.tsv"
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "##bcftools_annotateCommand=annotate --rename-annots ../rename.tsv -o annotated.vcf"
-echo "- test4 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "##bcftools_annotateCommand=annotate --rename-annots ../rename.tsv -o annotated.vcf" "VCF with command line"
+log "✓ Test 4 passed"
 
 popd > /dev/null
 
 # Test 5: Rename chromosomes
 mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
 
-echo "> Run bcftools_annotate with --rename-chromosomes option"
+log "Test 5: Rename chromosomes"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
   --rename_chromosomes "../rename_chrm.tsv"
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "chr1"
-echo "- test5 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "chr1" "VCF with renamed chromosomes"
+log "✓ Test 5 passed"
 
 popd > /dev/null
 
 # Test 6: Sample option
 mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
 
-echo "> Run bcftools_annotate with -s option"
+log "Test 6: Sample selection"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
   --samples "SAMPLE1"
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "##bcftools_annotateCommand=annotate -s SAMPLE1 -o annotated.vcf ../example.vcf"
-echo "- test6 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "##bcftools_annotateCommand=annotate -s SAMPLE1 -o annotated.vcf ../example.vcf" "VCF with sample selection"
+log "✓ Test 6 passed"
 
 popd > /dev/null
 
 # Test 7: Single overlaps
 mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
 
-echo "> Run bcftools_annotate with --single-overlaps option"	
+log "Test 7: Single overlaps and keep sites"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
@@ -183,17 +167,17 @@ echo "> Run bcftools_annotate with --single-overlaps option"
   --keep_sites \
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "annotate -k --single-overlaps -o annotated.vcf ../example.vcf"
-echo "- test7 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "annotate -k --single-overlaps -o annotated.vcf ../example.vcf" "VCF with single overlaps option"
+log "✓ Test 7 passed"
 
 popd > /dev/null
 
 # Test 8: Min overlap
 mkdir "$TMPDIR/test8" && pushd "$TMPDIR/test8" > /dev/null
 
-echo "> Run bcftools_annotate with --min-overlap option"
+log "Test 8: Minimum overlap option"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
@@ -203,85 +187,85 @@ echo "> Run bcftools_annotate with --min-overlap option"
   --min_overlap "1"
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "annotate -a ../annots.tsv.gz -c CHROM,FROM,TO,FMT/FOO,BAR -h ../header.hdr --min-overlap 1 -o annotated.vcf ../example.vcf"
-echo "- test8 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "annotate -a ../annots.tsv.gz -c CHROM,FROM,TO,FMT/FOO,BAR -h ../header.hdr --min-overlap 1 -o annotated.vcf ../example.vcf" "VCF with min overlap"
+log "✓ Test 8 passed"
 
 popd > /dev/null
 
 # Test 9: Regions
 mkdir "$TMPDIR/test9" && pushd "$TMPDIR/test9" > /dev/null
 
-echo "> Run bcftools_annotate with -r option"
+log "Test 9: Region filtering"
 "$meta_executable" \
   --input "../example.vcf.gz" \
   --output "annotated.vcf" \
   --regions "1:752567-752722"
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "annotate -r 1:752567-752722 -o annotated.vcf ../example.vcf.gz"
-echo "- test9 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "annotate -r 1:752567-752722 -o annotated.vcf ../example.vcf.gz" "VCF with region filtering"
+log "✓ Test 9 passed"
 
 popd > /dev/null
 
-# Test 10: pair-logic
+# Test 10: Pair logic
 mkdir "$TMPDIR/test10" && pushd "$TMPDIR/test10" > /dev/null
 
-echo "> Run bcftools_annotate with --pair-logic option"
+log "Test 10: Pair logic option"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
   --pair_logic "all"
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "annotate --pair-logic all -o annotated.vcf ../example.vcf"
-echo "- test10 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "annotate --pair-logic all -o annotated.vcf ../example.vcf" "VCF with pair logic"
+log "✓ Test 10 passed"
 
 popd > /dev/null
 
-# Test 11: regions-overlap
+# Test 11: Regions overlap
 mkdir "$TMPDIR/test11" && pushd "$TMPDIR/test11" > /dev/null
 
-echo "> Run bcftools_annotate with --regions-overlap option"
+log "Test 11: Regions overlap option"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
   --regions_overlap "1"
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "annotate --regions-overlap 1 -o annotated.vcf ../example.vcf"
-echo "- test11 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "annotate --regions-overlap 1 -o annotated.vcf ../example.vcf" "VCF with regions overlap"
+log "✓ Test 11 passed"
 
 popd > /dev/null
 
-# Test 12: include 
+# Test 12: Include filter
 mkdir "$TMPDIR/test12" && pushd "$TMPDIR/test12" > /dev/null
 
-echo "> Run bcftools_annotate with -i option"
+log "Test 12: Include filter expression"
 "$meta_executable" \
   --input "../example.vcf" \
   --output "annotated.vcf" \
   --include "FILTER='PASS'" \
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "annotate -i FILTER='PASS' -o annotated.vcf ../example.vcf"
-echo "- test12 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "annotate -i FILTER='PASS' -o annotated.vcf ../example.vcf" "VCF with include filter"
+log "✓ Test 12 passed"
 
 popd > /dev/null
 
-# Test 13: exclude
+# Test 13: Exclude filter with merge logic
 mkdir "$TMPDIR/test13" && pushd "$TMPDIR/test13" > /dev/null
 
-echo "> Run bcftools_annotate with -e option"
+log "Test 13: Exclude filter with merge logic"
 "$meta_executable" \
   --annotations "../annots.tsv.gz" \
   --input "../example.vcf" \
@@ -292,14 +276,13 @@ echo "> Run bcftools_annotate with -e option"
   --merge_logic "FOO:first" \
 
 # checks
-assert_file_exists "annotated.vcf"
-assert_file_not_empty "annotated.vcf"
-assert_file_contains "annotated.vcf" "annotate -a ../annots.tsv.gz -c CHROM,FROM,TO,FMT/FOO,BAR -e FILTER='PASS' -h ../header.hdr -l FOO:first -o annotated.vcf ../example.vcf"
-echo "- test13 succeeded -"
+check_file_exists "annotated.vcf" "output VCF file"
+check_file_not_empty "annotated.vcf" "output VCF file"
+check_file_contains "annotated.vcf" "annotate -a ../annots.tsv.gz -c CHROM,FROM,TO,FMT/FOO,BAR -e FILTER='PASS' -h ../header.hdr -l FOO:first -o annotated.vcf ../example.vcf" "VCF with exclude filter and merge logic"
+log "✓ Test 13 passed"
 
 popd > /dev/null
 
-
-echo "---- All tests succeeded! ----"
+log "All tests completed successfully!"
 exit 0
 

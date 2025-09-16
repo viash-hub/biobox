@@ -1,5 +1,5 @@
-```
-bcftools stats -h
+```bash
+docker run --rm quay.io/biocontainers/bcftools:1.22--h3a4d415_1 bcftools stats --help 2>&1 | grep -v unrecognized
 ```
 
 About:   Parses VCF or BCF and produces stats which can be plotted using plot-vcfstats.
@@ -31,5 +31,5 @@ Options:
     -u, --user-tstv TAG[:min:max:n]  Collect Ts/Tv stats for any tag using the given binning [0:1:100]
                                        A subfield can be selected as e.g. 'PV4[0]', here the first value of the PV4 tag
         --threads INT                Use multithreading with <int> worker threads [0]
-    -v, --verbose                    Produce verbose per-site and per-sample output
+    -v, --verbosity INT              Verbosity level
 
