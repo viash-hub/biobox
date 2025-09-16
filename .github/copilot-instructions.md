@@ -26,21 +26,21 @@ Each component consists of exactly 4 files:
 
 ```yaml
 # Core elements:
-name: tool_name                    # snake_case, matches folder name
-namespace: tool_namespace          # parent folder name
-description: |                    # markdown with examples
+name: tool_name                           # snake_case, matches folder name
+namespace: tool_namespace                 # parent folder name
+description: |                            # markdown with examples
   Brief tool description with [documentation](https://example.com) and usage examples
 authors:
-  - __merge__: /src/_authors/name.yaml  # reference author files
-argument_groups:                  # organize by: inputs, outputs, options
+  - __merge__: /src/_authors/name.yaml    # reference author files
+argument_groups:                          # organize by: inputs, outputs, options
   - name: inputs
     arguments:
-      - name: --input_file        # snake_case, type-specific patterns
-        type: file               # file, string, integer, boolean, double
-        description: |           # markdown with examples and defaults
+      - name: --input_file               # snake_case, type-specific patterns
+        type: file                       # file, string, integer, boolean_true, double
+        description: |                   # markdown with examples and defaults
           Input description with example: `input.vcf`
         required: true
-        multiple: false          # set true for arrays/lists
+        multiple: false                  # set true for arrays/lists
 resources:
   - type: bash_script
     path: script.sh
