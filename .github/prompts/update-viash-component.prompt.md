@@ -61,6 +61,7 @@ model: Claude Sonnet 4
 6. Write clear markdown descriptions with examples
 7. Exclude `--help/-h` and `--version` (handled by Viash)
 8. Never add CPU/memory parameters (use `meta_*` variables)
+9. Add `requirements.commands` section if tool needs specific CLI commands installed
 
 **Validation**: All current tool options represented, no deprecated options remain
 

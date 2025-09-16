@@ -83,6 +83,8 @@ argument_groups:
   - name: "Options"
     arguments:
       # Tool-specific options here
+requirements:                            # add if tool needs specific CLI commands
+  commands: [{cli_tool}]                 # list of required command-line tools
 resources:
   - type: bash_script
     path: script.sh

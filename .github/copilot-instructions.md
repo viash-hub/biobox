@@ -41,6 +41,8 @@ argument_groups:                          # organize by: inputs, outputs, option
           Input description with example: `input.vcf`
         required: true
         multiple: false                  # set true for arrays/lists
+requirements:                            # add if tool needs specific CLI commands
+  commands: [tool_name]                  # list of required command-line tools
 resources:
   - type: bash_script
     path: script.sh
@@ -189,6 +191,7 @@ Raw output from: tool --help
 
 - Use `--snake_case` names; write descriptions in markdown. Prefer file outputs over directories when possible.
 - Exclude `--help/-h` and `--version`. Don't add CPU/memory flags—use meta vars.
+- Add `requirements.commands` when tool needs specific CLI executables available in container.
 
 ## Core Workflows & Commands
 
