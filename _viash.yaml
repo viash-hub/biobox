@@ -47,4 +47,4 @@ authors:
     roles: [ author ]
 
 config_mods: |
-  .requirements.commands := ['ps']
+  .requirements.commands += ['ps']
