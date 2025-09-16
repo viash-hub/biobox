@@ -1,4 +1,4 @@
-# Unreleased
+# biobox 0.4.0
 
 <!-- Add new changes here before release -->
 
