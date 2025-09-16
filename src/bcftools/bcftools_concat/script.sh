@@ -6,16 +6,23 @@
 set -eo pipefail
 
 # Unset false boolean parameters
-[[ "$par_allow_overlaps" == "false" ]] && unset par_allow_overlaps
-[[ "$par_compact_ps" == "false" ]] && unset par_compact_ps
-[[ "$par_remove_duplicates" == "false" ]] && unset par_remove_duplicates
-[[ "$par_drop_genotypes" == "false" ]] && unset par_drop_genotypes
-[[ "$par_ligate" == "false" ]] && unset par_ligate
-[[ "$par_ligate_force" == "false" ]] && unset par_ligate_force
-[[ "$par_ligate_warn" == "false" ]] && unset par_ligate_warn
-[[ "$par_no_version" == "false" ]] && unset par_no_version
-[[ "$par_naive" == "false" ]] && unset par_naive
-[[ "$par_naive_force" == "false" ]] && unset par_naive_force
+unset_if_false=(
+  par_allow_overlaps
+  par_compact_ps
+  par_remove_duplicates
+  par_drop_genotypes
+  par_ligate
+  par_ligate_force
+  par_ligate_warn
+  par_no_version
+  par_naive
+  par_naive_force
+)
+
+for par in ${unset_if_false[@]}; do
+  test_val="${!par}"
+  [[ "$test_val" == "false" ]] && unset $par
+done
 
 # Check that either input files or file_list is provided
 if [[ -z "${par_input}" && -z "${par_file_list}" ]]; then

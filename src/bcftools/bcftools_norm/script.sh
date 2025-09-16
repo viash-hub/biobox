@@ -6,12 +6,19 @@
 set -eo pipefail
 
 # Unset false boolean parameters
-[[ "$par_atomize" == "false" ]] && unset par_atomize
-[[ "$par_remove_duplicates_flag" == "false" ]] && unset par_remove_duplicates_flag
-[[ "$par_force" == "false" ]] && unset par_force
-[[ "$par_no_version" == "false" ]] && unset par_no_version
-[[ "$par_do_not_normalize" == "false" ]] && unset par_do_not_normalize
-[[ "$par_strict_filter" == "false" ]] && unset par_strict_filter
+unset_if_false=(
+  par_atomize
+  par_remove_duplicates_flag
+  par_force
+  par_no_version
+  par_do_not_normalize
+  par_strict_filter
+)
+
+for par in ${unset_if_false[@]}; do
+  test_val="${!par}"
+  [[ "$test_val" == "false" ]] && unset $par
+done
 
 # Build command array
 cmd_args=(
