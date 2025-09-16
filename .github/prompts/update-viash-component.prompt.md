@@ -7,11 +7,13 @@ model: Claude Sonnet 4
 # Update Viash Component in biobox
 
 ## Context & Inputs
+
 - **Component path**: `${input:componentPath}` (e.g., src/bcftools/bcftools_annotate)
 - **Tool & version**: `${input:toolInfo}` (e.g., bcftools 1.20, quay.io/biocontainers/bcftools:1.20--h8b25389_0)
 - **Changes needed**: `${input:changes}` (flags added/removed/modified)
 
 ## Reference Materials
+
 - **Project patterns**: `.github/copilot-instructions.md`
 - **Documentation**: `docs/COMPONENT_DEVELOPMENT.md`, `docs/SCRIPT_DEVELOPMENT.md`, `docs/TESTING.md`, `docs/DOCKER_GUIDE.md`
 - **Example component**: `src/bedtools/bedtools_annotate/`
@@ -20,19 +22,37 @@ model: Claude Sonnet 4
 ## Step-by-Step Update Process
 
 ### Step 1: Refresh Help Documentation
-**Objective**: Update `help.txt` with latest tool help output
+
+**Objective**: Update `help.txt` with latest tool help output and docker command (if not already done)
 
 **Actions**:
-1. If biocontainer exists: Run `docker run <image> <tool> --help` and save output to `help.txt`
-2. If no container: Capture from authoritative documentation
-3. Keep raw output for development reference
 
-**Validation**: `help.txt` contains current command-line options
+1. Check if help.txt was already updated: Compare current `help.txt` against main branch using `git diff main -- help.txt`
+2. If help.txt is unchanged from main:
+
+   - Find latest biocontainer image version (check quay.io/biocontainers or use existing config as reference)
+   - Run `docker run --rm <latest_image> <tool> --help` and capture output
+   - Format `help.txt` with docker command at top in code block, followed by raw help output
+   - Example format:
+
+     ````plaintext
+     ```bash
+     docker run --rm quay.io/biocontainers/tool:version--build tool --help
+     ```
+     
+     [Raw help output here]
+     ````
+
+3. If help.txt was already updated: Review the changes and extract the docker image version from the command at the top - this indicates the user has already provided the latest container
+
+**Validation**: `help.txt` contains docker command at top and current command-line options
 
 ### Step 2: Update Configuration (`config.vsh.yaml`)
+
 **Objective**: Synchronize arguments with current tool capabilities
 
 **Actions**:
+
 1. Compare `help.txt` against existing `argument_groups`
 2. Add missing arguments using `--snake_case` naming
 3. Remove deprecated arguments
@@ -45,9 +65,11 @@ model: Claude Sonnet 4
 **Validation**: All current tool options represented, no deprecated options remain
 
 ### Step 3: Update Docker Engine & Version Detection
+
 **Objective**: Pin specific biocontainer version with version detection
 
 **Actions**:
+
 1. Pin `quay.io/biocontainers/<tool>:<version>--<build>` in engines section
 2. Add version detection command to write `tool: <version>` to `/var/software_versions.txt`
 3. Avoid comments in multiline `run: |` blocks
@@ -66,9 +88,11 @@ engines:
 **Validation**: Container builds successfully, version detection works
 
 ### Step 4: Refactor Script (`script.sh`)
+
 **Objective**: Follow biobox scripting patterns
 
 **Actions**:
+
 1. Maintain `## VIASH START` / `## VIASH END` blocks
 2. Use `set -eo pipefail` for error handling
 3. Apply two-space indentation consistently
@@ -83,9 +107,11 @@ engines:
 **Validation**: Script follows all biobox patterns, handles all parameter types correctly
 
 ### Step 5: Rewrite Tests (`test.sh`)
+
 **Objective**: Create comprehensive, self-contained tests
 
 **Actions**:
+
 1. Source test helpers: `source "$meta_resources_dir/test_helpers.sh"`
 2. Initialize environment: `setup_test_env`
 3. Generate test data using helpers (e.g., `create_test_fasta`, `create_test_bed`)
@@ -100,9 +126,11 @@ engines:
 **Validation**: Tests are self-contained, comprehensive, and pass reliably
 
 ### Step 6: Build & Test Validation
+
 **Objective**: Verify component works correctly
 
 **Actions**:
+
 1. Build component: `viash build ${input:componentPath}/config.vsh.yaml --setup cachedbuild`
 2. Run tests: `viash test ${input:componentPath}/config.vsh.yaml --keep true --verbose`
 3. Check version detection in container
@@ -111,9 +139,11 @@ engines:
 **Validation**: All tests pass, no build errors, version detection works
 
 ### Step 7: Quality Assurance Review
+
 **Objective**: Ensure all biobox standards are met
 
 **Checklist**:
+
 - [ ] `/var/software_versions.txt` contains correct version line
 - [ ] No CPU/memory arguments in config (script uses `meta_*` variables)
 - [ ] Script uses arrays for command building
@@ -127,18 +157,21 @@ engines:
 ## Expected Output
 
 **Updated Files**:
+
 - `help.txt`: Current tool help output
 - `config.vsh.yaml`: Updated arguments, pinned container, version detection
 - `script.sh`: Refactored following biobox patterns
 - `test.sh`: Comprehensive self-contained tests
 
 **Summary Report**:
+
 - Brief rationale for each file change
 - Test execution results (PASS/FAIL)
 - Any issues encountered and resolutions
 - Verification that all quality gates are met
 
 ## Success Criteria
+
 - Component builds without errors
 - All tests pass consistently
 - Follows all biobox coding standards

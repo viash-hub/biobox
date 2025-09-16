@@ -7,6 +7,7 @@ model: Claude Sonnet 4
 # Add New Viash Component in biobox
 
 ## Context & Inputs
+
 - **Component path**: `${input:componentPath}` (e.g., src/namespace/tool_name)
 - **Tool name**: `${input:toolName}` (e.g., bcftools annotate)
 - **Docker image**: `${input:dockerImage}` (optional, e.g., quay.io/biocontainers/tool:version--build)
@@ -15,6 +16,7 @@ model: Claude Sonnet 4
 - **Help file**: `${input:helpFile}` (optional, path to existing help.txt)
 
 ## Reference Materials
+
 - **Project patterns**: `.github/copilot-instructions.md`
 - **Documentation**: `docs/COMPONENT_DEVELOPMENT.md`, `docs/SCRIPT_DEVELOPMENT.md`, `docs/TESTING.md`, `docs/DOCKER_GUIDE.md`
 - **Example component**: `src/bedtools/bedtools_annotate/`
@@ -23,9 +25,11 @@ model: Claude Sonnet 4
 ## Step-by-Step Creation Process
 
 ### Step 1: Create Component Structure
+
 **Objective**: Set up the required 4-file component structure
 
 **Actions**:
+
 1. Create directory: `${input:componentPath}`
 2. Create files: `config.vsh.yaml`, `script.sh`, `test.sh`, `help.txt`
 3. Ensure proper directory permissions
@@ -33,9 +37,11 @@ model: Claude Sonnet 4
 **Validation**: All required files exist in correct location
 
 ### Step 2: Generate Help Documentation
+
 **Objective**: Populate `help.txt` with tool help information
 
 **Actions**:
+
 - If `${input:helpText}` provided: Write directly to `help.txt`
 - If `${input:helpFile}` provided: Copy content to `help.txt`
 - If `${input:dockerImage}` provided: Run `docker run <image> <tool> --help > help.txt`
@@ -44,9 +50,11 @@ model: Claude Sonnet 4
 **Validation**: `help.txt` contains useful tool documentation
 
 ### Step 3: Draft Configuration (`config.vsh.yaml`)
+
 **Objective**: Create complete component configuration
 
 **Template Structure**:
+
 ```yaml
 name: {component_name}           # from folder name (snake_case)
 namespace: {namespace}           # from parent folder
@@ -95,6 +103,7 @@ runners:
 ```
 
 **Actions**:
+
 1. Parse component and namespace from path
 2. Research tool for description, links, keywords
 3. If `help.txt` available: Extract arguments and map to Viash structure
@@ -107,9 +116,11 @@ runners:
 **Validation**: Configuration is complete and follows biobox standards
 
 ### Step 4: Implement Script (`script.sh`)
+
 **Objective**: Create working bash implementation
 
 **Template Structure**:
+
 ```bash
 #!/bin/bash
 
@@ -152,6 +163,7 @@ mkdir -p "$(dirname "$par_output")"
 ```
 
 **Actions**:
+
 1. Start with proper Viash blocks and error handling
 2. Implement boolean parameter unsetting pattern
 3. Handle multiple values with array splitting
@@ -164,9 +176,11 @@ mkdir -p "$(dirname "$par_output")"
 **Validation**: Script follows all biobox patterns and handles parameters correctly
 
 ### Step 5: Write Comprehensive Tests (`test.sh`)
+
 **Objective**: Create self-contained, comprehensive test suite
 
 **Template Structure**:
+
 ```bash
 #!/bin/bash
 
@@ -224,6 +238,7 @@ print_test_summary "All tests completed successfully"
 ```
 
 **Actions**:
+
 1. Source test helpers and initialize environment
 2. Generate appropriate test data using helper functions
 3. Create 2-3 test scenarios covering:
@@ -238,9 +253,11 @@ print_test_summary "All tests completed successfully"
 **Validation**: Tests are self-contained, comprehensive, and executable
 
 ### Step 6: Build & Validate Component
+
 **Objective**: Verify the complete component works
 
 **Actions**:
+
 1. Build: `viash build ${input:componentPath}/config.vsh.yaml --setup cachedbuild`
 2. Test: `viash test ${input:componentPath}/config.vsh.yaml --keep true --verbose`
 3. Check Docker image builds correctly
@@ -250,9 +267,11 @@ print_test_summary "All tests completed successfully"
 **Validation**: Component builds and tests pass successfully
 
 ### Step 7: Final Quality Review
+
 **Objective**: Ensure component meets all biobox standards
 
 **Quality Checklist**:
+
 - [ ] All 4 files present and properly structured
 - [ ] Configuration uses correct naming conventions
 - [ ] Script follows biobox patterns (arrays, conditionals, meta vars)
@@ -267,18 +286,21 @@ print_test_summary "All tests completed successfully"
 ## Expected Output
 
 **Created Files**:
+
 - `${input:componentPath}/config.vsh.yaml`: Complete component configuration
 - `${input:componentPath}/script.sh`: Working bash implementation
 - `${input:componentPath}/test.sh`: Comprehensive test suite
 - `${input:componentPath}/help.txt`: Tool help documentation
 
 **Summary Report**:
+
 - Brief description of component functionality
 - Notes on any special features or requirements
 - Test execution results
 - Instructions for usage and further development
 
 ## Success Criteria
+
 - Complete 4-file component structure
 - Component builds without errors
 - All tests pass reliably
@@ -287,6 +309,7 @@ print_test_summary "All tests completed successfully"
 - Well-documented and maintainable
 
 ## Notes
+
 - When uncertain about patterns, refer to `src/bedtools/bedtools_annotate/`
 - Prefer pinned biocontainer images when available
 - Keep components focused and single-purpose
