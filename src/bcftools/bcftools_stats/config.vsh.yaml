@@ -24,11 +24,14 @@ argument_groups:
   - name: Inputs
     arguments:
       - name: --input
-        alternatives: -i
         type: file
         multiple: true
-        description: Input VCF/BCF file. Maximum of two files.
+        description: |
+          Input VCF/BCF file(s). Maximum of two files can be provided.
+          When two files are given, the program generates separate stats 
+          for intersection and the complements.
         required: true
+        example: input.vcf.gz
     
   - name: Outputs
     arguments:
@@ -36,179 +39,157 @@ argument_groups:
         alternatives: -o
         direction: output
         type: file
-        description: Output txt statistics file.
+        description: |
+          Write output to a file. The output is a text file which can be 
+          plotted using plot-vcfstats.
         required: true
+        example: stats.txt
          
   - name: Options
     arguments:
-      
-      - name: --allele_frequency_bins
-        alternatives: --af_bins
+      - name: --af_bins
         type: string
         description: | 
-          Allele frequency bins, a list of bin values (0.1,0.5,1).
-        example: 0.1,0.5,1
+          Allele frequency bins, a list of comma-separated bin values.
+        example: "0.1,0.5,1"
 
-      - name: --allele_frequency_bins_file
-        alternatives: --af_bins_file
-        type: file
-        description: | 
-          Same as allele_frequency_bins, but in a file.
-          Format of file is one value per line. 
-          e.g. 
-            0.1
-            0.5
-            1
-
-      - name: --allele_frequency_tag
-        alternatives: --af_tag
+      - name: --af_tag
         type: string
         description: | 
           Allele frequency tag to use, by default estimated from AN,AC or GT.
+        example: "AF"
+
+      - name: --collapse
+        alternatives: -c
+        type: string
+        choices: [snps, indels, both, all, some, none]
+        description: | 
+          Treat as identical records with <snps|indels|both|all|some|none>.
+        example: "snps"
+
+      - name: --depth
+        alternatives: -d
+        type: string
+        description: | 
+          Depth distribution: min,max,bin size [0:200:1].
+        example: "0,500,1"
+
+      - name: --exclude
+        alternatives: -e
+        type: string
+        description: | 
+          Exclude sites for which the expression is true.
+        example: "QUAL < 30"
+
+      - name: --exons
+        alternatives: -E
+        type: file
+        description: | 
+          Tab-delimited file with exons for indel frameshifts statistics.
+          The columns of the file are CHR, FROM, TO, with 1-based positions.
+          The file should be BGZF-compressed and indexed with tabix.
+        example: exons.bed.gz
+
+      - name: --apply_filters
+        alternatives: -f
+        type: string
+        description: | 
+          Require at least one of the listed FILTER strings.
+        example: "PASS,."
+
+      - name: --fasta_ref
+        alternatives: -F
+        type: file
+        description: | 
+          Faidx indexed reference sequence file to determine INDEL context.
+        example: reference.fa
 
       - name: --first_allele_only
-        alternatives: --first_only
+        alternatives: ["--1st-allele-only"]
         type: boolean_true
         description: | 
           Include only 1st allele at multiallelic sites.
 
-      - name: --collapse
-        alternatives: --c
-        type: string
-        choices: [ snps, indels, both, all, some, none ]
-        description: | 
-          Treat as identical records with <snps|indels|both|all|some|none>.
-          See https://samtools.github.io/bcftools/bcftools.html#common_options for details.
-
-      - name: --depth
-        alternatives: --d
-        type: string
-        description: | 
-          Depth distribution: min,max,bin size.
-        example: 0,500,1
-
-      - name: --exclude
-        alternatives: --e
-        type: string
-        description: | 
-          Exclude sites for which the expression is true.
-          See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
-        example: 'QUAL < 30 && DP < 10'
-
-      - name: --exons
-        alternatives: --E
-        type: file
-        description: | 
-          tab-delimited file with exons for indel frameshifts statistics. 
-          The columns of the file are CHR, FROM, TO, with 1-based, inclusive, positions. 
-          The file is BGZF-compressed and indexed with tabix (e.g. tabix -s1 -b2 -e3 file.gz).
-
-      - name: --apply_filters
-        alternatives: --f
-        type: string
-        description: | 
-          Require at least one of the listed FILTER strings (e.g. "PASS,.").
-
-      - name: --fasta_reference
-        alternatives: --F
-        type: file
-        description: | 
-          Faidx indexed reference sequence file to determine INDEL context.
-
       - name: --include
-        alternatives: --i
+        alternatives: -i
         type: string
         description: | 
           Select sites for which the expression is true.
-          See https://samtools.github.io/bcftools/bcftools.html#expressions for details.
-        example: 'QUAL >= 30 && DP >= 10'
+        example: "QUAL >= 30"
       
-      - name: --split_by_ID
-        alternatives: --I
+      - name: --split_by_id
+        alternatives: -I
         type: boolean_true
         description: | 
           Collect stats for sites with ID separately (known vs novel).
 
       - name: --regions
-        alternatives: --r
+        alternatives: -r
         type: string
         description: | 
-          Restrict to comma-separated list of regions. 
-          Following formats are supported: chr|chr:pos|chr:beg-end|chr:beg-[,…​].
-        example: '20:1000000-2000000'
+          Restrict to comma-separated list of regions.
+        example: "chr20:1000000-2000000"
 
       - name: --regions_file
-        alternatives: --R
+        alternatives: -R
         type: file
         description: | 
-          Restrict to regions listed in a file. 
-          Regions can be specified either on a VCF, BED, or tab-delimited file (the default). 
-          For more information check manual.
+          Restrict to regions listed in a file.
+        example: regions.bed
 
       - name: --regions_overlap
         type: string
-        choices: ['pos', 'record', 'variant', '0', '1', '2']
+        choices: [pos, record, variant, "0", "1", "2"]
         description: | 
-          This option controls how overlapping records are determined: 
-          set to 'pos' or '0' if the VCF record has to have POS inside a region (this corresponds to the default behavior of -t/-T); 
-          set to 'record' or '1' if also overlapping records with POS outside a region should be included (this is the default behavior of -r/-R, 
-          and includes indels with POS at the end of a region, which are technically outside the region); 
-          or set to 'variant' or '2' to include only true overlapping variation (compare the full VCF representation "TA>T-" vs the true sequence variation "A>-").
+          Include if POS in the region (pos), record overlaps (record), 
+          variant overlaps (variant). Can also use numeric equivalents 0, 1, 2.
 
       - name: --samples
-        alternatives: --s
+        alternatives: -s
         type: string
         description: | 
           List of samples for sample stats, "-" to include all samples.
+        example: "sample1,sample2"
 
       - name: --samples_file
-        alternatives: --S
+        alternatives: -S
         type: file
         description: | 
           File of samples to include.
-          e.g. 
-            sample1    1
-            sample2    2
-            sample3    2
+        example: samples.txt
 
       - name: --targets
-        alternatives: --t
+        alternatives: -t
         type: string
         description: | 
-          Similar as -r, --regions, but the next position is accessed by streaming the whole VCF/BCF 
-          rather than using the tbi/csi index. Both -r and -t options can be applied simultaneously: -r uses the 
-          index to jump to a region and -t discards positions which are not in the targets. Unlike -r, targets 
-          can be prefixed with "^" to request logical complement. For example, "^X,Y,MT" indicates that 
-          sequences X, Y and MT should be skipped. Yet another difference between the -t/-T and -r/-R is 
-          that -r/-R checks for proper overlaps and considers both POS and the end position of an indel, 
-          while -t/-T considers the POS coordinate only (by default; see also --regions-overlap and --targets-overlap). 
-          Note that -t cannot be used in combination with -T.
-          Following formats are supported: chr|chr:pos|chr:beg-end|chr:beg-[,…​].
-        example: '20:1000000-2000000'
+          Similar to regions, but streams rather than using index.
+          Targets can be prefixed with "^" for logical complement.
+        example: "chr20:1000000-2000000"
       
       - name: --targets_file
-        alternatives: --T
+        alternatives: -T
         type: file
         description: | 
-          Similar to --regions_file option but streams rather than index-jumps.
+          Similar to regions_file but streams rather than index-jumps.
+        example: targets.bed
 
-      - name: --targets_overlaps
+      - name: --targets_overlap
         type: string
-        choices: ['pos', 'record', 'variant', '0', '1', '2']
+        choices: [pos, record, variant, "0", "1", "2"]
         description: | 
-          Include if POS in the region (0), record overlaps (1), variant overlaps (2).
+          Include if POS in the region (pos), record overlaps (record), 
+          variant overlaps (variant). Can also use numeric equivalents 0, 1, 2.
 
       - name: --user_tstv
-        alternatives: --u
+        alternatives: -u
         type: string
         description: | 
-          Collect Ts/Tv stats for any tag using the given binning [0:1:100].
-          Format is <TAG[:min:max:n]>.
-          A subfield can be selected as e.g. 'PV4[0]', here the first value of the PV4 tag.
-          
+          Collect Ts/Tv stats for any tag using the given binning.
+          Format is TAG[:min:max:n]. Default binning is [0:1:100].
+        example: "QUAL:0:40:40"
       
       - name: --verbose 
-        alternatives: --v
+        alternatives: -v
         type: boolean_true
         description: | 
           Produce verbose per-site and per-sample output.
@@ -223,16 +204,11 @@ test_resources:
 
 engines:
   - type: docker
-    image: debian:stable-slim
+    image: quay.io/biocontainers/bcftools:1.22--h3a4d415_1
     setup:
-      - type: apt
-        packages: [bcftools, procps]
       - type: docker
         run: |
-          echo "bcftools: \"$(bcftools --version | grep 'bcftools' | sed -n 's/^bcftools //p')\"" > /var/software_versions.txt
-    test_setup:  
-      - type: apt  
-        packages: [tabix]
+          bcftools --version | head -1 | sed 's/bcftools /bcftools: /' > /var/software_versions.txt
 
 runners:
   - type: executable
