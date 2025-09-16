@@ -5,6 +5,7 @@
 ## Repository Overview
 
 **biobox** is a curated collection of containerized bioinformatics tools built with the Viash framework. Each component:
+
 - Lives under `src/<namespace>/<component>/` 
 - Ships as both a containerized executable and Nextflow module
 - Uses pinned biocontainer images for reproducibility
@@ -12,6 +13,7 @@
 - Must pass `viash test` validation in CI
 
 **Key Files**:
+
 - `_viash.yaml`: Top-level Viash project configuration
 - `src/_utils/test_helpers.sh`: Centralized testing utilities
 - `docs/`: Comprehensive development guides
@@ -21,6 +23,7 @@
 Each component consists of exactly 4 files:
 
 ### 1. `config.vsh.yaml` - Component Metadata & Interface
+
 ```yaml
 # Core elements:
 name: tool_name                    # snake_case, matches folder name
@@ -58,6 +61,7 @@ runners:
 ```
 
 ### 2. `script.sh` - Bash Implementation
+
 ```bash
 #!/bin/bash
 
@@ -99,6 +103,7 @@ fi
 ```
 
 ### 3. `test.sh` - Self-contained Tests
+
 ```bash
 #!/bin/bash
 
@@ -146,14 +151,19 @@ print_test_summary "All tests completed successfully"
 ```
 
 ### 4. `help.txt` - Tool Help Reference
+````plaintext
+```bash
+docker run --rm quay.io/biocontainers/tool:version--build tool --help
 ```
+
 Raw output from: tool --help
 (For development reference only)
-```
+````
 
 ## Essential Patterns for Success
 
 ### Script patterns that matter
+
 - Place `## VIASH START` and `## VIASH END` at top; Viash injects `par_*` and `meta_*` vars there.
 - Use arrays for commands; include options conditionally:
 	- Unset false booleans: `[[ "$par_flag" == "false" ]] && unset par_flag`
@@ -164,33 +174,39 @@ Raw output from: tool --help
 - Resources: never add threads/memory as normal params. Use meta vars: `meta_cpus`, `meta_memory_gb`, `meta_temp_dir`, `meta_resources_dir`.
 
 ### Testing conventions (see `docs/TESTING.md` and `src/_utils/test_helpers.sh`)
+
 - Tests must be self-contained. Generate data with helpers (`create_test_fasta/fastq/...`) and validate with `check_file_*`, `check_file_contains`, etc.
 - Always add helpers as a test resource and source them: `source "$meta_resources_dir/test_helpers.sh"`.
 - Use `$meta_executable` to run the built component; finish with `print_test_summary`.
 
 ### Docker/engine setup (see `docs/DOCKER_GUIDE.md`)
+
 - Prefer biocontainers with pinned versions. Add version detection to `/var/software_versions.txt`:
 	- Example (bedtools): `bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt`
 - Avoid comments inside multiline `run: |` blocks; they become Dockerfile RUN lines.
 
 ### Authoring arguments and docs (see `docs/COMPONENT_DEVELOPMENT.md` and `docs/SCRIPT_DEVELOPMENT.md`)
+
 - Use `--snake_case` names; write descriptions in markdown. Prefer file outputs over directories when possible.
 - Exclude `--help/-h` and `--version`. Don't add CPU/memory flags—use meta vars.
 
 ## Core Workflows & Commands
 
 ### Local development
+
 - Build: `viash build src/<ns>/<comp>/config.vsh.yaml --setup cachedbuild`
 - Test single: `viash test src/<ns>/<comp>/config.vsh.yaml --keep true --verbose`
 - Test all/namespace: `viash ns test --parallel` or `viash ns test -q <ns> --parallel`
 - Run with resources: `viash run config.vsh.yaml --cpus 4 --memory 8GB -- --input x --output y`
 
 ### Reference examples
+
 - `src/bedtools/bedtools_annotate/script.sh`: arrays, boolean unsetting, multi-value splitting, output redirection.
 - `src/bedtools/bedtools_annotate/config.vsh.yaml`: argument groups, `multiple: true`, pinned image, version detection, runners.
 - Central helpers: `src/_utils/test_helpers.sh`.
 
 ### Quality gates checklist
+
 - Version detection in `/var/software_versions.txt`
 - No CPU/memory args in config (use meta vars in script)
 - Array-based arguments with conditional inclusion
@@ -203,10 +219,12 @@ Raw output from: tool --help
 ## Prompt Files for Common Tasks
 
 ### Available prompts
+
 - Update existing component: `.github/prompts/update-viash-component.prompt.md`
 - Add new component: `.github/prompts/add-viash-component.prompt.md`
 
 ### How to run prompts
+
 - In Chat, type `/` and select the prompt by name (e.g., `/update-viash-component`).
 - Or open the prompt file in the editor and press the play button.
 - Or run "Chat: Run Prompt" from the Command Palette and pick the prompt.
@@ -214,6 +232,7 @@ Raw output from: tool --help
 ## AI Assistant Best Practices
 
 ### When working with this repository:
+
 1. **Always read existing patterns first** - Use `src/bedtools/bedtools_annotate/` as the gold standard reference
 2. **Follow the step-by-step prompts** - Use the provided prompt files for systematic component work
 3. **Validate frequently** - Build and test components after each major change
@@ -221,6 +240,7 @@ Raw output from: tool --help
 5. **Check quality gates** - Ensure all biobox standards are met before considering work complete
 
 ### Common Pitfalls to Avoid:
+
 - Adding CPU/memory arguments to config (use meta variables instead)
 - Forgetting to unset false boolean parameters
 - Not using arrays for command building
@@ -230,20 +250,23 @@ Raw output from: tool --help
 - Missing version detection in Docker setup
 
 What to reference for examples
+
 - `src/bedtools/bedtools_annotate/script.sh`: arrays, boolean unsetting, multi-value splitting, output redirection.
 - `src/bedtools/bedtools_annotate/config.vsh.yaml`: argument groups, `multiple: true`, pinned image, version detection, runners.
 - Central helpers: `src/_utils/test_helpers.sh`.
 
 Questions to confirm/extend
+
 - Any repo-wide defaults for Nextflow runner options beyond `runners: [executable,nextflow]`?
 - Any additional meta variables or naming conventions to enforce (beyond current docs)?
 
 Prompt files for common tasks
+
 - Update existing component: `.github/prompts/update-viash-component.prompt.md`
 - Add new component: `.github/prompts/add-viash-component.prompt.md`
 
 How to run a prompt
+
 - In Chat, type `/` and select the prompt by name (for example, `/update-viash-component`).
 - Or open the prompt file in the editor and press the play button.
 - Or run “Chat: Run Prompt” from the Command Palette and pick the prompt.
-
