@@ -1,26 +1,27 @@
 ```
-docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger mkref -h
+docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger mkvdjref -h
 ```
 
-Prepare a reference for use with 10x analysis software. Requires a GTF and FASTA
+Prepare a reference for use with CellRanger VDJ
 
-Usage: cellranger mkref [OPTIONS] --genome <GENOME_NAMES> --fasta <FASTA_FILES> --genes <GTF_FILES>
+Usage: cellranger mkvdjref [OPTIONS] --genome <GENOME_NAME>
 
 Options:
-      --genome <GENOME_NAMES>
-          Unique genome name, used to name output folder [a-zA-Z0-9_-]+. Specify
-          multiple genomes by specifying this argument multiple times; the
-          output folder will be <name1>_and_<name2>
-      --fasta <FASTA_FILES>
-          Path to FASTA file containing your genome reference. Specify multiple
-          genomes by specifying this argument multiple times
+      --genome <GENOME_NAME>
+          Unique genome name, used to name output folder [a-zA-Z0-9_-]+
+      --fasta <FASTA_FILE>
+          Path to FASTA file containing your genome reference
       --genes <GTF_FILES>
           Path to genes GTF file containing annotated genes for your genome
           reference. Specify multiple genomes by specifying this argument
           multiple times
-      --nthreads <NUM_THREADS>
-          Number of threads used during STAR genome index generation. Defaults
-          to 1 [default: 1]
+      --seqs <SEQ_FILE>
+          Path to a FASTA file that directly specifies V(D)J sequences. This is
+          mutually exclusive with the "fasta" and "genes" args
+      --rm-transcripts <REMOVE_TRANSCRIPTS_FILE>
+          Path to text file with transcript IDs to ignore. This file should have
+          one transcript ID per line where the IDs correspond to the
+          "transcript_id" key in the GTF info column
       --memgb <MEM_GB>
           Maximum memory (GB) used [default: 16]
       --ref-version <REF_VERSION>
@@ -68,4 +69,4 @@ Options:
       --nopreflight
           Skip preflight checks
   -h, --help
-          Print help
+          Print help (see more with '--help')

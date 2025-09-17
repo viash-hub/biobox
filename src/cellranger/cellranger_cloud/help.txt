@@ -1,0 +1,37 @@
+```
+docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger cloud -h
+```
+
+The official command-line client for 10x Genomics Cloud Analysis.
+
+You can use 'txg help command' for more information on any of the available
+commands.
+
+Before using the CLI, you'll need to authenticate with 'txg auth setup'.  See
+'txg help auth' for more information.
+
+For more information, please visit https://support.10xgenomics.com/cloud-analysis
+
+Usage:
+  txg [command]
+
+Available Commands:
+  analyses    Manage analyses
+  annotation  Cell type annotation functions
+  auth        Manage authentication
+  fastqs      Upload and manage FASTQs
+  files       Upload and manage files
+  help        Help about any command
+  projects    Manage projects
+  references  Upload and manage custom references
+
+Flags:
+      --access-token string   Specify an access token to use.  Default: the saved token from 'txg auth setup'.
+  -y, --assumeyes             Assume yes (don't interactively prompt for confirmation, etc).  Default: off.
+  -H, --header header         Extra header to include in the request when sending HTTP requests to a server.  May be given multiple times to add multiple headers.  Each header must be of the form 'Header: value'.  Default: no extra headers.
+  -h, --help                  Display help and exit.
+  -q, --quiet                 Don't show progress or messages.  Default: off.
+  -v, --verbose               Display extra debugging information.  Default: off.
+      --version               Display version and exit.
+
+Use "txg [command] --help" for more information about a command.
