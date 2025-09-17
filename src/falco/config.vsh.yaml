@@ -46,7 +46,7 @@ argument_groups:
           must contain sets of named contaminants in 
           the form name[tab]sequence. Lines prefixed 
           with a hash will be ignored. Default: 
-          https://github.com/smithlabcode/falco/blob/v1.2.2/Configuration/contaminant_list.txt
+          https://github.com/smithlabcode/falco/blob/v1.2.5/Configuration/contaminant_list.txt
       - name: --adapters
         type: file
         description: |
@@ -56,7 +56,7 @@ argument_groups:
           file must contain sets of named adapters in 
           the form name[tab]sequence. Lines prefixed 
           with a hash will be ignored. Default:
-          https://github.com/smithlabcode/falco/blob/v1.2.2/Configuration/adapter_list.txt
+          https://github.com/smithlabcode/falco/blob/v1.2.5/Configuration/adapter_list.txt
       - name: --limits
         type: file
         description: |
@@ -68,7 +68,7 @@ argument_groups:
           output all together. The format needs to 
           mirror the default limits.txt file found in 
           the Configuration folder. Default: 
-          https://github.com/smithlabcode/falco/blob/v1.2.2/Configuration/limits.txt
+          https://github.com/smithlabcode/falco/blob/v1.2.5/Configuration/limits.txt
       - name: --subsample
         alternatives: [-s]
         type: integer
@@ -93,6 +93,11 @@ argument_groups:
           [Falco only] The input is a 
           reverse-complement. All modules will be 
           tested by swapping A/T and C/G
+
+      - name: --allow_empty_input
+        type: boolean_true
+        description: |
+          Allow empty input files and generate empty output files without an error state.
 
   - name: Output arguments
     arguments:
@@ -174,6 +179,7 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - path: /src/_utils/test_helpers.sh
 
 engines:
   - type: docker
@@ -183,13 +189,14 @@ engines:
         packages: [wget, build-essential, g++, zlib1g-dev, procps]
       - type: docker
         run: |
-          wget https://github.com/smithlabcode/falco/releases/download/v1.2.2/falco-1.2.2.tar.gz -O /tmp/falco.tar.gz && \
+          wget https://github.com/smithlabcode/falco/releases/download/v1.2.5/falco-1.2.5.tar.gz -O /tmp/falco.tar.gz && \
           cd /tmp && \
           tar xvf falco.tar.gz && \
-          cd falco-1.2.2 && \
+          cd falco-1.2.5 && \
           ./configure && \
           make all && \
-          make install
+          make install && \
+          make clean
       - type: docker
         run: |
           echo "falco: \"$(falco -v | sed -n 's/^falco //p')\"" > /var/software_versions.txt

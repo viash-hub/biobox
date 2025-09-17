@@ -1,3 +1,7 @@
+```
+docker run --rm biobox/falco:test falco --help 2> ./src/falco/help.txt
+```
+
 Usage: falco [OPTIONS] <seqfile1> <seqfile2> ...
 
 Options:
@@ -78,14 +82,14 @@ Options:
                            must contain sets of named contaminants in 
                            the form name[tab]sequence. Lines prefixed 
                            with a hash will be ignored. Default: 
-                           /tmp/falco-1.2.2/Configuration/contaminant_list.txt 
+                           /tmp/falco-1.2.5/Configuration/contaminant_list.txt 
   -a, --adapters           Specifies a non-default file which contains 
                            the list of adapter sequences which will be 
                            explicity searched against the library. The 
                            file must contain sets of named adapters in 
                            the form name[tab]sequence. Lines prefixed 
                            with a hash will be ignored. Default: 
-                           /tmp/falco-1.2.2/Configuration/adapter_list.txt 
+                           /tmp/falco-1.2.5/Configuration/adapter_list.txt 
   -l, --limits             Specifies a non-default file which contains 
                            a set of criteria which will be used to 
                            determine the warn/error limits for the 
@@ -94,7 +98,7 @@ Options:
                            output all together. The format needs to 
                            mirror the default limits.txt file found in 
                            the Configuration folder. Default: 
-                           /tmp/falco-1.2.2/Configuration/limits.txt 
+                           /tmp/falco-1.2.5/Configuration/limits.txt 
   -k, --kmers              [IGNORED BY FALCO AND ALWAYS SET TO 7] 
                            Specifies the length of Kmer to look for in 
                            the Kmer content module. Specified Kmer 
@@ -149,6 +153,10 @@ Options:
                            (this may break the parse of fastqc_data.txt 
                            in programs that are very strict about the 
                            FastQC output format).  
+      -allow-empty-input   [Falco only] allow empty input files and 
+                           generate empty output files without en error 
+                           state. WARNING: using this option can mask 
+                           problems in other parts of a workflow.  
 
 Help options:
   -?, -help                print this help message  
