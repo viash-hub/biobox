@@ -40,9 +40,9 @@ log "Run falco on test data, output to individual files. Please note this is onl
 test_2_output="$meta_temp_dir/output2/"
 $meta_executable \
   --input "$test_data_dir/R1.fastq.gz" \
-  --data_filename "meta_temp_dir/output2/data.txt" \
-  --report_filename "$meta_temp_dir/output2/report.html" \
-  --summary_filename "$meta_temp_dir/output2/summary.txt" \
+  --data_filename "$test_2_output/data.txt" \
+  --report_filename "$test_2_output/report.html" \
+  --summary_filename "$test_2_output/summary.txt" \
   --outdir "$test_2_output"
 
 log "Checking whether output exists"
