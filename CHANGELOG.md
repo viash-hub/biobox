@@ -2,7 +2,7 @@
 
 <!-- Add new changes here before release -->
 
-## Minor changes
+## MINOR CHANGES
 
 * `falco`: Update falco to 1.2.5 (PR #201).
 
