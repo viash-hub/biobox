@@ -20,31 +20,19 @@ links:
 
 viash_version: 0.9.4
 
-authors:
-  - __merge__: /src/_authors/robrecht_cannoodt.yaml
-    roles: [ author, maintainer ]
-  - __merge__: /src/_authors/angela_o_pisco.yaml
-    roles: [ author ]
-  - __merge__: /src/_authors/dorien_roosen.yaml
-    roles: [ author ]
-  - __merge__: /src/_authors/dries_schaumont.yaml
-    roles: [ author ]
-  - __merge__: /src/_authors/emma_rousseau.yaml
-    roles: [ author ]
-  - __merge__: /src/_authors/jakub_majercik.yaml
-    roles: [ author ]
-  - __merge__: /src/_authors/kai_waldrant.yaml
-    roles: [ author ]
-  - __merge__: /src/_authors/leila_paquay.yaml
-    roles: [ author ]
-  - __merge__: /src/_authors/sai_nirmayi_yasa.yaml
-    roles: [ author ]
-  - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author ]
-  - __merge__: /src/_authors/toni_verbeiren.yaml
-    roles: [ author ]
-  - __merge__: /src/_authors/weiwei_schultz.yaml
-    roles: [ author ]
+## TODO: __merge__ properties in the package config could not be loaded by viash-hub. 
+## Re-enable this again again later once this is supported
+# authors:
+#   - __merge__: /src/_authors/robrecht_cannoodt.yaml
+#     roles: [ author, maintainer ]
+#   - __merge__: /src/_authors/dorien_roosen.yaml
+#     roles: [ author ]
+#   - __merge__: /src/_authors/dries_schaumont.yaml
+#     roles: [ author ]
+#   - __merge__: /src/_authors/jakub_majercik.yaml
+#     roles: [ author ]
+#   - __merge__: /src/_authors/toni_verbeiren.yaml
+#     roles: [ author ]
 
 config_mods: |
   .requirements.commands += ['ps']
