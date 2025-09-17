@@ -1,6 +1,12 @@
-# biobox 0.4.0
+# unreleased
 
 <!-- Add new changes here before release -->
+
+## Minor changes
+
+* `falco`: Update falco to 1.2.5 (PR #201).
+
+# biobox 0.4.0
 
 ## BREAKING CHANGES
 
