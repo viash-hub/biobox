@@ -1,0 +1,23 @@
+```bash
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools summary -h
+```
+
+Tool:    bedtools sammary
+Version: v2.31.1
+Summary: Report summary statistics of the intervals in a file 
+
+Usage:   bedtools summary [OPTIONS] -i <bed/gff/vcf/bam> -g <genome>
+
+Notes: 
+	(1)  The genome file should tab delimited and structured as follows:
+	     <chromName><TAB><chromSize>
+
+	For example, Human (hg19):
+	chr1	249250621
+	chr2	243199373
+	...
+	chr18_gl000207_random	4262
+
+
+
+

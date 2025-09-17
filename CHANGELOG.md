@@ -1,16 +1,25 @@
-# Unreleased
+# unreleased
 
 <!-- Add new changes here before release -->
+
+## MINOR CHANGES
+
+* `falco`: Update falco to 1.2.5 (PR #201).
+
+# biobox 0.4.0
 
 ## BREAKING CHANGES
 
 * `fq_subsample` has been removed after its functionality was previously copied to `fq/fq_subsample`. Please use the latter instead. (PR #182).
 
+* `snpeff` has been removed. Please use `snpeff/snpeff_ann` (which is a functional copy of `snpeff`) as this is the default subcommand when running this tool (PR #194)
+
+
 ## NEW FUNCTIONALITY
 
-* `fq`:
-  - `fq/fq_filter`: Filter FASTQ files based on record names or sequence patterns (PR #182).
-  - `fq/fq_generate`: Generate a random FASTQ file pair for testing and simulation purposes (PR #182).
+* `fq`: Added two new components for FASTQ file processing (PR #182):
+  - `fq/fq_filter`: Filter FASTQ files based on record names or sequence patterns.
+  - `fq/fq_generate`: Generate a random FASTQ file pair for testing and simulation purposes.
 
 * `bwa`: Added BWA support for single-end and paired-end read alignment (PR #183).
   - `bwa/bwa_index`: Create BWA index files for reference genome alignment.
@@ -18,6 +27,84 @@
   - `bwa/bwa_aln`: BWA aln algorithm for aligning short sequence reads to a reference genome.
   - `bwa/bwa_samse`: BWA samse - generate single-end alignment in SAM format from BWA aln SAI files.
   - `bwa/bwa_sampe`: BWA sampe - generate paired-end alignment in SAM format from BWA aln SAI files.
+
+* `bowtie2`: Add support for Bowtie2 alignment and indexing (PR #184).
+  - `bowtie2/bowtie2_build`: Build Bowtie2 index files from reference sequences.
+  - `bowtie2/bowtie2_align`: Align single-end and paired-end reads using Bowtie2.
+  - `bowtie2/bowtie2_inspect`: Extract information from Bowtie2 index files.
+
+* `bedtools`: Major expansion with 32 new components providing comprehensive genomic interval analysis (PR #188):
+  - `bedtools/bedtools_annotate`: Annotate coverage based on overlaps with interval files
+  - `bedtools/bedtools_bedpetobam`: Convert BEDPE to BAM format
+  - `bedtools/bedtools_closest`: Find closest features between two interval files
+  - `bedtools/bedtools_cluster`: Cluster nearby intervals
+  - `bedtools/bedtools_complement`: Report intervals not covered by features
+  - `bedtools/bedtools_coverage`: Compute coverage of features
+  - `bedtools/bedtools_expand`: Expand blocked BED features
+  - `bedtools/bedtools_fisher`: Compute Fisher's exact test for overlaps
+  - `bedtools/bedtools_flank`: Create flanking intervals around features
+  - `bedtools/bedtools_igv`: Create IGV batch scripts for visualization
+  - `bedtools/bedtools_jaccard`: Compute Jaccard statistic between interval sets
+  - `bedtools/bedtools_makewindows`: Make windows across genome or intervals
+  - `bedtools/bedtools_map`: Map values from overlapping intervals
+  - `bedtools/bedtools_maskfasta`: Mask FASTA sequences using intervals
+  - `bedtools/bedtools_multicov`: Count coverage across multiple BAM files
+  - `bedtools/bedtools_multiinter`: Identify common intervals across multiple files
+  - `bedtools/bedtools_overlap`: Compute overlaps between paired-end reads and intervals
+  - `bedtools/bedtools_pairtobed`: Find overlaps between paired-end reads and intervals
+  - `bedtools/bedtools_pairtopair`: Find overlaps between paired-end read sets
+  - `bedtools/bedtools_random`: Generate random intervals
+  - `bedtools/bedtools_reldist`: Compute relative distances between features
+  - `bedtools/bedtools_sample`: Sample random subsets of intervals
+  - `bedtools/bedtools_shift`: Shift intervals by specified amounts
+  - `bedtools/bedtools_shuffle`: Shuffle intervals while preserving size
+  - `bedtools/bedtools_slop`: Extend intervals by specified amounts
+  - `bedtools/bedtools_spacing`: Report spacing between intervals
+  - `bedtools/bedtools_split`: Split BED12 features into individual intervals
+  - `bedtools/bedtools_subtract`: Remove overlapping features
+  - `bedtools/bedtools_summary`: Summarize interval statistics
+  - `bedtools/bedtools_tag`: Tag BAM alignments with overlapping intervals
+  - `bedtools/bedtools_unionbedg`: Combine multiple BEDGRAPH files
+  - `bedtools/bedtools_window`: Find overlapping features within specified windows
+
+* Developer tools: Added GitHub Copilot integration (PR #192):
+  - `.github/copilot-instructions.md`: Complete coding assistant guide with biobox patterns, examples, and best practices
+  - `.github/prompts/update-viash-component.prompt.md`: Step-by-step prompt for updating existing components
+  - `.github/prompts/add-viash-component.prompt.md`: Comprehensive prompt for creating new components from scratch
+
+## MAJOR CHANGES
+
+* `bedtools`: Enhanced 11 existing bedtools components with improved functionality and standardized interfaces (PR #188):
+  - `bedtools/bedtools_bamtobed`: Enhanced with additional output format options
+  - `bedtools/bedtools_bamtofastq`: Improved paired-end read handling  
+  - `bedtools/bedtools_bed12tobed6`: Standardized parameter handling
+  - `bedtools/bedtools_bedtobam`: Enhanced genome file support
+  - `bedtools/bedtools_genomecov`: Added scale and split options
+  - `bedtools/bedtools_getfasta`: Improved FASTA extraction features
+  - `bedtools/bedtools_groupby`: Enhanced grouping and operation options
+  - `bedtools/bedtools_intersect`: Expanded intersection mode support
+  - `bedtools/bedtools_links`: Improved link generation functionality
+  - `bedtools/bedtools_merge`: Enhanced merging options and distance parameters
+  - `bedtools/bedtools_sort`: Standardized sorting options
+
+* `bcftools`: Updated components to version 1.22 with comprehensive improvements including enhanced argument coverage, improved script patterns, biobox standard compliance, and comprehensive testing overhaul (PR #193):
+  * `bcftools_annotate`: Added `--verbosity` parameter; updated to use `meta_cpus` instead of `--threads` parameter
+  * `bcftools_concat`: Renamed `--compact_PS` to `--compact_ps`, `--min_PQ` to `--min_pq`; added `--rm_dups`, `--drop_genotypes`, `--verbosity`, `--write_index` parameters; updated to use `meta_cpus` instead of `--threads` parameter
+  * `bcftools_norm`: Renamed `--remove_duplicates` to `--rm_dup`, added `--remove_duplicates_flag` as boolean alias; added `--exclude`, `--include`, `--gff_annot`, `--multi_overlaps`, `--sort`, `--verbosity`, `--write_index` parameters; updated to use `meta_cpus` instead of `--threads` parameter
+  * `bcftools_sort`: Removed `--max_mem` and `--temp_dir` parameters (now use `meta_memory_mb` and `meta_temp_dir` respectively); added `--verbosity`, `--write_index` parameters
+  * `bcftools_stats`: Renamed `--allele_frequency_bins` to `--af_bins`, `--allele_frequency_bins_file` removed, `--allele_frequency_tag` to `--af_tag`, `--fasta_reference` to `--fasta_ref`, `--split_by_ID` to `--split_by_id`, `--targets_overlaps` to `--targets_overlap`
+
+## MINOR CHANGES
+
+* `bases2fastq`: Updated component with comprehensive argument support and latest practices (PR #190).
+
+* `arriba`: Updated to v2.5.0 and refactored script and tests based on latest contributing guidelines (PR #187).
+
+* `snpeff` has been updated to version `5.2f` (PR #194)
+
+# BUG FIXES
+
+* Fix the `commands` property from components being overwritten by the global configuration (which only included `ps`) (PR #196).
 
 ## DOCUMENTATION
 
@@ -47,7 +134,7 @@
 
 * Update README (PR #177).
 
-* Add authors to package config and update author information (PR #180).
+* Update author information (PR #180, PR #200).
 
 * `fastqc`: add `--outdir` argument (PR #181).
 

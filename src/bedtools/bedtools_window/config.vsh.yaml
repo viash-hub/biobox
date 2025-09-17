@@ -1,0 +1,254 @@
+name: bedtools_window
+namespace: bedtools
+description: |
+  Examine a "window" around each feature in A and report overlapping features in B.
+  
+  For each feature in file A, bedtools window searches for overlapping features in 
+  file B within a defined window around each feature in A. The window can be 
+  symmetrical (same distance upstream and downstream) or asymmetrical (different 
+  distances). For each overlap found, the complete entries from both files A and B 
+  are reported.
+  
+  This tool is particularly useful for:
+  - Finding features within a specific distance of target regions
+  - Associating regulatory elements with nearby genes
+  - Creating annotation contexts around genomic features
+  - Proximity-based genomic analysis
+  - Building feature neighborhoods for downstream analysis
+
+keywords: [genomics, window, proximity, overlap, annotation, neighborhood, bedtools]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/window.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/window.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input_a
+        alternatives: [-a]
+        type: file
+        description: |
+          Query file in BED, GFF, or VCF format.
+          
+          **Format:** BED, GFF, or VCF file with genomic coordinates
+          **Content:** Features around which windows will be created
+          **Usage:** Each feature becomes the center of a search window
+          **Requirements:** Must have valid genomic coordinates
+        required: true
+        example: queries.bed
+
+      - name: --input_b
+        alternatives: [-b]
+        type: file
+        description: |
+          Database file in BED, GFF, or VCF format.
+          
+          **Format:** BED, GFF, or VCF file with genomic coordinates  
+          **Content:** Features to search for within windows around A
+          **Usage:** Features overlapping windows around A will be reported
+          **Requirements:** Must have matching chromosome names with file A
+        required: true
+        example: annotations.bed
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with overlapping feature pairs.
+          
+          **Format:** Tab-separated file with entries from both input files
+          **Content:** For each overlap, complete records from both A and B files
+          **Structure:** Columns from A file followed by columns from B file
+          **Size:** Number of lines depends on overlaps found within windows
+        required: true
+        direction: output
+        example: windowed_overlaps.bed
+
+  - name: Window Options
+    arguments:
+      - name: --window_size
+        alternatives: [-w]
+        type: integer
+        description: |
+          Base pairs added upstream and downstream of each entry in A.
+          
+          **Default:** 1000 bp
+          **Usage:** Creates symmetrical windows around features in A
+          **Effect:** Extends search region by this amount in both directions
+          **Range:** Must be positive integer
+          **Note:** Cannot be used with -l/-r options
+        example: 5000
+
+      - name: --left_window
+        alternatives: [-l]
+        type: integer
+        description: |
+          Base pairs added upstream (left) of each entry in A.
+          
+          **Default:** 1000 bp
+          **Usage:** Creates asymmetrical windows with custom upstream extension
+          **Effect:** Extends search region upstream by this amount
+          **Range:** Must be positive integer
+          **Note:** Use with -r to create asymmetrical windows
+        example: 2000
+
+      - name: --right_window
+        alternatives: [-r]
+        type: integer
+        description: |
+          Base pairs added downstream (right) of each entry in A.
+          
+          **Default:** 1000 bp
+          **Usage:** Creates asymmetrical windows with custom downstream extension
+          **Effect:** Extends search region downstream by this amount
+          **Range:** Must be positive integer
+          **Note:** Use with -l to create asymmetrical windows
+        example: 3000
+
+      - name: --strand_windows
+        alternatives: [-sw]
+        type: boolean_true
+        description: |
+          Define left (-l) and right (-r) based on strand orientation.
+          
+          **Usage:** For negative-strand features, -l adds bases downstream
+          **Effect:** Makes window extensions relative to feature orientation
+          **Default:** false (extensions are always relative to chromosome coordinates)
+          **Requirement:** Only works with -l and -r options, not with -w
+
+  - name: Strand Options
+    arguments:
+      - name: --same_strand
+        alternatives: [-sm]
+        type: boolean_true
+        description: |
+          Only report overlaps between features on the same strand.
+          
+          **Usage:** Restricts results to strand-specific overlaps
+          **Effect:** Features must be on identical strands to be reported
+          **Default:** false (strand is ignored)
+          **Note:** Cannot be used with --opposite_strand
+
+      - name: --opposite_strand
+        alternatives: [-Sm]
+        type: boolean_true
+        description: |
+          Only report overlaps between features on opposite strands.
+          
+          **Usage:** Restricts results to antisense overlaps
+          **Effect:** Features must be on opposite strands to be reported
+          **Default:** false (strand is ignored)
+          **Note:** Cannot be used with --same_strand
+
+  - name: Output Options
+    arguments:
+      - name: --unique
+        alternatives: [-u]
+        type: boolean_true
+        description: |
+          Write the original A entry once if any overlaps found in B.
+          
+          **Usage:** Reports existence of overlap without listing all B features
+          **Effect:** Each A feature appears at most once in output
+          **Output:** Only A file columns, no B file columns
+          **Use case:** When you only need to know if overlap exists
+
+      - name: --count
+        alternatives: [-c]
+        type: boolean_true
+        description: |
+          For each entry in A, report the number of overlaps with B.
+          
+          **Usage:** Adds count column showing number of B features in window
+          **Effect:** Each A entry gets additional column with overlap count
+          **Output:** Original A columns plus count column
+          **Values:** 0 for no overlaps, positive integers for overlap count
+
+      - name: --no_overlaps
+        alternatives: [-v]
+        type: boolean_true
+        description: |
+          Only report entries in A that have no overlaps with B.
+          
+          **Usage:** Filters to show only A features with no nearby B features
+          **Effect:** Inverse of normal operation (like "grep -v")
+          **Output:** Only A file columns for features with no overlaps
+          **Use case:** Finding isolated or unique features
+
+      - name: --header
+        type: boolean_true
+        description: |
+          Print the header from the A file prior to results.
+          
+          **Usage:** Preserves header information from input file A
+          **Effect:** First line of output will be the A file header
+          **Default:** false (no header in output)
+          **Note:** Only applicable if A file contains header lines
+
+  - name: BAM Options
+    arguments:
+      - name: --input_bam
+        alternatives: [-abam]
+        type: file
+        description: |
+          Input A file in BAM format instead of BED/GFF/VCF.
+          
+          **Format:** Sorted BAM file with aligned reads
+          **Usage:** Replaces -a option for BAM input
+          **Output:** Default output is BAM format
+          **Requirements:** Must be coordinate-sorted
+          **Note:** Cannot be used together with --input_a
+        example: alignments.bam
+
+      - name: --uncompressed_bam
+        alternatives: [-ubam]
+        type: boolean_true
+        description: |
+          Write uncompressed BAM output when using BAM input.
+          
+          **Usage:** Only applicable when using --input_bam
+          **Effect:** Output BAM will be uncompressed for faster writing
+          **Default:** false (compressed BAM output)
+          **Performance:** Faster writing but larger file size
+
+      - name: --bed_output
+        alternatives: [-bed]
+        type: boolean_true
+        description: |
+          Write output as BED format when using BAM input.
+          
+          **Usage:** Only applicable when using --input_bam
+          **Effect:** Converts BAM records to BED format in output
+          **Default:** false (BAM output when BAM input)
+          **Format:** Standard BED format with coordinates and names
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run:
+          - "bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt"
+
+runners:
+  - type: executable
+  - type: nextflow

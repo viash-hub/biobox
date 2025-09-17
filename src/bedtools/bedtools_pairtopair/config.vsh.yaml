@@ -1,0 +1,169 @@
+name: bedtools_pairtopair
+namespace: bedtools
+description: |
+  Report overlaps between two paired-end BED files (BEDPE).
+  
+  bedtools pairtopair finds overlaps between paired-end intervals in two BEDPE files. 
+  This tool is particularly useful for comparing structural variants, chromatin interactions, 
+  or any paired-end genomic data between different samples or conditions.
+  
+  This tool is commonly used for:
+  - Comparing structural variants between samples
+  - Intersecting Hi-C or ChIA-PET datasets
+  - Finding common paired-end features across experiments
+  - Analyzing concordance between paired-end calling methods
+  - Quality control of structural variant detection pipelines
+  - Cross-referencing chromatin interaction datasets
+
+keywords: [genomics, paired-end, bedpe, structural-variants, intersect, chromatin-interactions]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/pairtopair.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/pairtopair.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --bedpe_a
+        alternatives: [-a]
+        type: file
+        description: |
+          First input BEDPE file with paired interval data.
+          
+          **Format:** BEDPE format with paired genomic coordinates
+          **Content:** Each line represents a pair of genomic intervals
+          **Columns:** chrom1, start1, end1, chrom2, start2, end2, [name], [score], [strand1], [strand2]
+          **Usage:** Primary dataset to find overlaps for
+          **Requirements:** Must be in valid BEDPE format
+        required: true
+        example: "dataset_a.bedpe"
+
+      - name: --bedpe_b
+        alternatives: [-b]
+        type: file
+        description: |
+          Second input BEDPE file with paired interval data.
+          
+          **Format:** BEDPE format with paired genomic coordinates
+          **Content:** Each line represents a pair of genomic intervals
+          **Columns:** chrom1, start1, end1, chrom2, start2, end2, [name], [score], [strand1], [strand2]
+          **Usage:** Reference dataset to intersect with dataset A
+          **Requirements:** Must be in valid BEDPE format
+        required: true
+        example: "dataset_b.bedpe"
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with overlapping paired intervals from dataset A.
+          
+          **Format:** BEDPE format containing overlapping pairs from input A
+          **Content:** Only pairs from dataset A that meet overlap criteria with dataset B
+          **Filtering:** Results depend on overlap type and threshold parameters
+        required: true
+        direction: output
+        example: "overlapping_pairs.bedpe"
+
+  - name: Overlap Options
+    arguments:
+      - name: --min_overlap
+        alternatives: [-f]
+        type: double
+        description: |
+          Minimum overlap required as fraction of dataset A intervals.
+          
+          **Default:** 1E-9 (effectively 1 base pair)
+          **Range:** 0.0 to 1.0
+          **Usage:** Overlap must be at least this fraction of A's interval length
+          **Example:** 0.05 requires 5% overlap
+        example: 0.1
+
+      - name: --type
+        type: string
+        description: |
+          Approach for reporting overlaps between BEDPE datasets.
+          
+          **both:** Report if both ends of A overlap B (default)
+          **either:** Report if either end of A overlaps B
+          **neither:** Report if neither end of A overlaps B
+          **notboth:** Report if one or neither end of A overlaps B
+          
+          **Usage:** Defines the overlap stringency requirement
+        choices: [both, either, neither, notboth]
+        default: both
+        example: "either"
+
+      - name: --slop
+        type: integer
+        description: |
+          Amount of slop (in base pairs) to add to each footprint of dataset A.
+          
+          **Default:** 0 (no slop)
+          **Usage:** Extends intervals before overlap detection
+          **Effect:** Slop is subtracted from start1/start2 and added to end1/end2
+          **Applications:** Finding near-misses or fuzzy overlaps
+        example: 1000
+
+      - name: --strand_slop
+        alternatives: [-ss]
+        type: boolean_true
+        description: |
+          Add slop based on strand information.
+          
+          **Plus strand:** Slop only added to end coordinates
+          **Minus strand:** Slop only added to start coordinates
+          **Default:** Slop added in both directions regardless of strand
+          **Requirements:** Requires strand information in BEDPE files
+
+  - name: Filtering Options
+    arguments:
+      - name: --ignore_strand
+        alternatives: [-is]
+        type: boolean_true
+        description: |
+          Ignore strand information when searching for overlaps.
+          
+          **Default:** Strand information is enforced
+          **Usage:** Overlaps reported regardless of strand orientation
+          **Applications:** When strand doesn't matter for the analysis
+
+      - name: --require_different_names
+        alternatives: [-rdn]
+        type: boolean_true
+        description: |
+          Require overlapping pairs to have different names.
+          
+          **Default:** Same names are allowed
+          **Usage:** Avoids self-hits when datasets contain overlapping entries
+          **Applications:** Comparing datasets that might have common entries
+          **Effect:** Filters out pairs with identical names between datasets
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

@@ -1,0 +1,203 @@
+name: bedtools_multicov
+namespace: bedtools
+description: |
+  Count sequence coverage for multiple BAM files at specific genomic loci.
+  
+  bedtools multicov counts the number of alignments from multiple BAM files that overlap 
+  each interval in a BED/GFF/VCF file. For each genomic interval, it reports the coverage 
+  from each BAM file in additional columns, making it ideal for comparing coverage across 
+  multiple samples or conditions.
+  
+  This tool is commonly used for:
+  - Multi-sample coverage analysis across specific regions
+  - Comparing read depths between different samples
+  - Quality control of sequencing experiments
+  - Preparing coverage data for differential analysis
+  - Generating coverage matrices for downstream analysis
+
+keywords: [genomics, coverage, bam, alignment, multi-sample, depth, sequencing]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/multicov.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/multicov.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --bams
+        alternatives: [-bams]
+        type: file
+        multiple: true
+        description: |
+          Input BAM files for coverage counting.
+          
+          **Format:** Sorted and indexed BAM files
+          **Content:** Aligned sequencing reads
+          **Usage:** Coverage will be calculated for each BAM file separately
+          **Requirements:** Must be coordinate-sorted with corresponding .bai index files
+          **Output:** Each BAM contributes one column to the output
+        required: true
+        example: ["sample1.bam", "sample2.bam", "sample3.bam"]
+
+      - name: --bed
+        alternatives: [-bed]
+        type: file
+        description: |
+          BED/GFF/VCF file with genomic intervals for coverage calculation.
+          
+          **Format:** BED, GFF, or VCF file with genomic coordinates
+          **Content:** Intervals where coverage will be measured
+          **Usage:** Each interval becomes a row in the output with coverage columns appended
+          **Requirements:** Chromosome names must match BAM file references
+        required: true
+        example: regions_of_interest.bed
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with coverage counts appended to input intervals.
+          
+          **Format:** Same as input BED/GFF/VCF with additional coverage columns
+          **Content:** Original interval data plus one coverage column per BAM file
+          **Columns:** Coverage counts are appended in the order BAM files were specified
+        required: true
+        direction: output
+        example: coverage_matrix.bed
+
+  - name: Overlap Options
+    arguments:
+      - name: --min_overlap
+        alternatives: [-f]
+        type: double
+        description: |
+          Minimum overlap required as a fraction of each BED interval.
+          
+          **Default:** 1E-9 (essentially 1 base pair)
+          **Range:** 0.0 to 1.0
+          **Usage:** Read must overlap at least this fraction of the interval
+          **Example:** 0.5 requires read to overlap at least 50% of interval
+        example: 0.1
+
+      - name: --reciprocal
+        alternatives: [-r]
+        type: boolean_true
+        description: |
+          Require reciprocal overlap for both interval and read.
+          
+          **Usage:** Both interval and read must overlap each other by min_overlap fraction
+          **Example:** With -f 0.9, interval must overlap 90% of read AND read must overlap 90% of interval
+          **Effect:** More stringent overlap requirement than -f alone
+          **Default:** false (only interval overlap required)
+
+  - name: Strand Options
+    arguments:
+      - name: --same_strand
+        alternatives: [-s]
+        type: boolean_true
+        description: |
+          Only count reads on the same strand as the interval.
+          
+          **Usage:** Requires strand information in BED file (6th column)
+          **Effect:** Ignores reads on opposite strand
+          **Applications:** Strand-specific RNA-seq analysis, antisense detection
+          **Default:** false (count reads on both strands)
+
+      - name: --opposite_strand
+        alternatives: [-S]
+        type: boolean_true
+        description: |
+          Only count reads on the opposite strand from the interval.
+          
+          **Usage:** Requires strand information in BED file (6th column)  
+          **Effect:** Ignores reads on same strand
+          **Applications:** Antisense RNA detection, strand-specific analysis
+          **Default:** false (count reads on both strands)
+
+  - name: Read Filtering
+    arguments:
+      - name: --min_quality
+        alternatives: [-q]
+        type: integer
+        description: |
+          Minimum mapping quality (MAPQ) required for reads.
+          
+          **Default:** 0 (no quality filtering)
+          **Range:** 0-255
+          **Usage:** Higher values exclude poorly mapped reads
+          **Common values:** 10, 20, 30 for increasingly stringent filtering
+        example: 20
+
+      - name: --include_duplicates
+        alternatives: [-D]
+        type: boolean_true
+        description: |
+          Include duplicate reads in coverage counting.
+          
+          **Default:** false (exclude duplicates)
+          **Usage:** Count reads marked as duplicates in BAM FLAG field
+          **Applications:** When duplicates represent real biological signal
+          **Effect:** May increase coverage counts significantly
+
+      - name: --include_failed_qc
+        alternatives: [-F]
+        type: boolean_true
+        description: |
+          Include reads that failed quality control checks.
+          
+          **Default:** false (exclude failed QC reads)
+          **Usage:** Count reads marked as QC failures in BAM FLAG field
+          **Applications:** When QC failures should still be counted
+          **Effect:** May include low-quality alignments
+
+      - name: --proper_pairs_only
+        alternatives: [-p]
+        type: boolean_true
+        description: |
+          Only count reads from proper pairs.
+          
+          **Default:** false (count all alignments above quality threshold)
+          **Usage:** Requires both reads in pair to be properly aligned
+          **Applications:** Paired-end sequencing quality control
+          **Effect:** Excludes singleton reads and improperly paired reads
+
+  - name: Advanced Options
+    arguments:
+      - name: --split
+        type: boolean_true
+        description: |
+          Treat split BAM or BED12 entries as distinct intervals.
+          
+          **BAM context:** Count spliced alignments across individual exons
+          **BED12 context:** Process each block in BED12 entry separately
+          **Applications:** RNA-seq analysis, exon-specific coverage
+          **Default:** false (treat as single interval)
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

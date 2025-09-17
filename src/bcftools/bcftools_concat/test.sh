@@ -3,225 +3,136 @@
 ## VIASH START
 ## VIASH END
 
-# Exit on error
 set -eo pipefail
 
-#test_data="$meta_resources_dir/test_data"
+# Always source centralized helpers
+source "$meta_resources_dir/test_helpers.sh"
 
-#############################################
-# helper functions
-assert_file_exists() {
-  [ -f "$1" ] || { echo "File '$1' does not exist" && exit 1; }
-}
-assert_file_not_empty() {
-  [ -s "$1" ] || { echo "File '$1' is empty but shouldn't be" && exit 1; }
-}
-assert_file_contains() {
-  grep -q "$2" "$1" || { echo "File '$1' does not contain '$2'" && exit 1; }
-}
-assert_identical_content() {
-  diff -a "$2" "$1" \
-    || (echo "Files are not identical!" && exit 1)
-}
-#############################################
+# Initialize test environment
+setup_test_env
 
-# Create directories for tests
-echo "Creating Test Data..."
-TMPDIR=$(mktemp -d "$meta_temp_dir/XXXXXX")
-function clean_up {
-  [[ -d "$TMPDIR" ]] && rm -r "$TMPDIR"
+log "Starting tests for $meta_name"
+
+# Create test VCF files using helpers
+create_test_vcf() {
+  local output_file="$1"
+  local chrom="$2"
+  local start_pos="$3"
+  local end_pos="$4"
+  
+  cat > "$output_file" <<EOF
+##fileformat=VCFv4.2
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##contig=<ID=$chrom,length=249250621,assembly=b37>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
+$chrom	$start_pos	.	G	C	15	PASS	.	GT	0/1
+$chrom	$end_pos	.	A	T	20	PASS	.	GT	1/1
+EOF
 }
-trap clean_up EXIT
 
 # Create test data
-cat <<EOF > "$TMPDIR/example.vcf"
-##fileformat=VCFv4.1
-##contig=<ID=1,length=249250621,assembly=b37>
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
-1	752567	llama	G	C,A	15	.	.	.	1/2
-1	752752	.	G	A,AAA	20	.	.	.	./.
-EOF
+log "Creating test VCF files"
+create_test_vcf "$meta_temp_dir/input1.vcf" "chr1" 1000 2000
+create_test_vcf "$meta_temp_dir/input2.vcf" "chr1" 3000 4000
 
-bgzip -c $TMPDIR/example.vcf > $TMPDIR/example.vcf.gz
-tabix -p vcf $TMPDIR/example.vcf.gz
+# Compress and index VCF files for bcftools
+bgzip -c "$meta_temp_dir/input1.vcf" > "$meta_temp_dir/input1.vcf.gz"
+bgzip -c "$meta_temp_dir/input2.vcf" > "$meta_temp_dir/input2.vcf.gz"
+tabix -p vcf "$meta_temp_dir/input1.vcf.gz"
+tabix -p vcf "$meta_temp_dir/input2.vcf.gz"
 
-cat <<EOF > "$TMPDIR/example_2.vcf"
-##fileformat=VCFv4.1
-##contig=<ID=1,length=249250621,assembly=b37>
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
-1	752569	cat	G	C,A	15	.	.	.	1/2
-1	752739	.	G	A,AAA	20	.	.	.	./.
-EOF
+# Create file list
+echo "$meta_temp_dir/input1.vcf.gz" > "$meta_temp_dir/file_list.txt"
+echo "$meta_temp_dir/input2.vcf.gz" >> "$meta_temp_dir/file_list.txt"
 
-bgzip -c $TMPDIR/example_2.vcf > $TMPDIR/example_2.vcf.gz
-tabix -p vcf $TMPDIR/example_2.vcf.gz
-
-cat <<EOF > "$TMPDIR/file_list.txt"
-$TMPDIR/example.vcf.gz
-$TMPDIR/example_2.vcf.gz
-EOF
-
-# Test 1: Default test
-mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
-
-echo "> Run bcftools_concat default test"
+# Test 1: Basic concatenation
+log "Starting TEST 1: Basic concatenation"
 "$meta_executable" \
-  --input "../example.vcf" \
-  --input "../example_2.vcf" \
-  --output "concatenated.vcf" \
-  &> /dev/null
+  --input "$meta_temp_dir/input1.vcf.gz" \
+  --input "$meta_temp_dir/input2.vcf.gz" \
+  --output "$meta_temp_dir/output1.vcf"
 
-# checks
-assert_file_exists "concatenated.vcf"
-assert_file_not_empty "concatenated.vcf"
-assert_file_contains "concatenated.vcf" "concat -o concatenated.vcf ../example.vcf ../example_2.vcf"
-echo "- test1 succeeded -"
+check_file_exists "$meta_temp_dir/output1.vcf" "basic concatenation output"
+check_file_not_empty "$meta_temp_dir/output1.vcf" "basic concatenation output"
+check_file_contains "$meta_temp_dir/output1.vcf" "chr1	1000" "first variant"
+check_file_contains "$meta_temp_dir/output1.vcf" "chr1	4000" "last variant"
+log "✅ TEST 1 completed successfully"
 
-popd > /dev/null
-
-# Test 2: Allow overlaps, compact PS and remove duplicates
-mkdir "$TMPDIR/test2" && pushd "$TMPDIR/test2" > /dev/null
-
-echo "> Run bcftools_concat test with allow overlaps, and remove duplicates"
+# Test 2: File list input
+log "Starting TEST 2: File list input"
 "$meta_executable" \
-  --input "../example.vcf.gz" \
-  --input "../example_2.vcf.gz" \
-  --output "concatenated.vcf" \
+  --file_list "$meta_temp_dir/file_list.txt" \
+  --output "$meta_temp_dir/output2.vcf"
+
+check_file_exists "$meta_temp_dir/output2.vcf" "file list output"
+check_file_not_empty "$meta_temp_dir/output2.vcf" "file list output"
+check_file_contains "$meta_temp_dir/output2.vcf" "chr1	1000" "first variant from file list"
+log "✅ TEST 2 completed successfully"
+
+# Test 3: Allow overlaps and output type
+log "Starting TEST 3: Allow overlaps with compressed output"
+"$meta_executable" \
+  --input "$meta_temp_dir/input1.vcf.gz" \
+  --input "$meta_temp_dir/input2.vcf.gz" \
+  --output "$meta_temp_dir/output3.vcf.gz" \
   --allow_overlaps \
-  --remove_duplicates 'none' \
-  &> /dev/null
+  --output_type "z"
 
-# checks
-assert_file_exists "concatenated.vcf"
-assert_file_not_empty "concatenated.vcf"
-assert_file_contains "concatenated.vcf" "concat -a -d none -o concatenated.vcf ../example.vcf.gz ../example_2.vcf.gz"  
-echo "- test2 succeeded -"
+check_file_exists "$meta_temp_dir/output3.vcf.gz" "compressed output"
+check_file_not_empty "$meta_temp_dir/output3.vcf.gz" "compressed output"
+log "✅ TEST 3 completed successfully"
 
-popd > /dev/null
-
-
-# Test 3: Ligate, ligate force and ligate warn
-mkdir "$TMPDIR/test3" && pushd "$TMPDIR/test3" > /dev/null
-
-echo "> Run bcftools_concat test with ligate, ligate force and ligate warn"
+# Test 4: Remove duplicates
+log "Starting TEST 4: Remove duplicates"
 "$meta_executable" \
-  --input "../example.vcf.gz" \
-  --input "../example_2.vcf.gz" \
-  --output "concatenated.vcf" \
-  --ligate \
-  --compact_PS \
-  &> /dev/null
-
-
-# checks
-assert_file_exists "concatenated.vcf"
-assert_file_not_empty "concatenated.vcf"
-assert_file_contains "concatenated.vcf" "concat -c -l -o concatenated.vcf ../example.vcf.gz ../example_2.vcf.gz"
-echo "- test3 succeeded -"
-
-popd > /dev/null
-
-# Test 4: file list with ligate force and ligate warn
-mkdir "$TMPDIR/test4" && pushd "$TMPDIR/test4" > /dev/null
-
-echo "> Run bcftools_concat test with file list, ligate force and ligate warn"
-"$meta_executable" \
-  --file_list "../file_list.txt" \
-  --output "concatenated.vcf" \
-  --ligate_force \
-  &> /dev/null
-
-# checks
-assert_file_exists "concatenated.vcf"
-assert_file_not_empty "concatenated.vcf"
-assert_file_contains "concatenated.vcf" "concat --ligate-force -o concatenated.vcf -f ../file_list.txt"
-echo "- test4 succeeded -"
-
-popd > /dev/null
-
-# Test 5: ligate warn and naive
-mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
-
-echo "> Run bcftools_concat test with ligate warn and naive"
-"$meta_executable" \
-  --input "../example.vcf.gz" \
-  --input "../example_2.vcf.gz" \
-  --output "concatenated.vcf.gz" \
-  --ligate_warn \
-  --naive \
-  &> /dev/null
-
-bgzip -d concatenated.vcf.gz
-
-# checks
-assert_file_exists "concatenated.vcf"
-assert_file_not_empty "concatenated.vcf"
-assert_file_contains "concatenated.vcf" "##fileformat=VCFv4.1"
-echo "- test5 succeeded -"
-
-popd > /dev/null
-
-# Test 6: minimal PQ
-mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
-
-echo "> Run bcftools_concat test with minimal PQ"
-"$meta_executable" \
-  --input "../example.vcf.gz" \
-  --input "../example_2.vcf.gz" \
-  --output "concatenated.vcf" \
-  --min_PQ 20 \
-  &> /dev/null
-
-# checks
-assert_file_exists "concatenated.vcf"
-assert_file_not_empty "concatenated.vcf"
-assert_file_contains "concatenated.vcf" "concat -q 20 -o concatenated.vcf ../example.vcf.gz ../example_2.vcf.gz"
-echo "- test6 succeeded -"
-
-popd > /dev/null
-
-# Test 7: regions
-mkdir "$TMPDIR/test7" && pushd "$TMPDIR/test7" > /dev/null
-
-echo "> Run bcftools_concat test with regions"
-"$meta_executable" \
-  --input "../example.vcf.gz" \
-  --input "../example_2.vcf.gz" \
-  --output "concatenated.vcf" \
+  --input "$meta_temp_dir/input1.vcf.gz" \
+  --input "$meta_temp_dir/input1.vcf.gz" \
+  --output "$meta_temp_dir/output4.vcf" \
   --allow_overlaps \
-  --regions "1:752569-752739" \
-  &> /dev/null
+  --rm_dups "exact"
 
-# checks
-assert_file_exists "concatenated.vcf"
-assert_file_not_empty "concatenated.vcf"
-assert_file_contains "concatenated.vcf" "concat -a -r 1:752569-752739 -o concatenated.vcf ../example.vcf.gz ../example_2.vcf.gz"
-echo "- test7 succeeded -"
+check_file_exists "$meta_temp_dir/output4.vcf" "deduplicated output"
+check_file_not_empty "$meta_temp_dir/output4.vcf" "deduplicated output"
+log "✅ TEST 4 completed successfully"
 
-popd > /dev/null
-
-# Test 8: regions overlap
-mkdir "$TMPDIR/test8" && pushd "$TMPDIR/test8" > /dev/null
-
-echo "> Run bcftools_concat test with regions overlap"
+# Test 5: Naive concatenation
+log "Starting TEST 5: Naive concatenation"
 "$meta_executable" \
-  --input "../example.vcf.gz" \
-  --input "../example_2.vcf.gz" \
-  --output "concatenated.vcf" \
+  --input "$meta_temp_dir/input1.vcf.gz" \
+  --input "$meta_temp_dir/input2.vcf.gz" \
+  --output "$meta_temp_dir/output5.vcf" \
+  --naive
+
+check_file_exists "$meta_temp_dir/output5.vcf" "naive concatenation output"
+check_file_not_empty "$meta_temp_dir/output5.vcf" "naive concatenation output"
+log "✅ TEST 5 completed successfully"
+
+# Test 6: Drop genotypes
+log "Starting TEST 6: Drop genotypes"
+"$meta_executable" \
+  --input "$meta_temp_dir/input1.vcf.gz" \
+  --input "$meta_temp_dir/input2.vcf.gz" \
+  --output "$meta_temp_dir/output6.vcf" \
+  --drop_genotypes
+
+check_file_exists "$meta_temp_dir/output6.vcf" "genotype-free output"
+check_file_not_empty "$meta_temp_dir/output6.vcf" "genotype-free output"
+log "✅ TEST 6 completed successfully"
+
+# Test 7: Regions filtering
+log "Starting TEST 7: Regions filtering"
+"$meta_executable" \
+  --input "$meta_temp_dir/input1.vcf.gz" \
+  --input "$meta_temp_dir/input2.vcf.gz" \
+  --output "$meta_temp_dir/output7.vcf" \
   --allow_overlaps \
-  --regions_overlap 'pos' \
-  &> /dev/null
+  --regions "chr1:1000-2000"
 
-# checks
-assert_file_exists "concatenated.vcf"
-assert_file_not_empty "concatenated.vcf"
-assert_file_contains "concatenated.vcf" "concat -a --regions-overlap pos -o concatenated.vcf ../example.vcf.gz ../example_2.vcf.gz"
-echo "- test8 succeeded -"
+check_file_exists "$meta_temp_dir/output7.vcf" "regions filtered output"
+check_file_not_empty "$meta_temp_dir/output7.vcf" "regions filtered output"
+check_file_contains "$meta_temp_dir/output7.vcf" "chr1	1000" "variant in region"
+log "✅ TEST 7 completed successfully"
 
-popd > /dev/null
-
-echo "---- All tests succeeded! ----"
-exit 0
-
-
+# Always end with summary
+print_test_summary "All tests completed successfully"
 

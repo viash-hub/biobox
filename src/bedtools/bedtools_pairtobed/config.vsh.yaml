@@ -1,0 +1,202 @@
+name: bedtools_pairtobed
+namespace: bedtools
+description: |
+  Report overlaps between a BEDPE file and a BED/GFF/VCF file.
+  
+  bedtools pairtobed finds overlaps between paired-end intervals (BEDPE format) 
+  and genomic features in BED/GFF/VCF format. This tool is particularly useful 
+  for analyzing paired-end sequencing data, structural variants, or any genomic 
+  data where you need to consider relationships between paired intervals.
+  
+  This tool is commonly used for:
+  - Annotating structural variants with genomic features
+  - Finding overlaps between paired-end ChIP-seq reads and genes
+  - Analyzing chromatin interactions (Hi-C, ChIA-PET) with genomic annotations
+  - Quality control of paired-end sequencing experiments
+  - Intersecting BEDPE format data with reference annotations
+  - Processing BAM files with paired-end alignment information
+
+keywords: [genomics, paired-end, bedpe, overlaps, structural-variants, bam, intervals]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/pairtobed.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/pairtobed.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --bedpe
+        alternatives: [-a]
+        type: file
+        description: |
+          Input BEDPE file with paired interval data.
+          
+          **Format:** BEDPE format with paired genomic coordinates
+          **Content:** Each line represents a pair of genomic intervals
+          **Columns:** chrom1, start1, end1, chrom2, start2, end2, [name], [score], [strand1], [strand2]
+          **Usage:** Pairs will be tested for overlaps with features in --bed file
+          **Requirements:** Must be in valid BEDPE format
+        required: true
+        example: "structural_variants.bedpe"
+
+      - name: --bed
+        alternatives: [-b]
+        type: file
+        description: |
+          Input BED/GFF/VCF file with genomic features.
+          
+          **Format:** BED, GFF, or VCF file with genomic coordinates
+          **Content:** Genomic features to test for overlaps with BEDPE pairs
+          **Usage:** Features will be intersected with paired intervals from --bedpe
+          **Requirements:** Standard genomic coordinate format
+        required: true
+        example: "genes.bed"
+
+      - name: --bam_input
+        alternatives: [-abam]
+        type: file
+        description: |
+          Input BAM file instead of BEDPE file.
+          
+          **Format:** BAM format with paired-end alignments
+          **Content:** Paired-end sequencing reads
+          **Requirements:** Must be grouped or sorted by query name
+          **Usage:** Replaces --bedpe argument when working with BAM input
+          **Output:** Will produce BAM output by default (unless --bedpe_output is used)
+        example: "paired_reads.bam"
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with overlap results.
+          
+          **Format:** Depends on input type and options
+          **BAM input:** BAM format (unless --bedpe_output specified)
+          **BEDPE input:** BEDPE format with overlapping pairs
+          **Content:** Original paired intervals that meet the overlap criteria
+        required: true
+        direction: output
+        example: "overlapping_pairs.bedpe"
+
+  - name: Output Options
+    arguments:
+      - name: --uncompressed_bam
+        alternatives: [-ubam]
+        type: boolean_true
+        description: |
+          Write uncompressed BAM output.
+          
+          **Usage:** Only applies when using BAM input (--bam_input)
+          **Default:** Compressed BAM output
+          **Effect:** Produces larger but faster-to-write output files
+          **Applications:** When downstream tools require uncompressed BAM
+
+      - name: --bedpe_output
+        alternatives: [-bedpe]
+        type: boolean_true
+        description: |
+          Write output in BEDPE format when using BAM input.
+          
+          **Usage:** Only applies when using BAM input (--bam_input)
+          **Default:** BAM output when BAM input is used
+          **Effect:** Converts BAM pairs to BEDPE format in output
+          **Applications:** When you need text-based output from BAM input
+
+  - name: Overlap Options
+    arguments:
+      - name: --min_overlap
+        alternatives: [-f]
+        type: double
+        description: |
+          Minimum overlap required as fraction of BEDPE intervals.
+          
+          **Default:** 1E-9 (effectively 1 base pair)
+          **Range:** 0.0 to 1.0
+          **Usage:** Overlap must be at least this fraction of the BEDPE interval
+          **Example:** 0.5 requires 50% overlap
+        example: 0.1
+
+      - name: --type
+        type: string
+        description: |
+          Approach for reporting overlaps between BEDPE and BED.
+          
+          **either:** Report if either end of BEDPE overlaps BED (default)
+          **neither:** Report if neither end of BEDPE overlaps BED
+          **both:** Report if both ends of BEDPE overlap BED
+          **xor:** Report if exactly one end of BEDPE overlaps BED
+          **notboth:** Report if neither or exactly one end overlaps (xor + neither)
+          **ispan:** Report overlaps between [end1, start2] span of BEDPE and BED
+          **ospan:** Report overlaps between [start1, end2] span of BEDPE and BED
+          **notispan:** Report if ispan doesn't overlap BED
+          **notospan:** Report if ospan doesn't overlap BED
+        choices: [either, neither, both, xor, notboth, ispan, ospan, notispan, notospan]
+        default: either
+        example: "both"
+
+  - name: Strand Options
+    arguments:
+      - name: --same_strand
+        alternatives: [-s]
+        type: boolean_true
+        description: |
+          Require same strandedness when finding overlaps.
+          
+          **Default:** Ignore strand information
+          **Usage:** Only report overlaps on the same strand
+          **Note:** Not applicable with ispan, ospan, notispan, or notospan types
+          **Applications:** Strand-specific analyses
+
+      - name: --opposite_strand
+        alternatives: [-S]
+        type: boolean_true
+        description: |
+          Require different strandedness when finding overlaps.
+          
+          **Default:** Ignore strand information
+          **Usage:** Only report overlaps on opposite strands
+          **Note:** Not applicable with ispan, ospan, notispan, or notospan types
+          **Applications:** Antisense interaction analyses
+
+  - name: BAM-specific Options
+    arguments:
+      - name: --edit_distance
+        alternatives: [-ed]
+        type: boolean_true
+        description: |
+          Use BAM total edit distance (NM tag) for BEDPE score.
+          
+          **Default:** Use minimum mapping quality of the two mates as score
+          **Usage:** Only applies when using BAM input (--bam_input)
+          **Effect:** Reports total edit distance from both mates as the score
+          **Applications:** Quality assessment based on sequence accuracy
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

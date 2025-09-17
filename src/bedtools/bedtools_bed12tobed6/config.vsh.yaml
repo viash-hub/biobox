@@ -7,8 +7,7 @@ keywords: [Converts, BED12, BED6]
 links:
   documentation: https://bedtools.readthedocs.io/en/latest/content/tools/bed12tobed6.html
   repository: https://github.com/arq5x/bedtools2
-  homepage: https://bedtools.readthedocs.io/en/latest/#
-  issue_tracker: https://github.com/arq5x/bedtools2/issues
+  homepage: https://bedtools.readthedocs.io/en/latest/
 references:
   doi: 10.1093/bioinformatics/btq033
 license: MIT
@@ -16,33 +15,52 @@ requirements:
   commands: [bedtools]
 authors:
   - __merge__: /src/_authors/theodoro_gasperin.yaml
-    roles: [ author, maintainer ]
+    roles: [author]
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
 
 argument_groups:
 
   - name: Inputs
     arguments:
       - name: --input
-        alternatives: -i
+        alternatives: [-i]
         type: file
-        description: Input BED12 file.
+        description: |
+          Input BED12 file containing blocked features.
+          
+          **Requirements:**
+          - Must be in BED12 format (12 columns)
+          - Should contain blocked features (e.g., genes with exons)
+          - Blocks are defined by columns 10-12 (blockCount, blockSizes, blockStarts)
         required: true
+        example: input.bed12
     
   - name: Outputs
     arguments:
       - name: --output
-        alternatives: -o
+        alternatives: [-o]
         type: file
         direction: output
-        description: Output BED6 file to be written.
+        description: |
+          Output BED6 file containing discrete features.
+          
+          **Output format:**
+          - Each block from input BED12 becomes a separate BED6 entry
+          - Maintains chromosome, strand, and name information
+          - Coordinates are adjusted to represent individual blocks
+        example: output.bed6
 
   - name: Options
     arguments:
       - name: --n_score
-        alternatives: -n
+        alternatives: [-n]
         type: boolean_true
         description: | 
-          Force the score to be the (1-based) block number from the BED12.
+          Force the score to be the 1-based block number from the BED12.
+          
+          **Default behavior:** Preserves original score from BED12
+          **With --n_score:** Sets score to block number (1, 2, 3, etc.)
 
 resources:
   - type: bash_script
@@ -51,16 +69,16 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
 
 engines:
   - type: docker
-    image: debian:stable-slim
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
     setup:
-      - type: apt
-        packages: [bedtools, procps]
       - type: docker
-        run: |
-          echo "bedtools: \"$(bedtools --version | sed -n 's/^bedtools //p')\"" > /var/software_versions.txt
+        run:
+          - "bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt"
 
 runners:
   - type: executable

@@ -1,0 +1,158 @@
+name: bedtools_shift
+namespace: bedtools
+description: |
+  Shift genomic intervals by a specified number of base pairs.
+  
+  bedtools shift moves genomic intervals (BED/GFF/VCF) by a user-specified number of base pairs.
+  The tool can shift all features by the same amount, or apply strand-specific shifts to features
+  on the positive and negative strands separately. Shifts can be absolute values or proportional
+  to feature length.
+  
+  This tool is commonly used for:
+  - Adjusting genomic coordinates for analysis offsets
+  - Creating flanking regions around features
+  - Simulating experimental bias or systematic shifts
+  - Generating control regions at specified distances
+  - Converting between different coordinate systems
+  - Modeling positional uncertainty in genomic data
+
+keywords: [genomics, intervals, shift, coordinates, offset, flanking]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/shift.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/shift.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: [-i]
+        type: file
+        description: |
+          Input file containing genomic intervals to shift.
+          
+          **Format:** BED, GFF, or VCF file
+          **Content:** Genomic intervals with coordinates to be shifted
+          **Requirements:** Must contain valid genomic coordinates
+          **Usage:** Each interval will be shifted according to specified parameters
+        required: true
+        example: intervals.bed
+
+      - name: --genome
+        alternatives: [-g]
+        type: file
+        description: |
+          Genome file defining chromosome sizes.
+          
+          **Format:** Tab-delimited text file with chromosome names and sizes
+          **Content:** Each line contains: <chromName><TAB><chromSize>
+          **Usage:** Prevents shifted coordinates from exceeding chromosome boundaries
+          **Creation:** Can be generated with 'samtools faidx' or UCSC Table Browser
+          **Example format:**
+            chr1    249250621
+            chr2    243199373
+        required: true
+        example: hg19.genome
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with shifted genomic intervals.
+          
+          **Format:** Same format as input file
+          **Content:** Original intervals with shifted coordinates
+          **Boundaries:** Coordinates clamped to [0, chromosome_length] range
+        required: true
+        direction: output
+        example: shifted_intervals.bed
+
+  - name: Shift Options
+    arguments:
+      - name: --shift
+        alternatives: [-s]
+        type: double
+        description: |
+          Shift all features by this number of base pairs.
+          
+          **Usage:** Positive values shift downstream, negative values shift upstream
+          **Interaction:** Cannot be used together with --plus_shift and --minus_shift
+          **Percentage mode:** When --pct is used, this becomes a fraction (e.g., 0.1 = 10%)
+          **Boundary handling:** Results clamped to valid chromosome coordinates
+        example: 1000
+
+      - name: --plus_shift
+        alternatives: [-p]
+        type: double
+        description: |
+          Shift features on the positive strand by this number of base pairs.
+          
+          **Usage:** Applied only to features on the + strand
+          **Requirement:** Must be used together with --minus_shift
+          **Interaction:** Cannot be used with --shift parameter
+          **Percentage mode:** When --pct is used, this becomes a fraction
+        example: 500
+
+      - name: --minus_shift
+        alternatives: [-m]
+        type: double
+        description: |
+          Shift features on the negative strand by this number of base pairs.
+          
+          **Usage:** Applied only to features on the - strand
+          **Requirement:** Must be used together with --plus_shift
+          **Interaction:** Cannot be used with --shift parameter
+          **Percentage mode:** When --pct is used, this becomes a fraction
+        example: -500
+
+      - name: --percentage
+        alternatives: [-pct]
+        type: boolean_true
+        description: |
+          Interpret shift values as fractions of feature length.
+          
+          **Effect:** Shift distances calculated as fraction × feature_length
+          **Example:** -s 0.5 shifts each feature by 50% of its length
+          **Applications:** Proportional shifts, relative positioning
+          **Default:** false (absolute base pair values)
+
+  - name: Output Options
+    arguments:
+      - name: --header
+        type: boolean_true
+        description: |
+          Include the original file header in output.
+          
+          **Usage:** Preserves metadata and format information from input
+          **Applications:** Maintaining file structure, format compatibility
+          **Formats:** Particularly useful for VCF and GFF files
+          **Default:** false (no header included)
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

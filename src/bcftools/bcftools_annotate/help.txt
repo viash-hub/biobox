@@ -1,8 +1,6 @@
+```bash
+docker run --rm quay.io/biocontainers/bcftools:1.22--h3a4d415_1 bcftools annotate --help 2>&1 | grep -v unrecognized
 ```
-bcftools annotate -h
-```
-
-annotate: option requires an argument -- 'h'
 
 About:   Annotate and edit VCF/BCF files.
 Usage:   bcftools annotate [options] VCF
@@ -24,7 +22,7 @@ Options:
        --no-version                Do not append version and command line to the header
    -o, --output FILE               Write output to a file [standard output]
    -O, --output-type u|b|v|z[0-9]  u/b: un/compressed BCF, v/z: un/compressed VCF, 0-9: compression level [v]
-       --pair-logic STR            Matching records by <snps|indels|both|all|some|exact>, see man page for details [some]
+       --pair-logic STR            Matching records by <snps|indels|both|all|some|exact|id>, see man page for details [some]
    -r, --regions REGION            Restrict to comma-separated list of regions
    -R, --regions-file FILE         Restrict to regions listed in FILE
        --regions-overlap 0|1|2     Include if POS in the region (0), record overlaps (1), variant overlaps (2) [1]
@@ -35,6 +33,8 @@ Options:
        --single-overlaps           Keep memory low by avoiding complexities arising from handling multiple overlapping intervals
    -x, --remove LIST               List of annotations (e.g. ID,INFO/DP,FORMAT/DP,FILTER) to remove (or keep with "^" prefix). See man page for details
        --threads INT               Number of extra output compression threads [0]
+   -v, --verbosity INT             Verbosity level
+   -W, --write-index[=FMT]         Automatically index the output files [off]
 
 Examples:
    http://samtools.github.io/bcftools/howtos/annotate.html

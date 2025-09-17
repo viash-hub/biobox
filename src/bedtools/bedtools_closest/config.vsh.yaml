@@ -1,0 +1,221 @@
+name: bedtools_closest
+namespace: bedtools
+description: |
+  Find the closest feature in file B for each feature in file A.
+  
+  For each interval in file A, this tool identifies the nearest feature in
+  file B, regardless of whether they overlap. Useful for associating genomic
+  features with their nearest neighbors, such as finding the closest gene
+  to each SNP or the nearest regulatory element to each promoter.
+  
+  **Default behavior:** Reports closest feature regardless of strand or overlap
+  **Distance reporting:** Optional distance calculation with various orientations
+  **Multiple hits:** Configurable handling of ties and k-nearest neighbors
+
+keywords: [Closest, Nearest, Distance, BED, GFF, VCF, Association]
+links:
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/closest.html
+  repository: https://github.com/arq5x/bedtools2
+  homepage: https://bedtools.readthedtools.io/en/latest/
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input_a
+        alternatives: [-a]
+        type: file
+        description: |
+          Query file in BED, GFF, or VCF format.
+          
+          For each feature in this file, the closest feature in file B
+          will be identified and reported.
+        required: true
+        example: queries.bed
+
+      - name: --input_b  
+        alternatives: [-b]
+        type: file
+        multiple: true
+        description: |
+          Database file(s) in BED, GFF, or VCF format.
+          
+          **Single file:** Find closest features in one database
+          **Multiple files:** Find closest features across multiple databases
+          **Format:** Same or different format as input A
+        required: true
+        example: ["database1.bed", "database2.bed"]
+    
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: |
+          Output file with closest feature results.
+          
+          Contains input A features with additional columns showing
+          the closest features from file(s) B, and optionally distance
+          and other metadata.
+        required: true
+        example: closest_features.bed
+
+  - name: Distance Options
+    arguments:
+      - name: --distance
+        alternatives: [-d]
+        type: boolean_true
+        description: |
+          Report distance to closest feature as extra column.
+          
+          **Distance calculation:** Always positive, 0 for overlapping features
+          **Use case:** When you need quantitative proximity measurements
+
+      - name: --distance_mode
+        alternatives: [-D]
+        type: string
+        choices: ["ref", "a", "b"]
+        description: |
+          Report signed distance with orientation awareness.
+          
+          **"ref":** Distance relative to reference genome coordinates
+          **"a":** Distance relative to strand of feature A  
+          **"b":** Distance relative to strand of feature B
+          
+          **Negative values:** Upstream features
+          **Positive values:** Downstream features
+        example: "ref"
+
+  - name: Filtering Options
+    arguments:
+      - name: --ignore_overlaps
+        alternatives: [-io]
+        type: boolean_true
+        description: |
+          Ignore overlapping features in B.
+          
+          Only consider features in B that do not overlap with A.
+          Useful for finding nearby but non-overlapping features.
+
+      - name: --ignore_upstream
+        alternatives: [-iu]
+        type: boolean_true
+        description: |
+          Ignore upstream features in B.
+          
+          **Requires:** --distance_mode parameter
+          **Effect:** Only consider downstream features
+          **Orientation:** Follows --distance_mode orientation rules
+
+      - name: --ignore_downstream
+        alternatives: [-id]
+        type: boolean_true
+        description: |
+          Ignore downstream features in B.
+          
+          **Requires:** --distance_mode parameter  
+          **Effect:** Only consider upstream features
+          **Orientation:** Follows --distance_mode orientation rules
+
+      - name: --force_upstream
+        alternatives: [-fu]
+        type: boolean_true
+        description: |
+          Choose first upstream feature when ties exist.
+          
+          **Requires:** --distance_mode parameter
+          **Tie handling:** Among equally close features, prefer upstream
+          **Orientation:** Follows --distance_mode orientation rules
+
+      - name: --force_downstream
+        alternatives: [-fd]
+        type: boolean_true
+        description: |
+          Choose first downstream feature when ties exist.
+          
+          **Requires:** --distance_mode parameter
+          **Tie handling:** Among equally close features, prefer downstream  
+          **Orientation:** Follows --distance_mode orientation rules
+
+      - name: --strand
+        alternatives: [-s]
+        type: boolean_true
+        description: |
+          Require same strandedness.
+          
+          Only consider features in B that are on the same strand as
+          the corresponding feature in A.
+
+      - name: --different_strand
+        alternatives: [-S]
+        type: boolean_true
+        description: |
+          Require different strandedness.
+          
+          Only consider features in B that are on the opposite strand
+          from the corresponding feature in A.
+
+  - name: Advanced Options
+    arguments:
+      - name: --k_closest
+        alternatives: [-k]
+        type: integer
+        description: |
+          Report k closest hits for each query.
+          
+          **Default:** 1 (single closest feature)
+          **Multiple hits:** Reports multiple closest features per query
+          **Tie handling:** All ties still reported based on --tie_mode
+        default: 1
+        example: 3
+
+      - name: --tie_mode
+        alternatives: [-t]
+        type: string
+        choices: ["all", "first", "last"]
+        description: |
+          How to handle ties for closest features.
+          
+          **"all":** Report all equally close features (default)
+          **"first":** Report first tie found in file B
+          **"last":** Report last tie found in file B
+        default: "all"
+        example: "first"
+
+      - name: --different_names
+        alternatives: [-N]
+        type: boolean_true
+        description: |
+          Require different names between query and hit.
+          
+          For BED files, compares the 4th column (name field).
+          Useful to avoid self-hits in self-comparisons.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run:
+          - "bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt"
+
+runners:
+  - type: executable
+  - type: nextflow

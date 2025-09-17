@@ -1,0 +1,179 @@
+name: bedtools_sample
+namespace: bedtools
+description: |
+  Take a random sample of records from BED/GFF/VCF/BAM files using reservoir sampling algorithm.
+  
+  bedtools sample uses the reservoir sampling algorithm to randomly select a specified number
+  of records from genomic interval files. This is particularly useful for creating representative
+  subsets of large datasets for testing, quality control, or downstream analysis.
+  
+  This tool is commonly used for:
+  - Creating representative subsets of large genomic datasets
+  - Quality control and validation with smaller sample sizes
+  - Testing pipelines with manageable data volumes
+  - Generating training datasets for machine learning applications
+  - Reducing file sizes while maintaining statistical properties
+
+keywords: [genomics, sampling, subset, reservoir, random, quality-control]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/sample.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/sample.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: [-i]
+        type: file
+        description: |
+          Input file to sample from.
+          
+          **Format:** BED, GFF, VCF, or BAM file
+          **Content:** Genomic intervals or alignments to sample from
+          **Usage:** Records will be randomly selected from this file
+          **Requirements:** File must be in valid format for the specified type
+        required: true
+        example: large_dataset.bed
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file containing the sampled records.
+          
+          **Format:** Same format as input file
+          **Content:** Randomly selected subset of input records
+          **Size:** Contains exactly n records (unless input has fewer records)
+        required: true
+        direction: output
+        example: sampled_subset.bed
+
+  - name: Sampling Options
+    arguments:
+      - name: --number
+        alternatives: [-n]
+        type: integer
+        description: |
+          Number of records to randomly sample.
+          
+          **Default:** 1,000,000
+          **Range:** 1 to total number of records in input
+          **Usage:** If input has fewer records than requested, all records are returned
+          **Memory:** All selected records held in memory before output
+        example: 10000
+
+      - name: --seed
+        type: integer
+        description: |
+          Integer seed for random number generation.
+          
+          **Usage:** Ensures reproducible random sampling
+          **Range:** Any integer value
+          **Default:** Automatically chosen seed (non-reproducible)
+          **Applications:** Reproducible research, testing, validation
+        example: 42
+
+  - name: Strand Options
+    arguments:
+      - name: --strand_requirement
+        alternatives: [-s]
+        type: string
+        description: |
+          Require records from specific strand orientation.
+          
+          **Values:** "forward", "reverse", or unspecified for both strands
+          **Usage:** Only sample records from the specified strand
+          **Requirements:** Input must contain strand information
+          **Applications:** Strand-specific analyses, RNA-seq processing
+        choices: ["forward", "reverse"]
+        example: forward
+
+  - name: Output Format Options
+    arguments:
+      - name: --output_bed
+        alternatives: [-bed]
+        type: boolean_true
+        description: |
+          Convert BAM input to BED format output.
+          
+          **Usage:** Only applicable when input is BAM format
+          **Effect:** Output genomic coordinates in BED format instead of BAM
+          **Applications:** Converting alignment data to interval format
+          **Default:** false (maintain input format)
+
+      - name: --uncompressed_bam
+        alternatives: [-ubam]
+        type: boolean_true
+        description: |
+          Write uncompressed BAM output.
+          
+          **Usage:** Only applicable when input is BAM format
+          **Effect:** Output BAM file without compression
+          **Trade-off:** Faster writing but larger file size
+          **Default:** false (compressed BAM output)
+
+      - name: --include_header
+        alternatives: [-header]
+        type: boolean_true
+        description: |
+          Include the original file header in output.
+          
+          **Usage:** Preserves metadata from input file
+          **Applications:** Maintaining file structure and annotations
+          **Formats:** Particularly relevant for VCF and GFF files
+          **Default:** false (no header included)
+
+  - name: Performance Options
+    arguments:
+      - name: --no_buffer
+        alternatives: [-nobuf]
+        type: boolean_true
+        description: |
+          Disable output buffering for real-time processing.
+          
+          **Effect:** Each line printed immediately instead of buffered
+          **Trade-off:** Slower output but enables real-time processing
+          **Applications:** Pipeline integration, streaming processing
+          **Default:** false (buffered output for performance)
+
+      - name: --input_buffer
+        alternatives: [-iobuf]
+        type: string
+        description: |
+          Amount of memory to allocate for input buffer.
+          
+          **Format:** Integer with optional K/M/G suffix
+          **Examples:** "1G", "512M", "2048K"
+          **Usage:** Larger buffers can improve I/O performance
+          **Note:** Currently has no effect with compressed files
+        example: 1G
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

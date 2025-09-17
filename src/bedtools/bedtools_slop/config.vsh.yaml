@@ -1,0 +1,171 @@
+name: bedtools_slop
+namespace: bedtools
+description: |
+  Extend genomic intervals by adding flanking sequences (slop) to each feature.
+  
+  bedtools slop increases the size of genomic intervals by adding a specified number
+  of base pairs to the start and/or end coordinates. The extension can be symmetric 
+  (same on both sides) or asymmetric (different amounts on each side), and can be 
+  strand-aware for directional features.
+  
+  This tool is commonly used for:
+  - Creating flanking regions around features of interest
+  - Expanding intervals for motif discovery or regulatory analysis
+  - Generating extended regions for ChIP-seq peak calling
+  - Creating buffer zones around genomic features
+  - Preparing regions for downstream intersection analysis
+  - Converting point features to intervals with context
+
+keywords: [genomics, intervals, extend, flanking, slop, expand, regions]
+links:
+  homepage: https://bedtools.readthedocs.io/en/latest/content/tools/slop.html
+  documentation: https://bedtools.readthedocs.io/en/latest/content/tools/slop.html
+  repository: https://github.com/arq5x/bedtools2
+references:
+  doi: 10.1093/bioinformatics/btq033
+license: MIT
+requirements:
+  commands: [bedtools]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        alternatives: [-i]
+        type: file
+        description: |
+          Input file containing genomic intervals to extend.
+          
+          **Format:** BED, GFF, or VCF file
+          **Content:** Genomic intervals that will be extended with flanking sequences
+          **Requirements:** Must contain valid genomic coordinates
+          **Usage:** Each interval will be expanded according to specified parameters
+        required: true
+        example: features.bed
+
+      - name: --genome
+        alternatives: [-g]
+        type: file
+        description: |
+          Genome file defining chromosome sizes for boundary constraints.
+          
+          **Format:** Tab-delimited text file with chromosome names and sizes
+          **Content:** Each line contains: <chromName><TAB><chromSize>
+          **Usage:** Prevents extended coordinates from exceeding chromosome boundaries
+          **Creation:** Can be generated with 'samtools faidx' or UCSC Table Browser
+          **Example format:**
+            chr1    249250621
+            chr2    243199373
+        required: true
+        example: hg19.genome
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: |
+          Output file with extended genomic intervals.
+          
+          **Format:** Same format as input file
+          **Content:** Original intervals with extended coordinates
+          **Boundaries:** Coordinates clamped to [0, chromosome_length] range
+        required: true
+        direction: output
+        example: extended_features.bed
+
+  - name: Extension Options
+    arguments:
+      - name: --both
+        alternatives: [-b]
+        type: double
+        description: |
+          Extend intervals by this number of base pairs in both directions.
+          
+          **Usage:** Symmetric extension - same amount added to start and end
+          **Interaction:** Cannot be used together with --left and --right
+          **Percentage mode:** When --pct is used, this becomes a fraction (e.g., 0.1 = 10%)
+          **Boundary handling:** Results clamped to valid chromosome coordinates
+        example: 1000
+
+      - name: --left
+        alternatives: [-l]
+        type: double
+        description: |
+          Number of base pairs to subtract from the start coordinate.
+          
+          **Usage:** Extends the interval upstream (toward lower coordinates)
+          **Requirement:** Must be used together with --right
+          **Interaction:** Cannot be used with --both parameter
+          **Percentage mode:** When --pct is used, this becomes a fraction
+          **Strand behavior:** Modified by --strand option
+        example: 500
+
+      - name: --right
+        alternatives: [-r]
+        type: double
+        description: |
+          Number of base pairs to add to the end coordinate.
+          
+          **Usage:** Extends the interval downstream (toward higher coordinates)
+          **Requirement:** Must be used together with --left
+          **Interaction:** Cannot be used with --both parameter
+          **Percentage mode:** When --pct is used, this becomes a fraction
+          **Strand behavior:** Modified by --strand option
+        example: 300
+
+      - name: --strand_aware
+        alternatives: [-s]
+        type: boolean_true
+        description: |
+          Define left and right extensions based on feature strand.
+          
+          **Effect:** For negative strand features, left extends downstream, right extends upstream
+          **Requirements:** Input must contain strand information (6th column in BED)
+          **Usage:** Enables directional, strand-specific extension
+          **Default:** false (extension based on coordinate direction only)
+
+      - name: --percentage
+        alternatives: [-pct]
+        type: boolean_true
+        description: |
+          Interpret extension values as fractions of feature length.
+          
+          **Effect:** Extension distances calculated as fraction × feature_length
+          **Example:** -b 0.5 extends each feature by 50% of its length in each direction
+          **Applications:** Proportional extensions, relative scaling
+          **Default:** false (absolute base pair values)
+
+  - name: Output Options
+    arguments:
+      - name: --header
+        type: boolean_true
+        description: |
+          Include the original file header in output.
+          
+          **Usage:** Preserves metadata and format information from input
+          **Applications:** Maintaining file structure, format compatibility
+          **Formats:** Particularly useful for VCF and GFF files
+          **Default:** false (no header included)
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bedtools:2.31.1--h13024bc_3
+    setup:
+      - type: docker
+        run: |
+          bedtools --version 2>&1 | head -1 | sed 's/.*bedtools v/bedtools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

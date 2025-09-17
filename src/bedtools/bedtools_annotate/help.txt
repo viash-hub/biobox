@@ -1,0 +1,29 @@
+```bash
+docker run --rm quay.io/biocontainers/bedtools:2.31.1--h13024bc_3 bedtools annotate -h
+```
+
+Tool:    bedtools annotate (aka annotateBed)
+Version: v2.31.1
+Summary: Annotates the depth & breadth of coverage of features from mult. files
+	 on the intervals in -i.
+
+Usage:   bedtools annotate [OPTIONS] -i <bed/gff/vcf> -files FILE1 FILE2..FILEn
+
+Options: 
+	-names	A list of names (one / file) to describe each file in -i.
+		These names will be printed as a header line.
+
+	-counts	Report the count of features in each file that overlap -i.
+		- Default is to report the fraction of -i covered by each file.
+
+	-both	Report the counts followed by the % coverage.
+		- Default is to report the fraction of -i covered by each file.
+
+	-s	Require same strandedness.  That is, only counts overlaps
+		on the _same_ strand.
+		- By default, overlaps are counted without respect to strand.
+
+	-S	Require different strandedness.  That is, only count overlaps
+		on the _opposite_ strand.
+		- By default, overlaps are counted without respect to strand.
+
