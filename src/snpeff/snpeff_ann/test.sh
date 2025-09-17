@@ -7,6 +7,22 @@ set -eo pipefail
 
 ###########################################################################
 
+# create temporary directory and clean up on exit
+TMPDIR=$(mktemp -d "$meta_temp_dir/$meta_name-XXXXXX")
+echo "> Created $TMPDIR"
+function clean_up {
+  [[ -d "$TMPDIR" ]] && rm -rf "$TMPDIR"
+}
+trap clean_up EXIT
+DATA_DIR="$TMPDIR/data"
+mkdir "$DATA_DIR"
+TEST_GENOME="$DATA_DIR/test"
+mkdir "$TEST_GENOME"
+echo "Downloading test data"
+curl -o - https://ftp.ensembl.org/pub/release-115/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz > "$TEST_GENOME/sequences.fa.gz"
+curl -o - https://ftp.ensembl.org/pub/release-115/gtf/homo_sapiens/Homo_sapiens.GRCh38.115.chr.gtf.gz | zcat | sed -n '/^[#1]\s/p' | gzip > "$TEST_GENOME/genes.gtf.gz"
+snpEff build -dataDir "$DATA_DIR" -noCheckCds -noCheckProtein -gtf22 -noLog -configOption "test.genome=GRCh38Chr1" -v test 
+
 # Test 1: Run SnpEff with only required parameters
 
 mkdir test1
@@ -14,7 +30,9 @@ pushd test1 > /dev/null # cd test1 (stack)
 
 echo "> Run Test 1: required parameters"
 "$meta_executable" \
-  --genome_version GRCh38.86 \
+  --genome_version test \
+  --data_dir "$DATA_DIR" \
+  --config_option "test.genome=GRCh38Chr1" \
   --input "$meta_resources_dir/test_data/cancer.vcf" \
   --output out.vcf
 
@@ -48,7 +66,9 @@ pushd test2 > /dev/null
 
 echo "> Run Test 2: different input + options"
 "$meta_executable" \
-  --genome_version GRCh38.86 \
+  --genome_version test \
+  --data_dir "$DATA_DIR" \
+  --config_option "test.genome=GRCh38Chr1" \
   --input "$meta_resources_dir/test_data/test.vcf" \
   --interval "$meta_resources_dir/test_data/my_annotations.bed" \
   --no_stats \
@@ -87,9 +107,11 @@ mkdir temp
 
 echo "> Run Test 3: move output files"
 "$meta_executable" \
-  --genome_version GRCh38.86 \
+  --genome_version test \
   --input "$meta_resources_dir/test_data/test.vcf" \
   --output output.vcf \
+  --data_dir "$DATA_DIR" \
+  --config_option "test.genome=GRCh38Chr1" \
   --summary temp \
   --genes temp
 
