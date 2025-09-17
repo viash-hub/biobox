@@ -128,7 +128,7 @@
 
 * Update README (PR #177).
 
-* Add authors to package config and update author information (PR #180).
+* Update author information (PR #180, PR #200).
 
 * `fastqc`: add `--outdir` argument (PR #181).
 
