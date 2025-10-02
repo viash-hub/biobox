@@ -6,7 +6,7 @@
 
 * `falco`: Update falco to 1.2.5 (PR #201).
 
-* `bases2fastq`: Bump from 2.2.0 to 2.2.1 (PR #)
+* `bases2fastq`: Bump from 2.2.0 to 2.2.1 (PR #202).
 
 # biobox 0.4.0
 
