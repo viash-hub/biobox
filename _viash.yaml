@@ -1,5 +1,5 @@
 name: biobox
-version: v0.4.0
+version: v0.4.1
 summary: |
   A curated collection of high-quality, standalone bioinformatics components built with [Viash](https://viash.io).
 description: |
