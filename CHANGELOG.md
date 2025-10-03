@@ -1,6 +1,4 @@
-# unreleased
-
-<!-- Add new changes here before release -->
+# biobox 0.4.1
 
 ## MINOR CHANGES
 
