@@ -1,0 +1,139 @@
+name: filter_vep
+namespace: ensembl_vep
+description: |
+  Filter and post-process VEP output by consequence type, phenotype, clinical significance, and more.
+  
+  This script filters VEP output files based on various criteria including:
+  - Consequence types and predicted effects
+  - Clinical significance and phenotype associations
+  - Frequency thresholds from population databases
+  - Quality metrics and variant properties
+  
+  See the [Filter VEP documentation](http://www.ensembl.org/info/docs/tools/vep/script/vep_filter.html) for details.
+
+keywords: [variant effect prediction, filtering, annotation, genomics, post-processing]
+links:
+  homepage: https://www.ensembl.org/info/docs/tools/vep/index.html
+  documentation: http://www.ensembl.org/info/docs/tools/vep/script/vep_filter.html
+  repository: https://github.com/Ensembl/ensembl-vep
+license: Apache-2.0
+requirements:
+  commands: [filter_vep]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Inputs"
+    arguments:
+      - name: --input_file
+        alternatives: [-i]
+        type: file
+        description: |
+          Input VEP result file to filter.
+          
+          **Format:** VEP tab-delimited or JSON format output  
+          **Compression:** Supports gzip compressed files (.gz)
+        required: true
+        example: "vep_results.txt"
+        
+      - name: --format
+        type: string
+        description: |
+          Specify input file format.
+        choices: ["tab", "json"]
+        default: "tab"
+        required: false
+
+  - name: "Outputs"
+    arguments:
+      - name: --output_file
+        alternatives: [-o]
+        type: file
+        direction: output
+        description: |
+          Output filtered results to file.
+          
+          **Format:** Same format as input file  
+          **Compression:** Automatically gzip if filename ends with .gz
+        required: true
+        example: "filtered_results.txt"
+
+  - name: "Filtering Options"
+    arguments:
+      - name: --filter
+        type: string
+        multiple: true
+        description: |
+          Add filter condition. Multiple filters are joined with AND.
+          
+          **Syntax:** field operator value  
+          **Operators:** eq, ne, gt, gte, lt, lte, match, in, is, exists  
+          **Examples:**
+          
+          - "Consequence eq missense_variant"
+          - "MAX_AF lt 0.01"
+          - "IMPACT match HIGH"
+        required: false
+        example: ["Consequence eq missense_variant", "MAX_AF lt 0.01"]
+        
+      - name: --only_matched
+        type: boolean_true
+        description: |
+          In VCF files, only output matched variants.
+          
+          **Default behavior:** Output all variants, flag matches  
+          **With flag:** Only output variants passing filters
+
+  - name: "Annotation Options"
+    arguments:
+      - name: --ontology
+        type: boolean_true
+        description: |
+          Use Sequence Ontology (SO) to match consequence terms.
+          
+          **Enables:** Hierarchical matching of consequence types  
+          **Example:** "transcript_variant" matches "missense_variant"
+          
+      - name: --count
+        alternatives: [-c]
+        type: boolean_true
+        description: |
+          Print only a count of matched variants.
+          
+          **Output:** Single number instead of filtered variants  
+          **Use case:** Quick summary of filter results
+
+  - name: "Advanced Options"  
+    arguments:
+      - name: --force_valid_header
+        type: boolean_true
+        description: |
+          Force output of valid VCF header when using --only_matched.
+          
+          **Use case:** Ensure downstream tools can parse filtered VCF
+          
+      - name: --test
+        type: integer
+        description: |
+          Quick test on first n variants.
+        required: false
+        example: 100
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+engines:
+  - type: docker
+    image: quay.io/biocontainers/ensembl-vep:115.2--pl5321h2a3209d_1
+    setup:
+      - type: docker
+        run:
+          - "filter_vep --help | head -1 | sed 's/.*filter_vep.*/filter_vep: 115.2/' > /var/software_versions.txt"
+runners:
+  - type: executable
+  - type: nextflow
