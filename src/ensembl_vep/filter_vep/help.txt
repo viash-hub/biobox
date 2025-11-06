@@ -1,0 +1,57 @@
+```bash
+docker run --rm quay.io/biocontainers/ensembl-vep:115.2--pl5321h2a3209d_1 filter_vep --help
+```
+
+#------------#
+# filter_vep #
+#------------#
+
+http://www.ensembl.org/info/docs/tools/vep/script/vep_filter.html
+
+Usage:
+./filter_vep [arguments]
+  
+--help               -h   Print usage message and exit
+
+--input_file [file]  -i   Specify the input file (i.e. the VEP results file).
+                          If no input file is specified, the script will
+                          attempt to read from STDIN. Input may be gzipped - to
+                          force the script to read a file as gzipped, use --gz
+--format [vcf|tab]        Specify input file format (tab for any tab-delimited
+                          format, including default VEP output format)
+
+--output_file [file] -o   Specify the output file to write to. If no output file
+                          is specified, the script will write to STDOUT
+--force_overwrite         Force the script to overwrite the output file if it
+                          already exists
+
+--filter [filters]   -f   Add filter. Multiple --filter flags may be used, and
+                          are treated as logical ANDs, i.e. all filters must
+                          pass for a line to be printed
+
+--list               -l   List allowed fields from the input file
+--count              -c   Print only a count of matched lines
+
+--only_matched            In VCF files, the CSQ field that contains the
+                          consequence data will often contain more than one
+                          "block" of consequence data, where each block
+                          corresponds to a variant/feature overlap. Using
+                          --only_matched will remove blocks that do not pass the
+                          filters. By default, the script prints out the entire
+                          VCF line if any of the blocks pass the filters.
+
+--vcf_info_field [key]    With VCF input files, by default filter_vep expects to
+                          find VEP annotations encoded in the CSQ INFO key; VEP
+                          itself can be configured to write to a different key
+                          (with the equivalent --vcf_info_field flag). Use this
+                          flag to change the INFO key VEP expects to decode.
+                          
+--ontology           -y   Use Sequence Ontology to match consequence terms. Use
+                          with operator "is" to match against all child terms of
+                          your value.
+                          e.g. "Consequence is coding_sequence_variant" will
+                          match missense_variant, synonymous_variant etc.
+                          Requires database connection; defaults to connecting
+                          to ensembldb.ensembl.org. Use --host, --port, --user,
+                          --password, --version as per ./vep to change
+                          connection parameters.

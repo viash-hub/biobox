@@ -1,0 +1,161 @@
+name: vep_install
+namespace: ensembl_vep
+description: |
+  Install Ensembl VEP cache data, FASTA files, and plugins for variant effect prediction.
+  
+  The VEP installer script downloads and installs reference data required by VEP, including:
+  - Cache files containing transcript and regulatory data
+  - FASTA files for reference sequences  
+  - VEP plugins for extended functionality
+  
+  See the [VEP installation documentation](http://www.ensembl.org/info/docs/variation/vep/vep_script.html#installer) for details.
+
+keywords: [variant effect prediction, annotation, genomics, installation, cache]
+links:
+  homepage: https://www.ensembl.org/info/docs/tools/vep/index.html
+  documentation: http://www.ensembl.org/info/docs/variation/vep/vep_script.html#installer
+  repository: https://github.com/Ensembl/ensembl-vep
+license: Apache-2.0
+requirements:
+  commands: [vep_install]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Outputs"
+    arguments:
+      - name: --destdir
+        type: file
+        direction: output
+        description: |
+          Set destination directory for API install.
+        default: "./"
+        required: false
+        example: "/opt/vep"
+      
+      - name: --cachedir  
+        type: file
+        direction: output
+        description: |
+          Set destination directory for cache files.
+        default: "/root/.vep/"
+        required: false
+        example: "/data/vep_cache"
+        
+      - name: --pluginsdir
+        type: file
+        direction: output  
+        description: |
+          Set destination directory for VEP plugins files.
+        default: "/root/.vep/Plugins/"
+        required: false
+        example: "/data/vep_plugins"
+
+  - name: "Basic Options"
+    arguments:
+      - name: --cache_version
+        type: integer
+        description: |
+          Set data (cache, FASTA) version to install.
+        default: 115
+        required: false
+        example: 115
+
+  - name: "Installation Options"
+    arguments:
+      - name: --auto
+        type: string
+        description: |
+          Run installer without user prompts. Use combinations of:
+          
+          - "a" (API + Faidx/htslib)
+          - "l" (Faidx/htslib only)
+          - "c" (cache)
+          - "f" (FASTA)
+          - "p" (plugins)
+          
+          Example: "ac" for API and cache.
+        required: false
+        example: "ac"
+        
+      - name: --species
+        type: string
+        description: |
+          Comma-separated list of species to install when using --auto.
+        required: false
+        example: "homo_sapiens,mus_musculus"
+        multiple: true
+        
+      - name: --assembly
+        type: string
+        description: |
+          Assembly name to use if more than one during --auto.
+        required: false
+        example: "GRCh38"
+
+  - name: "Plugin Options"
+    arguments:
+      - name: --plugins
+        type: string
+        description: |
+          Comma-separated list of plugins to install when using --auto.  
+          Use "list" to list all plugins or "all" to install all available plugins.
+        required: false
+        example: "CADD,dbNSFP"
+        multiple: true
+
+  - name: "Advanced Options"
+    arguments:
+      - name: --no_update
+        type: boolean_true
+        description: |
+          Do not check for updates to ensembl-vep or API.
+      
+      - name: --no_plugins
+        type: boolean_true
+        description: |
+          Skip plugin installation.
+          
+      - name: --no_htslib
+        type: boolean_true
+        description: |
+          Do not attempt to install Faidx/htslib.
+          
+      - name: --no_bioperl
+        type: boolean_true
+        description: |
+          Do not install BioPerl.
+          
+      - name: --prefer_bin
+        type: boolean_true
+        description: |
+          Use this if the installer fails with out of memory errors.
+          
+      - name: --convert
+        type: boolean_true
+        description: |
+          Convert downloaded caches to use tabix for retrieving co-located variants (requires tabix).
+          
+      - name: --quiet
+        type: boolean_true
+        description: |
+          Do not write any status output when using --auto.
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+engines:
+  - type: docker
+    image: quay.io/biocontainers/ensembl-vep:115.2--pl5321h2a3209d_1
+    setup:
+      - type: docker
+        run: |
+          vep_install --help | head -1 | sed 's/.*INSTALLER.*/vep_install: 115.2/' > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
