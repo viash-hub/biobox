@@ -1,3 +1,12 @@
+# biobox unreleased
+
+## NEW FUNCTIONALITY
+
+* `ensembl_vep`: Added Ensembl Variant Effect Predictor (VEP) support for variant annotation and filtering (PR #205):
+  * `ensembl_vep/vep_install`: Install VEP cache data, FASTA files, and plugins for variant effect prediction.
+  * `ensembl_vep/filter_vep`: Filter and post-process VEP output by consequence type, phenotype, clinical significance, and more.
+  * `ensembl_vep/vep`: Determine the effect of variants on genes, transcripts, and protein sequences with comprehensive annotation options.
+
 # biobox 0.4.1
 
 ## MINOR CHANGES
