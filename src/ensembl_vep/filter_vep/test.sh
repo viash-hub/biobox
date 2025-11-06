@@ -23,35 +23,37 @@ EOF
 }
 
 # Test 1: List available fields functionality
-# Test 1: Basic format parameter functionality
-log "Starting TEST 1: Format parameter test"
+# Test 1: Basic filtering with consequence
+log "Starting TEST 1: Basic consequence filtering"
 create_test_vep_output "$meta_temp_dir/test_input.txt"
 
 "$meta_executable" \
   --input_file "$meta_temp_dir/test_input.txt" \
-  --output_file "$meta_temp_dir/format_output.txt" \
-  --format tab > "$meta_temp_dir/format_test.txt" 2>&1 || true
-
-check_file_exists "$meta_temp_dir/format_test.txt" "format test output"
-check_file_exists "$meta_temp_dir/format_output.txt" "format output file"
-log "✅ TEST 1 completed successfully"
-
-# Test 2: Basic filtering with consequence
-log "Starting TEST 2: Basic consequence filtering"
-create_test_vep_output "$meta_temp_dir/test_input2.txt"
-
-"$meta_executable" \
-  --input_file "$meta_temp_dir/test_input2.txt" \
   --output_file "$meta_temp_dir/filtered_output1.txt" \
-  --filter "Consequence eq missense_variant" 2>&1 || true
+  --filter "Consequence eq missense_variant" > "$meta_temp_dir/filter_test.txt" 2>&1 || true
 
-check_file_exists "$meta_temp_dir/filtered_output1.txt" "filtered output"
+check_file_exists "$meta_temp_dir/filter_test.txt" "filter test output"
+check_file_exists "$meta_temp_dir/filtered_output1.txt" "filtered output file"
 # Check that missense variant line is present
 if grep -q "missense_variant" "$meta_temp_dir/filtered_output1.txt"; then
   log "✅ Missense variant found in filtered output"
 else
   log "⚠️  Missense variant not found in filtered output (may be expected depending on filter logic)"
 fi
+log "✅ TEST 1 completed successfully"
+
+# Test 2: Format parameter with filtering
+log "Starting TEST 2: Format parameter test"
+create_test_vep_output "$meta_temp_dir/test_input2.txt"
+
+"$meta_executable" \
+  --input_file "$meta_temp_dir/test_input2.txt" \
+  --output_file "$meta_temp_dir/format_output.txt" \
+  --format tab \
+  --filter "IMPACT eq MODERATE" > "$meta_temp_dir/format_test.txt" 2>&1 || true
+
+check_file_exists "$meta_temp_dir/format_test.txt" "format test output"
+check_file_exists "$meta_temp_dir/format_output.txt" "format output file"
 log "✅ TEST 2 completed successfully"
 
 # Test 3: Count mode
