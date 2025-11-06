@@ -1,33 +1,31 @@
 ```
-docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger mkref -h
+docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger aggr -h
 ```
 
-Prepare a reference for use with 10x analysis software. Requires a GTF and FASTA
+Aggregate data from multiple Cell Ranger runs
 
-Usage: cellranger mkref [OPTIONS] --genome <GENOME_NAMES> --fasta <FASTA_FILES> --genes <GTF_FILES>
+Usage: cellranger aggr [OPTIONS] --id <ID> --csv <CSV>
 
 Options:
-      --genome <GENOME_NAMES>
-          Unique genome name, used to name output folder [a-zA-Z0-9_-]+. Specify
-          multiple genomes by specifying this argument multiple times; the
-          output folder will be <name1>_and_<name2>
-      --fasta <FASTA_FILES>
-          Path to FASTA file containing your genome reference. Specify multiple
-          genomes by specifying this argument multiple times
-      --genes <GTF_FILES>
-          Path to genes GTF file containing annotated genes for your genome
-          reference. Specify multiple genomes by specifying this argument
-          multiple times
-      --nthreads <NUM_THREADS>
-          Number of threads used during STAR genome index generation. Defaults
-          to 1 [default: 1]
-      --memgb <MEM_GB>
-          Maximum memory (GB) used [default: 16]
-      --ref-version <REF_VERSION>
-          Optional reference version string to include with reference
+      --id <ID>
+          A unique run id and output folder name [a-zA-Z0-9_-]+
+      --description <TEXT>
+          Sample description to embed in output files [default: ]
+      --csv <CSV>
+          Path of CSV file enumerating 'cellranger count/vdj/multi' outputs
+      --normalize <MODE>
+          Library depth normalization mode [default: mapped] [possible values:
+          mapped, none]
+      --nosecondary
+          Disable secondary analysis, e.g. clustering
       --dry
           Do not execute the pipeline. Generate a pipeline invocation (.mro)
           file and stop
+      --min-crispr-umi <NUM>
+          Minimum CRISPR UMI threshold [default: 3]
+      --enable-tsne <true|false>
+          Enable t-SNE projection [default: false] [possible values: true,
+          false]
       --jobmode <MODE>
           Job manager to use. Valid options: local (default), sge, lsf, slurm or
           path to a .template file. Search for help on "Cluster Mode" at

@@ -1,0 +1,25 @@
+```
+docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger mat2csv -h
+```
+
+Tool for converting feature-barcode matrices from sparse format to dense.
+
+CSV format, for use by external programs.
+
+The commands below should be preceded by 'cellranger':
+
+Usage:
+    mat2csv <input_path> <output_csv> [--genome=GENOME]
+    mat2csv -h | --help | --version
+
+Arguments:
+    input_path          Path to a Cell Ranger feature-barcode matrix. Can be
+                            either a feature-barcode h5 file (recommended) or a
+                            path to a MEX Cell Ranger output folder.
+    output_csv          Output CSV file.
+
+Options:
+    --genome=GENOME     Specify which genome to extract. This only applies to
+                            multi-genome h5 input files.
+    -h --help           Show this message.
+    --version           Show version.

@@ -1,30 +1,42 @@
 ```
-docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger mkref -h
+docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger reanalyze -h
 ```
 
-Prepare a reference for use with 10x analysis software. Requires a GTF and FASTA
+Re-run secondary analysis (dimensionality reduction, clustering, etc)
 
-Usage: cellranger mkref [OPTIONS] --genome <GENOME_NAMES> --fasta <FASTA_FILES> --genes <GTF_FILES>
+Usage: cellranger reanalyze [OPTIONS] --id <ID> --matrix <MATRIX_H5>
 
 Options:
-      --genome <GENOME_NAMES>
-          Unique genome name, used to name output folder [a-zA-Z0-9_-]+. Specify
-          multiple genomes by specifying this argument multiple times; the
-          output folder will be <name1>_and_<name2>
-      --fasta <FASTA_FILES>
-          Path to FASTA file containing your genome reference. Specify multiple
-          genomes by specifying this argument multiple times
-      --genes <GTF_FILES>
-          Path to genes GTF file containing annotated genes for your genome
-          reference. Specify multiple genomes by specifying this argument
-          multiple times
-      --nthreads <NUM_THREADS>
-          Number of threads used during STAR genome index generation. Defaults
-          to 1 [default: 1]
-      --memgb <MEM_GB>
-          Maximum memory (GB) used [default: 16]
-      --ref-version <REF_VERSION>
-          Optional reference version string to include with reference
+      --id <ID>
+          A unique run id and output folder name [a-zA-Z0-9_-]+
+      --description <TEXT>
+          Sample description to embed in output files [default: ]
+      --matrix <MATRIX_H5>
+          A feature-barcode matrix containing data for one genome. Should be the
+          filtered version, unless using --force-cells
+      --params <PARAMS_CSV>
+          A CSV file specifying analysis parameters. Optional
+      --barcodes <BARCODES_CSV>
+          A CSV file containing a list of cell barcodes to use for reanalysis,
+          e.g. barcodes exported from Loupe Browser. Optional
+      --genes <GENES_CSV>
+          A CSV file containing a list of feature IDs to use for reanalysis. For
+          gene expression, this should correspond to the gene_id field in the
+          reference GTF should be \(e.g. ENSG... for ENSEMBL-based references\).
+          Optional
+      --exclude-genes <GENES_CSV>
+          A CSV file containing a list of feature IDs to exclude from
+          reanalysis. For gene expression, this should correspond to the gene_id
+          field in the reference GTF \(e.g., ENSG... for ENSEMBL-based
+          references\). The exclusion is applied after --genes. Optional
+      --agg <AGGREGATION_CSV>
+          If the input matrix was produced by 'aggr', you may pass the same
+          aggregation CSV in order to retain per-library tag information in the
+          resulting .cloupe file.  This argument is required to enable chemistry
+          batch correction. Optional
+      --force-cells <NUM>
+          Force pipeline to use this number of cells, bypassing cell calling
+          algorithm. [MINIMUM: 10]
       --dry
           Do not execute the pipeline. Generate a pipeline invocation (.mro)
           file and stop
