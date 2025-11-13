@@ -190,10 +190,24 @@ debug
 # individual files.
 ###########################################################
 
-if [[ -z $par_fasta ]]; then
-  ext="fastq"
+# Extract extension from output pattern, preserving compression if specified
+echo ">> Determining output file extension from pattern: $par_output"
+
+# Extract everything after the last '.' in the filename part of the pattern
+# This handles patterns like "*.fastq.gz", "*.fasta.bz2", etc.
+filename=$(basename "$par_output")
+if [[ "$filename" == *.* ]]; then
+  # Remove everything up to and including the first dot
+  ext="${filename#*.}"
+  echo "  Detected extension from pattern: .$ext"
 else
-  ext="fasta"
+  # Default to fastq/fasta based on --fasta flag
+  if [[ -z "$par_fasta" ]]; then
+    ext="fastq"
+  else
+    ext="fasta"
+  fi
+  echo "  Using default extension: .$ext"
 fi
 
 demultiplex_mode="$par_demultiplex_mode"

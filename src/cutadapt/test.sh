@@ -255,6 +255,149 @@ cd ..
 echo
 
 #############################################
+mkdir test_gzip_compression_se
+cd test_gzip_compression_se
+
+echo "#############################################"
+echo "> Test gzip compression with single-end data"
+
+cat > example.fastq <<'EOF'
+@read1
+ACGTACGTACGTAAAAA
++
+IIIIIIIIIIIIIIIII
+@read2
+ACGTACGTACGTCCCCC
++
+IIIIIIIIIIIIIIIII
+@read3
+ACGTACGTACGTGGGGG
++
+IIIIIIIIIIIIIIIII
+EOF
+
+"$meta_executable" \
+  --report minimal \
+  --output "out_test_gz/*.fastq.gz" \
+  --adapter AAAAA \
+  --input example.fastq \
+  --json
+
+echo ">> Checking gzipped output"
+assert_file_exists "report.json"
+assert_file_exists "out_test_gz/trimmed_001.fastq.gz"
+
+echo ">> Check if gzipped output is not empty"
+assert_file_not_empty "report.json"
+assert_file_not_empty "out_test_gz/trimmed_001.fastq.gz"
+
+echo ">> Check if file is actually gzipped"
+file out_test_gz/trimmed_001.fastq.gz | grep -q "gzip compressed" || { echo "File is not gzipped" && exit 1; }
+
+echo ">> Check contents by decompressing"
+zcat out_test_gz/trimmed_001.fastq.gz | head -1 | grep -q "@read1" || { echo "Decompressed file does not contain expected content" && exit 1; }
+
+cd ..
+echo
+
+#############################################
+mkdir test_gzip_compression_pe
+cd test_gzip_compression_pe
+
+echo "#############################################"
+echo "> Test gzip compression with paired-end data"
+
+cat > example_R1.fastq <<'EOF'
+@read1
+ACGTACGTACGTAAAAA
++
+IIIIIIIIIIIIIIIII
+@read2
+ACGTACGTACGTCCCCC
++
+IIIIIIIIIIIIIIIII
+EOF
+
+cat > example_R2.fastq <<'EOF'
+@read1
+ACGTACGTACGTGGGGG
++
+IIIIIIIIIIIIIIIII
+@read2
+ACGTACGTACGTTTTTT
++
+IIIIIIIIIIIIIIIII
+EOF
+
+"$meta_executable" \
+  --report minimal \
+  --output "out_test_gz_pe/*.fastq.gz" \
+  --adapter AAAAA \
+  --adapter_r2 GGGGG \
+  --input example_R1.fastq \
+  --input_r2 example_R2.fastq \
+  --json
+
+echo ">> Checking gzipped paired-end output"
+assert_file_exists "report.json"
+assert_file_exists "out_test_gz_pe/trimmed_R1_001.fastq.gz"
+assert_file_exists "out_test_gz_pe/trimmed_R2_001.fastq.gz"
+
+echo ">> Check if gzipped output is not empty"
+assert_file_not_empty "report.json"
+assert_file_not_empty "out_test_gz_pe/trimmed_R1_001.fastq.gz"
+assert_file_not_empty "out_test_gz_pe/trimmed_R2_001.fastq.gz"
+
+echo ">> Check if files are actually gzipped"
+file out_test_gz_pe/trimmed_R1_001.fastq.gz | grep -q "gzip compressed" || { echo "R1 file is not gzipped" && exit 1; }
+file out_test_gz_pe/trimmed_R2_001.fastq.gz | grep -q "gzip compressed" || { echo "R2 file is not gzipped" && exit 1; }
+
+cd ..
+echo
+
+#############################################
+mkdir test_bz2_compression
+cd test_bz2_compression
+
+echo "#############################################"
+echo "> Test bzip2 compression"
+
+cat > example.fastq <<'EOF'
+@read1
+ACGTACGTACGTAAAAA
++
+IIIIIIIIIIIIIIIII
+@read2
+ACGTACGTACGTCCCCC
++
+IIIIIIIIIIIIIIIII
+EOF
+
+"$meta_executable" \
+  --report minimal \
+  --output "out_test_bz2/*.fastq.bz2" \
+  --adapter AAAAA \
+  --input example.fastq \
+  --json
+
+echo ">> Checking bzip2 output"
+assert_file_exists "report.json"
+assert_file_exists "out_test_bz2/trimmed_001.fastq.bz2"
+
+echo ">> Check if bzip2 output is not empty"
+assert_file_not_empty "report.json"
+assert_file_not_empty "out_test_bz2/trimmed_001.fastq.bz2"
+
+echo ">> Check if file is actually bzip2 compressed"
+file out_test_bz2/trimmed_001.fastq.bz2 | grep -q "bzip2 compressed" || { echo "File is not bzip2 compressed" && exit 1; }
+
+echo ">> Check contents by decompressing"
+bzcat out_test_bz2/trimmed_001.fastq.bz2 | head -1 | grep -q "@read1" || { echo "Decompressed file does not contain expected content" && exit 1; }
+
+cd ..
+echo
+
+#############################################
 
 echo "#############################################"
 echo "> Test successful"

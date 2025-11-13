@@ -432,8 +432,9 @@ argument_groups:
         type: file
         description: |
           Glob pattern for matching the expected output files.
-          Should include `$output_dir`.
-        example: "fastq/*_001.fast[a,q]"
+          Should include `$output_dir`. Supports compression formats (.gz, .xz, .bz2) 
+          which will be auto-detected from the file extension.
+        example: "fastq/*_001.fastq.gz"
         direction: output
         required: true
         must_exist: true
