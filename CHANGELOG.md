@@ -9,7 +9,7 @@
 
 # MINOR CHANGES
 
-* `bases2fastq`: Bump from `2.2.1` to `2.3.0` (PR)
+* `bases2fastq`: Bump from `2.2.1` to `2.3.0` (PR #207)
 
 # biobox 0.4.1
 
