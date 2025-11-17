@@ -21,6 +21,7 @@ unset_if_false=(
   par_skip_multi_qc
   par_force_index_orientation
   par_per_target_fastq
+  par_group_well_label
 )
 
 for par in ${unset_if_false[@]}; do
