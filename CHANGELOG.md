@@ -7,6 +7,10 @@
   * `ensembl_vep/filter_vep`: Filter and post-process VEP output by consequence type, phenotype, clinical significance, and more.
   * `ensembl_vep/vep`: Determine the effect of variants on genes, transcripts, and protein sequences with comprehensive annotation options.
 
+# MINOR CHANGES
+
+* `bases2fastq`: Bump from `2.2.1` to `2.3.0` (PR #207)
+
 # biobox 0.4.1
 
 ## MINOR CHANGES

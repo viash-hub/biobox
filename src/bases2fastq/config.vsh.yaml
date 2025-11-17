@@ -186,6 +186,10 @@ argument_groups:
         multiple: true
         description: |
           Cycle mask for cyto fastq generation. This flag can be specified multiple times.
+      - name: "--group_well_label"
+        type: boolean_true
+        description: |
+          Merge FASTQ according to well label defined in run manifest.
       - name: "--panel"
         type: file
         description: |
@@ -218,7 +222,7 @@ test_resources:
 
 engines:
 - type: docker
-  image: elembio/bases2fastq:2.2.1
+  image: elembio/bases2fastq:2.3.0
   setup:
     - type: docker
       run: |
