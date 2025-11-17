@@ -53,6 +53,7 @@ args=(
   ${par_no_error_on_invalid:+--no-error-on-invalid}
   ${par_no_projects:+--no-projects}
   ${par_split_lanes:+--split-lanes}
+  ${par_group_well_label:+--group-well-label}
   ${par_force_index_orientation:+--force-index-orientation}
   ${par_skip_qc_report:+--skip-qc-report}
   ${par_skip_multi_qc:+--skip-multi-qc}
