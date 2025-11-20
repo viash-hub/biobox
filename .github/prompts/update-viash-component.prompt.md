@@ -126,18 +126,17 @@ engines:
 
 **Validation**: Tests are self-contained, comprehensive, and pass reliably
 
-### Step 6: Build & Test Validation
+### Step 6: Test Validation
 
 **Objective**: Verify component works correctly
 
 **Actions**:
 
-1. Build component: `viash build ${input:componentPath}/config.vsh.yaml --setup cachedbuild`
-2. Run tests: `viash test ${input:componentPath}/config.vsh.yaml --keep true --verbose`
-3. Check version detection in container
-4. Optional: Run namespace tests: `viash ns test -q <namespace> --parallel`
+1. Run tests: `viash test ${input:componentPath}/config.vsh.yaml`
+2. Check version detection in container
+3. Optional: Run namespace tests: `viash ns test -q <namespace> --parallel`
 
-**Validation**: All tests pass, no build errors, version detection works
+**Validation**: All tests pass, version detection works
 
 ### Step 7: Quality Assurance Review
 

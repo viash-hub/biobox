@@ -1,0 +1,54 @@
+```bash
+docker run --rm quay.io/biocontainers/ensembl-vep:115.2--pl5321h2a3209d_1 vep_install --help
+```
+
+#---------------#
+# VEP INSTALLER #
+#---------------#
+
+http://www.ensembl.org/info/docs/variation/vep/vep_script.html#installer
+
+Usage:
+perl INSTALL.pl [arguments]
+
+Options
+=======
+
+-h | --help        Display this message and quit
+
+-d | --DESTDIR     Set destination directory for API install (default = './')
+--CACHE_VERSION    Set data (cache, FASTA) version to install (default = 115)
+-c | --CACHEDIR    Set destination directory for cache files (default = '/root/.vep/')
+
+-a | --AUTO        Run installer without user prompts. Use "a" (API + Faidx/htslib),
+                   "l" (Faidx/htslib only), "c" (cache), "f" (FASTA), "p" (plugins) to specify
+                   parts to install e.g. -a ac for API and cache
+-n | --NO_UPDATE   Do not check for updates to ensembl-vep or API
+-s | --SPECIES     Comma-separated list of species to install when using --AUTO
+-y | --ASSEMBLY    Assembly name to use if more than one during --AUTO
+
+--NO_PLUGINS       Skip plugin installation
+-g | --PLUGINS     Comma-separated list of plugins to install when using --AUTO; you can also
+                   use "list" to list all plugins and "all" to install all available plugins
+-r | --PLUGINSDIR  Set destination directory for VEP plugins files (default = '/root/.vep/Plugins/')
+-q | --QUIET       Do not write any status output when using --AUTO
+-p | --PREFER_BIN  Use this if the installer fails with out of memory errors
+-l | --NO_HTSLIB   Do not attempt to install Faidx/htslib
+--NO_BIOPERL       Do not install BioPerl
+
+-t | --CONVERT     Convert downloaded caches to use tabix for retrieving
+                   co-located variants (requires tabix)
+
+
+-u | --CACHEURL    Override default cache URL; this may be a local directory or
+                   a remote (e.g. FTP) address.
+-f | --FASTAURL    Override default FASTA URL; this may be a local directory or
+                   a remote (e.g. FTP) address. The FASTA URL/directory must have
+                   gzipped FASTA files under the following structure:
+                   [species]/[dna]/
+--USE_HTTPS_PROTO  Download cache and FASTA file using HTTPs protocol instead of FTP.
+                   Useful for networks where FTP port is blocked by firewall.
+
+
+--GITHUBTOKEN      Set token to use for authentication when querying GitHub API. Authenticated
+                   user have increased rate-limit. NOTE: use token with read-only access.

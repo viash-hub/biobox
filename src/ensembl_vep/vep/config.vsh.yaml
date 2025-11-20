@@ -1,0 +1,278 @@
+name: vep
+namespace: ensembl_vep
+description: |
+  Variant Effect Predictor (VEP) determines the effect of variants on genes, transcripts, and protein sequences.
+  
+  VEP annotates variants with:
+  - Consequence types (missense, nonsense, splice site, etc.)
+  - Gene and transcript information
+  - Protein effect predictions (SIFT, PolyPhen)
+  - Population frequencies and clinical significance
+  - Conservation scores and regulatory features
+  
+  See the [VEP documentation](http://www.ensembl.org/info/docs/tools/vep/script/index.html) for comprehensive usage.
+
+keywords: [variant effect prediction, annotation, genomics, consequence, missense]
+links:
+  homepage: https://www.ensembl.org/info/docs/tools/vep/index.html
+  documentation: http://www.ensembl.org/info/docs/tools/vep/script/index.html
+  repository: https://github.com/Ensembl/ensembl-vep
+license: Apache-2.0
+requirements:
+  commands: [vep]
+authors:
+  - __merge__: /src/_authors/robrecht_cannoodt.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Inputs"
+    arguments:
+      - name: --input_file
+        alternatives: [-i]
+        type: file
+        description: |
+          Input variant file for annotation.
+          
+          **Formats:** VCF, VEP, variant_identifier, HGVS, ID, region, SPDI  
+          **Compression:** Supports gzip (.gz) and bgzip compressed files
+        required: true
+        example: "variants.vcf"
+        
+      - name: --format
+        type: string
+        description: |
+          Input file format.
+        choices: ["vcf", "variant_identifier", "hgvs", "id", "region", "spdi", "vep"]
+        default: "vcf"
+        required: false
+
+  - name: "Outputs"
+    arguments:
+      - name: --output_file
+        alternatives: [-o]
+        type: file
+        direction: output
+        description: |
+          Output annotated variants to file.
+          
+          **Compression:** Automatically compress if filename ends with .gz
+        required: true
+        example: "annotated_variants.txt"
+        
+      - name: --vcf
+        type: boolean_true
+        description: |
+          Output results in VCF format.
+          
+          **Default:** Tab-delimited text format  
+          **VCF mode:** Adds INFO field with VEP annotations
+
+  - name: "Reference Data"
+    arguments:
+      - name: --species
+        type: string
+        description: |
+          Species for annotation.
+        default: "homo_sapiens"
+        required: false
+        example: "homo_sapiens"
+        
+      - name: --assembly
+        type: string
+        description: |
+          Genome assembly version.
+        required: false
+        example: "GRCh38"
+        
+      - name: --cache
+        type: boolean_true
+        description: |
+          Use cache files for annotation (recommended).
+          
+          **Performance:** Much faster than database queries  
+          **Location:** Specify with --dir or use default ~/.vep/
+          
+      - name: --dir
+        type: file
+        description: |
+          Directory containing cache files.
+        default: "/root/.vep/"
+        required: false
+        example: "/data/vep_cache"
+        
+      - name: --cache_version
+        type: integer
+        description: |
+          Use specific cache version.
+        required: false
+        example: 115
+        
+      - name: --offline
+        type: boolean_true
+        description: |
+          Enable offline mode (no database connections).
+          
+          **Requires:** Cache files and FASTA files  
+          **Use case:** Isolated environments or reproducible runs
+
+  - name: "Annotation Options"
+    arguments:
+      - name: --everything
+        type: boolean_true
+        description: |
+          Shortcut to switch on commonly used options.
+          
+          **Includes:** --sift, --polyphen, --ccds, --hgvs, --symbol,  
+          --numbers, --domains, --regulatory, --canonical, --protein,  
+          --biotype, --uniprot, --tsl, --appris, --gene_phenotype,  
+          --af, --af_1kg, --af_esp, --af_gnomad, --max_af, --pubmed,  
+          --variant_class, --mane
+          
+      - name: --canonical
+        type: boolean_true
+        description: |
+          Add canonical transcript flag to output.
+          
+          **Canonical:** Transcript selected as representative for each gene
+          
+      - name: --ccds
+        type: boolean_true
+        description: |
+          Add CCDS transcript identifiers.
+          
+      - name: --protein
+        type: boolean_true
+        description: |
+          Add Ensembl protein identifiers.
+          
+      - name: --symbol
+        type: boolean_true
+        description: |
+          Add gene symbol (e.g., HGNC).
+          
+      - name: --hgvs
+        type: boolean_true
+        description: |
+          Add HGVS nomenclature for variants.
+          
+      - name: --sift
+        type: string
+        description: |
+          Add SIFT prediction and/or score.
+        choices: ["p", "s", "b"]
+        required: false
+        
+      - name: --polyphen
+        type: string
+        description: |
+          Add PolyPhen prediction and/or score.
+        choices: ["p", "s", "b"]
+        required: false
+
+  - name: "Frequency Options"
+    arguments:
+      - name: --af
+        type: boolean_true
+        description: |
+          Add global allele frequency from 1000 Genomes.
+          
+      - name: --af_1kg
+        type: boolean_true
+        description: |
+          Add continental allele frequencies from 1000 Genomes.
+          
+      - name: --af_gnomad
+        type: boolean_true
+        description: |
+          Add allele frequencies from gnomAD exomes collections.
+          
+      - name: --max_af
+        type: boolean_true
+        description: |
+          Add maximum observed allele frequency across populations.
+
+  - name: "Filtering Options"
+    arguments:
+      - name: --pick
+        type: boolean_true
+        description: |
+          Pick one consequence annotation per variant.
+          
+          **Selection:** Most severe consequence per gene  
+          **Output:** Single annotation line per variant
+          
+      - name: --pick_allele
+        type: boolean_true
+        description: |
+          Pick one consequence annotation per allele.
+          
+      - name: --flag_pick
+        type: boolean_true
+        description: |
+          Flag picked consequence with PICK=1.
+          
+      - name: --per_gene
+        type: boolean_true
+        description: |
+          Use one consequence annotation per gene.
+          
+      - name: --pick_order
+        type: string
+        description: |
+          Customize annotation selection criteria order.
+        required: false
+        example: "canonical,appris,tsl,biotype,ccds,rank,length"
+
+  - name: "Output Filtering"
+    arguments:
+      - name: --most_severe
+        type: boolean_true
+        description: |
+          Output only most severe consequence per variant.
+          
+      - name: --summary
+        type: boolean_true
+        description: |
+          Output only summary of consequences for each variant.
+          
+      - name: --filter_common
+        type: boolean_true
+        description: |
+          Shortcut to exclude common variants (frequency > 0.01).
+
+  - name: "Advanced Options"
+    arguments:
+      - name: --buffer_size
+        type: integer
+        description: |
+          Number of variants to read at once.
+        default: 5000
+        required: false
+        
+      - name: --no_check_variants_order
+        type: boolean_true
+        description: |
+          Permit variants not ordered by position.
+          
+      - name: --allow_non_variant
+        type: boolean_true
+        description: |
+          Allow non-variant VCF lines through analysis.
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+engines:
+  - type: docker
+    image: quay.io/biocontainers/ensembl-vep:115.2--pl5321h2a3209d_1
+    setup:
+      - type: docker
+        run:
+          - "vep --help | head -1 | sed 's/.*Variant Effect Predictor.*/vep: 115.2/' > /var/software_versions.txt"
+runners:
+  - type: executable
+  - type: nextflow

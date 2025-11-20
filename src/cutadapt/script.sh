@@ -186,14 +186,25 @@ debug $optional_output_args
 debug
 
 # Output arguments
-# We write the output to a directory rather than
-# individual files.
+# Extract extension from output pattern, with fallback to default
 ###########################################################
 
-if [[ -z $par_fasta ]]; then
-  ext="fastq"
+echo ">> Determining output file extension from pattern: $par_output"
+
+# Extract the extension from the filename in the output pattern
+filename=$(basename "$par_output")
+if [[ "$filename" == *.* ]]; then
+  # Extract everything after the first dot (handles compression like .fastq.gz)
+  ext="${filename#*.}"
+  echo "  Detected extension from pattern: .$ext"
 else
-  ext="fasta"
+  # Fallback when no extension is specified in the pattern
+  if [[ -z "$par_fasta" ]]; then
+    ext="fastq"
+  else
+    ext="fasta"
+  fi
+  echo "  No extension in pattern, using default: .$ext"
 fi
 
 demultiplex_mode="$par_demultiplex_mode"
