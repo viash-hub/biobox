@@ -7,7 +7,7 @@ license <- paste0(package$links$repository, "/blob/main/LICENSE")
 contributing <- paste0(package$links$repository, "/blob/main/CONTRIBUTING.md")
 
 pkg <- package$name
-ver <- if (!is.null(package$version)) package$version else "v0.4.1"
+ver <- if (!is.null(package$version)) package$version else "v0.4.2"
 comp <- "bowtie2_align"
 
 # Count components
