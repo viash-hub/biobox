@@ -41,7 +41,10 @@ else
 fi
 
 # Create arrays for inputs that contain multiple arguments
-IFS=";" read -ra read_structures <<< "$par_read_structures"
+read_structures=()
+if [[ -n "$par_read_structures" ]]; then
+    IFS=";" read -ra read_structures <<< "$par_read_structures"
+fi
 IFS=";" read -ra lane <<< "$par_lane"
 IFS=";" read -ra quality_mask_threashold <<< "$par_quality_mask_threshold"
 IFS=";" read -ra output_types <<< "$par_output_types"
