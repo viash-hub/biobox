@@ -17,7 +17,7 @@ argument_groups:
       - name: "--fastqs"
         alternatives: [-f]
         type: file
-        description: Path(s) to the input FASTQs.
+        description: Path(s) to the input FASTQs (mutually exclusive with --fastqs_root/--fastqs_prefix).
         required: false
         multiple: true
         example: sample1_r1.fq;sample1_r2.fq;sample2_r1.fq;sample2_r2.fq
