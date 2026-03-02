@@ -30,7 +30,7 @@ argument_groups:
         example: bowtie2_index/
       - name: --index_prefix
         type: string
-        description: bt2 filename minus trailing .1.bt2/.2.bt2 inside the index root.
+        description: Bowtie2 index base name (prefix of .1.bt2/.2.bt2 files) inside the index root.
         required: true
         example: genome_index
 
