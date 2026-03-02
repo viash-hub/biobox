@@ -32,7 +32,8 @@ if [[ -n "$par_fastqs_prefix" ]]; then
         exit 1
     fi
     fastqs_prefix_path="${par_fastqs_root%/}/$par_fastqs_prefix"
-    mapfile -t fastqs < <(find "$par_fastqs_root" -type f -path "${fastqs_prefix_path}*" | sort)
+    fastqs_prefix_dir="${fastqs_prefix_path%/*}"
+    mapfile -t fastqs < <(find "$fastqs_prefix_dir" -type f -path "${fastqs_prefix_path}*" | sort)
     if [[ ${#fastqs[@]} -eq 0 ]]; then
         echo "Error: No FASTQ files found matching prefix ${fastqs_prefix_path}" >&2
         exit 1
@@ -46,7 +47,10 @@ else
 fi
 
 # Create arrays for inputs that contain multiple arguments
-IFS=";" read -ra read_structures <<< "$par_read_structures"
+read_structures=()
+if [[ -n "$par_read_structures" ]]; then
+    IFS=";" read -ra read_structures <<< "$par_read_structures"
+fi
 IFS=";" read -ra lane <<< "$par_lane"
 IFS=";" read -ra quality_mask_threashold <<< "$par_quality_mask_threshold"
 IFS=";" read -ra output_types <<< "$par_output_types"
