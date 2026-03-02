@@ -53,7 +53,8 @@ log "Starting TEST 1: Basic BWA aln alignment"
 
 log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "reference.fasta" \
   --reads "$test_data_dir/reads.fastq" \
   --output "$meta_temp_dir/output.sai"
 
@@ -68,7 +69,8 @@ log "Starting TEST 2: BWA aln with custom parameters"
 
 log "Executing $meta_name with custom parameters..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "reference.fasta" \
   --reads "$test_data_dir/reads.fastq" \
   --output "$meta_temp_dir/custom.sai" \
   --max_diff "0.05" \
@@ -85,7 +87,8 @@ log "Starting TEST 3: BWA aln with stdout output"
 
 log "Executing $meta_name with stdout output..."
 stdout_output=$("$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "reference.fasta" \
   --reads "$test_data_dir/reads.fastq" 2>/dev/null)
 
 log "Validating TEST 3 outputs..."

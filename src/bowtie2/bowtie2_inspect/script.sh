@@ -14,9 +14,11 @@ set -eo pipefail
 [[ "$par_verbose" == "false" ]] && unset par_verbose
 [[ "$par_large_index" == "false" ]] && unset par_large_index
 
+index_path="${par_index_root%/}/$par_index_prefix"
+
 # Build the command arguments
 cmd_args=(
-    "$par_index"
+    "$index_path"
     ${par_summary:+-s}
     ${par_names:+-n}
     ${par_across:+-a "$par_across"}

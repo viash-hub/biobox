@@ -17,10 +17,20 @@ argument_groups:
       - name: "--fastqs"
         alternatives: [-f]
         type: file
-        description: Path to the input FASTQs, or path prefix if not a file
-        required: true
+        description: Path(s) to the input FASTQs.
+        required: false
         multiple: true
         example: sample1_r1.fq;sample1_r2.fq;sample2_r1.fq;sample2_r2.fq
+      - name: "--fastqs_root"
+        type: file
+        description: Directory containing input FASTQs when using --fastqs_prefix.
+        required: false
+        example: fastqs/
+      - name: "--fastqs_prefix"
+        type: string
+        description: Prefix for input FASTQs inside --fastqs_root.
+        required: false
+        example: sample
       - name: --sample_metadata
         alternatives: ["-s"]
         type: file
@@ -83,7 +93,7 @@ argument_groups:
       - name: --read_structures
         alternatives: ["-r"]
         type: string
-        description: Read structures, one per input FASTQ. Do not provide when using a path prefix for FASTQs
+        description: Read structures, one per input FASTQ. Do not provide when using --fastqs_prefix.
         required: false
         multiple: true
       - name: --allowed_mismatches

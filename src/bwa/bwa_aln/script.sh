@@ -15,6 +15,8 @@ set -eo pipefail
 [[ "$par_use_second_read" == "false" ]] && unset par_use_second_read
 [[ "$par_filter_casava" == "false" ]] && unset par_filter_casava
 
+index_path="${par_index_root%/}/$par_index_prefix"
+
 # Build the command
 cmd_args=(
     # Algorithm options
@@ -48,7 +50,7 @@ cmd_args=(
     ${par_filter_casava:+-Y}
     
     # Index and input file
-    "$par_index"
+    "$index_path"
     "$par_reads"
 )
 
