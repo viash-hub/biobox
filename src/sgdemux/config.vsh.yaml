@@ -28,7 +28,7 @@ argument_groups:
         example: fastqs/
       - name: "--fastqs_prefix"
         type: string
-        description: Path prefix used by sgdemux to locate input FASTQs inside --fastqs_root.
+        description: Path prefix (not a full filename) used by sgdemux to locate matching input FASTQs inside --fastqs_root.
         required: false
         example: sample
       - name: --sample_metadata
@@ -93,7 +93,7 @@ argument_groups:
       - name: --read_structures
         alternatives: ["-r"]
         type: string
-        description: Read structures, one per input FASTQ. Do not provide when using --fastqs_prefix.
+        description: Read structures, one per input FASTQ. Mutually exclusive with --fastqs_prefix.
         required: false
         multiple: true
       - name: --allowed_mismatches
