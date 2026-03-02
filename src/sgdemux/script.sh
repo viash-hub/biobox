@@ -31,7 +31,12 @@ if [[ -n "$par_fastqs_prefix" ]]; then
         echo "Error: --read_structures cannot be used with --fastqs_prefix" >&2
         exit 1
     fi
-    fastqs+=("${par_fastqs_root%/}/$par_fastqs_prefix")
+    fastqs_prefix_path="${par_fastqs_root%/}/$par_fastqs_prefix"
+    mapfile -t fastqs < <(find "$par_fastqs_root" -type f -path "${fastqs_prefix_path}*" | sort)
+    if [[ ${#fastqs[@]} -eq 0 ]]; then
+        echo "Error: No FASTQ files found matching prefix ${fastqs_prefix_path}" >&2
+        exit 1
+    fi
 else
     if [[ -z "$par_fastqs" ]]; then
         echo "Error: --fastqs is required unless --fastqs_prefix is provided" >&2
