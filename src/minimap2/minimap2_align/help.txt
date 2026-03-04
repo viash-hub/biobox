@@ -1,0 +1,15 @@
+```
+minimap2_align
+```
+
+Usage: minimap2_align [options]
+
+Description
+A versatile pairwise aligner for genomic and spliced nucleotide sequences.
+
+Options:
+  -h [ --help ]                          Print this help message
+  -V [ --version ]                       Print the version and exit
+  -o, --output FILE          Write output to FILE [standard output]
+
+
