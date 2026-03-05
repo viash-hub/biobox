@@ -34,3 +34,5 @@ if [ "$output_mmi_hash" != "$check_mmi_hash" ]; then
 else
     echo "The output .mmi file matches 'check.mmi'."
 fi
+
+echo "minimap2_index tests passed."
