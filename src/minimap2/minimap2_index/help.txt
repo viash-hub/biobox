@@ -11,19 +11,17 @@ Description:
 Options:
   -h [ --help ]             Print this help message
   -V [ --version ]          Print the version and exit
-  -i [--input ]             Input FASTA file (required)
+  -i [--input ]             Input FASTA file [required]
   -o [--output ]            Output file for the minimap2 index (.mmi) [required]
 
 Example:
+  # Create the index file 'reference.mmi' from 'reference.fasta'
   minimap2_index --input reference.fasta --output reference.mmi
-  # This will create the index file 'reference.mmi' from 'reference.fasta'
-  
-  minimap2 -d reference.mmi reference.fasta
-  # This is the equivalent command for creating the index manually using minimap2
 
-Note:
+  # This is the equivalent command for creating the index manually using minimap2
+  minimap2 -d reference.mmi reference.fasta
+
+Notes:
   - The `minimap2` tool is invoked with the `-d` flag for indexing.
   - The `--input` argument is the reference FASTA file.
   - The `--output` argument is the file where the index (.mmi) will be saved.
-
-
