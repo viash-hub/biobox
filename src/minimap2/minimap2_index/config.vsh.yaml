@@ -3,14 +3,14 @@ namespace: minimap2
 description: |
   Provides fasta index required by minimap2 alignment.
   Create a minimap2 index (.mmi) from a FASTA reference.
-  This component uses minimap2's `-d` flag to create an index file (.mmi)
+  This component uses minimap2's `-d` flag to create an index file (.mmi).
 keywords: [Alignment, Indexing, Minimap2]
 links:
   homepage: https://lh3.github.io/minimap2/
   documentation: https://github.com/lh3/minimap2#uguide
   repository: https://github.com/lh3/minimap2
 references:
-  doi: 
+  doi:
     - 10.1093/bioinformatics/bty191
     - 10.1093/bioinformatics/btab705
 license: MIT
@@ -46,6 +46,7 @@ argument_groups:
 resources:
   - type: bash_script
     path: script.sh
+
 test_resources:
   - type: bash_script
     path: test.sh
