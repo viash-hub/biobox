@@ -6,10 +6,32 @@ Usage: minimap2_align [options]
 
 Description
 A versatile pairwise aligner for genomic and spliced nucleotide sequences.
+This component maps DNA or mRNA query sequences against a reference database (FASTA or .mmi index).
+By default, it outputs mapping coordinates in PAF format. If the --bam flag is provided, it outputs a sorted and indexed BAM file.
 
 Options:
-  -h [ --help ]                          Print this help message
-  -V [ --version ]                       Print the version and exit
-  -o, --output FILE          Write output to FILE [standard output]
+  -h [ --help ]                          Print this help message.
+  -V [ --version ]                       Print the version and exit.
+  -i [ --reference , --input]            Reference database file in FASTA format or a pre-built Minimap2 index (.mmi) [required].
+  -q [ --query ]                         Query sequences (FASTQ/FASTA) to be aligned [required].
+  -x [ --preset ]                        Preset options for specific data types (e.g., map-ont, map-hifi, sr, splice).
+  --bam                                  Output a sorted BAM file instead of PAF. This also generates a .bai index file.
+  -c [--cigar_paf ]                      Include the CIGAR string in the PAF output (adds -c flag).
+  -L [--cigar_bam ]                      Include the CIGAR string in the BAM CG tag (adds -L flag).
+  -o [ --output ]                        Output filename for the alignment file (e.g., alignment.paf or alignment.bam) [required].
 
+Example:
+# Standard alignment to PAF format
+minimap2_align --reference ref.fasta --query reads.fastq --preset map-ont --output alignment.paf
 
+Output to sorted BAM format (for use with samtools)
+minimap2_align --reference ref.fasta --query reads.fastq --bam --output alignment.bam
+
+# This is the equivalent command for running the alignment manually using minimap2
+minimap2 -ax map-ont ref.fasta reads.fastq | samtools sort -o alignment.bam -
+samtools index alignment.bam
+
+Notes:
+  - When --bam is used, the component automatically adds the -a flag to minimap2 and pipes the output through samtools sort.
+  - The '--reference' can be a raw FASTA file or an index file created by minimap2_index.
+  - Using the correct '--preset' is highly recommended for optimal alignment accuracy based on your sequencing technology.
