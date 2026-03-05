@@ -84,12 +84,26 @@ test_resources:
 
 engines:
   - type: docker
-    image: quay.io/biocontainers/minimap2:2.30--h577a1d6_0
+    image: python:3.12
     setup:
-      - type: docker
-        run: >
-          minimap2 --version | head -1 | sed 's/^/minimap2: /' > /var/software_versions.txt &&
-          samtools --version | head -1 | sed 's/^/samtools: /' >> /var/software_versions.txt
+    - type: apt
+      packages: [ wget, gcc, make, libbz2-dev, zlib1g-dev, libncurses5-dev, libncursesw5-dev, liblzma-dev, bzip2]
+    - type: docker
+      run: | # Install Samtools 1.21 and Minimap2 2.30
+        wget -q https://github.com/samtools/samtools/releases/download/1.21/samtools-1.21.tar.bz2 && \
+        tar jxf samtools-1.21.tar.bz2 && \
+        rm samtools-1.21.tar.bz2 && \
+        cd samtools-1.21 && \
+        ./configure --prefix=/usr/local && \
+        make && \
+        make install && \
+        cd .. && \
+        rm -rf samtools-1.21 && \
+        wget -q https://github.com/lh3/minimap2/releases/download/v2.30/minimap2-2.30_x64-linux.tar.bz2 && \
+        tar jxf minimap2-2.30_x64-linux.tar.bz2 && \
+        rm minimap2-2.30_x64-linux.tar.bz2 && \
+        mv minimap2-2.30_x64-linux/minimap2 /usr/local/bin/ && \
+        rm -rf minimap2-2.30_x64-linux
 
 runners:
   - type: executable

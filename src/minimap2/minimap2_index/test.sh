@@ -14,7 +14,7 @@ echo "> Run minimap2_index on test FASTA"
   --output "$meta_resources_dir/test_data/test.mmi"
 
 echo "Output .mmi will be written to: $meta_resources_dir/test_data/test.mmi"
-  
+
 # Check output exists
 echo ">> Check if output exists"
 if [ ! -f "$meta_resources_dir/test_data/test.mmi" ]; then
