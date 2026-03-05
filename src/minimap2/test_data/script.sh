@@ -32,13 +32,10 @@ ACTGATCGATCGATCGATCGATCAAAAGATCGATCGATCGACTATCGATCGATCGATCGA
 IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 EOF
 
-### check-paf
+### check.paf
 cat <<EOF > "$TEST_DATA/check.paf"
 read1	60	5	60	+	seq1	60	9	60	45	55	6	tp:A:P	cm:i:6	s1:i:44	s2:i:0	dv:f:0	rl:i:0
 EOF
 
-### check-bam
-cat <<EOF > "$TEST_DATA/check.bam"
-read1	60	5	60	+	seq1	60	9	60	45	55	6	tp:A:P	cm:i:6	s1:i:44	s2:i:0	dv:f:0	rl:i:0
-EOF
+### check.bam TODO, no cat creation/read possible!
 
