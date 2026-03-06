@@ -7,6 +7,9 @@
   * `ensembl_vep/filter_vep`: Filter and post-process VEP output by consequence type, phenotype, clinical significance, and more.
   * `ensembl_vep/vep`: Determine the effect of variants on genes, transcripts, and protein sequences with comprehensive annotation options.
 
+* `minimap2`: A versatile pairwise aligner for genomic and spliced nucleotide sequences (PR #211):
+  - `minimap2/minimap2_index`: Provides fasta index required by minimap2 alignment.
+  - `minimap2/minimap2_align`: Maps DNA or mRNA query sequences against a reference database.
 
 # MINOR CHANGES
 
