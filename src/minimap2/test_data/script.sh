@@ -8,13 +8,9 @@ cat <<EOF > "$meta_resources_dir/test_data/test.fasta"
 ACGTACGTACGT
 EOF
 
-### check.mmi TODO, no cat creation/read possible!
-#cat <<EOF > "$meta_resources_dir/test_data/check.mmi"
-#MMI
-#chr1
-#    222
-#EOF
-
+### check.mmi, retrieve from github as not creation with cat possible
+wget -O "$meta_resources_dir/test_data/check.mmi" \
+  "https://raw.githubusercontent.com/viash-hub/biobox/minimap2/src/minimap2/test_data/check.mmi"
 
 ## minimap_align
 

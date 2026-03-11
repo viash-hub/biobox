@@ -84,26 +84,13 @@ test_resources:
 
 engines:
   - type: docker
-    image: python:3.12
+    image: quay.io/biocontainers/mulled-v2-66534bcbb7031a148b13e2ad42583020b9cd25c4:e1ea28074233d7265a5dc2111d6e55130dff5653-2
     setup:
-    - type: apt
-      packages: [ wget, gcc, make, libbz2-dev, zlib1g-dev, libncurses5-dev, libncursesw5-dev, liblzma-dev, bzip2]
     - type: docker
-      run: | # Install Samtools 1.21 and Minimap2 2.30
-        wget -q https://github.com/samtools/samtools/releases/download/1.21/samtools-1.21.tar.bz2 && \
-        tar jxf samtools-1.21.tar.bz2 && \
-        rm samtools-1.21.tar.bz2 && \
-        cd samtools-1.21 && \
-        ./configure --prefix=/usr/local && \
-        make && \
-        make install && \
-        cd .. && \
-        rm -rf samtools-1.21 && \
-        wget -q https://github.com/lh3/minimap2/releases/download/v2.30/minimap2-2.30_x64-linux.tar.bz2 && \
-        tar jxf minimap2-2.30_x64-linux.tar.bz2 && \
-        rm minimap2-2.30_x64-linux.tar.bz2 && \
-        mv minimap2-2.30_x64-linux/minimap2 /usr/local/bin/ && \
-        rm -rf minimap2-2.30_x64-linux
+      run: |
+          samtools --version 2>&1 | grep -E '^(samtools|Using htslib)' | \
+          sed 's#Using ##;s# \([0-9\.]*\)$#: \1#' > /var/software_versions.txt && \
+          minimap2 --version 2>&1 | sed 's/^/minimap2: /' >> /var/software_versions.txt
 
 runners:
   - type: executable
