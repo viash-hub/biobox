@@ -5,4 +5,3 @@ docker run --rm quay.io/biocontainers/bwa-mem2:2.3--he70b90d_0 bwa-mem2 index
 Usage:   bwa-mem2 index [-p prefix] <in.fasta>
 
 Options: -p STR    prefix of the index [same as fasta name]
-
