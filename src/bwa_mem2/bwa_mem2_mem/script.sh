@@ -17,7 +17,6 @@ set -eo pipefail
 [[ "$par_output_ref_header" == "false" ]] && unset par_output_ref_header
 [[ "$par_soft_clipping" == "false" ]] && unset par_soft_clipping
 [[ "$par_mark_secondary" == "false" ]] && unset par_mark_secondary
-[[ "$par_output_xb" == "false" ]] && unset par_output_xb
 
 # Build the command
 cmd_args=(
@@ -42,7 +41,6 @@ cmd_args=(
     ${par_gap_extend_penalty:+-E "$par_gap_extend_penalty"}
     ${par_clipping_penalty:+-L "$par_clipping_penalty"}
     ${par_unpaired_penalty:+-U "$par_unpaired_penalty"}
-    ${par_read_type:+-x "$par_read_type"}
     
     # Input/Output options
     ${par_smart_pairing:+-p}
@@ -56,13 +54,11 @@ cmd_args=(
     ${par_verbosity:+-v "$par_verbosity"}
     ${par_min_score:+-T "$par_min_score"}
     ${par_max_hits_xa:+-h "$par_max_hits_xa"}
-    ${par_score_fraction:+-z "$par_score_fraction"}
     ${par_output_all:+-a}
     ${par_append_comment:+-C}
     ${par_output_ref_header:+-V}
     ${par_soft_clipping:+-Y}
     ${par_mark_secondary:+-M}
-    ${par_output_xb:+-u}
     ${par_insert_size:+-I "$par_insert_size"}
     
     # Index and input files

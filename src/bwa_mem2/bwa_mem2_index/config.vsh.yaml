@@ -1,0 +1,59 @@
+name: bwa_mem2_index
+namespace: bwa_mem2
+description: Index sequences in the FASTA format for BWA alignment.
+keywords: [alignment, indexing, BWA, BWA-MEM, BWA-MEM2, reference]
+links:
+  homepage: https://bio-bwa.sourceforge.net/
+  documentation: https://bio-bwa.sourceforge.net/bwa.shtml
+  repository: https://github.com/lh3/bwa
+license: MIT
+requirements:
+  commands: [bwa-mem2]
+authors:
+  - __merge__: /src/_authors/dries_vaneechoutte.yaml
+    roles: [ author, maintainer ]
+
+argument_groups: 
+- name: "Input"
+  arguments: 
+  - name: "--input"
+    type: file
+    description: Input FASTA file to be indexed.
+    required: true
+    example: reference.fasta
+
+- name: "Output"
+  arguments: 
+  - name: "--output"
+    type: file
+    direction: output
+    description: Output directory containing BWA index files (.amb, .ann, .bwt, .pac, .sa).
+    example: bwa_index/
+
+- name: "Options"
+  arguments: 
+  - name: "--prefix"
+    alternatives: [-p]
+    type: string
+    description: Prefix of the index files. Default is same as input fasta name.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:  
+  - type: docker
+    image: quay.io/biocontainers/bwa-mem2:2.3--he70b90d_0
+    setup:
+      - type: docker
+        run: |
+          bwa-mem2 version 2>&1 | tail -n 1 | sed 's/^/bwa-mem2: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

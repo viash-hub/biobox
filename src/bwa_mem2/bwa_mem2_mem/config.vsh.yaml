@@ -1,5 +1,5 @@
-name: bwa_mem2
-namespace: bwa
+name: bwa_mem2_mem
+namespace: bwa_mem2
 description: BWA-MEM2 algorithm for aligning sequence reads to a reference genome.
 keywords: [alignment, BWA, BWA-MEM, BWA-MEM2, mapping]
 links:
@@ -12,8 +12,6 @@ requirements:
 authors:
   - __merge__: /src/_authors/dries_vaneechoutte.yaml
     roles: [ author, maintainer ]
-  - __merge__: /src/_authors/toni_verbeiren.yaml
-    roles: [ reviewer ]
 
 argument_groups: 
 - name: "Input"
@@ -130,11 +128,6 @@ argument_groups:
     type: integer
     description: Penalty for an unpaired read pair. Default is 17.
     example: 17
-  - name: "--read_type"
-    alternatives: [-x]
-    type: string
-    description: Read type preset (pacbio, ont2d, intractg).
-    choices: [pacbio, ont2d, intractg]
 
 - name: "Input/Output Options"
   arguments:
@@ -181,11 +174,6 @@ argument_groups:
     type: string
     description: If there are <INT hits with score >80.00% of the max score, output all in XA. Default is 5,200.
     example: "5,200"
-  - name: "--score_fraction"
-    alternatives: [-z]
-    type: double
-    description: The fraction of the max score to use with -h. Default is 0.800000.
-    example: 0.8
   - name: "--output_all"
     alternatives: [-a]
     type: boolean_true
@@ -206,10 +194,6 @@ argument_groups:
     alternatives: [-M]
     type: boolean_true
     description: Mark shorter split hits as secondary.
-  - name: "--output_xb"
-    alternatives: [-u]
-    type: boolean_true
-    description: Output XB instead of XA; XB is XA with the alignment score and mapping quality added.
   - name: "--insert_size"
     alternatives: [-I]
     type: string
@@ -223,7 +207,6 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  # - path: ./test_data/index
   - path: /src/_utils/test_helpers.sh
 
 engines:
@@ -232,8 +215,7 @@ engines:
     setup:
       - type: docker
         run: |
-          bwa 2>&1 | grep "Version:" | sed 's/Version: /bwa: /' > /var/software_versions.txt
-  - type: native
+          bwa-mem2 version 2>&1 | tail -n 1 | sed 's/^/bwa-mem2: /' > /var/software_versions.txt
 
 runners:
   - type: executable
