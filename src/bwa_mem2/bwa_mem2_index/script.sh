@@ -29,4 +29,4 @@ cmd_args=(
 )
 
 # Run bwa index
-bwa index "${cmd_args[@]}"
+bwa-mem2 index "${cmd_args[@]}"

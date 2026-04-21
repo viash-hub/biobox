@@ -36,12 +36,11 @@ check_dir_exists "$meta_temp_dir/bwa_index" "output index directory"
 
 # Check for BWA index files with the prefix used by bwa index
 index_files=(
-  "$test_data_dir/index/test_ref.fasta"
-  "$test_data_dir/index/test_ref.fasta.0123"
-  "$test_data_dir/index/test_ref.fasta.amb"
-  "$test_data_dir/index/test_ref.fasta.ann"
-  "$test_data_dir/index/test_ref.fasta.bwt.2bit.64"
-  "$test_data_dir/index/test_ref.fasta.pac"
+  "$meta_temp_dir/bwa_index/test_ref.0123"
+  "$meta_temp_dir/bwa_index/test_ref.amb"
+  "$meta_temp_dir/bwa_index/test_ref.ann"
+  "$meta_temp_dir/bwa_index/test_ref.bwt.2bit.64"
+  "$meta_temp_dir/bwa_index/test_ref.pac"
 )
 
 for file in "${index_files[@]}"; do
@@ -66,12 +65,11 @@ check_dir_exists "$meta_temp_dir/custom_index" "custom index directory"
 # Check for index files with custom prefix
 log "Checking for custom-prefixed index files..."
 index_files=(
-  "$test_data_dir/index/custom_genome.fasta"
-  "$test_data_dir/index/custom_genome.fasta.0123"
-  "$test_data_dir/index/custom_genome.fasta.amb"
-  "$test_data_dir/index/custom_genome.fasta.ann"
-  "$test_data_dir/index/custom_genome.fasta.bwt.2bit.64"
-  "$test_data_dir/index/custom_genome.fasta.pac"
+  "$meta_temp_dir/custom_index/custom_genome.0123"
+  "$meta_temp_dir/custom_index/custom_genome.amb"
+  "$meta_temp_dir/custom_index/custom_genome.ann"
+  "$meta_temp_dir/custom_index/custom_genome.bwt.2bit.64"
+  "$meta_temp_dir/custom_index/custom_genome.pac"
 )
 
 for file in "${custom_index_files[@]}"; do
