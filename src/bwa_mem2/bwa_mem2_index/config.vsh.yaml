@@ -27,7 +27,7 @@ argument_groups:
   - name: "--output"
     type: file
     direction: output
-    description: Output directory containing BWA index files (.amb, .ann, .bwt, .pac, .sa).
+    description: Output directory containing BWA index files (.0123, .amb, .ann, .bwt.2bit.64, .pac).
     example: bwa_index/
 
 - name: "Options"

@@ -18,7 +18,7 @@ argument_groups:
   arguments: 
   - name: "--index"
     type: file
-    description: BWA index base name (prefix of .amb, .ann, .bwt, .pac, .sa files).
+    description: BWA index base name (prefix of .0123, .amb, .ann, .bwt.2bit.64, .pac files).
     required: true
     example: reference.fasta
   - name: "--reads1"
