@@ -64,7 +64,7 @@ check_dir_exists "$meta_temp_dir/custom_index" "custom index directory"
 
 # Check for index files with custom prefix
 log "Checking for custom-prefixed index files..."
-index_files=(
+custom_index_files=(
   "$meta_temp_dir/custom_index/custom_genome.0123"
   "$meta_temp_dir/custom_index/custom_genome.amb"
   "$meta_temp_dir/custom_index/custom_genome.ann"

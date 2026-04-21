@@ -108,7 +108,6 @@ log "Executing $meta_name with advanced parameters..."
   --index "$test_data_dir/index/reference.fasta" \
   --reads1 "$test_data_dir/reads_single.fastq" \
   --output "$meta_temp_dir/advanced.sam" \
-  --threads 2 \
   --min_seed_length 15
 
 log "Validating TEST 3 outputs..."

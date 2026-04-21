@@ -5,7 +5,7 @@ keywords: [alignment, BWA, BWA-MEM, BWA-MEM2, mapping]
 links:
   homepage: https://bio-bwa.sourceforge.net/
   documentation: https://bio-bwa.sourceforge.net/bwa.shtml
-  repository: https://github.com/lh3/bwa
+  repository: https://github.com/bwa-mem2/bwa-mem2
 license: MIT
 requirements:
   commands: [bwa-mem2]
