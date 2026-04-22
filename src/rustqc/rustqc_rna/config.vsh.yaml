@@ -1,0 +1,271 @@
+name: rustqc_rna
+namespace: rustqc
+description: |
+  RNA-Seq QC — single-pass analysis of BAM/SAM/CRAM files.
+
+  Runs featureCounts, dupRadar, Qualimap, samtools stats, and RSeQC analyses
+  (infer_experiment, read_distribution, junction_annotation, junction_saturation,
+  inner_distance, read_duplication, TIN, bam_stat) in one pass over the input file.
+  Requires a GTF annotation and duplicate-marked (not removed) alignments.
+
+  [Documentation](https://seqeralabs.github.io/RustQC/)
+keywords: [RNA-seq, QC, quality control, RSeQC, featureCounts, dupRadar, Qualimap, preseq, samtools]
+links:
+  homepage: https://seqeralabs.github.io/RustQC/
+  documentation: https://seqeralabs.github.io/RustQC/
+  repository: https://github.com/seqeralabs/RustQC
+requirements:
+  commands: [rustqc]
+authors:
+  - __merge__: /src/_authors/dries_vaneechoutte.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        type: file
+        description: |
+          Duplicate-marked alignment file(s) in SAM, BAM, or CRAM format. Multiple files
+          can be provided and will be processed together.
+          Example: `sample.bam`
+        required: true
+        multiple: true
+        example: sample.bam
+
+      - name: --gtf
+        alternatives: [-g]
+        type: file
+        description: |
+          GTF gene annotation file, plain or gzip-compressed.
+          Example: `annotation.gtf.gz`
+        required: true
+        example: annotation.gtf
+
+      - name: --reference
+        alternatives: [-r]
+        type: file
+        description: |
+          Reference FASTA file. Required when input is in CRAM format.
+          Example: `genome.fa`
+        example: genome.fa
+
+      - name: --config
+        alternatives: [-c]
+        type: file
+        description: |
+          YAML configuration file for RustQC tool parameters.
+          Example: `rustqc.yaml`
+        example: rustqc.yaml
+
+  - name: Outputs
+    arguments:
+      - name: --outdir
+        alternatives: [-o]
+        type: file
+        direction: output
+        description: |
+          Output directory for all QC result files. Defaults to the current directory.
+          Example: `qc_results/`
+        default: "."
+        example: qc_results/
+
+      - name: --json_summary
+        alternatives: [-j]
+        type: string
+        description: |
+          Path for the JSON summary output. Use `-` to write to stdout.
+          Example: `summary.json`
+        example: summary.json
+
+  - name: Options
+    arguments:
+      - name: --sample_name
+        type: string
+        description: |
+          Override the sample name used for output filenames. Defaults to the BAM filename.
+          Example: `my_sample`
+        example: my_sample
+
+      - name: --flat_output
+        type: boolean_true
+        description: Write all output files directly into the output directory without subdirectories.
+
+  - name: Library
+    arguments:
+      - name: --stranded
+        alternatives: [-s]
+        type: string
+        description: |
+          Library strandedness for read counting and RSeQC analyses.
+
+          - `unstranded`: reads are counted on either strand
+          - `forward`: read 1 maps to the transcript strand (e.g. ligation-based)
+          - `reverse`: read 2 maps to the transcript strand (e.g. dUTP)
+        choices: [unstranded, forward, reverse]
+        example: reverse
+
+      - name: --paired
+        alternatives: [-p]
+        type: boolean_true
+        description: Input reads are paired-end.
+
+  - name: General
+    arguments:
+      - name: --mapq
+        alternatives: [-Q]
+        type: integer
+        description: |
+          MAPQ cutoff for quality filtering. Reads below this threshold are excluded. Default: `30`.
+        example: 30
+
+      - name: --biotype_attribute
+        type: string
+        description: |
+          GTF attribute name used for biotype grouping in featureCounts summaries.
+          Example: `gene_biotype`
+        example: gene_biotype
+
+      - name: --skip_dup_check
+        type: boolean_true
+        description: Skip the check that verifies input alignments are duplicate-marked.
+
+      - name: --quiet
+        alternatives: [-q]
+        type: boolean_true
+        description: Suppress all output except warnings and errors.
+
+      - name: --verbose
+        alternatives: [-v]
+        type: boolean_true
+        description: Show additional detail during processing.
+
+  - name: Tool parameters
+    arguments:
+      - name: --infer_experiment_sample_size
+        type: integer
+        description: |
+          Number of reads sampled for strandedness inference. Default: `200000`.
+        example: 200000
+
+      - name: --min_intron
+        type: integer
+        description: |
+          Minimum intron size for junction annotation. Default: `50`.
+        example: 50
+
+      - name: --junction_saturation_seed
+        type: integer
+        description: Random seed for reproducible junction saturation results.
+        example: 42
+
+      - name: --junction_saturation_min_coverage
+        type: integer
+        description: |
+          Minimum read coverage for a junction to be included in saturation analysis. Default: `1`.
+        example: 1
+
+      - name: --junction_saturation_percentile_floor
+        type: integer
+        description: |
+          Starting subsampling percentage for junction saturation analysis. Default: `5`.
+        example: 5
+
+      - name: --junction_saturation_percentile_ceiling
+        type: integer
+        description: |
+          Ending subsampling percentage for junction saturation analysis. Default: `100`.
+        example: 100
+
+      - name: --junction_saturation_percentile_step
+        type: integer
+        description: |
+          Step size between subsampling percentages for junction saturation. Default: `5`.
+        example: 5
+
+      - name: --inner_distance_sample_size
+        type: integer
+        description: |
+          Number of read pairs sampled for inner distance estimation. Default: `1000000`.
+        example: 1000000
+
+      - name: --inner_distance_lower_bound
+        type: integer
+        description: |
+          Lower bound for inner distance histogram. Default: `-250`.
+        example: -250
+
+      - name: --inner_distance_upper_bound
+        type: integer
+        description: |
+          Upper bound for inner distance histogram. Default: `250`.
+        example: 250
+
+      - name: --inner_distance_step
+        type: integer
+        description: |
+          Bin width for inner distance histogram. Default: `5`.
+        example: 5
+
+      - name: --tin_seed
+        type: integer
+        description: Random seed for reproducible TIN (Transcript Integrity Number) results.
+        example: 42
+
+      - name: --skip_tin
+        type: boolean_true
+        description: Skip TIN (Transcript Integrity Number) analysis.
+
+      - name: --skip_read_duplication
+        type: boolean_true
+        description: Skip read duplication analysis.
+
+      - name: --skip_preseq
+        type: boolean_true
+        description: Skip preseq library complexity analysis.
+
+      - name: --preseq_seed
+        type: integer
+        description: Random seed for preseq bootstrap confidence intervals.
+        example: 42
+
+      - name: --preseq_max_extrap
+        type: integer
+        description: Maximum extrapolation depth for preseq.
+        example: 1000000000
+
+      - name: --preseq_step_size
+        type: integer
+        description: Step size between extrapolation points for preseq.
+        example: 1000000
+
+      - name: --preseq_n_bootstraps
+        type: integer
+        description: Number of bootstrap replicates for preseq confidence intervals.
+        example: 100
+
+      - name: --preseq_seg_len
+        type: integer
+        description: Maximum segment length for paired-end merging in preseq.
+        example: 5000
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: ghcr.io/seqeralabs/rustqc:0.2.1
+    setup:
+      - type: docker
+        run: |
+          rustqc --version 2>&1 | head -1 | sed 's/ (.*//' | sed 's/ /: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
