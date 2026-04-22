@@ -260,7 +260,7 @@ test_resources:
 
 engines:
   - type: docker
-    image: ghcr.io/seqeralabs/rustqc:0.2.1
+    image: ghcr.io/seqeralabs/rustqc:v0.2.1
     setup:
       - type: docker
         run: |
