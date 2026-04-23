@@ -17,21 +17,25 @@ set -eo pipefail
 IFS=';' read -ra input_files <<< "$par_input"
 
 cmd_args=(
+  # Input / Output:
   --gtf "$par_gtf"
-  --outdir "$par_outdir"
   ${par_reference:+--reference "$par_reference"}
-  ${par_config:+--config "$par_config"}
-  ${par_json_summary:+--json-summary "$par_json_summary"}
+  --outdir "$par_outdir"
   ${par_sample_name:+--sample-name "$par_sample_name"}
   ${par_flat_output:+--flat-output}
+  ${par_config:+--config "$par_config"}
+  ${par_json_summary:+--json-summary "$par_json_summary"}
+  # Library:
   ${par_stranded:+--stranded "$par_stranded"}
   ${par_paired:+--paired}
+  # General:
   ${meta_cpus:+--threads "$meta_cpus"}
   ${par_mapq:+--mapq "$par_mapq"}
   ${par_biotype_attribute:+--biotype-attribute "$par_biotype_attribute"}
   ${par_skip_dup_check:+--skip-dup-check}
   ${par_quiet:+--quiet}
   ${par_verbose:+--verbose}
+  # Tool parameters:
   ${par_infer_experiment_sample_size:+--infer-experiment-sample-size "$par_infer_experiment_sample_size"}
   ${par_min_intron:+--min-intron "$par_min_intron"}
   ${par_junction_saturation_seed:+--junction-saturation-seed "$par_junction_saturation_seed"}

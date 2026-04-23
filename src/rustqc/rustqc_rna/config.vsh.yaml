@@ -21,14 +21,13 @@ authors:
     roles: [author, maintainer]
 
 argument_groups:
-  - name: Inputs
+  - name: Input / Output
     arguments:
       - name: --input
         type: file
         description: |
           Duplicate-marked alignment file(s) in SAM, BAM, or CRAM format. Multiple files
           can be provided and will be processed together.
-          Example: `sample.bam`
         required: true
         multiple: true
         example: sample.bam
@@ -38,7 +37,6 @@ argument_groups:
         type: file
         description: |
           GTF gene annotation file, plain or gzip-compressed.
-          Example: `annotation.gtf.gz`
         required: true
         example: annotation.gtf
 
@@ -47,49 +45,40 @@ argument_groups:
         type: file
         description: |
           Reference FASTA file. Required when input is in CRAM format.
-          Example: `genome.fa`
         example: genome.fa
 
-      - name: --config
-        alternatives: [-c]
-        type: file
-        description: |
-          YAML configuration file for RustQC tool parameters.
-          Example: `rustqc.yaml`
-        example: rustqc.yaml
-
-  - name: Outputs
-    arguments:
       - name: --outdir
         alternatives: [-o]
         type: file
         direction: output
         description: |
           Output directory for all QC result files. Defaults to the current directory.
-          Example: `qc_results/`
         default: "."
         example: qc_results/
+
+      - name: --sample_name
+        type: string
+        description: |
+          Override the sample name used for output filenames. Defaults to the BAM filename.
+        example: my_sample
+
+      - name: --flat_output
+        type: boolean_true
+        description: Write all output files directly into the output directory without subdirectories.
+
+      - name: --config
+        alternatives: [-c]
+        type: file
+        description: |
+          YAML configuration file for RustQC tool parameters.
+        example: rustqc.yaml
 
       - name: --json_summary
         alternatives: [-j]
         type: string
         description: |
           Path for the JSON summary output. Use `-` to write to stdout.
-          Example: `summary.json`
         example: summary.json
-
-  - name: Options
-    arguments:
-      - name: --sample_name
-        type: string
-        description: |
-          Override the sample name used for output filenames. Defaults to the BAM filename.
-          Example: `my_sample`
-        example: my_sample
-
-      - name: --flat_output
-        type: boolean_true
-        description: Write all output files directly into the output directory without subdirectories.
 
   - name: Library
     arguments:
@@ -103,7 +92,7 @@ argument_groups:
           - `forward`: read 1 maps to the transcript strand (e.g. ligation-based)
           - `reverse`: read 2 maps to the transcript strand (e.g. dUTP)
         choices: [unstranded, forward, reverse]
-        example: reverse
+        example: unstranded
 
       - name: --paired
         alternatives: [-p]
@@ -123,7 +112,6 @@ argument_groups:
         type: string
         description: |
           GTF attribute name used for biotype grouping in featureCounts summaries.
-          Example: `gene_biotype`
         example: gene_biotype
 
       - name: --skip_dup_check
@@ -226,28 +214,33 @@ argument_groups:
 
       - name: --preseq_seed
         type: integer
-        description: Random seed for preseq bootstrap confidence intervals.
-        example: 42
+        description: |
+          Random seed for preseq bootstrap confidence intervals. Default: `408`.
+        example: 408
 
       - name: --preseq_max_extrap
-        type: integer
-        description: Maximum extrapolation depth for preseq.
-        example: 1000000000
+        type: long
+        description: |
+          Maximum extrapolation depth for preseq. Default: `1e10`.
+        example: 1e10
 
       - name: --preseq_step_size
         type: integer
-        description: Step size between extrapolation points for preseq.
-        example: 1000000
+        description: |
+          Step size between extrapolation points for preseq. Default: `1e6`
+        example: 1e6
 
       - name: --preseq_n_bootstraps
         type: integer
-        description: Number of bootstrap replicates for preseq confidence intervals.
+        description: |
+          Number of bootstrap replicates for preseq confidence intervals. Default: `100`.
         example: 100
 
       - name: --preseq_seg_len
         type: integer
-        description: Maximum segment length for paired-end merging in preseq.
-        example: 5000
+        description: |
+          Maximum segment length for paired-end merging in preseq. Default: `1e8`.
+        example: 1e8
 
 resources:
   - type: bash_script
