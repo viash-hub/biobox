@@ -92,7 +92,7 @@ argument_groups:
           - `forward`: read 1 maps to the transcript strand (e.g. ligation-based)
           - `reverse`: read 2 maps to the transcript strand (e.g. dUTP)
         choices: [unstranded, forward, reverse]
-        example: unstranded
+        example: forward
 
       - name: --paired
         alternatives: [-p]
@@ -249,6 +249,8 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - type: file
+    path: test_data
   - path: /src/_utils/test_helpers.sh
 
 engines:
