@@ -9,6 +9,7 @@
   * `bwa_mem2`: Added support for bwa-mem2, an optimized replacement of bwa mem (PR #215):
     - `bwa_mem2/bwa_mem2_index`: Create BWA index files for reference genome alignment, to use with bwa-mem2 mem.
     - `bwa_mem2/bwa_mem2_mem`: BWA-MEM algorithm for sequence alignment supporting single-end and paired-end reads.
+  * `rustqc`: Added support for RustQC, a Rust re-implementation of several established bioinformatics QC tools.
 
 # MINOR CHANGES
 
