@@ -43,27 +43,21 @@ argument_groups:
         alternatives: -x
         type: string
         description: |
-          Preset alignment options:
-          - map-ont: Oxford Nanopore genomic reads
-          - map-hifi: PacBio HiFi/CCS genomic reads
-          - sr: Short single-end reads
-          - splice: spliced alignment (long-read cotranscriptomic)
+          Preset alignment options (e.g. map-ont, map-hifi, map-pb, asm5, asm10,
+          asm20, splice, sr, ava-ont, ava-pb). Run `minimap2 -x` for the full list.
         example: map-ont
 
   - name: Outputs
     arguments:
       - name: --bam
-        type: boolean
+        type: boolean_true
         description: Output BAM instead of PAF.
-        default: false
       - name: --cigar_paf
-        type: boolean
+        type: boolean_true
         description: Output CIGAR in PAF format (-c flag).
-        default: false
       - name: --cigar_bam
-        type: boolean
+        type: boolean_true
         description: Write long CIGARs in BAM CG tag (-L flag).
-        default: false
       - name: --output
         alternatives: -o
         type: file
@@ -79,8 +73,7 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
-  - type: file
-    path: ../test_data  #src/minimap2/test_data
+  - path: /src/_utils/test_helpers.sh
 
 engines:
   - type: docker

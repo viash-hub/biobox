@@ -6,8 +6,8 @@ set -euo pipefail
 ## VIASH END
 
 echo "Running minimap2_align..."
-echo "DEBUG: Output path is $par_output"
-echo "DEBUG: BAM mode is $par_bam"
+echo "Output path is $par_output"
+echo "BAM mode is $par_bam"
 
 # Set number of threads
 threads=${VIASH_META_CPUS:-2}

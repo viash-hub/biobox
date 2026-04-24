@@ -1,36 +1,62 @@
-#!/usr/bin/env bash
-
-set -euo pipefail
+#!/bin/bash
 
 ## VIASH START
-meta_executable="target/executable/minimap2/minimap2_align"
-meta_resources_dir="src/minimap2/minimap2_align"
 ## VIASH END
 
-# Test PAF output
-echo ">> Testing PAF output..."
-TEST_DATA="$meta_resources_dir/test_data"
+set -eo pipefail
+
+source "$meta_resources_dir/test_helpers.sh"
+setup_test_env
+
+log "Starting tests for $meta_name"
+
+test_dir="$meta_temp_dir/test_data"
+mkdir -p "$test_dir"
+
+cat > "$test_dir/ref.fasta" <<'EOF'
+>seq1
+ACTGATCGATCGATCGATCGATCGATCGATCGATCGATCGACTATCGATCGATCGATCGA
+EOF
+
+cat > "$test_dir/reads.fastq" <<'EOF'
+@read1
+ACTGATCGATCGATCGATCGATCAAAAGATCGATCGATCGACTATCGATCGATCGATCGA
++
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+EOF
+
+check_file_exists "$test_dir/ref.fasta" "reference FASTA"
+check_file_exists "$test_dir/reads.fastq" "query FASTQ"
+
+# --- TEST 1: PAF output ---
+log "TEST 1: alignment to PAF"
 "$meta_executable" \
-  --reference "$TEST_DATA/ref.fasta" \
-  --query "$TEST_DATA/reads.fastq" \
-  --output "$TEST_DATA/test.paf"
+  --reference "$test_dir/ref.fasta" \
+  --query "$test_dir/reads.fastq" \
+  --output "$meta_temp_dir/out.paf"
 
-if [ ! -s "$TEST_DATA/test.paf" ]; then echo "PAF file is empty"; exit 1; fi
-grep -q "seq1" "$TEST_DATA/test.paf" || { echo "PAF alignment failed"; exit 1; }
+check_file_exists "$meta_temp_dir/out.paf" "PAF output"
+check_file_not_empty "$meta_temp_dir/out.paf" "PAF output"
+check_file_contains "$meta_temp_dir/out.paf" "seq1" "PAF alignment to seq1"
+log "✅ TEST 1 passed"
 
-# Test BAM output
-echo ">> Testing BAM output..."
+# --- TEST 2: sorted + indexed BAM output ---
+log "TEST 2: alignment to sorted BAM"
 "$meta_executable" \
-  --reference "$TEST_DATA/ref.fasta" \
-  --query "$TEST_DATA/reads.fastq" \
-  --bam true \
-  --output "$TEST_DATA/test.bam"
+  --reference "$test_dir/ref.fasta" \
+  --query "$test_dir/reads.fastq" \
+  --bam \
+  --output "$meta_temp_dir/out.bam"
 
-if [ ! -s "$TEST_DATA/test.bam" ]; then echo "BAM file is empty"; exit 1; fi
-# Check if BAM index was created
-if [ ! -f "$TEST_DATA/test.bam.bai" ]; then echo "BAM index missing"; exit 1; fi
+check_file_exists "$meta_temp_dir/out.bam" "BAM output"
+check_file_not_empty "$meta_temp_dir/out.bam" "BAM output"
+check_file_exists "$meta_temp_dir/out.bam.bai" "BAM index"
 
-# Check BAM content using samtools
-samtools view "$TEST_DATA/test.bam" | grep -q "seq1" || { echo "BAM alignment failed"; exit 1; }
+if ! samtools view "$meta_temp_dir/out.bam" | grep -q "seq1"; then
+  log_error "BAM alignment to seq1 missing"
+  exit 1
+fi
+log "✓ BAM contains alignment to seq1"
+log "✅ TEST 2 passed"
 
-echo "minimap2_align tests passed."
+print_test_summary "$meta_name tests passed"

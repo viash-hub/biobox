@@ -1,38 +1,40 @@
-#!/usr/bin/env bash
-
-set -euo pipefail
+#!/bin/bash
 
 ## VIASH START
-meta_executable="target/executable/minimap2/minimap2_index"
-meta_resources_dir="src/minimap2"
 ## VIASH END
 
-# Run minimap2_index component
-echo "> Run minimap2_index on test FASTA"
+set -eo pipefail
+
+source "$meta_resources_dir/test_helpers.sh"
+setup_test_env
+
+log "Starting tests for $meta_name"
+
+test_dir="$meta_temp_dir/test_data"
+mkdir -p "$test_dir"
+
+cat > "$test_dir/ref.fasta" <<'EOF'
+>chr1
+ACTGATCGATCGATCGATCGATCGATCGATCGATCGATCGACTATCGATCGATCGATCGA
+EOF
+check_file_exists "$test_dir/ref.fasta" "test reference FASTA"
+
+# --- TEST 1: create a minimap2 index ---
+log "TEST 1: create a minimap2 index from a FASTA"
 "$meta_executable" \
-  --input "$meta_resources_dir/test_data/test.fasta" \
-  --output "$meta_resources_dir/test_data/test.mmi"
+  --input "$test_dir/ref.fasta" \
+  --output "$meta_temp_dir/ref.mmi"
 
-echo "Output .mmi will be written to: $meta_resources_dir/test_data/test.mmi"
+check_file_exists "$meta_temp_dir/ref.mmi" "minimap2 index"
+check_file_not_empty "$meta_temp_dir/ref.mmi" "minimap2 index"
 
-# Check output exists
-echo ">> Check if output exists"
-if [ ! -f "$meta_resources_dir/test_data/test.mmi" ]; then
-    echo ">> test.mmi does not exist"
-    exit 1
+# minimap2 index files start with the magic bytes "MMI\2"
+if ! head -c 3 "$meta_temp_dir/ref.mmi" | grep -q "MMI"; then
+  log_error "output does not look like a minimap2 index (missing MMI magic bytes)"
+  exit 1
 fi
+log "✓ minimap2 index magic bytes present"
 
-# Generate checksums of the output index file and the provided check.mmi file
-output_mmi_hash=$(sha256sum "$meta_resources_dir/test_data/test.mmi" | awk '{print $1}')
-check_mmi_hash=$(sha256sum "$meta_resources_dir/test_data/check.mmi" | awk '{print $1}')
+log "✅ TEST 1 passed"
 
-# Compare checksums
-echo "Comparing checksums..."
-
-if [ "$output_mmi_hash" != "$check_mmi_hash" ]; then
-    echo "Warning: The output .mmi file does not match 'check.mmi'."
-else
-    echo "The output .mmi file matches 'check.mmi'."
-fi
-
-echo "minimap2_index tests passed."
+print_test_summary "$meta_name tests passed"
