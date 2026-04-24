@@ -7,6 +7,10 @@
   * `ensembl_vep/filter_vep`: Filter and post-process VEP output by consequence type, phenotype, clinical significance, and more.
   * `ensembl_vep/vep`: Determine the effect of variants on genes, transcripts, and protein sequences with comprehensive annotation options.
 
+* `bwa_mem2`: Added support for bwa-mem2, an optimized replacement of bwa mem (PR #215):
+  - `bwa_mem2/bwa_mem2_index`: Create BWA index files for reference genome alignment, to use with bwa-mem2 mem.
+  - `bwa_mem2/bwa_mem2_mem`: BWA-MEM algorithm for sequence alignment supporting single-end and paired-end reads.
+
 * `minimap2`: A versatile pairwise aligner for genomic and spliced nucleotide sequences (PR #213):
   - `minimap2/minimap2_index`: Provides fasta index required by minimap2 alignment.
   - `minimap2/minimap2_align`: Maps DNA or mRNA query sequences against a reference database.
