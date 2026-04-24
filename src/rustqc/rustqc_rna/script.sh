@@ -5,14 +5,21 @@
 
 set -eo pipefail
 
-[[ "$par_flat_output" == "false" ]] && unset par_flat_output
-[[ "$par_paired" == "false" ]] && unset par_paired
-[[ "$par_skip_dup_check" == "false" ]] && unset par_skip_dup_check
-[[ "$par_quiet" == "false" ]] && unset par_quiet
-[[ "$par_verbose" == "false" ]] && unset par_verbose
-[[ "$par_skip_tin" == "false" ]] && unset par_skip_tin
-[[ "$par_skip_read_duplication" == "false" ]] && unset par_skip_read_duplication
-[[ "$par_skip_preseq" == "false" ]] && unset par_skip_preseq
+unset_if_false=(
+  par_flat_output
+  par_paired
+  par_skip_dup_check
+  par_quiet
+  par_verbose
+  par_skip_tin
+  par_skip_read_duplication
+  par_skip_preseq
+)
+
+for par in "${unset_if_false[@]}"; do
+  test_val="${!par}"
+  [[ "$test_val" == "false" ]] && unset "$par"
+done
 
 IFS=';' read -ra input_files <<< "$par_input"
 
