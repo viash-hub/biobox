@@ -15,6 +15,9 @@
   - `minimap2/minimap2_index`: Provides fasta index required by minimap2 alignment.
   - `minimap2/minimap2_align`: Maps DNA or mRNA query sequences against a reference database.
 
+* `rustqc`: Added support for RustQC, a Rust re-implementation of several established bioinformatics QC tools.
+
+
 # MINOR CHANGES
 
 * `bases2fastq`: Bump from `2.2.1` to `2.3.0` (PR #207)
