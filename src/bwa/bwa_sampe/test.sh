@@ -65,7 +65,8 @@ log "Starting TEST 1: Basic BWA sampe"
 
 log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "reference.fasta" \
   --sai1 "$test_data_dir/reads_R1.sai" \
   --sai2 "$test_data_dir/reads_R2.sai" \
   --reads1 "$test_data_dir/reads_R1.fastq" \
@@ -91,7 +92,8 @@ log "Starting TEST 2: BWA sampe with custom parameters"
 
 log "Executing $meta_name with custom parameters..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "reference.fasta" \
   --sai1 "$test_data_dir/reads_R1.sai" \
   --sai2 "$test_data_dir/reads_R2.sai" \
   --reads1 "$test_data_dir/reads_R1.fastq" \

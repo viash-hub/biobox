@@ -57,7 +57,8 @@ log "Starting TEST 1: Single-end BWA MEM alignment"
 
 log "Executing $meta_name with single-end reads..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "reference.fasta" \
   --reads1 "$test_data_dir/reads_single.fastq" \
   --output "$meta_temp_dir/single_end.sam"
 
@@ -80,7 +81,8 @@ log "Starting TEST 2: Paired-end BWA MEM alignment"
 
 log "Executing $meta_name with paired-end reads..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "reference.fasta" \
   --reads1 "$test_data_dir/reads_R1.fastq" \
   --reads2 "$test_data_dir/reads_R2.fastq" \
   --output "$meta_temp_dir/paired_end.sam"
@@ -104,7 +106,8 @@ log "Starting TEST 3: BWA MEM with advanced parameters"
 
 log "Executing $meta_name with advanced parameters..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "reference.fasta" \
   --reads1 "$test_data_dir/reads_single.fastq" \
   --output "$meta_temp_dir/advanced.sam" \
   --threads 2 \
