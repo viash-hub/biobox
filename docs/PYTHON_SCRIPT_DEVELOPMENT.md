@@ -25,7 +25,7 @@ Default to bash. Reach for Python when:
 - The wrapper has to coordinate multiple tool invocations and shuffle their outputs.
 - Input validation is substantive (e.g. matched paired-end file lists, schema checks).
 
-If the job is "arrange CLI flags and exec one tool", stay in bash. It is shorter and the surrounding ecosystem in this repo assumes bash.
+If the job is "arrange CLI flags and execute one tool", stay in bash. It is shorter and the surrounding ecosystem in this repo assumes bash.
 
 In the config, use a Python resource:
 
