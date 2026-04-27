@@ -20,7 +20,7 @@ This guide covers best practices for writing Python-based component scripts in b
 
 Default to bash. Reach for Python when:
 
-- The wrapper parses structured output (JSON, YAML, TSV with complex rules) and feeds it back to the tool.
+- The wrapper parses structured data (JSON, YAML, TSV with complex rules) and feeds it to the tool.
 - Arg construction has non-trivial branching (more than a handful of if/else).
 - The wrapper has to coordinate multiple tool invocations and shuffle their outputs.
 - Input validation is substantive (e.g. matched paired-end file lists, schema checks).
