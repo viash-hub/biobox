@@ -156,9 +156,9 @@ with open(par["output"], "w") as out:
 ```python
 cmd = ["tool", "--input", par["input"], "--output", par["output"]]
 
-if meta.get("cpus"):
+if meta["cpus"]:
     cmd += ["--threads", str(meta["cpus"])]
-if meta.get("memory_gb"):
+if meta["memory_gb"]:
     cmd += ["--memory", f"{meta['memory_gb']}G"]
 ```
 
