@@ -1,6 +1,6 @@
 # Python Script Development Guide
 
-This guide covers best practices for writing Python-based component scripts in biobox. Most biobox components are bash wrappers (see [Script Development Guide](SCRIPT_DEVELOPMENT.md)); Python is used when the wrapper needs real logic — parsing structured output, conditionals beyond a few branches, or data transformations that would be painful in bash.
+This guide covers best practices for writing Python-based component scripts in biobox. Most biobox components are bash wrappers (see [Script Development Guide](SCRIPT_DEVELOPMENT.md)); Python is used when the wrapper needs real logic and/or complex data structures — parsing structured output, conditionals beyond a few branches, or data transformations that would be painful in bash.
 
 ## Table of Contents
 - [When to Choose Python over Bash](#when-to-choose-python-over-bash)
