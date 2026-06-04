@@ -1,0 +1,90 @@
+name: hisat2_align
+namespace: hisat2
+description: |
+  Align reads to a reference genome using HISAT2
+keywords: [Alignment, Index, Fasta, Reference, HISAT2]
+links:
+  homepage: https://daehwankimlab.github.io/hisat2/main/
+  documentation: https://daehwankimlab.github.io/hisat2/manual/
+  repository: https://github.com/daehwankimlab/hisat2
+references:
+  doi: 10.1038/s41587-019-0201-4
+license: MIT
+authors:
+  - __merge__: /src/_authors/cydric_geyskens.yaml
+    roles: [author]
+
+requirements:
+  commands: [hisat2, curl]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - type: file
+        name: --index_dir
+        description: |
+          Directory containing the HISAT2 index files.
+          Contains 8 files with suffixes .1.ht2 through .8.ht2.
+        required: true
+        example: index
+      - type: string
+        name: --index_prefix
+        description: |
+          Prefix name used for the 8 index files inside the index_directory.
+        required: true
+        example: genome
+      - type: file
+        name: --input
+        description: |
+          For single-end provide one file,
+          for paired-end provide the R1 (forward) file.
+        required: true
+        example: reads_R1.fa 
+      - type: file
+        name: --input_r2
+        description: |
+          R2 (reverse) reads file for paired-end alignment.
+          If not provided, single-end mode is used.
+        required: false
+        example: reads_R2.fa 
+
+  - name: Outputs
+    arguments:
+      - type: file
+        direction: output
+        name: --output_sam
+        description: |
+          Output SAM file containing alignments.
+        required: true
+        example: output.sam
+
+  - name: Arguments
+    arguments:
+      - type: boolean_true
+        name: --fasta
+        description: |
+          Input reads are in FASTA format. Default expects FASTQ.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/hisat2:2.2.2--h503566f_0
+    setup:
+      - type: docker
+        run: |
+          wget -q https://github.com/moparisthebest/static-curl/releases/download/v8.1.2/curl-amd64 -O /usr/local/bin/curl && \
+          chmod +x /usr/local/bin/curl && \
+          hisat2 --version 2>&1 | head -1 | sed 's/.*version /hisat2: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

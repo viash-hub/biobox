@@ -1,0 +1,67 @@
+name: hisat2_build
+namespace: hisat2
+description: |
+  Build a HISAT2 index from a reference genome FASTA file.
+keywords: [Build, Index, Fasta, Reference, HISAT2]
+links:
+  homepage: https://daehwankimlab.github.io/hisat2/main/
+  documentation: https://daehwankimlab.github.io/hisat2/manual/
+  repository: https://github.com/daehwankimlab/hisat2
+references:
+  doi: 10.1038/s41587-019-0201-4
+license: MIT
+authors:
+  - __merge__: /src/_authors/cydric_geyskens.yaml
+    roles: [author]
+
+requirements:
+  commands: [hisat2-build]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+    - type: file
+      name: --input
+      alternatives: -i
+      description: |
+        Reference genome file in FASTA format.
+      required: true
+      example: reference_genome.fa
+
+  - name: Outputs
+    arguments:
+      - type: file
+        name: --index_dir
+        description: |
+          Directory where the HISAT2 index files will be written.
+          Will contain 8 files with suffixes .1.ht2 through .8.ht2.
+        required: true
+        example: index
+      - type: string
+        name: --index_prefix
+        description: |
+          Prefix name for the 8 index files inside the index_directory.
+        required: true
+        example: genome
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/hisat2:2.2.2--h503566f_0
+    setup:
+      - type: docker
+        run: |
+          hisat2-build --version 2>&1 | head -1 | sed 's/.*version /hisat2: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
