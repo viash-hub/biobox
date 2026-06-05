@@ -2,7 +2,7 @@ name: hisat2_align
 namespace: hisat2
 description: |
   Align reads to a reference genome using HISAT2
-keywords: [Alignment, Index, Fasta, Reference, HISAT2]
+keywords: [Alignment, RNA-seq, HISAT2]
 links:
   homepage: https://daehwankimlab.github.io/hisat2/main/
   documentation: https://daehwankimlab.github.io/hisat2/manual/
@@ -15,7 +15,7 @@ authors:
     roles: [author]
 
 requirements:
-  commands: [hisat2, curl]
+  commands: [hisat2]
 
 argument_groups:
   - name: Inputs
@@ -39,14 +39,14 @@ argument_groups:
           For single-end provide one file,
           for paired-end provide the R1 (forward) file.
         required: true
-        example: reads_R1.fa 
+        example: reads_R1.fastq
       - type: file
         name: --input_r2
         description: |
           R2 (reverse) reads file for paired-end alignment.
           If not provided, single-end mode is used.
         required: false
-        example: reads_R2.fa 
+        example: reads_R2.fastq
 
   - name: Outputs
     arguments:
@@ -81,8 +81,6 @@ engines:
     setup:
       - type: docker
         run: |
-          wget -q https://github.com/moparisthebest/static-curl/releases/download/v8.1.2/curl-amd64 -O /usr/local/bin/curl && \
-          chmod +x /usr/local/bin/curl && \
           hisat2 --version 2>&1 | head -1 | sed 's/.*version /hisat2: /' > /var/software_versions.txt
 
 runners:

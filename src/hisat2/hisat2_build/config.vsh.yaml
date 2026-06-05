@@ -2,7 +2,7 @@ name: hisat2_build
 namespace: hisat2
 description: |
   Build a HISAT2 index from a reference genome FASTA file.
-keywords: [Build, Index, Fasta, Reference, HISAT2]
+keywords: [Build, Index, RNA-seq, HISAT2]
 links:
   homepage: https://daehwankimlab.github.io/hisat2/main/
   documentation: https://daehwankimlab.github.io/hisat2/manual/
@@ -21,8 +21,7 @@ argument_groups:
   - name: Inputs
     arguments:
     - type: file
-      name: --input
-      alternatives: -i
+      name: --reference
       description: |
         Reference genome file in FASTA format.
       required: true
@@ -32,11 +31,15 @@ argument_groups:
     arguments:
       - type: file
         name: --index_dir
+        direction: output
         description: |
           Directory where the HISAT2 index files will be written.
           Will contain 8 files with suffixes .1.ht2 through .8.ht2.
         required: true
         example: index
+
+  - name: Options
+    arguments:
       - type: string
         name: --index_prefix
         description: |
