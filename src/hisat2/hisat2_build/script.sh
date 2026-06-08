@@ -3,9 +3,6 @@
 set -euo pipefail
 
 ## VIASH START
-par_reference="/Users/cydricgeyskens/Documents/viashhub/hisat2/22_20-21M.fa"
-par_index_dir="/Users/cydricgeyskens/Documents/viashhub/hisat2/index"
-par_index_prefix=genome
 ## VIASH END
 
 echo "Building hisat2 index ..."

@@ -18,8 +18,8 @@
 * `rustqc`: Added support for RustQC, a Rust re-implementation of several established bioinformatics QC tools.
 
 * `hisat2`: A graph-based alignment program for mapping RNA-seq reads to a reference genome. (PR #XXX)
-  - `minimap2/minimap2_build`: Builds a HISAT2 index from a reference FASTA file.
-  - `minimap2/minimap2_align`: Aligns RNA-seq reads to a reference genome using the HISAT2 aligner.
+  - `hisat2/hisat2_build`: Builds a HISAT2 index from a reference FASTA file.
+  - `hisat2/hisat2_align`: Aligns RNA-seq reads to a reference genome using the HISAT2 aligner.
 
 # MINOR CHANGES
 

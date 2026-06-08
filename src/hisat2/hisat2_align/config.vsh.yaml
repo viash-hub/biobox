@@ -1,7 +1,8 @@
 name: hisat2_align
 namespace: hisat2
 description: |
-  Align reads to a reference genome using HISAT2
+  Align reads to a reference genome using HISAT2.
+  Outputs SAM files containing the alignment.
 keywords: [Alignment, RNA-seq, HISAT2]
 links:
   homepage: https://daehwankimlab.github.io/hisat2/main/

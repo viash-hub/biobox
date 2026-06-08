@@ -40,7 +40,7 @@ check_file_exists "$test_data_dir/reads/reads_2.fa" "reads file 2"
 log "Test data created, fetched and validated"
 
 # --- TEST_1: basic functionality ---
-log "Starting TEST_1: basic functionality, running in single-end mode)"
+log "Starting TEST_1: basic functionality, running in single-end mode"
 log "Now executing $meta_name with basic parameters..."
 "$meta_executable" \
   --index_dir "$test_data_dir/index" \
