@@ -13,7 +13,7 @@ log "Starting tests for $meta_name"
 log "Start creating & fetching test data"
 
 test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"/{fastq_reads,output_test_{1,2,3}}
+mkdir -p "$test_data_dir"/{fastq_reads,output_test_{1,2,3,4}}
 
 # create and validate the fastq reads
 create_test_fastq "$test_data_dir/fastq_reads/read_1.fastq" 1 100
@@ -86,5 +86,21 @@ check_file_not_empty "$test_data_dir/output_test_3/output.sam" "Output SAM file"
 check_file_matches_regex "$test_data_dir/output_test_3/output.sam" "^@(HD|SQ|PG)" "TEST_3 SAM headers"
 
 log "✓ TEST_3 completed successfully"
+
+# --- TEST_4: testing --summary_file output ---
+log "Starting TEST_4: testing --summary_file optional output"
+"$meta_executable" \
+  --index_dir "$test_data_dir/index" \
+  --index_prefix 22_20-21M_snp \
+  --input "$test_data_dir/fastq_reads/read_1.fastq" \
+  --output_sam "$test_data_dir/output_test_4/output.sam" \
+  --summary_file "$test_data_dir/output_test_4/summary.txt"
+
+check_file_exists "$test_data_dir/output_test_4/output.sam" "Output SAM file"
+check_file_exists "$test_data_dir/output_test_4/summary.txt" "Alignment summary file"
+check_file_not_empty "$test_data_dir/output_test_4/summary.txt" "Alignment summary file"
+check_file_matches_regex "$test_data_dir/output_test_4/summary.txt" "reads; of these" "TEST_4 summary alignment stats"
+
+log "✓ TEST_4 completed successfully"
 
 print_test_summary "$meta_name tests"

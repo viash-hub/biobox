@@ -2,6 +2,7 @@ name: hisat2_build
 namespace: hisat2
 description: |
   Build a HISAT2 index from a reference genome FASTA file.
+  Optionally incorporates splice sites, exons, SNPs, and haplotypes for a graph-based index.
 keywords: [Build, Index, RNA-seq, HISAT2]
 links:
   homepage: https://daehwankimlab.github.io/hisat2/main/
@@ -20,32 +21,113 @@ requirements:
 argument_groups:
   - name: Inputs
     arguments:
-    - type: file
-      name: --reference
-      description: |
-        Reference genome file in FASTA format.
-      required: true
-      example: reference_genome.fa
+      - type: file
+        name: --reference
+        description: Reference genome file in FASTA format.
+        required: true
+        example: reference_genome.fa
+
+  - name: Annotation Inputs
+    description: Optional annotation files for building a splice-aware or SNP-aware graph-based index.
+    arguments:
+      - type: file
+        name: --ss
+        description: Splice site file in HISAT2 tab-separated format.
+        example: splicesites.txt
+      - type: file
+        name: --exon
+        description: Exon file in HISAT2 tab-separated format.
+        example: exons.txt
+      - type: file
+        name: --snp
+        description: SNP file for building a SNP-aware index.
+        example: snps.txt
+      - type: file
+        name: --haplotype
+        description: Haplotype file for building a haplotype-aware index.
+        example: haplotypes.txt
 
   - name: Outputs
     arguments:
       - type: file
         name: --index_dir
         direction: output
-        description: |
-          Directory where the HISAT2 index files will be written.
-          Will contain 8 files with suffixes .1.ht2 through .8.ht2.
+        description: Directory where the HISAT2 index files will be written (.1.ht2 through .8.ht2).
         required: true
         example: index
-
-  - name: Options
-    arguments:
       - type: string
         name: --index_prefix
-        description: |
-          Prefix name for the 8 index files inside the index_directory.
+        description: Prefix name for the 8 index files inside the index directory.
         required: true
         example: genome
+
+  - name: Index Construction Options
+    arguments:
+      - type: boolean_true
+        name: --large_index
+        description: Force a large index (>4 billion nucleotides), even if the reference is smaller.
+      - type: boolean_true
+        name: --noauto
+        description: Disable automatic selection of block size and memory parameters.
+      - type: boolean_true
+        name: --nodc
+        description: Disable the difference-cover sample (may reduce memory usage at the cost of speed).
+      - type: boolean_true
+        name: --noref
+        alternatives: [-r]
+        description: Do not build the packed reference (.3/.4.ht2) portion of the index.
+      - type: boolean_true
+        name: --justref
+        alternatives: ["-3"]
+        description: Build only the packed reference (.3/.4.ht2) portion of the index.
+      - type: integer
+        name: --bmax
+        description: Maximum number of suffixes allowed in a block during index construction. Default is auto-selected.
+        min: 1
+      - type: integer
+        name: --bmaxdivn
+        description: Set bmax as a fraction of the reference length (reference_length / bmaxdivn). Default is 4.
+        example: 4
+        min: 1
+      - type: integer
+        name: --dcv
+        description: Period for the difference-cover sample. Larger values use less memory but slow construction. Default is 1024.
+        example: 1024
+        min: 3
+      - type: integer
+        name: --offrate
+        alternatives: [-o]
+        description: "Suffix array is sampled every 2^N BWT characters. Larger values = smaller index but slower alignment. Default: 4."
+        example: 4
+        min: 0
+      - type: integer
+        name: --ftabchars
+        alternatives: [-t]
+        description: Number of characters consumed in the initial lookup table (ftab). Default is 10.
+        example: 10
+        min: 1
+      - type: integer
+        name: --localoffrate
+        description: "Suffix array sampling rate for the local index: every 2^N BWT chars. Default: 3."
+        example: 3
+        min: 0
+      - type: integer
+        name: --localftabchars
+        description: Number of characters consumed in the local initial lookup table. Default is 6.
+        example: 6
+        min: 1
+
+  - name: Other Options
+    arguments:
+      - type: integer
+        name: --seed
+        description: Seed for the pseudo-random number generator.
+        example: 0
+        min: 0
+      - type: boolean_true
+        name: --quiet
+        alternatives: [-q]
+        description: Disable verbose output (quiet mode).
 
 resources:
   - type: bash_script

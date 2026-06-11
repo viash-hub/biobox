@@ -23,29 +23,22 @@ argument_groups:
     arguments:
       - type: file
         name: --index_dir
-        description: |
-          Directory containing the HISAT2 index files.
-          Contains 8 files with suffixes .1.ht2 through .8.ht2.
+        description: Directory containing the HISAT2 index files (.1.ht2 through .8.ht2).
         required: true
         example: index
       - type: string
         name: --index_prefix
-        description: |
-          Prefix name used for the 8 index files inside the index_directory.
+        description: Prefix name for the 8 index files inside the index directory.
         required: true
         example: genome
       - type: file
         name: --input
-        description: |
-          For single-end provide one file,
-          for paired-end provide the R1 (forward) file.
+        description: For single-end, the reads file. For paired-end, the R1 (forward) reads file.
         required: true
         example: reads_R1.fastq
       - type: file
         name: --input_r2
-        description: |
-          R2 (reverse) reads file for paired-end alignment.
-          If not provided, single-end mode is used.
+        description: R2 (reverse) reads file for paired-end alignment. If omitted, single-end mode is used.
         required: false
         example: reads_R2.fastq
 
@@ -54,17 +47,336 @@ argument_groups:
       - type: file
         direction: output
         name: --output_sam
-        description: |
-          Output SAM file containing alignments.
+        description: Output SAM file containing alignments.
         required: true
         example: output.sam
+      - type: file
+        direction: output
+        name: --novel_splicesite_outfile
+        description: Report a list of splice sites discovered during alignment to this file.
+        required: false
+        example: novel_splicesites.txt
+      - type: file
+        direction: output
+        name: --summary_file
+        description: Print alignment summary statistics to this file.
+        required: false
+        example: summary.txt
 
-  - name: Arguments
+  - name: Input Format
     arguments:
       - type: boolean_true
         name: --fasta
-        description: |
-          Input reads are in FASTA format. Default expects FASTQ.
+        alternatives: [-f]
+        description: Input reads are in FASTA format. Default expects FASTQ.
+      - type: boolean_true
+        name: --qseq
+        description: Input reads are in Illumina QSEQ format.
+      - type: boolean_true
+        name: --phred64
+        description: Input quality scores are Phred+64 encoded. Default is Phred+33.
+      - type: boolean_true
+        name: --int_quals
+        description: Input quality scores are encoded as space-separated integers.
+      - type: integer
+        name: --skip
+        alternatives: [-s]
+        description: Skip the first N reads or read pairs in the input.
+        example: 0
+        min: 0
+      - type: integer
+        name: --qupto
+        alternatives: [-u]
+        description: Align only the first N reads or read pairs. Default processes all reads.
+        example: 1000000
+        min: 1
+      - type: integer
+        name: --trim5
+        description: Trim N bases from the 5' (left) end of each read before alignment.
+        example: 0
+        min: 0
+      - type: integer
+        name: --trim3
+        description: Trim N bases from the 3' (right) end of each read before alignment.
+        example: 0
+        min: 0
+
+  - name: Paired-end Options
+    arguments:
+      - type: integer
+        name: --minins
+        alternatives: [-I]
+        description: Minimum fragment length for valid paired-end alignment. Default is 0.
+        example: 0
+        min: 0
+      - type: integer
+        name: --maxins
+        alternatives: [-X]
+        description: Maximum fragment length for valid paired-end alignment. Default is 500.
+        example: 500
+        min: 1
+      - type: boolean_true
+        name: --fr
+        description: Paired-end mates are oriented forward/reverse (default).
+      - type: boolean_true
+        name: --rf
+        description: Paired-end mates are oriented reverse/forward.
+      - type: boolean_true
+        name: --ff
+        description: Paired-end mates are oriented forward/forward.
+      - type: boolean_true
+        name: --no_mixed
+        description: Suppress unpaired alignments for paired reads that fail to align concordantly.
+      - type: boolean_true
+        name: --no_discordant
+        description: Suppress discordant alignments for paired reads.
+      - type: boolean_true
+        name: --dovetail
+        description: Treat dovetailing mates as concordant.
+      - type: boolean_true
+        name: --no_contain
+        description: Not concordant if one mate is contained within the other.
+      - type: boolean_true
+        name: --no_overlap
+        description: Not concordant if mates overlap at all.
+
+  - name: Alignment Options
+    arguments:
+      - type: boolean_true
+        name: --end_to_end
+        description: End-to-end alignment mode; entire read must align (default).
+      - type: boolean_true
+        name: --local
+        description: Local alignment mode; soft clipping of ends is allowed.
+      - type: boolean_true
+        name: --very_fast
+        description: Preset for very fast end-to-end alignment (low sensitivity).
+      - type: boolean_true
+        name: --fast
+        description: Preset for fast end-to-end alignment.
+      - type: boolean_true
+        name: --sensitive
+        description: Preset for sensitive end-to-end alignment (default).
+      - type: boolean_true
+        name: --very_sensitive
+        description: Preset for very sensitive end-to-end alignment (high sensitivity, slower).
+      - type: boolean_true
+        name: --very_fast_local
+        description: Preset for very fast local alignment (low sensitivity).
+      - type: boolean_true
+        name: --fast_local
+        description: Preset for fast local alignment.
+      - type: boolean_true
+        name: --sensitive_local
+        description: Preset for sensitive local alignment.
+      - type: boolean_true
+        name: --very_sensitive_local
+        description: Preset for very sensitive local alignment (high sensitivity, slower).
+      - type: string
+        name: --n_ceil
+        description: "Function governing max number of ambiguous characters (N) allowed in a read. Default: L,0,0.15."
+        example: "L,0,0.15"
+      - type: integer
+        name: --dpad
+        description: Pad dynamic programming problems by N extra reference columns on either side. Default is 15.
+        example: 15
+        min: 0
+      - type: integer
+        name: --gbar
+        description: Disallow gaps within N positions of the read start or end. Default is 4.
+        example: 4
+        min: 0
+      - type: boolean_true
+        name: --ignore_quals
+        description: Treat all base quality values as the highest possible when calculating mismatch penalties.
+      - type: boolean_true
+        name: --nofw
+        description: Do not attempt to align the forward strand of reads.
+      - type: boolean_true
+        name: --norc
+        description: Do not attempt to align the reverse-complement strand of reads.
+      - type: boolean_true
+        name: --no_1mm_upfront
+        description: Disable the 1-mismatch-per-seed policy applied before dynamic programming.
+
+  - name: Spliced Alignment Options
+    arguments:
+      - type: boolean_true
+        name: --no_spliced_alignment
+        description: Disable spliced alignment; treat the genome as a flat reference.
+      - type: string
+        name: --rna_strandness
+        description: "Specify strand-specific information: F (forward), R (reverse), FR, or RF."
+        choices: [F, R, FR, RF]
+        example: FR
+      - type: boolean_true
+        name: --tmo
+        description: Report only alignments within the known transcriptome (transcriptome-mapping-only).
+      - type: boolean_true
+        name: --dta
+        description: Report alignments tailored for downstream transcript assembly (e.g. StringTie).
+      - type: boolean_true
+        name: --dta_cufflinks
+        description: Report alignments tailored for Cufflinks downstream assembly.
+      - type: boolean_true
+        name: --avoid_pseudogene
+        description: Avoid alignment to pseudogene regions.
+      - type: boolean_true
+        name: --no_templatelen_adjustment
+        description: Disable template length adjustment for RNA-seq pairs.
+      - type: file
+        name: --known_splicesite_infile
+        description: Provide a file of known splice sites to guide alignment.
+        example: known_splicesites.txt
+      - type: file
+        name: --novel_splicesite_infile
+        description: Provide a file of novel splice sites (e.g. from a prior run) to use during alignment.
+        example: novel_splicesites.txt
+      - type: boolean_true
+        name: --no_temp_splicesite
+        description: Do not use temporary splice sites discovered in earlier reads to inform later alignments.
+      - type: boolean_true
+        name: --secondary_alignments
+        description: Report secondary alignments.
+      - type: integer
+        name: --pen_cansplice
+        description: Penalty for a canonical splice site (GT/AG). Default is 0.
+        example: 0
+        min: 0
+      - type: integer
+        name: --pen_noncansplice
+        description: Penalty for a non-canonical splice site. Default is 12.
+        example: 12
+        min: 0
+      - type: string
+        name: --pen_canintronlen
+        description: "Penalty function for canonical intron length. Default: G,-8,1."
+        example: "G,-8,1"
+      - type: string
+        name: --pen_noncanintronlen
+        description: "Penalty function for non-canonical intron length. Default: G,-8,1."
+        example: "G,-8,1"
+      - type: integer
+        name: --min_intronlen
+        description: Minimum intron length. Default is 20.
+        example: 20
+        min: 1
+      - type: integer
+        name: --max_intronlen
+        description: Maximum intron length. Default is 500000.
+        example: 500000
+        min: 1
+
+  - name: Scoring Options
+    arguments:
+      - type: integer
+        name: --ma
+        description: Match bonus in local alignment mode. Default is 2.
+        example: 2
+        min: 0
+      - type: string
+        name: --mp
+        description: "Max and min mismatch penalties as MX,MN. Default: 6,2."
+        example: "6,2"
+      - type: string
+        name: --sp
+        description: "Max and min soft-clipping penalties for local mode as MX,MN. Default: 1,0."
+        example: "1,0"
+      - type: integer
+        name: --np
+        description: Penalty for aligning against an ambiguous (N) character. Default is 1.
+        example: 1
+        min: 0
+      - type: string
+        name: --rdg
+        description: "Read gap open and extend penalties as open,extend. Default: 5,3."
+        example: "5,3"
+      - type: string
+        name: --rfg
+        description: "Reference gap open and extend penalties as open,extend. Default: 5,3."
+        example: "5,3"
+      - type: string
+        name: --score_min
+        description: "Function for minimum acceptable alignment score. Default: L,0,-0.2 (end-to-end); G,20,8 (local)."
+        example: "L,0,-0.2"
+
+  - name: Reporting Options
+    arguments:
+      - type: integer
+        name: --k
+        alternatives: [-k]
+        description: Report up to N alignments per read. Default reports the best alignment only.
+        example: 5
+        min: 1
+      - type: boolean_true
+        name: --all
+        alternatives: [-a]
+        description: Report all valid alignments per read.
+      - type: integer
+        name: --max_seeds
+        description: Maximum number of seeds to try extending per read. Default is 5.
+        example: 5
+        min: 1
+
+  - name: SAM Options
+    arguments:
+      - type: boolean_true
+        name: --no_unal
+        description: Suppress SAM records for reads that fail to align.
+      - type: boolean_true
+        name: --no_hd
+        description: Suppress SAM header lines (lines beginning with @).
+      - type: boolean_true
+        name: --no_sq
+        description: Suppress @SQ SAM header lines.
+      - type: string
+        name: --rg_id
+        description: Set the read group ID; causes an @RG header line with this ID to appear in SAM output.
+        example: sample1
+      - type: string
+        name: --rg
+        description: "Add a field (TAG:VALUE) to the @RG SAM header line. Can be specified multiple times."
+        multiple: true
+        example: "SM:sample1"
+      - type: boolean_true
+        name: --omit_sec_seq
+        description: Put * in the SEQ and QUAL fields for secondary alignments to reduce output size.
+      - type: boolean_true
+        name: --sam_no_qname_trunc
+        description: Suppress read-name truncation (by default names longer than 255 characters are truncated).
+      - type: boolean_true
+        name: --xeq
+        description: Use = and X CIGAR operations instead of M to distinguish matches from mismatches.
+      - type: boolean_true
+        name: --soft_clipped_unmapped_tlen
+        description: Set TLEN field to 0 for soft-clipped reads that are otherwise unmapped.
+      - type: boolean_true
+        name: --add_chrname
+        description: Add "chr" prefix to reference sequence names in SAM output.
+      - type: boolean_true
+        name: --remove_chrname
+        description: Remove "chr" prefix from reference sequence names in SAM output.
+
+  - name: Other Options
+    arguments:
+      - type: boolean_true
+        name: --new_summary
+        description: Print alignment summary to stderr in a machine-friendly tab-separated format.
+      - type: boolean_true
+        name: --quiet
+        alternatives: [-q]
+        description: Print nothing to stderr except serious errors.
+      - type: boolean_true
+        name: --reorder
+        description: Force SAM output to appear in the same order as the input reads.
+      - type: boolean_true
+        name: --mm
+        description: Use memory-mapped I/O to load the index (useful when aligning many samples concurrently).
+      - type: integer
+        name: --seed
+        description: Seed for the pseudo-random number generator. Default is 0.
+        example: 0
+        min: 0
 
 resources:
   - type: bash_script
