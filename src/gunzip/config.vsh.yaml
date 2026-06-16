@@ -1,0 +1,42 @@
+name: "gunzip"
+info:
+  migration_info:
+    git_repo: https://github.com/nf-core/rnaseq.git
+    paths: [modules/nf-core/gunzip/main.nf, modules/nf-core/gunzip/meta.yml]
+    last_sha: 54721c6946daf6d602d7069dc127deef9cbe6b33
+description: |
+  Compress or uncompress a file or list of files.
+
+argument_groups:
+- name: "Input"
+  arguments:
+  - name: "--input"
+    type: file 
+    required: true
+    description: Path of file to be uncompressed
+    
+- name: "Output"
+  arguments:  
+  - name: "--output"
+    type: file
+    direction: output
+    required: true
+    description: Decompressed file. 
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /testData/minimal_test/reference/genes.gff.gz
+  
+engines:
+  - type: docker
+    image: ubuntu:22.04
+    setup:
+      - type: apt
+        packages: [ gzip ]
+runners:
+  - type: executable
+  - type: nextflow
