@@ -1,0 +1,49 @@
+```bash
+seekarctools arc run --help
+```
+
+Note: SeekArc Tools is distributed as a proprietary conda-packed tarball and the raw
+`--help` output cannot be regenerated without the tool installed. The reference below
+is compiled from the SeekArc Tools v1.1.0 documentation:
+https://seeksoul.online/cloudplatform-doc/en/document/Software/1_SeekArc_Tools/2_v1.1.0/4_Analysis.html
+
+Usage:
+  seekarctools arc run [options]
+
+Run the primary single-cell ATAC multi-omics analysis pipeline.
+
+Required:
+  --rnafq1 PATH         Expression (RNA) library R1 FASTQ.
+  --rnafq2 PATH         Expression (RNA) library R2 FASTQ.
+  --atacfq1 PATH        ATAC library R1 FASTQ.
+  --atacfq2 PATH        ATAC library R2 FASTQ.
+  --samplename STR      Sample identifier.
+  --refpath PATH        Reference genome directory.
+  --chemistry STR       Library chemistry: DD_AG (3') or DD5_AG (5').
+
+Optional:
+  --outdir PATH         Output directory (default: ./).
+  --core INT            Number of threads.
+  --include-introns     Include intronic reads in expression quantification.
+  --skip_misB           Disable the default 1-mismatch tolerance for barcodes.
+  --skip_misL           Disable the default 1-mismatch tolerance for linkers.
+  --skip_multi          Discard reads correctable to multiple barcodes.
+  --skip_len            Skip short-read length filtering.
+  --star_path PATH      External STAR executable to use instead of the bundled one.
+
+Peak calling:
+  --qvalue FLOAT        FDR cutoff for peaks (default: 0.001).
+  --snapshift INT       Read shift in bp before peak calling (default: 0).
+  --extsize INT         Pileup extension size in bp (default: 400).
+  --min_len INT         Minimum peak length in bp (default: 400).
+  --nolambda            Use the background lambda as the local lambda.
+  --broad               Enable broad peak calling (gappedPeak output).
+  --broad_cutoff FLOAT  FDR cutoff for broad peaks (default: 0.1).
+
+Cell filtering:
+  --min_atac_count INT  Minimum ATAC transposition events per cell barcode
+                        (only effective together with --min_gex_count).
+  --min_gex_count INT   Minimum UMI count per cell barcode.
+
+  -h, --help            Show this help message.
+```

@@ -1,0 +1,182 @@
+name: seekarc
+namespace: seekgene
+description: |
+  Process single-cell ATAC multi-omics data with SeekArc Tools (`seekarctools arc run`).
+
+  SeekArc Tools is SeekGene's suite for joint single-cell gene-expression (RNA) and
+  ATAC analysis. From paired RNA and ATAC FASTQ libraries it performs barcode
+  extraction and correction, alignment, peak and cell calling, and produces filtered
+  and raw expression / accessibility matrices, fragment files, BAM files, peak calls,
+  and an HTML report. See the
+  [SeekArc Tools documentation](https://seeksoul.online/cloudplatform-doc/en/document/Software/1_SeekArc_Tools/2_v1.1.0/1_Overview.html).
+keywords: [single-cell, ATAC, multi-omics, scATAC, scRNA-seq, alignment, peak-calling]
+links:
+  homepage: https://www.seekgene.com
+  documentation: https://seeksoul.online/cloudplatform-doc/en/document/Software/1_SeekArc_Tools/2_v1.1.0/1_Overview.html
+license: Proprietary
+requirements:
+  commands: [seekarctools]
+authors:
+  - __merge__: /src/_authors/dorien_roosen.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --rnafq1
+        type: file
+        required: true
+        description: Expression (RNA) library FASTQ file with the first reads (R1).
+        example: demo_GE_S1_L001_R1_001.fastq.gz
+      - name: --rnafq2
+        type: file
+        required: true
+        description: Expression (RNA) library FASTQ file with the second reads (R2).
+        example: demo_GE_S1_L001_R2_001.fastq.gz
+      - name: --atacfq1
+        type: file
+        required: true
+        description: ATAC library FASTQ file with the first reads (R1).
+        example: demo_arc_S2_L002_R1_001.fastq.gz
+      - name: --atacfq2
+        type: file
+        required: true
+        description: ATAC library FASTQ file with the second reads (R2).
+        example: demo_arc_S2_L002_R2_001.fastq.gz
+
+  - name: Reference
+    arguments:
+      - name: --refpath
+        type: file
+        required: true
+        description: |
+          Path to the directory containing the pre-built SeekArc reference genome
+          (e.g. GRCh38 or GRCm38). References are distributed by SeekGene or built
+          following their "How to Build a Reference Genome?" guide.
+        example: reference/GRCh38
+
+  - name: Sample options
+    arguments:
+      - name: --samplename
+        type: string
+        required: true
+        description: Sample identifier, used to name the output sub-directory and result files.
+        example: demo
+      - name: --chemistry
+        type: string
+        required: true
+        choices: [DD_AG, DD5_AG]
+        description: |
+          Library chemistry. Use `DD_AG` for 3' chemistry or `DD5_AG` for 5' chemistry.
+        example: DD_AG
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        required: true
+        description: |
+          Output directory. SeekArc writes results for the sample into this directory
+          (an `outs` folder containing filtered/raw matrices, fragment and BAM files,
+          peak calls, a QC metrics CSV, an RDS object, and an HTML report).
+        example: output/
+
+  - name: Barcode processing options
+    arguments:
+      - name: --include_introns
+        type: boolean_true
+        description: Include intronic reads in the expression quantification.
+      - name: --skip_misB
+        type: boolean_true
+        description: Disable the default tolerance of 1 barcode mismatch during correction.
+      - name: --skip_misL
+        type: boolean_true
+        description: Disable the default tolerance of 1 linker mismatch during correction.
+      - name: --skip_multi
+        type: boolean_true
+        description: Discard reads that are correctable to multiple barcodes.
+      - name: --skip_len
+        type: boolean_true
+        description: Skip the short-read length filtering step.
+      - name: --star_path
+        type: string
+        description: Path to an external STAR executable to use instead of the bundled one.
+        example: /usr/local/bin/STAR
+
+  - name: Peak calling options
+    arguments:
+      - name: --qvalue
+        type: double
+        description: "Minimum FDR (q-value) cutoff for calling significant peaks. Default: 0.001."
+        example: 0.001
+      - name: --snapshift
+        type: integer
+        description: "Arbitrary shift in bp applied to reads in the 5'->3' direction before peak calling. Default: 0."
+        example: 0
+      - name: --extsize
+        type: integer
+        description: "Extension size in bp used when building the pileup for peak calling. Default: 400."
+        example: 400
+      - name: --min_len
+        type: integer
+        description: "Minimum length of a called peak in bp. Default: 400."
+        example: 400
+      - name: --nolambda
+        type: boolean_true
+        description: Use the background lambda as the local lambda for peak calling.
+      - name: --broad
+        type: boolean_true
+        description: Enable broad peak calling, producing output in gappedPeak format.
+      - name: --broad_cutoff
+        type: double
+        description: "FDR cutoff used to merge nearby regions into broad peaks. Default: 0.1."
+        example: 0.1
+
+  - name: Cell filtering options
+    arguments:
+      - name: --min_atac_count
+        type: integer
+        description: |
+          Minimum number of ATAC transposition events per barcode for a cell to be kept.
+          Only takes effect when `--min_gex_count` is also set.
+      - name: --min_gex_count
+        type: integer
+        description: Minimum UMI count per barcode for a cell to be kept.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: ubuntu:22.04
+    setup:
+      - type: apt
+        packages:
+          - wget
+          - ca-certificates
+          - bzip2
+          - procps
+      - type: docker
+        env:
+          - SEEKARCTOOLS_VERSION=1.1.0
+          - PATH=/opt/seekarctools/bin:$PATH
+        run: |
+          mkdir -p /opt/seekarctools && cd /opt/seekarctools && \
+          wget -c --no-check-certificate -O seekarctools.tar.gz "https://seekgene-public.oss-cn-beijing.aliyuncs.com/software/seekarctools/seekarctools_v${SEEKARCTOOLS_VERSION}.tar.gz" && \
+          tar zxf seekarctools.tar.gz && \
+          rm seekarctools.tar.gz && \
+          ./bin/conda-unpack
+      - type: docker
+        run: |
+          seekarctools --version 2>&1 | tail -n 1 | sed 's/^/seekarctools: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
