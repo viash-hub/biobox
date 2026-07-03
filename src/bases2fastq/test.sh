@@ -82,7 +82,7 @@ wget http://element-public-data.s3.amazonaws.com/bases2fastq-share/bases2fastq-v
 log_info "Extracting test data"
 BCL_DIR="$TMPDIR/bcl"
 mkdir "$BCL_DIR"
-tar -xzf "$TAR_DIR/20230404-bases2fastq-sim-151-151-9-9.tar.gz" -C "$BCL_DIR"
+tar -xvf "$TAR_DIR/20230404-bases2fastq-sim-151-151-9-9.tar.gz" -C "$BCL_DIR"
 
 log_info "Running test 1 with multiple options"
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null
@@ -186,12 +186,70 @@ find "$expected_out_dir" -name "*.fastq.gz" | head -10
 
 log_info "Checking split lane FASTQ files"
 for sample in "${expected_samples[@]}"; do
-  for lane in "L1" "L2"; do 
+  for lane in "L1" "L2"; do
     for orientation in "R1" "R2"; do
       check_file_exists "$expected_out_dir/${sample}_${lane}_${orientation}.fastq.gz" "Split lane FASTQ file ${sample}_${lane}_${orientation}"
     done
   done
 done
+popd > /dev/null
+
+log_info "Running test 5 with skip_empty_fq_files option"
+mkdir "$TMPDIR/test5" && pushd "$TMPDIR/test5" > /dev/null
+expected_out_dir="$TMPDIR/test5/out"
+
+# Create a run manifest that adds a sample with a barcode that does not occur in
+# the sequencing data, so this sample will be assigned zero reads.
+custom_manifest="$TMPDIR/test5/RunManifest.csv"
+cp "$BCL_DIR/20230404-bases2fastq-sim-151-151-9-9/RunManifest.csv" "$custom_manifest"
+echo "sample_empty,AAAAAAAAA,TTTTTTTTT" >> "$custom_manifest"
+
+"$meta_executable" \
+  --analysis_directory "$BCL_DIR/20230404-bases2fastq-sim-151-151-9-9" \
+  --output_directory "$expected_out_dir" \
+  --run_manifest "$custom_manifest" \
+  --skip_empty_fq_files
+
+log_info "Inspecting skip_empty_fq_files output directory:"
+find "$expected_out_dir" -name "*.fastq.gz" | head -10
+
+log_info "Checking that FASTQ files were still created for samples with reads"
+check_file_exists "$expected_out_dir/DefaultProject/sample_0/sample_0_R1.fastq.gz" "Sample sample_0 R1 FASTQ file"
+check_file_exists "$expected_out_dir/DefaultProject/sample_0/sample_0_R2.fastq.gz" "Sample sample_0 R2 FASTQ file"
+
+log_info "Checking that no FASTQ files were created for the empty sample"
+check_file_not_exists "$expected_out_dir/DefaultProject/sample_empty/sample_empty_R1.fastq.gz" "Empty sample R1 FASTQ file (should not exist)"
+check_file_not_exists "$expected_out_dir/DefaultProject/sample_empty/sample_empty_R2.fastq.gz" "Empty sample R2 FASTQ file (should not exist)"
+popd > /dev/null
+
+log_info "Running test 6 with force_detect_index_orientation option"
+# Note: --force_detect_index_orientation is mutually exclusive with
+# --force_index_orientation, so it is exercised in its own invocation.
+mkdir "$TMPDIR/test6" && pushd "$TMPDIR/test6" > /dev/null
+expected_out_dir="$TMPDIR/test6/out"
+"$meta_executable" \
+  --analysis_directory "$BCL_DIR/20230404-bases2fastq-sim-151-151-9-9" \
+  --output_directory "$expected_out_dir" \
+  --force_detect_index_orientation
+
+expected_samples=(
+  sample_0
+  sample_1
+  sample_2
+  sample_3
+  sample_4
+)
+log_info "Inspecting force_detect_index_orientation output directory:"
+find "$expected_out_dir" -name "*.fastq.gz" | head -10
+
+log_info "Checking sample FASTQ files"
+for sample in "${expected_samples[@]}"; do
+  for orientation in "R1" "R2"; do
+    check_file_exists "$expected_out_dir/DefaultProject/${sample}/${sample}_${orientation}.fastq.gz" "Sample ${sample} ${orientation} FASTQ file"
+  done
+done
+check_file_exists "$expected_out_dir/Unassigned/Unassigned_R1.fastq.gz" "Unassigned R1 FASTQ file"
+check_file_exists "$expected_out_dir/Unassigned/Unassigned_R2.fastq.gz" "Unassigned R2 FASTQ file"
 popd > /dev/null
 
 log_info "All tests completed successfully"
