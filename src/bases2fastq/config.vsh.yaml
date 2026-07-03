@@ -179,7 +179,7 @@ argument_groups:
           Run manifest settings override. This option may be specified multiple times.
       - name: --skip_empty_fq_files
         type: boolean_true
-        description: 
+        description: |
           Do not create FASTQ files for sample/read outputs with zero reads.
       
   # Cyto-fastq specific arguments
