@@ -1,3 +1,9 @@
+# biobiox x.x.x
+
+## MINOR CHANGES
+
+* `bases2fastq`: Bump bump version to 2.4.0 (PR #221).
+
 # biobox 0.4.2
 
 ## NEW FUNCTIONALITY
