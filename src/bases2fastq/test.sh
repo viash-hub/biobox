@@ -82,7 +82,7 @@ wget http://element-public-data.s3.amazonaws.com/bases2fastq-share/bases2fastq-v
 log_info "Extracting test data"
 BCL_DIR="$TMPDIR/bcl"
 mkdir "$BCL_DIR"
-tar -xzf "$TAR_DIR/20230404-bases2fastq-sim-151-151-9-9.tar.gz" -C "$BCL_DIR"
+tar -xvf "$TAR_DIR/20230404-bases2fastq-sim-151-151-9-9.tar.gz" -C "$BCL_DIR"
 
 log_info "Running test 1 with multiple options"
 mkdir "$TMPDIR/test1" && pushd "$TMPDIR/test1" > /dev/null

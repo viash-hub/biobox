@@ -81,6 +81,10 @@ argument_groups:
         type: string
         description: |
           Run parameters override, flowcell ID.
+      - name: --force_detect_index_orientation
+        type: boolean_true
+        description: |
+          Detect index orientation by scanning all tiles and using the highest-PF tile in each lane.
       - name: "--force_index_orientation"
         type: boolean_true
         description: |
@@ -173,7 +177,11 @@ argument_groups:
         multiple: true
         description: |
           Run manifest settings override. This option may be specified multiple times.
-  
+      - name: --skip_empty_fq_files
+        type: boolean_true
+        description: 
+          Do not create FASTQ files for sample/read outputs with zero reads.
+      
   # Cyto-fastq specific arguments
   - name: "Cyto-fastq Arguments"
     arguments:
@@ -209,7 +217,8 @@ argument_groups:
         # --num-threads, -p NUMBER        Number of threads (use meta_cpus instead)
         # --output-remote, NAME           Rclone remote name for remote OUTPUT_DIRECTORY (not needed for biobox)
         # --version, -v                   Display bases2fastq version (handled by viash)
-
+        # --analysis-region PATH            Path to AnalysisRegion/ directory (can be local or remote)
+        # --segmentation PATH               Path to CellSegmentation/ directory (can be local or remote)
 resources:
   - type: bash_script
     path: script.sh
