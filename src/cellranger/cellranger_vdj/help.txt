@@ -1,30 +1,37 @@
 ```
-docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger mkref -h
+docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger vdj -h
 ```
 
-Prepare a reference for use with 10x analysis software. Requires a GTF and FASTA
+Assembles single-cell VDJ receptor sequences from 10x Immune Profiling libraries
 
-Usage: cellranger mkref [OPTIONS] --genome <GENOME_NAMES> --fasta <FASTA_FILES> --genes <GTF_FILES>
+Usage: cellranger vdj [OPTIONS] --id <ID> --fastqs <PATH>
 
 Options:
-      --genome <GENOME_NAMES>
-          Unique genome name, used to name output folder [a-zA-Z0-9_-]+. Specify
-          multiple genomes by specifying this argument multiple times; the
-          output folder will be <name1>_and_<name2>
-      --fasta <FASTA_FILES>
-          Path to FASTA file containing your genome reference. Specify multiple
-          genomes by specifying this argument multiple times
-      --genes <GTF_FILES>
-          Path to genes GTF file containing annotated genes for your genome
-          reference. Specify multiple genomes by specifying this argument
-          multiple times
-      --nthreads <NUM_THREADS>
-          Number of threads used during STAR genome index generation. Defaults
-          to 1 [default: 1]
-      --memgb <MEM_GB>
-          Maximum memory (GB) used [default: 16]
-      --ref-version <REF_VERSION>
-          Optional reference version string to include with reference
+      --id <ID>
+          A unique run id and output folder name [a-zA-Z0-9_-]+
+      --description <TEXT>
+          Sample description to embed in output files [default: ]
+      --reference <PATH>
+          Path of folder containing 10x-compatible VDJ reference. Optional if
+          '--denovo' is specified
+      --fastqs <PATH>
+          Path to input FASTQ data
+      --project <TEXT>
+          Name of the project folder within a mkfastq or bcl2fastq-generated
+          folder to pick FASTQs from
+      --sample <PREFIX>
+          Prefix of the filenames of FASTQs to select
+      --lanes <NUMS>
+          Only use FASTQs from selected lanes
+      --denovo
+          Run in reference-free mode (do not use annotations)
+      --chain <CHAIN_SPEC>
+          Chain type to display metrics for: 'TR' for T cell receptors, 'IG' for
+          B cell receptors, or 'auto' to autodetect [default: auto]
+      --inner-enrichment-primers <PATH>
+          If inner enrichment primers other than those provided in the 10x kits
+          are used, they need to be specified here as a textfile with one primer
+          per line. Disable secondary analysis, e.g. clustering
       --dry
           Do not execute the pipeline. Generate a pipeline invocation (.mro)
           file and stop
