@@ -10,6 +10,8 @@ set -eo pipefail
 [[ "$par_disable_smith_waterman" == "false" ]] && unset par_disable_smith_waterman
 [[ "$par_disable_insert_size_estimate" == "false" ]] && unset par_disable_insert_size_estimate
 
+index_path="${par_index_root%/}/$par_index_prefix"
+
 # Build the command
 cmd_args=(
     # Pairing options
@@ -29,7 +31,7 @@ cmd_args=(
     ${par_disable_insert_size_estimate:+-A}
     
     # Required arguments: index, SAI files, FASTQ files
-    "$par_index"
+    "$index_path"
     "$par_sai1"
     "$par_sai2"
     "$par_reads1"

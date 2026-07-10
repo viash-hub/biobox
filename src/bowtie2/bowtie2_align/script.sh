@@ -58,10 +58,12 @@ set -eo pipefail
 [[ "$par_non_deterministic" == "false" ]] && unset par_non_deterministic
 
 # Validate input arguments
-if [[ -z "$par_index" ]]; then
-  echo "Error: --index is required" >&2
+if [[ -z "$par_index_root" || -z "$par_index_prefix" ]]; then
+  echo "Error: --index_root and --index_prefix are required" >&2
   exit 1
 fi
+
+index_path="${par_index_root%/}/$par_index_prefix"
 
 # Validate that at least one input type is specified
 if [[ -z "$par_mate1" && -z "$par_mate2" && -z "$par_unpaired" && -z "$par_interleaved" && -z "$par_bam_input" ]]; then
@@ -77,7 +79,7 @@ fi
 
 # Build the command arguments
 cmd_args=(
-    -x "$par_index"
+    -x "$index_path"
     ${par_mate1:+-1 "$(IFS=','; echo "${par_mate1[*]}")"}
     ${par_mate2:+-2 "$(IFS=','; echo "${par_mate2[*]}")"}
     ${par_unpaired:+-U "$(IFS=','; echo "${par_unpaired[*]}")"}

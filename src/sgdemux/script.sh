@@ -17,9 +17,40 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
+fastqs=()
+if [[ -n "$par_fastqs_prefix" ]]; then
+    if [[ -z "$par_fastqs_root" ]]; then
+        echo "Error: --fastqs_root is required when using --fastqs_prefix" >&2
+        exit 1
+    fi
+    if [[ -n "$par_fastqs" ]]; then
+        echo "Error: Use either --fastqs or --fastqs_prefix/--fastqs_root, not both" >&2
+        exit 1
+    fi
+    if [[ -n "$par_read_structures" ]]; then
+        echo "Error: --read_structures cannot be used with --fastqs_prefix" >&2
+        exit 1
+    fi
+    fastqs_prefix_path="${par_fastqs_root%/}/$par_fastqs_prefix"
+    fastqs_prefix_dir="${fastqs_prefix_path%/*}"
+    mapfile -t fastqs < <(find "$fastqs_prefix_dir" -type f -path "${fastqs_prefix_path}*" | sort)
+    if [[ ${#fastqs[@]} -eq 0 ]]; then
+        echo "Error: No FASTQ files found matching prefix ${fastqs_prefix_path}" >&2
+        exit 1
+    fi
+else
+    if [[ -z "$par_fastqs" ]]; then
+        echo "Error: --fastqs is required unless --fastqs_prefix is provided" >&2
+        exit 1
+    fi
+    IFS=";" read -ra fastqs <<< "$par_fastqs"
+fi
+
 # Create arrays for inputs that contain multiple arguments
-IFS=";" read -ra fastqs <<< "$par_fastqs"
-IFS=";" read -ra read_structures <<< "$par_read_structures"
+read_structures=()
+if [[ -n "$par_read_structures" ]]; then
+    IFS=";" read -ra read_structures <<< "$par_read_structures"
+fi
 IFS=";" read -ra lane <<< "$par_lane"
 IFS=";" read -ra quality_mask_threashold <<< "$par_quality_mask_threshold"
 IFS=";" read -ra output_types <<< "$par_output_types"

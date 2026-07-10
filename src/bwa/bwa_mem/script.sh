@@ -19,6 +19,8 @@ set -eo pipefail
 [[ "$par_mark_secondary" == "false" ]] && unset par_mark_secondary
 [[ "$par_output_xb" == "false" ]] && unset par_output_xb
 
+index_path="${par_index_root%/}/$par_index_prefix"
+
 # Build the command
 cmd_args=(
     # Algorithm options
@@ -66,7 +68,7 @@ cmd_args=(
     ${par_insert_size:+-I "$par_insert_size"}
     
     # Index and input files
-    "$par_index"
+    "$index_path"
     "$par_reads1"
     ${par_reads2:+"$par_reads2"}
 )

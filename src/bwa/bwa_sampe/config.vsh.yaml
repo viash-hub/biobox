@@ -18,9 +18,14 @@ authors:
 argument_groups: 
 - name: "Input"
   arguments: 
-  - name: "--index"
+  - name: "--index_root"
     type: file
-    description: BWA index base name (prefix of .amb, .ann, .bwt, .pac, .sa files).
+    description: Directory containing the BWA index files.
+    required: true
+    example: bwa_index/
+  - name: "--index_prefix"
+    type: string
+    description: BWA index base name (prefix of .amb, .ann, .bwt, .pac, .sa files) inside the index root.
     required: true
     example: reference.fasta
   - name: "--sai1"

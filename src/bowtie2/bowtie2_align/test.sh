@@ -44,7 +44,8 @@ log "Starting TEST 1: Single-end alignment"
 
 log "Executing $meta_name with single-end reads..."
 "$meta_executable" \
-  --index "$test_data_dir/index/genome" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "genome" \
   --unpaired "$test_data_dir/reads_single.fastq" \
   --output "$meta_temp_dir/single_end.sam"
 
@@ -67,7 +68,8 @@ log "Starting TEST 2: Paired-end alignment"
 
 log "Executing $meta_name with paired-end reads..."
 "$meta_executable" \
-  --index "$test_data_dir/index/genome" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "genome" \
   --mate1 "$test_data_dir/reads_R1.fastq" \
   --mate2 "$test_data_dir/reads_R2.fastq" \
   --output "$meta_temp_dir/paired_end.sam"
@@ -91,7 +93,8 @@ log "Starting TEST 3: Advanced alignment parameters"
 
 log "Executing $meta_name with advanced parameters..."
 "$meta_executable" \
-  --index "$test_data_dir/index/genome" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "genome" \
   --unpaired "$test_data_dir/reads_single.fastq" \
   --output "$meta_temp_dir/advanced.sam" \
   --threads 2 \
@@ -109,7 +112,8 @@ log "Starting TEST 4: Output format options"
 
 log "Executing $meta_name with BAM output..."
 "$meta_executable" \
-  --index "$test_data_dir/index/genome" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "genome" \
   --unpaired "$test_data_dir/reads_single.fastq" \
   --output "$meta_temp_dir/output.bam" \
   --threads 2

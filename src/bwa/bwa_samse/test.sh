@@ -60,7 +60,8 @@ log "Starting TEST 1: Basic BWA samse"
 
 log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "reference.fasta" \
   --sai "$test_data_dir/reads.sai" \
   --reads "$test_data_dir/reads.fastq" \
   --output "$meta_temp_dir/single_end.sam"
@@ -84,7 +85,8 @@ log "Starting TEST 2: BWA samse with custom parameters"
 
 log "Executing $meta_name with custom parameters..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "reference.fasta" \
   --sai "$test_data_dir/reads.sai" \
   --reads "$test_data_dir/reads.fastq" \
   --output "$meta_temp_dir/custom.sam" \

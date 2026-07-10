@@ -37,7 +37,8 @@ log "Starting TEST 1: Default FASTA output"
 
 log "Executing $meta_name with default FASTA output..."
 "$meta_executable" \
-  --index "$test_data_dir/index/test_ref" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "test_ref" \
   --output "$meta_temp_dir/sequences.fasta"
 
 log "Validating TEST 1 outputs..."
@@ -67,7 +68,8 @@ log "Starting TEST 2: Names only output"
 
 log "Executing $meta_name with names only..."
 "$meta_executable" \
-  --index "$test_data_dir/index/test_ref" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "test_ref" \
   --names \
   --output "$meta_temp_dir/names.txt"
 
@@ -98,7 +100,8 @@ log "Starting TEST 3: Summary output"
 
 log "Executing $meta_name with summary..."
 "$meta_executable" \
-  --index "$test_data_dir/index/test_ref" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "test_ref" \
   --summary \
   --output "$meta_temp_dir/summary.txt"
 
@@ -120,7 +123,7 @@ log "✅ TEST 3 completed successfully"
 log "Starting TEST 4: Standard output"
 
 log "Executing $meta_name with stdout output..."
-stdout_output=$("$meta_executable" --index "$test_data_dir/index/test_ref" --names 2>/dev/null)
+stdout_output=$("$meta_executable" --index_root "$test_data_dir/index" --index_prefix "test_ref" --names 2>/dev/null)
 
 log "Validating TEST 4 outputs..."
 if [[ -n "$stdout_output" ]]; then
@@ -145,7 +148,8 @@ log "Starting TEST 5: Across parameter"
 
 log "Executing $meta_name with across parameter..."
 "$meta_executable" \
-  --index "$test_data_dir/index/test_ref" \
+  --index_root "$test_data_dir/index" \
+  --index_prefix "test_ref" \
   --across 60 \
   --output "$meta_temp_dir/across.fasta"
 

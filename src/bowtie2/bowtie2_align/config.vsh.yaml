@@ -24,9 +24,14 @@ authors:
 argument_groups:
   - name: Inputs
     arguments:
-      - name: --index
+      - name: --index_root
+        type: file
+        description: Directory containing the Bowtie2 index files.
+        required: true
+        example: bowtie2_index/
+      - name: --index_prefix
         type: string
-        description: Index filename prefix (minus trailing .X.bt2).
+        description: Index filename prefix (minus trailing .X.bt2) inside the index root.
         required: true
         example: genome_index
 

@@ -5,6 +5,8 @@
 
 set -eo pipefail
 
+index_path="${par_index_root%/}/$par_index_prefix"
+
 # Build the command
 cmd_args=(
     # Options
@@ -13,7 +15,7 @@ cmd_args=(
     ${par_read_group:+-r "$par_read_group"}
     
     # Required arguments: index, SAI file, FASTQ file
-    "$par_index"
+    "$index_path"
     "$par_sai"
     "$par_reads"
 )
