@@ -11,6 +11,7 @@ unset_if_false=(
     par_download
     par_file_list
     par_cancer
+    par_fastaprot_no_ref
     par_format_eff
     par_gene_id
     par_hgvs
@@ -73,8 +74,9 @@ snpEff ann \
     ${par_no_utr:+-no-utr} \
     ${par_no:+-no "$par_no"} \
     ${par_cancer:+-cancer} \
-    ${par_cancer_samples:+-cancerSamples "$par_cancer_samples]"} \
-    ${par_fastaprot:+-fastaProt "$par_fastaprot]"} \
+    ${par_cancer_samples:+-cancerSamples "$par_cancer_samples"} \
+    ${par_fastaprot:+-fastaProt "$par_fastaprot"} \
+    ${par_fastaprot_no_ref:+-fastaProtNoRef} \
     ${par_format_eff:+-formatEff} \
     ${par_gene_id:+-geneId} \
     ${par_hgvs:+-hgvs} \
@@ -111,7 +113,7 @@ snpEff ann \
     ${par_no_nextprot:+-noNextProt} \
     ${par_only_reg:+-onlyReg} \
     ${par_only_protein:+-onlyProtein} \
-    ${par_only_tr:+-onlyTr "$par_onlyTr"} \
+    ${par_only_tr:+-onlyTr "$par_only_tr"} \
     ${par_reg:+-reg "$par_reg"} \
     ${par_ss:+-ss "$par_ss"} \
     ${par_splice_region_exon_size:+-spliceRegionExonSize "$par_splice_region_exon_size"} \

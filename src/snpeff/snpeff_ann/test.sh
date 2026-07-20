@@ -137,4 +137,40 @@ log "Test 4 succeeded."
 
 ###########################################################################
 
+# Test 5: --no_hgvs, --only_tr and --fastaprot/--fastaprot_no_ref
+
+log "> Run Test 5: --no_hgvs, --only_tr, --fastaprot_no_ref"
+mkdir test5
+pushd test5 > /dev/null
+
+# ENST00000641515 (OR4F5) is a real, protein-coding chr1 transcript whose CDS
+# overlaps the variant in test_data/cancer.vcf (position 69091)
+echo "ENST00000641515" > only_tr.txt
+
+"$meta_executable" \
+  --genome_version test \
+  --input "$meta_resources_dir/test_data/cancer.vcf" \
+  --output output.vcf \
+  --data_dir "$DATA_DIR" \
+  --config_option "test.genome=GRCh38Chr1" \
+  --no_hgvs \
+  --only_tr only_tr.txt \
+  --fastaprot proteins.fa \
+  --fastaprot_no_ref
+
+check_file_exists "output.vcf" "annotated VCF output"
+check_file_not_empty "output.vcf" "annotated VCF output"
+
+# --only_tr should restrict annotation to just the listed transcript
+check_file_contains "output.vcf" "ENST00000641515" "annotated VCF output (restricted via --only_tr)"
+
+check_file_exists "proteins.fa" "protein FASTA"
+check_file_not_empty "proteins.fa" "protein FASTA"
+
+popd > /dev/null
+
+log "Test 5 succeeded."
+
+###########################################################################
+
 print_test_summary "snpeff_ann"
