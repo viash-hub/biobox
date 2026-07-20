@@ -10,7 +10,6 @@ unset_if_false=(
     par_classic
     par_download
     par_file_list
-    par_stats
     par_cancer
     par_format_eff
     par_gene_id
@@ -64,7 +63,7 @@ snpEff ann \
     ${par_input_format:+-i "$par_input_format"} \
     ${par_file_list:+-fileList} \
     ${par_output_format:+-o "$par_output_format"} \
-    ${par_stats:+-stats} \
+    ${par_stats:+-stats "$par_stats"} \
     ${par_no_stats:+-noStats} \
     ${par_fi:+-fi "$par_fi"} \
     ${par_no_downstream:+-no-downstream} \
@@ -124,25 +123,16 @@ snpEff ann \
     "$par_input" \
     > "$par_output"
 
-# Path of the output file (par_output)
-absolute_path=$(realpath "$par_output")
-directory_path=$(dirname "$absolute_path")
+# Copy summary HTML to the final destination
+if [ -z "$par_no_stats" ] && [ ! -z "$par_summary" ]; then
+    mv -n "$par_stats" "$par_summary"
+fi
 
-# Move the automatically generated outputs to their locations
-if [ -z "$par_no_stats" ]; then
-    if [ ! -z "$par_summary" ]; then
-        mv -n snpEff_summary.html "$par_summary"
-    else
-        mv -n snpEff_summary.html "$directory_path"
-    fi
-fi 
-
-if [ -z "$par_no_stats" ]; then
-    if [ ! -z "$par_genes" ]; then
-        mv -n snpEff_genes.txt "$par_genes"
-    else
-        mv -n snpEff_genes.txt "$directory_path"
-    fi
+# snpEff derives the genes-statistics filename from the stats file's base name
+# (e.g. "snpEff_summary.html" -> "snpEff_summary.genes.txt")
+if [ -z "$par_no_stats" ] && [ ! -z "$par_genes" ]; then
+    genes_file="${par_stats%.*}.genes.txt"
+    mv -n "$genes_file" "$par_genes"
 fi
 
 exit 0

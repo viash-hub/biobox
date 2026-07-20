@@ -37,7 +37,7 @@ echo "> Run Test 1: required parameters"
   --output out.vcf
 
 # Check if output files are generated
-output_files=("out.vcf" "snpEff_genes.txt" "snpEff_summary.html")
+output_files=("out.vcf" "snpEff_summary.html" "snpEff_summary.genes.txt")
 
 # Check if any of the files do not exist
 for file in "${output_files[@]}"; do
@@ -80,7 +80,7 @@ if [ ! -e "output.vcf" ]; then
 fi
 
 # These files should not exist
-files=("snpEff_genes.txt" "snpEff_summary.html")
+files=("snpEff_summary.genes.txt" "snpEff_summary.html")
 for file in "${files[@]}"; do
     if [ -e "$file" ]; then
         echo "Error: File $file exists."
@@ -103,8 +103,6 @@ echo "Test 2 succeeded."
 mkdir test3
 pushd test3 > /dev/null
 
-mkdir temp
-
 echo "> Run Test 3: move output files"
 "$meta_executable" \
   --genome_version test \
@@ -112,23 +110,21 @@ echo "> Run Test 3: move output files"
   --output output.vcf \
   --data_dir "$DATA_DIR" \
   --config_option "test.genome=GRCh38Chr1" \
-  --summary temp \
-  --genes temp
+  --summary temp/summary.html \
+  --genes temp/genes.txt
 
 # Check if output.vcf exists
 if [ ! -e "output.vcf" ]; then
     echo "File output.vcf does not exist."
 fi
 
-# Check if the other output files have been moved to temp folder
-output_files=("snpEff_genes.txt" "snpEff_summary.html")
+if [ ! -e "temp/summary.html" ]; then
+    echo "File temp/summary.html does not exist."
+fi
 
-# Check if any of the files do not exist
-for file in "${output_files[@]}"; do
-    if [ ! -e "temp/$file" ]; then
-        echo "File $file does not exist in 'temp' folder."
-    fi
-done
+if [ ! -e "temp/genes.txt" ]; then
+    echo "File temp/genes.txt does not exist."
+fi
 
 # Check if output.vcf is empty
 if [ ! -s "output.vcf" ]; then
@@ -136,8 +132,9 @@ if [ ! -s "output.vcf" ]; then
 fi
 
 # Check if the other output files in temp folder are empty
+output_files=("temp/summary.html" "temp/genes.txt")
 for file in "${output_files[@]}"; do
-    if [ ! -s "temp/$file" ]; then
+    if [ ! -s "$file" ]; then
         echo "File $file is empty."
     fi
 done
@@ -145,6 +142,60 @@ done
 popd > /dev/null
 
 echo "Test 3 succeeded."
+
+###########################################################################
+
+# Test 4: --stats names the intermediate file, --summary sets the final path
+
+mkdir test4
+pushd test4 > /dev/null
+
+echo "> Run Test 4: --stats intermediate name + --summary final path"
+"$meta_executable" \
+  --genome_version test \
+  --input "$meta_resources_dir/test_data/test.vcf" \
+  --output output.vcf \
+  --data_dir "$DATA_DIR" \
+  --config_option "test.genome=GRCh38Chr1" \
+  --stats custom_intermediate.html \
+  --summary final_summary.html
+
+# Check if output.vcf exists
+if [ ! -e "output.vcf" ]; then
+    echo "File output.vcf does not exist."
+fi
+
+# The HTML summary should end up at the --summary path, not the --stats path.
+if [ ! -e "final_summary.html" ]; then
+    echo "File final_summary.html does not exist."
+fi
+
+if [ -e "custom_intermediate.html" ]; then
+    echo "Error: File custom_intermediate.html exists (intermediate name was not moved away)."
+fi
+
+# The genes stats file name is derived from the --stats (intermediate) base name,
+# i.e. "custom_intermediate.html" -> "custom_intermediate.genes.txt".
+if [ ! -e "custom_intermediate.genes.txt" ]; then
+    echo "File custom_intermediate.genes.txt does not exist."
+fi
+
+# Check if output.vcf, final_summary.html and custom_intermediate.genes.txt are not empty
+if [ ! -s "output.vcf" ]; then
+    echo "File output.vcf is empty."
+fi
+
+if [ ! -s "final_summary.html" ]; then
+    echo "File final_summary.html is empty."
+fi
+
+if [ ! -s "custom_intermediate.genes.txt" ]; then
+    echo "File custom_intermediate.genes.txt is empty."
+fi
+
+popd > /dev/null
+
+echo "Test 4 succeeded."
 
 ###########################################################################
 

@@ -36,13 +36,17 @@ argument_groups:
         required: true
       - name: --summary
         type: file
-        description: Summary file directory.
-        example: summary_dir
+        description: |
+          Output location for the summary HTML file created by --stats. Cannot
+          be used together with --no_stats.
+        example: snpEff_summary.html
         direction: output
       - name: --genes
         type: file
-        description: Txt file directory.
-        example: genes_dir
+        description: |
+          Output location for the genes statistics file created by --stats.
+          Cannot be used together with --no_stats.
+        example: snpEff_summary.genes.txt
         direction: output
   - name: Options
     arguments:
@@ -76,8 +80,9 @@ argument_groups:
         example: "VCF"
       - name: --stats
         alternatives: [-s, --htmlStats]
-        type: boolean_true
+        type: string
         description: Create HTML summary file.
+        default: snpEff_summary.html
       - name: --no_stats
         type: boolean_true
         description: Do not create stats (summary) file.
