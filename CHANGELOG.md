@@ -1,8 +1,25 @@
 # biobox x.x.x
 
+## BREAKING CHANGES
+
+* `snpeff_ann`: Rename argument `-no_hgvs` to `--no_hgvs` for consistency (PR #222)
+
 ## MINOR CHANGES
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
+
+* `snpeff_ann`: Bump snpEff from `5.2f` to `5.4c` and remove a config patch that is no longer needed (PR #222)
+
+* `snpeff_ann`: Add `--fastaprot_no_ref` argument (`-fastaProtNoRef`) to not add reference sequences to the output when `--fastaprot` is used (PR #222)
+
+## BUG FIXES
+
+* `snpeff_ann`: Fix and update arguments (PR #222):
+  * Fix `--stats`/`-s`/`--htmlStats` to be `string` instead of `boolean_true` to prevent it swallowing the following argument when used.
+    `--stats` now sets the name of the intermediate HTML summary file snpEff writes, use the existing `--summary` argument to specify the final output path.
+  * Fix `--only_tr` which referenced an incorrect variable name and always passed an empty value to `-onlyTr` instead of the provided file
+  * Fix `--csv_stats` and `--fastaprot` which were missing `direction: output` and so defaulted to `direction: input`, requiring the (not yet created) output file to already exist before running
+  * Fix `--cancer_samples` and `--fastaprot` which appended a stray literal `]` character to the provided value, corrupting the file path passed to `-cancerSamples`/`-fastaProt`
 
 # biobox 0.4.2
 
