@@ -4,6 +4,9 @@
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
 
+* `bwa_mem2/bwa_mem2_mem`: `--index` now expects the index directory rather than a single index file, so the Nextflow runner stages all index files.
+  Passing a file is still accepted for backward compatibility, with a warning, falling back to its containing directory. (PR #223)
+
 # biobox 0.4.2
 
 ## NEW FUNCTIONALITY
