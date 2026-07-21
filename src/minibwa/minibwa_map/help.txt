@@ -1,0 +1,46 @@
+```
+docker run --rm quay.io/biocontainers/minibwa:0.4--hab16a5f_0 minibwa map
+```
+
+Usage: minibwa map [options] <in.idx> <in.fastq>
+Options:
+  Common:
+    -f               output PAF (SAM by default)
+    -t INT           number of worker threads [1]
+    -l NUM           treat reads <NUM as short reads in the default adaptive mode [325]
+    -R STR           SAM read group line in a format like '@RG\tID:foo\tSM:bar' []
+    -b STR           output a base alignment tag: cs, ds or MD []
+    --hic            map Hi-C reads; equivalent to option -5P
+    --meth           map *directional* bisulfite sequencing reads
+  Mapping:
+    -k INT           min seed length [19]
+    -c NUM           max seed occurrences [250]
+    -g NUM           max gap size, controlling extension and chain breaking [100]
+    -w NUM           bandwidth [100]
+    -W NUM           long bandwidth (for long reads or the adaptive mode) [20000]
+    -m INT           min chaining score [25]
+    -p FLOAT         min secondary-to-primary score ratio [0.5]
+    -N INT           retain at most INT secondary alignments [50]
+    --chain-only     perform chaining only without base alignment
+    -x STR           preset (sr, lr or adap for mixed short/long reads) [adap]
+  Alignment:
+    -A INT           matching score [2]
+    -B INT           mismatching openalty [8]
+    -O INT1[,INT2]   gap open penalty [12,23]
+    -E INT1[,INT2]   gap extension penalty [2,1]
+    -s INT           suppress alignment with DP score lower than INT*{-A} [30]
+  Paired-end:
+    -P               skip pairing and mate rescue
+    --rescue=INT     mate rescue for up to INT candidates; 0 to skip rescue [10]
+  Input/Output:
+    -o FILE          output file name [stdout]
+    -u               don't output unmapped reads
+    --outn=NUM       output up to INT secondary alignments [0]
+    --xa=NUM         if <=NUM hits with score >80% of the best hit, output them to XA [5]
+    -y               copy FASTA/Q comments to output
+    -Y               use soft clipping for supplementary alignments
+    -H STR           if STR starts with @, insert to header; or insert lines in file STR []
+    -5               take the alignment with the smallest query position as primary
+    -K NUM1[,NUM2]   process NUM1-NUM2 bp of query sequences in a batch [100m,1g]
+    --version        print version number
+    --help           print this help message
