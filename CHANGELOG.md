@@ -1,5 +1,11 @@
 # biobox x.x.x
 
+## NEW FUNCTIONALITY
+
+* `minibwa`: Added components for minibwa, the successor to bwa-mem with native Hi-C and bisulfite sequencing alignment modes (PR #225):
+  * `minibwa/minibwa_index`: Build a minibwa reference index, optionally including a bisulfite (BS-seq) index
+  * `minibwa/minibwa_map`: Align short, long, Hi-C or bisulfite reads to a minibwa index
+
 ## MINOR CHANGES
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
