@@ -1,5 +1,9 @@
 # biobox x.x.x
 
+## NEW FUNCTIONALITY
+
+* `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
+
 ## MINOR CHANGES
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
