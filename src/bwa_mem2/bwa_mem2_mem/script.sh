@@ -60,9 +60,22 @@ cmd_args=(
     ${par_soft_clipping:+-Y}
     ${par_mark_secondary:+-M}
     ${par_insert_size:+-I "$par_insert_size"}
-    
+)
+
+# If --index is a file, use the containing directory with a warning
+if [[ -d "$par_index" ]]; then
+    index_directory="$par_index"
+else
+    index_directory="$(dirname "$par_index")"
+    echo "Warning: --index ('$par_index') is not a directory, using its containing directory ('$index_directory') instead. Pass the index directory itself to --index so all index files are staged correctly under the Nextflow runner." >&2
+fi
+
+# Determine the index prefix from the .0123 index file
+index_prefix="$(basename "$(ls "${index_directory%/}"/*.0123)" .0123)"
+
+cmd_args+=(
     # Index and input files
-    "$par_index"
+    "${index_directory%/}/$index_prefix"
     "$par_reads1"
     ${par_reads2:+"$par_reads2"}
 )
