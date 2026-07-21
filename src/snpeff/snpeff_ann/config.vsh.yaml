@@ -36,13 +36,17 @@ argument_groups:
         required: true
       - name: --summary
         type: file
-        description: Summary file directory.
-        example: summary_dir
+        description: |
+          Output location for the summary HTML file created by --stats. Cannot
+          be used together with --no_stats.
+        example: snpEff_summary.html
         direction: output
       - name: --genes
         type: file
-        description: Txt file directory.
-        example: genes_dir
+        description: |
+          Output location for the genes statistics file created by --stats.
+          Cannot be used together with --no_stats.
+        example: snpEff_summary.genes.txt
         direction: output
   - name: Options
     arguments:
@@ -56,6 +60,7 @@ argument_groups:
       - name: --csv_stats
         type: file
         description: Create CSV summary file.
+        direction: output
       - name: --download
         type: boolean_true
         description: Download reference genome if not available.
@@ -76,8 +81,9 @@ argument_groups:
         example: "VCF"
       - name: --stats
         alternatives: [-s, --htmlStats]
-        type: boolean_true
+        type: string
         description: Create HTML summary file.
+        default: snpEff_summary.html
       - name: --no_stats
         type: boolean_true
         description: Do not create stats (summary) file.
@@ -120,6 +126,11 @@ argument_groups:
         type: file
         description: |
           Create an output file containing the resulting protein sequences.
+        direction: output
+      - name: --fastaprot_no_ref
+        type: boolean_true
+        description: |
+          Do not add reference sequences to the output (only valid when --fastaprot is used).
       - name: --format_eff
         type: boolean_true
         description: |
@@ -143,7 +154,7 @@ argument_groups:
         type: boolean_true
         description: |
           Add loss of function (LOF) and Nonsense mediated decay (NMD) tags.
-      - name: -no_hgvs
+      - name: --no_hgvs
         type: boolean_true
         description: Do not add HGVS annotations.
       - name: --no_lof
@@ -279,29 +290,16 @@ argument_groups:
 resources:
   - type: bash_script
     path: script.sh
-  - path: config.patch
 test_resources:
   - type: bash_script
     path: test.sh
   - type: file
     path: test_data
+  - path: /src/_utils/test_helpers.sh
 engines:
   - type: docker
-    image: quay.io/staphb/snpeff:5.2f
+    image: quay.io/staphb/snpeff:5.4c
     setup:
-      - type: docker
-        # Apply a partial patch from this commit
-        # https://github.com/pcingola/SnpEff/commit/6339f6cab984bd5f35b81a77e05c517be5d112a6
-        # This updates the repositories where to download the references from
-        # At the time of writing this comment, these changes were not included in a release.
-        # This patch can be removed in an upcomming release.
-        copy: ["config.patch /opt/config.patch"]
-      - type: apt
-        packages: 
-          - git
-      - type: docker
-        run: |
-          bash -c "pushd /snpEff && git apply /opt/config.patch && popd"
       - type: docker
         run: |
           version=$(snpEff -version) && \
