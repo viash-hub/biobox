@@ -58,7 +58,7 @@ log "Starting TEST 1: Single-end BWA MEM alignment"
 
 log "Executing $meta_name with single-end reads..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index "$test_data_dir/index" \
   --reads1 "$test_data_dir/reads_single.fastq" \
   --output "$meta_temp_dir/single_end.sam"
 
@@ -81,7 +81,7 @@ log "Starting TEST 2: Paired-end BWA MEM alignment"
 
 log "Executing $meta_name with paired-end reads..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index "$test_data_dir/index" \
   --reads1 "$test_data_dir/reads_R1.fastq" \
   --reads2 "$test_data_dir/reads_R2.fastq" \
   --output "$meta_temp_dir/paired_end.sam"
@@ -105,7 +105,7 @@ log "Starting TEST 3: BWA MEM with advanced parameters"
 
 log "Executing $meta_name with advanced parameters..."
 "$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
+  --index "$test_data_dir/index" \
   --reads1 "$test_data_dir/reads_single.fastq" \
   --output "$meta_temp_dir/advanced.sam" \
   --min_seed_length 15
@@ -115,5 +115,27 @@ check_file_exists "$meta_temp_dir/advanced.sam" "advanced SAM output"
 check_file_not_empty "$meta_temp_dir/advanced.sam" "advanced SAM output"
 
 log "✅ TEST 3 completed successfully"
+
+# --- Test Case 4: --index is a file  ---
+log "Starting TEST 4: BWA MEM with --index file input"
+
+log "Executing $meta_name with a file passed to --index instead of a directory..."
+legacy_output="$("$meta_executable" \
+  --index "$test_data_dir/index/reference.fasta" \
+  --reads1 "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/legacy.sam" 2>&1)"
+
+log "Validating TEST 4 outputs..."
+check_file_exists "$meta_temp_dir/legacy.sam" "SAM output"
+check_file_not_empty "$meta_temp_dir/legacy.sam" "SAM output"
+
+if echo "$legacy_output" | grep -qi "warning.*--index"; then
+  log "✓ Warning emitted for file --index"
+else
+  log_error "Expected a warning about --index not being a directory"
+  exit 1
+fi
+
+log "✅ TEST 4 completed successfully"
 
 print_test_summary "All tests completed successfully"
