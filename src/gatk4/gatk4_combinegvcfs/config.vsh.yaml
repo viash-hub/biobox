@@ -1,0 +1,283 @@
+name: gatk4_combinegvcfs
+namespace: gatk4
+description: |
+  Merges multiple per-sample GVCF files (produced by `gatk4 HaplotypeCaller`
+  in `--emit_ref_confidence GVCF` mode) into a single multi-sample GVCF with
+  appropriate annotations.
+
+  The resulting combined GVCF is not genotyped, it is intended to be used
+  as input to `gatk4 GenotypeGVCFs` to jointly call genotypes across all
+  merged samples.
+keywords: [variant calling, germline, GATK, GATK4, GVCF, joint genotyping]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--variant"
+        alternatives: [-V]
+        type: file
+        multiple: true
+        description: |
+          Per-sample GVCF file(s) to combine (as produced by
+          `gatk4 HaplotypeCaller` in `--emit_ref_confidence GVCF` mode).
+
+          Specify this argument once per input GVCF file.
+        required: true
+        example: sample1.g.vcf
+      - name: "--reference"
+        alternatives: [-R]
+        type: file
+        description: Reference sequence FASTA file.
+        required: true
+        example: reference.fasta
+      - name: "--reference_fai"
+        type: file
+        description: FASTA index file (`.fai`) for the reference sequence.
+        required: true
+        example: reference.fasta.fai
+      - name: "--reference_dict"
+        type: file
+        description: Sequence dictionary (`.dict`) file for the reference sequence.
+        required: true
+        example: reference.dict
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: |
+          The combined multi-sample GVCF output file.
+        required: true
+        example: combined.g.vcf
+
+  - name: "Options"
+    arguments:
+      - name: "--annotation"
+        alternatives: [-A]
+        type: string
+        multiple: true
+        description: |
+          One or more specific annotations to add to variant calls, e.g.
+          `ChromosomeCounts` or `InbreedingCoeff`.
+        example: [ChromosomeCounts]
+        choices:
+          - AlleleFraction
+          - AllelePseudoDepth
+          - AS_BaseQualityRankSumTest
+          - AS_FisherStrand
+          - AS_InbreedingCoeff
+          - AS_MappingQualityRankSumTest
+          - AS_QualByDepth
+          - AS_ReadPosRankSumTest
+          - AS_RMSMappingQuality
+          - AS_StrandBiasMutectAnnotation
+          - AS_StrandOddsRatio
+          - AssemblyComplexity
+          - BaseQuality
+          - BaseQualityHistogram
+          - BaseQualityRankSumTest
+          - ChromosomeCounts
+          - ClippingRankSumTest
+          - CountNs
+          - Coverage
+          - CycleSkipStatus
+          - DepthPerAlleleBySample
+          - DepthPerSampleHC
+          - ExcessHet
+          - FisherStrand
+          - FragmentDepthPerAlleleBySample
+          - FragmentLength
+          - GcContent
+          - GenotypeSummaries
+          - HaplotypeFilteringAnnotation
+          - HmerIndelLength
+          - HmerIndelNuc
+          - HmerMotifs
+          - InbreedingCoeff
+          - IndelClassify
+          - IndelLength
+          - LikelihoodRankSumTest
+          - MappingQuality
+          - MappingQualityRankSumTest
+          - MappingQualityZero
+          - OrientationBiasReadCounts
+          - OriginalAlignment
+          - PossibleDeNovo
+          - QualByDepth
+          - RawGtCount
+          - ReadPosition
+          - ReadPosRankSumTest
+          - ReferenceBases
+          - RMSMappingQuality
+          - SampleList
+          - StrandBiasBySample
+          - StrandOddsRatio
+          - TandemRepeat
+          - TransmittedSingleton
+          - UniqueAltReadCount
+          - VariantType
+      - name: "--annotation_group"
+        alternatives: [-G]
+        type: string
+        multiple: true
+        description: |
+          One or more groups of annotations to apply to variant calls.
+        example: [StandardAnnotation]
+        choices:
+          - AlleleSpecificAnnotation
+          - AS_StandardAnnotation
+          - GenotypeAnnotation
+          - InfoFieldAnnotation
+          - JumboGenotypeAnnotation
+          - JumboInfoAnnotation
+          - ReducibleAnnotation
+          - StandardAnnotation
+          - StandardFlowBasedAnnotation
+          - StandardHCAnnotation
+          - StandardMutectAnnotation
+          - VariantAnnotation
+      - name: "--annotations_to_exclude"
+        alternatives: [-AX]
+        type: string
+        multiple: true
+        description: |
+          One or more specific annotations to exclude from variant calls
+        example: [RMSMappingQuality]
+        choices:
+          - BaseQualityRankSumTest
+          - ChromosomeCounts
+          - Coverage
+          - DepthPerAlleleBySample
+          - ExcessHet
+          - FisherStrand
+          - InbreedingCoeff
+          - MappingQualityRankSumTest
+          - QualByDepth
+          - ReadPosRankSumTest
+          - RMSMappingQuality
+          - StrandOddsRatio
+      - name: "--break_bands_at_multiples_of"
+        type: integer
+        description: |
+          If greater than `0`, reference bands will be broken up at genomic
+          positions that are multiples of this number.
+        default: 0
+      - name: "--call_genotypes"
+        type: boolean_true
+        description: |
+          Output called genotypes.
+      - name: "--combine_variants_distance"
+        type: integer
+        description: |
+          Maximum distance (in bp) for variants to be grouped together
+          when combining.
+        default: 0
+      - name: "--convert_to_base_pair_resolution"
+        type: boolean_true
+        description: |
+          If specified, convert banded GVCFs to all-sites GVCFs.
+      - name: "--dbsnp"
+        alternatives: [-D]
+        type: file
+        description: |
+          dbSNP VCF file used to annotate the combined GVCF with known
+          variant IDs.
+        example: dbsnp.vcf
+      - name: "--disable_tool_default_annotations"
+        type: boolean_true
+        description: |
+          Disable all tool default annotations.
+      - name: "--drop_somatic_filtering_annotations"
+        type: boolean_true
+        description: |
+          For input somatic GVCFs (i.e. from Mutect2), drop filtering
+          annotations.
+      - name: "--enable_all_annotations"
+        type: boolean_true
+        description: |
+          Use all possible annotations (not for the faint of heart).
+      - name: "--founder_id"
+        type: string
+        multiple: true
+        description: |
+          Samples representing the population "founders", used (together
+          with `--pedigree`) by pedigree-aware annotations.
+        example: [sample1]
+      - name: "--ignore_variants_starting_outside_interval"
+        type: boolean_true
+        description: |
+          Restrict variant output to sites that start within the provided
+          `--intervals` (only applies when an interval is specified).
+      - name: "--input_is_somatic"
+        type: boolean_true
+        description: |
+          Merge input GVCFs according to somatic (i.e. Mutect2) annotations
+          (BETA).
+      - name: "--intervals"
+        alternatives: [-L]
+        type: file
+        description: |
+          One or more genomic intervals over which to operate, provided as
+          a file (e.g. BED, interval_list).
+        example: intervals.bed
+      - name: "--max_variants_per_shard"
+        type: integer
+        description: |
+          If non-zero, partitions VCF output into shards, each containing
+          up to the given number of records.
+        default: 0
+      - name: "--pedigree"
+        alternatives: [-ped]
+        type: file
+        description: |
+          Pedigree file for determining the population "founders".
+        example: pedigree.ped
+      - name: "--ref_padding"
+        type: integer
+        description: |
+          Number of bases on either side to expand the spanning reference
+          window.
+        default: 1
+      - name: "--variant_output_filtering"
+        type: string
+        choices: [STARTS_IN, ENDS_IN, OVERLAPS, CONTAINED, ANYWHERE]
+        description: |
+          Restrict the output variants to ones that match the
+          `--intervals` according to the specified matching mode.
+        example: STARTS_IN
+
+__merge__: /src/gatk4/utils/common_argument_groups.yaml
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow
