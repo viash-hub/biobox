@@ -1,0 +1,288 @@
+name: gatk4_selectvariants
+namespace: gatk4
+description: |
+  Selects a subset of variants from a VCF file based on various criteria.
+
+  This tool makes it possible to select a subset of variants based on
+  various criteria in order to facilitate certain analyses. Examples include
+  comparing and contrasting cases vs. controls, extracting variant or
+  non-variant loci that meet certain requirements, or troubleshooting some
+  unexpected results, to name a few.
+keywords: [variant selection, GATK, GATK4, VCF, filtering]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--variant"
+        alternatives: [-V]
+        type: file
+        description: Input VCF file containing variants to select from.
+        required: true
+        example: variants.vcf.gz
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: Output VCF file containing the selected variants.
+        required: true
+        example: selected.vcf.gz
+
+  - name: "Options"
+    arguments:
+      - name: "--apply_jexl_filters_first"
+        alternatives: [-jexl-first]
+        type: boolean_true
+        description: |
+          Apply JEXL-based filtering (`--select_expressions`) before subsetting
+          samples.
+      - name: "--call_genotypes"
+        type: boolean_true
+        description: Output called genotypes in the final VCF (otherwise no-call).
+      - name: "--concordance"
+        alternatives: [-conc]
+        type: file
+        description: Output variants that are also called in this comparison VCF track.
+        example: concordance.vcf.gz
+      - name: "--discordance"
+        alternatives: [-disc]
+        type: file
+        description: Output variants that are not called in this comparison VCF track.
+        example: discordance.vcf.gz
+      - name: "--drop_genotype_annotation"
+        alternatives: [-DGA]
+        type: string
+        multiple: true
+        description: |
+          Genotype (`FORMAT`) annotations to drop from the output VCF,
+          specified by their key. Can be specified multiple times.
+        example: [PL]
+      - name: "--drop_info_annotation"
+        alternatives: [-DA]
+        type: string
+        multiple: true
+        description: |
+          `INFO` annotations to drop from the output VCF, specified by
+          their key. Can be specified multiple times.
+        example: [DP]
+      - name: "--exclude_filtered"
+        type: boolean_true
+        description: Don't include filtered sites in the output VCF.
+      - name: "--exclude_ids"
+        alternatives: [-xl-ids]
+        type: string
+        multiple: true
+        description: List of variant rsIDs to exclude. Can be specified multiple times.
+        example: [rs123]
+      - name: "--exclude_intervals"
+        alternatives: [-XL]
+        type: file
+        description: |
+          One or more genomic intervals to exclude from processing,
+          provided as a file (e.g. BED, interval_list).
+        example: exclude_intervals.bed
+      - name: "--exclude_non_variants"
+        type: boolean_true
+        description: Don't include non-variant sites in the output VCF.
+      - name: "--exclude_sample_expressions"
+        alternatives: [-xl-se]
+        type: string
+        multiple: true
+        description: |
+          Regular expression(s) matching sample names to exclude. Can be
+          specified multiple times.
+        example: ["control.*"]
+      - name: "--exclude_sample_name"
+        alternatives: [-xl-sn]
+        type: string
+        multiple: true
+        description: Exclude genotypes from this sample. Can be specified multiple times.
+        example: [sample3]
+      - name: "--ignore_non_ref_in_types"
+        type: boolean_true
+        description: |
+          Ignore `NON_REF` alleles when determining variant type. Required
+          for filtering GVCF files by type.
+      - name: "--intervals"
+        alternatives: [-L]
+        type: file
+        description: |
+          One or more genomic intervals over which to operate, provided
+          as a file (e.g. BED, interval_list).
+        example: intervals.bed
+      - name: "--invert_mendelian_violation"
+        type: boolean_true
+        description: Output non-Mendelian-violation sites only.
+      - name: "--invert_select"
+        alternatives: [-invert-select]
+        type: boolean_true
+        description: Invert the selection criteria specified by `--select_expressions`.
+      - name: "--keep_ids"
+        alternatives: [-ids]
+        type: string
+        multiple: true
+        description: List of variant rsIDs to select. Can be specified multiple times.
+        example: [rs123]
+      - name: "--keep_original_ac"
+        type: boolean_true
+        description: Store the original `AC`, `AF`, and `AN` values after subsetting.
+      - name: "--keep_original_dp"
+        type: boolean_true
+        description: Store the original `DP` value after subsetting.
+      - name: "--max_filtered_genotypes"
+        type: integer
+        description: Maximum number of samples filtered at the genotype level.
+        example: 10
+      - name: "--max_fraction_filtered_genotypes"
+        type: double
+        description: Maximum fraction of samples filtered at the genotype level.
+        example: 0.5
+      - name: "--max_indel_size"
+        type: integer
+        description: Maximum size of indels to include.
+        example: 50
+      - name: "--max_nocall_fraction"
+        type: double
+        description: Maximum fraction of samples with no-call genotypes.
+        example: 0.5
+      - name: "--max_nocall_number"
+        type: integer
+        description: Maximum number of samples with no-call genotypes.
+        example: 5
+      - name: "--mendelian_violation"
+        type: boolean_true
+        description: Output Mendelian violation sites only.
+      - name: "--mendelian_violation_qual_threshold"
+        type: double
+        description: Minimum GQ score for each trio member to accept a site as a Mendelian violation.
+        example: 30.0
+      - name: "--min_filtered_genotypes"
+        type: integer
+        description: Minimum number of samples filtered at the genotype level.
+        example: 1
+      - name: "--min_fraction_filtered_genotypes"
+        type: double
+        description: Minimum fraction of samples filtered at the genotype level.
+        example: 0.1
+      - name: "--min_indel_size"
+        type: integer
+        description: Minimum size of indels to include.
+        example: 1
+      - name: "--pedigree"
+        alternatives: [-ped]
+        type: file
+        description: |
+          Pedigree file, used for pedigree-based analyses such as
+          Mendelian violation detection (`--mendelian_violation`,
+          `--invert_mendelian_violation`).
+        example: family.ped
+      - name: "--preserve_alleles"
+        type: boolean_true
+        description: Preserve original alleles, do not trim.
+      - name: "--remove_fraction_genotypes"
+        type: double
+        description: |
+          Select a fraction of genotypes at random from the input and
+          set them to no-call.
+        example: 0.1
+      - name: "--remove_unused_alternates"
+        type: boolean_true
+        description: Remove alternate alleles not present in any genotypes.
+      - name: "--restrict_alleles_to"
+        type: string
+        choices: [ALL, BIALLELIC, MULTIALLELIC]
+        description: Select only variants of a particular allelicity.
+        example: BIALLELIC
+      - name: "--sample_expressions"
+        alternatives: [-se]
+        type: string
+        multiple: true
+        description: |
+          Regular expression to select multiple samples. Can be
+          specified multiple times.
+        example: ["sample.*"]
+      - name: "--sample_name"
+        alternatives: [-sn]
+        type: string
+        multiple: true
+        description: Include genotypes from this sample. Can be specified multiple times.
+        example: [sample1, sample2]
+      - name: "--select_expressions"
+        alternatives: [--select]
+        type: string
+        multiple: true
+        description: |
+          A filtering expression in terms of either `INFO` fields or the
+          `VariantContext` object (JEXL syntax). If the expression
+          evaluates to `true` for a variant, it will be kept in the
+          output VCF. Can be specified multiple times.
+        example: ["QD > 2.0"]
+      - name: "--select_genotype_expressions"
+        alternatives: [-select-genotype]
+        type: string
+        multiple: true
+        description: |
+          A filtering expression in terms of `FORMAT` fields. If the
+          expression evaluates to `true` for a variant, it will be kept
+          in the output VCF. Can be specified multiple times.
+        example: ["DP > 10"]
+      - name: "--select_random_fraction"
+        alternatives: [-fraction]
+        type: double
+        description: Select a fraction of variants at random from the input.
+        example: 0.5
+      - name: "--select_type_to_exclude"
+        alternatives: [-xl-select-type]
+        type: string
+        multiple: true
+        choices: [NO_VARIATION, SNP, MNP, INDEL, SYMBOLIC, MIXED]
+        description: |
+          Do not select certain type of variants from the input file.
+          Can be specified multiple times.
+        example: [INDEL]
+      - name: "--select_type_to_include"
+        alternatives: [-select-type]
+        type: string
+        multiple: true
+        choices: [NO_VARIATION, SNP, MNP, INDEL, SYMBOLIC, MIXED]
+        description: |
+          Select only a certain type of variants from the input file.
+          Can be specified multiple times.
+        example: [SNP]
+      - name: "--set_filtered_gt_to_nocall"
+        type: boolean_true
+        description: Set filtered genotypes to no-call.
+
+__merge__: /src/gatk4/utils/common_argument_groups.yaml
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow
