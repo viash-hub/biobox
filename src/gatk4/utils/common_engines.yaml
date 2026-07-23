@@ -1,0 +1,6 @@
+type: docker
+image: quay.io/biocontainers/gatk4:4.6.2.0--py310hdfd78af_1
+setup:
+  - type: docker
+    run: |
+      gatk --version 2>&1 | grep "Genome Analysis Toolkit" | sed 's/^/gatk4: /' > /var/software_versions.txt
