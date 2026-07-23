@@ -1,0 +1,297 @@
+name: gatk4_haplotypecaller
+namespace: gatk4
+description: |
+  Calls germline SNVs and indels via local re-assembly of haplotypes.
+
+  The HaplotypeCaller is capable of calling SNPs and indels simultaneously
+  via local de-novo assembly of haplotypes in an active region. Whenever
+  the program encounters a region showing signs of variation, it discards
+  the existing mapping information and completely reassembles the reads in
+  that region. This allows it to be more accurate when calling regions
+  that are traditionally difficult to call, for example when they contain
+  different types of variants close to each other.
+keywords: [variant calling, germline, GATK, GATK4, SNV, indel]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--input"
+        alternatives: [-I]
+        type: file
+        description: |
+          Input BAM file containing reads to call variants from.
+
+          The file must be coordinate-sorted and indexed (see `--bai`).
+        required: true
+        example: sample.bam
+      - name: "--bai"
+        type: file
+        description: BAM index file (`.bai`) for the input BAM file.
+        required: true
+        example: sample.bam.bai
+      - name: "--reference"
+        alternatives: [-R]
+        type: file
+        description: Reference sequence FASTA file.
+        required: true
+        example: reference.fasta
+      - name: "--reference_fai"
+        type: file
+        description: FASTA index file (`.fai`) for the reference sequence.
+        required: true
+        example: reference.fasta.fai
+      - name: "--reference_dict"
+        type: file
+        description: Sequence dictionary (`.dict`) file for the reference sequence.
+        required: true
+        example: reference.dict
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: |
+          Output file containing the called variants.
+
+          This can be a VCF file (`.vcf`/`.vcf.gz`) or, when
+          `--emit_ref_confidence` is set to `GVCF`, a GVCF file.
+        required: true
+        example: output.vcf
+
+  - name: "Options"
+    arguments:
+      - name: "--active_probability_threshold"
+        type: double
+        description: |
+          Minimum probability for a locus to be considered active.
+        default: 0.002
+      - name: "--alleles"
+        type: file
+        description: |
+          VCF file with the set of alleles to force-call regardless of
+          evidence.
+        example: alleles.vcf
+      - name: "--assembly_region_padding"
+        type: integer
+        description: |
+          Number of additional bases of context to include around each
+          assembly region.
+        default: 100
+      - name: "--base_quality_score_threshold"
+        type: integer
+        description: |
+          Base qualities below this threshold will be reduced to the
+          minimum (6).
+        default: 18
+      - name: "--contamination_fraction_to_filter"
+        alternatives: [-contamination]
+        type: double
+        description: |
+          Fraction of contamination in sequencing data (for all samples)
+          to aggressively remove.
+        default: 0.0
+      - name: "--dbsnp"
+        alternatives: [-D]
+        type: file
+        description: |
+          dbSNP VCF file used to annotate called variants with known
+          variant IDs.
+        example: dbsnp.vcf
+      - name: "--disable_optimizations"
+        type: boolean_true
+        description: |
+          Don't skip calculations in assembly regions with no variants.
+      - name: "--dont_use_soft_clipped_bases"
+        type: boolean_true
+        description: |
+          Do not analyze soft-clipped bases in the reads.
+      - name: "--emit_ref_confidence"
+        alternatives: [-ERC]
+        type: string
+        description: |
+          Mode for emitting reference confidence scores.
+
+          Set this to `GVCF` to generate a GVCF file suitable for joint
+          genotyping of multiple samples (e.g. via
+          `gatk4 GenotypeGVCFs`).
+        choices: [NONE, BP_RESOLUTION, GVCF]
+        default: NONE
+      - name: "--floor_blocks"
+        type: boolean_true
+        description: |
+          Output the band lower bound for each GQ block regardless of the
+          data it represents. Only relevant when `--emit_ref_confidence`
+          is set to `GVCF`.
+      - name: "--force_active"
+        type: boolean_true
+        description: |
+          If set, all regions are marked as active, disabling the active
+          region detection step.
+      - name: "--founder_id"
+        type: string
+        multiple: true
+        description: |
+          Samples representing the population "founders", used together
+          with `--pedigree` to inform genotyping priors.
+      - name: "--gvcf_gq_bands"
+        alternatives: [-GQB]
+        type: integer
+        min: 1
+        max: 100
+        multiple: true
+        description: |
+          Exclusive upper bounds for reference confidence GQ bands (must
+          be in `[1, 100]` and specified in increasing order). Only
+          relevant when `--emit_ref_confidence` is set to `GVCF`.
+      - name: "--heterozygosity"
+        type: double
+        description: |
+          Expected heterozygosity value used to compute the prior
+          probability of a het genotype.
+        default: 0.001
+      - name: "--heterozygosity_stdev"
+        type: double
+        description: |
+          Standard deviation of heterozygosity for SNP and indel calling.
+        default: 0.01
+      - name: "--indel_heterozygosity"
+        type: double
+        description: |
+          Heterozygosity for indel calling.
+        default: 0.000125
+      - name: "--intervals"
+        alternatives: [-L]
+        type: file
+        description: |
+          One or more genomic intervals over which to operate, provided as
+          a file (e.g. BED, interval_list).
+        example: intervals.bed
+      - name: "--kmer_size"
+        type: integer
+        multiple: true
+        description: |
+          Kmer size(s) to use in the read threading assembler.
+        default: [10, 25]
+      - name: "--max_alternate_alleles"
+        type: integer
+        description: |
+          Maximum number of alternate alleles to genotype.
+        default: 6
+      - name: "--max_assembly_region_size"
+        type: integer
+        description: |
+          Maximum size of an assembly region.
+        default: 300
+      - name: "--max_reads_per_alignment_start"
+        type: integer
+        description: |
+          Maximum number of reads to retain per alignment start position.
+
+          Reads above this threshold will be downsampled. Set to `0` to
+          disable.
+        default: 50
+      - name: "--min_assembly_region_size"
+        type: integer
+        description: |
+          Minimum size of an assembly region.
+        default: 50
+      - name: "--min_base_quality_score"
+        alternatives: [-mbq]
+        type: integer
+        description: |
+          Minimum base quality required to consider a base for calling.
+        default: 10
+      - name: "--min_pruning"
+        type: integer
+        description: |
+          Minimum support to not prune paths in the assembly graph.
+        default: 2
+      - name: "--minimum_mapping_quality"
+        type: integer
+        description: |
+          Minimum mapping quality required to consider a read for calling.
+        default: 20
+      - name: "--output_mode"
+        type: string
+        description: |
+          Specifies which type of calls to output.
+        choices: [EMIT_VARIANTS_ONLY, EMIT_ALL_CONFIDENT_SITES, EMIT_ALL_ACTIVE_SITES]
+        default: EMIT_VARIANTS_ONLY
+      - name: "--pcr_indel_model"
+        type: string
+        description: |
+          The PCR indel model to use.
+
+          Set this parameter to `NONE` to disable the PCR indel model, for
+          example when using PCR-free sequencing data.
+        choices: [NONE, HOSTILE, AGGRESSIVE, CONSERVATIVE]
+        default: CONSERVATIVE
+      - name: "--pedigree"
+        alternatives: [-ped]
+        type: file
+        description: |
+          Pedigree file for determining the population "founders" (see
+          `--founder_id`).
+        example: family.ped
+      - name: "--ploidy_regions"
+        type: file
+        description: |
+          Interval file with a column specifying the desired ploidy for
+          genotyping models, overriding the default ploidy (and
+          `--sample_ploidy`) in specific regions (e.g. sex chromosomes).
+        example: ploidy_regions.bed
+      - name: "--sample_name"
+        alternatives: [-ALIAS]
+        type: string
+        description: |
+          Name of a single sample to use from a multi-sample BAM file.
+      - name: "--sample_ploidy"
+        alternatives: [-ploidy]
+        type: integer
+        description: |
+          Ploidy (number of chromosomes) per sample. For pooled data, set
+          to (number of samples in each pool * sample ploidy).
+        default: 2
+      - name: "--stand_call_conf"
+        alternatives: [-stand-call-conf]
+        type: double
+        description: |
+          The minimum phred-scaled confidence threshold at which variants
+          should be called.
+        default: 30
+
+__merge__: /src/gatk4/utils/common_argument_groups.yaml
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow
