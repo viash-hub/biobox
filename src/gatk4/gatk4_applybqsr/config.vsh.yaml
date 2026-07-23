@@ -1,0 +1,166 @@
+name: gatk4_applybqsr
+namespace: gatk4
+description: |
+  Apply a linear base quality recalibration model trained with the
+  BaseRecalibrator tool.
+
+  This is the second pass of the GATK Base Quality Score Recalibration
+  (BQSR) workflow. It applies the recalibration table produced by
+  `gatk4_baserecalibrator` to the input BAM, adjusting base quality scores
+  to correct for systematic technical errors in the sequencing process.
+keywords: [BQSR, base quality recalibration, GATK, GATK4, alignment]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--input"
+        alternatives: [-I]
+        type: file
+        description: |
+          Input BAM file containing reads to be recalibrated.
+
+          The file must be coordinate-sorted and indexed (see `--bai`).
+        required: true
+        example: sample.bam
+      - name: "--bai"
+        type: file
+        description: BAM index file (`.bai`) for the input BAM file.
+        required: true
+        example: sample.bam.bai
+      - name: "--bqsr_recal_file"
+        alternatives: [-bqsr]
+        type: file
+        description: |
+          Input recalibration table for BQSR, as produced by
+          `gatk BaseRecalibrator`.
+        required: true
+        example: recal.table
+      - name: "--reference"
+        alternatives: [-R]
+        type: file
+        description: |
+          Reference sequence FASTA file.
+
+          If provided, `--reference_fai` and `--reference_dict` must be provided
+          too.
+        example: reference.fasta
+      - name: "--reference_fai"
+        type: file
+        description: FASTA index file (`.fai`) for the reference sequence.
+        example: reference.fasta.fai
+      - name: "--reference_dict"
+        type: file
+        description: Sequence dictionary (`.dict`) file for the reference sequence.
+        example: reference.dict
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: Recalibrated output BAM file.
+        required: true
+        example: output.bam
+
+  - name: "Options"
+    arguments:
+      - name: "--allow_missing_read_group"
+        type: boolean_true
+        description: |
+          Do not throw an error when encountering a read group in the input BAM
+          that is not in the recalibration table.
+      - name: "--emit_original_quals"
+        type: boolean_true
+        description: |
+          Emit the original base qualities under the `OQ` tag, alongside the
+          recalibrated qualities.
+      - name: "--exclude_intervals"
+        alternatives: [-XL]
+        type: file
+        description: |
+          One or more genomic intervals to exclude from processing, provided as
+          a file (e.g. BED, interval_list).
+        example: exclude_intervals.bed
+      - name: "--global_qscore_prior"
+        type: double
+        description: |
+          Global Q-score Bayesian prior to use for BQSR. A negative value
+          disables this behavior.
+        default: -1.0
+      - name: "--intervals"
+        alternatives: [-L]
+        type: file
+        description: |
+          One or more genomic intervals over which to operate, provided as
+          a file (e.g. BED, interval_list).
+        example: intervals.bed
+      - name: "--preserve_qscores_less_than"
+        type: integer
+        description: |
+          Don't recalibrate bases with quality scores less than this threshold.
+        default: 6
+      - name: "--quantize_quals"
+        type: integer
+        description: |
+          Quantize quality scores to a given number of levels.
+
+          Set to `0` to disable quantization. Mutually exclusive with
+          `--static_quantized_quals`; the script errors out if both are set
+          to a non-default value.
+        default: 0
+      - name: "--round_down_quantized"
+        type: boolean_true
+        description: |
+          Round quantized quality scores down to the nearest quantized value.
+          Cannot be used with `--quantization_levels`.
+      - name: "--static_quantized_quals"
+        type: integer
+        multiple: true
+        description: |
+          Use static quantized quality scores to a given number of levels.
+
+          Can be specified multiple times to define several levels, each
+          producing one `--static-quantized-quals` flag passed to the
+          tool. Mutually exclusive with `--quantize_quals`.
+        example: [10, 20, 30]
+      - name: "--use_original_qualities"
+        alternatives: [-OQ]
+        type: boolean_true
+        description: |
+          Use the original base quality scores (`OQ` tag) from the input BAM 
+          instead of the current ones.
+
+__merge__: /src/gatk4/utils/common_argument_groups.yaml
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow
