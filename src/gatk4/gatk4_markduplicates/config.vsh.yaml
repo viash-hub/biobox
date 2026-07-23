@@ -1,0 +1,286 @@
+name: gatk4_markduplicates
+namespace: gatk4
+description: |
+  Identifies duplicate reads in a SAM/BAM/CRAM file.
+
+  This tool locates and tags duplicate reads in a coordinate-sorted SAM,
+  BAM or CRAM file, where duplicate reads are defined as originating from
+  a single fragment of DNA. Duplicates can arise during sample preparation
+  (e.g. library construction using PCR) or from a single amplification
+  cluster incorrectly detected as multiple clusters by the optical sensor
+  of the sequencing instrument (optical duplicates).
+
+  The tool works by comparing sequences in the 5' positions of both reads
+  and read-pairs. After duplicate reads are collected, the tool
+  differentiates the primary and duplicate reads using an algorithm that
+  ranks reads by the sums of their base-quality scores by default.
+  Duplicate reads are marked with the hexadecimal SAM flag value `0x0400`
+  (decimal `1024`).
+
+  In addition to the dedup-tagged output file, the tool produces a metrics
+  file indicating the numbers of duplicates for both single- and
+  paired-end reads.
+keywords: [deduplication, alignment, BAM, GATK, GATK4, Picard]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--input"
+        alternatives: [-I]
+        type: file
+        description: |
+          Input coordinate-sorted SAM, BAM or CRAM file to analyze.
+        required: true
+        example: input.bam
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: |
+          Output file with duplicate reads marked (or removed, see
+          `--remove_duplicates`).
+        required: true
+        example: marked_duplicates.bam
+      - name: "--metrics"
+        alternatives: [-M]
+        type: file
+        direction: output
+        description: |
+          Output metrics file with duplication metrics, including the
+          estimated library size.
+        required: true
+        example: marked_dup_metrics.txt
+
+  - name: "Options"
+    arguments:
+      - name: "--add_pg_tag_to_reads"
+        type: boolean
+        description: |
+          Add a `PG` tag to each read in a SAM or BAM file.
+        default: true
+      - name: "--assume_sort_order"
+        alternatives: [-ASO]
+        type: string
+        description: |
+          If provided, assume that the input file has this sort order
+          even if the header says otherwise.
+        choices: [unsorted, queryname, coordinate]
+      - name: "--barcode_tag"
+        type: string
+        description: |
+          Barcode SAM tag (e.g. `BC` for 10x Genomics) used to facilitate
+          duplicate marking using molecular barcodes.
+      - name: "--clear_dt"
+        type: boolean
+        description: |
+          Clear the `DT` tag from input SAM records. Should be set to
+          `false` if the input SAM file doesn't have this tag.
+        default: true
+      - name: "--comment"
+        alternatives: [-CO]
+        type: string
+        multiple: true
+        description: |
+          Comment(s) to include in the output file's header. May be
+          specified more than once.
+      - name: "--create_index"
+        type: boolean_true
+        description: |
+          If set, create an index when writing a coordinate-sorted BAM
+          output file.
+      - name: "--duplex_umi"
+        type: boolean_true
+        description: |
+          Treat UMIs as being duplex stranded. This option requires that
+          the UMI consist of two equal-length strings separated by a
+          hyphen (e.g. `ATC-GTC`). Reads are considered duplicates if, in
+          addition to the standard definition, they have identical
+          normalized UMIs. Requires `--barcode_tag` to hold
+          non-normalized UMIs.
+      - name: "--duplicate_scoring_strategy"
+        alternatives: [-DS]
+        type: string
+        description: |
+          The scoring strategy for choosing the non-duplicate among
+          duplicate candidates.
+        default: SUM_OF_BASE_QUALITIES
+        choices:
+          - SUM_OF_BASE_QUALITIES
+          - TOTAL_MAPPED_REFERENCE_LENGTH
+          - RANDOM
+      - name: "--max_file_handles_for_read_ends_map"
+        alternatives: [-MAX_FILE_HANDLES]
+        type: integer
+        description: |
+          Maximum number of file handles to keep open when spilling read
+          ends to disk. Set this number a little lower than the
+          per-process maximum number of files that may be open (find
+          this with the `ulimit -n` command on a Unix system).
+        default: 8000
+      - name: "--max_optical_duplicate_set_size"
+        type: long
+        description: |
+          The maximum size of a set of duplicate reads for which to
+          attempt to determine which are optical duplicates. Raising
+          this value too high for a very large set of duplicate reads
+          will severely affect the runtime of this tool. Set to `-1` to
+          completely disable this check.
+        default: 300000
+      - name: "--max_records_in_ram"
+        type: integer
+        description: |
+          When writing files that need to be sorted, this will specify
+          the number of records stored in RAM before spilling to disk.
+          Increasing this number reduces the number of file handles
+          needed to sort the file, and increases the amount of RAM
+          needed.
+        default: 500000
+      - name: "--molecular_identifier_tag"
+        type: string
+        description: |
+          SAM tag used to uniquely identify the molecule from which a
+          read was derived. Requires `--barcode_tag` to also be set.
+      - name: "--optical_duplicate_pixel_distance"
+        type: integer
+        description: |
+          The maximum offset between two duplicate clusters in order to
+          consider them optical duplicates.
+
+          The default of `100` is appropriate for non-patterned
+          flowcells. For patterned flowcell models (e.g. NovaSeq,
+          HiSeqX), `2500` is more appropriate. For other platforms and
+          models, experiment to find what works best.
+        default: 100
+      - name: "--program_group_command_line"
+        alternatives: [-PG_COMMAND]
+        type: string
+        description: |
+          Value of the `CL` tag of the `PG` record to be created. If not
+          supplied, the command line is detected automatically.
+      - name: "--program_group_name"
+        alternatives: [-PG_NAME]
+        type: string
+        description: |
+          Value of the `PN` tag of the `PG` record to be created.
+        default: MarkDuplicates
+      - name: "--program_group_version"
+        alternatives: [-PG_VERSION]
+        type: string
+        description: |
+          Value of the `VN` tag of the `PG` record to be created. If not
+          supplied, the version is detected automatically.
+      - name: "--program_record_id"
+        alternatives: [-PG]
+        type: string
+        description: |
+          The program record ID for the `PG` record(s) created by this
+          tool. A suffix may be appended to this string to avoid
+          collision with other program record IDs. Set to `null` to
+          disable `PG` record creation.
+        default: MarkDuplicates
+      - name: "--read_name_regex"
+        type: string
+        description: |
+          MarkDuplicates can use the tile and cluster positions to
+          estimate the rate of optical duplication in addition to the
+          dominant source of duplication, PCR, to provide a more
+          accurate estimation of library size. By default (with no
+          `--read_name_regex` specified), MarkDuplicates will attempt to
+          extract coordinates using a split on `:`. Set
+          `--read_name_regex` to `null` to disable optical duplicate
+          detection. Note that without optical duplicate counts, library
+          size estimation will be less accurate.
+      - name: "--read_one_barcode_tag"
+        type: string
+        description: |
+          Read one barcode SAM tag (e.g. `BX` for 10x Genomics).
+      - name: "--read_two_barcode_tag"
+        type: string
+        description: |
+          Read two barcode SAM tag (e.g. `BX` for 10x Genomics).
+      - name: "--reference_sequence"
+        alternatives: [-R]
+        type: file
+        description: |
+          Reference sequence FASTA file. Only required when the input
+          file is CRAM format.
+        example: reference.fasta
+      - name: "--remove_duplicates"
+        type: boolean_true
+        description: |
+          If set, do not write duplicates to the output file instead of
+          writing them with the appropriate SAM flags set.
+      - name: "--remove_sequencing_duplicates"
+        type: boolean_true
+        description: |
+          If set, remove 'optical' duplicates and other duplicates that
+          appear to have arisen from the sequencing process instead of
+          the library preparation process, even if
+          `--remove_duplicates` is not set. If `--remove_duplicates` is
+          set, all duplicates are removed and this option is ignored.
+      - name: "--sorting_collection_size_ratio"
+        type: double
+        description: |
+          This number, plus the maximum RAM available to the JVM,
+          determine the memory footprint used by some of the sorting
+          collections. If you are running out of memory, try reducing
+          this number.
+        default: 0.25
+      - name: "--tag_duplicate_set_members"
+        type: boolean_true
+        description: |
+          If set, for a read that appears in a duplicate set, add two
+          tags. The first tag, `DS`, indicates the size of the duplicate
+          set. The second tag, `DI`, represents a unique identifier for
+          the duplicate set to which the record belongs.
+      - name: "--tagging_policy"
+        type: string
+        description: |
+          Determines how duplicate types are recorded in the `DT`
+          optional attribute.
+        choices: [DontTag, OpticalOnly, All]
+        default: DontTag
+      - name: "--validation_stringency"
+        type: string
+        description: |
+          Validation stringency for all SAM files read by this program.
+          Setting stringency to `SILENT` can improve performance when
+          processing a BAM file in which variable-length data (read,
+          qualities, tags) do not otherwise need to be decoded.
+        choices: [STRICT, LENIENT, SILENT]
+        default: STRICT
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow
