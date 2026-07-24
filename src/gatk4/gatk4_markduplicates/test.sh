@@ -102,4 +102,36 @@ check_file_contains "$test3_dir/marked_dup_metrics.txt" "ESTIMATED_LIBRARY_SIZE"
 
 log "✅ TEST 3 completed successfully"
 
+# --- Test Case 4: Multiple --input files (merge and de-duplicate together) ---
+log "Starting TEST 4: Multiple --input files"
+
+# Build a second BAM sharing a duplicate position (1) with the first file's
+# read1/read2 pair, plus one read at a new position
+sam_file2="$test_data_dir/input2.sam"
+create_test_sam "$sam_file2" seq1 2000 rg1 sample1 1 1300
+check_file_exists "$sam_file2" "second synthetic SAM fixture"
+
+input_bam2="$test_data_dir/input2.bam"
+sort_and_index_bam "$sam_file2" "$input_bam2" coordinate
+check_file_exists "$input_bam2" "second coordinate-sorted input BAM"
+
+test4_dir="$meta_temp_dir/test4"
+mkdir -p "$test4_dir"
+
+log "Executing $meta_name with two --input files..."
+"$meta_executable" \
+  --input "$input_bam" \
+  --input "$input_bam2" \
+  --output "$test4_dir/marked_duplicates.bam" \
+  --metrics "$test4_dir/marked_dup_metrics.txt"
+
+log "Validating TEST 4 outputs..."
+check_file_exists "$test4_dir/marked_duplicates.bam" "merged dedup-tagged output BAM"
+check_file_not_empty "$test4_dir/marked_duplicates.bam" "merged dedup-tagged output BAM"
+check_file_exists "$test4_dir/marked_dup_metrics.txt" "merged duplication metrics file"
+check_file_not_empty "$test4_dir/marked_dup_metrics.txt" "merged duplication metrics file"
+check_file_contains "$test4_dir/marked_dup_metrics.txt" "ESTIMATED_LIBRARY_SIZE" "merged duplication metrics file"
+
+log "✅ TEST 4 completed successfully"
+
 print_test_summary "All tests"

@@ -28,12 +28,13 @@ trap 'rm -rf "$tmp_dir"' EXIT
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
-# Convert semicolon-separated comments into repeated --COMMENT arguments
+# Convert semicolon-separated multi-value arguments into repeated flags
+split_multiple_to_flags "$par_input" "--INPUT" input_args
 split_multiple_to_flags "$par_comment" "--COMMENT" comment_args
 
 # Build command arguments array
 cmd_args=(
-  --INPUT "$par_input"
+  "${input_args[@]}"
   --OUTPUT "$par_output"
   --METRICS_FILE "$par_metrics"
   --TMP_DIR "$tmp_dir"

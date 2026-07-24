@@ -40,8 +40,12 @@ argument_groups:
       - name: "--input"
         alternatives: [-I]
         type: file
+        multiple: true
         description: |
-          Input coordinate-sorted SAM, BAM or CRAM file to analyze.
+          Input coordinate-sorted SAM, BAM or CRAM file(s) to analyze.
+
+          Can be specified multiple times to merge and de-duplicate reads
+          across several input files in a single pass.
         required: true
         example: input.bam
 
