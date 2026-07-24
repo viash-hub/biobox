@@ -26,3 +26,35 @@ split_multiple_to_flags() {
     done
   fi
 }
+
+# Symlink a reference FASTA and its .fai/.dict into a temp dir under matching
+# basenames, so GATK can find them
+#
+# Usage: staged=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
+stage_reference_trio() {
+  local tmp_dir="$1"
+  local reference="$2"
+  local reference_fai="$3"
+  local reference_dict="$4"
+
+  ln -s "$(readlink -f "$reference")" "$tmp_dir/reference.fasta"
+  ln -s "$(readlink -f "$reference_fai")" "$tmp_dir/reference.fasta.fai"
+  ln -s "$(readlink -f "$reference_dict")" "$tmp_dir/reference.dict"
+
+  echo "$tmp_dir/reference.fasta"
+}
+
+# Symlink a BAM and its .bai companion into a temp dir under matching
+# basenames, so GATK can find them
+#
+# Usage: staged=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
+stage_bam_bai() {
+  local tmp_dir="$1"
+  local input_bam="$2"
+  local input_bai="$3"
+
+  ln -s "$(readlink -f "$input_bam")" "$tmp_dir/sample.bam"
+  ln -s "$(readlink -f "$input_bai")" "$tmp_dir/sample.bai"
+
+  echo "$tmp_dir/sample.bam"
+}

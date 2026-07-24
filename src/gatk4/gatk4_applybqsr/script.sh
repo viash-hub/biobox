@@ -27,15 +27,12 @@ done
 tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT
 
-ln -s "$(readlink -f "$par_input")" "$tmp_dir/sample.bam"
-ln -s "$(readlink -f "$par_bai")" "$tmp_dir/sample.bai"
+staged_bam=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
 
 reference_args=()
 if [[ -n "$par_reference" ]]; then
-  ln -s "$(readlink -f "$par_reference")" "$tmp_dir/reference.fasta"
-  ln -s "$(readlink -f "$par_reference_fai")" "$tmp_dir/reference.fasta.fai"
-  ln -s "$(readlink -f "$par_reference_dict")" "$tmp_dir/reference.dict"
-  reference_args=(--reference "$tmp_dir/reference.fasta")
+  staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
+  reference_args=(--reference "$staged_reference")
 fi
 
 # Determine available memory for the JVM
@@ -64,7 +61,7 @@ split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disab
 
 # Build command arguments array
 cmd_args=(
-  --input "$tmp_dir/sample.bam"
+  --input "$staged_bam"
   "${reference_args[@]}"
   --bqsr-recal-file "$par_bqsr_recal_file"
   --output "$par_output"

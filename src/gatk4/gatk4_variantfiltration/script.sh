@@ -56,15 +56,13 @@ extra_args=(
 
 # Stage the reference trio into a temp dir with matching basenames so GATK
 # can find them
-tmp_dir=$(mktemp -d "${meta_temp_dir:-/tmp}/gatk4_variantfiltration.XXXXXX")
+tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT
 
 reference_args=()
 if [[ -n "$par_reference" ]]; then
-  ln -s "$(realpath "$par_reference")" "$tmp_dir/reference.fasta"
-  ln -s "$(realpath "$par_reference_fai")" "$tmp_dir/reference.fasta.fai"
-  ln -s "$(realpath "$par_reference_dict")" "$tmp_dir/reference.dict"
-  reference_args=(--reference "$tmp_dir/reference.fasta")
+  staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
+  reference_args=(--reference "$staged_reference")
 fi
 
 # Run gatk VariantFiltration

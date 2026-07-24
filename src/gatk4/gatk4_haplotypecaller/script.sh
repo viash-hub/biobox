@@ -12,11 +12,8 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT
 
-ln -s "$(readlink -f "$par_reference")" "$tmp_dir/reference.fasta"
-ln -s "$(readlink -f "$par_reference_fai")" "$tmp_dir/reference.fasta.fai"
-ln -s "$(readlink -f "$par_reference_dict")" "$tmp_dir/reference.dict"
-ln -s "$(readlink -f "$par_input")" "$tmp_dir/sample.bam"
-ln -s "$(readlink -f "$par_bai")" "$tmp_dir/sample.bai"
+staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
+staged_bam=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
 
 # Determine available memory for the JVM
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
@@ -42,9 +39,9 @@ split_multiple_to_flags "$par_kmer_size" "--kmer-size" kmer_size_args
 
 # Build command arguments array
 cmd_args=(
-  --input "$tmp_dir/sample.bam"
+  --input "$staged_bam"
   --output "$par_output"
-  --reference "$tmp_dir/reference.fasta"
+  --reference "$staged_reference"
   --native-pair-hmm-threads "${meta_cpus:-1}"
   ${par_active_probability_threshold:+--active-probability-threshold "$par_active_probability_threshold"}
   ${par_alleles:+--alleles "$par_alleles"}

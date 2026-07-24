@@ -31,9 +31,7 @@ done
 tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT
 
-ln -s "$(readlink -f "$par_reference")" "$tmp_dir/reference.fasta"
-ln -s "$(readlink -f "$par_reference_fai")" "$tmp_dir/reference.fasta.fai"
-ln -s "$(readlink -f "$par_reference_dict")" "$tmp_dir/reference.dict"
+staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
 
 # Convert semicolon-separated multi-value arguments into repeated flags
 split_multiple_to_flags "$par_variant" "--variant" variant_args
@@ -82,7 +80,7 @@ cmd_args=(
 gatk CombineGVCFs \
   --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" \
   "${variant_args[@]}" \
-  --reference "$tmp_dir/reference.fasta" \
+  --reference "$staged_reference" \
   --output "$par_output" \
   "${cmd_args[@]}" \
   --tmp-dir "$tmp_dir"

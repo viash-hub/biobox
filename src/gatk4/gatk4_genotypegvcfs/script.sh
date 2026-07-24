@@ -36,9 +36,7 @@ done
 tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT
 
-ln -s "$(readlink -f "$par_reference")" "$tmp_dir/reference.fasta"
-ln -s "$(readlink -f "$par_reference_fai")" "$tmp_dir/reference.fasta.fai"
-ln -s "$(readlink -f "$par_reference_dict")" "$tmp_dir/reference.dict"
+staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
 
 # GATK requires a literal `gendb://` prefix to recognize a GenomicsDB
 # workspace. The `--variant` argument may be either a single GVCF file or a
@@ -105,7 +103,7 @@ cmd_args=(
 # Run GATK GenotypeGVCFs
 gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" GenotypeGVCFs \
   --variant "$variant_arg" \
-  --reference "$tmp_dir/reference.fasta" \
+  --reference "$staged_reference" \
   --output "$par_output" \
   "${cmd_args[@]}" \
   --tmp-dir "$tmp_dir" \
