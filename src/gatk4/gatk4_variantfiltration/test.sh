@@ -57,7 +57,7 @@ mkdir -p "$(dirname "$output_vcf")"
 
 log "Executing $meta_name with --filter_expression/--filter_name pairs..."
 "$meta_executable" \
-  --input "$input_vcf" \
+  --variant "$input_vcf" \
   --reference "$ref_fasta" \
   --reference_fai "$ref_fai" \
   --reference_dict "$ref_dict" \
@@ -138,7 +138,7 @@ mkdir -p "$(dirname "$output_vcf3")"
 
 log "Executing $meta_name with --mask, --genotype_filter_expression and --set_filtered_genotype_to_no_call..."
 "$meta_executable" \
-  --input "$input_vcf3" \
+  --variant "$input_vcf3" \
   --reference "$ref_fasta" \
   --reference_fai "$ref_fai" \
   --reference_dict "$ref_dict" \
@@ -187,7 +187,7 @@ mkdir -p "$(dirname "$output_vcf4")"
 
 log "Executing $meta_name with --interval_padding and --create_output_variant_index false..."
 "$meta_executable" \
-  --input "$input_vcf" \
+  --variant "$input_vcf" \
   --reference "$ref_fasta" \
   --reference_fai "$ref_fai" \
   --reference_dict "$ref_dict" \
@@ -210,7 +210,7 @@ mkdir -p "$(dirname "$output_vcf5")"
 
 log "Executing $meta_name without a reference..."
 "$meta_executable" \
-  --input "$input_vcf" \
+  --variant "$input_vcf" \
   --output "$output_vcf5" \
   --filter_expression "QD < 2.0" \
   --filter_name "lowQD"

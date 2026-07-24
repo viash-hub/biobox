@@ -26,7 +26,7 @@ authors:
 argument_groups:
   - name: "Input"
     arguments:
-      - name: "--input"
+      - name: "--variant"
         alternatives: [-V]
         type: file
         description: Input VCF file containing variants to be filtered.
@@ -49,23 +49,6 @@ argument_groups:
         type: file
         description: Sequence dictionary (`.dict`) file for the reference genome.
         example: reference.dict
-      - name: "--filter_expression"
-        alternatives: [-filter]
-        type: string
-        multiple: true
-        description: |
-          One or more JEXL expressions used with INFO fields to filter,
-          e.g. `"vc.isSNP() && QD < 2.0"`. Must be paired 1-to-1 with
-          `--filter_name`.
-        example: ["vc.isSNP() && QD < 2.0"]
-      - name: "--filter_name"
-        type: string
-        multiple: true
-        description: |
-          Names for the list of site-level filters in `--filter_expression`.
-          Recorded in the `FILTER` field for records that fail the corresponding
-          expression.
-        example: ["SNP_QD2"]
 
   - name: "Output"
     arguments:
@@ -91,7 +74,7 @@ argument_groups:
         description: |
           The number of SNPs which make up a cluster. Must be at least
           2. Used together with `--cluster_window_size` to enable
-          clustered-SNP filtering (GATK default: 3). Requires `--input`
+          clustered-SNP filtering (GATK default: 3). Requires `--variant`
           to support random access (e.g. bgzipped and tabix-indexed, or
           a plain VCF with an accompanying `.idx`).
       - name: "--cluster_window_size"
@@ -100,9 +83,26 @@ argument_groups:
         description: |
           The window size (in bases) in which to evaluate clustered
           SNPs. A value of 0 (the GATK default) disables clustered-SNP
-          filtering. Requires `--input` to support random access (e.g.
+          filtering. Requires `--variant` to support random access (e.g.
           bgzipped and tabix-indexed, or a plain VCF with an
           accompanying `.idx`).
+      - name: "--filter_expression"
+        alternatives: [-filter]
+        type: string
+        multiple: true
+        description: |
+          One or more JEXL expressions used with INFO fields to filter,
+          e.g. `"vc.isSNP() && QD < 2.0"`. Must be paired 1-to-1 with
+          `--filter_name`.
+        example: ["vc.isSNP() && QD < 2.0"]
+      - name: "--filter_name"
+        type: string
+        multiple: true
+        description: |
+          Names for the list of site-level filters in `--filter_expression`.
+          Recorded in the `FILTER` field for records that fail the corresponding
+          expression.
+        example: ["SNP_QD2"]
       - name: "--filter_not_in_mask"
         type: boolean_true
         description: Filter records that are NOT in the regions given by `--mask`.

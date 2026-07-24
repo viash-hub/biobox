@@ -67,7 +67,7 @@ fi
 
 # Run gatk VariantFiltration
 gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" VariantFiltration \
-  --variant "$par_input" \
+  --variant "$par_variant" \
   --output "$par_output" \
   "${reference_args[@]}" \
   "${filter_expression_args[@]}" \
