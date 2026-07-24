@@ -79,7 +79,7 @@ argument_groups:
         description: |
           If provided, assume that the input file has this sort order
           even if the header says otherwise.
-        choices: [unsorted, queryname, coordinate]
+        choices: [unsorted, queryname, coordinate, duplicate, unknown]
       - name: "--barcode_tag"
         type: string
         description: |
