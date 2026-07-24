@@ -79,7 +79,7 @@ log "✅ TEST 2 completed successfully"
 # --- Test Case 3: Assembly/genotyping tuning options ---
 log "Starting TEST 3: Assembly and genotyping tuning options"
 
-log "Executing $meta_name with sample-ploidy, output-mode and other tuning options..."
+log "Executing $meta_name with sample-ploidy, output-mode, annotation and other tuning options..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --bai "$test_data_dir/reads.sorted.bai" \
@@ -96,13 +96,16 @@ log "Executing $meta_name with sample-ploidy, output-mode and other tuning optio
   --kmer_size 10 \
   --kmer_size 25 \
   --min_pruning 2 \
-  --active_probability_threshold 0.002
+  --active_probability_threshold 0.002 \
+  --annotation ChromosomeCounts \
+  --annotations_to_exclude InbreedingCoeff
 
 log "Validating TEST 3 outputs..."
 check_file_exists "$meta_temp_dir/output_tuned.vcf" "output VCF file"
 check_file_not_empty "$meta_temp_dir/output_tuned.vcf" "output VCF file"
 check_file_contains "$meta_temp_dir/output_tuned.vcf" "^##fileformat=VCF" "output VCF file header"
 check_file_contains "$meta_temp_dir/output_tuned.vcf" "sample1" "output VCF sample column"
+check_file_contains "$meta_temp_dir/output_tuned.vcf" "##INFO=<ID=AC," "output VCF AC INFO definition (from --annotation ChromosomeCounts)"
 
 log "✅ TEST 3 completed successfully"
 

@@ -33,6 +33,9 @@ avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 # Convert semicolon-separated arguments to repeated flags
 split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
 split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
+split_multiple_to_flags "$par_annotation" "--annotation" annotation_args
+split_multiple_to_flags "$par_annotation_group" "--annotation-group" annotation_group_args
+split_multiple_to_flags "$par_annotations_to_exclude" "--annotations-to-exclude" annotations_to_exclude_args
 split_multiple_to_flags "$par_founder_id" "--founder-id" founder_id_args
 split_multiple_to_flags "$par_gvcf_gq_bands" "--gvcf-gq-bands" gvcf_gq_bands_args
 split_multiple_to_flags "$par_kmer_size" "--kmer-size" kmer_size_args
@@ -45,6 +48,9 @@ cmd_args=(
   --native-pair-hmm-threads "${meta_cpus:-1}"
   ${par_active_probability_threshold:+--active-probability-threshold "$par_active_probability_threshold"}
   ${par_alleles:+--alleles "$par_alleles"}
+  "${annotation_args[@]}"
+  "${annotation_group_args[@]}"
+  "${annotations_to_exclude_args[@]}"
   ${par_assembly_region_padding:+--assembly-region-padding "$par_assembly_region_padding"}
   ${par_base_quality_score_threshold:+--base-quality-score-threshold "$par_base_quality_score_threshold"}
   ${par_contamination_fraction_to_filter:+--contamination-fraction-to-filter "$par_contamination_fraction_to_filter"}

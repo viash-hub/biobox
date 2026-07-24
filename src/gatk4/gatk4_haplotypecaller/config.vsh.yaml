@@ -85,6 +85,115 @@ argument_groups:
           VCF file with the set of alleles to force-call regardless of
           evidence.
         example: alleles.vcf
+      - name: "--annotation"
+        alternatives: [-A]
+        type: string
+        multiple: true
+        description: |
+          One or more specific annotations to add to variant calls, e.g.
+          `ChromosomeCounts` or `InbreedingCoeff`.
+        example: [ChromosomeCounts]
+        choices:
+          - AlleleFraction
+          - AllelePseudoDepth
+          - AS_BaseQualityRankSumTest
+          - AS_FisherStrand
+          - AS_InbreedingCoeff
+          - AS_MappingQualityRankSumTest
+          - AS_QualByDepth
+          - AS_ReadPosRankSumTest
+          - AS_RMSMappingQuality
+          - AS_StrandBiasMutectAnnotation
+          - AS_StrandOddsRatio
+          - AssemblyComplexity
+          - BaseQuality
+          - BaseQualityHistogram
+          - BaseQualityRankSumTest
+          - ChromosomeCounts
+          - ClippingRankSumTest
+          - CountNs
+          - Coverage
+          - CycleSkipStatus
+          - DepthPerAlleleBySample
+          - DepthPerSampleHC
+          - ExcessHet
+          - FisherStrand
+          - FragmentDepthPerAlleleBySample
+          - FragmentLength
+          - GcContent
+          - GenotypeSummaries
+          - HaplotypeFilteringAnnotation
+          - HmerIndelLength
+          - HmerIndelNuc
+          - HmerMotifs
+          - InbreedingCoeff
+          - IndelClassify
+          - IndelLength
+          - LikelihoodRankSumTest
+          - MappingQuality
+          - MappingQualityRankSumTest
+          - MappingQualityZero
+          - OrientationBiasReadCounts
+          - OriginalAlignment
+          - PossibleDeNovo
+          - QualByDepth
+          - RawGtCount
+          - ReadPosition
+          - ReadPosRankSumTest
+          - ReferenceBases
+          - RMSMappingQuality
+          - SampleList
+          - StrandBiasBySample
+          - StrandOddsRatio
+          - TandemRepeat
+          - TransmittedSingleton
+          - UniqueAltReadCount
+          - VariantType
+      - name: "--annotation_group"
+        alternatives: [-G]
+        type: string
+        multiple: true
+        description: |
+          One or more groups of annotations to apply to variant calls.
+
+          Common values include `StandardAnnotation` and, for
+          allele-specific annotations, `AS_StandardAnnotation`.
+        example: [StandardAnnotation]
+        choices:
+          - AlleleSpecificAnnotation
+          - AS_StandardAnnotation
+          - GenotypeAnnotation
+          - InfoFieldAnnotation
+          - JumboGenotypeAnnotation
+          - JumboInfoAnnotation
+          - ReducibleAnnotation
+          - StandardAnnotation
+          - StandardFlowBasedAnnotation
+          - StandardHCAnnotation
+          - StandardMutectAnnotation
+          - VariantAnnotation
+      - name: "--annotations_to_exclude"
+        alternatives: [-AX]
+        type: string
+        multiple: true
+        description: |
+          One or more specific annotations to exclude from variant calls,
+          e.g. `RMSMappingQuality` or `FisherStrand`.
+        example: [RMSMappingQuality]
+        choices:
+          - BaseQualityRankSumTest
+          - ChromosomeCounts
+          - Coverage
+          - DepthPerAlleleBySample
+          - DepthPerSampleHC
+          - ExcessHet
+          - FisherStrand
+          - InbreedingCoeff
+          - MappingQualityRankSumTest
+          - QualByDepth
+          - ReadPosRankSumTest
+          - RMSMappingQuality
+          - StrandOddsRatio
       - name: "--assembly_region_padding"
         type: integer
         description: |
