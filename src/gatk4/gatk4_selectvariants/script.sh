@@ -51,10 +51,22 @@ split_multiple_to_flags "$par_select_genotype_expressions" "--select-genotype-ex
 split_multiple_to_flags "$par_select_type_to_include" "--select-type-to-include" select_type_to_include_args
 split_multiple_to_flags "$par_select_type_to_exclude" "--select-type-to-exclude" select_type_to_exclude_args
 
+# Stage the reference trio into a temp dir using matching basenames so GATK
+# can find them, if provided
+tmp_dir=$(mktemp -d)
+trap 'rm -rf "$tmp_dir"' EXIT
+
+reference_args=()
+if [[ -n "$par_reference" ]]; then
+  staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
+  reference_args=(--reference "$staged_reference")
+fi
+
 # Build command arguments array
 cmd_args=(
   --variant "$par_variant"
   --output "$par_output"
+  "${reference_args[@]}"
   ${par_apply_jexl_filters_first:+--apply-jexl-filters-first}
   ${par_call_genotypes:+--call-genotypes}
   ${par_concordance:+--concordance "$par_concordance"}

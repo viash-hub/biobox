@@ -26,7 +26,7 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
-# Compute available memory for the JVM
+# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
 # Convert semicolon-separated arguments into repeated flags

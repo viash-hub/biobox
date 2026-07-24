@@ -160,7 +160,6 @@ argument_groups:
 
           Common values include `StandardAnnotation` and, for
           allele-specific annotations, `AS_StandardAnnotation`.
-        default: [StandardAnnotation]
         choices:
           - AlleleSpecificAnnotation
           - AS_StandardAnnotation

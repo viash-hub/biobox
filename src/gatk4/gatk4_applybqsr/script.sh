@@ -19,7 +19,7 @@ unset_if_false=(
 )
 for par in "${unset_if_false[@]}"; do
   test_val="${!par}"
-  [[ "$test_val" == "false" ]] && unset "$par"
+  [[ "$test_val" == "false" ]] && unset $par
 done
 
 # Stage the BAM/BAI, and the reference if provided, into a temp dir using
@@ -35,7 +35,7 @@ if [[ -n "$par_reference" ]]; then
   reference_args=(--reference "$staged_reference")
 fi
 
-# Determine available memory for the JVM
+# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
 # Convert semicolon-separated static quantized quality levels to repeated flags

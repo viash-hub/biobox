@@ -3,8 +3,9 @@
 ## VIASH START
 ## VIASH END
 
-# Source the centralized test helpers
+# Source the centralized test helpers and the GATK4-specific helpers
 source "$meta_resources_dir/test_helpers.sh"
+source "$meta_resources_dir/gatk4/test_helpers.sh"
 
 # Initialize test environment with strict error handling
 setup_test_env
@@ -175,5 +176,35 @@ else
 fi
 
 log "✅ TEST 5 completed successfully"
+
+# --- Test Case 6: Optional --reference trio ---
+log "Starting TEST 6: Optional --reference"
+
+log "Creating synthetic reference matching the test VCF's seq1 contig..."
+reference_fasta="$test_data_dir/reference.fasta"
+create_test_reference "$reference_fasta" 1 1000
+
+log "Executing $meta_name with --reference..."
+"$meta_executable" \
+  --variant "$test_data_dir/variants.vcf" \
+  --output "$meta_temp_dir/with_reference.vcf" \
+  --reference "$reference_fasta" \
+  --reference_fai "${reference_fasta}.fai" \
+  --reference_dict "${reference_fasta%.fasta}.dict" \
+  --select_type_to_include SNP
+
+log "Validating TEST 6 outputs..."
+check_file_exists "$meta_temp_dir/with_reference.vcf" "output VCF file (with reference)"
+check_file_not_empty "$meta_temp_dir/with_reference.vcf" "output VCF file (with reference)"
+
+record_count=$(grep -c "^seq1" "$meta_temp_dir/with_reference.vcf")
+if [[ "$record_count" -eq 2 ]]; then
+  log "✓ output VCF (with reference) contains expected number of records (2): $meta_temp_dir/with_reference.vcf"
+else
+  log_error "✗ output VCF (with reference) has $record_count records, expected 2: $meta_temp_dir/with_reference.vcf"
+  exit 1
+fi
+
+log "✅ TEST 6 completed successfully"
 
 print_test_summary "All tests completed successfully"

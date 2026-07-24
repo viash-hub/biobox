@@ -15,17 +15,24 @@ trap 'rm -rf "$tmp_dir"' EXIT
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
 staged_bam=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
 
-# Determine available memory for the JVM
+# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
 # unset "false" flags
-[[ "$par_disable_optimizations" == "false" ]] && unset par_disable_optimizations
-[[ "$par_dont_use_soft_clipped_bases" == "false" ]] && unset par_dont_use_soft_clipped_bases
-[[ "$par_floor_blocks" == "false" ]] && unset par_floor_blocks
-[[ "$par_force_active" == "false" ]] && unset par_force_active
-[[ "$par_sites_only_vcf_output" == "false" ]] && unset par_sites_only_vcf_output
-[[ "$par_disable_tool_default_read_filters" == "false" ]] && unset par_disable_tool_default_read_filters
-[[ "$par_disable_sequence_dictionary_validation" == "false" ]] && unset par_disable_sequence_dictionary_validation
+unset_if_false=(
+  par_disable_optimizations
+  par_dont_use_soft_clipped_bases
+  par_floor_blocks
+  par_force_active
+  par_sites_only_vcf_output
+  par_disable_tool_default_read_filters
+  par_disable_sequence_dictionary_validation
+)
+
+for par in "${unset_if_false[@]}"; do
+  test_val="${!par}"
+  [[ "$test_val" == "false" ]] && unset $par
+done
 
 # Convert semicolon-separated arguments to repeated flags
 split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args

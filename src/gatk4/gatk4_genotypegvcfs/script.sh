@@ -28,7 +28,7 @@ unset_if_false=(
 
 for par in "${unset_if_false[@]}"; do
   test_val="${!par}"
-  [[ "$test_val" == "false" ]] && unset "$par"
+  [[ "$test_val" == "false" ]] && unset $par
 done
 
 # Stage the reference trio into a temp dir using matching basenames so
@@ -57,7 +57,7 @@ split_multiple_to_flags "$par_keep_specific_combined_raw_annotation" "--keep-spe
 split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
 split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
 
-# Determine available memory for the JVM
+# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
 # Build command arguments array

@@ -31,6 +31,23 @@ argument_groups:
         description: Input VCF file containing variants to select from.
         required: true
         example: variants.vcf.gz
+      - name: "--reference"
+        alternatives: [-R]
+        type: file
+        description: |
+          Reference genome FASTA file.
+
+          Optional for `SelectVariants` itself, but if provided,
+          `--reference_fai` and `--reference_dict` must be provided too.
+        example: reference.fasta
+      - name: "--reference_fai"
+        type: file
+        description: FASTA index (`.fai`) file for the reference genome.
+        example: reference.fasta.fai
+      - name: "--reference_dict"
+        type: file
+        description: Sequence dictionary (`.dict`) file for the reference genome.
+        example: reference.dict
 
   - name: "Output"
     arguments:
@@ -279,6 +296,8 @@ test_resources:
   - type: bash_script
     path: test.sh
   - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
 
 engines:
   - __merge__: /src/gatk4/utils/common_engines.yaml

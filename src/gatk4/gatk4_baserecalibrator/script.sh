@@ -26,7 +26,7 @@ split_multiple_to_flags "$par_known_sites" "--known-sites" known_sites_args
 split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
 split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
 
-# Determine available memory for the JVM
+# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
 # Build command arguments array

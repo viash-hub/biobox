@@ -37,6 +37,11 @@ stage_reference_trio() {
   local reference_fai="$3"
   local reference_dict="$4"
 
+  if [[ -z "$reference_fai" || -z "$reference_dict" ]]; then
+    echo "Error: --reference_fai and --reference_dict must both be provided when --reference is set." >&2
+    exit 1
+  fi
+
   ln -s "$(readlink -f "$reference")" "$tmp_dir/reference.fasta"
   ln -s "$(readlink -f "$reference_fai")" "$tmp_dir/reference.fasta.fai"
   ln -s "$(readlink -f "$reference_dict")" "$tmp_dir/reference.dict"
