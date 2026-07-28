@@ -1,0 +1,246 @@
+name: mosdepth
+namespace: mosdepth
+description: |
+  Fast calculation of BAM/CRAM depth-of-coverage, producing per-base depth,
+  windowed/region coverage, quantized coverage, and threshold summaries from
+  a coordinate-sorted, indexed alignment file.
+keywords: [coverage, depth, mosdepth, bam, cram, qc]
+links:
+  homepage: https://github.com/brentp/mosdepth
+  documentation: https://github.com/brentp/mosdepth#usage
+  repository: https://github.com/brentp/mosdepth
+references:
+  doi: 10.1093/bioinformatics/btx699
+license: MIT
+requirements:
+  commands: [mosdepth]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Inputs"
+    arguments:
+      - name: "--input"
+        type: file
+        description: Coordinate-sorted BAM or CRAM file to calculate depth for.
+        required: true
+        example: input.bam
+      - name: "--input_index"
+        type: file
+        description: |
+          Index for `--input` (`.bai` for BAM, `.crai` for CRAM). If not
+          provided, an index is expected alongside the input file.
+        example: input.bam.bai
+      - name: "--fasta"
+        alternatives: [-f]
+        type: file
+        description: Reference FASTA file. Required when `--input` is a CRAM file.
+        example: reference.fasta
+      - name: "--fasta_index"
+        type: file
+        description: |
+          FASTA index (`.fai`) for `--fasta`. If not provided, an index is
+          expected alongside the FASTA file.
+        example: reference.fasta.fai
+
+  - name: "Outputs"
+    arguments:
+      - name: "--output_summary"
+        type: file
+        direction: output
+        description: Summary of mean depth per chromosome and genome-wide.
+        example: mosdepth.summary.txt
+      - name: "--output_global_dist"
+        type: file
+        direction: output
+        description: |
+          Cumulative distribution of proportion of bases covered at or above
+          each depth, genome-wide and per chromosome.
+        example: mosdepth.global.dist.txt
+      - name: "--output_region_dist"
+        type: file
+        direction: output
+        description: |
+          Same as `--output_global_dist`, but for the regions given by `--by`.
+          Only produced when `--by` is set.
+        example: mosdepth.region.dist.txt
+      - name: "--output_per_base"
+        type: file
+        direction: output
+        description: Per-base depth. Not produced if `--no_per_base` is set.
+        example: mosdepth.per-base.bed.gz
+      - name: "--output_per_base_index"
+        type: file
+        direction: output
+        description: CSI index of `--output_per_base`.
+        example: mosdepth.per-base.bed.gz.csi
+      - name: "--output_regions"
+        type: file
+        direction: output
+        description: |
+          Mean (or median, see `--use_median`) depth per region. Only produced
+          when `--by` is set.
+        example: mosdepth.regions.bed.gz
+      - name: "--output_regions_index"
+        type: file
+        direction: output
+        description: CSI index of `--output_regions`.
+        example: mosdepth.regions.bed.gz.csi
+      - name: "--output_quantized"
+        type: file
+        direction: output
+        description: |
+          Quantized coverage regions. Only produced when `--quantize` is set.
+        example: mosdepth.quantized.bed.gz
+      - name: "--output_quantized_index"
+        type: file
+        direction: output
+        description: CSI index of `--output_quantized`.
+        example: mosdepth.quantized.bed.gz.csi
+      - name: "--output_thresholds"
+        type: file
+        direction: output
+        description: |
+          Number of bases covered at or above each of `--thresholds` per region.
+          Only produced when `--thresholds` is set, which in turn requires
+          `--by` to also be set.
+        example: mosdepth.thresholds.bed.gz
+      - name: "--output_thresholds_index"
+        type: file
+        direction: output
+        description: CSI index of `--output_thresholds`.
+        example: mosdepth.thresholds.bed.gz.csi
+
+  - name: "Coverage Options"
+    arguments:
+      - name: "--by"
+        alternatives: [-b]
+        type: string
+        description: |
+          Restrict `--output_regions`/`--output_region_dist` output to windows
+          of this fixed size (an integer), or to the intervals in a BED file.
+          Required in order to use `--thresholds`.
+        example: 500
+      - name: "--quantize"
+        alternatives: [-q]
+        type: string
+        description: |
+          Colon-separated list of coverage cutoffs to quantize
+          `--output_quantized` into. `N` cutoffs produce `N - 1` bins between
+          consecutive cutoffs. Add a trailing colon (e.g. `0:1:5:100:500:`) to
+          also get a final open-ended bin from the last cutoff to infinity.
+        example: "0:1:5:100:500"
+      - name: "--quantize_labels"
+        type: string
+        description: |
+          Comma-separated custom labels for the `--quantize` bins, replacing
+          their default numeric range labels in `--output_quantized`. The
+          number of labels must match the number of bins produced by
+          `--quantize`.
+        example: "NO_COVERAGE,LOW_COVERAGE,CALLABLE,HIGH_COVERAGE"
+      - name: "--thresholds"
+        alternatives: [-T]
+        type: string
+        description: |
+          Comma-separated list of integer coverage thresholds to report per
+          region in `--output_thresholds`. Requires `--by` to be set.
+        example: "1,5,10,20,50"
+      - name: "--use_median"
+        alternatives: [-m]
+        type: boolean_true
+        description: |
+            Output the median depth of each region in `--output_regions`
+            instead of the mean. Only has an effect when `--by` is set.
+      - name: "--no_per_base"
+        alternatives: [-n]
+        type: boolean_true
+        description: |
+          Don't output per-base depth. Speeds up execution substantially.
+          Prefer `--quantize` or `--thresholds` if possible.
+      - name: "--fast_mode"
+        alternatives: [-x]
+        type: boolean_true
+        description: |
+          Don't look at internal CIGAR operations or correct mate overlaps.
+          Recommended for most use-cases.
+      - name: "--fragment_mode"
+        alternatives: [-a]
+        type: boolean_true
+        description: |
+          Count the coverage of the full fragment, including the insert (proper
+          pairs only).
+      - name: "--dist_precision"
+        type: integer
+        description: |
+          Number of decimal places to report in `--output_global_dist`/
+          `--output_region_dist`.
+        default: 2
+
+  - name: "Read Filtering"
+    arguments:
+      - name: "--mapq"
+        alternatives: [-Q]
+        type: integer
+        description: |
+          Mapping quality threshold. Reads with a lower quality are ignored.
+        default: 0
+      - name: "--flag"
+        alternatives: [-F]
+        type: integer
+        description: Exclude reads with any of these SAM flag bits set.
+        default: 1796
+      - name: "--include_flag"
+        alternatives: [-i]
+        type: integer
+        description: |
+          Only include reads with any of these SAM flag bits set (0 is unset).
+        default: 0
+      - name: "--min_frag_len"
+        alternatives: [-l]
+        type: integer
+        description: |
+          Minimum insert size. Reads with a smaller insert size are ignored
+          (-1 is unset).
+        default: -1
+      - name: "--max_frag_len"
+        alternatives: [-u]
+        type: integer
+        description: |
+          Maximum insert size. Reads with a larger insert size are ignored
+          (-1 is unset).
+        default: -1
+      - name: "--chrom"
+        alternatives: [-c]
+        type: string
+        description: Restrict depth calculation to this chromosome.
+        example: chr1
+      - name: "--read_groups"
+        alternatives: [-R]
+        type: string
+        description: |
+          Comma-separated list of read group IDs to restrict depth calculation
+          to.
+        example: "RG1,RG2"
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: test_data
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/mosdepth:0.3.14--h05c3d44_1
+    setup:
+      - type: docker
+        run:
+          - "mosdepth --version 2>&1 | sed 's/^/mosdepth: /' > /var/software_versions.txt"
+
+runners:
+  - type: executable
+  - type: nextflow
