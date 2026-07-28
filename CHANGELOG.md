@@ -1,5 +1,11 @@
 # biobox x.x.x
 
+## NEW FUNCTIONALITY
+
+* `tabix`: Add tabix, a generic indexer/query tool for BGZF block-compressed, position-sorted files (PR #228):
+  - `tabix/tabix_index`: Build a tabix (`.tbi`) or CSI (`.csi`) index for a BGZF-compressed file.
+  - `tabix/tabix_query`: Query an indexed file by region, or list its chromosomes.
+
 ## MINOR CHANGES
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
