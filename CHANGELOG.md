@@ -1,5 +1,9 @@
 # biobox x.x.x
 
+## NEW FUNCTIONALITY
+
+* `mosdepth`: Add mosdepth, a fast BAM/CRAM depth-of-coverage calculator (PR #227).
+
 ## MINOR CHANGES
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
