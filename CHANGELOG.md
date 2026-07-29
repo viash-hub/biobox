@@ -1,5 +1,10 @@
 # biobox x.x.x
 
+## NEW FUNCTIONALITY
+
+* `winnowmap`: Long-read aligner optimised for repetitive genomic regions using weighted minimizers (PR #xxx):
+  - `winnowmap/winnowmap_align`: Map long reads against a reference genome using Winnowmap with automatic or pre-computed meryl k-mer frequencies. Outputs SAM, or a coordinate-sorted BAM with a companion index (`--bam` / `--output_index`).
+
 ## MINOR CHANGES
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
