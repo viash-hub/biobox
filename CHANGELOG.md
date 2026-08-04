@@ -2,6 +2,8 @@
 
 ## NEW FUNCTIONALITY
 
+* `cat_fastq`: Added `cat_fastq`: Concatenate multiple single-end or paired-end fastq files (with any mix of compressed and uncompressed replicates) into a single pair of output fastq files.
+
 * `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
 
 ## MINOR CHANGES
