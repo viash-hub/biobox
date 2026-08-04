@@ -1,0 +1,54 @@
+name: "cat_fastq"
+description: Concatenate multiple fastq files
+keywords: [fastq, concatenation, preprocessing]
+links:
+  repository: https://github.com/nf-core/rnaseq
+license: MIT
+authors:
+  - __merge__: /src/_authors/hannes_demeyer.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+- name: "Input"
+  arguments: 
+  - name: "--read_1"
+    type: file
+    multiple: true
+    multiple_sep: ";"
+    description: Read 1 fastq files to be concatenated
+  - name: "--read_2"
+    type: file
+    multiple: true
+    multiple_sep: ";"
+    description: Read 2 fastq files to be concatenated
+
+- name: "Output"
+  arguments:   
+  - name: "--fastq_1"
+    type: file
+    direction: output
+    required: true
+    example: $id_r1.fastq
+    description: Concatenated read 1 fastq
+  - name: "--fastq_2"
+    type: file
+    direction: output
+    must_exist: false
+    example: $id_r2.fastq
+    description: Concatenated read 2 fastq
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: ubuntu:22.04
+runners:
+  - type: executable
+  - type: nextflow
