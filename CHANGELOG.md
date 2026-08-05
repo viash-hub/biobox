@@ -2,7 +2,8 @@
 
 ## NEW FUNCTIONALITY
 
-* `mosdepth`: Add mosdepth, a fast BAM/CRAM depth-of-coverage calculator (PR #227).
+* `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
+* `mosdepth`: Add mosdepth, a fast BAM/CRAM depth-of-coverage calculator (PR #227)
 
 ## MINOR CHANGES
 
