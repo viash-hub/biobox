@@ -2,8 +2,8 @@ name: "cat_fastq"
 description: Concatenate multiple fastq files
 keywords: [fastq, concatenation, preprocessing]
 links:
-  repository: https://github.com/nf-core/rnaseq
-license: MIT
+  repository: https://www.gnu.org/software/coreutils/
+license: GPL-3.0
 authors:
   - __merge__: /src/_authors/hannes_demeyer.yaml
     roles: [author, maintainer]
