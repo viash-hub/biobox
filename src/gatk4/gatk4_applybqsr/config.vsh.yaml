@@ -118,8 +118,7 @@ argument_groups:
           Quantize quality scores to a given number of levels.
 
           Set to `0` to disable quantization. Mutually exclusive with
-          `--static_quantized_quals`; the script errors out if both are set
-          to a non-default value.
+          `--static_quantized_quals`.
         default: 0
       - name: "--round_down_quantized"
         type: boolean_true
