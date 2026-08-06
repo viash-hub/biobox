@@ -72,7 +72,8 @@ log "Executing $meta_name with --emit_ref_confidence GVCF..."
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/output.g.vcf" "output GVCF file"
 check_file_not_empty "$meta_temp_dir/output.g.vcf" "output GVCF file"
-check_file_contains "$meta_temp_dir/output.g.vcf" "^##fileformat=VCF" "output GVCF file header"
+check_file_contains "$meta_temp_dir/output.g.vcf" "^##fileformat=VCF" "output VCF file header"
+check_file_contains "$meta_temp_dir/output.g.vcf" "^##GVCFBlock" "output GVCF block header"
 
 log "✅ TEST 2 completed successfully"
 
