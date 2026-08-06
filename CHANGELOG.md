@@ -2,6 +2,7 @@
 
 ## NEW FUNCTIONALITY
 
+* `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
 * `tabix`: Add tabix, a generic indexer/query tool for BGZF block-compressed, position-sorted files (PR #228):
   - `tabix/tabix_index`: Build a tabix (`.tbi`) or CSI (`.csi`) index for a BGZF-compressed file.
   - `tabix/tabix_query`: Query an indexed file by region, or list its chromosomes.
