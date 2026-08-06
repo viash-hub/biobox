@@ -87,6 +87,15 @@ sort_and_index_bam() {
   log "✓ Sorted and indexed BAM: $output_bam (index: ${output_bam%.bam}.bai)"
 }
 
+# Count the number of reads in a SAM/BAM/CRAM file using GATK's CountReads
+# tool.
+#
+# Usage: count_bam_reads "/path/to/file.bam"
+count_bam_reads() {
+  local bam_path="$1"
+  gatk CountReads --input "$bam_path" --verbosity ERROR 2>/dev/null | tail -n 1
+}
+
 # Create a synthetic reference FASTA together with its .fai and .dict
 # companion files (the "reference trio" most GATK4 tools require to find
 # indices/dictionaries by basename next to the FASTA).

@@ -72,6 +72,13 @@ check_file_not_empty "$test2_dir/dedup.bam" "duplicate-removed output BAM"
 check_file_exists "$test2_dir/dedup_metrics.txt" "duplication metrics file"
 check_file_not_empty "$test2_dir/dedup_metrics.txt" "duplication metrics file"
 check_file_contains "$test2_dir/dedup_metrics.txt" "ESTIMATED_LIBRARY_SIZE" "duplication metrics file"
+# Check deplicate-removed BAM has fewer reads than the input BAM
+input_read_count=$(count_bam_reads "$input_bam")
+dedup_read_count=$(count_bam_reads "$test2_dir/dedup.bam")
+if [ "$dedup_read_count" -ge "$input_read_count" ]; then
+  echo "Error: Duplicate-removed BAM has $dedup_read_count reads, which is not fewer than the input BAM's $input_read_count reads." >&2
+  exit 1
+fi
 
 log "✅ TEST 2 completed successfully"
 
