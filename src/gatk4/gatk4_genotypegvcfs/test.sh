@@ -139,4 +139,35 @@ check_file_not_exists "$meta_temp_dir/output_engine.vcf.idx" "output VCF index (
 
 log "✅ TEST 4 completed successfully"
 
+# --- Test Case 5: Test GenomicsDB workspace input ---
+log "Starting TEST 5: GenomicsDB workspace input"
+
+log "Creating a GenomicsDB workspace from the input GVCF..."
+printf 'sample1\t%s\n' "$test_data_dir/sample.g.vcf" > "$test_data_dir/sample_map.tsv"
+gatk GenomicsDBImport \
+  --genomicsdb-workspace-path "$meta_temp_dir/genomicsdb_workspace" \
+  --batch-size 50 \
+  --sample-name-map "$test_data_dir/sample_map.tsv" \
+  --reader-threads 1 \
+  --tmp-dir "$meta_temp_dir" \
+  --intervals "seq1:1-2000" \
+  --reference "$test_data_dir/reference.fasta"
+
+log "Executing $meta_name with GenomicsDB workspace input..."
+"$meta_executable" \
+  --variant "$meta_temp_dir/genomicsdb_workspace" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/output_genomicsdb.vcf"
+
+log "Validating TEST 5 outputs..."
+check_file_exists "$meta_temp_dir/output_genomicsdb.vcf" "output VCF file (GenomicsDB input)"
+check_file_not_empty "$meta_temp_dir/output_genomicsdb.vcf" "output VCF file (GenomicsDB input)"
+check_file_contains "$meta_temp_dir/output_genomicsdb.vcf" "^##fileformat=VCF" "output VCF file header (GenomicsDB input)"
+check_file_contains "$meta_temp_dir/output_genomicsdb.vcf" "sample1" "output VCF sample column (GenomicsDB input)"
+check_file_not_contains "$meta_temp_dir/output_genomicsdb.vcf" "<NON_REF>" "output VCF should not contain GVCF placeholder allele (GenomicsDB input)"
+
+log "✅ TEST 5 completed successfully"
+
 print_test_summary "All tests completed successfully"
