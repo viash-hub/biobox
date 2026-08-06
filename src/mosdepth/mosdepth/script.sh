@@ -17,7 +17,7 @@ trap 'rm -rf "$tmp_dir"' EXIT
 # If an input index is provided, stage it to a temporary directory with the main
 # file so they are available alongside each other. If only the main input is
 # provided, we don't stage it and assume the index is available in the existing
-#location.
+# location.
 if [ -n "$par_input_index" ]; then
   staged_input="$tmp_dir/$(basename "$par_input")"
   ln -s "$(realpath "$par_input")" "$staged_input"
@@ -50,6 +50,16 @@ fi
 # mosdepth names output files using a fixed prefix. We stage output to a
 # temporary directory and rename it at the end of the script.
 output_prefix="$tmp_dir/mosdepth"
+
+# Select either --by_bed or --by_window, but not both depending on which is set
+if [ -n "$par_by_bed" ] && [ -n "$par_by_window" ]; then
+  echo "Error: --by_bed and --by_window cannot be set at the same time." >&2
+  exit 1
+elif [ -n "$par_by_bed" ]; then
+  par_by="$par_by_bed"
+elif [ -n "$par_by_window" ]; then
+  par_by="$par_by_window"
+fi
 
 cmd_args=(
   ${meta_cpus:+--threads "$meta_cpus"}

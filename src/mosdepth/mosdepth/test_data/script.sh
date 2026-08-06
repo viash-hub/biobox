@@ -51,3 +51,12 @@ rm test.sam
 # --- CRAM (same alignment, for --fasta/CRAM-input tests) -------------------
 samtools view -O cram -T reference.fasta -o test.cram test.paired_end.sorted.bam
 samtools index test.cram
+
+# --- Intervals (BED) -------------------------------------------------------
+# Create a BED file with two intervals that overlap the synthetic reads, and one
+# that does not.
+{
+  echo -e "chr1\t100\t200"
+  echo -e "chr1\t150\t250"
+  echo -e "chr1\t300\t400"
+} > test_intervals.bed

@@ -40,12 +40,12 @@ check_file_exists "$meta_temp_dir/test1_per_base.bed.gz.csi" "Per-base output in
 log "✅ TEST 1 completed successfully"
 
 ##############################################################
-log "Starting TEST 2: Windowed coverage with --by"
+log "Starting TEST 2: Windowed coverage with --by_window"
 ##############################################################
 "$meta_executable" \
   --input "$bam" \
   --input_index "$bai" \
-  --by 100 \
+  --by_window 100 \
   --fragment_mode \
   --output_regions "$meta_temp_dir/test2_regions.bed.gz" \
   --output_regions_index "$meta_temp_dir/test2_regions.bed.gz.csi" \
@@ -92,7 +92,7 @@ log "Starting TEST 5: --thresholds"
 "$meta_executable" \
   --input "$bam" \
   --input_index "$bai" \
-  --by 100 \
+  --by_window 100 \
   --thresholds "1,5,10" \
   --output_thresholds "$meta_temp_dir/test5_thresholds.bed.gz" \
   --output_thresholds_index "$meta_temp_dir/test5_thresholds.bed.gz.csi"
@@ -166,5 +166,22 @@ log "Starting TEST 9: Index auto-discovery when --input_index is omitted"
 check_file_exists "$meta_temp_dir/test9_summary.txt" "Summary output (auto-discovered index)"
 check_file_not_empty "$meta_temp_dir/test9_summary.txt" "Summary output (auto-discovered index)"
 log "✅ TEST 9 completed successfully"
+
+##############################################################
+log "Starting TEST 10: Intervals with --by_bed"
+##############################################################
+"$meta_executable" \
+  --input "$bam" \
+  --input_index "$bai" \
+  --by_bed "$test_data/test_intervals.bed" \
+  --output_regions "$meta_temp_dir/test10_regions.bed.gz" \
+  --output_regions_index "$meta_temp_dir/test10_regions.bed.gz.csi" \
+  --output_region_dist "$meta_temp_dir/test10_region_dist.txt"
+
+check_file_exists "$meta_temp_dir/test10_regions.bed.gz" "Regions output"
+check_file_not_empty "$meta_temp_dir/test10_regions.bed.gz" "Regions output"
+check_file_exists "$meta_temp_dir/test10_regions.bed.gz.csi" "Regions output index"
+check_file_exists "$meta_temp_dir/test10_region_dist.txt" "Region distribution output"
+log "✅ TEST 10 completed successfully"
 
 print_test_summary "All tests completed successfully"

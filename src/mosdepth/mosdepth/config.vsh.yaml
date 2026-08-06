@@ -62,8 +62,8 @@ argument_groups:
         type: file
         direction: output
         description: |
-          Same as `--output_global_dist`, but for the regions given by `--by`.
-          Only produced when `--by` is set.
+          Same as `--output_global_dist`, but for selected regions.
+          Only produced when `--by_window`/`--by_bed` is set.
         example: mosdepth.region.dist.txt
       - name: "--output_per_base"
         type: file
@@ -80,7 +80,7 @@ argument_groups:
         direction: output
         description: |
           Mean (or median, see `--use_median`) depth per region. Only produced
-          when `--by` is set.
+          when `--by_window`/`--by_bed` is set.
         example: mosdepth.regions.bed.gz
       - name: "--output_regions_index"
         type: file
@@ -104,7 +104,7 @@ argument_groups:
         description: |
           Number of bases covered at or above each of `--thresholds` per region.
           Only produced when `--thresholds` is set, which in turn requires
-          `--by` to also be set.
+          `--by_window`/`--by_bed` to also be set.
         example: mosdepth.thresholds.bed.gz
       - name: "--output_thresholds_index"
         type: file
@@ -114,14 +114,17 @@ argument_groups:
 
   - name: "Coverage Options"
     arguments:
-      - name: "--by"
-        alternatives: [-b]
-        type: string
+      - name: "--by_window"
+        type: integer
         description: |
           Restrict `--output_regions`/`--output_region_dist` output to windows
-          of this fixed size (an integer), or to the intervals in a BED file.
-          Required in order to use `--thresholds`.
-        example: 500
+          of this fixed size. Cannot be used with `--by_bed`.
+      - name: "--by_bed"
+        type: string
+        description: |
+          Restrict `--output_regions`/`--output_region_dist` output to the
+          intervals in a BED file. Cannot be used with `--by_window`.
+        example: regions.bed
       - name: "--quantize"
         alternatives: [-q]
         type: string
@@ -144,14 +147,16 @@ argument_groups:
         type: string
         description: |
           Comma-separated list of integer coverage thresholds to report per
-          region in `--output_thresholds`. Requires `--by` to be set.
+          region in `--output_thresholds`. Requires `--by_bed`/`--by_window` to
+          be set.
         example: "1,5,10,20,50"
       - name: "--use_median"
         alternatives: [-m]
         type: boolean_true
         description: |
             Output the median depth of each region in `--output_regions`
-            instead of the mean. Only has an effect when `--by` is set.
+            instead of the mean. Only has an effect when
+            `--by_window`/`--by_bed` is set.
       - name: "--no_per_base"
         alternatives: [-n]
         type: boolean_true
