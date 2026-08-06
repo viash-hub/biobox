@@ -2,6 +2,7 @@
 
 ## NEW FUNCTIONALITY
 
+* `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
 * `gatk4`: Added components for the Genome Analysis Toolkit (GATK4), covering a full germline short-variant discovery pipeline (PR #226):
   * `gatk4/gatk4_createsequencedictionary`: Create a sequence dictionary (`.dict`) for a reference FASTA file.
   * `gatk4/gatk4_markduplicates`: Locate and tag duplicate reads in a BAM file.

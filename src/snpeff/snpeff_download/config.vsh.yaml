@@ -1,0 +1,77 @@
+name: snpeff_download
+namespace: snpeff
+description: |
+  Download a pre-built SnpEff reference genome/annotation database.
+keywords: ["annotation", "database", "download", "snp", "variant", "snpeff"]
+
+links:
+  repository: https://github.com/pcingola/SnpEff
+  homepage: https://pcingola.github.io/SnpEff/
+  documentation: https://pcingola.github.io/SnpEff/
+references:
+  doi: 10.3389/fgene.2012.00035
+license: MIT
+requirements:
+  commands: [snpEff]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --genome_version
+        type: string
+        description: Reference genome/database version to download.
+        example: GRCh38.86
+        required: true
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        description: Directory in which the downloaded database is stored
+        direction: output
+        required: true
+        example: data_dir
+  - name: Generic options
+    arguments:
+      - name: --config
+        alternatives: [-c]
+        type: file
+        description: Specify config file.
+      - name: --config_option
+        type: string
+        description: Override a config file option (name=value).
+      - name: --debug
+        alternatives: [-d]
+        type: boolean_true
+        description: Debug mode (very verbose).
+      - name: --no_log
+        type: boolean_true
+        description: Do not report usage statistics to server.
+      - name: --quiet
+        alternatives: [-q]
+        type: boolean_true
+        description: Quiet mode (do not show any messages or errors).
+      - name: --verbose
+        alternatives: [-v]
+        type: boolean_true
+        description: Verbose mode.
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+engines:
+  - type: docker
+    image: quay.io/staphb/snpeff:5.4c
+    setup:
+      - type: docker
+        run: |
+          version=$(snpEff -version) && \
+          version_trimmed=$(echo "$version" | awk '{print $1, $2}') && \
+          echo "$version_trimmed" > /var/software_versions.txt
+runners:
+  - type: executable
+  - type: nextflow
