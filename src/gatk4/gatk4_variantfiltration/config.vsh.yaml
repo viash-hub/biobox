@@ -127,7 +127,7 @@ argument_groups:
         example: ["lowDP"]
       - name: "--invalidate_previous_filters"
         type: boolean_true
-        description: | 
+        description: |
           Remove previous filters applied to the VCF before applying the filters
           requested here.
       - name: "--invert_filter_expression"
