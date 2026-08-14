@@ -14,6 +14,9 @@
   * `gatk4/gatk4_genotypegvcfs`: Perform joint genotyping on GVCFs, combined GVCFs, or a GenomicsDB workspace.
   * `gatk4/gatk4_variantfiltration`: Filter variant calls based on INFO and/or FORMAT annotations.
   * `gatk4/gatk4_selectvariants`: Select a subset of variants from a VCF based on various criteria.
+* `tabix`: Add tabix, a generic indexer/query tool for BGZF block-compressed, position-sorted files (PR #228):
+  - `tabix/tabix_index`: Build a tabix (`.tbi`) or CSI (`.csi`) index for a BGZF-compressed file.
+  - `tabix/tabix_query`: Query an indexed file by region, or list its chromosomes.
 
 ## MINOR CHANGES
 
