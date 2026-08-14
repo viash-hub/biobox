@@ -18,9 +18,9 @@ argument_groups:
   arguments: 
   - name: "--index"
     type: file
-    description: BWA index base name (prefix of .0123, .amb, .ann, .bwt.2bit.64, .pac files).
+    description: Directory containing the BWA-MEM2 index files (.0123, .amb, .ann, .bwt.2bit.64, .pac).
     required: true
-    example: reference.fasta
+    example: bwa_index/
   - name: "--reads1"
     type: file
     description: Input FASTQ file with first reads in pair (R1) or single-end reads.
