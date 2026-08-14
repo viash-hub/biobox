@@ -2,21 +2,27 @@
 
 ## NEW FUNCTIONALITY
 
-* `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
 * `gatk4`: Added components for the Genome Analysis Toolkit (GATK4), covering a full germline short-variant discovery pipeline (PR #226):
-  * `gatk4/gatk4_createsequencedictionary`: Create a sequence dictionary (`.dict`) for a reference FASTA file.
-  * `gatk4/gatk4_markduplicates`: Locate and tag duplicate reads in a BAM file.
-  * `gatk4/gatk4_baserecalibrator`: Generate a base quality score recalibration (BQSR) table from known variant sites.
-  * `gatk4/gatk4_applybqsr`: Apply a base quality score recalibration table to a BAM file.
-  * `gatk4/gatk4_haplotypecaller`: Call germline SNVs and indels from a BAM file via local re-assembly of haplotypes.
-  * `gatk4/gatk4_combinegvcfs`: Combine per-sample GVCFs into a single multi-sample GVCF.
-  * `gatk4/gatk4_genomicsdbimport`: Import per-sample GVCFs into a GenomicsDB workspace for scalable joint genotyping.
-  * `gatk4/gatk4_genotypegvcfs`: Perform joint genotyping on GVCFs, combined GVCFs, or a GenomicsDB workspace.
-  * `gatk4/gatk4_variantfiltration`: Filter variant calls based on INFO and/or FORMAT annotations.
-  * `gatk4/gatk4_selectvariants`: Select a subset of variants from a VCF based on various criteria.
+  - `gatk4/gatk4_createsequencedictionary`: Create a sequence dictionary (`.dict`) for a reference FASTA file.
+  - `gatk4/gatk4_markduplicates`: Locate and tag duplicate reads in a BAM file.
+  - `gatk4/gatk4_baserecalibrator`: Generate a base quality score recalibration (BQSR) table from known variant sites.
+  - `gatk4/gatk4_applybqsr`: Apply a base quality score recalibration table to a BAM file.
+  - `gatk4/gatk4_haplotypecaller`: Call germline SNVs and indels from a BAM file via local re-assembly of haplotypes.
+  - `gatk4/gatk4_combinegvcfs`: Combine per-sample GVCFs into a single multi-sample GVCF.
+  - `gatk4/gatk4_genomicsdbimport`: Import per-sample GVCFs into a GenomicsDB workspace for scalable joint genotyping.
+  - `gatk4/gatk4_genotypegvcfs`: Perform joint genotyping on GVCFs, combined GVCFs, or a GenomicsDB workspace.
+  - `gatk4/gatk4_variantfiltration`: Filter variant calls based on INFO and/or FORMAT annotations.
+  - `gatk4/gatk4_selectvariants`: Select a subset of variants from a VCF based on various criteria.
+
+* `minibwa`: Added components for minibwa, the successor to bwa-mem with native Hi-C and bisulfite sequencing alignment modes (PR #225):
+  - `minibwa/minibwa_index`: Build a minibwa reference index, optionally including a bisulfite (BS-seq) index
+  - `minibwa/minibwa_map`: Align short, long, Hi-C or bisulfite reads to a minibwa index
+
 * `tabix`: Add tabix, a generic indexer/query tool for BGZF block-compressed, position-sorted files (PR #228):
   - `tabix/tabix_index`: Build a tabix (`.tbi`) or CSI (`.csi`) index for a BGZF-compressed file.
   - `tabix/tabix_query`: Query an indexed file by region, or list its chromosomes.
+
+* `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
 
 ## MINOR CHANGES
 
