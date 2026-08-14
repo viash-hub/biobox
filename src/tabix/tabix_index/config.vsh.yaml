@@ -1,0 +1,123 @@
+name: tabix_index
+namespace: tabix
+description: |
+  Build a tabix (`.tbi`) or CSI (`.csi`) index for a BGZF block-compressed,
+  position-sorted file (VCF, BED, GFF, SAM, GAF) so it can later be queried by
+  region. BAM/CRAM/BCF inputs are also supported, producing `.bai`/`.crai`/`.csi`
+  indexes as appropriate.
+keywords: [index, tabix, htslib, vcf, bed, gff]
+links:
+  homepage: https://www.htslib.org/
+  documentation: https://www.htslib.org/doc/tabix.html
+  repository: https://github.com/samtools/htslib
+license: MIT/Expat
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+requirements:
+  commands: [tabix]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        type: file
+        description: |
+          BGZF block-compressed, position-sorted file to index. Typically a
+          `.vcf.gz`, `.bed.gz`, `.gff.gz`, `.sam.gz`, or `.gaf.gz` file, but
+          `.bam`, `.cram`, and `.bcf` files are also supported.
+        required: true
+        must_exist: true
+        example: variants.vcf.gz
+
+  - name: Outputs
+    arguments:
+      - name: --output_index
+        type: file
+        direction: output
+        description: |
+          Resulting index file. The file type depends on the input file type and
+          whether `--csi` was set. Typically a `.tbi` but can also  be `.csi`,
+          `.bai`, or `.crai`.
+        required: true
+        example: variants.vcf.gz.tbi
+
+  - name: Options
+    arguments:
+      - name: --preset
+        alternatives: [-p]
+        type: string
+        choices: [gff, bed, sam, vcf, gaf]
+        description: |
+          Format preset to use for the sequence/begin/end/comment/skip-lines
+          settings. Suppresses `--sequence`. If none of `--preset`,
+          `--sequence`, `--begin`, `--end`, `--comment`, `--skip_lines`, or
+          `--zero_based` is set, tabix attempts to detect the format from the
+          `--input` file extension, falling back to GFF-preset settings
+          (`--sequence 1 --begin 4 --end 5 --comment '#' --skip_lines 0`) if
+          detection fails.
+      - name: --sequence
+        alternatives: [-s]
+        type: integer
+        description: |
+          Column number for sequence (chromosome/contig) names. Ignored when
+          `--preset` is set.
+      - name: --begin
+        alternatives: [-b]
+        type: integer
+        description: Column number for region start.
+      - name: --end
+        alternatives: [-e]
+        type: integer
+        description: |
+          Column number for region end. If the format has no end column, set
+          this to the same value as `--begin`.
+      - name: --skip_lines
+        alternatives: [-S]
+        type: integer
+        description: Skip the first `N` lines of the input file.
+      - name: --comment
+        alternatives: [-c]
+        type: string
+        description: Skip lines starting with this character.
+      - name: --zero_based
+        type: boolean_true
+        description: Coordinates in the input file are zero-based, half-open.
+      - name: --force
+        alternatives: [-f]
+        type: boolean_true
+        description: Overwrite an existing index without asking.
+      - name: --csi
+        alternatives: [-C]
+        type: boolean_true
+        description: |
+          Generate a CSI index instead of the default TBI. Required for
+          chromosomes larger than 2^29 bases.
+      - name: --min_shift
+        alternatives: [-m]
+        type: integer
+        description: |
+          Set the minimal interval size for CSI indices to `2^INT`.
+        default: 14
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/htslib:1.24--ha79157c_0
+    setup:
+      - type: docker
+        run: |
+          tabix --version 2>&1 | head -1 | sed 's/tabix (htslib) /tabix: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

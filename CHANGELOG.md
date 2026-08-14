@@ -4,15 +4,18 @@
 
 * `snpeff`: Add `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
 
+* `tabix`: Add tabix, a generic indexer/query tool for BGZF block-compressed, position-sorted files (PR #228):
+  - `tabix/tabix_index`: Build a tabix (`.tbi`) or CSI (`.csi`) index for a BGZF-compressed file.
+  - `tabix/tabix_query`: Query an indexed file by region, or list its chromosomes.
+
 ## MINOR CHANGES
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
 
-* `snpeff_ann`: Bump snpEff from `5.2f` to `5.4c` and remove a config patch that is no longer needed (PR #222)
-
-* `snpeff_ann`: Add `--fastaprot_no_ref` argument (`-fastaProtNoRef`) to not add reference sequences to the output when `--fastaprot` is used (PR #222)
-
-* `snpeff_ann`: Rename argument `-no_hgvs` to `--no_hgvs` for consistency. `-no_hgvs` is kept as an alternative for backwards compatibility. (PR #222)
+* `snpeff_ann`:
+  - Bump snpEff from `5.2f` to `5.4c` and remove a config patch that is no longer needed (PR #222)
+  - Add `--fastaprot_no_ref` argument (`-fastaProtNoRef`) to not add reference sequences to the output when `--fastaprot` is used (PR #222)
+  - Rename argument `-no_hgvs` to `--no_hgvs` for consistency. `-no_hgvs` is kept as an alternative for backwards compatibility. (PR #222)
 
 ## BUG FIXES
 
