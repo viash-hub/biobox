@@ -120,7 +120,7 @@ argument_groups:
           Restrict `--output_regions`/`--output_region_dist` output to windows
           of this fixed size. Cannot be used with `--by_bed`.
       - name: "--by_bed"
-        type: string
+        type: file
         description: |
           Restrict `--output_regions`/`--output_region_dist` output to the
           intervals in a BED file. Cannot be used with `--by_window`.
