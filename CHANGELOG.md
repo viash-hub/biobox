@@ -3,6 +3,9 @@
 ## NEW FUNCTIONALITY
 
 * `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
+* `minibwa`: Added components for minibwa, the successor to bwa-mem with native Hi-C and bisulfite sequencing alignment modes (PR #225):
+  * `minibwa/minibwa_index`: Build a minibwa reference index, optionally including a bisulfite (BS-seq) index
+  * `minibwa/minibwa_map`: Align short, long, Hi-C or bisulfite reads to a minibwa index
 * `tabix`: Add tabix, a generic indexer/query tool for BGZF block-compressed, position-sorted files (PR #228):
   - `tabix/tabix_index`: Build a tabix (`.tbi`) or CSI (`.csi`) index for a BGZF-compressed file.
   - `tabix/tabix_query`: Query an indexed file by region, or list its chromosomes.
