@@ -1,0 +1,13 @@
+```
+docker run --rm quay.io/biocontainers/minibwa:0.4--hab16a5f_0 minibwa index --help
+```
+
+Usage: minibwa index [options] <in.fasta> [out.prefix]
+Options:
+  -s INT    random seed for amibiguous bases [11]
+  -u INT    SA sample rate at 1/(1<<INT) [4]
+  -l        low-memory GPL'd algorithm for BWT construction
+  -b NUM    block size (effective with -l) [10m]
+  -t INT    number of threads (effective w/o -l) [4]
+  --meth    build FM-index for BS-seq mapping
+  --help    print this help message
