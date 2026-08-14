@@ -1,8 +1,8 @@
 name: snpeff_ann
 namespace: snpeff
 description: |
-  Genetic variant annotation, and functional effect prediction toolbox. 
-  It annotates and predicts the effects of genetic variants on genes and 
+  Genetic variant annotation, and functional effect prediction toolbox.
+  It annotates and predicts the effects of genetic variants on genes and
   proteins (such as amino acid changes).
 keywords: [ "annotation", "effect prediction", "snp", "variant", "vcf"]
 
@@ -93,9 +93,9 @@ argument_groups:
         alternatives: [--filterInterval]
         type: file
         description: |
-          Only analyze changes that intersect with the intervals 
+          Only analyze changes that intersect with the intervals
           specified in this file. This option can be used several times.
-      - name: --no_downstream 
+      - name: --no_downstream
         type: boolean_true
         description: Do not show DOWNSTREAM changes
       - name: --no_intergenic
@@ -116,7 +116,7 @@ argument_groups:
           Do not show 'EffectType'. This option can be used several times.
   - name: Annotations options
     arguments:
-      - name: --cancer 
+      - name: --cancer
         type: boolean_true
         description: Perform 'cancer' comparisons (Somatic vs Germline).
       - name: --cancer_samples
@@ -144,7 +144,7 @@ argument_groups:
       - name: --hgvs_old
         type: boolean_true
         description: Use old HGVS notation.
-      - name: --hgvs1_letter_aa 
+      - name: --hgvs1_letter_aa
         type: boolean_true
         description: Use one letter Amino acid codes in HGVS notation.
       - name: --hgvs_tr_id
@@ -155,6 +155,7 @@ argument_groups:
         description: |
           Add loss of function (LOF) and Nonsense mediated decay (NMD) tags.
       - name: --no_hgvs
+        alternatives: [-no_hgvs] # Included for backward compatibility with older versions of the component
         type: boolean_true
         description: Do not add HGVS annotations.
       - name: --no_lof
@@ -202,13 +203,13 @@ argument_groups:
         description: Verbose mode.
   - name: Database options
     arguments:
-      - name: --canon 
+      - name: --canon
         type: boolean_true
         description: Only use canonical transcripts.
       - name: --canon_list
         type: file
         description: |
-          Only use canonical transcripts, replace some transcripts using the 'gene_id         
+          Only use canonical transcripts, replace some transcripts using the 'gene_id
           transcript_id' entries in <file>.
       - name: --tag
         type: string
@@ -228,7 +229,7 @@ argument_groups:
       - name: --max_tsl
         type: integer
         description: Only use transcripts having Transcript Support Level lower than <TSL_number>.
-      - name: --motif 
+      - name: --motif
         type: boolean_true
         description: Annotate using motifs (requires Motif database).
       - name: --nextprot
