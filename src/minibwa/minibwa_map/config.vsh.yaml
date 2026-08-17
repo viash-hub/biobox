@@ -1,0 +1,246 @@
+name: minibwa_map
+namespace: minibwa
+description: |
+  Align reads to a reference genome using minibwa, the successor to bwa-mem.
+  Combines BWA-MEM-style variable-length seeding with minimap2-style chaining
+  and SIMD alignment. Can handle short reads, long reads, Hi-C
+  proximity-ligation reads, and directional bisulfite (BS-seq) reads.
+keywords: [alignment, minibwa, BWA, BWA-MEM, mapping, Hi-C, bisulfite, long-read]
+links:
+  homepage: https://github.com/lh3/minibwa
+  documentation: https://github.com/lh3/minibwa#readme
+  repository: https://github.com/lh3/minibwa
+references:
+  doi: 10.48550/arXiv.2606.15357
+license: GPL-2.0-or-later
+requirements:
+  commands: [minibwa]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+- name: "Input"
+  arguments:
+  - name: "--index"
+    type: file
+    description: |
+      Directory containing the minibwa index files (`.l2b`, `.mbw`, and
+      optionally `.meth.mbw`), as produced by `minibwa_index`.
+    required: true
+    example: minibwa_index/
+  - name: "--reads1"
+    type: file
+    description: Input FASTQ/FASTA file with first reads in pair (R1) or single-end/long reads.
+    required: true
+    example: reads_R1.fastq
+  - name: "--reads2"
+    type: file
+    description: Input FASTQ file with second reads in pair (R2). Omit for single-end or long-read data.
+    example: reads_R2.fastq
+
+- name: "Output"
+  arguments:
+  - name: "--output"
+    alternatives: [-o]
+    type: file
+    direction: output
+    description: |
+      Output alignment file. In SAM format by default, or PAF format when
+      `--paf_output` is set. If not specified, output goes to stdout.
+    example: output.sam
+
+- name: "Common Options"
+  arguments:
+  - name: "--paf_output"
+    alternatives: [-f]
+    type: boolean_true
+    description: Output in PAF format instead of SAM.
+  - name: "--short_read_threshold"
+    alternatives: [-l]
+    type: integer
+    description: |
+      In the default adaptive mode, reads shorter than this length are
+      treated as short reads. Default is 325.
+    default: 325
+  - name: "--read_group"
+    alternatives: [-R]
+    type: string
+    description: |
+      SAM read group line, e.g. `'@RG\tID:foo\tSM:bar'`.
+    example: "@RG\tID:sample1\tSM:sample1"
+  - name: "--base_tag"
+    alternatives: [-b]
+    type: string
+    description: Output a base alignment tag.
+    choices: [cs, ds, MD]
+  - name: "--hic"
+    type: boolean_true
+    description: |
+      Map Hi-C proximity-ligation reads. Equivalent to setting `--primary_5prime`
+      and `--skip_pairing`.
+  - name: "--meth"
+    type: boolean_true
+    description: |
+      Map directional bisulfite sequencing (BS-seq) reads. Requires an index
+      built with `minibwa_index --meth`.
+
+- name: "Mapping Options"
+  arguments:
+  - name: "--min_seed_length"
+    alternatives: [-k]
+    type: integer
+    description: Minimum seed length.
+    default: 19
+  - name: "--max_seed_occurrences"
+    alternatives: [-c]
+    type: integer
+    description: Maximum seed occurrences.
+    default: 250
+  - name: "--max_gap_size"
+    alternatives: [-g]
+    type: integer
+    description: Maximum gap size, controlling extension and chain breaking.
+    default: 100
+  - name: "--bandwidth"
+    alternatives: [-w]
+    type: integer
+    description: Bandwidth.
+    default: 100
+  - name: "--long_bandwidth"
+    alternatives: [-W]
+    type: integer
+    description: Long bandwidth, used for long reads or the adaptive mode.
+    default: 20000
+  - name: "--min_chaining_score"
+    alternatives: [-m]
+    type: integer
+    description: Minimum chaining score.
+    default: 25
+  - name: "--secondary_ratio"
+    alternatives: [-p]
+    type: double
+    description: Minimum secondary-to-primary score ratio.
+    default: 0.5
+  - name: "--max_secondary"
+    alternatives: [-N]
+    type: integer
+    description: Retain at most this many secondary alignments.
+    default: 50
+  - name: "--chain_only"
+    type: boolean_true
+    description: Perform chaining only, without base alignment.
+  - name: "--mode"
+    alternatives: [-x]
+    type: string
+    description: |
+      Preset mode. Default is `adap`, which adaptively chooses parameters
+      based on read length.
+    choices: [sr, lr, adap]
+    default: adap
+
+- name: "Alignment Options"
+  arguments:
+  - name: "--match_score"
+    alternatives: [-A]
+    type: integer
+    description: Matching score.
+    default: 2
+  - name: "--mismatch_penalty"
+    alternatives: [-B]
+    type: integer
+    description: Mismatch penalty.
+    default: 8
+  - name: "--gap_open_penalty"
+    alternatives: [-O]
+    type: string
+    description: Gap open penalty for deletions and insertions. 
+    default: "12,23"
+  - name: "--gap_extend_penalty"
+    alternatives: [-E]
+    type: string
+    description: Gap extension penalty.
+    default: "2,1"
+  - name: "--min_score"
+    alternatives: [-s]
+    type: integer
+    description: Suppress alignments with a DP score lower than `INT * match_score`.
+    default: 30
+
+- name: "Paired-end Options"
+  arguments:
+  - name: "--skip_pairing"
+    alternatives: [-P]
+    type: boolean_true
+    description: Skip pairing and mate rescue.
+  - name: "--rescue"
+    type: integer
+    description: |
+      Perform mate rescue for up to this many candidates. Set to 0 to skip
+      rescue.
+    default: 10
+
+- name: "Input/Output Options"
+  arguments:
+  - name: "--no_unmapped"
+    alternatives: [-u]
+    type: boolean_true
+    description: Don't output unmapped reads.
+  - name: "--secondary_output_limit"
+    alternatives: [--outn]
+    type: integer
+    description: Output up to this many secondary alignments.
+    default: 0
+  - name: "--xa_max_hits"
+    alternatives: [--xa]
+    type: integer
+    description: |
+      If there are at most this many hits with a score above 80% of the best
+      hit, output them all in the XA tag.
+    default: 5
+  - name: "--copy_comments"
+    alternatives: [-y]
+    type: boolean_true
+    description: Copy FASTA/FASTQ comments to the output.
+  - name: "--soft_clipping"
+    alternatives: [-Y]
+    type: boolean_true
+    description: Use soft clipping for supplementary alignments.
+  - name: "--header"
+    alternatives: [-H]
+    type: string
+    description: |
+      If the value starts with `@`, insert it into the header, otherwise
+      treat it as a path to a file with lines to insert.
+  - name: "--primary_5prime"
+    alternatives: ["-5"]
+    type: boolean_true
+    description: |
+      For split alignments, take the alignment with the smallest query
+      position as primary.
+  - name: "--batch_size"
+    alternatives: [-K]
+    type: string
+    description: Process NUM1-NUM2 bp of query sequences in a batch.
+    default: "100m,1g"
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/minibwa:0.4--hab16a5f_0
+    setup:
+      - type: docker
+        run: |
+          minibwa version 2>&1 | sed 's/^/minibwa: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

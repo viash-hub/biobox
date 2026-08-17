@@ -2,15 +2,35 @@
 
 ## NEW FUNCTIONALITY
 
-* `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
+* `minibwa`: Added components for minibwa, the successor to bwa-mem with native Hi-C and bisulfite sequencing alignment modes (PR #225):
+  - `minibwa/minibwa_index`: Build a minibwa reference index, optionally including a bisulfite (BS-seq) index
+  - `minibwa/minibwa_map`: Align short, long, Hi-C or bisulfite reads to a minibwa index
+
 * `mosdepth`: Add mosdepth, a fast BAM/CRAM depth-of-coverage calculator (PR #227)
+
 * `tabix`: Add tabix, a generic indexer/query tool for BGZF block-compressed, position-sorted files (PR #228):
   - `tabix/tabix_index`: Build a tabix (`.tbi`) or CSI (`.csi`) index for a BGZF-compressed file.
   - `tabix/tabix_query`: Query an indexed file by region, or list its chromosomes.
 
+* `snpeff`: Add `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
+
 ## MINOR CHANGES
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
+
+* `snpeff_ann`:
+  - Bump snpEff from `5.2f` to `5.4c` and remove a config patch that is no longer needed (PR #222)
+  - Add `--fastaprot_no_ref` argument (`-fastaProtNoRef`) to not add reference sequences to the output when `--fastaprot` is used (PR #222)
+  - Rename argument `-no_hgvs` to `--no_hgvs` for consistency. `-no_hgvs` is kept as an alternative for backwards compatibility. (PR #222)
+
+## BUG FIXES
+
+* `snpeff_ann`: Fix and update arguments (PR #222):
+  * Fix `--stats`/`-s`/`--htmlStats` to be `string` instead of `boolean_true` to prevent it swallowing the following argument when used.
+    `--stats` now sets the name of the intermediate HTML summary file snpEff writes, use the existing `--summary` argument to specify the final output path.
+  * Fix `--only_tr` which referenced an incorrect variable name and always passed an empty value to `-onlyTr` instead of the provided file
+  * Fix `--csv_stats` and `--fastaprot` which were missing `direction: output` and so defaulted to `direction: input`, requiring the (not yet created) output file to already exist before running
+  * Fix `--cancer_samples` and `--fastaprot` which appended a stray literal `]` character to the provided value, corrupting the file path passed to `-cancerSamples`/`-fastaProt`
 
 # biobox 0.4.2
 
@@ -117,7 +137,7 @@
 
 * `bedtools`: Enhanced 11 existing bedtools components with improved functionality and standardized interfaces (PR #188):
   - `bedtools/bedtools_bamtobed`: Enhanced with additional output format options
-  - `bedtools/bedtools_bamtofastq`: Improved paired-end read handling  
+  - `bedtools/bedtools_bamtofastq`: Improved paired-end read handling
   - `bedtools/bedtools_bed12tobed6`: Standardized parameter handling
   - `bedtools/bedtools_bedtobam`: Enhanced genome file support
   - `bedtools/bedtools_genomecov`: Added scale and split options
@@ -301,8 +321,8 @@
   - `bedtools/bedtools_bedtobam`: Converts genomic feature records (bed/gff/vcf) to BAM format (PR #111).
   - `bedtools/bedtools_bed12tobed6`: Converts BED12 files to BED6 files (PR #140).
   - `bedtools/bedtools_links`: Creates an HTML file with links to an instance of the UCSC Genome Browser for all features / intervals in a (bed/gff/vcf) file (PR #137).
- 
-* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74). 
+
+* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74).
 
 * `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
 
@@ -324,7 +344,7 @@
     - `kallisto_index`: Create a kallisto index (PR #149).
     - `kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads (PR #152).
 
-* `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
+* `trimgalore`: Quality and adapter trimming for fastq files (PR #117).
 
 
 ## MINOR CHANGES
@@ -372,7 +392,7 @@
 
 * `fastp`: An ultra-fast all-in-one FASTQ preprocessor (PR #3).
 
-* `busco`: 
+* `busco`:
     - `busco/busco_run`: Assess genome assembly and annotation completeness with single copy orthologs (PR #6).
     - `busco/busco_list_datasets`: Lists available busco datasets (PR #18).
     - `busco/busco_download_datasets`: Download busco datasets (PR #19).
@@ -395,7 +415,7 @@
     - `star/star_align_reads`: Align reads to a reference genome (PR #22).
     - `star/star_genome_generate`: Generate a genome index for STAR alignment (PR #58).
 
-* `gffread`: Validate, filter, convert and perform other operations on GFF files (PR #29).  
+* `gffread`: Validate, filter, convert and perform other operations on GFF files (PR #29).
 
 * `salmon`:
     - `salmon/salmon_index`: Create a salmon index for the transcriptome to use Salmon in the mapping-based mode (PR #24).
@@ -422,7 +442,7 @@
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
-                           
+
 * `bbmap`:
     - `bbmap_bbsplit`: Split sequencing reads by mapping them to multiple references simultaneously (PR #138).
 
