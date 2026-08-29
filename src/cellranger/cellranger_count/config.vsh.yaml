@@ -18,7 +18,7 @@ authors:
   - __merge__: /src/_authors/emma_rousseau.yaml
     roles: [author]
   - __merge__: /src/_authors/robrecht_cannoodt.yaml
-    roles: [author]
+    roles: [author, maintainer]
 argument_groups:
   - name: FASTQ inputs
     arguments:
@@ -114,6 +114,12 @@ argument_groups:
         type: integer
         description: |
           Minimum CRISPR UMI threshold. Default: 3.
+      - name: --tenx_cloud_token
+        type: file
+        description: |
+          The path to the 10x Cloud Analysis user token used to enable cell
+          annotation. If not provided, will default to the location stored
+          through cellranger cloud auth setup.
 
   - name: Outputs
     arguments:
@@ -144,12 +150,6 @@ argument_groups:
         type: boolean_true
         description: |
           Whether to check for barcode compatibility between libraries.
-      - name: --tenx_cloud_token
-        type: file
-        description: |
-          The path to the 10x Cloud Analysis user token used to enable cell
-          annotation. If not provided, will default to the location stored
-          through cellranger cloud auth setup.
       - name: --dry
         type: boolean_true
         description: |
@@ -161,17 +161,16 @@ resources:
 test_resources:
   - type: bash_script
     path: test.sh
+  - path: /src/_utils/test_helpers.sh
 engines:
   - type: docker
-    image: quay.io/nf-core/cellranger:8.0.0
+    image: quay.io/nf-core/cellranger:9.0.1
     setup:
       - type: docker
-        run: |
-          DEBIAN_FRONTEND=noninteractive apt update && \
-          apt upgrade -y && apt install -y procps && rm -rf /var/lib/apt/lists/*
-      - type: docker
-        run: |
-          cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
+        run:
+          - cellranger telemetry disable
+          - |
+            cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
 
 runners:
   - type: executable

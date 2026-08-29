@@ -1,6 +1,5 @@
 ```
-docker run --rm -it quay.io/nf-core/cellranger:9.0.1 \
-  cellranger count --help
+docker run --rm quay.io/nf-core/cellranger:9.0.1 cellranger count -h
 ```
 
 Count gene expression and/or feature barcode reads from a single sample and GEM
