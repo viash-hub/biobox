@@ -1,0 +1,219 @@
+name: gatk4_genomicsdbimport
+namespace: gatk4
+description: |
+  Imports single-sample GVCFs into a GenomicsDB before joint genotyping.
+
+  GenomicsDBImport reads GVCF files produced by `gatk4 HaplotypeCaller` (or
+  similar tools) and consolidates them into a GenomicsDB datastore, a
+  scalable alternative to `gatk4 CombineGVCFs` for cohorts with large
+  numbers of samples. The initial import creates a new GenomicsDB workspace.
+keywords: [variant calling, joint genotyping, germline, GATK, GATK4, GVCF, GenomicsDB]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--variant"
+        alternatives: [-V]
+        type: file
+        multiple: true
+        description: |
+          Single-sample GVCF files to import to GenomicsDB.
+
+          Each file must contain data for only a single sample. Either this
+          or `--sample_name_map` must be specified.
+        example: sample1.g.vcf.gz
+      - name: "--sample_name_map"
+        type: file
+        description: |
+          Tab-delimited file containing a mapping of sample name to file
+          URI, one sample per line, e.g.:
+
+          ```
+          sample1	/path/to/sample1.g.vcf.gz
+          sample2	/path/to/sample2.g.vcf.gz
+          ```
+
+          If specified, the header from the first sample is treated as the
+          merged header rather than merging the headers, and sample names
+          are taken from this file rather than the GVCF headers. This is an
+          alternative to `--variant` and is a performance optimization for
+          large cohorts, since it relaxes the normal checks for consistent
+          headers.
+        example: sample_map.tsv
+      - name: "--intervals"
+        alternatives: [-L]
+        type: file
+        description: |
+          One or more genomic intervals over which to operate, provided as
+          a file (e.g. BED, interval_list).
+
+          Unlike most other GATK tools, `--intervals` is mandatory for
+          GenomicsDBImport. You may currently only import a single interval per
+          workspace.
+        required: true
+        example: intervals.list
+
+  - name: "Output"
+    arguments:
+      - name: "--genomicsdb_workspace_path"
+        type: file
+        direction: output
+        description: |
+          Path for the GenomicsDB workspace to create.
+
+          This must be an empty or non-existent directory (unless
+          `--overwrite_existing_genomicsdb_workspace` is set). The
+          resulting workspace directory can be consumed downstream by
+          `gatk4 GenotypeGVCFs` by prefixing the path with `gendb://`.
+        required: true
+        example: genomicsdb_workspace
+
+  - name: "Options"
+    arguments:
+      - name: "--avoid_nio"
+        type: boolean_true
+        description: |
+          If set, do not attempt to open the input GVCF file paths in
+          Java. This can only be used together with
+          `--bypass_feature_reader`, and allows operating on file systems
+          which GenomicsDB understands how to open but GATK does not.
+          This disables many sanity checks and cannot be used together
+          with `--variant` (only with `--sample_name_map`). GATK also
+          requires `--header` to be set whenever `--avoid_nio` is used.
+      - name: "--batch_size"
+        type: integer
+        description: |
+          Batch size controls the number of samples for which readers are
+          open at once and therefore provides a way to minimize memory
+          consumption. However, it can take longer to complete. Use
+          `--consolidate` if more than a hundred batches were used, to
+          improve feature read time. A value of `0` means no batching
+          (i.e. readers for all samples will be opened at once).
+        default: 0
+      - name: "--bypass_feature_reader"
+        type: boolean_true
+        description: |
+          If set, use htslib to read input GVCFs instead of GATK's
+          FeatureReader. This reduces memory usage and can speed up the
+          import. Lower memory requirements may also enable parallelism
+          through `--max_num_intervals_to_import_in_parallel`. To enable
+          this option, GVCFs must be normalized, block-compressed and
+          indexed.
+      - name: "--consolidate"
+        type: boolean_true
+        description: |
+          If set, merge all fragments into one. If importing data in
+          batches, a new fragment is created for each batch. In case
+          thousands of fragments are created, GenomicsDB feature readers
+          will try to open ~20x as many files, and internally GenomicsDB
+          would consume more memory to maintain bookkeeping data from all
+          fragments. Merging can potentially improve read performance,
+          however this has no effect if only one batch is used.
+      - name: "--genomicsdb_segment_size"
+        type: integer
+        description: |
+          Buffer size in bytes allocated for GenomicsDB attributes during
+          import. Should be large enough to hold data from one site.
+        default: 1048576
+      - name: "--genomicsdb_shared_posixfs_optimizations"
+        type: boolean_true
+        description: |
+          If set, allow for optimizations to improve the usability and
+          performance for shared POSIX filesystems (e.g. NFS, Lustre).
+          File level locking is disabled and file system writes are
+          minimized by keeping a higher number of file descriptors open
+          for longer periods of time. Use with `--batch_size` if keeping a
+          large number of file descriptors open is an issue.
+      - name: "--genomicsdb_vcf_buffer_size"
+        type: integer
+        description: |
+          Buffer size in bytes to store variant contexts. Larger values
+          are better, as smaller values cause frequent disk writes.
+        default: 16384
+      - name: "--header"
+        type: file
+        description: |
+          VCF file to use instead of reading and combining headers from
+          the input GVCFs.
+
+          Cannot be used together with an incremental import into an
+          existing GenomicsDB workspace.
+        example: header.vcf
+      - name: "--max_num_intervals_to_import_in_parallel"
+        type: integer
+        description: |
+          Maximum number of intervals to import in parallel. Higher
+          values may improve performance but require more memory and a
+          higher number of file descriptors open at the same time.
+        default: 1
+      - name: "--merge_contigs_into_num_partitions"
+        type: integer
+        description: |
+          Number of GenomicsDB arrays to merge input intervals into. A
+          value of `0` disables this merging. This option can only be
+          used if entire contigs are specified as intervals: the tool
+          will not split a contig into multiple arrays, so the actual
+          number of partitions may be less than what is specified here.
+          This can improve performance when importing a very large number
+          of contigs (more than 100).
+        default: 0
+      - name: "--merge_input_intervals"
+        type: boolean_true
+        description: |
+          If set, import all data in between intervals. Improves
+          performance using large lists of intervals, as in exome
+          sequencing, especially if GVCF data only exists for specified
+          intervals.
+      - name: "--overwrite_existing_genomicsdb_workspace"
+        type: boolean_true
+        description: |
+          If set, overwrite `--genomicsdb_workspace_path` if it already
+          exists. Otherwise a new workspace is created.
+      - name: "--reader_threads"
+        type: integer
+        description: |
+          How many simultaneous threads to use when opening VCFs in
+          batches. Higher values may improve performance when network
+          latency is an issue. Multiple reader threads are not supported
+          when running with multiple intervals.
+        default: 1
+      - name: "--validate_sample_name_map"
+        type: boolean_true
+        description: |
+          If set, enable checks on the `--sample_name_map` file. Verifies
+          that feature readers are valid and shows a warning if sample
+          names do not match with the headers.
+
+__merge__: /src/gatk4/utils/common_argument_groups.yaml
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow

@@ -1,0 +1,178 @@
+name: gatk4_baserecalibrator
+namespace: gatk4
+description: |
+  First pass of the Base Quality Score Recalibration (BQSR) process.
+
+  Generates a recalibration table based on various user-specified
+  covariates (such as read group, reported quality score, machine cycle,
+  and nucleotide context), modeling systematic errors made by the
+  sequencing machine that cause it to over- or under-estimate the quality
+  scores assigned to each individual base call. Known sites of variation
+  are used to mask out bases at sites of real (expected) variation, so
+  that the model captures only errors. The resulting recalibration table
+  is consumed by `gatk4 ApplyBQSR` to recalibrate the base quality scores
+  in the original BAM file.
+keywords: [base quality score recalibration, BQSR, GATK, GATK4, preprocessing]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--input"
+        alternatives: [-I]
+        type: file
+        description: |
+          Input BAM file containing reads to be recalibrated.
+
+          The file must be coordinate-sorted and indexed (see `--bai`).
+        required: true
+        example: sample.bam
+      - name: "--bai"
+        type: file
+        description: BAM index file (`.bai`) for the input BAM file.
+        required: true
+        example: sample.bam.bai
+      - name: "--reference"
+        alternatives: [-R]
+        type: file
+        description: Reference sequence FASTA file.
+        required: true
+        example: reference.fasta
+      - name: "--reference_fai"
+        type: file
+        description: FASTA index file (`.fai`) for the reference sequence.
+        required: true
+        example: reference.fasta.fai
+      - name: "--reference_dict"
+        type: file
+        description: Sequence dictionary (`.dict`) file for the reference sequence.
+        required: true
+        example: reference.dict
+      - name: "--known_sites"
+        type: file
+        multiple: true
+        required: true
+        description: |
+          One or more databases of known polymorphic sites (e.g. dbSNP,
+          Mills and 1000G gold standard indels) used to exclude regions
+          around known polymorphisms from the recalibration analysis.
+
+          At least one known-sites VCF file must be provided.
+        example: [dbsnp.vcf, mills_indels.vcf]
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: |
+          Output recalibration table file (GATKReport format) to be used
+          as input to `gatk4 ApplyBQSR`.
+        required: true
+        example: recal_data.table
+
+  - name: "Options"
+    arguments:
+      - name: "--binary_tag_name"
+        type: string
+        description: The binary tag covariate name if using it.
+      - name: "--bqsr_baq_gap_open_penalty"
+        type: double
+        description: |
+          BQSR BAQ gap open penalty (Phred scaled).
+
+          The default value is 40. 30 is perhaps better for whole genome call
+          sets.
+        default: 40
+      - name: "--default_base_qualities"
+        type: integer
+        description: |
+          Assign a default base quality to use in place of read qualities that
+          are missing or invalid.
+        default: -1
+      - name: "--deletions_default_quality"
+        type: integer
+        description: Default quality for the base deletions covariate.
+        default: 45
+      - name: "--indels_context_size"
+        alternatives: [-ics]
+        type: integer
+        description: |
+          Size of the k-mer context to be used for base insertions and deletions.
+        default: 3
+      - name: "--insertions_default_quality"
+        type: integer
+        description: Default quality for the base insertions covariate.
+        default: 45
+      - name: "--intervals"
+        alternatives: [-L]
+        type: file
+        description: |
+          One or more genomic intervals over which to operate, provided as
+          a file (e.g. BED, interval_list).
+        example: intervals.bed
+      - name: "--low_quality_tail"
+        type: integer
+        description: Minimum quality for the bases in the tail of the reads to be considered.
+        default: 2
+      - name: "--maximum_cycle_value"
+        alternatives: [-max-cycle]
+        type: integer
+        description: The maximum cycle value permitted for the Cycle covariate.
+        default: 500
+      - name: "--mismatches_context_size"
+        alternatives: [-mcs]
+        type: integer
+        description: Size of the k-mer context to be used for base mismatches.
+        default: 2
+      - name: "--mismatches_default_quality"
+        type: integer
+        description: Default quality for the base mismatches covariate.
+        default: -1
+      - name: "--preserve_qscores_less_than"
+        type: integer
+        description: Don't recalibrate bases with quality scores less than this threshold.
+        default: 6
+      - name: "--quantizing_levels"
+        type: integer
+        description: Number of distinct quality scores in the quantized output.
+        default: 16
+      - name: "--use_original_qualities"
+        alternatives: [-OQ]
+        type: boolean_true
+        description: Use the base quality scores from the `OQ` tag instead of the current ones.
+
+__merge__: /src/gatk4/utils/common_argument_groups.yaml
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+# Docker engine setup shared identically across the whole gatk4 family.
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow

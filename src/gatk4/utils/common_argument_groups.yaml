@@ -1,0 +1,112 @@
+argument_groups:
+  - name: "GATK Engine Options"
+    arguments:
+      - name: "--interval_padding"
+        alternatives: [-ip]
+        type: integer
+        description: |
+          Amount of padding (in bp) to add to each interval specified via
+          `--intervals`, to capture flanking context (e.g. near
+          capture/exome-bait edges). A commonly-used default in GATK's own
+          exome workflows is `100`.
+        default: 0
+      - name: "--sites_only_vcf_output"
+        type: boolean_true
+        description: |
+          Only emit site-level information in the output VCF/GVCF, dropping
+          the FORMAT/genotype columns. Useful for producing a compact,
+          privacy-preserving sites-only VCF (e.g. for public release or QC).
+      - name: "--create_output_variant_index"
+        alternatives: [-OVI]
+        type: boolean
+        description: Create a VCF index (`.tbi`) when writing a coordinate-sorted VCF output.
+        default: true
+      - name: "--create_output_bam_index"
+        alternatives: [-OBI]
+        type: boolean
+        description: Create a BAM/CRAM index when writing a coordinate-sorted BAM/CRAM output.
+        default: true
+      - name: "--read_filter"
+        alternatives: [-RF]
+        type: string
+        multiple: true
+        description: |
+          Read filter(s) to apply before analysis, given by their GATK Java
+          class name (e.g. `MappingQualityReadFilter`). Can be specified
+          multiple times.
+        choices:
+          - AlignmentAgreesWithHeaderReadFilter
+          - AllowAllReadsReadFilter
+          - AmbiguousBaseReadFilter
+          - CigarContainsNoNOperator
+          - ExcessiveEndClippedReadFilter
+          - FirstOfPairReadFilter
+          - FlowBasedTPAttributeSymetricReadFilter
+          - FlowBasedTPAttributeValidReadFilter
+          - FragmentLengthReadFilter
+          - GoodCigarReadFilter
+          - HasReadGroupReadFilter
+          - HmerQualitySymetricReadFilter
+          - IntervalOverlapReadFilter
+          - JexlExpressionReadTagValueFilter
+          - LibraryReadFilter
+          - MappedReadFilter
+          - MappingQualityAvailableReadFilter
+          - MappingQualityNotZeroReadFilter
+          - MappingQualityReadFilter
+          - MatchingBasesAndQualsReadFilter
+          - MateDifferentStrandReadFilter
+          - MateDistantReadFilter
+          - MateOnSameContigOrNoMappedMateReadFilter
+          - MateUnmappedAndUnmappedReadFilter
+          - MetricsReadFilter
+          - NonChimericOriginalAlignmentReadFilter
+          - NonZeroFragmentLengthReadFilter
+          - NonZeroReferenceLengthAlignmentReadFilter
+          - NotDuplicateReadFilter
+          - NotOpticalDuplicateReadFilter
+          - NotProperlyPairedReadFilter
+          - NotSecondaryAlignmentReadFilter
+          - NotSupplementaryAlignmentReadFilter
+          - OverclippedReadFilter
+          - PairedReadFilter
+          - PassesVendorQualityCheckReadFilter
+          - PlatformReadFilter
+          - PlatformUnitReadFilter
+          - PrimaryLineReadFilter
+          - ProperlyPairedReadFilter
+          - ReadGroupBlackListReadFilter
+          - ReadGroupHasFlowOrderReadFilter
+          - ReadGroupReadFilter
+          - ReadLengthEqualsCigarLengthReadFilter
+          - ReadLengthReadFilter
+          - ReadNameReadFilter
+          - ReadStrandFilter
+          - ReadTagValueFilter
+          - SampleReadFilter
+          - SecondOfPairReadFilter
+          - SeqIsStoredReadFilter
+          - SoftClippedReadFilter
+          - ValidAlignmentEndReadFilter
+          - ValidAlignmentStartReadFilter
+          - WellformedFlowBasedReadFilter
+          - WellformedReadFilter
+      - name: "--disable_read_filter"
+        alternatives: [-DF]
+        type: string
+        multiple: true
+        description: |
+          Read filter(s) to disable before analysis, given by their GATK
+          Java class name. Can be specified multiple times.
+      - name: "--disable_tool_default_read_filters"
+        type: boolean_true
+        description: |
+          Disable all tool-default read filters. Many tools will not
+          function correctly without their default read filters enabled, so
+          use with caution.
+      - name: "--disable_sequence_dictionary_validation"
+        type: boolean_true
+        description: |
+          Do not check the input sequence dictionaries for compatibility.
+          Useful when combining files from different sources with
+          mismatched (but compatible) dictionaries. Use at your own risk.

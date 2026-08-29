@@ -1,0 +1,107 @@
+name: gatk4_createsequencedictionary
+namespace: gatk4
+description: |
+  Creates a sequence dictionary (`.dict` file) for a reference sequence.
+
+  This tool builds a sequence dictionary file from a reference sequence
+  provided in FASTA format. The output file contains a header but no
+  records and the header contains only sequence records. A sequence
+  dictionary is required by many GATK tools (such as `HaplotypeCaller`)
+  that process the reference genome.
+keywords: [reference, indexing, GATK, GATK4, sequence dictionary]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--input"
+        alternatives: [-R]
+        type: file
+        description: Input reference FASTA file (optionally gzipped).
+        required: true
+        example: reference.fasta
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: Output `.dict` file containing only the sequence dictionary.
+        required: true
+        example: reference.dict
+
+  - name: "Options"
+    arguments:
+      - name: "--alt_names"
+        alternatives: [-AN]
+        type: file
+        description: |
+          Optional file containing alternative names for the contigs.
+          Tools may use this information to consider different contig
+          notations as identical (e.g. `chr1` and `1`). The alternative
+          names will be put into the appropriate `@AN` annotation for
+          each contig. No header. The first column is the original
+          name, the second column is an alternative name. One contig
+          may have more than one alternative name.
+        example: alt_names.txt
+      - name: "--genome_assembly"
+        alternatives: [-AS]
+        type: string
+        description: |
+          Genome assembly identifier (e.g. `GRCh38`) to put into the `AS`
+          field of each sequence dictionary entry.
+        example: GRCh38
+      - name: "--num_sequences"
+        type: integer
+        description: |
+          Stop after writing this many sequences. For testing.
+        example: 100
+      - name: "--species"
+        alternatives: [-SP]
+        type: string
+        description: |
+          Species name to put into the `SP` field of each sequence
+          dictionary entry.
+        example: Homo_sapiens
+      - name: "--truncate_names_at_whitespace"
+        type: boolean
+        description: |
+          Make the sequence name the first word from the `>` line in
+          the FASTA file. By default the entire contents of the `>`
+          line is used, excluding leading and trailing whitespace.
+        default: true
+      - name: "--uri"
+        alternatives: [-UR]
+        type: string
+        description: |
+          URI to put in the `UR` field of the sequence dictionary entries,
+          describing where the reference file can be found. If not supplied,
+          the absolute path of the input reference file is used.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow

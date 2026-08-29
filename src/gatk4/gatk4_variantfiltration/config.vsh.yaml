@@ -1,0 +1,194 @@
+name: gatk4_variantfiltration
+namespace: gatk4
+description: |
+  Filter variant calls based on INFO and/or FORMAT annotations.
+
+  This tool is designed for hard-filtering variant calls based on certain
+  criteria. Records are hard-filtered by changing the value in the FILTER field
+  to something other than PASS. Filtered records will be preserved in the
+  output unless their removal is requested. Site-level filters are supplied as
+  one or more JEXL expressions via `--filter_expression` with a name via
+  `--filter_name`.
+keywords: [variant filtering, GATK, GATK4, hard filtering, VCF]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--variant"
+        alternatives: [-V]
+        type: file
+        description: Input VCF file containing variants to be filtered.
+        required: true
+        example: variants.vcf.gz
+      - name: "--reference"
+        alternatives: [-R]
+        type: file
+        description: |
+          Reference genome FASTA file.
+
+          Optional for `VariantFiltration` itself, but if provided,
+          `--reference_fai` and `--reference_dict` must be provided too.
+        example: reference.fasta
+      - name: "--reference_fai"
+        type: file
+        description: FASTA index (`.fai`) file for the reference genome.
+        example: reference.fasta.fai
+      - name: "--reference_dict"
+        type: file
+        description: Sequence dictionary (`.dict`) file for the reference genome.
+        example: reference.dict
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: Output VCF file with the `FILTER` column annotated.
+        required: true
+        example: variants.filtered.vcf.gz
+
+  - name: "Options"
+    arguments:
+      - name: "--apply_allele_specific_filters"
+        type: boolean_true
+        description: |
+          Set the mask at the allele level rather than the site level.
+          Not compatible with clustered-SNP filtering
+          (`--cluster_size`/`--cluster_window_size`).
+      - name: "--cluster_size"
+        alternatives: [-cluster]
+        type: integer
+        description: |
+          The number of SNPs which make up a cluster. Must be at least
+          2. Used together with `--cluster_window_size` to enable
+          clustered-SNP filtering (GATK default: 3). Requires `--variant`
+          to support random access (e.g. bgzipped and tabix-indexed, or
+          a plain VCF with an accompanying `.idx`).
+      - name: "--cluster_window_size"
+        alternatives: [-window]
+        type: integer
+        description: |
+          The window size (in bases) in which to evaluate clustered
+          SNPs. A value of 0 (the GATK default) disables clustered-SNP
+          filtering. Requires `--variant` to support random access (e.g.
+          bgzipped and tabix-indexed, or a plain VCF with an
+          accompanying `.idx`).
+      - name: "--filter_expression"
+        alternatives: [-filter]
+        type: string
+        multiple: true
+        description: |
+          One or more JEXL expressions used with INFO fields to filter,
+          e.g. `"vc.isSNP() && QD < 2.0"`. Must be paired 1-to-1 with
+          `--filter_name`.
+        example: ["vc.isSNP() && QD < 2.0"]
+      - name: "--filter_name"
+        type: string
+        multiple: true
+        description: |
+          Names for the list of site-level filters in `--filter_expression`.
+          Recorded in the `FILTER` field for records that fail the corresponding
+          expression.
+        example: ["SNP_QD2"]
+      - name: "--filter_not_in_mask"
+        type: boolean_true
+        description: Filter records that are NOT in the regions given by `--mask`.
+      - name: "--genotype_filter_expression"
+        alternatives: [-G-filter]
+        type: string
+        multiple: true
+        description: |
+          One or more expressions used with FORMAT (sample/genotype-level)
+          fields to filter, distinct from the site-level hard filters
+          above. Must be paired 1-to-1 with `--genotype_filter_name`.
+        example: ["DP < 10"]
+      - name: "--genotype_filter_name"
+        alternatives: [-G-filter-name]
+        type: string
+        multiple: true
+        description: |
+          Names for the list of genotype-level filters (1-to-1 mapping
+          with `--genotype_filter_expression`); recorded in the FORMAT
+          `FT` field for genotypes that fail the corresponding
+          expression.
+        example: ["lowDP"]
+      - name: "--invalidate_previous_filters"
+        type: boolean_true
+        description: |
+          Remove previous filters applied to the VCF before applying the filters
+          requested here.
+      - name: "--invert_filter_expression"
+        alternatives: [-invfilter]
+        type: boolean_true
+        description: Invert the selection criteria for `--filter_expression`.
+      - name: "--invert_genotype_filter_expression"
+        alternatives: [-invG-filter]
+        type: boolean_true
+        description: Invert the selection criteria for `--genotype_filter_expression`.
+      - name: "--mask"
+        type: file
+        description: |
+          BED/VCF file of genomic regions used to mask (flag) variants
+          that fall within (or near, see `--mask_extension`) them.
+        example: mask.bed
+      - name: "--mask_description"
+        type: string
+        description: Description to add to the FILTER field header line for the mask filter.
+      - name: "--mask_extension"
+        type: integer
+        description: |
+          How many bases beyond the regions in `--mask` should variants
+          also be filtered (GATK default: 0).
+      - name: "--mask_name"
+        type: string
+        description: |
+          The text to put in the FILTER field if a variant overlaps (or
+          is within `--mask_extension` of) the regions in `--mask`
+          (GATK default: Mask).
+      - name: "--missing_values_evaluate_as_failing"
+        type: boolean_true
+        description: |
+          When evaluating the JEXL filter expressions, treat missing
+          INFO/FORMAT values as failing the expression rather than
+          passing it.
+      - name: "--set_filtered_genotype_to_no_call"
+        type: boolean_true
+        description: |
+          Set genotypes that fail `--genotype_filter_expression` to
+          no-call (`./.`) instead of leaving the original genotype call
+          annotated with a FORMAT `FT` filter name.
+
+__merge__: /src/gatk4/utils/common_argument_groups.yaml
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow

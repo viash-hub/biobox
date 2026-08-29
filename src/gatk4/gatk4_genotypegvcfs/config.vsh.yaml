@@ -1,0 +1,431 @@
+name: gatk4_genotypegvcfs
+namespace: gatk4
+description: |
+  Perform joint genotyping on one or more samples previously called with
+  HaplotypeCaller in GVCF mode.
+
+  GenotypeGVCFs merges the records in the input GVCF(s) and performs joint
+  genotyping to produce a set of final, genotyped calls in a VCF file. The
+  input can be a single-sample GVCF (e.g. from `gatk4 HaplotypeCaller` run
+  with `--emit_ref_confidence GVCF`), a combined multi-sample GVCF (e.g.
+  from `gatk4 CombineGVCFs`), or a GenomicsDB workspace produced by
+  `gatk4 GenomicsDBImport`.
+keywords: [variant calling, germline, joint genotyping, GATK, GATK4, VCF, GVCF]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--variant"
+        alternatives: [-V]
+        type: file
+        description: |
+          Input variants to joint-genotype.
+
+          This can be one of:
+          - A single-sample GVCF produced by `gatk4 HaplotypeCaller` run
+            with `--emit_ref_confidence GVCF`
+          - A combined multi-sample GVCF produced by `gatk4 CombineGVCFs`
+          - A GenomicsDB workspace directory produced by
+            `gatk4 GenomicsDBImport`
+
+          When a directory is provided, it is assumed to be a GenomicsDB
+          workspace and is automatically referenced with the required
+          `gendb://` prefix.
+        required: true
+        example: sample.g.vcf
+      - name: "--reference"
+        alternatives: [-R]
+        type: file
+        description: Reference sequence FASTA file.
+        required: true
+        example: reference.fasta
+      - name: "--reference_fai"
+        type: file
+        description: FASTA index file (`.fai`) for the reference sequence.
+        required: true
+        example: reference.fasta.fai
+      - name: "--reference_dict"
+        type: file
+        description: Sequence dictionary (`.dict`) file for the reference sequence.
+        required: true
+        example: reference.dict
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: |
+          Output file containing the final, genotyped variants in VCF
+          format (`.vcf`/`.vcf.gz`).
+        required: true
+        example: output.vcf
+
+  - name: "Options"
+    arguments:
+      - name: "--allele_fraction_error"
+        type: double
+        description: |
+          Margin of error in allele fraction to consider a somatic variant
+          homoplasmic. Only relevant when `--input_is_somatic` is set.
+        default: 0.001
+      - name: "--annotate_with_num_discovered_alleles"
+        type: boolean_true
+        description: |
+          Annotate records with the number of alternate alleles that were
+          discovered (but not necessarily genotyped) at a given site.
+      - name: "--annotation"
+        alternatives: [-A]
+        type: string
+        multiple: true
+        description: |
+          One or more specific annotations to add to variant calls, e.g.
+          `ChromosomeCounts` or `InbreedingCoeff`.
+        example: [ChromosomeCounts]
+        choices:
+          - AlleleFraction
+          - AllelePseudoDepth
+          - AS_BaseQualityRankSumTest
+          - AS_FisherStrand
+          - AS_InbreedingCoeff
+          - AS_MappingQualityRankSumTest
+          - AS_QualByDepth
+          - AS_ReadPosRankSumTest
+          - AS_RMSMappingQuality
+          - AS_StrandBiasMutectAnnotation
+          - AS_StrandOddsRatio
+          - AssemblyComplexity
+          - BaseQuality
+          - BaseQualityHistogram
+          - BaseQualityRankSumTest
+          - ChromosomeCounts
+          - ClippingRankSumTest
+          - CountNs
+          - Coverage
+          - CycleSkipStatus
+          - DepthPerAlleleBySample
+          - DepthPerSampleHC
+          - ExcessHet
+          - FisherStrand
+          - FragmentDepthPerAlleleBySample
+          - FragmentLength
+          - GcContent
+          - GenotypeSummaries
+          - HaplotypeFilteringAnnotation
+          - HmerIndelLength
+          - HmerIndelNuc
+          - HmerMotifs
+          - InbreedingCoeff
+          - IndelClassify
+          - IndelLength
+          - LikelihoodRankSumTest
+          - MappingQuality
+          - MappingQualityRankSumTest
+          - MappingQualityZero
+          - OrientationBiasReadCounts
+          - OriginalAlignment
+          - PossibleDeNovo
+          - QualByDepth
+          - RawGtCount
+          - ReadPosition
+          - ReadPosRankSumTest
+          - ReferenceBases
+          - RMSMappingQuality
+          - SampleList
+          - StrandBiasBySample
+          - StrandOddsRatio
+          - TandemRepeat
+          - TransmittedSingleton
+          - UniqueAltReadCount
+          - VariantType
+      - name: "--annotation_group"
+        alternatives: [-G]
+        type: string
+        multiple: true
+        description: |
+          One or more groups of annotations to apply to variant calls.
+
+          Common values include `StandardAnnotation` and, for
+          allele-specific annotations, `AS_StandardAnnotation`.
+        choices:
+          - AlleleSpecificAnnotation
+          - AS_StandardAnnotation
+          - GenotypeAnnotation
+          - InfoFieldAnnotation
+          - JumboGenotypeAnnotation
+          - JumboInfoAnnotation
+          - ReducibleAnnotation
+          - StandardAnnotation
+          - StandardFlowBasedAnnotation
+          - StandardHCAnnotation
+          - StandardMutectAnnotation
+          - VariantAnnotation
+      - name: "--annotations_to_exclude"
+        alternatives: [-AX]
+        type: string
+        multiple: true
+        description: |
+          One or more specific annotations to exclude from variant calls,
+          e.g. `RMSMappingQuality` or `FisherStrand`.
+        example: [RMSMappingQuality]
+        choices:
+          - BaseQualityRankSumTest
+          - ChromosomeCounts
+          - Coverage
+          - DepthPerAlleleBySample
+          - ExcessHet
+          - FisherStrand
+          - InbreedingCoeff
+          - MappingQualityRankSumTest
+          - QualByDepth
+          - ReadPosRankSumTest
+          - RMSMappingQuality
+          - StrandOddsRatio
+      - name: "--call_genotypes"
+        type: boolean_true
+        description: |
+          Output called genotypes in the final VCF (otherwise no-call).
+      - name: "--dbsnp"
+        alternatives: [-D]
+        type: file
+        description: |
+          dbSNP VCF file used to annotate called variants with known
+          variant IDs.
+        example: dbsnp.vcf
+      - name: "--disable_tool_default_annotations"
+        type: boolean_true
+        description: |
+          Disable all tool default annotations.
+      - name: "--enable_all_annotations"
+        type: boolean_true
+        description: |
+          Use all possible annotations (not for the faint of heart).
+      - name: "--force_output_intervals"
+        type: file
+        multiple: true
+        description: |
+          Sites at which to output genotypes even if non-variant in all
+          samples, provided as a file (e.g. BED, interval_list). Can be
+          specified multiple times.
+        example: [force_call_sites.bed]
+      - name: "--founder_id"
+        type: string
+        multiple: true
+        description: |
+          Samples representing the population "founders", used (together
+          with `--pedigree`) by pedigree-aware genotype assignment (see
+          `--genotype_assignment_method`).
+        example: [sample1]
+      - name: "--genomicsdb_max_alternate_alleles"
+        type: integer
+        description: |
+          Maximum number of alternate alleles that will be combined when
+          reading variants from a GenomicsDB workspace.
+        default: 50
+      - name: "--genomicsdb_shared_posixfs_optimizations"
+        type: boolean_true
+        description: |
+          Allow optimizations to improve the usability and performance of
+          reading a GenomicsDB workspace on shared POSIX filesystems (e.g.
+          NFS, Lustre). Disables file-level locking and minimizes file
+          system writes.
+      - name: "--genomicsdb_use_bcf_codec"
+        type: boolean_true
+        description: |
+          Use BCF codec streaming for data read from a GenomicsDB
+          workspace instead of the default VCF codec. Performs slightly
+          better, but does not support 64-bit positions or very large
+          `INFO` field sizes.
+      - name: "--genotype_assignment_method"
+        alternatives: [-gam]
+        type: string
+        description: |
+          How genotypes are assigned in the final VCF.
+        default: USE_PLS_TO_ASSIGN
+        choices: 
+          - SET_TO_NO_CALL
+          - USE_PLS_TO_ASSIGN
+          - USE_POSTERIORS_ANNOTATION
+          - SET_TO_NO_CALL_NO_ANNOTATIONS
+          - BEST_MATCH_TO_ORIGINAL
+          - DO_NOT_ASSIGN_GENOTYPES
+          - USE_POSTERIOR_PROBABILITIES
+          - PREFER_PLS
+      - name: "--heterozygosity"
+        type: double
+        description: |
+          Heterozygosity value used to compute prior probabilities for any
+          locus.
+
+          See the [GATK docs](https://gatk.broadinstitute.org/hc/en-us) for full
+          details on the meaning of this population genetics concept.
+        default: 0.001
+      - name: "--heterozygosity_stdev"
+        type: double
+        description: |
+          Standard deviation of heterozygosity for SNP and indel calling.
+        default: 0.01
+      - name: "--include_non_variant_sites"
+        alternatives: [-all-sites]
+        type: boolean_true
+        description: |
+          Include loci found to be non-variant after genotyping in the
+          output.
+      - name: "--indel_heterozygosity"
+        type: double
+        description: |
+          Heterozygosity for indel calling.
+
+          See the [GATK docs](https://gatk.broadinstitute.org/hc/en-us) for full
+          details on the meaning of this population genetics concept.
+        default: 0.000125
+      - name: "--input_is_somatic"
+        type: boolean_true
+        description: |
+          Finalize the input GVCF according to somatic (i.e. Mutect2)
+          TLODs (BETA feature).
+      - name: "--intervals"
+        alternatives: [-L]
+        type: file
+        description: |
+          One or more genomic intervals over which to operate, provided as
+          a file (e.g. BED, interval_list).
+        example: intervals.bed
+      - name: "--keep_combined_raw_annotations"
+        alternatives: [-keep-combined]
+        type: boolean_true
+        description: |
+          Keep the combined raw annotations. Cannot be used together with
+          `--keep_specific_combined_raw_annotation`.
+      - name: "--keep_specific_combined_raw_annotation"
+        alternatives: [-keep-specific-combined]
+        type: string
+        multiple: true
+        description: |
+          Keep only the specific combined raw annotations specified
+          (removing the other raw annotations). Cannot be used together
+          with `--keep_combined_raw_annotations`.
+        example: [AS_RAW_ReadPosRankSum]
+      - name: "--max_alternate_alleles"
+        type: integer
+        description: |
+          Maximum number of alternate alleles to genotype.
+        default: 6
+      - name: "--max_genotype_count"
+        type: integer
+        description: |
+          Maximum number of genotypes to consider at any site.
+        default: 1024
+      - name: "--max_variants_per_shard"
+        type: integer
+        description: |
+          If non-zero, partitions VCF output into shards, each containing
+          up to the given number of records.
+        default: 0
+      - name: "--merge_input_intervals"
+        type: boolean_true
+        description: |
+          Import all data in between intervals rather than only the
+          intervals themselves.
+      - name: "--num_reference_samples_if_no_call"
+        type: integer
+        description: |
+          Number of hom-ref genotypes to infer at sites not present in a
+          `--population_callset` panel.
+        default: 0
+      - name: "--only_output_calls_starting_in_intervals"
+        type: boolean_true
+        description: |
+          Restrict variant output to sites that start within the provided
+          `--intervals`.
+      - name: "--pedigree"
+        alternatives: [-ped]
+        type: file
+        description: |
+          Pedigree file for determining the population "founders" (see
+          `--founder_id`).
+        example: pedigree.ped
+      - name: "--population_callset"
+        alternatives: [-population]
+        type: file
+        description: |
+          Callset (VCF) used to calculate genotype priors. Used together
+          with `--num_reference_samples_if_no_call` and
+          `--use_posteriors_to_calculate_qual`.
+        example: population.vcf.gz
+      - name: "--sample_ploidy"
+        alternatives: [-ploidy]
+        type: integer
+        description: |
+          Ploidy (number of chromosomes) per sample.
+
+          For pooled data, set to (number of samples in each pool * sample
+          ploidy).
+        default: 2
+      - name: "--stand_call_conf"
+        alternatives: [-stand-call-conf]
+        type: double
+        description: |
+          The minimum phred-scaled confidence threshold at which variants
+          should be called.
+        default: 30.0
+      - name: "--tumor_lod_to_emit"
+        alternatives: [-emit-lod]
+        type: double
+        description: |
+          LOD threshold to emit a variant to the VCF. Only relevant when
+          `--input_is_somatic` is set.
+        default: 3.5
+      - name: "--use_posteriors_to_calculate_qual"
+        alternatives: [-gp-qual]
+        type: boolean_true
+        description: |
+          If available, use the genotype posterior probabilities (see
+          `--population_callset`) to calculate the site QUAL.
+      - name: "--variant_output_filtering"
+        type: string
+        description: |
+          Restrict the output variants to ones that match the
+          `--intervals` according to the specified matching mode.
+        example: STARTS_IN
+        choices: 
+          - STARTS_IN
+          - ENDS_IN
+          - OVERLAPS
+          - CONTAINED
+          - ANYWHERE
+
+__merge__: /src/gatk4/utils/common_argument_groups.yaml
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow
