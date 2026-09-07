@@ -18,6 +18,30 @@ set -eo pipefail
 [[ "$par_soft_clipping" == "false" ]] && unset par_soft_clipping
 [[ "$par_mark_secondary" == "false" ]] && unset par_mark_secondary
 
+# Resolve the index base name from the index directory. BWA-MEM2 takes a prefix
+# that its index files share, which is not itself a path that can be mounted or
+# staged, so the directory holding them is passed in instead.
+index_dir="${par_index%/}"
+
+if [[ ! -d "$index_dir" ]]; then
+    echo "Error: --index must be a directory containing the BWA-MEM2 index files," >&2
+    echo "but '$index_dir' is not a directory." >&2
+    exit 1
+fi
+
+mapfile -d '' -t bwt_files < <(find -L "$index_dir" -maxdepth 1 -name '*.bwt.2bit.64' -type f -print0)
+
+if [[ "${#bwt_files[@]}" -eq 0 ]]; then
+    echo "Error: No BWA-MEM2 index found in '$index_dir': expected a '.bwt.2bit.64' file." >&2
+    exit 1
+elif [[ "${#bwt_files[@]}" -gt 1 ]]; then
+    echo "Error: Multiple BWA-MEM2 indices found in '$index_dir': ${bwt_files[*]}." >&2
+    echo "The index directory must contain exactly one index." >&2
+    exit 1
+fi
+
+index_prefix="${bwt_files[0]%.bwt.2bit.64}"
+
 # Build the command
 cmd_args=(
     # Algorithm options
@@ -62,7 +86,7 @@ cmd_args=(
     ${par_insert_size:+-I "$par_insert_size"}
     
     # Index and input files
-    "$par_index"
+    "$index_prefix"
     "$par_reads1"
     ${par_reads2:+"$par_reads2"}
 )
