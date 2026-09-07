@@ -23,6 +23,16 @@
 
 ## BUG FIXES
 
+* Fix `--index` in `bwa_aln`, `bwa_mem`, `bwa_sampe`, `bwa_samse` and `bwa_mem2_mem` (PR #233).
+  The argument was documented as the index base name, but a base name is a shared prefix of the index files
+  rather than a path, so there was no value that worked: passing the prefix was rejected because no such file
+  exists, and passing one of the index files left the aligner unable to locate the others.
+  Pointing it at the reference FASTA only appeared to work with the executable runner, which mounts the parent
+  directory of an input file and so happened to bring the sibling index files along; under Nextflow, which
+  stages just the named file, the index files were missing.
+  `--index` now takes the directory holding the index files, matching the output of `bwa_index` and
+  `bwa_mem2_index`, and the base name is derived from the directory contents.
+
 * `snpeff_ann`: Fix and update arguments (PR #222):
   * Fix `--stats`/`-s`/`--htmlStats` to be `string` instead of `boolean_true` to prevent it swallowing the following argument when used.
     `--stats` now sets the name of the intermediate HTML summary file snpEff writes, use the existing `--summary` argument to specify the final output path.

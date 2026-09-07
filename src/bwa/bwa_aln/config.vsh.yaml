@@ -20,9 +20,13 @@ argument_groups:
   arguments: 
   - name: "--index"
     type: file
-    description: BWA index base name (prefix of .amb, .ann, .bwt, .pac, .sa files).
+    description: |
+      Directory containing the BWA index files (`.amb`, `.ann`, `.bwt`, `.pac`
+      and `.sa`), as produced by `bwa_index`. The index base name is derived
+      from the contents of the directory, so the directory must contain exactly
+      one index.
     required: true
-    example: reference.fasta
+    example: bwa_index/
   - name: "--reads"
     type: file
     description: Input FASTQ file with reads to align.
