@@ -57,12 +57,6 @@ set -eo pipefail
 [[ "$par_qc_filter" == "false" ]] && unset par_qc_filter
 [[ "$par_non_deterministic" == "false" ]] && unset par_non_deterministic
 
-# Validate input arguments
-if [[ -z "$par_index" ]]; then
-  echo "Error: --index is required" >&2
-  exit 1
-fi
-
 # Validate that at least one input type is specified
 if [[ -z "$par_mate1" && -z "$par_mate2" && -z "$par_unpaired" && -z "$par_interleaved" && -z "$par_bam_input" ]]; then
   echo "Error: At least one input type must be specified (--mate1/--mate2, --unpaired, --interleaved, or --bam_input)" >&2
@@ -75,9 +69,43 @@ if [[ -n "$par_mate1" && -z "$par_mate2" ]] || [[ -z "$par_mate1" && -n "$par_ma
   exit 1
 fi
 
+# Resolve the index path prefix from the index directory. The small (.bt2) index
+# is preferred, as bowtie2 itself does when both are present; a large (.bt2l)
+# index is only built for references over 4 billion nucleotides, and in that
+# case no .bt2 files exist at all.
+index_dir="${par_index%/}"
+if [[ ! -d "$index_dir" ]]; then
+  echo "Error: --index must be a directory containing the bowtie2 index files" >&2
+  exit 1
+fi
+
+index_files=()
+for index_suffix in bt2 bt2l; do
+  # -L follows symlinks, as a workflow engine may stage the index files as such.
+  # The .rev.1 files are excluded, as they belong to the same index.
+  mapfile -d '' -t index_files < <(
+    find -L "$index_dir" -maxdepth 1 -type f \
+      -name "*.1.$index_suffix" ! -name "*.rev.1.$index_suffix" -print0
+  )
+  [[ "${#index_files[@]}" -gt 0 ]] && break
+done
+
+if [[ "${#index_files[@]}" -eq 0 ]]; then
+  echo "Error: no bowtie2 index files (.bt2 or .bt2l) found in '$par_index'" >&2
+  exit 1
+fi
+
+if [[ "${#index_files[@]}" -gt 1 ]]; then
+  echo "Error: multiple bowtie2 indices found in '$par_index': ${index_files[*]##*/}." \
+    "The index directory must contain exactly one index." >&2
+  exit 1
+fi
+
+index_path="${index_files[0]%.1.$index_suffix}"
+
 # Build the command arguments
 cmd_args=(
-    -x "$par_index"
+    -x "$index_path"
     ${par_mate1:+-1 "$(IFS=','; echo "${par_mate1[*]}")"}
     ${par_mate2:+-2 "$(IFS=','; echo "${par_mate2[*]}")"}
     ${par_unpaired:+-U "$(IFS=','; echo "${par_unpaired[*]}")"}

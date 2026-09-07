@@ -24,10 +24,15 @@ argument_groups:
   - name: Inputs
     arguments:
       - name: --index
-        type: string
-        description: bt2 filename minus trailing .1.bt2/.2.bt2
+        type: file
+        description: |
+          Directory containing the bowtie2 index files (`.1.bt2`, `.2.bt2`,
+          `.3.bt2`, `.4.bt2`, `.rev.1.bt2` and `.rev.2.bt2`, or their `.bt2l`
+          equivalents for a large index), as produced by `bowtie2_build`.
+          The index prefix is derived from the files in the directory.
         required: true
-        example: genome_index
+        must_exist: true
+        example: bowtie2_index/
 
   - name: Outputs
     arguments:
@@ -72,7 +77,11 @@ argument_groups:
     arguments:
       - name: --large_index
         type: boolean_true
-        description: Force inspection of the 'large' index, even if a 'small' one is present
+        description: |
+          Force inspection of the 'large' (`.bt2l`) index, even if a 'small'
+          (`.bt2`) one is present. Fails if `--index` contains no large index.
+          When not set, a small index is preferred and a large one is used when
+          that is all the index directory contains.
 
 resources:
   - type: bash_script
