@@ -25,10 +25,15 @@ argument_groups:
   - name: Inputs
     arguments:
       - name: --index
-        type: string
-        description: Index filename prefix (minus trailing .X.bt2).
+        type: file
+        description: |
+          Directory containing the bowtie2 index files (`.1.bt2`, `.2.bt2`,
+          `.3.bt2`, `.4.bt2`, `.rev.1.bt2` and `.rev.2.bt2`, or their `.bt2l`
+          equivalents for a large index), as produced by `bowtie2_build`.
+          The index prefix is derived from the files in the directory.
         required: true
-        example: genome_index
+        must_exist: true
+        example: bowtie2_index/
 
       - name: --mate1
         type: file

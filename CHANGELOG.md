@@ -23,6 +23,13 @@
 
 ## BUG FIXES
 
+* `bowtie2`: Fix `--index` of `bowtie2/bowtie2_align` and `bowtie2/bowtie2_inspect` (PR #233):
+  * `--index` was a `string` holding the index filename prefix, so the index files were not mounted or staged when running with Docker or Nextflow.
+    It is now a `file` pointing to the directory containing the index files (as produced by `bowtie2/bowtie2_build`), and the prefix is derived from the directory contents.
+  * `bowtie2_inspect`: pass the index as the last argument, as documented. The `bowtie2-inspect` wrapper reads the index basename from the final argument to decide whether to run the small or the large binary,
+    so passing it first made it always pick the small one and fail on a large (`.bt2l`) index.
+  * `bowtie2_inspect`: setting `--large_index` now restricts the lookup to a large index and fails if the index directory does not contain one, instead of silently inspecting a small index.
+
 * `snpeff_ann`: Fix and update arguments (PR #222):
   * Fix `--stats`/`-s`/`--htmlStats` to be `string` instead of `boolean_true` to prevent it swallowing the following argument when used.
     `--stats` now sets the name of the intermediate HTML summary file snpEff writes, use the existing `--summary` argument to specify the final output path.
