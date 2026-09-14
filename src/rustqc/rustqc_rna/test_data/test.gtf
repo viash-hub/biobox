@@ -1,0 +1,4 @@
+chr1	test	gene	1000	1999	.	+	.	gene_id "gene1"; gene_name "GENE1";
+chr1	test	transcript	1000	1999	.	+	.	gene_id "gene1"; transcript_id "tx1"; gene_name "GENE1";
+chr1	test	exon	1000	1499	.	+	.	gene_id "gene1"; transcript_id "tx1"; exon_number "1";
+chr1	test	exon	1500	1999	.	+	.	gene_id "gene1"; transcript_id "tx1"; exon_number "2";

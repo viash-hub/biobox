@@ -1,0 +1,90 @@
+name: minimap2_align
+namespace: minimap2
+description: |
+  A versatile pairwise aligner for genomic and spliced nucleotide sequences.
+  This component maps DNA or mRNA query sequences against a reference database (FASTA or .mmi index).
+  By default, it outputs mapping coordinates in PAF format. If the --bam flag is provided, it outputs a sorted and indexed BAM file.
+keywords: [Alignment, Mapper, Minimap2]
+links:
+  homepage: https://lh3.github.io/minimap2/
+  documentation: https://github.com/lh3/minimap2#uguide
+  repository: https://github.com/lh3/minimap2
+references:
+  doi: 
+    - 10.1093/bioinformatics/bty191
+    - 10.1093/bioinformatics/btab705
+license: MIT
+authors:
+  - __merge__: /src/_authors/marilyn_degraeve.yaml
+    roles: [author, maintainer]
+
+requirements:
+  commands: [minimap2]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --reference
+        alternatives: [-i, --input]
+        type: file
+        description: Reference fasta or .mmi index.
+        required: true
+        example: reference.fasta
+      - name: --query
+        alternatives: [-q]
+        type: file
+        description: Query sequences (FASTQ/FASTA).
+        required: true
+        example: reads.fastq
+  
+  - name: Options
+    arguments:
+      - name: --preset
+        alternatives: -x
+        type: string
+        description: |
+          Preset alignment options (e.g. map-ont, map-hifi, map-pb, asm5, asm10,
+          asm20, splice, sr, ava-ont, ava-pb). Run `minimap2 -x` for the full list.
+        example: map-ont
+
+  - name: Outputs
+    arguments:
+      - name: --bam
+        type: boolean_true
+        description: Output BAM instead of PAF.
+      - name: --cigar_paf
+        type: boolean_true
+        description: Output CIGAR in PAF format (-c flag).
+      - name: --cigar_bam
+        type: boolean_true
+        description: Write long CIGARs in BAM CG tag (-L flag).
+      - name: --output
+        alternatives: -o
+        type: file
+        direction: output
+        description: Output alignment file in PAF (default) or BAM format.
+        required: true
+        example: alignment.paf
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/mulled-v2-66534bcbb7031a148b13e2ad42583020b9cd25c4:e1ea28074233d7265a5dc2111d6e55130dff5653-2
+    setup:
+    - type: docker
+      run: |
+          samtools --version 2>&1 | grep -E '^(samtools|Using htslib)' | \
+          sed 's#Using ##;s# \([0-9\.]*\)$#: \1#' > /var/software_versions.txt && \
+          minimap2 --version 2>&1 | sed 's/^/minimap2: /' >> /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

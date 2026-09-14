@@ -22,6 +22,8 @@ unset_if_false=(
   par_force_index_orientation
   par_per_target_fastq
   par_group_well_label
+  par_skip_empty_fq_files
+  par_force_detect_index_orientation
 )
 
 for par in ${unset_if_false[@]}; do
@@ -55,6 +57,8 @@ args=(
   ${par_no_projects:+--no-projects}
   ${par_split_lanes:+--split-lanes}
   ${par_group_well_label:+--group-well-label}
+  ${par_skip_empty_fq_files:+--skip-empty-fq-files}
+  ${par_force_detect_index_orientation:+--force-detect-index-orientation}
   ${par_force_index_orientation:+--force-index-orientation}
   ${par_skip_qc_report:+--skip-qc-report}
   ${par_skip_multi_qc:+--skip-multi-qc}
