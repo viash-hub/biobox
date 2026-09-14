@@ -1,8 +1,8 @@
 name: snpeff_ann
 namespace: snpeff
 description: |
-  Genetic variant annotation, and functional effect prediction toolbox. 
-  It annotates and predicts the effects of genetic variants on genes and 
+  Genetic variant annotation, and functional effect prediction toolbox.
+  It annotates and predicts the effects of genetic variants on genes and
   proteins (such as amino acid changes).
 keywords: [ "annotation", "effect prediction", "snp", "variant", "vcf"]
 
@@ -36,13 +36,17 @@ argument_groups:
         required: true
       - name: --summary
         type: file
-        description: Summary file directory.
-        example: summary_dir
+        description: |
+          Output location for the summary HTML file created by --stats. Cannot
+          be used together with --no_stats.
+        example: snpEff_summary.html
         direction: output
       - name: --genes
         type: file
-        description: Txt file directory.
-        example: genes_dir
+        description: |
+          Output location for the genes statistics file created by --stats.
+          Cannot be used together with --no_stats.
+        example: snpEff_summary.genes.txt
         direction: output
   - name: Options
     arguments:
@@ -56,6 +60,7 @@ argument_groups:
       - name: --csv_stats
         type: file
         description: Create CSV summary file.
+        direction: output
       - name: --download
         type: boolean_true
         description: Download reference genome if not available.
@@ -76,8 +81,9 @@ argument_groups:
         example: "VCF"
       - name: --stats
         alternatives: [-s, --htmlStats]
-        type: boolean_true
+        type: string
         description: Create HTML summary file.
+        default: snpEff_summary.html
       - name: --no_stats
         type: boolean_true
         description: Do not create stats (summary) file.
@@ -87,9 +93,9 @@ argument_groups:
         alternatives: [--filterInterval]
         type: file
         description: |
-          Only analyze changes that intersect with the intervals 
+          Only analyze changes that intersect with the intervals
           specified in this file. This option can be used several times.
-      - name: --no_downstream 
+      - name: --no_downstream
         type: boolean_true
         description: Do not show DOWNSTREAM changes
       - name: --no_intergenic
@@ -110,7 +116,7 @@ argument_groups:
           Do not show 'EffectType'. This option can be used several times.
   - name: Annotations options
     arguments:
-      - name: --cancer 
+      - name: --cancer
         type: boolean_true
         description: Perform 'cancer' comparisons (Somatic vs Germline).
       - name: --cancer_samples
@@ -120,6 +126,11 @@ argument_groups:
         type: file
         description: |
           Create an output file containing the resulting protein sequences.
+        direction: output
+      - name: --fastaprot_no_ref
+        type: boolean_true
+        description: |
+          Do not add reference sequences to the output (only valid when --fastaprot is used).
       - name: --format_eff
         type: boolean_true
         description: |
@@ -133,7 +144,7 @@ argument_groups:
       - name: --hgvs_old
         type: boolean_true
         description: Use old HGVS notation.
-      - name: --hgvs1_letter_aa 
+      - name: --hgvs1_letter_aa
         type: boolean_true
         description: Use one letter Amino acid codes in HGVS notation.
       - name: --hgvs_tr_id
@@ -143,7 +154,8 @@ argument_groups:
         type: boolean_true
         description: |
           Add loss of function (LOF) and Nonsense mediated decay (NMD) tags.
-      - name: -no_hgvs
+      - name: --no_hgvs
+        alternatives: [-no_hgvs] # Included for backward compatibility with older versions of the component
         type: boolean_true
         description: Do not add HGVS annotations.
       - name: --no_lof
@@ -191,13 +203,13 @@ argument_groups:
         description: Verbose mode.
   - name: Database options
     arguments:
-      - name: --canon 
+      - name: --canon
         type: boolean_true
         description: Only use canonical transcripts.
       - name: --canon_list
         type: file
         description: |
-          Only use canonical transcripts, replace some transcripts using the 'gene_id         
+          Only use canonical transcripts, replace some transcripts using the 'gene_id
           transcript_id' entries in <file>.
       - name: --tag
         type: string
@@ -217,7 +229,7 @@ argument_groups:
       - name: --max_tsl
         type: integer
         description: Only use transcripts having Transcript Support Level lower than <TSL_number>.
-      - name: --motif 
+      - name: --motif
         type: boolean_true
         description: Annotate using motifs (requires Motif database).
       - name: --nextprot
@@ -279,29 +291,16 @@ argument_groups:
 resources:
   - type: bash_script
     path: script.sh
-  - path: config.patch
 test_resources:
   - type: bash_script
     path: test.sh
   - type: file
     path: test_data
+  - path: /src/_utils/test_helpers.sh
 engines:
   - type: docker
-    image: quay.io/staphb/snpeff:5.2f
+    image: quay.io/staphb/snpeff:5.4c
     setup:
-      - type: docker
-        # Apply a partial patch from this commit
-        # https://github.com/pcingola/SnpEff/commit/6339f6cab984bd5f35b81a77e05c517be5d112a6
-        # This updates the repositories where to download the references from
-        # At the time of writing this comment, these changes were not included in a release.
-        # This patch can be removed in an upcomming release.
-        copy: ["config.patch /opt/config.patch"]
-      - type: apt
-        packages: 
-          - git
-      - type: docker
-        run: |
-          bash -c "pushd /snpEff && git apply /opt/config.patch && popd"
       - type: docker
         run: |
           version=$(snpEff -version) && \

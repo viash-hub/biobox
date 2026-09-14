@@ -1,4 +1,4 @@
-snpEff version SnpEff 5.2f (build 2025-02-07 08:36), by Pablo Cingolani
+snpEff version SnpEff 5.4c (build 2026-02-23 07:25), by Pablo Cingolani
 Usage: snpEff [ann] [options] genome_version [input_file]
 
 

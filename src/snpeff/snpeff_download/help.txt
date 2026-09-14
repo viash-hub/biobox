@@ -1,0 +1,25 @@
+```sh
+snpEff download -h
+```
+```
+snpEff version SnpEff 5.4c (build 2026-02-23 07:25), by Pablo Cingolani
+Usage: snpEff download [options] {snpeff | genome_version}
+```
+
+```sh
+snpEff -h
+```
+```
+Generic options:
+	-c , -config                 : Specify config file
+	-configOption name=value     : Override a config file option
+	-d , -debug                  : Debug mode (very verbose).
+	-dataDir <path>              : Override data_dir parameter from config file.
+	-download                    : Download a SnpEff database, if not available locally. Default: true
+	-nodownload                  : Do not download a SnpEff database, if not available locally.
+	-h , -help                   : Show this help and exit
+	-noLog                       : Do not report usage statistics to server
+	-q , -quiet                  : Quiet mode (do not show any messages or errors)
+	-v , -verbose                : Verbose mode
+	-version                     : Show version number and exit
+```
