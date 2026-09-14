@@ -20,7 +20,8 @@ set -eo pipefail
 
 # Resolve the index base name from the index directory. BWA-MEM2 takes a prefix
 # that its index files share, which is not itself a path that can be mounted or
-# staged, so the directory holding them is passed in instead.
+# staged, so the directory holding them is passed in instead. When that directory
+# holds more than one index, --index_prefix picks the base name to use.
 index_dir="${par_index%/}"
 
 if [[ ! -d "$index_dir" ]]; then
@@ -29,14 +30,18 @@ if [[ ! -d "$index_dir" ]]; then
     exit 1
 fi
 
-mapfile -d '' -t bwt_files < <(find -L "$index_dir" -maxdepth 1 -name '*.bwt.2bit.64' -type f -print0)
+# Searching for the base name the index files share doubles as the lookup for an
+# explicit --index_prefix: the prefix simply narrows the pattern to one name.
+index_name="${par_index_prefix:-*}"
+
+mapfile -d '' -t bwt_files < <(find -L "$index_dir" -maxdepth 1 -name "$index_name.bwt.2bit.64" -type f -print0)
 
 if [[ "${#bwt_files[@]}" -eq 0 ]]; then
-    echo "Error: No BWA-MEM2 index found in '$index_dir': expected a '.bwt.2bit.64' file." >&2
+    echo "Error: No BWA-MEM2 index found in '$index_dir': expected a '$index_name.bwt.2bit.64' file." >&2
     exit 1
 elif [[ "${#bwt_files[@]}" -gt 1 ]]; then
     echo "Error: Multiple BWA-MEM2 indices found in '$index_dir': ${bwt_files[*]}." >&2
-    echo "The index directory must contain exactly one index." >&2
+    echo "Use --index_prefix to select one of them by base name." >&2
     exit 1
 fi
 

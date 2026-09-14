@@ -152,4 +152,62 @@ check_file_contains "$meta_temp_dir/no_index.err" "No BWA index" "error message"
 
 log "✅ TEST 4 completed successfully"
 
+# --- Test Case 5: Selecting one index out of a directory holding several ---
+log "Starting TEST 5: BWA samse selecting an index with --index_prefix"
+
+mkdir -p "$test_data_dir/ambiguous_index"
+cp "$test_data_dir/index"/reference.* "$test_data_dir/ambiguous_index/"
+for ext in amb ann bwt pac sa; do
+  cp "$test_data_dir/index/reference.$ext" "$test_data_dir/ambiguous_index/second.$ext"
+done
+
+# Without a prefix this directory is ambiguous, so the base name has to say which
+# of the two indices to use.
+log "Executing $meta_name without --index_prefix..."
+if "$meta_executable" \
+  --index "$test_data_dir/ambiguous_index" \
+  --sai "$test_data_dir/reads.sai" \
+  --reads "$test_data_dir/reads.fastq" \
+  --output "$meta_temp_dir/should_not_exist2.sam" 2> "$meta_temp_dir/ambiguous.err"; then
+  log_error "Expected a non-zero exit code for an ambiguous index directory"
+  exit 1
+fi
+
+check_file_contains "$meta_temp_dir/ambiguous.err" "Multiple BWA indices" "error message"
+check_file_contains "$meta_temp_dir/ambiguous.err" "index_prefix" "error message"
+
+log "Executing $meta_name with --index_prefix..."
+"$meta_executable" \
+  --index "$test_data_dir/ambiguous_index" \
+  --index_prefix "second" \
+  --sai "$test_data_dir/reads.sai" \
+  --reads "$test_data_dir/reads.fastq" \
+  --output "$meta_temp_dir/index_prefix.sam"
+
+log "Validating TEST 5 outputs..."
+check_file_exists "$meta_temp_dir/index_prefix.sam" "selected-index SAM output"
+check_file_not_empty "$meta_temp_dir/index_prefix.sam" "selected-index SAM output"
+check_file_contains "$meta_temp_dir/index_prefix.sam" "@SQ" "selected-index SAM output"
+
+log "✅ TEST 5 completed successfully"
+
+# --- Test Case 6: An index prefix that is not present ---
+log "Starting TEST 6: BWA samse with an unknown index prefix"
+
+log "Executing $meta_name with an index prefix that is not present..."
+if "$meta_executable" \
+  --index "$test_data_dir/index" \
+  --index_prefix "not_an_index" \
+  --sai "$test_data_dir/reads.sai" \
+  --reads "$test_data_dir/reads.fastq" \
+  --output "$meta_temp_dir/should_not_exist3.sam" 2> "$meta_temp_dir/unknown_prefix.err"; then
+  log_error "Expected a non-zero exit code for an index prefix that is not present"
+  exit 1
+fi
+
+log "Validating TEST 6 outputs..."
+check_file_contains "$meta_temp_dir/unknown_prefix.err" "not_an_index" "error message"
+
+log "✅ TEST 6 completed successfully"
+
 print_test_summary "All tests completed successfully"

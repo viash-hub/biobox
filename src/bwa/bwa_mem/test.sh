@@ -208,6 +208,7 @@ fi
 
 log "Validating TEST 7 outputs..."
 check_file_contains "$meta_temp_dir/ambiguous.err" "Multiple BWA indices" "error message"
+check_file_contains "$meta_temp_dir/ambiguous.err" "index_prefix" "error message"
 
 log "✅ TEST 7 completed successfully"
 
@@ -249,5 +250,42 @@ check_file_not_empty "$meta_temp_dir/dangling.sam" "dangling-symlink SAM output"
 check_file_contains "$meta_temp_dir/dangling.sam" "@SQ" "dangling-symlink SAM output"
 
 log "✅ TEST 9 completed successfully"
+
+# --- Test Case 10: Selecting one index out of an ambiguous directory ---
+log "Starting TEST 10: BWA MEM selecting an index with --index_prefix"
+
+# The directory built for TEST 7 holds two indices, so it can only be used by
+# naming the base name of the one to align against.
+log "Executing $meta_name with --index_prefix..."
+"$meta_executable" \
+  --index "$test_data_dir/ambiguous_index" \
+  --index_prefix "second" \
+  --reads1 "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/index_prefix.sam"
+
+log "Validating TEST 10 outputs..."
+check_file_exists "$meta_temp_dir/index_prefix.sam" "selected-index SAM output"
+check_file_not_empty "$meta_temp_dir/index_prefix.sam" "selected-index SAM output"
+check_file_contains "$meta_temp_dir/index_prefix.sam" "@SQ" "selected-index SAM output"
+
+log "✅ TEST 10 completed successfully"
+
+# --- Test Case 11: An index prefix that is not present ---
+log "Starting TEST 11: BWA MEM with an unknown index prefix"
+
+log "Executing $meta_name with an index prefix that is not present..."
+if "$meta_executable" \
+  --index "$test_data_dir/index" \
+  --index_prefix "not_an_index" \
+  --reads1 "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/should_not_exist4.sam" 2> "$meta_temp_dir/unknown_prefix.err"; then
+  log_error "Expected a non-zero exit code for an index prefix that is not present"
+  exit 1
+fi
+
+log "Validating TEST 11 outputs..."
+check_file_contains "$meta_temp_dir/unknown_prefix.err" "not_an_index" "error message"
+
+log "✅ TEST 11 completed successfully"
 
 print_test_summary "All tests completed successfully"

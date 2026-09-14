@@ -20,11 +20,21 @@ argument_groups:
     type: file
     description: |
       Directory containing the BWA-MEM2 index files (`.0123`, `.amb`, `.ann`,
-      `.bwt.2bit.64` and `.pac`), as produced by `bwa_mem2_index`. The index
-      base name is derived from the contents of the directory, so the directory
-      must contain exactly one index.
+      `.bwt.2bit.64` and `.pac`), as produced by `bwa_mem2_index`. When the
+      directory holds a single index, its base name is derived from the contents
+      of the directory; when it holds more than one, use `--index_prefix` to
+      select one.
     required: true
     example: bwa_index/
+  - name: "--index_prefix"
+    type: string
+    description: |
+      Base name of the index to use from the `--index` directory, that is, the
+      name the index files share with their extensions (`.0123`, `.amb`, `.ann`,
+      `.bwt.2bit.64`, `.pac`) removed. Required when the directory contains more
+      than one index; when omitted, the single index present in the directory is
+      used.
+    example: genome
   - name: "--reads1"
     type: file
     description: Input FASTQ file with first reads in pair (R1) or single-end reads.

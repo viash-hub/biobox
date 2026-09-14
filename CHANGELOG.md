@@ -32,6 +32,7 @@
   stages just the named file, the index files were missing.
   `--index` now takes the directory holding the index files, matching the output of `bwa_index` and
   `bwa_mem2_index`, and the base name is derived from the directory contents.
+  A new `--index_prefix` argument selects the index to use by base name, for directories that hold more than one.
 
 * `snpeff_ann`: Fix and update arguments (PR #222):
   * Fix `--stats`/`-s`/`--htmlStats` to be `string` instead of `boolean_true` to prevent it swallowing the following argument when used.
