@@ -24,7 +24,7 @@ mkdir -p "$test_data_dir"
 # are unrelated to the reference, so nothing aligns.
 #
 # So build fixtures locally instead: one unique contig plus one contig
-# carrying a real tandem-repeat array, and reads sampled FROM that reference.
+# carrying real tandem-repeat arrays, and reads sampled FROM that reference.
 # awk with a fixed seed keeps this deterministic (no python3 in this container).
 ##############################################################
 
@@ -111,8 +111,22 @@ count_mapped() { awk '!/^@/ && $3 != "*"' "$1" | wc -l; }
 # Distinct reads that mapped. Repeat-array reads pick up supplementary
 # alignments, so record count exceeds read count - count QNAMEs instead.
 count_mapped_reads() { awk '!/^@/ && $3 != "*" { seen[$1] = 1 } END { print length(seen) }' "$1"; }
+# Records whose RNAME is a given contig. Grepping the file for the contig name
+# instead would match the @SQ header line and pass even with nothing aligned.
+count_on_contig() { awk -v c="$2" '!/^@/ && $3 == c' "$1" | wc -l; }
 
-log "Generating test reference (unique contig + 171bp tandem-repeat array)..."
+# Assert at least one alignment landed on a contig
+check_contig_aligned() {
+  local sam="$1" contig="$2" label="$3" n
+  n=$(count_on_contig "$sam" "$contig")
+  if [[ "$n" -lt 1 ]]; then
+    log_error "$label: no alignment records with RNAME $contig"
+    exit 1
+  fi
+  log "$label: $n records on $contig"
+}
+
+log "Generating test reference (unique contig + 20bp x600 and 31bp x250 tandem arrays)..."
 generate_reference "$test_data_dir/reference.fasta"
 check_file_exists "$test_data_dir/reference.fasta" "test reference genome"
 check_file_not_empty "$test_data_dir/reference.fasta" "test reference genome"
@@ -152,9 +166,10 @@ if [[ "$t1_mapped_reads" -lt "$n_reads" ]]; then
   log_error "Only $t1_mapped_reads of $n_reads reads mapped; all reads were sampled from the reference so all should map"
   exit 1
 fi
-# Both contigs should be represented among the targets
-check_file_contains "$meta_temp_dir/test1.sam" "chr_unique" "SAM output (unique contig alignments)"
-check_file_contains "$meta_temp_dir/test1.sam" "chr_repeat" "SAM output (repeat contig alignments)"
+# Both contigs must carry alignments, asserted on RNAME rather than on the
+# contig name appearing anywhere in the file (which the @SQ lines guarantee).
+check_contig_aligned "$meta_temp_dir/test1.sam" "chr_unique" "TEST 1"
+check_contig_aligned "$meta_temp_dir/test1.sam" "chr_repeat" "TEST 1"
 log "TEST 1 completed successfully"
 
 ##############################################################
@@ -166,7 +181,7 @@ meryl count k=15 output "$meryl_db" "$test_data_dir/reference.fasta"
 meryl print greater-than distinct=0.9998 "$meryl_db" > "$repetitive_kmers"
 
 check_file_exists "$repetitive_kmers" "meryl repetitive k-mers"
-# The tandem-repeat array must make this non-empty, otherwise the weighted
+# The tandem-repeat arrays must make this non-empty, otherwise the weighted
 # minimizer path is not being tested at all.
 check_file_not_empty "$repetitive_kmers" "meryl repetitive k-mers"
 log "TEST 2: meryl reported $(wc -l < "$repetitive_kmers") repetitive k-mers"
@@ -224,6 +239,35 @@ check_file_contains <(samtools view -H "$meta_temp_dir/test3.bam") "SO:coordinat
 log "TEST 3 completed successfully"
 
 ##############################################################
+log "Starting TEST 3b: --bam writes BAM even when --output ends in .sam"
+##############################################################
+# Regression guard: samtools sort infers its output format from the file
+# extension, so without an explicit -O bam this run wrote plain SAM and
+# samtools index then failed with "not a BGZF file". The Nextflow runner
+# derives the output name from the config `example:` (alignment.sam), so this
+# is the default path there, not an edge case.
+"$meta_executable" \
+  --reference "$test_data_dir/reference.fasta" \
+  --query "$test_data_dir/reads.fastq" \
+  --preset map-ont \
+  --bam \
+  --output "$meta_temp_dir/test3b.sam" \
+  --output_index "$meta_temp_dir/test3b.sam.bai"
+
+check_file_not_empty "$meta_temp_dir/test3b.sam" "BAM output (.sam extension)"
+check_file_not_empty "$meta_temp_dir/test3b.sam.bai" "BAM index (.sam extension)"
+if ! samtools quickcheck "$meta_temp_dir/test3b.sam"; then
+  log_error "--bam with a .sam output path did not produce a valid BAM"
+  exit 1
+fi
+# BGZF magic: a plain-text SAM starts with "@HD"/"@SQ" instead
+if [[ "$(head -c 2 "$meta_temp_dir/test3b.sam" | od -An -tx1 | tr -d ' ')" != "1f8b" ]]; then
+  log_error "Output is not BGZF-compressed; samtools sort fell back to SAM"
+  exit 1
+fi
+log "TEST 3b completed successfully"
+
+##############################################################
 log "Starting TEST 4: BAM index written to an explicit --output_index path"
 ##############################################################
 "$meta_executable" \
@@ -238,6 +282,28 @@ check_file_exists "$meta_temp_dir/test4.bam" "BAM output (explicit index path)"
 check_file_exists "$meta_temp_dir/test4_custom.bam.bai" "BAM index (explicit path)"
 check_file_not_empty "$meta_temp_dir/test4_custom.bam.bai" "BAM index (explicit path)"
 log "TEST 4 completed successfully"
+
+##############################################################
+log "Starting TEST 4b: --output_index without --bam is ignored, not an error"
+##############################################################
+# The Nextflow runner auto-fills every declared output argument, so
+# --output_index is always set there even in the default SAM mode. Rejecting
+# that combination made every default-mode Nextflow run fail. `must_exist: false`
+# on the argument is what keeps viash's own post-run output check quiet when no
+# index is produced.
+"$meta_executable" \
+  --reference "$test_data_dir/reference.fasta" \
+  --query "$test_data_dir/reads.fastq" \
+  --preset map-ont \
+  --output "$meta_temp_dir/test4b.sam" \
+  --output_index "$meta_temp_dir/test4b.sam.bai"
+
+check_file_not_empty "$meta_temp_dir/test4b.sam" "SAM output (--output_index given without --bam)"
+if [[ "$(count_mapped_reads "$meta_temp_dir/test4b.sam")" -lt 1 ]]; then
+  log_error "SAM run with --output_index mapped no reads"
+  exit 1
+fi
+log "TEST 4b completed successfully"
 
 ##############################################################
 log "Starting TEST 5: custom meryl k-mer size"
@@ -306,6 +372,21 @@ fi
 log "TEST 5c completed successfully (k mismatch rejected)"
 
 ##############################################################
+log "Starting TEST 5d: --kmer_size above winnowmap's ceiling is rejected by the config"
+##############################################################
+# max: 28 in the config turns this into an argument-parsing failure, instead of
+# a full meryl count over the reference followed by a winnowmap abort.
+if "$meta_executable" \
+     --reference "$test_data_dir/reference.fasta" \
+     --query "$test_data_dir/reads.fastq" \
+     --kmer_size 30 \
+     --output "$meta_temp_dir/test5d.sam" > /dev/null 2>&1; then
+  log_error "--kmer_size 30 was accepted; winnowmap allows at most 28"
+  exit 1
+fi
+log "TEST 5d completed successfully (out-of-range kmer_size rejected)"
+
+##############################################################
 log "Starting TEST 6: gzip-compressed FASTQ query"
 ##############################################################
 gzip -c "$test_data_dir/reads.fastq" > "$test_data_dir/reads.fastq.gz"
@@ -359,16 +440,54 @@ fi
 log "TEST 8 completed successfully"
 
 ##############################################################
-log "Starting TEST 9: default preset (no --preset given)"
+log "Starting TEST 8b: asm5 preset, whose own k must not override --kmer_size"
 ##############################################################
+# asm5/asm10/asm20 set k=19 themselves, so they are the presets that can
+# desynchronise winnowmap's k from the k the -W list was built with
+# ("input list of k-mers and winnowmap parameter k are inconsistent"). No asm
+# preset was covered before. Verified with winnowmap 2.03: an explicit -k wins
+# over the preset regardless of where -x sits on the command line.
+"$meta_executable" \
+  --reference "$test_data_dir/reference.fasta" \
+  --query "$test_data_dir/reads.fasta" \
+  --preset asm5 \
+  --output "$meta_temp_dir/test8b.sam"
+
+check_file_not_empty "$meta_temp_dir/test8b.sam" "SAM output (asm5)"
+if [[ "$(count_mapped "$meta_temp_dir/test8b.sam")" -lt 1 ]]; then
+  log_error "asm5 preset produced no mapped reads"
+  exit 1
+fi
+
+# And the same preset with an explicit k: the user's value must win, both for
+# meryl and for winnowmap.
+"$meta_executable" \
+  --reference "$test_data_dir/reference.fasta" \
+  --query "$test_data_dir/reads.fasta" \
+  --preset asm5 \
+  --kmer_size 19 \
+  --output "$meta_temp_dir/test8c.sam"
+
+check_file_not_empty "$meta_temp_dir/test8c.sam" "SAM output (asm5, kmer_size 19)"
+if [[ "$(count_mapped "$meta_temp_dir/test8c.sam")" -lt 1 ]]; then
+  log_error "asm5 preset with --kmer_size 19 produced no mapped reads"
+  exit 1
+fi
+log "TEST 8b completed successfully"
+
+##############################################################
+log "Starting TEST 9: no preset at all (winnowmap defaults)"
+##############################################################
+# --preset has no default, matching winnowmap's own `-x STR ... []`, so this
+# exercises the no -x code path rather than repeating TEST 1.
 "$meta_executable" \
   --reference "$test_data_dir/reference.fasta" \
   --query "$test_data_dir/reads.fastq" \
   --output "$meta_temp_dir/test9.sam"
 
-check_file_exists "$meta_temp_dir/test9.sam" "SAM output (default preset)"
+check_file_exists "$meta_temp_dir/test9.sam" "SAM output (no preset)"
 if [[ "$(count_mapped "$meta_temp_dir/test9.sam")" -lt 1 ]]; then
-  log_error "default preset produced no mapped reads"
+  log_error "run without a preset produced no mapped reads"
   exit 1
 fi
 log "TEST 9 completed successfully"
@@ -376,7 +495,8 @@ log "TEST 9 completed successfully"
 ##############################################################
 log "Starting TEST 10: an unsupported preset must fail loudly"
 ##############################################################
-# Guard with "if !" because setup_test_env enabled `set -e`.
+# `choices:` in the config rejects this during argument parsing, before the
+# meryl count step; guard with "if !" because setup_test_env enabled `set -e`.
 if "$meta_executable" \
      --reference "$test_data_dir/reference.fasta" \
      --query "$test_data_dir/reads.fastq" \
@@ -386,5 +506,108 @@ if "$meta_executable" \
   exit 1
 fi
 log "TEST 10 completed successfully (invalid preset rejected)"
+
+##############################################################
+log "Starting TEST 11: pass-through of the wider winnowmap option surface"
+##############################################################
+"$meta_executable" \
+  --reference "$test_data_dir/reference.fasta" \
+  --query "$test_data_dir/reads.fastq" \
+  --preset map-ont \
+  --read_group '@RG\tID:rg1\tSM:sample1' \
+  --md_tag \
+  --eqx \
+  --cigar_bam \
+  --soft_clipping \
+  --window_size 30 \
+  --secondary_ratio 0.5 \
+  --min_chaining_score 30 \
+  --output "$meta_temp_dir/test11.sam"
+
+check_file_not_empty "$meta_temp_dir/test11.sam" "SAM output (extra options)"
+# -R lands in the header, and every record must carry the RG tag
+check_file_contains "$meta_temp_dir/test11.sam" "@RG" "SAM header (read group)"
+check_file_contains "$meta_temp_dir/test11.sam" "SM:sample1" "SAM header (read group sample)"
+if [[ "$(awk '!/^@/ && /RG:Z:rg1/' "$meta_temp_dir/test11.sam" | wc -l)" -lt 1 ]]; then
+  log_error "--read_group did not tag any alignment records"
+  exit 1
+fi
+# --MD adds MD:Z:, --eqx replaces M operators with =/X in the CIGAR
+if [[ "$(awk '!/^@/ && /MD:Z:/' "$meta_temp_dir/test11.sam" | wc -l)" -lt 1 ]]; then
+  log_error "--md_tag produced no MD tags"
+  exit 1
+fi
+if [[ "$(awk '!/^@/ && $6 ~ /=/' "$meta_temp_dir/test11.sam" | wc -l)" -lt 1 ]]; then
+  log_error "--eqx produced no =/X CIGAR operators"
+  exit 1
+fi
+log "TEST 11 completed successfully"
+
+##############################################################
+log "Starting TEST 11b: --cs_tag"
+##############################################################
+"$meta_executable" \
+  --reference "$test_data_dir/reference.fasta" \
+  --query "$test_data_dir/reads.fastq" \
+  --preset map-ont \
+  --cs_tag short \
+  --output "$meta_temp_dir/test11b.sam"
+
+if [[ "$(awk '!/^@/ && /cs:Z:/' "$meta_temp_dir/test11b.sam" | wc -l)" -lt 1 ]]; then
+  log_error "--cs_tag short produced no cs tags"
+  exit 1
+fi
+log "TEST 11b completed successfully"
+
+##############################################################
+log "Starting TEST 12: two concurrent runs sharing one temp root"
+##############################################################
+# The meryl database and k-mer list are built under meta_temp_dir, which is a
+# shared root (VIASH_TEMP, /tmp inside the container) rather than a
+# per-invocation directory - the -W paths in the logs above show it. With fixed
+# names there, parallel runs on the same host write the same merylDB and the
+# same k-mer list: one run reads what the other is still writing, giving
+# silently wrong weighting or a mid-run abort.
+#
+# The two runs below use different k so their meryl databases genuinely differ;
+# running them with the same reference and k would collide on byte-identical
+# content and prove nothing.
+"$meta_executable" \
+  --reference "$test_data_dir/reference.fasta" \
+  --query "$test_data_dir/reads.fastq" \
+  --preset map-ont \
+  --kmer_size 15 \
+  --output "$meta_temp_dir/test12a.sam" > "$meta_temp_dir/test12a.log" 2>&1 &
+pid_a=$!
+"$meta_executable" \
+  --reference "$test_data_dir/reference.fasta" \
+  --query "$test_data_dir/reads.fastq" \
+  --preset map-ont \
+  --kmer_size 19 \
+  --output "$meta_temp_dir/test12b.sam" > "$meta_temp_dir/test12b.log" 2>&1 &
+pid_b=$!
+
+status=0
+wait "$pid_a" || status=1
+wait "$pid_b" || status=1
+if [[ "$status" -ne 0 ]]; then
+  log_error "Concurrent runs failed; the meryl scratch files are colliding"
+  cat "$meta_temp_dir/test12a.log" "$meta_temp_dir/test12b.log"
+  exit 1
+fi
+
+# Each must reproduce exactly what the same arguments produced sequentially
+for pair in "test12a:test1" "test12b:test5"; do
+  conc="${pair%%:*}"
+  seq="${pair##*:}"
+  awk '!/^@/ {print $1, $2, $3, $4, $5, $6}' "$meta_temp_dir/$conc.sam" | sort > "$meta_temp_dir/$conc.key"
+  awk '!/^@/ {print $1, $2, $3, $4, $5, $6}' "$meta_temp_dir/$seq.sam" | sort > "$meta_temp_dir/$seq.key"
+  if ! diff -q "$meta_temp_dir/$conc.key" "$meta_temp_dir/$seq.key" > /dev/null; then
+    log_error "Concurrent run $conc differs from the sequential run $seq"
+    diff "$meta_temp_dir/$seq.key" "$meta_temp_dir/$conc.key" | head -10
+    exit 1
+  fi
+done
+log "TEST 12 completed successfully"
 
 print_test_summary "All tests completed successfully"
