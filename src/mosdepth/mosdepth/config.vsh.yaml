@@ -179,8 +179,7 @@ argument_groups:
         type: integer
         description: |
           Number of decimal places to report in `--output_global_dist`/
-          `--output_region_dist`.
-        default: 2
+          `--output_region_dist`. Default: 2.
 
   - name: "Read Filtering"
     arguments:
@@ -188,33 +187,31 @@ argument_groups:
         alternatives: [-Q]
         type: integer
         description: |
-          Mapping quality threshold. Reads with a lower quality are ignored.
-        default: 0
+          Mapping quality threshold. Reads with a lower quality are
+          ignored. Default: 0.
       - name: "--flag"
         alternatives: [-F]
         type: integer
-        description: Exclude reads with any of these SAM flag bits set.
-        default: 1796
+        description: |
+          Exclude reads with any of these SAM flag bits set. Default: 1796.
       - name: "--include_flag"
         alternatives: [-i]
         type: integer
         description: |
-          Only include reads with any of these SAM flag bits set (0 is unset).
-        default: 0
+          Only include reads with any of these SAM flag bits set (0 is
+          unset). Default: 0.
       - name: "--min_frag_len"
         alternatives: [-l]
         type: integer
         description: |
           Minimum insert size. Reads with a smaller insert size are ignored
-          (-1 is unset).
-        default: -1
+          (-1 is unset). Default: -1.
       - name: "--max_frag_len"
         alternatives: [-u]
         type: integer
         description: |
           Maximum insert size. Reads with a larger insert size are ignored
-          (-1 is unset).
-        default: -1
+          (-1 is unset). Default: -1.
       - name: "--chrom"
         alternatives: [-c]
         type: string
