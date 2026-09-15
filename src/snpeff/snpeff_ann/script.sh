@@ -54,6 +54,9 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
+# snpEff's own default HTML summary filename, used below to locate the file
+# for relocation when --stats is not explicitly set.
+par_stats="${par_stats:-snpEff_summary.html}"
 
 # Run SnpEff
 snpEff ann \
