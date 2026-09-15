@@ -173,4 +173,45 @@ log "Test 5 succeeded."
 
 ###########################################################################
 
+# Test 6: --summary/--genes cannot be used together with --no_stats, since
+# --no_stats skips the stats step that would produce the files they relocate.
+
+log "> Run Test 6: --no_stats with --summary/--genes should fail"
+mkdir test6
+pushd test6 > /dev/null
+
+if "$meta_executable" \
+  --genome_version test \
+  --input "$meta_resources_dir/test_data/test.vcf" \
+  --output output.vcf \
+  --data_dir "$DATA_DIR" \
+  --config_option "test.genome=GRCh38Chr1" \
+  --no_stats \
+  --summary summary.html 2>/dev/null; then
+  log_error "Component should have failed when --summary is combined with --no_stats"
+  exit 1
+else
+  log "✓ Component properly failed when --summary is combined with --no_stats"
+fi
+
+if "$meta_executable" \
+  --genome_version test \
+  --input "$meta_resources_dir/test_data/test.vcf" \
+  --output output.vcf \
+  --data_dir "$DATA_DIR" \
+  --config_option "test.genome=GRCh38Chr1" \
+  --no_stats \
+  --genes genes.txt 2>/dev/null; then
+  log_error "Component should have failed when --genes is combined with --no_stats"
+  exit 1
+else
+  log "✓ Component properly failed when --genes is combined with --no_stats"
+fi
+
+popd > /dev/null
+
+log "Test 6 succeeded."
+
+###########################################################################
+
 print_test_summary "snpeff_ann"
