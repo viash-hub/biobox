@@ -1,0 +1,127 @@
+name: tabix_query
+namespace: tabix
+description: |
+  Query a tabix/CSI-indexed, BGZF block-compressed file by region or list its
+  chromosomes.
+keywords: [query, tabix, htslib, vcf, bed, gff]
+links:
+  homepage: https://www.htslib.org/
+  documentation: https://www.htslib.org/doc/tabix.html
+  repository: https://github.com/samtools/htslib
+license: MIT/Expat
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+requirements:
+  commands: [tabix]
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --input
+        type: file
+        description: BGZF block-compressed file to query.
+        required: true
+        must_exist: true
+        example: variants.vcf.gz
+      - name: --index
+        type: file
+        description: |
+          Index for `--input` (`.tbi`, `.csi`, `.bai`, or `.crai`), as
+          produced by `tabix`.
+        required: true
+        must_exist: true
+        example: variants.vcf.gz.tbi
+      - name: --region
+        type: string
+        multiple: true
+        description: |
+          One or more regions to query, e.g. `chr1:1000-2000`.
+        required: false
+      - name: --regions_file
+        type: file
+        description: |
+          BED or tab-delimited file listing regions to restrict output to
+          (index-jumps to each region).
+        required: false
+        must_exist: true
+      - name: --targets_file
+        type: file
+        description: |
+          Like `--regions_file`, but streams through the input rather than
+          index-jumping to each region.
+        required: false
+        must_exist: true
+
+  - name: Outputs
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        description: |
+          List of chromosome names in the file if `--list_chroms` is set,
+          otherwise lines matching the query regions.
+        required: true
+        example: output.txt
+
+  - name: Options
+    arguments:
+      - name: --print_header
+        type: boolean_true
+        description: Also print the header lines in output.
+      - name: --only_header
+        alternatives: [-H]
+        type: boolean_true
+        description: |
+          Print only the header lines.
+      - name: --list_chroms
+        alternatives: [-l]
+        type: boolean_true
+        description: |
+          List chromosome names from the index. If this is set, the output is a
+          list of chromosome names rather than lines matching the query regions.
+      - name: --unique
+        alternatives: [-u]
+        type: boolean_true
+        description: |
+          Only output each region once, even if overlapping. Cannot be
+          combined with `--separate_regions`.
+      - name: --separate_regions
+        type: boolean_true
+        description: |
+          Separate the output by corresponding region. Cannot be combined
+          with `--unique`.
+      - name: --cache
+        type: integer
+        description: BGZF block cache size in megabytes (`0` disables it).
+        default: 10
+      - name: --verbosity
+        type: integer
+        description: Logging verbosity.
+        default: 3
+      - name: --skip_index_download
+        alternatives: [-D]
+        type: boolean_true
+        description: Do not download the index file for remote inputs.
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/htslib:1.24--ha79157c_0
+    setup:
+      - type: docker
+        run: |
+          tabix --version 2>&1 | head -1 | sed 's/tabix (htslib) /tabix: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
