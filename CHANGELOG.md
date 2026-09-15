@@ -23,6 +23,7 @@
 
 ## BUG FIXES
 
+<<<<<<< HEAD
 * `bowtie2`: Fix `--index` of `bowtie2/bowtie2_align` and `bowtie2/bowtie2_inspect` (PR #233):
   * `--index` was a `string` holding the index filename prefix, so the index files were not mounted or staged when running with Docker or Nextflow.
     It is now a `file` pointing to the directory containing the index files (as produced by `bowtie2/bowtie2_build`), and the prefix is derived from the directory contents.
@@ -30,6 +31,17 @@
     so passing it first made it always pick the small one and fail on a large (`.bt2l`) index.
   * `bowtie2_inspect`: setting `--large_index` now restricts the lookup to a large index and fails if the index directory does not contain one, instead of silently inspecting a small index.
   * A new `--index_prefix` argument selects the index to use by prefix, for directories that hold more than one.
+
+* Fix `--index` in `bwa_aln`, `bwa_mem`, `bwa_sampe`, `bwa_samse` and `bwa_mem2_mem` (PR #233).
+  The argument was documented as the index base name, but a base name is a shared prefix of the index files
+  rather than a path, so there was no value that worked: passing the prefix was rejected because no such file
+  exists, and passing one of the index files left the aligner unable to locate the others.
+  Pointing it at the reference FASTA only appeared to work with the executable runner, which mounts the parent
+  directory of an input file and so happened to bring the sibling index files along; under Nextflow, which
+  stages just the named file, the index files were missing.
+  `--index` now takes the directory holding the index files, matching the output of `bwa_index` and
+  `bwa_mem2_index`, and the base name is derived from the directory contents.
+  A new `--index_prefix` argument selects the index to use by base name, for directories that hold more than one.
 
 * `snpeff_ann`: Fix and update arguments (PR #222):
   * Fix `--stats`/`-s`/`--htmlStats` to be `string` instead of `boolean_true` to prevent it swallowing the following argument when used.
