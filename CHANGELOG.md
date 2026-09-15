@@ -29,6 +29,7 @@
   * `bowtie2_inspect`: pass the index as the last argument, as documented. The `bowtie2-inspect` wrapper reads the index basename from the final argument to decide whether to run the small or the large binary,
     so passing it first made it always pick the small one and fail on a large (`.bt2l`) index.
   * `bowtie2_inspect`: setting `--large_index` now restricts the lookup to a large index and fails if the index directory does not contain one, instead of silently inspecting a small index.
+  * A new `--index_prefix` argument selects the index to use by prefix, for directories that hold more than one.
 
 * `snpeff_ann`: Fix and update arguments (PR #222):
   * Fix `--stats`/`-s`/`--htmlStats` to be `string` instead of `boolean_true` to prevent it swallowing the following argument when used.

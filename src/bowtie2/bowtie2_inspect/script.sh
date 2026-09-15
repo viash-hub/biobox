@@ -28,30 +28,35 @@ if [[ -z "$par_large_index" ]]; then
   index_suffixes+=(bt2)
 fi
 
+# Searching for the prefix the index files share doubles as the lookup for an
+# explicit --index_prefix: the prefix simply narrows the pattern to one name.
+index_name="${par_index_prefix:-*}"
+
 index_files=()
 for index_suffix in "${index_suffixes[@]}"; do
   # -L follows symlinks, as a workflow engine may stage the index files as such.
   # The .rev.1 files are excluded, as they belong to the same index.
   mapfile -d '' -t index_files < <(
     find -L "$index_dir" -maxdepth 1 -type f \
-      -name "*.1.$index_suffix" ! -name "*.rev.1.$index_suffix" -print0
+      -name "$index_name.1.$index_suffix" ! -name "*.rev.1.$index_suffix" -print0
   )
   [[ "${#index_files[@]}" -gt 0 ]] && break
 done
 
 if [[ "${#index_files[@]}" -eq 0 ]]; then
   if [[ -n "$par_large_index" ]]; then
-    echo "Error: no large bowtie2 index files (.bt2l) found in '$par_index'." \
-      "Omit --large_index to inspect a small (.bt2) index." >&2
+    echo "Error: no large bowtie2 index files ($index_name.1.bt2l) found in" \
+      "'$par_index'. Omit --large_index to inspect a small (.bt2) index." >&2
   else
-    echo "Error: no bowtie2 index files (.bt2 or .bt2l) found in '$par_index'" >&2
+    echo "Error: no bowtie2 index files ($index_name.1.bt2 or $index_name.1.bt2l)" \
+      "found in '$par_index'" >&2
   fi
   exit 1
 fi
 
 if [[ "${#index_files[@]}" -gt 1 ]]; then
   echo "Error: multiple bowtie2 indices found in '$par_index': ${index_files[*]##*/}." \
-    "The index directory must contain exactly one index." >&2
+    "Use --index_prefix to select one of them by prefix." >&2
   exit 1
 fi
 

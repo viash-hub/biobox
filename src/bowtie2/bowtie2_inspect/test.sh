@@ -223,6 +223,7 @@ fi
 
 log "Validating TEST 8 outputs..."
 check_file_contains "$meta_temp_dir/multi_index.log" "multiple bowtie2 indices" "error message about multiple indices"
+check_file_contains "$meta_temp_dir/multi_index.log" "index_prefix" "error message pointing at --index_prefix"
 
 log "✅ TEST 8 completed successfully"
 
@@ -279,5 +280,63 @@ check_file_contains "$meta_temp_dir/forced_large_missing.log" "no large bowtie2 
   "error message about missing large index files"
 
 log "✅ TEST 11 completed successfully"
+
+# --- Test Case 12: Selecting one index out of a directory holding several ---
+log "Starting TEST 12: Selecting an index with --index_prefix"
+
+# The directory built for TEST 8 holds the 'test_ref' and 'other' indices, so the
+# prefix is what decides which of the two is inspected.
+log "Executing $meta_name with --index_prefix on an ambiguous index directory..."
+"$meta_executable" \
+  --index "$test_data_dir/multi_index" \
+  --index_prefix "other" \
+  --names \
+  --output "$meta_temp_dir/index_prefix_names.txt"
+
+log "Validating TEST 12 outputs..."
+check_file_exists "$meta_temp_dir/index_prefix_names.txt" "selected-index names output"
+check_file_not_empty "$meta_temp_dir/index_prefix_names.txt" "selected-index names output"
+check_file_contains "$meta_temp_dir/index_prefix_names.txt" "seq" "selected-index names output"
+
+log "✅ TEST 12 completed successfully"
+
+# --- Test Case 13: An index prefix that is not present ---
+log "Starting TEST 13: Index prefix that is not present"
+
+log "Executing $meta_name with an index prefix that is not present..."
+if "$meta_executable" \
+  --index "$test_data_dir/index" \
+  --index_prefix "not_an_index" \
+  --names \
+  --output "$meta_temp_dir/unknown_prefix.txt" 2> "$meta_temp_dir/unknown_prefix.log"; then
+  log_error "Expected failure when the index prefix is not present in the index directory"
+  exit 1
+fi
+
+log "Validating TEST 13 outputs..."
+check_file_contains "$meta_temp_dir/unknown_prefix.log" "not_an_index" "error message naming the index prefix"
+
+log "✅ TEST 13 completed successfully"
+
+# --- Test Case 14: --index_prefix combined with --large_index ---
+log "Starting TEST 14: --index_prefix combined with --large_index"
+
+log "Building a second large index next to the first one..."
+bowtie2-build --large-index "$test_data_dir/test_ref.fasta" "$test_data_dir/large_index/other" >/dev/null 2>&1
+check_file_exists "$test_data_dir/large_index/other.1.bt2l" "second large bowtie2 index file"
+
+log "Executing $meta_name with --large_index and --index_prefix..."
+"$meta_executable" \
+  --index "$test_data_dir/large_index" \
+  --large_index \
+  --index_prefix "other" \
+  --names \
+  --output "$meta_temp_dir/large_index_prefix_names.txt"
+
+log "Validating TEST 14 outputs..."
+check_file_exists "$meta_temp_dir/large_index_prefix_names.txt" "selected large index names output"
+check_file_contains "$meta_temp_dir/large_index_prefix_names.txt" "seq" "selected large index names output"
+
+log "✅ TEST 14 completed successfully"
 
 print_test_summary "All tests completed successfully"

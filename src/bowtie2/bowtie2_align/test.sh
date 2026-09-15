@@ -198,6 +198,7 @@ fi
 
 log "Validating TEST 7 outputs..."
 check_file_contains "$meta_temp_dir/multi_index.log" "multiple bowtie2 indices" "error message about multiple indices"
+check_file_contains "$meta_temp_dir/multi_index.log" "index_prefix" "error message pointing at --index_prefix"
 
 log "✅ TEST 7 completed successfully"
 
@@ -219,5 +220,48 @@ check_file_exists "$meta_temp_dir/symlink_index.sam" "symlinked index SAM output
 check_file_not_empty "$meta_temp_dir/symlink_index.sam" "symlinked index SAM output"
 
 log "✅ TEST 8 completed successfully"
+
+# --- Test Case 9: Selecting one index out of a directory holding several ---
+log "Starting TEST 9: Selecting an index with --index_prefix"
+
+# The directory built for TEST 7 holds the 'genome' and 'other' indices, so the
+# prefix is what decides which of the two the reads are aligned against.
+log "Executing $meta_name with --index_prefix on an ambiguous index directory..."
+"$meta_executable" \
+  --index "$test_data_dir/multi_index" \
+  --index_prefix "other" \
+  --unpaired "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/index_prefix.sam"
+
+log "Validating TEST 9 outputs..."
+check_file_exists "$meta_temp_dir/index_prefix.sam" "selected-index SAM output"
+check_file_not_empty "$meta_temp_dir/index_prefix.sam" "selected-index SAM output"
+
+if head -5 "$meta_temp_dir/index_prefix.sam" | grep -q "^@"; then
+  log "✓ SAM file contains proper headers"
+else
+  log_error "SAM file does not contain proper headers"
+  exit 1
+fi
+
+log "✅ TEST 9 completed successfully"
+
+# --- Test Case 10: An index prefix that is not present ---
+log "Starting TEST 10: Index prefix that is not present"
+
+log "Executing $meta_name with an index prefix that is not present..."
+if "$meta_executable" \
+  --index "$test_data_dir/index" \
+  --index_prefix "not_an_index" \
+  --unpaired "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/unknown_prefix.sam" 2> "$meta_temp_dir/unknown_prefix.log"; then
+  log_error "Expected failure when the index prefix is not present in the index directory"
+  exit 1
+fi
+
+log "Validating TEST 10 outputs..."
+check_file_contains "$meta_temp_dir/unknown_prefix.log" "not_an_index" "error message naming the index prefix"
+
+log "✅ TEST 10 completed successfully"
 
 print_test_summary "All tests completed successfully"
