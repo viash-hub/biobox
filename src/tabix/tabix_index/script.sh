@@ -29,7 +29,7 @@ cmd_args=(
   ${par_zero_based:+--zero-based}
   ${par_force:+--force}
   ${par_csi:+--csi}
-  ${par_csi:+--min-shift "$par_min_shift"}
+  ${par_csi:+${par_min_shift:+--min-shift "$par_min_shift"}}
   ${meta_cpus:+--threads "$meta_cpus"}
   "$staged_input"
 )
