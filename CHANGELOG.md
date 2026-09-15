@@ -23,6 +23,15 @@
 
 ## BUG FIXES
 
+<<<<<<< HEAD
+* `bowtie2`: Fix `--index` of `bowtie2/bowtie2_align` and `bowtie2/bowtie2_inspect` (PR #233):
+  * `--index` was a `string` holding the index filename prefix, so the index files were not mounted or staged when running with Docker or Nextflow.
+    It is now a `file` pointing to the directory containing the index files (as produced by `bowtie2/bowtie2_build`), and the prefix is derived from the directory contents.
+  * `bowtie2_inspect`: pass the index as the last argument, as documented. The `bowtie2-inspect` wrapper reads the index basename from the final argument to decide whether to run the small or the large binary,
+    so passing it first made it always pick the small one and fail on a large (`.bt2l`) index.
+  * `bowtie2_inspect`: setting `--large_index` now restricts the lookup to a large index and fails if the index directory does not contain one, instead of silently inspecting a small index.
+  * A new `--index_prefix` argument selects the index to use by prefix, for directories that hold more than one.
+
 * Fix `--index` in `bwa_aln`, `bwa_mem`, `bwa_sampe`, `bwa_samse` and `bwa_mem2_mem` (PR #233).
   The argument was documented as the index base name, but a base name is a shared prefix of the index files
   rather than a path, so there was no value that worked: passing the prefix was rejected because no such file
