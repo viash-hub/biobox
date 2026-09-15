@@ -61,8 +61,7 @@ argument_groups:
     type: integer
     description: |
       In the default adaptive mode, reads shorter than this length are
-      treated as short reads. Default is 325.
-    default: 325
+      treated as short reads. Default: 325.
   - name: "--read_group"
     alternatives: [-R]
     type: string
@@ -90,43 +89,45 @@ argument_groups:
   - name: "--min_seed_length"
     alternatives: [-k]
     type: integer
-    description: Minimum seed length.
-    default: 19
+    description: |
+      Minimum seed length. Default: 19.
   - name: "--max_seed_occurrences"
     alternatives: [-c]
     type: integer
-    description: Maximum seed occurrences.
-    default: 250
+    description: |
+      Maximum seed occurrences. Default: 250.
   - name: "--max_gap_size"
     alternatives: [-g]
     type: integer
-    description: Maximum gap size, controlling extension and chain breaking.
-    default: 100
+    description: |
+      Maximum gap size, controlling extension and chain breaking.
+      Default: 100.
   - name: "--bandwidth"
     alternatives: [-w]
     type: integer
-    description: Bandwidth.
-    default: 100
+    description: |
+      Bandwidth. Default: 100.
   - name: "--long_bandwidth"
     alternatives: [-W]
     type: integer
-    description: Long bandwidth, used for long reads or the adaptive mode.
-    default: 20000
+    description: |
+      Long bandwidth, used for long reads or the adaptive mode.
+      Default: 20000.
   - name: "--min_chaining_score"
     alternatives: [-m]
     type: integer
-    description: Minimum chaining score.
-    default: 25
+    description: |
+      Minimum chaining score. Default: 25.
   - name: "--secondary_ratio"
     alternatives: [-p]
     type: double
-    description: Minimum secondary-to-primary score ratio.
-    default: 0.5
+    description: |
+      Minimum secondary-to-primary score ratio. Default: 0.5.
   - name: "--max_secondary"
     alternatives: [-N]
     type: integer
-    description: Retain at most this many secondary alignments.
-    default: 50
+    description: |
+      Retain at most this many secondary alignments. Default: 50.
   - name: "--chain_only"
     type: boolean_true
     description: Perform chaining only, without base alignment.
@@ -134,38 +135,38 @@ argument_groups:
     alternatives: [-x]
     type: string
     description: |
-      Preset mode. Default is `adap`, which adaptively chooses parameters
-      based on read length.
+      Preset mode, which adaptively chooses parameters based on read
+      length. Default: 'adap'.
     choices: [sr, lr, adap]
-    default: adap
 
 - name: "Alignment Options"
   arguments:
   - name: "--match_score"
     alternatives: [-A]
     type: integer
-    description: Matching score.
-    default: 2
+    description: |
+      Matching score. Default: 2.
   - name: "--mismatch_penalty"
     alternatives: [-B]
     type: integer
-    description: Mismatch penalty.
-    default: 8
+    description: |
+      Mismatch penalty. Default: 8.
   - name: "--gap_open_penalty"
     alternatives: [-O]
     type: string
-    description: Gap open penalty for deletions and insertions. 
-    default: "12,23"
+    description: |
+      Gap open penalty for deletions and insertions. Default: '12,23'.
   - name: "--gap_extend_penalty"
     alternatives: [-E]
     type: string
-    description: Gap extension penalty.
-    default: "2,1"
+    description: |
+      Gap extension penalty. Default: '2,1'.
   - name: "--min_score"
     alternatives: [-s]
     type: integer
-    description: Suppress alignments with a DP score lower than `INT * match_score`.
-    default: 30
+    description: |
+      Suppress alignments with a DP score lower than `INT * match_score`.
+      Default: 30.
 
 - name: "Paired-end Options"
   arguments:
@@ -177,8 +178,7 @@ argument_groups:
     type: integer
     description: |
       Perform mate rescue for up to this many candidates. Set to 0 to skip
-      rescue.
-    default: 10
+      rescue. Default: 10.
 
 - name: "Input/Output Options"
   arguments:
@@ -189,15 +189,14 @@ argument_groups:
   - name: "--secondary_output_limit"
     alternatives: [--outn]
     type: integer
-    description: Output up to this many secondary alignments.
-    default: 0
+    description: |
+      Output up to this many secondary alignments. Default: 0.
   - name: "--xa_max_hits"
     alternatives: [--xa]
     type: integer
     description: |
       If there are at most this many hits with a score above 80% of the best
-      hit, output them all in the XA tag.
-    default: 5
+      hit, output them all in the XA tag. Default: 5.
   - name: "--copy_comments"
     alternatives: [-y]
     type: boolean_true
@@ -221,8 +220,8 @@ argument_groups:
   - name: "--batch_size"
     alternatives: [-K]
     type: string
-    description: Process NUM1-NUM2 bp of query sequences in a batch.
-    default: "100m,1g"
+    description: |
+      Process NUM1-NUM2 bp of query sequences in a batch. Default: '100m,1g'.
 
 resources:
   - type: bash_script
