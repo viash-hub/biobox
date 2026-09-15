@@ -62,7 +62,7 @@ cmd = [
     "--input", par["input"],
     "--output", par["output"],
 ]
-if par.get("verbose"):
+if par["verbose"]:
     cmd.append("--verbose")
 if meta.get("cpus"):
     cmd += ["--threads", str(meta["cpus"])]
@@ -107,15 +107,15 @@ In Python components, arguments are delivered as a `par` dict rather than enviro
 cmd = ["tool", "--input", par["input"]]
 
 # Optional argument
-if par.get("reference") is not None:
+if par["reference"] is not None:
     cmd += ["--reference", par["reference"]]
 
 # Boolean flag (presence toggle — boolean_true / boolean_false in the config)
-if par.get("verbose"):
+if par["verbose"]:
     cmd.append("--verbose")
 
 # Bare boolean (value forwarded — user passed --verbose=true/false)
-if par.get("verbose") is not None:
+if par["verbose"] is not None:
     cmd += ["--verbose", str(par["verbose"]).lower()]
 
 # multiple: true — already a list
@@ -127,7 +127,36 @@ Note the boolean split mirrors the three Viash types (`boolean_true`, `boolean_f
 
 ## Calling External Tools
 
-Always `subprocess.run(cmd, check=True)` with `cmd` as a list:
+Preferably output from an external tool should be displayed on the fly (while the process is running; especially for long running processes) and optionally written to a log file. For this, `subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, text=True)` can be used, with `cmd` being a list.
+
+Example using an extra `log` argument that outputs a log file (when the output from the tool is a directory, the log file can also just be written in output directory).
+```python
+with (
+    Path(par["log"]).open("w", buffering=1) as open_log,
+    subprocess.Popen(
+        cmd,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        bufsize=1,
+        errors="replace", # Handle encoding errors in stderr and stdout
+        encoding="utf-8",
+    ) as process,
+):
+    for line in process.stdout:
+        print(line, end="", flush=True)
+        open_log.write(line)
+if process.returncode != 0:
+    raise RuntimeError(f"{cmd} returned a nonzero exitcode!")
+```
+
+- Capture output with `stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1`.
+- Optionally, the output from the process can be written to a file in the output.
+- Handle the text errors during encoding by using `encoding="utf-8"` and work around encoding errors by using `errors="replace"`.
+- When the `returncode` from the process is nonzero, raise an error.
+- Do not use `shell=True` unless there is a very good reason.
+
+Alternatively, in case when the output should not be captured (e.g. the command does not output anything or upon user request), `subprocess.run(cmd, check=True)` can be used.
 
 ```python
 subprocess.run(
@@ -136,20 +165,28 @@ subprocess.run(
 )
 ```
 
-- Never `shell=True` unless you have a very good reason (piping through shell operators, and even then prefer composing in Python).
-- `check=True` turns non-zero exits into `CalledProcessError`, so failures stop the script.
-- Capture output with `capture_output=True, text=True` when you need to parse it; otherwise let it stream to the component's stderr/stdout.
-
 For commands that need the shell (pipelines, redirections), prefer Python-level plumbing:
 
 ```python
 # Instead of: subprocess.run("tool | grep -v '^#' > out.tsv", shell=True, check=True)
 with open(par["output"], "w") as out:
-    p1 = subprocess.Popen(["tool"], stdout=subprocess.PIPE)
-    subprocess.run(["grep", "-v", "^#"], stdin=p1.stdout, stdout=out, check=True)
+    p1_cmd = ["tool"]
+    p1 = subprocess.Popen(p1_cmd, stdout=subprocess.PIPE)
+    p2_cmd = ["grep", "-v", "^#"]
+    p2 = subprocess.Popen(p2_cmd, stdin=p1.stdout, stdout=out)
     p1.stdout.close()
     p1.wait()
+    p2.wait()
+    if not all([proc.returncode in (0, -signal.SIGPIPE) for proc in (p1, p2)]):
+        p1_str, p2_str = ' '.join(p1_cmd), ' '.join(p2_cmd)
+        raise RuntimeError(f"{p1_str} | {p2_str} had a non-zero exitcode")
 ```
+
+- Use `subprocess.PIPE` instead of `shell=True` with shell pipelines.
+- Make sure that an earlier process in the pipe can receive a `SIGPIPE` signal if a later process exits early
+  (in the example above `grep` might exit before `tool`)
+- Check the exit code of every process in the pipe, not just the last one — a pipeline whose first
+  stage dies still writes a plausible-looking, silently truncated output file.
 
 ## Resource Usage
 

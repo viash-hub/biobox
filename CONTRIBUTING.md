@@ -122,15 +122,22 @@ Guidelines:
 - If the tool only exposes a short flag, use a descriptive long name and put the short flag in `alternatives:`.
 - Substitute `-` with `_` where Viash requires it (Viash maps `--my-flag` ↔ `par_my_flag`).
 - Resource-related options (threads, CPUs, memory) are the exception: **do not expose** them as arguments. Use `meta_cpus` and `meta_memory_*` inside the script instead. See the `meta_*` section of [Script Development Guide](docs/SCRIPT_DEVELOPMENT.md).
-- Booleans: pick the variant that matches the tool's semantics. They are **not** interchangeable.
+- Booleans: use `boolean_true` or `boolean` — pick the variant that matches the tool's semantics. They are **not** interchangeable.
+  `boolean_false` also exists; but it's harder to use in combination with the Nextflow runner. Avoid it when the `nextflow` runner is enabled for a component
+  and prefer `boolean` with a `default: true`.
 
 #### Boolean variants
 
 | Type             | CLI behaviour                              | Use when                                                                                  |
 | ---------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------- |
 | `boolean_true`   | `--flag` present ⇒ true, absent ⇒ false    | Default is false; passing the flag turns the option on. Most common case.                 |
-| `boolean_false`  | `--flag` present ⇒ false, absent ⇒ true    | Default is true; passing the flag turns the option off (e.g. `--no-cache`).               |
 | `boolean`        | User must pass `--flag=true` / `--flag=false` | Tri-state intent: the user explicitly chooses, or the wrapped tool itself takes `true`/`false` as a value (not just a presence toggle). |
+
+To be avoided when using the `nextflow` runner:
+
+| Type             | CLI behaviour                              |
+| ---------------- | ------------------------------------------ |
+| `boolean_false`  | `--flag` present ⇒ false, absent ⇒ true    |
 
 Scripting implication: with `boolean_true` / `boolean_false` you typically `unset` the "false" case and use `${par_x:+--flag}`. With bare `boolean` you must forward the actual value (e.g. `--flag="$par_x"`) because both `true` and `false` are meaningful inputs to the tool.
 
@@ -222,7 +229,7 @@ Working with containers: choosing biocontainers, version pinning, detecting soft
    - Argument group names are singular (`Input`, `Output`, `Arguments`).
    - Argument names mirror the wrapped tool's flags.
    - No `par_threads` / `par_cores` / `par_memory` arguments (use `meta_*`).
-   - Boolean arguments use the variant matching the tool's semantics (`boolean_true`, `boolean_false`, or bare `boolean`).
+   - Boolean arguments use the variant matching the tool's semantics (`boolean_true` or bare `boolean`).
    - Script starts with `#!/bin/bash` + `set -eo pipefail`.
    - `viash test` passes locally.
    - `CHANGELOG.md` updated.
