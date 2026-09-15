@@ -65,6 +65,10 @@ if [ -n "$par_no_stats" ] && [ -n "$par_genes" ]; then
     exit 1
 fi
 
+# snpEff's own default HTML summary filename, used below to locate the file
+# for relocation when --stats is not explicitly set.
+par_stats="${par_stats:-snpEff_summary.html}"
+
 # Run SnpEff
 snpEff ann \
     ${par_chr:+-chr "$par_chr"} \

@@ -54,19 +54,17 @@ argument_groups:
     alternatives: [-b]
     type: string
     description: |
-      Block size, effective only when `--low_memory` is set.
-    default: 10m
+      Block size, effective only when `--low_memory` is set. Default: '10m'.
   - name: "--random_seed"
     alternatives: [-s]
     type: integer
-    description: Random seed used to resolve ambiguous bases.
-    default: 11
+    description: |
+      Random seed used to resolve ambiguous bases. Default: 11.
   - name: "--sa_sample_rate"
     alternatives: [-u]
     type: integer
     description: |
-      Suffix array sample rate, at a rate of `1/(1<<INT)`.
-    default: 4
+      Suffix array sample rate, at a rate of `1/(1<<INT)`. Default: 4.
   - name: "--meth"
     type: boolean_true
     description: |

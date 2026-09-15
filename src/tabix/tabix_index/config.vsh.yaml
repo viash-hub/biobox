@@ -99,7 +99,7 @@ argument_groups:
         type: integer
         description: |
           Set the minimal interval size for CSI indices to `2^INT`.
-        default: 14
+          Default: 14.
 
 resources:
   - type: bash_script
