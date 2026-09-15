@@ -81,7 +81,7 @@ argument_groups:
           Make the sequence name the first word from the `>` line in
           the FASTA file. By default the entire contents of the `>`
           line is used, excluding leading and trailing whitespace.
-        default: true
+          Default: true.
       - name: "--uri"
         alternatives: [-UR]
         type: string

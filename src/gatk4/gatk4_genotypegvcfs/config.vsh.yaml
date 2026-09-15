@@ -81,7 +81,7 @@ argument_groups:
         description: |
           Margin of error in allele fraction to consider a somatic variant
           homoplasmic. Only relevant when `--input_is_somatic` is set.
-        default: 0.001
+          Default: 0.001.
       - name: "--annotate_with_num_discovered_alleles"
         type: boolean_true
         description: |
@@ -233,8 +233,7 @@ argument_groups:
         type: integer
         description: |
           Maximum number of alternate alleles that will be combined when
-          reading variants from a GenomicsDB workspace.
-        default: 50
+          reading variants from a GenomicsDB workspace. Default: 50.
       - name: "--genomicsdb_shared_posixfs_optimizations"
         type: boolean_true
         description: |
@@ -253,8 +252,8 @@ argument_groups:
         alternatives: [-gam]
         type: string
         description: |
-          How genotypes are assigned in the final VCF.
-        default: USE_PLS_TO_ASSIGN
+          How genotypes are assigned in the final VCF. Default:
+          'USE_PLS_TO_ASSIGN'.
         choices: 
           - SET_TO_NO_CALL
           - USE_PLS_TO_ASSIGN
@@ -272,12 +271,12 @@ argument_groups:
 
           See the [GATK docs](https://gatk.broadinstitute.org/hc/en-us) for full
           details on the meaning of this population genetics concept.
-        default: 0.001
+          Default: 0.001.
       - name: "--heterozygosity_stdev"
         type: double
         description: |
           Standard deviation of heterozygosity for SNP and indel calling.
-        default: 0.01
+          Default: 0.01.
       - name: "--include_non_variant_sites"
         alternatives: [-all-sites]
         type: boolean_true
@@ -291,7 +290,7 @@ argument_groups:
 
           See the [GATK docs](https://gatk.broadinstitute.org/hc/en-us) for full
           details on the meaning of this population genetics concept.
-        default: 0.000125
+          Default: 0.000125.
       - name: "--input_is_somatic"
         type: boolean_true
         description: |
@@ -322,19 +321,16 @@ argument_groups:
       - name: "--max_alternate_alleles"
         type: integer
         description: |
-          Maximum number of alternate alleles to genotype.
-        default: 6
+          Maximum number of alternate alleles to genotype. Default: 6.
       - name: "--max_genotype_count"
         type: integer
         description: |
-          Maximum number of genotypes to consider at any site.
-        default: 1024
+          Maximum number of genotypes to consider at any site. Default: 1024.
       - name: "--max_variants_per_shard"
         type: integer
         description: |
           If non-zero, partitions VCF output into shards, each containing
-          up to the given number of records.
-        default: 0
+          up to the given number of records. Default: 0.
       - name: "--merge_input_intervals"
         type: boolean_true
         description: |
@@ -344,8 +340,7 @@ argument_groups:
         type: integer
         description: |
           Number of hom-ref genotypes to infer at sites not present in a
-          `--population_callset` panel.
-        default: 0
+          `--population_callset` panel. Default: 0.
       - name: "--only_output_calls_starting_in_intervals"
         type: boolean_true
         description: |
@@ -373,22 +368,19 @@ argument_groups:
           Ploidy (number of chromosomes) per sample.
 
           For pooled data, set to (number of samples in each pool * sample
-          ploidy).
-        default: 2
+          ploidy). Default: 2.
       - name: "--stand_call_conf"
         alternatives: [-stand-call-conf]
         type: double
         description: |
           The minimum phred-scaled confidence threshold at which variants
-          should be called.
-        default: 30.0
+          should be called. Default: 30.0.
       - name: "--tumor_lod_to_emit"
         alternatives: [-emit-lod]
         type: double
         description: |
           LOD threshold to emit a variant to the VCF. Only relevant when
-          `--input_is_somatic` is set.
-        default: 3.5
+          `--input_is_somatic` is set. Default: 3.5.
       - name: "--use_posteriors_to_calculate_qual"
         alternatives: [-gp-qual]
         type: boolean_true

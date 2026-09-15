@@ -174,8 +174,7 @@ argument_groups:
         type: integer
         description: |
           If greater than `0`, reference bands will be broken up at genomic
-          positions that are multiples of this number.
-        default: 0
+          positions that are multiples of this number. Default: 0.
       - name: "--call_genotypes"
         type: boolean_true
         description: |
@@ -184,8 +183,7 @@ argument_groups:
         type: integer
         description: |
           Maximum distance (in bp) for variants to be grouped together
-          when combining.
-        default: 0
+          when combining. Default: 0.
       - name: "--convert_to_base_pair_resolution"
         type: boolean_true
         description: |
@@ -238,8 +236,7 @@ argument_groups:
         type: integer
         description: |
           If non-zero, partitions VCF output into shards, each containing
-          up to the given number of records.
-        default: 0
+          up to the given number of records. Default: 0.
       - name: "--pedigree"
         alternatives: [-ped]
         type: file
@@ -250,8 +247,7 @@ argument_groups:
         type: integer
         description: |
           Number of bases on either side to expand the spanning reference
-          window.
-        default: 1
+          window. Default: 1.
       - name: "--variant_output_filtering"
         type: string
         choices: [STARTS_IN, ENDS_IN, OVERLAPS, CONTAINED, ANYWHERE]

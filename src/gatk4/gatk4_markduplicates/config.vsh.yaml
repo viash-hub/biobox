@@ -75,8 +75,7 @@ argument_groups:
       - name: "--add_pg_tag_to_reads"
         type: boolean
         description: |
-          Add a `PG` tag to each read in a SAM or BAM file.
-        default: true
+          Add a `PG` tag to each read in a SAM or BAM file. Default: true.
       - name: "--assume_sort_order"
         alternatives: [-ASO]
         type: string
@@ -93,8 +92,7 @@ argument_groups:
         type: boolean
         description: |
           Clear the `DT` tag from input SAM records. Should be set to
-          `false` if the input SAM file doesn't have this tag.
-        default: true
+          `false` if the input SAM file doesn't have this tag. Default: true.
       - name: "--comment"
         alternatives: [-CO]
         type: string
@@ -121,8 +119,7 @@ argument_groups:
         type: string
         description: |
           The scoring strategy for choosing the non-duplicate among
-          duplicate candidates.
-        default: SUM_OF_BASE_QUALITIES
+          duplicate candidates. Default: 'SUM_OF_BASE_QUALITIES'.
         choices:
           - SUM_OF_BASE_QUALITIES
           - TOTAL_MAPPED_REFERENCE_LENGTH
@@ -134,8 +131,7 @@ argument_groups:
           Maximum number of file handles to keep open when spilling read
           ends to disk. Set this number a little lower than the
           per-process maximum number of files that may be open (find
-          this with the `ulimit -n` command on a Unix system).
-        default: 8000
+          this with the `ulimit -n` command on a Unix system). Default: 8000.
       - name: "--max_optical_duplicate_set_size"
         type: long
         description: |
@@ -143,8 +139,7 @@ argument_groups:
           attempt to determine which are optical duplicates. Raising
           this value too high for a very large set of duplicate reads
           will severely affect the runtime of this tool. Set to `-1` to
-          completely disable this check.
-        default: 300000
+          completely disable this check. Default: 300000.
       - name: "--max_records_in_ram"
         type: integer
         description: |
@@ -152,8 +147,7 @@ argument_groups:
           the number of records stored in RAM before spilling to disk.
           Increasing this number reduces the number of file handles
           needed to sort the file, and increases the amount of RAM
-          needed.
-        default: 500000
+          needed. Default: 500000.
       - name: "--molecular_identifier_tag"
         type: string
         description: |
@@ -165,11 +159,10 @@ argument_groups:
           The maximum offset between two duplicate clusters in order to
           consider them optical duplicates.
 
-          The default of `100` is appropriate for non-patterned
-          flowcells. For patterned flowcell models (e.g. NovaSeq,
-          HiSeqX), `2500` is more appropriate. For other platforms and
-          models, experiment to find what works best.
-        default: 100
+          A value of `100` is appropriate for non-patterned flowcells.
+          For patterned flowcell models (e.g. NovaSeq, HiSeqX), `2500` is
+          more appropriate. For other platforms and models, experiment to
+          find what works best. Default: 100.
       - name: "--program_group_command_line"
         alternatives: [-PG_COMMAND]
         type: string
@@ -180,8 +173,8 @@ argument_groups:
         alternatives: [-PG_NAME]
         type: string
         description: |
-          Value of the `PN` tag of the `PG` record to be created.
-        default: MarkDuplicates
+          Value of the `PN` tag of the `PG` record to be created. Default:
+          'MarkDuplicates'.
       - name: "--program_group_version"
         alternatives: [-PG_VERSION]
         type: string
@@ -195,8 +188,7 @@ argument_groups:
           The program record ID for the `PG` record(s) created by this
           tool. A suffix may be appended to this string to avoid
           collision with other program record IDs. Set to `null` to
-          disable `PG` record creation.
-        default: MarkDuplicates
+          disable `PG` record creation. Default: 'MarkDuplicates'.
       - name: "--read_name_regex"
         type: string
         description: |
@@ -243,8 +235,7 @@ argument_groups:
           This number, plus the maximum RAM available to the JVM,
           determine the memory footprint used by some of the sorting
           collections. If you are running out of memory, try reducing
-          this number.
-        default: 0.25
+          this number. Default: 0.25.
       - name: "--tag_duplicate_set_members"
         type: boolean_true
         description: |
@@ -256,18 +247,17 @@ argument_groups:
         type: string
         description: |
           Determines how duplicate types are recorded in the `DT`
-          optional attribute.
+          optional attribute. Default: 'DontTag'.
         choices: [DontTag, OpticalOnly, All]
-        default: DontTag
       - name: "--validation_stringency"
         type: string
         description: |
           Validation stringency for all SAM files read by this program.
           Setting stringency to `SILENT` can improve performance when
           processing a BAM file in which variable-length data (read,
-          qualities, tags) do not otherwise need to be decoded.
+          qualities, tags) do not otherwise need to be decoded. Default:
+          'STRICT'.
         choices: [STRICT, LENIENT, SILENT]
-        default: STRICT
 
 resources:
   - type: bash_script

@@ -98,8 +98,7 @@ argument_groups:
         type: double
         description: |
           Global Q-score Bayesian prior to use for BQSR. A negative value
-          disables this behavior.
-        default: -1.0
+          disables this behavior. Default: -1.0.
       - name: "--intervals"
         alternatives: [-L]
         type: file
@@ -110,16 +109,15 @@ argument_groups:
       - name: "--preserve_qscores_less_than"
         type: integer
         description: |
-          Don't recalibrate bases with quality scores less than this threshold.
-        default: 6
+          Don't recalibrate bases with quality scores less than this
+          threshold. Default: 6.
       - name: "--quantize_quals"
         type: integer
         description: |
           Quantize quality scores to a given number of levels.
 
-          Set to `0` to disable quantization. Mutually exclusive with
-          `--static_quantized_quals`.
-        default: 0
+          Set to `0` to disable quantization. Default: 0. Mutually
+          exclusive with `--static_quantized_quals`.
       - name: "--round_down_quantized"
         type: boolean_true
         description: |

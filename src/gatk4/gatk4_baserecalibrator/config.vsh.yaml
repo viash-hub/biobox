@@ -91,31 +91,27 @@ argument_groups:
       - name: "--bqsr_baq_gap_open_penalty"
         type: double
         description: |
-          BQSR BAQ gap open penalty (Phred scaled).
-
-          The default value is 40. 30 is perhaps better for whole genome call
-          sets.
-        default: 40
+          BQSR BAQ gap open penalty (Phred scaled). Default: 40. `30` is
+          perhaps better for whole genome call sets.
       - name: "--default_base_qualities"
         type: integer
         description: |
           Assign a default base quality to use in place of read qualities that
-          are missing or invalid.
-        default: -1
+          are missing or invalid. Default: -1.
       - name: "--deletions_default_quality"
         type: integer
-        description: Default quality for the base deletions covariate.
-        default: 45
+        description: |
+          Default quality for the base deletions covariate. Default: 45.
       - name: "--indels_context_size"
         alternatives: [-ics]
         type: integer
         description: |
-          Size of the k-mer context to be used for base insertions and deletions.
-        default: 3
+          Size of the k-mer context to be used for base insertions and
+          deletions. Default: 3.
       - name: "--insertions_default_quality"
         type: integer
-        description: Default quality for the base insertions covariate.
-        default: 45
+        description: |
+          Default quality for the base insertions covariate. Default: 45.
       - name: "--intervals"
         alternatives: [-L]
         type: file
@@ -125,30 +121,35 @@ argument_groups:
         example: intervals.bed
       - name: "--low_quality_tail"
         type: integer
-        description: Minimum quality for the bases in the tail of the reads to be considered.
-        default: 2
+        description: |
+          Minimum quality for the bases in the tail of the reads to be
+          considered. Default: 2.
       - name: "--maximum_cycle_value"
         alternatives: [-max-cycle]
         type: integer
-        description: The maximum cycle value permitted for the Cycle covariate.
-        default: 500
+        description: |
+          The maximum cycle value permitted for the Cycle covariate.
+          Default: 500.
       - name: "--mismatches_context_size"
         alternatives: [-mcs]
         type: integer
-        description: Size of the k-mer context to be used for base mismatches.
-        default: 2
+        description: |
+          Size of the k-mer context to be used for base mismatches.
+          Default: 2.
       - name: "--mismatches_default_quality"
         type: integer
-        description: Default quality for the base mismatches covariate.
-        default: -1
+        description: |
+          Default quality for the base mismatches covariate. Default: -1.
       - name: "--preserve_qscores_less_than"
         type: integer
-        description: Don't recalibrate bases with quality scores less than this threshold.
-        default: 6
+        description: |
+          Don't recalibrate bases with quality scores less than this
+          threshold. Default: 6.
       - name: "--quantizing_levels"
         type: integer
-        description: Number of distinct quality scores in the quantized output.
-        default: 16
+        description: |
+          Number of distinct quality scores in the quantized output.
+          Default: 16.
       - name: "--use_original_qualities"
         alternatives: [-OQ]
         type: boolean_true

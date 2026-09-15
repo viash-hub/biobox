@@ -7,9 +7,8 @@ argument_groups:
         description: |
           Amount of padding (in bp) to add to each interval specified via
           `--intervals`, to capture flanking context (e.g. near
-          capture/exome-bait edges). A commonly-used default in GATK's own
-          exome workflows is `100`.
-        default: 0
+          capture/exome-bait edges). Default: 0. A commonly-used value in
+          GATK's own exome workflows is `100`.
       - name: "--sites_only_vcf_output"
         type: boolean_true
         description: |
@@ -19,13 +18,15 @@ argument_groups:
       - name: "--create_output_variant_index"
         alternatives: [-OVI]
         type: boolean
-        description: Create a VCF index (`.tbi`) when writing a coordinate-sorted VCF output.
-        default: true
+        description: |
+          Create a VCF index (`.tbi`) when writing a coordinate-sorted VCF
+          output. Default: true.
       - name: "--create_output_bam_index"
         alternatives: [-OBI]
         type: boolean
-        description: Create a BAM/CRAM index when writing a coordinate-sorted BAM/CRAM output.
-        default: true
+        description: |
+          Create a BAM/CRAM index when writing a coordinate-sorted BAM/CRAM
+          output. Default: true.
       - name: "--read_filter"
         alternatives: [-RF]
         type: string

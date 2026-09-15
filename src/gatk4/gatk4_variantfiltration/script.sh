@@ -78,8 +78,8 @@ gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" VariantFiltration \
   --tmp-dir "$tmp_dir" \
   ${par_interval_padding:+--interval-padding "$par_interval_padding"} \
   ${par_sites_only_vcf_output:+--sites-only-vcf-output} \
-  --create-output-variant-index "$par_create_output_variant_index" \
-  --create-output-bam-index "$par_create_output_bam_index" \
+  ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"} \
+  ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"} \
   "${read_filter_args[@]}" \
   "${disable_read_filter_args[@]}" \
   ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters} \
