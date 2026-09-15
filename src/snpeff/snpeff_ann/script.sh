@@ -54,6 +54,16 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
+# --summary/--genes relocate files produced by the stats step, so they
+# cannot be used together with --no_stats
+if [ -n "$par_no_stats" ] && [ -n "$par_summary" ]; then
+    echo "Error: --summary cannot be used together with --no_stats." >&2
+    exit 1
+fi
+if [ -n "$par_no_stats" ] && [ -n "$par_genes" ]; then
+    echo "Error: --genes cannot be used together with --no_stats." >&2
+    exit 1
+fi
 
 # Run SnpEff
 snpEff ann \
