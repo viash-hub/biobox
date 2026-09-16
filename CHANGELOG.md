@@ -24,7 +24,6 @@
 
 ## BUG FIXES
 
-<<<<<<< HEAD
 * `bowtie2`: Fix `--index` of `bowtie2/bowtie2_align` and `bowtie2/bowtie2_inspect` (PR #233):
   * `--index` was a `string` holding the index filename prefix, so the index files were not mounted or staged when running with Docker or Nextflow.
     It is now a `file` pointing to the directory containing the index files (as produced by `bowtie2/bowtie2_build`), and the prefix is derived from the directory contents.
