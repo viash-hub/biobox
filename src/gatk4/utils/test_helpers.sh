@@ -6,7 +6,7 @@
 # via:
 #   source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Create a samtools-compatible .fai index for a FASTA file without samtools.
+# Create a samtools-compatible .fai index for a FASTA file using pysam
 #
 # Usage: create_test_fasta_fai "/path/to/input.fasta" "/path/to/output.fai"
 create_test_fasta_fai() {
@@ -15,49 +15,11 @@ create_test_fasta_fai() {
 
   log "Creating FASTA index (.fai) for: $fasta_path"
 
-  # Re-implements the samtools .fai algorithm: for each sequence, walk the
-  # file byte-by-byte (via line lengths) tracking where the sequence's bases
-  # start (offset) and how the bases are wrapped (linebases/linewidth), then
-  # emit "name\tseqlen\toffset\tlinebases\tlinewidth" once the next header
-  # (or EOF) closes out the record.
-  awk '
-    BEGIN { name = ""; seqlen = 0; offset = 0; linebases = 0; linewidth = 0; bytepos = 0 }
-    {
-      # +1 accounts for the newline awk strips from $0
-      linelen = length($0) + 1
-      if (substr($0, 1, 1) == ">") {
-        # Header line: flush the previous record (if any), then start a new
-        # one. The sequence name is everything up to the first space/tab.
-        if (name != "") {
-          print name"\t"seqlen"\t"offset"\t"linebases"\t"linewidth
-        }
-        name = substr($0, 2)
-        sub(/[ \t].*/, "", name)
-        seqlen = 0
-        linebases = 0
-        linewidth = 0
-        bytepos += linelen
-        offset = bytepos
-      } else {
-        # Sequence line: linebases/linewidth are fixed from the first
-        # sequence line of the record (samtools assumes uniform wrapping),
-        # seqlen accumulates the total base count across all its lines.
-        if (linebases == 0) {
-          linebases = length($0)
-          linewidth = linelen
-        }
-        seqlen += length($0)
-        bytepos += linelen
-      }
-    }
-    END {
-      # Flush the final record, since there is no following header line to
-      # trigger it.
-      if (name != "") {
-        print name"\t"seqlen"\t"offset"\t"linebases"\t"linewidth
-      }
-    }
-  ' "$fasta_path" > "$fai_path"
+  python3 -c "import sys, pysam; pysam.faidx(sys.argv[1])" "$fasta_path"
+
+  if [[ "$fai_path" != "${fasta_path}.fai" ]]; then
+    mv "${fasta_path}.fai" "$fai_path"
+  fi
 
   log "✓ Created FASTA index: $fai_path"
 }

@@ -4,3 +4,7 @@ setup:
   - type: docker
     run: |
       gatk --version 2>&1 | grep "Genome Analysis Toolkit" | sed 's/^/gatk4: /' > /var/software_versions.txt
+test_setup:
+  - type: python
+    packages:
+      - pysam # For create_test_fasta_fai() in gatk4/utils/test_helpers.sh
