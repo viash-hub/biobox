@@ -2,23 +2,11 @@
 
 ## NEW FUNCTIONALITY
 
-* `gatk4`: Added components for the Genome Analysis Toolkit (GATK4), covering a full germline short-variant discovery pipeline (PR #226):
-  - `gatk4/gatk4_createsequencedictionary`: Create a sequence dictionary (`.dict`) for a reference FASTA file.
-  - `gatk4/gatk4_markduplicates`: Locate and tag duplicate reads in a BAM file.
-  - `gatk4/gatk4_baserecalibrator`: Generate a base quality score recalibration (BQSR) table from known variant sites.
-  - `gatk4/gatk4_applybqsr`: Apply a base quality score recalibration table to a BAM file.
-  - `gatk4/gatk4_haplotypecaller`: Call germline SNVs and indels from a BAM file via local re-assembly of haplotypes.
-  - `gatk4/gatk4_combinegvcfs`: Combine per-sample GVCFs into a single multi-sample GVCF.
-  - `gatk4/gatk4_genomicsdbimport`: Import per-sample GVCFs into a GenomicsDB workspace for scalable joint genotyping.
-  - `gatk4/gatk4_genotypegvcfs`: Perform joint genotyping on GVCFs, combined GVCFs, or a GenomicsDB workspace.
-  - `gatk4/gatk4_variantfiltration`: Filter variant calls based on INFO and/or FORMAT annotations.
-  - `gatk4/gatk4_selectvariants`: Select a subset of variants from a VCF based on various criteria.
-
 * `minibwa`: Added components for minibwa, the successor to bwa-mem with native Hi-C and bisulfite sequencing alignment modes (PR #225):
   - `minibwa/minibwa_index`: Build a minibwa reference index, optionally including a bisulfite (BS-seq) index
   - `minibwa/minibwa_map`: Align short, long, Hi-C or bisulfite reads to a minibwa index
 
-* `tabix`: Add tabix, a generic indexer/query tool for BGZF block-compressed, position-sorted files (PR #228):
+* `tabix`: Add tabix, a generic indexer/query tool for BGZF block-compressed, position-sorted files (PR #228, PR #235):
   - `tabix/tabix_index`: Build a tabix (`.tbi`) or CSI (`.csi`) index for a BGZF-compressed file.
   - `tabix/tabix_query`: Query an indexed file by region, or list its chromosomes.
 
@@ -32,8 +20,28 @@
   - Bump snpEff from `5.2f` to `5.4c` and remove a config patch that is no longer needed (PR #222)
   - Add `--fastaprot_no_ref` argument (`-fastaProtNoRef`) to not add reference sequences to the output when `--fastaprot` is used (PR #222)
   - Rename argument `-no_hgvs` to `--no_hgvs` for consistency. `-no_hgvs` is kept as an alternative for backwards compatibility. (PR #222)
+  - Move default arguments values to descriptions (PR #235)
 
 ## BUG FIXES
+
+* `bowtie2`: Fix `--index` of `bowtie2/bowtie2_align` and `bowtie2/bowtie2_inspect` (PR #233):
+  * `--index` was a `string` holding the index filename prefix, so the index files were not mounted or staged when running with Docker or Nextflow.
+    It is now a `file` pointing to the directory containing the index files (as produced by `bowtie2/bowtie2_build`), and the prefix is derived from the directory contents.
+  * `bowtie2_inspect`: pass the index as the last argument, as documented. The `bowtie2-inspect` wrapper reads the index basename from the final argument to decide whether to run the small or the large binary,
+    so passing it first made it always pick the small one and fail on a large (`.bt2l`) index.
+  * `bowtie2_inspect`: setting `--large_index` now restricts the lookup to a large index and fails if the index directory does not contain one, instead of silently inspecting a small index.
+  * A new `--index_prefix` argument selects the index to use by prefix, for directories that hold more than one.
+
+* Fix `--index` in `bwa_aln`, `bwa_mem`, `bwa_sampe`, `bwa_samse` and `bwa_mem2_mem` (PR #233).
+  The argument was documented as the index base name, but a base name is a shared prefix of the index files
+  rather than a path, so there was no value that worked: passing the prefix was rejected because no such file
+  exists, and passing one of the index files left the aligner unable to locate the others.
+  Pointing it at the reference FASTA only appeared to work with the executable runner, which mounts the parent
+  directory of an input file and so happened to bring the sibling index files along; under Nextflow, which
+  stages just the named file, the index files were missing.
+  `--index` now takes the directory holding the index files, matching the output of `bwa_index` and
+  `bwa_mem2_index`, and the base name is derived from the directory contents.
+  A new `--index_prefix` argument selects the index to use by base name, for directories that hold more than one.
 
 * `snpeff_ann`: Fix and update arguments (PR #222):
   * Fix `--stats`/`-s`/`--htmlStats` to be `string` instead of `boolean_true` to prevent it swallowing the following argument when used.
@@ -41,6 +49,7 @@
   * Fix `--only_tr` which referenced an incorrect variable name and always passed an empty value to `-onlyTr` instead of the provided file
   * Fix `--csv_stats` and `--fastaprot` which were missing `direction: output` and so defaulted to `direction: input`, requiring the (not yet created) output file to already exist before running
   * Fix `--cancer_samples` and `--fastaprot` which appended a stray literal `]` character to the provided value, corrupting the file path passed to `-cancerSamples`/`-fastaProt`
+  * Enforce that `--no-stats` cannot be set with `--summary`/`--genes` (PR #236)
 
 # biobox 0.4.2
 
