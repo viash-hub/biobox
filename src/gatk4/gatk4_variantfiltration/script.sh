@@ -56,7 +56,7 @@ extra_args=(
 
 # Stage the reference trio into a temp dir with matching basenames so GATK
 # can find them
-tmp_dir=$(mktemp -d)
+tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_variantfiltration.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 reference_args=()

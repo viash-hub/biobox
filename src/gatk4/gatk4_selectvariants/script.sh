@@ -53,7 +53,7 @@ split_multiple_to_flags "$par_select_type_to_exclude" "--select-type-to-exclude"
 
 # Stage the reference trio into a temp dir using matching basenames so GATK
 # can find them, if provided
-tmp_dir=$(mktemp -d)
+tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_selectvariants.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 reference_args=()

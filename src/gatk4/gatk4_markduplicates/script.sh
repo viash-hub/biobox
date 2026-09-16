@@ -22,7 +22,7 @@ for par in "${unset_if_false[@]}"; do
 done
 
 # Create a temporary directory for GATK's own scratch space
-tmp_dir=$(mktemp -d)
+tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_markduplicates.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)

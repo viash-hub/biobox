@@ -15,7 +15,7 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 # Stage the reference trio and BAM/BAI into a temp dir using matching
 # basenames so GATK can find them
-tmp_dir=$(mktemp -d)
+tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_baserecalibrator.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")

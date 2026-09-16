@@ -24,7 +24,7 @@ done
 
 # Stage the BAM/BAI, and the reference if provided, into a temp dir using
 # matching basenames so GATK can find them.
-tmp_dir=$(mktemp -d)
+tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_applybqsr.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 staged_bam=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
