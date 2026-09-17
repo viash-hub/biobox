@@ -17,7 +17,7 @@ samtools() {
 # A single 1000bp synthetic "chr1" contig with a repeating ATCG pattern
 {
   echo ">chr1"
-  head -c 1000 /dev/zero | tr '\0' 'A' | sed 's/A/ATCG/g' | head -c 1000
+  printf 'ATCG%.0s' {1..250}
   echo
 } > reference.fasta
 samtools faidx reference.fasta
@@ -26,7 +26,7 @@ samtools faidx reference.fasta
 # Six synthetic, properly-paired read pairs (MAPQ 60, insert size 150bp) at
 # staggered start positions, so per-base depth builds up from 0 to 5 and back
 # down across chr1:100-300
-SEQ50=$(head -c 50 /dev/zero | tr '\0' 'A' | sed 's/A/ACGT/g' | head -c 50)
+SEQ50=$(printf 'ACGT%.0s' {1..13} | head -c 50)
 QUAL50=$(printf '%*s' 50 '' | tr ' ' 'I')
 
 {
