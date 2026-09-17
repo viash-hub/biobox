@@ -34,6 +34,8 @@
   - Rename argument `-no_hgvs` to `--no_hgvs` for consistency. `-no_hgvs` is kept as an alternative for backwards compatibility. (PR #222)
   - Move default arguments values to descriptions (PR #235)
 
+* Bump `viash` to 0.9.7 (PR #238)
+
 ## BUG FIXES
 
 * `bowtie2`: Fix `--index` of `bowtie2/bowtie2_align` and `bowtie2/bowtie2_inspect` (PR #233):
