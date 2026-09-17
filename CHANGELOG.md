@@ -80,6 +80,8 @@
   * Enforce that `--no-stats` cannot be set with `--summary`/`--genes` (PR #236)
   * Resolve the path passed to `--data_dir` in case it is a symlink (PR #239)
 
+* `cellranger/cellranger_count`: fix `min_crispr_umi` argument (PR #240)
+
 # biobox 0.4.2
 
 ## NEW FUNCTIONALITY
