@@ -11,7 +11,7 @@ set -eo pipefail
 [[ "$par_fast_mode" == "false" ]] && unset par_fast_mode
 [[ "$par_fragment_mode" == "false" ]] && unset par_fragment_mode
 
-tmp_dir=$(mktemp -d)
+tmp_dir=$(mktemp -d "$meta_temp_dir/mosdepth.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 # If an input index is provided, stage it to a temporary directory with the main
