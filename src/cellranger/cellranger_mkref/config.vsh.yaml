@@ -49,11 +49,11 @@ engines:
 - type: docker
   image: debian:latest
   setup:
-      # quay.io/nf-core/cellranger:10.0.0 is based on bookworm (which has been deprecated)
-      # So use `debian:latest` and use a `COPY --from=...`
+    # quay.io/nf-core/cellranger:10.0.0 is based on bookworm (which has been deprecated)
+    # So use `debian:latest` and use a `COPY --from=...`
     - type: docker
       copy: 
-          - "--from=quay.io/nf-core/cellranger:10.0.0 /opt/cellranger-10.0.0 /opt/cellranger-10.0.0"
+        - "--from=quay.io/nf-core/cellranger:10.0.0 /opt/cellranger-10.0.0 /opt/cellranger-10.0.0"
       run: |
         DEBIAN_FRONTEND=noninteractive apt update && \
         apt upgrade -y && apt install -y procps pigz && rm -rf /var/lib/apt/lists/* && \

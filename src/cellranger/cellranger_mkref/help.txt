@@ -1,6 +1,5 @@
 ```
-docker run --rm -it -e NO_COLOR=1 quay.io/nf-core/cellranger:10.0.0 cellranger mkref --help > src/cellranger/cellranger_mkref/help.tx
-t
+docker run --rm -it -e NO_COLOR=1 quay.io/nf-core/cellranger:10.0.0 cellranger mkref --help > src/cellranger/cellranger_mkref/help.txt
 ```
 Prepare a reference for use with 10x analysis software. Requires a GTF and FASTA
 
