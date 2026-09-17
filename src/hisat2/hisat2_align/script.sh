@@ -69,6 +69,15 @@ for par in "${unset_if_false[@]}"; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
+# --input/--input_r2 are "multiple: true"; Viash joins repeated values with ";",
+# hisat2 expects its own lists comma-separated, so convert the separator.
+par_input=$(echo "$par_input" | tr ';' ',')
+[[ -n "${par_input_r2:-}" ]] && par_input_r2=$(echo "$par_input_r2" | tr ';' ',')
+[[ -n "${par_mp:-}" ]] && par_mp=$(echo "$par_mp" | tr ';' ',')
+[[ -n "${par_sp:-}" ]] && par_sp=$(echo "$par_sp" | tr ';' ',')
+[[ -n "${par_rdg:-}" ]] && par_rdg=$(echo "$par_rdg" | tr ';' ',')
+[[ -n "${par_rfg:-}" ]] && par_rfg=$(echo "$par_rfg" | tr ';' ',')
+
 # Build command arguments
 cmd_args=(
   ${meta_cpus:+-p "$meta_cpus"}

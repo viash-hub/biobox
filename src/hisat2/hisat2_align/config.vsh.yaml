@@ -33,13 +33,15 @@ argument_groups:
         example: genome
       - type: file
         name: --input
-        description: For single-end, the reads file. For paired-end, the R1 (forward) reads file.
+        description: For single-end, the reads file(s). For paired-end, the R1 (forward) reads file(s). Provide multiple files to align them together as one sample.
         required: true
+        multiple: true
         example: reads_R1.fastq
       - type: file
         name: --input_r2
-        description: R2 (reverse) reads file for paired-end alignment. If omitted, single-end mode is used.
+        description: R2 (reverse) reads file(s) for paired-end alignment. If omitted, single-end mode is used. Provide multiple files to align them together as one sample.
         required: false
+        multiple: true
         example: reads_R2.fastq
 
   - name: Outputs
@@ -274,27 +276,31 @@ argument_groups:
         description: Match bonus in local alignment mode. Default is 2.
         example: 2
         min: 0
-      - type: string
+      - type: integer
         name: --mp
         description: "Max and min mismatch penalties as MX,MN. Default: 6,2."
-        example: "6,2"
-      - type: string
+        multiple: true
+        example: [6, 2]
+      - type: integer
         name: --sp
         description: "Max and min soft-clipping penalties for local mode as MX,MN. Default: 1,0."
-        example: "1,0"
+        multiple: true
+        example: [1, 0]
       - type: integer
         name: --np
         description: Penalty for aligning against an ambiguous (N) character. Default is 1.
         example: 1
         min: 0
-      - type: string
+      - type: integer
         name: --rdg
         description: "Read gap open and extend penalties as open,extend. Default: 5,3."
-        example: "5,3"
-      - type: string
+        multiple: true
+        example: [5, 3]
+      - type: integer
         name: --rfg
         description: "Reference gap open and extend penalties as open,extend. Default: 5,3."
-        example: "5,3"
+        multiple: true
+        example: [5, 3]
       - type: string
         name: --score_min
         description: "Function for minimum acceptable alignment score. Default: L,0,-0.2 (end-to-end); G,20,8 (local)."

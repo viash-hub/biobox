@@ -23,8 +23,9 @@ argument_groups:
     arguments:
       - type: file
         name: --reference
-        description: Reference genome file in FASTA format.
+        description: Reference genome FASTA file(s). Provide multiple files to build an index from a combined multi-FASTA reference.
         required: true
+        multiple: true
         example: reference_genome.fa
 
   - name: Annotation Inputs

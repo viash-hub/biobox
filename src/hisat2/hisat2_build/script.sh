@@ -22,6 +22,10 @@ done
 
 mkdir -p "$par_index_dir"
 
+# --reference is "multiple: true"; Viash joins repeated values with ";",
+# hisat2-build expects its reference list comma-separated, so convert the separator.
+par_reference=$(echo "$par_reference" | tr ';' ',')
+
 cmd_args=(
   ${meta_cpus:+-p "$meta_cpus"}
   ${par_large_index:+--large-index}
