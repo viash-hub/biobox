@@ -1,5 +1,9 @@
 # biobox x.x.x
 
+## BREAKING CHANGES
+
+* `cellranger_count`: updated to Cell Ranger v10. This drops support for the `SC3Pv3LT` chemistry (PR #)
+
 ## NEW FUNCTIONALITY
 
 * `gatk4`: Added components for the Genome Analysis Toolkit (GATK4), covering a full germline short-variant discovery pipeline (PR #226):
@@ -23,6 +27,10 @@
   - `tabix/tabix_query`: Query an indexed file by region, or list its chromosomes.
 
 * `snpeff`: Add `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
+
+## MAJOR CHANGES
+
+* `cellranger_mkref`: updated Cell Ranger to v10 (PR #).
 
 ## MINOR CHANGES
 

@@ -1,26 +1,26 @@
 ```
-cellranger mkref -h
+docker run --rm -it -e NO_COLOR=1 quay.io/nf-core/cellranger:10.0.0 cellranger mkref --help > src/cellranger/cellranger_mkref/help.tx
+t
 ```
-Prepare a reference for use with 10x analysis software. Requires a GTF and
-FASTA
+Prepare a reference for use with 10x analysis software. Requires a GTF and FASTA
 
 Usage: cellranger mkref [OPTIONS] --genome <GENOME_NAMES> --fasta <FASTA_FILES> --genes <GTF_FILES>
 
 Options:
       --genome <GENOME_NAMES>
-          Unique genome name, used to name output folder [a-zA-Z0-9_-]+.
-          Specify multiple genomes by specifying this argument multiple
-          times; the output folder will be <name1>_and_<name2>
+          Unique genome name, used to name output folder [a-zA-Z0-9_-]+. Specify
+          multiple genomes by specifying this argument multiple times; the
+          output folder will be <name1>_and_<name2>
       --fasta <FASTA_FILES>
-          Path to FASTA file containing your genome reference. Specify
-          multiple genomes by specifying this argument multiple times
+          Path to FASTA file containing your genome reference. Specify multiple
+          genomes by specifying this argument multiple times
       --genes <GTF_FILES>
           Path to genes GTF file containing annotated genes for your genome
           reference. Specify multiple genomes by specifying this argument
           multiple times
       --nthreads <NUM_THREADS>
-          Number of threads used during STAR genome index generation.
-          Defaults to 1 [default: 1]
+          Number of threads used during STAR genome index generation. Defaults
+          to 1 [default: 1]
       --memgb <MEM_GB>
           Maximum memory (GB) used [default: 16]
       --ref-version <REF_VERSION>
@@ -29,33 +29,33 @@ Options:
           Do not execute the pipeline. Generate a pipeline invocation (.mro)
           file and stop
       --jobmode <MODE>
-          Job manager to use. Valid options: local (default), sge, lsf,
-          slurm or path to a .template file. Search for help on "Cluster
-          Mode" at support.10xgenomics.com for more details on configuring
-          the pipeline to use a compute cluster
+          Job manager to use. Valid options: local (default), sge, lsf, slurm or
+          path to a .template file. Search for help on "Cluster Mode" at
+          support.10xgenomics.com for more details on configuring the pipeline
+          to use a compute cluster
       --localcores <NUM>
-          Set max cores the pipeline may request at one time. Only applies
-          to local jobs
-      --localmem <NUM>
-          Set max GB the pipeline may request at one time. Only applies to
+          Set max cores the pipeline may request at one time. Only applies to
           local jobs
+      --localmem <NUM>
+          Set max GB the pipeline may request at one time. Only applies to local
+          jobs
       --localvmem <NUM>
-          Set max virtual address space in GB for the pipeline. Only applies
-          to local jobs
+          Set max virtual address space in GB for the pipeline. Only applies to
+          local jobs
       --mempercore <NUM>
-          Reserve enough threads for each job to ensure enough memory will
-          be available, assuming each core on your cluster has at least this
-          much memory available. Only applies to cluster jobmodes
+          Reserve enough threads for each job to ensure enough memory will be
+          available, assuming each core on your cluster has at least this much
+          memory available. Only applies to cluster jobmodes
       --maxjobs <NUM>
-          Set max jobs submitted to cluster at one time. Only applies to
-          cluster jobmodes
+          Set max jobs submitted to cluster at one time. Only applies to cluster
+          jobmodes
       --jobinterval <NUM>
-          Set delay between submitting jobs to cluster, in ms. Only applies
-          to cluster jobmodes
+          Set delay between submitting jobs to cluster, in ms. Only applies to
+          cluster jobmodes
       --overrides <PATH>
-          The path to a JSON file that specifies stage-level overrides for
-          cores and memory. Finer-grained than --localcores, --mempercore
-          and --localmem. Consult https://support.10xgenomics.com/ for an
+          The path to a JSON file that specifies stage-level overrides for cores
+          and memory. Finer-grained than --localcores, --mempercore and
+          --localmem. Consult https://10xgen.com/resource-override for an
           example override file
       --output-dir <PATH>
           Output the results to this directory
