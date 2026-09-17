@@ -66,6 +66,7 @@
   * Fix `--csv_stats` and `--fastaprot` which were missing `direction: output` and so defaulted to `direction: input`, requiring the (not yet created) output file to already exist before running
   * Fix `--cancer_samples` and `--fastaprot` which appended a stray literal `]` character to the provided value, corrupting the file path passed to `-cancerSamples`/`-fastaProt`
   * Enforce that `--no-stats` cannot be set with `--summary`/`--genes` (PR #236)
+  * Resolve the path passed to `--data_dir` in case it is a symlink (PR #239)
 
 # biobox 0.4.2
 
