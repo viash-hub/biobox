@@ -214,4 +214,30 @@ log "Test 6 succeeded."
 
 ###########################################################################
 
+# Test 7: --data_dir given as a symlink (mirrors how Nextflow stages
+# directory inputs) should be resolved to a real path and still work.
+
+log "> Run Test 7: --data_dir as a symlink"
+mkdir test7
+pushd test7 > /dev/null
+
+DATA_DIR_LINK="$TMPDIR/data_link"
+ln -s "$DATA_DIR" "$DATA_DIR_LINK"
+
+"$meta_executable" \
+  --genome_version test \
+  --data_dir "$DATA_DIR_LINK" \
+  --config_option "test.genome=GRCh38Chr1" \
+  --input "$meta_resources_dir/test_data/test.vcf" \
+  --output output.vcf
+
+check_file_exists "output.vcf" "annotated VCF output"
+check_file_not_empty "output.vcf" "annotated VCF output"
+
+popd > /dev/null
+
+log "Test 7 succeeded."
+
+###########################################################################
+
 print_test_summary "snpeff_ann"
