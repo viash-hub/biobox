@@ -51,6 +51,7 @@ cmd_args=(
   --reference "$staged_reference"
   --native-pair-hmm-threads "${meta_cpus:-1}"
   ${par_active_probability_threshold:+--active-probability-threshold "$par_active_probability_threshold"}
+  ${par_activeregion_alt_multiplier:+--activeregion-alt-multiplier "$par_activeregion_alt_multiplier"}
   ${par_alleles:+--alleles "$par_alleles"}
   "${annotation_args[@]}"
   "${annotation_group_args[@]}"
@@ -90,6 +91,7 @@ cmd_args=(
   ${par_sites_only_vcf_output:+--sites-only-vcf-output}
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
+  ${par_output_cram_version:+--output-cram-version "$par_output_cram_version"}
   "${read_filter_args[@]}"
   "${disable_read_filter_args[@]}"
   ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}

@@ -1,7 +1,10 @@
 ```sh
-docker run --rm quay.io/biocontainers/gatk4:4.6.2.0--py310hdfd78af_1 gatk CreateSequenceDictionary --help
+docker run --rm broadinstitute/gatk:4.7.0.0 gatk CreateSequenceDictionary --help
 ```
 
+Using GATK jar /gatk/gatk-package-4.7.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /gatk/gatk-package-4.7.0.0-local.jar CreateSequenceDictionary --help
 USAGE: CreateSequenceDictionary [arguments]
 
 Creates a sequence dictionary for a reference sequence.  This tool creates a sequence dictionary file (with ".dict"
@@ -9,7 +12,7 @@ extension) from a reference sequence provided in FASTA format, which is required
 The output file contains a header but no SAMRecords, and the header contains only sequence records.<br /><br />The
 reference sequence can be gzipped (both .fasta and .fasta.gz are supported).<h4>Usage example:</h4><pre>java -jar
 picard.jar CreateSequenceDictionary \ <br />      R=reference.fasta \ <br />      O=reference.dict</pre><hr />
-Version:4.6.2.0
+Version:4.7.0.0
 
 
 Required Arguments:

@@ -1,14 +1,15 @@
 ```sh
-docker run --rm quay.io/biocontainers/gatk4:4.6.2.0--py310hdfd78af_1 gatk ApplyBQSR --help
+docker run --rm broadinstitute/gatk:4.7.0.0 gatk ApplyBQSR --help
 ```
 
-Using GATK jar /usr/local/share/gatk4-4.6.2.0-1/gatk-package-4.6.2.0-local.jar
+Using GATK jar /gatk/gatk-package-4.7.0.0-local.jar
 Running:
-    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /usr/local/share/gatk4-4.6.2.0-1/gatk-package-4.6.2.0-local.jar ApplyBQSR --help
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /gatk/gatk-package-4.7.0.0-local.jar ApplyBQSR --help
 USAGE: ApplyBQSR [arguments]
 
 Apply a linear base quality recalibration model trained with the BaseRecalibrator tool.
-Version:4.6.2.0
+Version:4.7.0.0
+
 
 Required Arguments:
 
@@ -123,6 +124,10 @@ Optional Arguments:
 --max-variants-per-shard <Integer>
                               If non-zero, partitions VCF output into shards, each containing up to the given number of
                               records.  Default value: 0. 
+
+--output-cram-version <String>The CRAM version ('3.0' or '3.1') to write for CRAM output. Ignored for BAM/SAM output.
+                              Note that CRAM 3.1 (the default) cannot be read by tools that only support CRAM 3.0. 
+                              Default value: 3.1. 
 
 --preserve-qscores-less-than <Integer>
                               Don't recalibrate bases with quality scores less than this threshold  Default value: 6. 

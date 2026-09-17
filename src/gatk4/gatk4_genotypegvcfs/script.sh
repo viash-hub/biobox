@@ -94,6 +94,7 @@ cmd_args=(
   ${par_pedigree:+--pedigree "$par_pedigree"}
   ${par_population_callset:+--population-callset "$par_population_callset"}
   ${par_sample_ploidy:+--sample-ploidy "$par_sample_ploidy"}
+  ${par_somatic_quality_threshold:+--somatic-quality-threshold "$par_somatic_quality_threshold"}
   ${par_stand_call_conf:+--standard-min-confidence-threshold-for-calling "$par_stand_call_conf"}
   ${par_tumor_lod_to_emit:+--tumor-lod-to-emit "$par_tumor_lod_to_emit"}
   ${par_use_posteriors_to_calculate_qual:+--use-posteriors-to-calculate-qual}
@@ -111,6 +112,7 @@ gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" GenotypeGVCFs \
   ${par_sites_only_vcf_output:+--sites-only-vcf-output} \
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"} \
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"} \
+  ${par_output_cram_version:+--output-cram-version "$par_output_cram_version"} \
   "${read_filter_args[@]}" \
   "${disable_read_filter_args[@]}" \
   ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters} \

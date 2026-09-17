@@ -369,6 +369,11 @@ argument_groups:
 
           For pooled data, set to (number of samples in each pool * sample
           ploidy). Default: 2.
+      - name: "--somatic_quality_threshold"
+        type: double
+        description: |
+          SQ (somatic quality) threshold to emit a variant to the VCF.
+          Only relevant when `--input_is_somatic` is set. Default: 3.0.
       - name: "--stand_call_conf"
         alternatives: [-stand-call-conf]
         type: double

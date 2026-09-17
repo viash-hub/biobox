@@ -27,6 +27,12 @@ argument_groups:
         description: |
           Create a BAM/CRAM index when writing a coordinate-sorted BAM/CRAM
           output. Default: true.
+      - name: "--output_cram_version"
+        type: string
+        description: |
+          CRAM version to write for CRAM output ('3.0' or '3.1'). Ignored
+          for BAM/SAM output. Note that CRAM 3.1 cannot be read by tools
+          that only support CRAM 3.0. Default: '3.1'.
       - name: "--read_filter"
         alternatives: [-RF]
         type: string

@@ -1,15 +1,15 @@
 ```sh
-docker run --rm quay.io/biocontainers/gatk4:4.6.2.0--py310hdfd78af_1 gatk GenotypeGVCFs --help
+docker run --rm broadinstitute/gatk:4.7.0.0 gatk GenotypeGVCFs --help
 ```
 
-Using GATK jar /usr/local/share/gatk4-4.6.2.0-1/gatk-package-4.6.2.0-local.jar
+Using GATK jar /gatk/gatk-package-4.7.0.0-local.jar
 Running:
-    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /usr/local/share/gatk4-4.6.2.0-1/gatk-package-4.6.2.0-local.jar GenotypeGVCFs --help
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /gatk/gatk-package-4.7.0.0-local.jar GenotypeGVCFs --help
 USAGE: GenotypeGVCFs [arguments]
 
 Perform joint genotyping on a single-sample GVCF from HaplotypeCaller or a multi-sample GVCF from CombineGVCFs or
 GenomicsDBImport
-Version:4.6.2.0
+Version:4.7.0.0
 
 
 Required Arguments:
@@ -226,6 +226,10 @@ Optional Arguments:
 --num-reference-samples-if-no-call <Integer>
                               Number of hom-ref genotypes to infer at sites not present in a panel  Default value: 0.
 
+--output-cram-version <String>The CRAM version ('3.0' or '3.1') to write for CRAM output. Ignored for BAM/SAM output.
+                              Note that CRAM 3.1 (the default) cannot be read by tools that only support CRAM 3.0.
+                              Default value: 3.1.
+
 --pedigree,-ped <GATKPath>    Pedigree file for determining the population "founders"  Default value: null.
 
 --population-callset,-population <FeatureInput>
@@ -284,6 +288,9 @@ Optional Arguments:
 --sites-only-vcf-output <Boolean>
                               If true, don't emit genotype fields when writing vcf file output.  Default value: false.
                               Possible values: {true, false}
+
+--somatic-quality-threshold <Double>
+                              SQ threshold to emit variant to VCF.  Default value: 3.0.
 
 --standard-min-confidence-threshold-for-calling,-stand-call-conf <Double>
                               The minimum phred-scaled confidence threshold at which variants should be called  Default
@@ -505,9 +512,12 @@ Valid only if "SoftClippedReadFilter" is specified:
 --max-soft-clipped-leading-trailing-ratio <Double>
                               Threshold ratio of soft clipped bases (leading / trailing the cigar string) to total bases
                               in read for read to be filtered.  Default value: null.  Cannot be used in conjunction with
-                              argument(s) maximumLeadingTrailingSoftClippedRatio
+                              argument(s) maximumSoftClippedRatio
 
 --max-soft-clipped-ratio <Double>
                               Threshold ratio of soft clipped bases (anywhere in the cigar string) to total bases in
                               read for read to be filtered.  Default value: null.  Cannot be used in conjunction with
-                              argument(s) maximumSoftClippedRatio
+                              argument(s) maximumLeadingTrailingSoftClippedRatio
+
+Tool returned:
+0

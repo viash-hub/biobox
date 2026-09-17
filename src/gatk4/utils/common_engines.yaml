@@ -1,5 +1,5 @@
 type: docker
-image: quay.io/biocontainers/gatk4:4.6.2.0--py310hdfd78af_1
+image: broadinstitute/gatk:4.7.0.0
 setup:
   - type: docker
     run: |

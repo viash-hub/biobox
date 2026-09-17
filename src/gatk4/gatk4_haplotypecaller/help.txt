@@ -1,14 +1,14 @@
 ```sh
-docker run --rm quay.io/biocontainers/gatk4:4.6.2.0--py310hdfd78af_1 gatk HaplotypeCaller --help
+docker run --rm broadinstitute/gatk:4.7.0.0 gatk HaplotypeCaller --help
 ```
 
-Using GATK jar /usr/local/share/gatk4-4.6.2.0-1/gatk-package-4.6.2.0-local.jar
+Using GATK jar /gatk/gatk-package-4.7.0.0-local.jar
 Running:
-    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /usr/local/share/gatk4-4.6.2.0-1/gatk-package-4.6.2.0-local.jar HaplotypeCaller --help
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /gatk/gatk-package-4.7.0.0-local.jar HaplotypeCaller --help
 USAGE: HaplotypeCaller [arguments]
 
 Call germline SNPs and indels via local re-assembly of haplotypes
-Version:4.6.2.0
+Version:4.7.0.0
 
 
 Required Arguments:
@@ -241,6 +241,10 @@ Optional Arguments:
 --num-reference-samples-if-no-call <Integer>
                               Number of hom-ref genotypes to infer at sites not present in a panel  Default value: 0. 
 
+--output-cram-version <String>The CRAM version ('3.0' or '3.1') to write for CRAM output. Ignored for BAM/SAM output.
+                              Note that CRAM 3.1 (the default) cannot be read by tools that only support CRAM 3.0. 
+                              Default value: 3.1. 
+
 --output-mode <OutputMode>    Specifies which type of calls we should output  Default value: EMIT_VARIANTS_ONLY.
                               Possible values: {EMIT_VARIANTS_ONLY, EMIT_ALL_CONFIDENT_SITES, EMIT_ALL_ACTIVE_SITES} 
 
@@ -353,6 +357,10 @@ Advanced Arguments:
 --active-probability-threshold <Double>
                               Minimum probability for a locus to be considered active.  Default value: 0.002. 
 
+--activeregion-alt-multiplier <Double>
+                              Multiplier for up-weighting ALT-supporting reads during active region determination 
+                              Default value: 1.0. 
+
 --adaptive-pruning <Boolean>  Use Mutect2's adaptive graph pruning algorithm  Default value: false. Possible values:
                               {true, false} 
 
@@ -442,6 +450,11 @@ Advanced Arguments:
                               for concordance against DRAGEN 3.7.8. NOTE: THIS WILL OVERWRITE PROVIDED ARGUMENT CHECK
                               TOOL INFO TO SEE WHICH ARGUMENTS ARE SET).  Default value: false. Possible values: {true,
                               false}  Cannot be used in conjunction with argument(s) dragen3412mode
+
+--dragen-pd-pair-hmm-implementation,-pdPpairHMM <Implementation>
+                              The DRAGEN PDPairHMM implementation to use for genotype likelihood calculations  Default
+                              value: FASTEST_AVAILABLE. Possible values: {LOGLESS_CACHING, AVX_LOGLESS_CACHING,
+                              FASTEST_AVAILABLE} 
 
 --emit-ref-confidence,-ERC <ReferenceConfidenceMode>
                               Mode for emitting reference confidence scores (For Mutect2, this is a BETA feature) 
@@ -585,6 +598,22 @@ Advanced Arguments:
                               Minimum length of a dangling branch to attempt recovery  Default value: 4. 
 
 --min-pruning <Integer>       Minimum support to not prune paths in the graph  Default value: 2. 
+
+--native-dragen-pd-pair-avx-level <AVXLevel>
+                              AVX level instruction for gkl pd-pair-hmm impelmentation to use [SCALAR, AVX2, AVX512]. 
+                              Default value: FASTEST_AVAILABLE. Possible values: {FASTEST_AVAILABLE, SCALAR, AVX2,
+                              AVX512} 
+
+--native-dragen-pd-pair-hmm-threads <Integer>
+                              How many threads should a native DRAGEN pd-pairHMM implementation use  Default value: 8. 
+
+--native-dragen-pd-pair-memory-limit <Integer>
+                              Maximum limit for memory (in MB) to the GKL for internal uses. (NOTE: this memory is not
+                              manage by Java and is not subject to -Xmx limits)  Default value: 1024. 
+
+--native-dragen-pd-pair-open-mp-settings <OpenMPSetting>
+                              Whether to enable use of Open MP library within the GKL.  Default value:
+                              FASTEST_AVAILABLE. Possible values: {FASTEST_AVAILABLE, ENABLE, DISABLE} 
 
 --num-pruning-samples <Integer>
                               Number of samples that must pass the minPruning threshold  Default value: 1. 

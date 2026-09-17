@@ -79,6 +79,11 @@ argument_groups:
         description: |
           Minimum probability for a locus to be considered active.
           Default: 0.002.
+      - name: "--activeregion_alt_multiplier"
+        type: double
+        description: |
+          Multiplier for up-weighting ALT-supporting reads during active
+          region determination. Default: 1.0.
       - name: "--alleles"
         type: file
         description: |
