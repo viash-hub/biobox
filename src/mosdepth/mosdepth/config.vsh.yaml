@@ -136,20 +136,20 @@ argument_groups:
         example: "0:1:5:100:500"
       - name: "--quantize_labels"
         type: string
+        multiple: true
         description: |
-          Comma-separated custom labels for the `--quantize` bins, replacing
-          their default numeric range labels in `--output_quantized`. The
-          number of labels must match the number of bins produced by
-          `--quantize`.
-        example: "NO_COVERAGE,LOW_COVERAGE,CALLABLE,HIGH_COVERAGE"
+          Custom labels for the `--quantize` bins, replacing their default
+          numeric range labels in `--output_quantized`. The number of labels
+          must match the number of bins produced by `--quantize`.
+        example: [NO_COVERAGE, LOW_COVERAGE, CALLABLE, HIGH_COVERAGE]
       - name: "--thresholds"
         alternatives: [-T]
-        type: string
+        type: integer
+        multiple: true
         description: |
-          Comma-separated list of integer coverage thresholds to report per
-          region in `--output_thresholds`. Requires `--by_bed`/`--by_window` to
-          be set.
-        example: "1,5,10,20,50"
+          Coverage thresholds to report per region in `--output_thresholds`.
+          Requires `--by_bed`/`--by_window` to be set.
+        example: [1, 5, 10, 20, 50]
       - name: "--use_median"
         alternatives: [-m]
         type: boolean_true
@@ -220,10 +220,10 @@ argument_groups:
       - name: "--read_groups"
         alternatives: [-R]
         type: string
+        multiple: true
         description: |
-          Comma-separated list of read group IDs to restrict depth calculation
-          to.
-        example: "RG1,RG2"
+          Read group IDs to restrict depth calculation to.
+        example: [RG1, RG2]
 
 resources:
   - type: bash_script

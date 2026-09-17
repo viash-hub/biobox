@@ -38,7 +38,7 @@ fi
 
 # Custom quantize bin labels are set via MOSDEPTH_Q0..MOSDEPTH_QN env vars
 if [ -n "$par_quantize_labels" ]; then
-  IFS=',' read -ra quantize_labels <<<"$par_quantize_labels"
+  IFS=';' read -ra quantize_labels <<<"$par_quantize_labels"
   for i in "${!quantize_labels[@]}"; do
     export "MOSDEPTH_Q${i}=${quantize_labels[$i]}"
   done
@@ -46,6 +46,10 @@ fi
 
 # Distribution decimal precision is set via the MOSDEPTH_PRECISION env var
 [ -n "$par_dist_precision" ] && export MOSDEPTH_PRECISION="$par_dist_precision"
+
+# mosdepth expects --thresholds and --read-groups as comma-separated values
+par_thresholds=$(echo "$par_thresholds" | tr ';' ',')
+par_read_groups=$(echo "$par_read_groups" | tr ';' ',')
 
 # mosdepth names output files using a fixed prefix. We stage output to a
 # temporary directory and rename it at the end of the script.

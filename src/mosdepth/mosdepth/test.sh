@@ -76,7 +76,10 @@ log "Starting TEST 4: --quantize with custom --quantize_labels"
   --input "$bam" \
   --input_index "$bai" \
   --quantize "0:1:5:100:500" \
-  --quantize_labels "NO_COVERAGE,LOW_COVERAGE,CALLABLE,HIGH_COVERAGE" \
+  --quantize_labels "NO_COVERAGE" \
+  --quantize_labels "LOW_COVERAGE" \
+  --quantize_labels "CALLABLE" \
+  --quantize_labels "HIGH_COVERAGE" \
   --output_quantized "$meta_temp_dir/test4_quantized.bed.gz" \
   --output_quantized_index "$meta_temp_dir/test4_quantized.bed.gz.csi"
 
@@ -93,7 +96,9 @@ log "Starting TEST 5: --thresholds"
   --input "$bam" \
   --input_index "$bai" \
   --by_window 100 \
-  --thresholds "1,5,10" \
+  --thresholds 1 \
+  --thresholds 5 \
+  --thresholds 10 \
   --output_thresholds "$meta_temp_dir/test5_thresholds.bed.gz" \
   --output_thresholds_index "$meta_temp_dir/test5_thresholds.bed.gz.csi"
 
