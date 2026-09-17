@@ -59,13 +59,14 @@ engines:
         apt upgrade -y && apt install -y procps pigz && rm -rf /var/lib/apt/lists/* && \
         ln -s /opt/cellranger-10.0.0/bin/cellranger /usr/bin/cellranger && \
         cellranger telemetry disable
+    - type: docker
+      run: |
+        cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
+
   test_setup:
     - type: apt
       packages:
         - seqkit
-    - type: docker
-      run: |
-        cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
 
 runners:
 - type: executable
