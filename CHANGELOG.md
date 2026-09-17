@@ -2,7 +2,7 @@
 
 ## BREAKING CHANGES
 
-* `cellranger_count`: updated to Cell Ranger v10. This drops support for the `SC3Pv3LT` chemistry (PR #)
+* `cellranger_count`: updated to Cell Ranger v10. This drops support for the `SC3Pv3LT` chemistry (PR #240)
 
 ## NEW FUNCTIONALITY
 
@@ -30,7 +30,7 @@
 
 ## MAJOR CHANGES
 
-* `cellranger_mkref`: updated Cell Ranger to v10 (PR #).
+* `cellranger_mkref`: updated Cell Ranger to v10 (PR #240).
 
 ## MINOR CHANGES
 
