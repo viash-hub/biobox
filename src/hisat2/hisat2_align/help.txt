@@ -1,7 +1,7 @@
 `sh
 hisat2 --help
 `
-HISAT2 version 2.2.2 by Daehwan Kim (infphilo@gmail.com, www.ccb.jhu.edu/people/infphilo)
+HISAT2 version 2.2.3 by Daehwan Kim (infphilo@gmail.com, www.ccb.jhu.edu/people/infphilo)
 Usage: 
   hisat2 [options]* -x <ht2-idx> {-1 <m1> -2 <m2> | -U <r>} [-S <sam>]
 

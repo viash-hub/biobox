@@ -142,7 +142,7 @@ test_resources:
 
 engines:
   - type: docker
-    image: quay.io/biocontainers/hisat2:2.2.2--h503566f_0
+    image: quay.io/biocontainers/hisat2:2.2.3--h8471819_1
     setup:
       - type: docker
         run: |
