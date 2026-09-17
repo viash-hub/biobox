@@ -6,7 +6,7 @@
 # via:
 #   source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Create a samtools-compatible .fai index for a FASTA file using pysam
+# Create a .fai index for a FASTA file using samtools.
 #
 # Usage: create_test_fasta_fai "/path/to/input.fasta" "/path/to/output.fai"
 create_test_fasta_fai() {
@@ -15,7 +15,7 @@ create_test_fasta_fai() {
 
   log "Creating FASTA index (.fai) for: $fasta_path"
 
-  python3 -c "import sys, pysam; pysam.faidx(sys.argv[1])" "$fasta_path"
+  samtools faidx "$fasta_path"
 
   if [[ "$fai_path" != "${fasta_path}.fai" ]]; then
     mv "${fasta_path}.fai" "$fai_path"
