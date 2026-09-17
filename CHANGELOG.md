@@ -41,6 +41,8 @@
 
 * Bump `viash` to 0.9.7 (PR #238)
 
+* `hisat2`: Bump HISAT2 from `2.2.2` to `2.2.3` (PR #241)
+
 ## BUG FIXES
 
 * `bowtie2`: Fix `--index` of `bowtie2/bowtie2_align` and `bowtie2/bowtie2_inspect` (PR #233):
