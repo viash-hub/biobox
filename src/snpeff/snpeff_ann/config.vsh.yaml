@@ -82,8 +82,10 @@ argument_groups:
       - name: --stats
         alternatives: [-s, --htmlStats]
         type: string
-        description: Create HTML summary file.
-        default: snpEff_summary.html
+        description: |
+          Name of the intermediate HTML summary file snpEff creates.
+          Default: 'snpEff_summary.html'. This is not the final output
+          location: use `--summary` to set where the HTML summary ends up.
       - name: --no_stats
         type: boolean_true
         description: Do not create stats (summary) file.

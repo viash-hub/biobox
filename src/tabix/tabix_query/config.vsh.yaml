@@ -94,12 +94,12 @@ argument_groups:
           with `--unique`.
       - name: --cache
         type: integer
-        description: BGZF block cache size in megabytes (`0` disables it).
-        default: 10
+        description: |
+          BGZF block cache size in megabytes (`0` disables it). Default: 10.
       - name: --verbosity
         type: integer
-        description: Logging verbosity.
-        default: 3
+        description: |
+          Logging verbosity. Default: 3.
       - name: --skip_index_download
         alternatives: [-D]
         type: boolean_true
