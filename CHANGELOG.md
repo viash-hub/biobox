@@ -1,4 +1,4 @@
-# biobox x.x.x
+# biobox 0.5.0
 
 ## NEW FUNCTIONALITY
 
