@@ -139,7 +139,7 @@ Add all other arguments with these exceptions:
 * If the help file lists defaults, add them to description rather than as defaults
 
 **Boolean handling:**
-* Prefer using `boolean_true` over `boolean_false` to avoid confusion in Nextflow workflows
+* Prefer using `boolean` over `boolean_false` to avoid confusion in Nextflow workflows
 
 ### Description Formatting Guidelines
 
