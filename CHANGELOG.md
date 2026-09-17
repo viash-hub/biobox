@@ -22,11 +22,17 @@
   - `minibwa/minibwa_index`: Build a minibwa reference index, optionally including a bisulfite (BS-seq) index
   - `minibwa/minibwa_map`: Align short, long, Hi-C or bisulfite reads to a minibwa index
 
+* `mosdepth`: Add mosdepth, a fast BAM/CRAM depth-of-coverage calculator (PR #227)
+
 * `tabix`: Add tabix, a generic indexer/query tool for BGZF block-compressed, position-sorted files (PR #228, PR #235):
   - `tabix/tabix_index`: Build a tabix (`.tbi`) or CSI (`.csi`) index for a BGZF-compressed file.
   - `tabix/tabix_query`: Query an indexed file by region, or list its chromosomes.
 
 * `snpeff`: Add `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
+
+* `winnowmap`: Long-read aligner optimised for repetitive genomic regions using weighted minimizers (PR #230):
+  - `winnowmap/winnowmap_align`: Map long reads against a reference genome using Winnowmap with automatic or pre-computed meryl k-mer frequencies. Outputs SAM, or a coordinate-sorted BAM with a companion index (`--bam` / `--output_index`).
+
 
 ## MAJOR CHANGES
 
@@ -72,6 +78,7 @@
   * Fix `--csv_stats` and `--fastaprot` which were missing `direction: output` and so defaulted to `direction: input`, requiring the (not yet created) output file to already exist before running
   * Fix `--cancer_samples` and `--fastaprot` which appended a stray literal `]` character to the provided value, corrupting the file path passed to `-cancerSamples`/`-fastaProt`
   * Enforce that `--no-stats` cannot be set with `--summary`/`--genes` (PR #236)
+  * Resolve the path passed to `--data_dir` in case it is a symlink (PR #239)
 
 # biobox 0.4.2
 

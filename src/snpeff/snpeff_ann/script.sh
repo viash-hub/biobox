@@ -69,6 +69,11 @@ fi
 # for relocation when --stats is not explicitly set.
 par_stats="${par_stats:-snpEff_summary.html}"
 
+# Normalize data_dir to an absolute, symlink-resolved path
+if [ -n "$par_data_dir" ]; then
+    par_data_dir=$(realpath "$par_data_dir")
+fi
+
 # Run SnpEff
 snpEff ann \
     ${par_chr:+-chr "$par_chr"} \
