@@ -373,6 +373,8 @@ test_resources:
   - type: bash_script
     path: test.sh
   - type: file
+    path: test_data
+  - type: file
     path: /src/_utils/test_helpers.sh
 
 engines:
