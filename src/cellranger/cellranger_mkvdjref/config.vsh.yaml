@@ -33,14 +33,14 @@ authors:
 argument_groups:
   - name: Input
     arguments:
-      - type: file
-        name: --fasta
+      - name: --fasta
+        type: file
         description: |
           Path to FASTA file containing your genome reference. Must be combined
           with `--genes` and is mutually exclusive with `--seqs`.
         example: genome_sequence.fa.gz
-      - type: file
-        name: --genes
+      - name: --genes
+        type: file
         multiple: true
         description: |
           Path to genes GTF file containing annotated genes for your genome
@@ -48,14 +48,14 @@ argument_groups:
           times. Must be combined with `--fasta` and is mutually exclusive with
           `--seqs`.
         example: transcriptome_annotation.gtf.gz
-      - type: file
-        name: --seqs
+      - name: --seqs
+        type: file
         description: |
           Path to a FASTA file that directly specifies V(D)J sequences. This is
           mutually exclusive with the `--fasta` and `--genes` arguments.
         example: vdj_segments.fa
-      - type: file
-        name: --rm_transcripts
+      - name: --rm_transcripts
+        type: file
         description: |
           Path to text file with transcript IDs to ignore. This file should have
           one transcript ID per line where the IDs correspond to the
@@ -65,8 +65,8 @@ argument_groups:
 
   - name: Output
     arguments:
-      - type: file
-        name: --output
+      - name: --output
+        type: file
         direction: output
         required: true
         description: The folder to store the V(D)J reference in.
@@ -74,15 +74,15 @@ argument_groups:
 
   - name: Arguments
     arguments:
-      - type: string
-        name: --genome
+      - name: --genome
+        type: string
         required: true
         description: |
           Unique genome name, recorded in the reference metadata. Must match
           `[a-zA-Z0-9_-]+`.
         example: GRCh38_vdj
-      - type: string
-        name: --ref_version
+      - name: --ref_version
+        type: string
         description: Optional reference version string to include with reference.
         example: "1.0.0"
 
