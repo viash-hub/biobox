@@ -1,5 +1,9 @@
 # biobox x.x.x
 
+## BREAKING CHANGES
+
+* `cellranger_count`: updated to Cell Ranger v10. This drops support for the `SC3Pv3LT` chemistry (PR #240)
+
 ## NEW FUNCTIONALITY
 
 * `gatk4`: Added components for the Genome Analysis Toolkit (GATK4), covering a full germline short-variant discovery pipeline (PR #226):
@@ -28,6 +32,11 @@
 
 * `winnowmap`: Long-read aligner optimised for repetitive genomic regions using weighted minimizers (PR #230):
   - `winnowmap/winnowmap_align`: Map long reads against a reference genome using Winnowmap with automatic or pre-computed meryl k-mer frequencies. Outputs SAM, or a coordinate-sorted BAM with a companion index (`--bam` / `--output_index`).
+
+
+## MAJOR CHANGES
+
+* `cellranger_mkref`: updated Cell Ranger to v10 (PR #240).
 
 ## MINOR CHANGES
 
@@ -72,6 +81,8 @@
   * Fix `--cancer_samples` and `--fastaprot` which appended a stray literal `]` character to the provided value, corrupting the file path passed to `-cancerSamples`/`-fastaProt`
   * Enforce that `--no-stats` cannot be set with `--summary`/`--genes` (PR #236)
   * Resolve the path passed to `--data_dir` in case it is a symlink (PR #239)
+
+* `cellranger/cellranger_count`: fix `min_crispr_umi` argument (PR #240)
 
 # biobox 0.4.2
 
