@@ -1,0 +1,85 @@
+name: cellranger_mkgtf
+namespace: cellranger
+summary: Filter a GTF file for use with Cell Ranger.
+description: |
+  Filter a user-supplied gene GTF file so it can be used as the genes file for
+  `cellranger mkref`.
+
+  Records are kept when the attributes field of the GTF contains at least one of
+  the requested key-value pairs. When multiple values are requested for the same
+  key, a record is kept if it matches any of them. When multiple keys are
+  requested, a record must match at least one value for every key.
+
+  When no `--attribute` is given, all records are retained.
+keywords: [cellranger, single-cell, rna-seq, reference, gtf, filter]
+links:
+  documentation: https://www.10xgenomics.com/support/software/cell-ranger/latest
+  repository: https://github.com/10XGenomics/cellranger/blob/main/bin/rna/mkgtf
+  homepage: https://www.10xgenomics.com/support/software/cell-ranger/latest
+  issue_tracker: https://github.com/10XGenomics/cellranger/issues
+references:
+  doi: 10.1038/ncomms14049
+license: Proprietary
+requirements:
+  commands: [cellranger]
+authors:
+  - __merge__: /src/_authors/dries_schaumont.yaml
+    roles: [author]
+
+argument_groups:
+  - name: Input
+    arguments:
+      - type: file
+        name: --input_gtf
+        required: true
+        description: Path to input genes GTF file.
+        example: transcriptome_annotation.gtf
+
+  - name: Output
+    arguments:
+      - type: file
+        name: --output_gtf
+        direction: output
+        required: true
+        description: Path to filtered output genes GTF file.
+        example: transcriptome_annotation_filtered.gtf
+
+  - name: Arguments
+    arguments:
+      - type: string
+        name: --attribute
+        multiple: true
+        description: |
+          Key-value pair in the attributes field to be kept in the GTF file.
+          Specify multiple pairs by using this argument multiple times.
+        example: [ "gene_biotype:protein_coding", "gene_biotype:lincRNA" ]
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: debian:latest
+    setup:
+      # quay.io/nf-core/cellranger:10.0.0 is based on bookworm (which has been deprecated)
+      # So use `debian:latest` and use a `COPY --from=...`
+      - type: docker
+        copy:
+          - "--from=quay.io/nf-core/cellranger:10.0.0 /opt/cellranger-10.0.0 /opt/cellranger-10.0.0"
+        run: |
+          DEBIAN_FRONTEND=noninteractive apt update && \
+          apt upgrade -y && apt install -y procps && rm -rf /var/lib/apt/lists/* && \
+          ln -s /opt/cellranger-10.0.0/bin/cellranger /usr/bin/cellranger && \
+          cellranger telemetry disable
+      - type: docker
+        run: |
+          cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

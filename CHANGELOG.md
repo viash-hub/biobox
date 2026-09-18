@@ -1,3 +1,9 @@
+# biobox x.x.x
+
+## NEW FUNCTIONALITY
+
+* `cellranger/cellranger_mkgtf`: Filter a genes GTF file so it can be used as the genes file for `cellranger_mkref` (PR #244).
+
 # biobox 0.5.0
 
 ## BREAKING CHANGES
