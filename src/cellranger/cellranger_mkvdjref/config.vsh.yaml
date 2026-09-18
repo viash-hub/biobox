@@ -1,0 +1,119 @@
+name: cellranger_mkvdjref
+namespace: cellranger
+summary: Build a Cell Ranger V(D)J-compatible reference folder.
+description: |
+  Prepare a reference for use with Cell Ranger V(D)J.
+
+  The reference can be built from either:
+
+  1. a user-supplied genome FASTA and gene GTF file, for example using files
+     from ENSEMBL (`--fasta` together with `--genes`), or
+  2. a FASTA file containing V(D)J segments as per the mkvdjref spec, for
+     example using files from IMGT (`--seqs`).
+
+  Both modes are mutually exclusive, and `--rm_transcripts` only applies to the
+  first one.
+
+  Gzipped input files are decompressed before being handed to Cell Ranger.
+keywords: [ cellranger, single-cell, immune-profiling, vdj, reference, gtf, fasta ]
+links:
+  documentation: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-5p-references
+  repository: https://github.com/10XGenomics/cellranger/blob/main/lib/python/cellranger/vdj/reference_maker.py
+  homepage: https://www.10xgenomics.com/support/software/cell-ranger/latest
+  issue_tracker: https://github.com/10XGenomics/cellranger/issues
+references:
+  doi: 10.1038/ncomms14049
+license: Proprietary
+requirements:
+  commands: [cellranger, unpigz, file]
+authors:
+  - __merge__: /src/_authors/dries_schaumont.yaml
+    roles: [author]
+
+argument_groups:
+  - name: Input
+    arguments:
+      - type: file
+        name: --fasta
+        description: |
+          Path to FASTA file containing your genome reference. Must be combined
+          with `--genes` and is mutually exclusive with `--seqs`.
+        example: genome_sequence.fa.gz
+      - type: file
+        name: --genes
+        multiple: true
+        description: |
+          Path to genes GTF file containing annotated genes for your genome
+          reference. Specify multiple genomes by using this argument multiple
+          times. Must be combined with `--fasta` and is mutually exclusive with
+          `--seqs`.
+        example: transcriptome_annotation.gtf.gz
+      - type: file
+        name: --seqs
+        description: |
+          Path to a FASTA file that directly specifies V(D)J sequences. This is
+          mutually exclusive with the `--fasta` and `--genes` arguments.
+        example: vdj_segments.fa
+      - type: file
+        name: --rm_transcripts
+        description: |
+          Path to text file with transcript IDs to ignore. This file should have
+          one transcript ID per line where the IDs correspond to the
+          `transcript_id` key in the GTF info column. Only applies when building
+          the reference from `--fasta` and `--genes`.
+        example: remove_transcripts.txt
+
+  - name: Output
+    arguments:
+      - type: file
+        name: --output
+        direction: output
+        required: true
+        description: The folder to store the V(D)J reference in.
+        example: cellranger_vdj_reference
+
+  - name: Arguments
+    arguments:
+      - type: string
+        name: --genome
+        required: true
+        description: |
+          Unique genome name, recorded in the reference metadata. Must match
+          `[a-zA-Z0-9_-]+`.
+        example: GRCh38_vdj
+      - type: string
+        name: --ref_version
+        description: Optional reference version string to include with reference.
+        example: "1.0.0"
+
+resources:
+  - type: bash_script
+    path: script.sh
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: debian:latest
+    setup:
+      # quay.io/nf-core/cellranger:10.0.0 is based on bookworm (which has been deprecated)
+      # So use `debian:latest` and use a `COPY --from=...`
+      - type: docker
+        copy:
+          - "--from=quay.io/nf-core/cellranger:10.0.0 /opt/cellranger-10.0.0 /opt/cellranger-10.0.0"
+        run: |
+          DEBIAN_FRONTEND=noninteractive apt update && \
+          apt upgrade -y && apt install -y procps pigz file && rm -rf /var/lib/apt/lists/* && \
+          ln -s /opt/cellranger-10.0.0/bin/cellranger /usr/bin/cellranger && \
+          cellranger telemetry disable
+      - type: docker
+        run: |
+          cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [ highmem ]

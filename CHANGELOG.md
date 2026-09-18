@@ -1,3 +1,9 @@
+# biobox x.x.x
+
+## NEW FUNCTIONALITY
+
+* `cellranger/cellranger_mkvdjref`: Build a Cell Ranger V(D)J-compatible reference folder from a genome FASTA and gene GTF, or from a FASTA of V(D)J segments (PR #244).
+
 # biobox 0.5.0
 
 ## BREAKING CHANGES
