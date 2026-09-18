@@ -1,0 +1,196 @@
+name: cellranger_multi
+namespace: cellranger
+summary: Analyse multiplexed data or combined gene expression, immune profiling and feature barcode data using Cell Ranger multi.
+description: |
+  `cellranger multi` is configured through a single "multi config CSV" that both enumerates
+  the input libraries and holds the analysis parameters. That CSV refers to its inputs by
+  path: the FASTQ directories in the `fastqs` column of the `[libraries]` section, and the
+  transcriptome, feature, VDJ and probe set references in the option sections.
+
+  Those paths are resolved on the machine that runs Cell Ranger, so nothing stages them
+  into the container or into the Nextflow work directory. This component therefore accepts
+  the input files as separate arguments -- arguments that `cellranger multi` itself does not
+  have -- and rewrites the corresponding entries of the multi config CSV to the staged
+  locations before running the pipeline:
+
+  | Argument                      | Multi config CSV entry                        |
+  | ----------------------------- | --------------------------------------------- |
+  | `--fastqs`                    | `fastqs` column of `[libraries]`              |
+  | `--gex_reference`             | `[gene-expression] reference`                 |
+  | `--probe_set`                 | `[gene-expression] probe-set`                 |
+  | `--cmo_set`                   | `[gene-expression] cmo-set`                   |
+  | `--barcode_sample_assignment` | `[gene-expression] barcode-sample-assignment` |
+  | `--tenx_cloud_token`          | `[gene-expression] tenx-cloud-token-path`     |
+  | `--feature_reference`         | `[feature] reference`                         |
+  | `--vdj_reference`             | `[vdj] reference`                             |
+  | `--inner_enrichment_primers`  | `[vdj] inner-enrichment-primers`              |
+
+  An entry is overwritten when it is already present in the CSV and appended to its section
+  otherwise, so the paths in the input CSV can be placeholders. Sections and entries that
+  have no matching argument are passed through unchanged, which allows referring to files
+  that ship with Cell Ranger itself, such as the probe sets under
+  `/opt/cellranger-10.0.0/probe_sets`.
+
+  Cell Ranger identifies a set of reads by the directory that holds it and by the file names
+  in it, so the same library sequenced on more than one flowcell yields identically named
+  files that only the `fastqs` column tells apart. Staging keeps that grouping intact: the
+  files of each directory they come from are symlinked into a staged directory of their own.
+  Every `fastqs` column entry is then matched to the directory whose path shares the longest
+  tail with it, so the entry only has to carry enough of the path to tell the directories
+  apart rather than the path on the machine that runs this. `flowcell1/a` and `flowcell2/a`
+  stay apart that way, even though both end in `a`. When a single directory of FASTQ files is
+  passed, every entry points at it, so the column can be a placeholder as well.
+keywords: [cellranger, single-cell, rna-seq, alignment, multiplexing, immune-profiling, feature-barcode]
+links:
+  documentation: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi
+  repository: https://github.com/10XGenomics/cellranger
+  homepage: https://www.10xgenomics.com/support/software/cell-ranger/latest
+  issue_tracker: https://github.com/10XGenomics/cellranger/issues
+references:
+  doi: 10.1038/ncomms14049
+license: Proprietary
+requirements:
+  commands: [cellranger]
+authors:
+  - __merge__: /src/_authors/dries_schaumont.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Input
+    arguments:
+      - name: --csv
+        type: file
+        required: true
+        description: |
+          Path of the multi config CSV file enumerating the input libraries and the analysis
+          parameters. The paths it refers to are replaced by the staged locations of the
+          files passed with the arguments below.
+        example: config.csv
+      - name: --fastqs
+        type: file
+        required: true
+        multiple: true
+        description: |
+          The FASTQ files to analyse, compressed (`.fastq.gz`, `.fastq.lz4`) or not
+          (`.fastq`). Can also be one or more directories containing them, which are searched
+          recursively. The files of each directory they come from are staged separately, and
+          every `fastqs` column entry of the `[libraries]` section is matched to the directory
+          whose path shares the longest tail with it. When a single directory of FASTQ files
+          is passed, every entry points at it.
+        example: ["sample_S1_L001_R1_001.fastq.gz", "sample_S1_L001_R2_001.fastq.gz"]
+      - name: --gex_reference
+        type: file
+        description: |
+          Path of a folder containing a 10x-compatible transcriptome reference. Can also be a
+          `.tar.gz` file. Sets `reference` in the `[gene-expression]` section.
+        example: transcriptome.tar.gz
+      - name: --probe_set
+        type: file
+        description: |
+          Probe set CSV file, declaring the probe constructs and associated barcodes.
+          Required for Flex chemistries. Sets `probe-set` in the `[gene-expression]` section.
+        example: probe_set.csv
+      - name: --cmo_set
+        type: file
+        description: |
+          CMO set CSV file, declaring the Cell Multiplexing Oligo constructs and associated
+          barcodes. Sets `cmo-set` in the `[gene-expression]` section.
+        example: cmo_set.csv
+      - name: --barcode_sample_assignment
+        type: file
+        description: |
+          CSV file assigning cell barcodes to samples, bypassing the barcode assignment
+          algorithm. Sets `barcode-sample-assignment` in the `[gene-expression]` section.
+        example: barcode_sample_assignment.csv
+      - name: --tenx_cloud_token
+        type: file
+        description: |
+          The path to the 10x Cloud Analysis user token used to enable cell annotation.
+          Sets `tenx-cloud-token-path` in the `[gene-expression]` section. If not provided,
+          Cell Ranger defaults to the location stored through `cellranger cloud auth setup`.
+        example: tenx_cloud_token.json
+      - name: --feature_reference
+        type: file
+        description: |
+          Feature reference CSV file, declaring the Feature Barcode constructs and associated
+          barcodes. Sets `reference` in the `[feature]` section.
+        example: feature_reference.csv
+      - name: --vdj_reference
+        type: file
+        description: |
+          Path of a folder containing a 10x-compatible V(D)J reference. Can also be a
+          `.tar.gz` file. Sets `reference` in the `[vdj]` section.
+        example: vdj_reference.tar.gz
+      - name: --inner_enrichment_primers
+        type: file
+        description: |
+          A text file with one primer per line, listing the inner enrichment primers used
+          instead of the ones provided by 10x Genomics. Sets `inner-enrichment-primers` in
+          the `[vdj]` section.
+        example: primers.txt
+
+  - name: Output
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        required: true
+        description: |
+          The folder to store the analysis results in. Next to the Cell Ranger output it
+          holds `cellranger_multi.log`, the output of the run, which Cell Ranger itself only
+          keeps in the pipeline directory that is discarded after the run.
+        example: output
+
+  - name: Arguments
+    arguments:
+      - name: --id
+        type: string
+        default: run
+        description: |
+          A unique run id, matching `[a-zA-Z0-9_-]+`. Cell Ranger uses it to name the run
+          and, for runs without a `[samples]` section, the `per_sample_outs` subdirectory of
+          the output.
+      - name: --description
+        type: string
+        description: Sample description to embed in output files.
+      - name: --dry
+        type: boolean_true
+        description: |
+          Do not execute the pipeline. Generate a pipeline invocation (`.mro`) file and stop.
+          The multi config CSV is still parsed and validated, and written to the output
+          folder as `config.csv`, so the staging can be inspected without running Cell Ranger.
+
+resources:
+  - type: python_script
+    path: script.py
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: debian:latest
+    setup:
+      # quay.io/nf-core/cellranger:10.0.0 is based on bookworm (which has been deprecated)
+      # So use `debian:latest` and use a `COPY --from=...`
+      - type: docker
+        copy:
+          - "--from=quay.io/nf-core/cellranger:10.0.0 /opt/cellranger-10.0.0 /opt/cellranger-10.0.0"
+        run: |
+          DEBIAN_FRONTEND=noninteractive apt update && \
+          apt upgrade -y && apt install -y procps python3 python-is-python3 && \
+          rm -rf /var/lib/apt/lists/* && \
+          ln -s /opt/cellranger-10.0.0/bin/cellranger /usr/bin/cellranger && \
+          cellranger telemetry disable
+      - type: docker
+        run: |
+          cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
+    test_setup:
+      - type: apt
+        packages: [lz4]
+
+runners:
+  - type: executable
+  - type: nextflow

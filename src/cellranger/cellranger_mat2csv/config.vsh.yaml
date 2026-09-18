@@ -1,0 +1,91 @@
+name: cellranger_mat2csv
+namespace: cellranger
+summary: Convert a Cell Ranger feature-barcode matrix from sparse to dense CSV format.
+description: |
+  Converts a Cell Ranger feature-barcode matrix to a dense CSV file, for use by external
+  programs. The input is either a feature-barcode HDF5 file (recommended) or a MEX Cell
+  Ranger output folder, such as the `filtered_feature_bc_matrix.h5` file or the
+  `filtered_feature_bc_matrix` folder produced by `cellranger_count`.
+
+  The resulting CSV holds one row per feature and one column per barcode, including the
+  zero entries that the sparse input leaves out. Cell Ranger warns when the matrix is large,
+  because the dense representation can be slow to write and too big for other programs to
+  load.
+keywords: [cellranger, single-cell, rna-seq, feature-barcode-matrix, csv, conversion]
+links:
+  documentation: https://www.10xgenomics.com/support/software/cell-ranger/latest
+  repository: https://github.com/10XGenomics/cellranger
+  homepage: https://www.10xgenomics.com/support/software/cell-ranger/latest
+  issue_tracker: https://github.com/10XGenomics/cellranger/issues
+references:
+  doi: 10.1038/ncomms14049
+license: Proprietary
+requirements:
+  commands: [cellranger]
+authors:
+  - __merge__: /src/_authors/dries_schaumont.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: Input
+    arguments:
+      - name: --input
+        type: file
+        required: true
+        must_exist: true
+        description: |
+          Path to a Cell Ranger feature-barcode matrix. Can be either a feature-barcode h5
+          file (recommended) or a path to a MEX Cell Ranger output folder.
+        example: filtered_feature_bc_matrix.h5
+        info:
+          orig_arg: input_path
+
+  - name: Output
+    arguments:
+      - name: --output
+        type: file
+        direction: output
+        required: true
+        description: Output CSV file.
+        example: matrix.csv
+        info:
+          orig_arg: output_csv
+
+  - name: Arguments
+    arguments:
+      - name: --genome
+        type: string
+        description: |
+          Specify which genome to extract. This only applies to multi-genome h5 input files.
+        example: GRCh38
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: debian:latest
+    setup:
+      # quay.io/nf-core/cellranger:10.0.0 is based on bookworm (which has been deprecated)
+      # So use `debian:latest` and use a `COPY --from=...`
+      - type: docker
+        copy:
+          - "--from=quay.io/nf-core/cellranger:10.0.0 /opt/cellranger-10.0.0 /opt/cellranger-10.0.0"
+        run: |
+          DEBIAN_FRONTEND=noninteractive apt update && \
+          apt upgrade -y && apt install -y procps && rm -rf /var/lib/apt/lists/* && \
+          ln -s /opt/cellranger-10.0.0/bin/cellranger /usr/bin/cellranger && \
+          cellranger telemetry disable
+      - type: docker
+        run: |
+          cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow

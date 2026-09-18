@@ -1,3 +1,9 @@
+# biobox x.x.x
+
+## NEW FUNCTIONALITY
+
+* `cellranger/cellranger_mat2csv`: Convert a Cell Ranger feature-barcode matrix (an h5 file or a MEX folder) from sparse format to a dense CSV file (PR #243)
+
 # biobox 0.5.0
 
 ## BREAKING CHANGES
