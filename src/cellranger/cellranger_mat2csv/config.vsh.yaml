@@ -13,7 +13,7 @@ description: |
   load.
 keywords: [cellranger, single-cell, rna-seq, feature-barcode-matrix, csv, conversion]
 links:
-  documentation: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/outputs/cr-outputs-mat2csv
+  documentation: https://www.10xgenomics.com/support/software/cell-ranger/latest
   repository: https://github.com/10XGenomics/cellranger
   homepage: https://www.10xgenomics.com/support/software/cell-ranger/latest
   issue_tracker: https://github.com/10XGenomics/cellranger/issues
