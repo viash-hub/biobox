@@ -1,3 +1,9 @@
+# biobox x.x.x
+
+## BUG FIXES
+
+* `star/star_align_reads`: fixed a `duplicate parameter "readFilesCommand"` error that occurred when `--read_files_command` was set while the input files were gzipped or bzipped. The component now only derives a read files command when the user did not provide one (PR #246).
+
 # biobox 0.5.0
 
 ## BREAKING CHANGES
