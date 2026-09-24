@@ -179,8 +179,8 @@ check_file_not_empty "$meta_temp_dir/out.sam.bai" "BAM index (.sam extension)"
 log "OK: TEST 4 passed"
 
 # --- TEST 5: --bam under a cpu/memory allocation ---
-# ---cpus / ---memory are what populate meta_cpus, which is the only way the
-# -t / -@ branches of the script run at all.
+# ---cpus / ---memory are what populate meta_cpus / meta_memory_mb, which is
+# the only way the -t / -@ / -m branches of the script run at all.
 log "TEST 5: --bam under ---cpus 2 ---memory 2gb"
 "$meta_executable" \
   --reference "$test_dir/ref.fasta" \
@@ -200,9 +200,24 @@ fi
 log "- same alignments as the unconstrained run"
 # Same alignments alone would also hold if the threads were never passed on,
 # so check the @PG command lines that minimap2 and samtools sort record.
+# 2gb = 2000 MB; sort gets half of it over 1 + 2 threads -> -m 333M.
 samtools view -H "$meta_temp_dir/threads.bam" | grep "^@PG" > "$meta_temp_dir/threads.pg"
+grep "ID:samtools" "$meta_temp_dir/threads.pg" > "$meta_temp_dir/threads_sort.pg"
 check_file_contains "$meta_temp_dir/threads.pg" "CL:minimap2 -t 2" "@PG header (minimap2 -t)"
-check_file_contains "$meta_temp_dir/threads.pg" "CL:samtools sort -@ 2" "@PG header (samtools sort -@)"
+check_file_contains "$meta_temp_dir/threads_sort.pg" " -@ 2 " "@PG header (samtools sort -@)"
+check_file_contains "$meta_temp_dir/threads_sort.pg" " -m 333M " "@PG header (samtools sort -m)"
+
+# A small allocation must not drive -m below the 128M floor.
+"$meta_executable" \
+  --reference "$test_dir/ref.fasta" \
+  --query "$test_dir/reads.fastq" \
+  --bam \
+  --output "$meta_temp_dir/lowmem.bam" \
+  ---cpus 2 \
+  ---memory 512mb
+check_is_bam "$meta_temp_dir/lowmem.bam" "BAM output (low memory)"
+samtools view -H "$meta_temp_dir/lowmem.bam" | grep "ID:samtools" > "$meta_temp_dir/lowmem_sort.pg"
+check_file_contains "$meta_temp_dir/lowmem_sort.pg" " -m 128M " "@PG header (samtools sort -m floor)"
 log "OK: TEST 5 passed"
 
 # --- TEST 6: presets the old engine image could not run ---

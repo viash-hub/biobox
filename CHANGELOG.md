@@ -36,6 +36,10 @@
   file extension, so an `--output` ending in `.sam` produced plain SAM and the
   following `samtools index` failed.
 
+* `minimap2/minimap2_align`: Pass `-m` to `samtools sort`, derived from
+  `meta_memory_mb` as in `winnowmap_align` (PR #248). Without it, sort used its
+  768M-per-thread default regardless of the memory allocation.
+
 * `minimap2/minimap2_align`: Pass `-x` before the other minimap2 options, as
   minimap2 recommends, so that a preset cannot override them (PR #248).
 

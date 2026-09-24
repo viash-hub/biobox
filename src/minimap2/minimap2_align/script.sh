@@ -38,21 +38,37 @@ cmd_args=(
 )
 
 if [[ -n "${par_bam:-}" ]]; then
-  echo "Running minimap2 and producing sorted BAM..."
   # -O bam is required: samtools sort otherwise picks the format from the
   # output extension, so --output alignment.sam would silently yield plain SAM
   # and samtools index would then fail.
+  sort_args=(
+    -O bam
+    ${meta_cpus:+-@ "$meta_cpus"}
+    -o "$par_output"
+  )
+
+  # -m is per sorting thread, and "-@ N" means N additional threads, so samtools
+  # may use (N + 1) * -m in total; without -m it defaults to 768M/thread and
+  # overruns the task's allocation outright. Only half the allocation is handed
+  # to sort: minimap2 runs at the same time on the other side of the pipe,
+  # holds the reference index in RAM and cannot spill, while sort short of
+  # memory just writes more temp files.
+  if [[ -n "${meta_memory_mb:-}" ]]; then
+    mem_per_thread=$(( meta_memory_mb / 2 / ( ${meta_cpus:-1} + 1 ) ))
+    if [[ "$mem_per_thread" -lt 128 ]]; then
+      mem_per_thread=128
+    fi
+    sort_args+=( -m "${mem_per_thread}M" )
+  fi
+
+  echo "Running minimap2 and producing sorted BAM..."
   # -a is required for SAM/BAM output
   minimap2 \
     "${cmd_args[@]}" \
     -a \
     "$par_reference" \
     "$par_query" | \
-    samtools sort \
-      ${meta_cpus:+-@ "$meta_cpus"} \
-      -O bam \
-      -o "$par_output" \
-      -
+    samtools sort "${sort_args[@]}" -
 
   # Write the index to the declared output path when given, so the Nextflow
   # runner publishes it; otherwise fall back to the conventional <output>.bai.
