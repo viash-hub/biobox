@@ -22,7 +22,7 @@ requirements:
   commands: [minimap2]
 
 argument_groups:
-  - name: Inputs
+  - name: Input
     arguments:
     - name: --input
       alternatives: -i
@@ -32,7 +32,7 @@ argument_groups:
       required: true
       example: reference.fasta
 
-  - name: Outputs
+  - name: Output
     arguments:
       - name: --output
         alternatives: -o
@@ -42,6 +42,55 @@ argument_groups:
           Output Minimap2 index in .mmi format.
         required: true
         example: reference.mmi
+
+  - name: Arguments
+    arguments:
+      - name: --preset
+        alternatives: -x
+        type: string
+        description: |
+          Preset to build the index for (e.g. map-ont, map-hifi, map-pb, lr:hq,
+          asm5, asm10, asm20, splice, sr, ava-ont, ava-pb). Run `minimap2 -x`
+          for the full list.
+
+          A preset selects the indexing parameters `-k`, `-w` and `-H` (for
+          example `map-hifi` and `asm5` use `k=19, w=19`, while the default is
+          `k=15, w=10`). Those parameters are baked into the `.mmi` file and
+          **cannot** be changed later: when `minimap2_align` is given a
+          pre-built index it keeps the parameters the index was built with and
+          warns `Indexing parameters (-k, -w or -H) overridden by parameters
+          used in the prebuilt index`.
+
+          Pass the same `--preset` here that will be used for alignment, so the
+          index matches the intended sequencing technology.
+        example: map-ont
+
+      - name: --kmer_size
+        alternatives: -k
+        type: integer
+        description: |
+          K-mer size, overriding the value implied by `--preset`. Passed to
+          minimap2 `-k`. Maximum 28.
+        min: 1
+        max: 28
+        example: 15
+
+      - name: --window_size
+        alternatives: -w
+        type: integer
+        description: |
+          Minimizer window size, overriding the value implied by `--preset`.
+          Passed to minimap2 `-w`. Maximum 255.
+        min: 1
+        max: 255
+        example: 10
+
+      - name: --homopolymer_compressed
+        alternatives: -H
+        type: boolean_true
+        description: |
+          Use homopolymer-compressed k-mers, as recommended for PacBio CLR
+          reads. Passed to minimap2 `-H`.
 
 resources:
   - type: bash_script

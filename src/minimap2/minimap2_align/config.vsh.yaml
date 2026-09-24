@@ -19,10 +19,10 @@ authors:
     roles: [author, maintainer]
 
 requirements:
-  commands: [minimap2]
+  commands: [minimap2, samtools]
 
 argument_groups:
-  - name: Inputs
+  - name: Input
     arguments:
       - name: --reference
         alternatives: [-i, --input]
@@ -36,28 +36,27 @@ argument_groups:
         description: Query sequences (FASTQ/FASTA).
         required: true
         example: reads.fastq
-  
-  - name: Options
-    arguments:
-      - name: --preset
-        alternatives: -x
-        type: string
-        description: |
-          Preset alignment options (e.g. map-ont, map-hifi, map-pb, asm5, asm10,
-          asm20, splice, sr, ava-ont, ava-pb). Run `minimap2 -x` for the full list.
-        example: map-ont
 
-  - name: Outputs
+  - name: Output
     arguments:
       - name: --bam
         type: boolean_true
-        description: Output BAM instead of PAF.
+        description: |
+          Output a coordinate-sorted and indexed BAM file instead of PAF.
+
+          The alignment is piped through `samtools sort` and then indexed with
+          `samtools index`. Use `--output_index` to control where the index is
+          written.
       - name: --cigar_paf
         type: boolean_true
-        description: Output CIGAR in PAF format (-c flag).
+        description: |
+          Output CIGAR in PAF format (`-c`). Only valid without `--bam`, since
+          BAM records always carry a CIGAR.
       - name: --cigar_bam
         type: boolean_true
-        description: Write long CIGARs in BAM CG tag (-L flag).
+        description: |
+          Write long CIGARs (>65535 operations) in the BAM `CG` tag (`-L`).
+          Only valid together with `--bam`.
       - name: --output
         alternatives: -o
         type: file
@@ -65,6 +64,38 @@ argument_groups:
         description: Output alignment file in PAF (default) or BAM format.
         required: true
         example: alignment.paf
+      - name: --output_index
+        type: file
+        direction: output
+        description: |
+          Path for the BAM index. Ignored without `--bam`.
+
+          If omitted, the index is written next to `--output` as
+          `<output>.bai`. Declaring it explicitly is what makes the index a
+          tracked output, so it is published by the Nextflow runner instead of
+          being left behind in the work directory.
+        example: alignment.bam.bai
+
+  - name: Arguments
+    arguments:
+      - name: --preset
+        alternatives: -x
+        type: string
+        description: |
+          Preset alignment options (e.g. map-ont, map-hifi, map-pb, lr:hq, asm5,
+          asm10, asm20, splice, sr, ava-ont, ava-pb). Run `minimap2 -x` for the
+          full list.
+
+          The preset is applied before all other options, as minimap2
+          recommends, so that it does not override them.
+
+          Note that a preset also selects indexing parameters (`-k`, `-w`,
+          `-H`). Those only take effect when `--reference` is a FASTA file: when
+          a pre-built `.mmi` is passed, minimap2 keeps the parameters the index
+          was built with and warns `Indexing parameters (-k, -w or -H)
+          overridden by parameters used in the prebuilt index`. Build the index
+          with the matching `--preset` in `minimap2_index` to avoid this.
+        example: map-ont
 
 resources:
   - type: bash_script
@@ -77,7 +108,7 @@ test_resources:
 
 engines:
   - type: docker
-    image: quay.io/biocontainers/mulled-v2-66534bcbb7031a148b13e2ad42583020b9cd25c4:e1ea28074233d7265a5dc2111d6e55130dff5653-2
+    image: quay.io/biocontainers/mulled-v2-66534bcbb7031a148b13e2ad42583020b9cd25c4:eb7d926a9d7da1ab8e5427cd947dbbb8795eabab-0
     setup:
     - type: docker
       run: |
