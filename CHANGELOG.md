@@ -1,8 +1,40 @@
 # biobox x.x.x
 
+## MINOR CHANGES
+
+* `minimap2/minimap2_index`: Add `--preset`, `--kmer_size`, `--window_size` and
+  `--homopolymer_compressed` (PR #xxx). A preset determines the indexing
+  parameters `-k`/`-w`/`-H`, which are baked into the `.mmi` and cannot be
+  changed at alignment time, so the index has to be built for the sequencing
+  technology it will be used with. The index step now also uses `meta_cpus`.
+
+* `minimap2/minimap2_align`: Add `--output_index` to declare the BAM index as a
+  tracked output (PR #xxx). Previously `samtools index` wrote `<output>.bai` as
+  an undeclared file, which the Nextflow runner left unpublished in the work
+  directory and which the Docker engine left owned by `root`.
+
 ## BUG FIXES
 
 * `star/star_align_reads`: fixed a `duplicate parameter "readFilesCommand"` error that occurred when `--read_files_command` was set while the input files were gzipped or bzipped. The component now only derives a read files command when the user did not provide one (PR #246).
+
+* `minimap2/minimap2_align`: Update the engine image from minimap2 `2.17` /
+  samtools `1.9` to minimap2 `2.30` / samtools `1.22.1` (PR #xxx). The image
+  shipped minimap2 2.17 (2019), which rejected the `map-hifi` and `lr:hq`
+  presets that the component documented as valid, making PacBio HiFi alignment
+  impossible. This also brings `minimap2_align` onto the same minimap2 version
+  as `minimap2_index`.
+
+* `minimap2/minimap2_align`: Pass `-x` before the other minimap2 options, as
+  minimap2 recommends, so that a preset cannot override them (PR #xxx).
+
+* `minimap2/minimap2_align`: Use `meta_cpus` instead of `VIASH_META_CPUS` for
+  the thread count, and pass it on to `samtools index` as well (PR #xxx).
+
+* `minimap2/minimap2_align`: Reject `--cigar_bam` without `--bam` and
+  `--cigar_paf` with `--bam` instead of silently ignoring the flag (PR #xxx).
+
+* `minimap2`: Regenerate `help.txt` for both components from the tool's own
+  `--help` output, matching the rest of the repository (PR #xxx).
 
 # biobox 0.5.0
 
