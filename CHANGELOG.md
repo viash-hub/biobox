@@ -7,11 +7,18 @@
   parameters `-k`/`-w`/`-H`, which are baked into the `.mmi` and cannot be
   changed at alignment time, so the index has to be built for the sequencing
   technology it will be used with. The index step now also uses `meta_cpus`.
+  `--kmer_size` is bounded to 1-28 and `--window_size` to 1-255, so an
+  out-of-range value is rejected up front instead of aborting minimap2 on an
+  internal assertion.
+
+* `minimap2`: Rename the argument groups to `Input`, `Output` and `Arguments`,
+  as required by the contributing guidelines (PR #xxx).
 
 * `minimap2/minimap2_align`: Add `--output_index` to declare the BAM index as a
   tracked output (PR #xxx). Previously `samtools index` wrote `<output>.bai` as
   an undeclared file, which the Nextflow runner left unpublished in the work
-  directory and which the Docker engine left owned by `root`.
+  directory and which the Docker engine left owned by `root`. Without `--bam`
+  it is ignored, since the Nextflow runner always fills in a default path.
 
 ## BUG FIXES
 
@@ -23,6 +30,11 @@
   presets that the component documented as valid, making PacBio HiFi alignment
   impossible. This also brings `minimap2_align` onto the same minimap2 version
   as `minimap2_index`.
+
+* `minimap2/minimap2_align`: Pass `-O bam` to `samtools sort`, so `--bam`
+  always writes BAM (PR #xxx). `samtools sort` picks its output format from the
+  file extension, so an `--output` ending in `.sam` produced plain SAM and the
+  following `samtools index` failed.
 
 * `minimap2/minimap2_align`: Pass `-x` before the other minimap2 options, as
   minimap2 recommends, so that a preset cannot override them (PR #xxx).

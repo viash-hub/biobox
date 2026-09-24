@@ -22,7 +22,7 @@ requirements:
   commands: [minimap2]
 
 argument_groups:
-  - name: Inputs
+  - name: Input
     arguments:
     - name: --input
       alternatives: -i
@@ -32,7 +32,18 @@ argument_groups:
       required: true
       example: reference.fasta
 
-  - name: Options
+  - name: Output
+    arguments:
+      - name: --output
+        alternatives: -o
+        type: file
+        direction: output
+        description: |
+          Output Minimap2 index in .mmi format.
+        required: true
+        example: reference.mmi
+
+  - name: Arguments
     arguments:
       - name: --preset
         alternatives: -x
@@ -60,6 +71,8 @@ argument_groups:
         description: |
           K-mer size, overriding the value implied by `--preset`. Passed to
           minimap2 `-k`. Maximum 28.
+        min: 1
+        max: 28
         example: 15
 
       - name: --window_size
@@ -67,7 +80,9 @@ argument_groups:
         type: integer
         description: |
           Minimizer window size, overriding the value implied by `--preset`.
-          Passed to minimap2 `-w`.
+          Passed to minimap2 `-w`. Maximum 255.
+        min: 1
+        max: 255
         example: 10
 
       - name: --homopolymer_compressed
@@ -76,17 +91,6 @@ argument_groups:
         description: |
           Use homopolymer-compressed k-mers, as recommended for PacBio CLR
           reads. Passed to minimap2 `-H`.
-
-  - name: Outputs
-    arguments:
-      - name: --output
-        alternatives: -o
-        type: file
-        direction: output
-        description: |
-          Output Minimap2 index in .mmi format.
-        required: true
-        example: reference.mmi
 
 resources:
   - type: bash_script

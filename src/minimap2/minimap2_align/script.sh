@@ -11,10 +11,9 @@ set -eo pipefail
 [[ "$par_cigar_bam" == "false" ]] && unset par_cigar_bam
 
 # --- Argument checks -------------------------------------------------------
-if [[ -z "${par_bam:-}" && -n "${par_output_index:-}" ]]; then
-  echo "Error: --output_index is only valid together with --bam." >&2
-  exit 1
-fi
+# --output_index is deliberately not rejected without --bam: the Nextflow
+# runner fills in a default path for every output file argument, so rejecting
+# it would make every PAF run fail there. Without --bam it is simply ignored.
 
 # -L only affects SAM/BAM records and -c only affects PAF, so rejecting the
 # wrong combination is clearer than letting minimap2 silently ignore the flag.
@@ -40,6 +39,9 @@ cmd_args=(
 
 if [[ -n "${par_bam:-}" ]]; then
   echo "Running minimap2 and producing sorted BAM..."
+  # -O bam is required: samtools sort otherwise picks the format from the
+  # output extension, so --output alignment.sam would silently yield plain SAM
+  # and samtools index would then fail.
   # -a is required for SAM/BAM output
   minimap2 \
     "${cmd_args[@]}" \
@@ -48,6 +50,7 @@ if [[ -n "${par_bam:-}" ]]; then
     "$par_query" | \
     samtools sort \
       ${meta_cpus:+-@ "$meta_cpus"} \
+      -O bam \
       -o "$par_output" \
       -
 
