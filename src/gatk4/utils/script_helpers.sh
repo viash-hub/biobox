@@ -181,3 +181,16 @@ stage_interval_files() {
     fi
   done
 }
+
+# Print the path of the index that GATK writes next to a VCF output: a tabix
+# index for a bgzipped VCF (`.vcf.gz` or `.vcf.bgz`) and a Tribble index for
+# any other extension.
+#
+# Usage: gatk_index=$(gatk_output_vcf_index_path "$par_output")
+gatk_output_vcf_index_path() {
+  local output="$1"
+  case "$output" in
+    *.vcf.gz|*.vcf.bgz) echo "${output}.tbi" ;;
+    *) echo "${output}.idx" ;;
+  esac
+}
