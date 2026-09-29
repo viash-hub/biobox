@@ -105,7 +105,7 @@ argument_groups:
         direction: output
         description: |
           Output index file for `--output` (`.tbi` for a bgzipped
-          `.vcf.gz` file, `.idx` otherwise). Required when
+          `.vcf.gz` or `.vcf.bgz` file, `.idx` otherwise). Required when
           `--create_output_variant_index` is `true`, ignored when it is `false`.
         must_exist: false
         example: filtered.vcf.gz.tbi
