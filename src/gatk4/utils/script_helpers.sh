@@ -125,6 +125,7 @@ stage_vcf_with_index() {
     ln -s "$(readlink -f "$vcf")" "$staged_vcf"
     ln -s "$(readlink -f "$vcf_index")" "${staged_vcf}.${index_ext}"
   else
+    echo "Warning: no index was provided for '$vcf'. Copying and indexing it, which can be slow for a large file. Provide an index to skip this step." >&2
     cp "$(readlink -f "$vcf")" "$staged_vcf"
     gatk IndexFeatureFile --input "$staged_vcf" --verbosity ERROR >&2
   fi
