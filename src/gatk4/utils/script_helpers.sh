@@ -131,3 +131,52 @@ stage_vcf_with_index() {
 
   echo "$staged_vcf"
 }
+
+# Stage one or more interval files (BED, interval_list, VCF) and build the
+# repeated GATK interval flags for them. VCF files are staged with
+# stage_vcf_with_index because GATK needs an index for a block-compressed VCF.
+# The index files are matched by order to the VCF files only, other interval
+# files are passed directly. If index files are given, there must be one for
+# each VCF file.
+#
+# Usage: stage_interval_files "$tmp_dir" "$par_intervals" "$par_intervals_index" \
+#          arg_name gatk_flag result_array_name
+stage_interval_files() {
+  local tmp_dir="$1"
+  local interval_files="$2"
+  local interval_indexes="$3"
+  local arg_name="$4"
+  local gatk_flag="$5"
+  local -n result_ref="$6"
+
+  local files=()
+  local indexes=()
+  IFS=';' read -ra files <<< "$interval_files"
+  IFS=';' read -ra indexes <<< "$interval_indexes"
+
+  local vcf_count=0
+  local file
+  for file in "${files[@]}"; do
+    [[ "$file" == *.vcf || "$file" == *.vcf.gz ]] && vcf_count=$((vcf_count + 1))
+  done
+  if [[ ${#indexes[@]} -gt 0 && ${#indexes[@]} -ne $vcf_count ]]; then
+    echo "Error: ${arg_name}_index must be given once for each VCF file in $arg_name (got ${#indexes[@]} index file(s) and $vcf_count VCF file(s))." >&2
+    exit 1
+  fi
+
+  result_ref=()
+  local prefix="${arg_name#--}"
+  local vcf_i=0
+  local i
+  for i in "${!files[@]}"; do
+    file="${files[$i]}"
+    if [[ "$file" == *.vcf || "$file" == *.vcf.gz ]]; then
+      local staged_file
+      staged_file=$(stage_vcf_with_index "$tmp_dir" "$file" "${indexes[$vcf_i]:-}" "${prefix}_$((i + 1))")
+      result_ref+=("$gatk_flag" "$staged_file")
+      vcf_i=$((vcf_i + 1))
+    else
+      result_ref+=("$gatk_flag" "$file")
+    fi
+  done
+}
