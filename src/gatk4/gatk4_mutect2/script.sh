@@ -9,6 +9,8 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 # unset "false" flags
 unset_if_false=(
+  par_create_bam_output
+  par_create_f1r2_tar_gz
   par_dont_use_soft_clipped_bases
   par_force_active
   par_force_call_filtered_alleles
@@ -25,6 +27,22 @@ for par in "${unset_if_false[@]}"; do
   test_val="${!par}"
   [[ "$test_val" == "false" ]] && unset $par
 done
+
+# The output index is only written when --create_output_variant_index is not false
+move_output_index=""
+if [[ -n "$par_output_index" && "$par_create_output_variant_index" != "false" ]]; then
+  move_output_index="true"
+  gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
+fi
+
+if [[ -n "$par_create_f1r2_tar_gz" && -z "$par_f1r2_tar_gz" ]]; then
+  echo "Error: --create_f1r2_tar_gz requires --f1r2_tar_gz." >&2
+  exit 1
+fi
+if [[ -n "$par_create_bam_output" && -z "$par_bam_output" ]]; then
+  echo "Error: --create_bam_output requires --bam_output." >&2
+  exit 1
+fi
 
 # Stage the inputs into a temp dir so GATK can find the companion files
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_mutect2.XXXXXX")
@@ -79,8 +97,8 @@ cmd_args=(
   "${resource_args[@]}"
   "${intervals_args[@]}"
   "${exclude_intervals_args[@]}"
-  ${par_f1r2_tar_gz:+--f1r2-tar-gz "$par_f1r2_tar_gz"}
-  ${par_bam_output:+--bam-output "$par_bam_output"}
+  ${par_create_f1r2_tar_gz:+--f1r2-tar-gz "$par_f1r2_tar_gz"}
+  ${par_create_bam_output:+--bam-output "$par_bam_output"}
   ${par_active_probability_threshold:+--active-probability-threshold "$par_active_probability_threshold"}
   ${par_af_of_alleles_not_in_resource:+--af-of-alleles-not-in-resource "$par_af_of_alleles_not_in_resource"}
   "${annotation_args[@]}"
@@ -138,4 +156,9 @@ gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" Mutect2 "${cmd_args[
 # it next to the output VCF, so move it to --output_stats.
 if [[ ! "${par_output}.stats" -ef "$par_output_stats" ]]; then
   mv "${par_output}.stats" "$par_output_stats"
+fi
+
+# Move the output index to --output_index, if requested
+if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
+  mv "$gatk_output_index" "$par_output_index"
 fi

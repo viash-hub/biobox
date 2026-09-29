@@ -144,21 +144,40 @@ argument_groups:
           `gatk4 FilterMutectCalls` (`--stats`).
         required: true
         example: unfiltered.vcf.gz.stats
+      - name: "--output_index"
+        type: file
+        direction: output
+        description: |
+          Output index file for `--output` (`.tbi` for a bgzipped
+          `.vcf.gz` file, `.idx` otherwise). Required when
+          `--create_output_variant_index` is `true`, ignored when it is `false`.
+        must_exist: false
+        example: unfiltered.vcf.gz.tbi
+      - name: "--create_f1r2_tar_gz"
+        type: boolean_true
+        description: |
+          Collect the F1R2 counts and write them to `--f1r2_tar_gz`.
       - name: "--f1r2_tar_gz"
         type: file
         direction: output
         description: |
-          Output `.tar.gz` file with the F1R2 counts, used as input to
-          `gatk4 LearnReadOrientationModel`. Only written when this
-          argument is set.
+          Output `.tar.gz` file with the F1R2 counts. Required when
+          `--create_f1r2_tar_gz` is `true`, ignored when it is `false`.
+        must_exist: false
         example: f1r2.tar.gz
+      - name: "--create_bam_output"
+        type: boolean_true
+        description: |
+          Write the assembled haplotypes to `--bam_output`.
       - name: "--bam_output"
         alternatives: [-bamout]
         type: file
         direction: output
         description: |
           Output BAM file with the assembled haplotypes (see
-          `--bam_writer_type`). Only written when this argument is set.
+          `--bam_writer_type`). Required when `--create_bam_output` is
+          `true`, ignored when it is `false`.
+        must_exist: false
         example: bamout.bam
 
   - name: "Options"

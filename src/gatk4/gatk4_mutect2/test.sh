@@ -65,6 +65,8 @@ log "Executing $meta_name with a tumor and a normal BAM..."
   "${reference_args[@]}" \
   --output "$meta_temp_dir/tumor_normal.vcf" \
   --output_stats "$meta_temp_dir/tumor_normal.stats" \
+  --output_index "$meta_temp_dir/tumor_normal.idx" \
+  --create_f1r2_tar_gz \
   --f1r2_tar_gz "$meta_temp_dir/tumor_normal_f1r2.tar.gz"
 
 log "Validating TEST 1 outputs..."
@@ -76,6 +78,8 @@ check_snv_called "$meta_temp_dir/tumor_normal.vcf" "output VCF file"
 check_file_exists "$meta_temp_dir/tumor_normal.stats" "output stats file"
 check_file_contains "$meta_temp_dir/tumor_normal.stats" "callable" "output stats file"
 check_file_not_exists "$meta_temp_dir/tumor_normal.vcf.stats" "stats file next to the output VCF (moved to --output_stats)"
+check_file_exists "$meta_temp_dir/tumor_normal.idx" "output index file (Tribble index for a .vcf)"
+check_file_not_exists "$meta_temp_dir/tumor_normal.vcf.idx" "index next to the output VCF (moved to --output_index)"
 check_file_exists "$meta_temp_dir/tumor_normal_f1r2.tar.gz" "output F1R2 tarball"
 check_file_not_empty "$meta_temp_dir/tumor_normal_f1r2.tar.gz" "output F1R2 tarball"
 
@@ -84,14 +88,17 @@ log "✅ TEST 1 completed successfully"
 # --- Test Case 2: Tumor-only mode ---
 log "Starting TEST 2: Tumor-only mode"
 
-log "Executing $meta_name with only a tumor BAM and --output_stats next to --output..."
+log "Executing $meta_name with only a tumor BAM, --output_stats next to --output and optional output paths without --create_*..."
 mkdir -p "$meta_temp_dir/tumor_only"
 "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
   --bai "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/tumor_only/tumor_only.vcf.gz" \
-  --output_stats "$meta_temp_dir/tumor_only/tumor_only.vcf.gz.stats"
+  --output_stats "$meta_temp_dir/tumor_only/tumor_only.vcf.gz.stats" \
+  --output_index "$meta_temp_dir/tumor_only/tumor_only.tbi" \
+  --f1r2_tar_gz "$meta_temp_dir/tumor_only/f1r2.tar.gz" \
+  --bam_output "$meta_temp_dir/tumor_only/bamout.bam"
 
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/tumor_only/tumor_only.vcf.gz" "output VCF file"
@@ -103,9 +110,11 @@ zcat "$meta_temp_dir/tumor_only/tumor_only.vcf.gz" > "$meta_temp_dir/tumor_only/
 check_file_contains "$meta_temp_dir/tumor_only/tumor_only.vcf" "^##tumor_sample=tumor" "output VCF tumor sample header"
 check_snv_called "$meta_temp_dir/tumor_only/tumor_only.vcf" "output VCF file"
 check_file_exists "$meta_temp_dir/tumor_only/tumor_only.vcf.gz.stats" "output stats file"
+check_file_exists "$meta_temp_dir/tumor_only/tumor_only.tbi" "output index file (tabix index for a .vcf.gz)"
+check_file_not_exists "$meta_temp_dir/tumor_only/tumor_only.vcf.gz.tbi" "index next to the output VCF (moved to --output_index)"
 
 log "Checking that only the expected files were written..."
-expected_files=$'tumor_only.vcf\ntumor_only.vcf.gz\ntumor_only.vcf.gz.stats\ntumor_only.vcf.gz.tbi'
+expected_files=$'tumor_only.tbi\ntumor_only.vcf\ntumor_only.vcf.gz\ntumor_only.vcf.gz.stats'
 found_files=$(find "$meta_temp_dir/tumor_only" -type f -exec basename {} \; | sort)
 if [[ "$found_files" == "$expected_files" ]]; then
   log "✓ Output directory contains only the expected files"
@@ -174,6 +183,7 @@ log "Executing $meta_name with --bam_output and calling, annotation and assembly
   "${reference_args[@]}" \
   --output "$meta_temp_dir/options.vcf" \
   --output_stats "$meta_temp_dir/options.stats" \
+  --create_bam_output \
   --bam_output "$meta_temp_dir/bamout.bam" \
   --bam_writer_type ALL_POSSIBLE_HAPLOTYPES \
   --max_mnp_distance 0 \
@@ -226,7 +236,7 @@ check_file_contains "$meta_temp_dir/test5_mq10.log" "0 read(s) filtered by: Mapp
 log "✅ TEST 5 completed successfully"
 
 # --- Test Case 6: --input and --bai count mismatch ---
-log "Starting TEST 6: --input and --bai count mismatch fails"
+log "Starting TEST 6: Invalid argument combinations fail"
 
 if "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
@@ -240,6 +250,47 @@ if "$meta_executable" \
 fi
 check_file_contains "$meta_temp_dir/test6.log" "Error: --input and --bai must be given the same number of times" "error message"
 
+if "$meta_executable" \
+  --input "$test_data_dir/tumor.bam" \
+  --bai "$test_data_dir/tumor.bai" \
+  "${reference_args[@]}" \
+  --output "$meta_temp_dir/no_f1r2.vcf" \
+  --output_stats "$meta_temp_dir/no_f1r2.stats" \
+  --create_f1r2_tar_gz > "$meta_temp_dir/test6_f1r2.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --create_f1r2_tar_gz and no --f1r2_tar_gz"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test6_f1r2.log" "Error: --create_f1r2_tar_gz requires --f1r2_tar_gz" "error message"
+
 log "✅ TEST 6 completed successfully"
+
+# --- Test Case 7: Output index without index creation ---
+log "Starting TEST 7: --output_index is ignored when --create_output_variant_index is false"
+
+"$meta_executable" \
+  --input "$test_data_dir/tumor.bam" \
+  --bai "$test_data_dir/tumor.bai" \
+  "${reference_args[@]}" \
+  --output "$meta_temp_dir/no_index.vcf.bgz" \
+  --output_stats "$meta_temp_dir/no_index.stats" \
+  --output_index "$meta_temp_dir/no_index.tbi" \
+  --create_output_variant_index false
+
+check_file_exists "$meta_temp_dir/no_index.vcf.bgz" "output VCF file"
+check_file_not_exists "$meta_temp_dir/no_index.tbi" "output index file"
+check_file_not_exists "$meta_temp_dir/no_index.vcf.bgz.tbi" "index next to the output VCF"
+
+log "Executing $meta_name with a .vcf.bgz output and --output_index..."
+"$meta_executable" \
+  --input "$test_data_dir/tumor.bam" \
+  --bai "$test_data_dir/tumor.bai" \
+  "${reference_args[@]}" \
+  --output "$meta_temp_dir/bgz.vcf.bgz" \
+  --output_stats "$meta_temp_dir/bgz.stats" \
+  --output_index "$meta_temp_dir/bgz.tbi"
+
+check_file_exists "$meta_temp_dir/bgz.tbi" "output index file (tabix index for a .vcf.bgz)"
+
+log "✅ TEST 7 completed successfully"
 
 print_test_summary "All tests"
