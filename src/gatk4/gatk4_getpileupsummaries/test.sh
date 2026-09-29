@@ -288,4 +288,36 @@ check_file_contains "$meta_temp_dir/test7.log" "must be given once for each VCF 
 
 log "✅ TEST 7 completed successfully"
 
+# --- Test Case 8: .vcf.bgz intervals and a plain-gzip VCF ---
+log "Starting TEST 8: .vcf.bgz intervals, and a plain-gzip VCF fails"
+
+log "Executing $meta_name with an unindexed .vcf.bgz --intervals file..."
+bgzip -c "$test_data_dir/site_150.vcf" > "$test_data_dir/site_150.vcf.bgz"
+"$meta_executable" \
+  --input "$test_data_dir/reads.bam" \
+  --bai "$test_data_dir/reads.bai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --intervals "$test_data_dir/site_150.vcf.bgz" \
+  --maximum_population_allele_frequency 0.5 \
+  --output "$meta_temp_dir/pileups_bgz.table" 2>&1 | tee "$meta_temp_dir/test8_bgz.log"
+
+check_file_contains "$meta_temp_dir/pileups_bgz.table" $'chr1\t150\t1\t2\t0\t0.4' "position 150 counts"
+check_file_contains "$meta_temp_dir/test8_bgz.log" "Warning: no index was provided for '.*site_150.vcf.bgz'" "run log (.vcf.bgz staged as a VCF)"
+
+# A .vcf.gz compressed with gzip (not bgzip) cannot be indexed
+gzip -c "$test_data_dir/common_snps.vcf" > "$test_data_dir/plain_gzip.vcf.gz"
+if "$meta_executable" \
+  --input "$test_data_dir/reads.bam" \
+  --bai "$test_data_dir/reads.bai" \
+  --variant "$test_data_dir/plain_gzip.vcf.gz" \
+  --intervals "$test_data_dir/site_50.bed" \
+  --output "$meta_temp_dir/pileups_gzip.table" > "$meta_temp_dir/test8_gzip.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with a plain-gzip --variant"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test8_gzip.log" "Error: could not index '.*plain_gzip.vcf.gz'" "error message"
+check_file_not_contains "$meta_temp_dir/test8_gzip.log" "GetPileupSummaries done" "run log (GATK did not run)"
+
+log "✅ TEST 8 completed successfully"
+
 print_test_summary "All tests"
