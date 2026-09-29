@@ -28,9 +28,12 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
-# The output index is only written when --create_output_variant_index is not false
 move_output_index=""
-if [[ -n "$par_output_index" && "$par_create_output_variant_index" != "false" ]]; then
+if [[ "$par_create_output_variant_index" != "false" ]]; then
+  if [[ -z "$par_output_index" ]]; then
+    echo "Error: --output_index is required unless --create_output_variant_index is false." >&2
+    exit 1
+  fi
   move_output_index="true"
   gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
 fi
@@ -39,9 +42,21 @@ if [[ -n "$par_create_f1r2_tar_gz" && -z "$par_f1r2_tar_gz" ]]; then
   echo "Error: --create_f1r2_tar_gz requires --f1r2_tar_gz." >&2
   exit 1
 fi
-if [[ -n "$par_create_bam_output" && -z "$par_bam_output" ]]; then
-  echo "Error: --create_bam_output requires --bam_output." >&2
-  exit 1
+
+move_bam_output_index=""
+if [[ -n "$par_create_bam_output" ]]; then
+  if [[ -z "$par_bam_output" ]]; then
+    echo "Error: --create_bam_output requires --bam_output." >&2
+    exit 1
+  fi
+  if [[ "$par_create_output_bam_index" != "false" ]]; then
+    if [[ -z "$par_bam_output_index" ]]; then
+      echo "Error: --create_bam_output requires --bam_output_index unless --create_output_bam_index is false." >&2
+      exit 1
+    fi
+    move_bam_output_index="true"
+    gatk_bam_output_index=$(gatk_output_bam_index_path "$par_bam_output")
+  fi
 fi
 
 # Stage the inputs into a temp dir so GATK can find the companion files
@@ -158,7 +173,10 @@ if [[ ! "${par_output}.stats" -ef "$par_output_stats" ]]; then
   mv "${par_output}.stats" "$par_output_stats"
 fi
 
-# Move the output index to --output_index, if requested
+# Move indexes if requested
 if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
   mv "$gatk_output_index" "$par_output_index"
+fi
+if [[ -n "$move_bam_output_index" && ! "$gatk_bam_output_index" -ef "$par_bam_output_index" ]]; then
+  mv "$gatk_bam_output_index" "$par_bam_output_index"
 fi

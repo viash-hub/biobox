@@ -149,7 +149,7 @@ argument_groups:
         direction: output
         description: |
           Output index file for `--output` (`.tbi` for a bgzipped
-          `.vcf.gz` file, `.idx` otherwise). Required when
+          `.vcf.gz` or `.vcf.bgz` file, `.idx` otherwise). Required when
           `--create_output_variant_index` is `true`, ignored when it is `false`.
         must_exist: false
         example: unfiltered.vcf.gz.tbi
@@ -179,6 +179,15 @@ argument_groups:
           `true`, ignored when it is `false`.
         must_exist: false
         example: bamout.bam
+      - name: "--bam_output_index"
+        type: file
+        direction: output
+        description: |
+          Output index file (`.bai`) for `--bam_output`. Required when
+          `--create_bam_output` is `true` and `--create_output_bam_index`
+          is `true`, ignored otherwise.
+        must_exist: false
+        example: bamout.bai
 
   - name: "Options"
     arguments:
