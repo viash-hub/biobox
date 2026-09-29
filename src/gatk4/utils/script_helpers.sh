@@ -42,9 +42,10 @@ stage_reference_trio() {
     exit 1
   fi
 
-  ln -s "$(readlink -f "$reference")" "$tmp_dir/reference.fasta"
-  ln -s "$(readlink -f "$reference_fai")" "$tmp_dir/reference.fasta.fai"
-  ln -s "$(readlink -f "$reference_dict")" "$tmp_dir/reference.dict"
+  # Create links, explicitly exit on failure
+  ln -s "$(readlink -f "$reference")" "$tmp_dir/reference.fasta" || exit 1
+  ln -s "$(readlink -f "$reference_fai")" "$tmp_dir/reference.fasta.fai" || exit 1
+  ln -s "$(readlink -f "$reference_dict")" "$tmp_dir/reference.dict" || exit 1
 
   echo "$tmp_dir/reference.fasta"
 }
@@ -58,8 +59,9 @@ stage_bam_bai() {
   local input_bam="$2"
   local input_bai="$3"
 
-  ln -s "$(readlink -f "$input_bam")" "$tmp_dir/sample.bam"
-  ln -s "$(readlink -f "$input_bai")" "$tmp_dir/sample.bai"
+  # Create links, explicitly exit on failure
+  ln -s "$(readlink -f "$input_bam")" "$tmp_dir/sample.bam" || exit 1
+  ln -s "$(readlink -f "$input_bai")" "$tmp_dir/sample.bai" || exit 1
 
   echo "$tmp_dir/sample.bam"
 }
@@ -100,9 +102,9 @@ stage_bams_bais() {
 
 # Stage a VCF (or other feature file) into a temp dir so that GATK can find
 # its index. If an index is given, the file and the index are symlinked under
-# matching names (`.tbi` for tabix indexes of `.vcf.gz` files, `.idx` for
-# Tribble indexes of plain `.vcf` files). If no index is given, the file is
-# copied and indexed with IndexFeatureFile.
+# matching names (`.tbi` for tabix indexes of `.vcf.gz`/`.vcf.bgz` files,
+# `.idx` for Tribble indexes of plain `.vcf` files). If no index is given, the
+# file is copied and indexed with IndexFeatureFile.
 #
 # Usage: staged=$(stage_vcf_with_index "$tmp_dir" "$par_vcf" "$par_vcf_index" prefix)
 stage_vcf_with_index() {
@@ -122,12 +124,16 @@ stage_vcf_with_index() {
         exit 1
         ;;
     esac
-    ln -s "$(readlink -f "$vcf")" "$staged_vcf"
-    ln -s "$(readlink -f "$vcf_index")" "${staged_vcf}.${index_ext}"
+    # Create links, explicitly exit on failure
+    ln -s "$(readlink -f "$vcf")" "$staged_vcf" || exit 1
+    ln -s "$(readlink -f "$vcf_index")" "${staged_vcf}.${index_ext}" || exit 1
   else
     echo "Warning: no index was provided for '$vcf'. Copying and indexing it, which can be slow for a large file. Provide an index to skip this step." >&2
-    cp "$(readlink -f "$vcf")" "$staged_vcf"
-    gatk IndexFeatureFile --input "$staged_vcf" --verbosity ERROR >&2
+    cp "$(readlink -f "$vcf")" "$staged_vcf" || exit 1
+    if ! gatk IndexFeatureFile --input "$staged_vcf" --verbosity ERROR >&2; then
+      echo "Error: could not index '$vcf'. A .vcf.gz file must be compressed with bgzip." >&2
+      exit 1
+    fi
   fi
 
   echo "$staged_vcf"
@@ -158,7 +164,7 @@ stage_interval_files() {
   local vcf_count=0
   local file
   for file in "${files[@]}"; do
-    [[ "$file" == *.vcf || "$file" == *.vcf.gz ]] && vcf_count=$((vcf_count + 1))
+    [[ "$file" == *.vcf || "$file" == *.vcf.gz || "$file" == *.vcf.bgz ]] && vcf_count=$((vcf_count + 1))
   done
   if [[ ${#indexes[@]} -gt 0 && ${#indexes[@]} -ne $vcf_count ]]; then
     echo "Error: ${arg_name}_index must be given once for each VCF file in $arg_name (got ${#indexes[@]} index file(s) and $vcf_count VCF file(s))." >&2
@@ -171,7 +177,7 @@ stage_interval_files() {
   local i
   for i in "${!files[@]}"; do
     file="${files[$i]}"
-    if [[ "$file" == *.vcf || "$file" == *.vcf.gz ]]; then
+    if [[ "$file" == *.vcf || "$file" == *.vcf.gz || "$file" == *.vcf.bgz ]]; then
       local staged_file
       staged_file=$(stage_vcf_with_index "$tmp_dir" "$file" "${indexes[$vcf_i]:-}" "${prefix}_$((i + 1))")
       result_ref+=("$gatk_flag" "$staged_file")
@@ -193,4 +199,13 @@ gatk_output_vcf_index_path() {
     *.vcf.gz|*.vcf.bgz) echo "${output}.tbi" ;;
     *) echo "${output}.idx" ;;
   esac
+}
+
+# Print the path of the index that GATK writes next to a BAM output
+# (`<output without .bam>.bai`).
+#
+# Usage: gatk_index=$(gatk_output_bam_index_path "$par_bam_output")
+gatk_output_bam_index_path() {
+  local output="$1"
+  echo "${output%.bam}.bai"
 }
