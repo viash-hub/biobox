@@ -57,13 +57,20 @@ argument_groups:
           Output table with the contamination estimate of the tumor sample.
         required: true
         example: contamination.table
+      - name: "--create_tumor_segmentation"
+        type: boolean_true
+        description: |
+          Write the segmentation of the tumor sample to `--tumor_segmentation`.
+          If true, `--tumor_segmentation` must be set.
       - name: "--tumor_segmentation"
         alternatives: [-segments]
         type: file
         direction: output
         description: |
           Output table with the segmentation of the tumor sample by minor
-          allele fraction. Only written when this argument is set.
+          allele fraction. Ignored when `--create_tumor_segmentation` is
+          false.
+        must_exist: false
         example: segmentation.table
 
   - name: "Options"

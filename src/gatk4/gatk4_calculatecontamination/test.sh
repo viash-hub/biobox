@@ -74,6 +74,7 @@ log "Executing $meta_name with --matched_normal and --tumor_segmentation..."
   --input "$test_data_dir/tumor_pileups.table" \
   --matched_normal "$test_data_dir/normal_pileups.table" \
   --output "$meta_temp_dir/contamination_normal.table" \
+  --create_tumor_segmentation \
   --tumor_segmentation "$meta_temp_dir/segmentation.table"
 
 log "Validating TEST 2 outputs..."
@@ -85,27 +86,43 @@ check_file_contains "$meta_temp_dir/segmentation.table" $'contig\tstart\tend\tmi
 log "✅ TEST 2 completed successfully"
 
 # --- Test Case 3: Coverage thresholds, no tumor segmentation ---
-log "Starting TEST 3: Coverage thresholds without tumor segmentation"
+log "Starting TEST 3: Coverage thresholds, --tumor_segmentation without --create_tumor_segmentation"
 
 log "Executing $meta_name with --high_coverage_ratio_threshold and --low_coverage_ratio_threshold..."
 "$meta_executable" \
   --input "$test_data_dir/tumor_pileups.table" \
   --output "$meta_temp_dir/contamination_thresholds.table" \
+  --tumor_segmentation "$meta_temp_dir/segmentation_not_created.table" \
   --high_coverage_ratio_threshold 2.0 \
   --low_coverage_ratio_threshold 0.25
 
 log "Validating TEST 3 outputs..."
 check_file_exists "$meta_temp_dir/contamination_thresholds.table" "contamination table (thresholds)"
 check_file_matches_regex "$meta_temp_dir/contamination_thresholds.table" $'^tumor\t' "contamination table tumor row (thresholds)"
-# Only TEST 2 asked for a tumor segmentation table
+# The --tumor_segmentation path is set without --create_tumor_segmentation so the file should not be written
+check_file_not_exists "$meta_temp_dir/segmentation_not_created.table" "tumor segmentation table (not created)"
 segmentation_count=$(find "$meta_temp_dir" -maxdepth 1 -name '*segment*' | wc -l)
 if [[ "$segmentation_count" -eq 1 ]]; then
-  log "✓ No tumor segmentation table was written without --tumor_segmentation"
+  log "✓ No tumor segmentation table was written without --create_tumor_segmentation"
 else
   log_error "✗ Expected 1 tumor segmentation table (from TEST 2), found $segmentation_count"
   exit 1
 fi
 
 log "✅ TEST 3 completed successfully"
+
+# --- Test Case 4: --create_tumor_segmentation without a path ---
+log "Starting TEST 4: --create_tumor_segmentation without --tumor_segmentation fails"
+
+if "$meta_executable" \
+  --input "$test_data_dir/tumor_pileups.table" \
+  --output "$meta_temp_dir/contamination_bad.table" \
+  --create_tumor_segmentation > "$meta_temp_dir/test4.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --create_tumor_segmentation and no --tumor_segmentation"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test4.log" "Error: --create_tumor_segmentation requires --tumor_segmentation" "error message"
+
+log "✅ TEST 4 completed successfully"
 
 print_test_summary "All tests"
