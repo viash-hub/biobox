@@ -63,3 +63,71 @@ stage_bam_bai() {
 
   echo "$tmp_dir/sample.bam"
 }
+
+# Symlink one or more BAMs and their .bai companions into a temp dir under
+# matching basenames, so GATK can find them. The BAMs and BAIs are given as
+# semicolon-separated `multiple: true` argument values and are matched by
+# order. Stops with an error if the number of BAMs and BAIs is different.
+#
+# Usage: stage_bams_bais "$tmp_dir" "$par_input" "$par_bai" result_array_name
+stage_bams_bais() {
+  local tmp_dir="$1"
+  local input_bams="$2"
+  local input_bais="$3"
+  local -n result_ref="$4"
+
+  local bams=()
+  local bais=()
+  IFS=';' read -ra bams <<< "$input_bams"
+  IFS=';' read -ra bais <<< "$input_bais"
+
+  if [[ ${#bams[@]} -ne ${#bais[@]} ]]; then
+    echo "Error: --input and --bai must be given the same number of times (got ${#bams[@]} BAM file(s) and ${#bais[@]} BAI file(s))." >&2
+    exit 1
+  fi
+
+  # Stage to the original basename with a prefix to avoid collisions
+  result_ref=()
+  local i
+  for i in "${!bams[@]}"; do
+    local staged_bam
+    staged_bam="$tmp_dir/input_$((i + 1))_$(basename "${bams[$i]}")"
+    ln -s "$(readlink -f "${bams[$i]}")" "$staged_bam"
+    ln -s "$(readlink -f "${bais[$i]}")" "${staged_bam%.bam}.bai"
+    result_ref+=("$staged_bam")
+  done
+}
+
+# Stage a VCF (or other feature file) into a temp dir so that GATK can find
+# its index. If an index is given, the file and the index are symlinked under
+# matching names (`.tbi` for tabix indexes of `.vcf.gz` files, `.idx` for
+# Tribble indexes of plain `.vcf` files). If no index is given, the file is
+# copied and indexed with IndexFeatureFile.
+#
+# Usage: staged=$(stage_vcf_with_index "$tmp_dir" "$par_vcf" "$par_vcf_index" prefix)
+stage_vcf_with_index() {
+  local tmp_dir="$1"
+  local vcf="$2"
+  local vcf_index="$3"
+  local prefix="$4"
+  local staged_vcf="$tmp_dir/${prefix}_$(basename "$vcf")"
+
+  if [[ -n "$vcf_index" ]]; then
+    local index_ext
+    case "$vcf_index" in
+      *.tbi) index_ext="tbi" ;;
+      *.idx) index_ext="idx" ;;
+      *)
+        echo "Error: index file '$vcf_index' for '$vcf' must have a .tbi or .idx extension." >&2
+        exit 1
+        ;;
+    esac
+    ln -s "$(readlink -f "$vcf")" "$staged_vcf"
+    ln -s "$(readlink -f "$vcf_index")" "${staged_vcf}.${index_ext}"
+  else
+    cp "$(readlink -f "$vcf")" "$staged_vcf"
+    gatk IndexFeatureFile --input "$staged_vcf" --verbosity ERROR >&2
+  fi
+
+  echo "$staged_vcf"
+}
