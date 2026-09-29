@@ -1,0 +1,91 @@
+name: gatk4_learnreadorientationmodel
+namespace: gatk4
+description: |
+  Learns a read orientation bias model from the F1R2 counts collected by
+  `gatk4 Mutect2`.
+
+  Gets the maximum likelihood estimates of the artifact prior
+  probabilities in the orientation bias mixture model filter, for example
+  for artifacts from OxoG damage or FFPE deamination. The output model is
+  used by `gatk4 FilterMutectCalls` (`--orientation_bias_artifact_priors`)
+  to filter orientation bias artifacts from the somatic calls.
+keywords: [variant calling, somatic, GATK, GATK4, Mutect2, orientation bias]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--input"
+        alternatives: [-I]
+        type: file
+        multiple: true
+        description: |
+          One or more `.tar.gz` files with F1R2 counts, as produced by
+          `gatk4 Mutect2` (`--f1r2_tar_gz`).
+
+          Specify this argument more than once to combine the F1R2 counts
+          of a scattered Mutect2 run (for example, one file per interval).
+        required: true
+        example: f1r2.tar.gz
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: |
+          Output `.tar.gz` file with the artifact prior tables, used as
+          input to `gatk4 FilterMutectCalls`
+          (`--orientation_bias_artifact_priors`).
+        required: true
+        example: read_orientation_model.tar.gz
+
+  - name: "Options"
+    arguments:
+      - name: "--convergence_threshold"
+        type: double
+        description: |
+          Stop the EM algorithm when the distance between parameters
+          between iterations falls below this value. Default: 0.0001.
+      - name: "--max_depth"
+        type: integer
+        description: |
+          Sites with a depth higher than this value are grouped together.
+          Default: 200.
+      - name: "--num_em_iterations"
+        type: integer
+        description: |
+          Give up on the EM algorithm after this many iterations.
+          Default: 20.
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow
