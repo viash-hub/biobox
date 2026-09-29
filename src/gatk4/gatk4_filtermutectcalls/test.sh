@@ -59,6 +59,7 @@ log "Executing $meta_name with an unindexed --variant and --stats..."
   --stats "$test_data_dir/unfiltered.vcf.stats" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/filtered.vcf" \
+  --output_index "$meta_temp_dir/filtered.idx" \
   --filtering_stats "$meta_temp_dir/filtering_stats.tsv" 2>&1 | tee "$meta_temp_dir/test1.log"
 
 log "Validating TEST 1 outputs..."
@@ -135,6 +136,7 @@ log "Executing $meta_name with --threshold_strategy CONSTANT and --min_reads_per
   --initial_threshold 0.1 \
   --min_reads_per_strand 1 \
   --output "$meta_temp_dir/filtered_strand.vcf" \
+  --output_index "$meta_temp_dir/filtered_strand.idx" \
   --filtering_stats "$meta_temp_dir/filtering_stats_strand.tsv"
 
 log "Validating TEST 3 outputs..."
@@ -179,5 +181,21 @@ check_file_not_exists "$meta_temp_dir/filtered_intervals.idx" "output index file
 check_file_not_exists "$meta_temp_dir/filtered_intervals.vcf.idx" "index next to the output VCF"
 
 log "✅ TEST 4 completed successfully"
+
+# --- Test Case 5: Missing --output_index ---
+log "Starting TEST 5: A missing --output_index fails"
+
+if "$meta_executable" \
+  --variant "$test_data_dir/unfiltered.vcf" \
+  --stats "$test_data_dir/unfiltered.vcf.stats" \
+  "${reference_args[@]}" \
+  --output "$meta_temp_dir/no_output_index.vcf" \
+  --filtering_stats "$meta_temp_dir/no_output_index.tsv" > "$meta_temp_dir/test5.log" 2>&1; then
+  log_error "✗ $meta_name did not fail without --output_index"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test5.log" "Error: --output_index is required unless" "error message"
+
+log "✅ TEST 5 completed successfully"
 
 print_test_summary "All tests"

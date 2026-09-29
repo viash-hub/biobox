@@ -21,9 +21,12 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
-# The output index is only written when --create_output_variant_index is not false.
 move_output_index=""
-if [[ -n "$par_output_index" && "$par_create_output_variant_index" != "false" ]]; then
+if [[ "$par_create_output_variant_index" != "false" ]]; then
+  if [[ -z "$par_output_index" ]]; then
+    echo "Error: --output_index is required unless --create_output_variant_index is false." >&2
+    exit 1
+  fi
   move_output_index="true"
   gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
 fi
