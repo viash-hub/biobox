@@ -1,5 +1,14 @@
 # biobox x.x.x
 
+## NEW FUNCTIONALITY
+
+* `gatk4`: Add components for GATK4 somatic variant calling (PR #249):
+  - `gatk4/gatk4_mutect2`: Call somatic SNVs and indels in tumor-normal or tumor-only mode.
+  - `gatk4/gatk4_getpileupsummaries`: Summarize the read counts of a sample at known variant sites for contamination estimation.
+  - `gatk4/gatk4_calculatecontamination`: Calculate the fraction of reads that come from cross-sample contamination.
+  - `gatk4/gatk4_learnreadorientationmodel`: Learn a read orientation bias model from the F1R2 counts of Mutect2.
+  - `gatk4/gatk4_filtermutectcalls`: Filter the raw somatic calls of Mutect2.
+
 ## BUG FIXES
 
 * `star/star_align_reads`: fixed a `duplicate parameter "readFilesCommand"` error that occurred when `--read_files_command` was set while the input files were gzipped or bzipped. The component now only derives a read files command when the user did not provide one (PR #246).
