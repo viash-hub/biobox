@@ -159,7 +159,8 @@ log "Executing $meta_name with an unindexed --germline_resource, an indexed --pa
   --panel_of_normals_index "$test_data_dir/indexed/pon.vcf.idx" \
   --intervals "$test_data_dir/intervals.bed" \
   --output "$meta_temp_dir/resources.vcf" \
-  --output_stats "$meta_temp_dir/resources.stats" 2>&1 | tee "$meta_temp_dir/test3.log"
+  --output_stats "$meta_temp_dir/resources.stats" \
+  --output_index "$meta_temp_dir/resources.idx" 2>&1 | tee "$meta_temp_dir/test3.log"
 
 log "Validating TEST 3 outputs..."
 check_snv_called "$meta_temp_dir/resources.vcf" "output VCF file"
@@ -183,8 +184,10 @@ log "Executing $meta_name with --bam_output and calling, annotation and assembly
   "${reference_args[@]}" \
   --output "$meta_temp_dir/options.vcf" \
   --output_stats "$meta_temp_dir/options.stats" \
+  --output_index "$meta_temp_dir/options.idx" \
   --create_bam_output \
   --bam_output "$meta_temp_dir/bamout.bam" \
+  --bam_output_index "$meta_temp_dir/bamout_index.bai" \
   --bam_writer_type ALL_POSSIBLE_HAPLOTYPES \
   --max_mnp_distance 0 \
   --tumor_lod_to_emit 3.0 \
@@ -201,6 +204,8 @@ log "Validating TEST 4 outputs..."
 check_snv_called "$meta_temp_dir/options.vcf" "output VCF file"
 check_file_exists "$meta_temp_dir/bamout.bam" "output bamout file"
 check_file_not_empty "$meta_temp_dir/bamout.bam" "output bamout file"
+check_file_exists "$meta_temp_dir/bamout_index.bai" "output bamout index file"
+check_file_not_exists "$meta_temp_dir/bamout.bai" "index next to the bamout file (moved to --bam_output_index)"
 check_file_contains "$meta_temp_dir/options.vcf" "max-mnp-distance 0" "output VCF command line (--max_mnp_distance)"
 check_file_contains "$meta_temp_dir/options.vcf" "pcr-indel-model NONE" "output VCF command line (--pcr_indel_model)"
 
@@ -218,7 +223,8 @@ log "Executing $meta_name on MQ 15 reads with the default --minimum_mapping_qual
   --bai "$test_data_dir/tumor_mq15.bai" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/mq_default.vcf" \
-  --output_stats "$meta_temp_dir/mq_default.stats" > "$meta_temp_dir/test5_default.log" 2>&1
+  --output_stats "$meta_temp_dir/mq_default.stats" \
+  --output_index "$meta_temp_dir/mq_default.idx" > "$meta_temp_dir/test5_default.log" 2>&1
 
 check_file_contains "$meta_temp_dir/test5_default.log" "16 read(s) filtered by: MappingQualityReadFilter" "run log (all 16 MQ 15 reads filtered)"
 
@@ -229,7 +235,8 @@ log "Executing $meta_name on MQ 15 reads with --minimum_mapping_quality 10..."
   "${reference_args[@]}" \
   --minimum_mapping_quality 10 \
   --output "$meta_temp_dir/mq10.vcf" \
-  --output_stats "$meta_temp_dir/mq10.stats" > "$meta_temp_dir/test5_mq10.log" 2>&1
+  --output_stats "$meta_temp_dir/mq10.stats" \
+  --output_index "$meta_temp_dir/mq10.idx" > "$meta_temp_dir/test5_mq10.log" 2>&1
 
 check_file_contains "$meta_temp_dir/test5_mq10.log" "0 read(s) filtered by: MappingQualityReadFilter" "run log (no MQ 15 reads filtered)"
 
@@ -244,7 +251,8 @@ if "$meta_executable" \
   --bai "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/mismatch.vcf" \
-  --output_stats "$meta_temp_dir/mismatch.stats" > "$meta_temp_dir/test6.log" 2>&1; then
+  --output_stats "$meta_temp_dir/mismatch.stats" \
+  --output_index "$meta_temp_dir/mismatch.idx" > "$meta_temp_dir/test6.log" 2>&1; then
   log_error "✗ $meta_name did not fail with 2 --input files and 1 --bai file"
   exit 1
 fi
@@ -256,11 +264,37 @@ if "$meta_executable" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/no_f1r2.vcf" \
   --output_stats "$meta_temp_dir/no_f1r2.stats" \
+  --output_index "$meta_temp_dir/no_f1r2.idx" \
   --create_f1r2_tar_gz > "$meta_temp_dir/test6_f1r2.log" 2>&1; then
   log_error "✗ $meta_name did not fail with --create_f1r2_tar_gz and no --f1r2_tar_gz"
   exit 1
 fi
 check_file_contains "$meta_temp_dir/test6_f1r2.log" "Error: --create_f1r2_tar_gz requires --f1r2_tar_gz" "error message"
+
+# Run $meta_executable with extra arguments and check that it fails with a
+# message
+check_fails_with() {
+  local message="$1"
+  local log_file="$2"
+  shift 2
+  if "$meta_executable" \
+    --input "$test_data_dir/tumor.bam" \
+    --bai "$test_data_dir/tumor.bai" \
+    "${reference_args[@]}" \
+    --output "$meta_temp_dir/fail.vcf" \
+    --output_stats "$meta_temp_dir/fail.stats" \
+    "$@" > "$log_file" 2>&1; then
+    log_error "✗ $meta_name did not fail with: $*"
+    exit 1
+  fi
+  check_file_contains "$log_file" "$message" "error message"
+}
+
+check_fails_with "Error: --output_index is required unless" "$meta_temp_dir/test6_output_index.log"
+check_fails_with "Error: --create_bam_output requires --bam_output\." "$meta_temp_dir/test6_bam_output.log" \
+  --output_index "$meta_temp_dir/fail.idx" --create_bam_output
+check_fails_with "Error: --create_bam_output requires --bam_output_index" "$meta_temp_dir/test6_bam_output_index.log" \
+  --output_index "$meta_temp_dir/fail.idx" --create_bam_output --bam_output "$meta_temp_dir/fail.bam"
 
 log "✅ TEST 6 completed successfully"
 
@@ -292,5 +326,41 @@ log "Executing $meta_name with a .vcf.bgz output and --output_index..."
 check_file_exists "$meta_temp_dir/bgz.tbi" "output index file (tabix index for a .vcf.bgz)"
 
 log "✅ TEST 7 completed successfully"
+
+# --- Test Case 8: Force-calling alleles ---
+log "Starting TEST 8: Force-calling alleles with --alleles"
+
+# A site with no evidence in the reads, which is only in the output because it
+# is force-called
+cat > "$test_data_dir/alleles.vcf" <<'VCF'
+##fileformat=VCFv4.2
+##contig=<ID=chr1,length=500>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr1	300	.	A	C	.	.	.
+VCF
+cp "$test_data_dir/alleles.vcf" "$test_data_dir/indexed/alleles.vcf"
+gatk IndexFeatureFile --input "$test_data_dir/indexed/alleles.vcf" --verbosity ERROR
+
+log "Executing $meta_name with --alleles and --alleles_index..."
+"$meta_executable" \
+  --input "$test_data_dir/tumor.bam" \
+  --bai "$test_data_dir/tumor.bai" \
+  "${reference_args[@]}" \
+  --alleles "$test_data_dir/indexed/alleles.vcf" \
+  --alleles_index "$test_data_dir/indexed/alleles.vcf.idx" \
+  --output "$meta_temp_dir/alleles.vcf" \
+  --output_stats "$meta_temp_dir/alleles.stats" \
+  --output_index "$meta_temp_dir/alleles.idx"
+
+log "Validating TEST 8 outputs..."
+check_snv_called "$meta_temp_dir/alleles.vcf" "output VCF file"
+if grep -v '^#' "$meta_temp_dir/alleles.vcf" | grep -q $'^chr1\t300\t'; then
+  log "✓ The force-called chr1:300 allele is in the output"
+else
+  log_error "✗ The force-called chr1:300 allele is not in the output"
+  exit 1
+fi
+
+log "✅ TEST 8 completed successfully"
 
 print_test_summary "All tests"
