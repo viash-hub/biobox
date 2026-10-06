@@ -15,10 +15,7 @@
   as required by the contributing guidelines (PR #248).
 
 * `minimap2/minimap2_align`: Add `--output_index` to declare the BAM index as a
-  tracked output (PR #248). Previously `samtools index` wrote `<output>.bai` as
-  an undeclared file, which the Nextflow runner left unpublished in the work
-  directory and which the Docker engine left owned by `root`. Without `--bam`
-  it is ignored, since the Nextflow runner always fills in a default path.
+  tracked output (PR #248).
 
 ## BUG FIXES
 
