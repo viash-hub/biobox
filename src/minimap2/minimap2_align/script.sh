@@ -28,8 +28,6 @@ if [[ -n "${par_bam:-}" && -n "${par_cigar_paf:-}" ]]; then
 fi
 
 # --- Align -----------------------------------------------------------------
-# minimap2 recommends giving -x first, so that the preset does not override the
-# options that follow it.
 cmd_args=(
   ${par_preset:+-x "$par_preset"}
   ${meta_cpus:+-t "$meta_cpus"}

@@ -12,8 +12,6 @@ echo "Creating minimap2 index..."
 echo "Input FASTA: $par_input"
 echo "Output index: $par_output"
 
-# minimap2 recommends giving -x first, so that the preset does not override the
-# -k / -w / -H values that follow it.
 cmd_args=(
   ${par_preset:+-x "$par_preset"}
   ${par_kmer_size:+-k "$par_kmer_size"}

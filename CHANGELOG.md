@@ -3,16 +3,10 @@
 ## MINOR CHANGES
 
 * `minimap2/minimap2_index`: Add `--preset`, `--kmer_size`, `--window_size` and
-  `--homopolymer_compressed` (PR #248). A preset determines the indexing
-  parameters `-k`/`-w`/`-H`, which are baked into the `.mmi` and cannot be
-  changed at alignment time, so the index has to be built for the sequencing
-  technology it will be used with. The index step now also uses `meta_cpus`.
-  `--kmer_size` is bounded to 1-28 and `--window_size` to 1-255, so an
-  out-of-range value is rejected up front instead of aborting minimap2 on an
-  internal assertion.
-
-* `minimap2`: Rename the argument groups to `Input`, `Output` and `Arguments`,
-  as required by the contributing guidelines (PR #248).
+  `--homopolymer_compressed` (PR #248). Previously every index was built with
+  the default indexing parameters, so aligning against it with another preset
+  (e.g. `map-hifi`, `asm5`, `sr`) fell back to those parameters with only a
+  warning.
 
 * `minimap2/minimap2_align`: Add `--output_index` to declare the BAM index as a
   tracked output (PR #248).
@@ -37,17 +31,8 @@
   `meta_memory_mb` as in `winnowmap_align` (PR #248). Without it, sort used its
   768M-per-thread default regardless of the memory allocation.
 
-* `minimap2/minimap2_align`: Pass `-x` before the other minimap2 options, as
-  minimap2 recommends, so that a preset cannot override them (PR #248).
-
-* `minimap2/minimap2_align`: Use `meta_cpus` instead of `VIASH_META_CPUS` for
-  the thread count, and pass it on to `samtools index` as well (PR #248).
-
 * `minimap2/minimap2_align`: Reject `--cigar_bam` without `--bam` and
   `--cigar_paf` with `--bam` instead of silently ignoring the flag (PR #248).
-
-* `minimap2`: Regenerate `help.txt` for both components from the tool's own
-  `--help` output, matching the rest of the repository (PR #248).
 
 # biobox 0.5.0
 

@@ -86,8 +86,8 @@ argument_groups:
           asm10, asm20, splice, sr, ava-ont, ava-pb). Run `minimap2 -x` for the
           full list.
 
-          The preset is applied before all other options, as minimap2
-          recommends, so that it does not override them.
+          minimap2 always applies the preset before all other options, so
+          options that are set explicitly take precedence over it.
 
           Note that a preset also selects indexing parameters (`-k`, `-w`,
           `-H`). Those only take effect when `--reference` is a FASTA file: when
