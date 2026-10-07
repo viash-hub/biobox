@@ -101,7 +101,8 @@ gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" <Tool> "${cmd_args[@
 
 The `gatk` launcher has no default heap size of its own so a value must be set.
 Without `-Xmx`, the JVM uses a part of the visible memory, which is not the memory given to the task.
-The fallback value is taken from `nf-core` modules.
+This sets the heap size to 80% of the provided memory, the remaining 20% is reserved for use outside the heap.
+The fallback memory value of `3072` is the same value used by `nf-core` GATK4 modules.
 
 Give `--native-pair-hmm-threads` from `meta_cpus` for tools that have it.
 
