@@ -1,0 +1,192 @@
+name: gatk4_getpileupsummaries
+namespace: gatk4
+description: |
+  Summarizes the read counts of a sample at a set of known variant sites,
+  for use in the estimation of cross-sample contamination.
+
+  For each site in a VCF of common biallelic SNPs with population allele
+  frequencies (for example a gnomAD-derived resource), counts the reads
+  that support the reference allele, the alternate allele and any other
+  allele. The output pileup summary table is used as input to
+  `gatk4 CalculateContamination`.
+keywords: [variant calling, somatic, GATK, GATK4, Mutect2, contamination, pileup]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--input"
+        alternatives: [-I]
+        type: file
+        description: |
+          Input BAM file containing the reads to summarize.
+
+          The file must be coordinate-sorted and indexed (see `--bai`).
+        required: true
+        example: sample.bam
+      - name: "--bai"
+        type: file
+        description: BAM index file (`.bai`) for the input BAM file.
+        required: true
+        example: sample.bam.bai
+      - name: "--intervals"
+        alternatives: [-L]
+        type: file
+        multiple: true
+        description: |
+          One or more genomic intervals over which to operate, provided as
+          files (e.g. BED, interval_list or VCF).
+
+          To summarize all the sites in `--variant`, give the same VCF
+          file to `--intervals`. Specify this argument more than once to
+          combine intervals (see `--interval_set_rule`).
+        required: true
+        example: [intervals.bed]
+      - name: "--intervals_index"
+        type: file
+        multiple: true
+        description: |
+          Index files for the VCF files in `--intervals` (`.tbi` for a
+          `.vcf.gz` file, `.idx` for a `.vcf` file), in the same order as
+          the VCF files in `--intervals`. Other interval files do not get
+          an index.
+
+          If not provided, a copy of each VCF `--intervals` file is indexed
+          before the run. If provided, one index must be given for each VCF
+          file in `--intervals`.
+        example: [intervals.vcf.gz.tbi]
+      - name: "--variant"
+        alternatives: [-V]
+        type: file
+        description: |
+          VCF file of common biallelic SNPs with population allele
+          frequencies in the `AF` INFO field.
+        required: true
+        example: common_snps.vcf.gz
+      - name: "--variant_index"
+        type: file
+        description: |
+          Index file for `--variant` (`.tbi` for a `.vcf.gz` file, `.idx`
+          for a `.vcf` file).
+
+          If not provided, a copy of `--variant` is indexed before the run.
+        example: common_snps.vcf.gz.tbi
+      - name: "--reference"
+        alternatives: [-R]
+        type: file
+        description: |
+          Reference sequence FASTA file.
+
+          Optional, but if provided, `--reference_fai` and `--reference_dict`
+          must be provided too.
+        example: reference.fasta
+      - name: "--reference_fai"
+        type: file
+        description: FASTA index file (`.fai`) for the reference sequence.
+        example: reference.fasta.fai
+      - name: "--reference_dict"
+        type: file
+        description: Sequence dictionary (`.dict`) file for the reference sequence.
+        example: reference.dict
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: |
+          Output pileup summary table, used as input to
+          `gatk4 CalculateContamination`.
+        required: true
+        example: pileups.table
+
+  - name: "Options"
+    arguments:
+      - name: "--exclude_intervals"
+        alternatives: [-XL]
+        type: file
+        multiple: true
+        description: |
+          One or more genomic intervals to exclude from processing,
+          provided as files (e.g. BED, interval_list or VCF).
+        example: [exclude_intervals.bed]
+      - name: "--exclude_intervals_index"
+        type: file
+        multiple: true
+        description: |
+          Index files for the VCF files in `--exclude_intervals` (`.tbi`
+          for a `.vcf.gz` file, `.idx` for a `.vcf` file), in the same
+          order as the VCF files in `--exclude_intervals`. Other interval
+          files do not get an index.
+
+          If not provided, a copy of each VCF `--exclude_intervals` file is
+          indexed before the run. If provided, one index must be given for
+          each VCF file in `--exclude_intervals`.
+        example: [exclude_intervals.vcf.gz.tbi]
+      - name: "--interval_set_rule"
+        alternatives: [-isr]
+        type: string
+        description: |
+          Set merging approach to use to combine the `--intervals` inputs.
+          For example, use `INTERSECTION` with a target BED file and the
+          `--variant` VCF to summarize only the sites in the targets.
+          Default: 'UNION'.
+        choices: [UNION, INTERSECTION]
+      - name: "--max_depth_per_sample"
+        type: integer
+        description: |
+          Maximum number of reads to retain per sample per locus. Reads
+          above this threshold are downsampled. Set to `0` to disable.
+          Default: 0.
+      - name: "--maximum_population_allele_frequency"
+        alternatives: [-max-af]
+        type: double
+        description: |
+          Maximum population allele frequency of the sites to consider.
+          Default: 0.2.
+      - name: "--minimum_mapping_quality"
+        type: integer
+        description: |
+          Minimum mapping quality (inclusive) of the reads to keep, used by
+          the tool-default mapping quality read filter. Default: 50.
+      - name: "--minimum_population_allele_frequency"
+        alternatives: [-min-af]
+        type: double
+        description: |
+          Minimum population allele frequency of the sites to consider. A
+          low value increases accuracy at the expense of speed.
+          Default: 0.01.
+
+__merge__: /src/gatk4/utils/common_argument_groups.yaml
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow

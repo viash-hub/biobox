@@ -173,3 +173,105 @@ create_test_known_sites_vcf() {
 
   log "✓ Wrote and indexed known-sites VCF: $vcf_path"
 }
+
+# Somatic variant calling fixtures
+#
+# A 500bp single-contig ("chr1") reference with a known SNV at 1-based
+# position 250 (REF T > ALT A). Read pairs are two 100bp mates at 1-based
+# positions 200 and 350. The pos-200 mate spans the SNV (it is the 51st base
+# of that mate), the pos-350 mate never carries the variant.
+TEST_SOMATIC_SEQ="AAGCCCAATAAACCACTCTGACTGGCCGAATAGGGATATAGGCAACGACATGTGCGGCGACCCTTGCGACAGTGACGCTTTCGCCGTTGCCTAAACCTATTTGAAGGAGTCTAGCAGCCGCAGTAAGGCACAATACCTCGTCCGTGTTACCAGACCAAACAAGACGTCCTCTTCAATGTTTAAATGACCCTCTCGTCATAAAACCTTTCTACTATGTGTTCCGCAAGAATCAACAACTACAATGGCGCGTCGTGAATAACGCGACGGCTGAGACGAACGGCGCGTGAATGAAGCGCTTAAACAGCTCAGGAGCCAGTCCCCTACGTCGCATATCCTGGCCACTGGAGGTGAAGCGAATGGTATCGATACGTAGGAGGTGTGCCTTCGTAGGCTGTTTCTCAGGACGCCCAACTATTCTTTCCAATCCTACATCTGTTTCTTGCGTCGTAGCGGGACCCTCCATTGTTACTTATTAGGTTCTCGTTATGTCTCATAATCTC"
+TEST_SOMATIC_SEQ_REF="AAAACCTTTCTACTATGTGTTCCGCAAGAATCAACAACTACAATGGCGCGTCGTGAATAACGCGACGGCTGAGACGAACGGCGCGTGAATGAAGCGCTTA"
+TEST_SOMATIC_SEQ_ALT="AAAACCTTTCTACTATGTGTTCCGCAAGAATCAACAACTACAATGGCGCGACGTGAATAACGCGACGGCTGAGACGAACGGCGCGTGAATGAAGCGCTTA"
+TEST_SOMATIC_SEQ_MATE="TACGACGCAAGAAACAGATGTAGGATTGGAAAGAATAGTTGGGCGTCCTGAGAAACAGCCTACGAAGGCACACCTCCTACGTATCGATACCATTCGCTTC"
+
+# Create the 500bp somatic test reference FASTA together with its .fai and
+# .dict companion files.
+#
+# Usage: create_test_somatic_reference "/path/to/reference.fasta"
+# Produces "$fasta_path", "${fasta_path}.fai", and a sibling ".dict" file
+create_test_somatic_reference() {
+  local fasta_path="$1"
+  local dict_path="${fasta_path%.fasta}.dict"
+
+  log "Writing somatic test reference to: $fasta_path"
+  printf '>chr1\n%s\n' "$TEST_SOMATIC_SEQ" > "$fasta_path"
+
+  log "Creating sequence dictionary for: $fasta_path"
+  gatk CreateSequenceDictionary -R "$fasta_path" -O "$dict_path" --VERBOSITY ERROR
+
+  create_test_fasta_fai "$fasta_path" "${fasta_path}.fai"
+}
+
+# Create a sorted and indexed BAM of 8 read pairs over the somatic test SNV.
+# With mode "ref" all reads carry the reference allele (a matched normal
+# sample). With mode "mixed" the reads alternate between the reference and
+# alternate alleles (a tumor sample with a ~50% allele fraction).
+#
+# Usage: create_test_somatic_bam "/path/to/output.bam" sample_name read_group_id ref|mixed
+# Produces "$bam_path" and "${bam_path%.bam}.bai"
+create_test_somatic_bam() {
+  local bam_path="$1"
+  local sample_name="$2"
+  local read_group_id="$3"
+  local mode="$4"
+  local sam_path="${bam_path%.bam}.sam"
+  local qual
+  qual=$(printf 'I%.0s' $(seq 1 100))
+
+  log "Writing somatic test reads for $sample_name (mode: $mode) to: $sam_path"
+  {
+    printf '@HD\tVN:1.6\tSO:unsorted\n'
+    printf '@SQ\tSN:chr1\tLN:500\n'
+    printf '@RG\tID:%s\tSM:%s\tPL:ILLUMINA\tLB:lib_%s\n' "$read_group_id" "$sample_name" "$read_group_id"
+    local i variant_seq
+    for i in $(seq 0 7); do
+      if [[ "$mode" == "mixed" ]] && ((i % 2 == 0)); then
+        variant_seq="$TEST_SOMATIC_SEQ_ALT"
+      else
+        variant_seq="$TEST_SOMATIC_SEQ_REF"
+      fi
+      # Alternate which mate is the forward-strand read
+      if ((i % 4 < 2)); then
+        printf 'pair%d\t99\tchr1\t200\t60\t100M\t=\t350\t250\t%s\t%s\tRG:Z:%s\n' "$i" "$variant_seq" "$qual" "$read_group_id"
+        printf 'pair%d\t147\tchr1\t350\t60\t100M\t=\t200\t-250\t%s\t%s\tRG:Z:%s\n' "$i" "$TEST_SOMATIC_SEQ_MATE" "$qual" "$read_group_id"
+      else
+        printf 'pair%d\t83\tchr1\t350\t60\t100M\t=\t200\t-250\t%s\t%s\tRG:Z:%s\n' "$i" "$TEST_SOMATIC_SEQ_MATE" "$qual" "$read_group_id"
+        printf 'pair%d\t163\tchr1\t200\t60\t100M\t=\t350\t250\t%s\t%s\tRG:Z:%s\n' "$i" "$variant_seq" "$qual" "$read_group_id"
+      fi
+    done
+  } > "$sam_path"
+
+  sort_and_index_bam "$sam_path" "$bam_path"
+}
+
+# Create the full set of somatic fixtures in a directory:
+#
+# - the reference (reference.fasta/.fai/.dict)
+# - a tumor BAM (tumor.bam/.bai, sample "tumor")
+# - a matched normal BAM (normal.bam/.bai, sample "normal").
+#
+# Then run Mutect2 directly on the tumor/normal pair to produce an unfiltered
+# VCF (unfiltered.vcf), its stats file (unfiltered.vcf.stats) and an F1R2
+# tarball (f1r2.tar.gz) for testing the downstream somatic tools.
+#
+# Usage: create_test_mutect2_outputs "/path/to/dir"
+create_test_mutect2_outputs() {
+  local out_dir="$1"
+
+  create_test_somatic_reference "$out_dir/reference.fasta"
+  create_test_somatic_bam "$out_dir/tumor.bam" tumor rg_tumor mixed
+  create_test_somatic_bam "$out_dir/normal.bam" normal rg_normal ref
+
+  log "Running Mutect2 on the somatic test tumor/normal pair..."
+  gatk Mutect2 \
+    --reference "$out_dir/reference.fasta" \
+    --input "$out_dir/tumor.bam" \
+    --input "$out_dir/normal.bam" \
+    --normal-sample normal \
+    --output "$out_dir/unfiltered.vcf" \
+    --f1r2-tar-gz "$out_dir/f1r2.tar.gz" \
+    --verbosity ERROR
+
+  log "✓ Created Mutect2 outputs in: $out_dir"
+}
