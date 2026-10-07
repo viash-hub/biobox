@@ -1,8 +1,38 @@
 # biobox x.x.x
 
+## MINOR CHANGES
+
+* `minimap2/minimap2_index`: Add `--preset`, `--kmer_size`, `--window_size` and
+  `--homopolymer_compressed` (PR #248). Previously every index was built with
+  the default indexing parameters, so aligning against it with another preset
+  (e.g. `map-hifi`, `asm5`, `sr`) fell back to those parameters with only a
+  warning.
+
+* `minimap2/minimap2_align`: Add `--output_index` to declare the BAM index as a
+  tracked output (PR #248).
+
 ## BUG FIXES
 
 * `star/star_align_reads`: fixed a `duplicate parameter "readFilesCommand"` error that occurred when `--read_files_command` was set while the input files were gzipped or bzipped. The component now only derives a read files command when the user did not provide one (PR #246).
+
+* `minimap2/minimap2_align`: Update the engine image from minimap2 `2.17` /
+  samtools `1.9` to minimap2 `2.30` / samtools `1.22.1` (PR #248). The image
+  shipped minimap2 2.17 (2019), which rejected the `map-hifi` and `lr:hq`
+  presets that the component documented as valid, making PacBio HiFi alignment
+  impossible. This also brings `minimap2_align` onto the same minimap2 version
+  as `minimap2_index`.
+
+* `minimap2/minimap2_align`: Pass `-O bam` to `samtools sort`, so `--bam`
+  always writes BAM (PR #248). `samtools sort` picks its output format from the
+  file extension, so an `--output` ending in `.sam` produced plain SAM and the
+  following `samtools index` failed.
+
+* `minimap2/minimap2_align`: Pass `-m` to `samtools sort`, derived from
+  `meta_memory_mb` as in `winnowmap_align` (PR #248). Without it, sort used its
+  768M-per-thread default regardless of the memory allocation.
+
+* `minimap2/minimap2_align`: Reject `--cigar_bam` without `--bam` and
+  `--cigar_paf` with `--bam` instead of silently ignoring the flag (PR #248).
 
 # biobox 0.5.0
 
