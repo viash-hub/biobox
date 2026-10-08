@@ -9,7 +9,7 @@ License](https://img.shields.io/github/license/viash-hub/biobox.svg)](https://gi
 [![GitHub
 Issues](https://img.shields.io/github/issues/viash-hub/biobox.svg)](https://github.com/viash-hub/biobox/issues)
 [![Viash
-version](https://img.shields.io/badge/Viash-v0.9.4-blue.svg)](https://viash.io)
+version](https://img.shields.io/badge/Viash-v0.9.7-blue.svg)](https://viash.io)
 
 **A curated collection of high-quality, production-ready bioinformatics
 components**

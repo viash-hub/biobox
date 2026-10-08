@@ -2,15 +2,138 @@
 
 ## NEW FUNCTIONALITY
 
-* `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
+* `gatk4`: Add components for GATK4 somatic variant calling (PR #249):
+  - `gatk4/gatk4_mutect2`: Call somatic SNVs and indels in tumor-normal or tumor-only mode.
+  - `gatk4/gatk4_getpileupsummaries`: Summarize the read counts of a sample at known variant sites for contamination estimation.
+  - `gatk4/gatk4_calculatecontamination`: Calculate the fraction of reads that come from cross-sample contamination.
+  - `gatk4/gatk4_learnreadorientationmodel`: Learn a read orientation bias model from the F1R2 counts of Mutect2.
+  - `gatk4/gatk4_filtermutectcalls`: Filter the raw somatic calls of Mutect2.
+
+## MINOR CHANGES
+
+* `minimap2/minimap2_index`: Add `--preset`, `--kmer_size`, `--window_size` and
+  `--homopolymer_compressed` (PR #248). Previously every index was built with
+  the default indexing parameters, so aligning against it with another preset
+  (e.g. `map-hifi`, `asm5`, `sr`) fell back to those parameters with only a
+  warning.
+
+* `minimap2/minimap2_align`: Add `--output_index` to declare the BAM index as a
+  tracked output (PR #248).
+
+## BUG FIXES
+
+* `star/star_align_reads`: fixed a `duplicate parameter "readFilesCommand"` error that occurred when `--read_files_command` was set while the input files were gzipped or bzipped. The component now only derives a read files command when the user did not provide one (PR #246).
+
+* `minimap2/minimap2_align`: Update the engine image from minimap2 `2.17` /
+  samtools `1.9` to minimap2 `2.30` / samtools `1.22.1` (PR #248). The image
+  shipped minimap2 2.17 (2019), which rejected the `map-hifi` and `lr:hq`
+  presets that the component documented as valid, making PacBio HiFi alignment
+  impossible. This also brings `minimap2_align` onto the same minimap2 version
+  as `minimap2_index`.
+
+* `minimap2/minimap2_align`: Pass `-O bam` to `samtools sort`, so `--bam`
+  always writes BAM (PR #248). `samtools sort` picks its output format from the
+  file extension, so an `--output` ending in `.sam` produced plain SAM and the
+  following `samtools index` failed.
+
+* `minimap2/minimap2_align`: Pass `-m` to `samtools sort`, derived from
+  `meta_memory_mb` as in `winnowmap_align` (PR #248). Without it, sort used its
+  768M-per-thread default regardless of the memory allocation.
+
+* `minimap2/minimap2_align`: Reject `--cigar_bam` without `--bam` and
+  `--cigar_paf` with `--bam` instead of silently ignoring the flag (PR #248).
+
+# biobox 0.5.0
+
+## BREAKING CHANGES
+
+* `cellranger_count`: updated to Cell Ranger v10. This drops support for the `SC3Pv3LT` chemistry (PR #240)
+
+## NEW FUNCTIONALITY
+
+* `gatk4`: Added components for the Genome Analysis Toolkit (GATK4), covering a full germline short-variant discovery pipeline (PR #226):
+  - `gatk4/gatk4_createsequencedictionary`: Create a sequence dictionary (`.dict`) for a reference FASTA file.
+  - `gatk4/gatk4_markduplicates`: Locate and tag duplicate reads in a BAM file.
+  - `gatk4/gatk4_baserecalibrator`: Generate a base quality score recalibration (BQSR) table from known variant sites.
+  - `gatk4/gatk4_applybqsr`: Apply a base quality score recalibration table to a BAM file.
+  - `gatk4/gatk4_haplotypecaller`: Call germline SNVs and indels from a BAM file via local re-assembly of haplotypes.
+  - `gatk4/gatk4_combinegvcfs`: Combine per-sample GVCFs into a single multi-sample GVCF.
+  - `gatk4/gatk4_genomicsdbimport`: Import per-sample GVCFs into a GenomicsDB workspace for scalable joint genotyping.
+  - `gatk4/gatk4_genotypegvcfs`: Perform joint genotyping on GVCFs, combined GVCFs, or a GenomicsDB workspace.
+  - `gatk4/gatk4_variantfiltration`: Filter variant calls based on INFO and/or FORMAT annotations.
+  - `gatk4/gatk4_selectvariants`: Select a subset of variants from a VCF based on various criteria.
+
+* `minibwa`: Added components for minibwa, the successor to bwa-mem with native Hi-C and bisulfite sequencing alignment modes (PR #225, PR #235):
+  - `minibwa/minibwa_index`: Build a minibwa reference index, optionally including a bisulfite (BS-seq) index
+  - `minibwa/minibwa_map`: Align short, long, Hi-C or bisulfite reads to a minibwa index
+
+* `mosdepth`: Add mosdepth, a fast BAM/CRAM depth-of-coverage calculator (PR #227)
+
+* `tabix`: Add tabix, a generic indexer/query tool for BGZF block-compressed, position-sorted files (PR #228, PR #235):
+  - `tabix/tabix_index`: Build a tabix (`.tbi`) or CSI (`.csi`) index for a BGZF-compressed file.
+  - `tabix/tabix_query`: Query an indexed file by region, or list its chromosomes.
+
+* `snpeff`: Add `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
+
+* `winnowmap`: Long-read aligner optimised for repetitive genomic regions using weighted minimizers (PR #230):
+  - `winnowmap/winnowmap_align`: Map long reads against a reference genome using Winnowmap with automatic or pre-computed meryl k-mer frequencies. Outputs SAM, or a coordinate-sorted BAM with a companion index (`--bam` / `--output_index`).
+
+
+## MAJOR CHANGES
+
+* `cellranger_mkref`: updated Cell Ranger to v10 (PR #240).
 
 ## MINOR CHANGES
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
 
+<<<<<<< HEAD
 ## BUG FIXES
 
 * `rseqc/rseqc_inferexperiment`: Update stale test fixtures to match the output of the currently installed RSeQC release.
+=======
+* `snpeff_ann`:
+  - Bump snpEff from `5.2f` to `5.4c` and remove a config patch that is no longer needed (PR #222)
+  - Add `--fastaprot_no_ref` argument (`-fastaProtNoRef`) to not add reference sequences to the output when `--fastaprot` is used (PR #222)
+  - Rename argument `-no_hgvs` to `--no_hgvs` for consistency. `-no_hgvs` is kept as an alternative for backwards compatibility. (PR #222)
+  - Move default arguments values to descriptions (PR #235)
+
+* Bump `viash` to 0.9.7 (PR #238)
+
+* `hisat2`: Bump HISAT2 from `2.2.2` to `2.2.3` (PR #241)
+
+## BUG FIXES
+
+* `bowtie2`: Fix `--index` of `bowtie2/bowtie2_align` and `bowtie2/bowtie2_inspect` (PR #233):
+  * `--index` was a `string` holding the index filename prefix, so the index files were not mounted or staged when running with Docker or Nextflow.
+    It is now a `file` pointing to the directory containing the index files (as produced by `bowtie2/bowtie2_build`), and the prefix is derived from the directory contents.
+  * `bowtie2_inspect`: pass the index as the last argument, as documented. The `bowtie2-inspect` wrapper reads the index basename from the final argument to decide whether to run the small or the large binary,
+    so passing it first made it always pick the small one and fail on a large (`.bt2l`) index.
+  * `bowtie2_inspect`: setting `--large_index` now restricts the lookup to a large index and fails if the index directory does not contain one, instead of silently inspecting a small index.
+  * A new `--index_prefix` argument selects the index to use by prefix, for directories that hold more than one.
+
+* Fix `--index` in `bwa_aln`, `bwa_mem`, `bwa_sampe`, `bwa_samse` and `bwa_mem2_mem` (PR #233).
+  The argument was documented as the index base name, but a base name is a shared prefix of the index files
+  rather than a path, so there was no value that worked: passing the prefix was rejected because no such file
+  exists, and passing one of the index files left the aligner unable to locate the others.
+  Pointing it at the reference FASTA only appeared to work with the executable runner, which mounts the parent
+  directory of an input file and so happened to bring the sibling index files along; under Nextflow, which
+  stages just the named file, the index files were missing.
+  `--index` now takes the directory holding the index files, matching the output of `bwa_index` and
+  `bwa_mem2_index`, and the base name is derived from the directory contents.
+  A new `--index_prefix` argument selects the index to use by base name, for directories that hold more than one.
+
+* `snpeff_ann`: Fix and update arguments (PR #222):
+  * Fix `--stats`/`-s`/`--htmlStats` to be `string` instead of `boolean_true` to prevent it swallowing the following argument when used.
+    `--stats` now sets the name of the intermediate HTML summary file snpEff writes, use the existing `--summary` argument to specify the final output path.
+  * Fix `--only_tr` which referenced an incorrect variable name and always passed an empty value to `-onlyTr` instead of the provided file
+  * Fix `--csv_stats` and `--fastaprot` which were missing `direction: output` and so defaulted to `direction: input`, requiring the (not yet created) output file to already exist before running
+  * Fix `--cancer_samples` and `--fastaprot` which appended a stray literal `]` character to the provided value, corrupting the file path passed to `-cancerSamples`/`-fastaProt`
+  * Enforce that `--no-stats` cannot be set with `--summary`/`--genes` (PR #236)
+  * Resolve the path passed to `--data_dir` in case it is a symlink (PR #239)
+
+* `cellranger/cellranger_count`: fix `min_crispr_umi` argument (PR #240)
+>>>>>>> origin/main
 
 # biobox 0.4.2
 
@@ -31,6 +154,9 @@
 
 * `rustqc`: Added support for RustQC, a Rust re-implementation of several established bioinformatics QC tools.
 
+* `hisat2`: A graph-based alignment program for mapping RNA-seq reads to a reference genome. (PR #218)
+  - `hisat2/hisat2_build`: Builds a HISAT2 index from a reference FASTA file.
+  - `hisat2/hisat2_align`: Aligns RNA-seq reads to a reference genome using the HISAT2 aligner.
 
 # MINOR CHANGES
 
@@ -117,7 +243,7 @@
 
 * `bedtools`: Enhanced 11 existing bedtools components with improved functionality and standardized interfaces (PR #188):
   - `bedtools/bedtools_bamtobed`: Enhanced with additional output format options
-  - `bedtools/bedtools_bamtofastq`: Improved paired-end read handling  
+  - `bedtools/bedtools_bamtofastq`: Improved paired-end read handling
   - `bedtools/bedtools_bed12tobed6`: Standardized parameter handling
   - `bedtools/bedtools_bedtobam`: Enhanced genome file support
   - `bedtools/bedtools_genomecov`: Added scale and split options
@@ -301,8 +427,8 @@
   - `bedtools/bedtools_bedtobam`: Converts genomic feature records (bed/gff/vcf) to BAM format (PR #111).
   - `bedtools/bedtools_bed12tobed6`: Converts BED12 files to BED6 files (PR #140).
   - `bedtools/bedtools_links`: Creates an HTML file with links to an instance of the UCSC Genome Browser for all features / intervals in a (bed/gff/vcf) file (PR #137).
- 
-* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74). 
+
+* `qualimap/qualimap_rnaseq`: RNA-seq QC analysis using qualimap (PR #74).
 
 * `rsem/rsem_prepare_reference`: Prepare transcript references for RSEM (PR #89).
 
@@ -324,7 +450,7 @@
     - `kallisto_index`: Create a kallisto index (PR #149).
     - `kallisto_quant`: Quantifying abundances of transcripts from RNA-Seq data, or more generally of target sequences using high-throughput sequencing reads (PR #152).
 
-* `trimgalore`: Quality and adapter trimming for fastq files (PR #117). 
+* `trimgalore`: Quality and adapter trimming for fastq files (PR #117).
 
 
 ## MINOR CHANGES
@@ -372,7 +498,7 @@
 
 * `fastp`: An ultra-fast all-in-one FASTQ preprocessor (PR #3).
 
-* `busco`: 
+* `busco`:
     - `busco/busco_run`: Assess genome assembly and annotation completeness with single copy orthologs (PR #6).
     - `busco/busco_list_datasets`: Lists available busco datasets (PR #18).
     - `busco/busco_download_datasets`: Download busco datasets (PR #19).
@@ -395,7 +521,7 @@
     - `star/star_align_reads`: Align reads to a reference genome (PR #22).
     - `star/star_genome_generate`: Generate a genome index for STAR alignment (PR #58).
 
-* `gffread`: Validate, filter, convert and perform other operations on GFF files (PR #29).  
+* `gffread`: Validate, filter, convert and perform other operations on GFF files (PR #29).
 
 * `salmon`:
     - `salmon/salmon_index`: Create a salmon index for the transcriptome to use Salmon in the mapping-based mode (PR #24).
@@ -422,7 +548,7 @@
 * `bedtools`:
     - `bedtools_getfasta`: extract sequences from a FASTA file for each of the
                            intervals defined in a BED/GFF/VCF file (PR #59).
-                           
+
 * `bbmap`:
     - `bbmap_bbsplit`: Split sequencing reads by mapping them to multiple references simultaneously (PR #138).
 

@@ -172,4 +172,37 @@ cd ..
 
 #########################################################################################
 
+mkdir star_align_reads_read_files_command
+cd star_align_reads_read_files_command
+
+echo "> Prepare gzipped test data"
+gzip -c ../reads_R1.fastq > reads_R1.fastq.gz
+gzip -c ../reads_R2.fastq > reads_R2.fastq.gz
+
+echo ">> Run star_align_reads on gzipped PE with a user-specified --read_files_command"
+"$meta_executable" \
+  --input reads_R1.fastq.gz \
+  --input_r2 reads_R2.fastq.gz \
+  --genome_dir ../index/ \
+  --read_files_command "zcat" \
+  --aligned_reads output.bam \
+  --log log.txt \
+  ${meta_cpus:+---cpus $meta_cpus}
+
+echo ">> Check if output exists"
+assert_file_exists "output.bam"
+assert_file_exists "log.txt"
+
+echo ">> Check if output contents are not empty"
+assert_file_not_empty "output.bam"
+assert_file_not_empty "log.txt"
+
+echo ">> Check if output contents are correct"
+assert_file_contains "log.txt" "Number of input reads \\|	2"
+assert_file_contains "log.txt" "Uniquely mapped reads number \\|	1"
+
+cd ..
+
+#########################################################################################
+
 echo "> Test successful"

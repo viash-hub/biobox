@@ -20,9 +20,21 @@ argument_groups:
   arguments: 
   - name: "--index"
     type: file
-    description: BWA index base name (prefix of .amb, .ann, .bwt, .pac, .sa files).
+    description: |
+      Directory containing the BWA index files (`.amb`, `.ann`, `.bwt`, `.pac`
+      and `.sa`), as produced by `bwa_index`. When the directory holds a single
+      index, its base name is derived from the contents of the directory; when
+      it holds more than one, use `--index_prefix` to select one.
     required: true
-    example: reference.fasta
+    example: bwa_index/
+  - name: "--index_prefix"
+    type: string
+    description: |
+      Base name of the index to use from the `--index` directory, that is, the
+      name the index files share with their extensions (`.amb`, `.ann`, `.bwt`,
+      `.pac`, `.sa`) removed. Required when the directory contains more than one
+      index; when omitted, the single index present in the directory is used.
+    example: genome
   - name: "--reads1"
     type: file
     description: Input FASTQ file with first reads in pair (R1) or single-end reads.

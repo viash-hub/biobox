@@ -1,0 +1,77 @@
+```sh
+docker run --rm broadinstitute/gatk:4.7.0.0 gatk CalculateContamination --help
+```
+
+Using GATK jar /gatk/gatk-package-4.7.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /gatk/gatk-package-4.7.0.0-local.jar CalculateContamination --help
+USAGE: CalculateContamination [arguments]
+
+Calculate the fraction of reads coming from cross-sample contamination
+Version:4.7.0.0
+
+
+Required Arguments:
+
+--input,-I <File>             The input table  Required. 
+
+--output,-O <File>            The output table  Required. 
+
+
+Optional Arguments:
+
+--arguments_file <File>       read one or more arguments files and add them to the command line  This argument may be
+                              specified 0 or more times. Default value: null. 
+
+--gatk-config-file <String>   A configuration file to use with the GATK.  Default value: null. 
+
+--gcs-max-retries,-gcs-retries <Integer>
+                              If the GCS bucket channel errors out, how many times it will attempt to re-initiate the
+                              connection  Default value: 20. 
+
+--gcs-project-for-requester-pays <String>
+                              Project to bill when accessing "requester pays" buckets. If unset, these buckets cannot be
+                              accessed.  User must have storage.buckets.get permission on the bucket being accessed. 
+                              Default value: . 
+
+--help,-h <Boolean>           display the help message  Default value: false. Possible values: {true, false} 
+
+--high-coverage-ratio-threshold <Double>
+                              The maximum coverage relative to the mean.  Default value: 3.0. 
+
+--low-coverage-ratio-threshold <Double>
+                              The minimum coverage relative to the median.  Default value: 0.5. 
+
+--matched-normal,-matched <File>
+                              The matched normal input table  Default value: null. 
+
+--QUIET <Boolean>             Whether to suppress job-summary info on System.err.  Default value: false. Possible
+                              values: {true, false} 
+
+--tmp-dir <GATKPath>          Temp directory to use.  Default value: null. 
+
+--tumor-segmentation,-segments <File>
+                              The output table containing segmentation of the tumor by minor allele fraction  Default
+                              value: null. 
+
+--use-jdk-deflater,-jdk-deflater <Boolean>
+                              Whether to use the JdkDeflater (as opposed to IntelDeflater)  Default value: false.
+                              Possible values: {true, false} 
+
+--use-jdk-inflater,-jdk-inflater <Boolean>
+                              Whether to use the JdkInflater (as opposed to IntelInflater)  Default value: false.
+                              Possible values: {true, false} 
+
+--verbosity <LogLevel>        Control verbosity of logging.  Default value: INFO. Possible values: {ERROR, WARNING,
+                              INFO, DEBUG} 
+
+--version <Boolean>           display the version number for this tool  Default value: false. Possible values: {true,
+                              false} 
+
+
+Advanced Arguments:
+
+--showHidden <Boolean>        display hidden arguments  Default value: false. Possible values: {true, false} 
+
+Tool returned:
+0

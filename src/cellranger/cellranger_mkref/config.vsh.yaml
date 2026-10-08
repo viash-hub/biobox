@@ -47,19 +47,26 @@ test_resources:
 
 engines:
 - type: docker
-  image: ghcr.io/data-intuitive/cellranger:8.0
+  image: debian:latest
   setup:
-    - type: apt
-      packages:
-        - procps
-        - pigz
+    # quay.io/nf-core/cellranger:10.0.0 is based on bookworm (which has been deprecated)
+    # So use `debian:latest` and use a `COPY --from=...`
+    - type: docker
+      copy: 
+        - "--from=quay.io/nf-core/cellranger:10.0.0 /opt/cellranger-10.0.0 /opt/cellranger-10.0.0"
+      run: |
+        DEBIAN_FRONTEND=noninteractive apt update && \
+        apt upgrade -y && apt install -y procps pigz && rm -rf /var/lib/apt/lists/* && \
+        ln -s /opt/cellranger-10.0.0/bin/cellranger /usr/bin/cellranger && \
+        cellranger telemetry disable
+    - type: docker
+      run: |
+        cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
+
   test_setup:
     - type: apt
       packages:
         - seqkit
-    - type: docker
-      run: |
-        cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt
 
 runners:
 - type: executable

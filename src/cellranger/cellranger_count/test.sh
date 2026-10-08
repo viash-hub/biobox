@@ -14,8 +14,8 @@ trap clean_up EXIT
 
 echo "Copy test data from Cell Ranger installation directory"
 mkdir -p "${tmp_dir}/test_data/"
-cp -r "/opt/cellranger-8.0.0/external/cellranger_tiny_fastq/" "${tmp_dir}/test_data"
-cp -r "/opt/cellranger-8.0.0/external/cellranger_tiny_ref/" "${tmp_dir}/test_data"
+cp -r "/opt/cellranger-10.0.0/external/cellranger_tiny_fastq/" "${tmp_dir}/test_data"
+cp -r "/opt/cellranger-10.0.0/external/cellranger_tiny_ref/" "${tmp_dir}/test_data"
 input_dir="${tmp_dir}/test_data/cellranger_tiny_fastq"
 reference_dir="${tmp_dir}/test_data/cellranger_tiny_ref"
 

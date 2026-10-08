@@ -18,7 +18,7 @@ links:
   issue_tracker: https://github.com/viash-hub/biobox/issues
   repository: https://github.com/viash-hub/biobox
 
-viash_version: 0.9.4
+viash_version: 0.9.7
 
 ## TODO: __merge__ properties in the package config could not be loaded by viash-hub. 
 ## Re-enable this again again later once this is supported

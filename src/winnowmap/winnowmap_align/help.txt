@@ -1,0 +1,98 @@
+```sh
+winnowmap --help
+```
+
+winnowmap is built on top of minimap2, while modifying its minimizer sampling and indexing procedures
+Usage: winnowmap [options] <target.fa>|<target.idx> [query.fa] [...]
+Options:
+  Indexing:
+    -H           use homopolymer-compressed k-mer
+    -k INT       k-mer size (no larger than 28) [15]
+    -w INT       minimizer window size [50]
+    -W FILE      input file containing list of high freq. k-mers []
+    -I NUM       split index for every ~NUM input bases [4G]
+    -d FILE      dump index to FILE []
+  Mapping:
+    -f FLOAT     filter out top FLOAT (<1) fraction of repetitive minimizers [0.0]
+    -g NUM       stop chain enlongation if there are no minimizers in INT-bp [5000]
+    -G NUM       max intron length (effective with -xsplice; changing -r) [200k]
+    -F NUM       max fragment length (effective with -xsr or in the fragment mode) [800]
+    -r NUM       bandwidth used in chaining and DP-based alignment [500]
+    -n INT       minimal number of minimizers on a chain [3]
+    -m INT       minimal chaining score (matching bases minus log gap penalty) [40]
+    -X           skip self and dual mappings (for the all-vs-all mode)
+    -p FLOAT     min secondary-to-primary score ratio [0.8]
+    --sv-off     turn off SV-aware mode
+  Alignment:
+    -A INT       matching score [2]
+    -B INT       mismatch penalty [4]
+    -O INT[,INT] gap open penalty [4,24]
+    -E INT[,INT] gap extension penalty; a k-long gap costs min{O1+k*E1,O2+k*E2} [2,1]
+    -z INT[,INT] Z-drop score and inversion Z-drop score [400,200]
+    -s INT       minimal peak DP alignment score [80]
+    -u CHAR      how to find GT-AG. f:transcript strand, b:both strands, n:don't match GT-AG [n]
+  Input/Output:
+    -a           output in the SAM format (PAF by default)
+    -o FILE      output alignments to FILE [stdout]
+    -L           write CIGAR with >65535 ops at the CG tag
+    -R STR       SAM read group line in a format like '@RG\tID:foo\tSM:bar' []
+    -c           output CIGAR in PAF
+    --cs[=STR]   output the cs tag; STR is 'short' (if absent) or 'long' [none]
+    --MD         output the MD tag
+    --eqx        write =/X CIGAR operators
+    -Y           use soft clipping for supplementary alignments
+    -t INT       manually set pthread count rather than automatically
+    -K NUM       minibatch size for mapping [1000M]
+    --version    show version number
+  Preset:
+    -x STR       preset (always applied before other options) []
+                 - map-ont (ont-to-ref, uses default param)
+                 - map-pb (hifi-to-ref, all defaults but does finer read fragmentation in SV-aware mapping)
+                 - map-pb-clr (clr-to-ref, sets --sv-off)
+                 - splice/splice:hq - long-read/Pacbio-CCS spliced alignment, sets --sv-off
+                 - asm5/asm10/asm20 - asm-to-ref mapping
+
+```sh
+meryl --help
+```
+
+usage: meryl ...
+
+  A meryl command line is formed as a series of commands and files, possibly
+  grouped using square brackets.  Each command operates on the file(s) that
+  are listed after it.
+
+  COMMANDS:
+
+    statistics           display total, unique, distnict, present number of the kmers on the screen.  accepts exactly one input.
+    histogram            display kmer frequency on the screen as 'frequency<tab>count'.  accepts exactly one input.
+    print                display kmers on the screen as 'kmer<tab>count'.  accepts exactly one input.
+
+    count                Count the occurrences of canonical kmers in the input.  must have 'output' specified.
+    count-forward        Count the occurrences of forward kmers in the input.  must have 'output' specified.
+    count-reverse        Count the occurrences of reverse kmers in the input.  must have 'output' specified.
+      k=<K>              create mers of size K bases (mandatory).
+      n=<N>              expect N mers in the input (optional; for precise memory sizing).
+      memory=M           use no more than (about) M GB memory.
+      threads=T          use no more than T threads.
+      compress           compress homopolymer runs to a single letter.
+
+    less-than N          return kmers that occur fewer than N times in the input.  accepts exactly one input.
+    greater-than N       return kmers that occur more than N times in the input.  accepts exactly one input.
+    equal-to N           return kmers that occur exactly N times in the input.  accepts exactly one input.
+    not-equal-to N       return kmers that do not occur exactly N times in the input.  accepts exactly one input.
+
+    increase X           add X to the count of each kmer.
+    decrease X           subtract X from the count of each kmer.
+    multiply X           multiply the count of each kmer by X.
+    divide X             divide the count of each kmer by X.
+    divide-round X       divide the count of each kmer by X and round results. count < X will become 1.
+    modulo X             set the count of each kmer to the remainder of the count divided by X.
+
+    union                return kmers that occur in any input, set the count to the number of inputs with this kmer.
+    union-min            return kmers that occur in any input, set the count to the minimum count
+    union-max            return kmers that occur in any input, set the count to the maximum count
+    union-sum            return kmers that occur in any input, set the count to the sum of the counts
+
+    intersect            return kmers that occur in all inputs, set the count to the count in the first input.
+    intersect-min        return kmers that occur in all inputs, set the count to the minimum count.

@@ -40,6 +40,7 @@ cellranger mkref \
   --fasta "$tmp_dir/genome.fa" \
   --genes "$par_transcriptome_gtf" \
   --genome output \
+  --disable-ui \
   ${par_reference_version:+--ref-version $par_reference_version} \
   ${meta_cpus:+--nthreads $meta_cpus} \
   ${meta_memory_gb:+--memgb ${meta_memory_gb}}
