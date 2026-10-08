@@ -8,6 +8,10 @@
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
 
+## BUG FIXES
+
+* `rseqc/rseqc_inferexperiment`: Update stale test fixtures to match the output of the currently installed RSeQC release.
+
 # biobox 0.4.2
 
 ## NEW FUNCTIONALITY

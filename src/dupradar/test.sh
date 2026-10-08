@@ -16,9 +16,9 @@ output_intercept_slope="intercept_slope.txt"
 echo "> Running $meta_functionality_name for unpaired reads, writing to tmpdir $tmpdir."
 
 "$meta_executable" \
-    --input "$input_bam" \
+    --input_bam "$input_bam" \
     --id "test" \
-    --gtf_annotation "$input_gtf" \
+    --input_gtf "$input_gtf" \
     --strandedness 1 \
     --output_dupmatrix $output_dupmatrix \
     --output_dup_intercept_mqc $output_dup_intercept_mqc \
@@ -69,9 +69,9 @@ diff -B -b "$output_intercept_slope" "${meta_resources_dir}/test_data/test_inter
 echo ">>> Test 2: Example without specified output files"
 
 "$meta_executable" \
-    --input "$input_bam" \
+    --input_bam "$input_bam" \
     --id "test" \
-    --gtf_annotation "$input_gtf" \
+    --input_gtf "$input_gtf" \
     --strandedness 1
 
 exit_code=$?

@@ -15,14 +15,20 @@ argument_groups:
   - name: --id
     type: string
     description: Sample ID
-  - name: --input
+    default: "id"
+  - name: --input_bam
     type: file 
     required: true
-    description: Path to input alignment file in BAM format
-  - name: --gtf_annotation
+    description: |
+      Path to input alignment file in BAM format. Duplicates must already be
+      marked (SAM flag `0x400`), e.g. with Picard `MarkDuplicates` or
+      `samtools markdup`; dupRadar does not mark them itself.
+    example: "path/to/file.bam"
+  - name: --input_gtf
     type: file 
     required: true
     description: Path to GTF annotation file.
+    example: "path/to/file.gtf"
   - name: --paired
     type: boolean_true
     description: Add flag if input alignment file consists of paired reads
@@ -32,7 +38,7 @@ argument_groups:
     description: |
       Strandedness of input bam file reads (1 = forward, 2 = reverse or 0 = unstranded (default, 
       applicable to paired reads))
-    example: 0
+    default: 0
     
 - name: Output
   arguments: 
@@ -40,45 +46,46 @@ argument_groups:
     type: file
     direction: output
     description: path to output file (txt) of duplicate tag counts
-    example: dup_matrix.txt
+    example: "path/to/dup_matrix.txt"
   - name: --output_dup_intercept_mqc
     type: file
     direction: output
     description: path to output file (txt) of multiqc intercept value DupRadar
-    example: dup_intercept_mqc.txt
+    example: "path/to/dup_intercept_mqc.txt"
   - name: --output_duprate_exp_boxplot
     type: file
     direction: output
     description: |
       Path to output file (pdf) of distribution of expression box plot
+    example: "path/to/duprate_exp_boxplot.pdf"
   - name: --output_duprate_exp_densplot
     type: file
     direction: output
     description: |
       Path to output file (pdf) of 2D density scatter plot of duplicate tag counts
-    example: duprate_exp_densityplot.pdf
+    example: "path/to/duprate_exp_densityplot.pdf"
   - name: --output_duprate_exp_denscurve_mqc
     type: file
     direction: output
     description: |
-      Path to output file (pdf) of density curve of gene duplication multiqc
-    example: duprate_exp_density_curve_mqc.txt
+      Path to output file (txt) of density curve of gene duplication multiqc
+    example: "path/to/duprate_exp_density_curve_mqc.txt"
   - name: --output_expression_histogram
     type: file
     direction: output
     description: |
       Path to output file (pdf) of distribution of RPK values per gene histogram
-    example: expression_hist.pdf
+    example: "path/to/expression_hist.pdf"
   - name: --output_intercept_slope
     type: file
     direction: output
     description: output file (txt) with progression of duplication rate values
-    example: intercept_slope.txt
+    example: "path/to/intercept_slope.txt"
 
 resources:
   # Adapted from https://github.com/nf-core/rnaseq/blob/3.12.0/bin/dupradar.r
   - type: r_script
-    path: dupradar.r
+    path: script.R
 test_resources:
   - type: bash_script
     path: test.sh
@@ -87,17 +94,12 @@ test_resources:
     
 engines:
   - type: docker
-    image: ubuntu:22.04
-    setup:   
-      - type: apt
-        packages: [ r-base ]
-      - type: r
-        bioc: [ dupRadar ]
-        packages: [ parallel, rlang ]
+    image: quay.io/biocontainers/bioconductor-dupradar:1.40.0--r45hdfd78af_0
+    setup:
       - type: docker
-        run: |
-          echo "DupRadar: $(Rscript -e "library(dupRadar); cat(as.character(packageVersion('dupRadar')))")" > /var/software_versions.txt
-        
+        run:
+          - 'Rscript -e ''cat("dupradar: ", as.character(packageVersion("dupRadar")), "\n", sep = "")'' > /var/software_versions.txt'
+
 runners:
   - type: executable  
   - type: nextflow
