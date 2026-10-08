@@ -1,5 +1,4 @@
 library("dupRadar")
-library("parallel")
 
 ## VIASH START
 par <- list(
@@ -7,12 +6,12 @@ par <- list(
     input_gtf = "test_data/genes.gtf",
     id = "test",
     strandedness = 0L,
-    paired = TRUE,
+    paired = FALSE,
     output_dupmatrix = "dup_matrix.txt",
     output_dup_intercept_mqc = "dup_intercept_mqc.txt",
     output_duprate_exp_boxplot = "duprate_exp_boxplot.pdf",
     output_duprate_exp_densplot = "duprate_exp_densityplot.pdf",
-    output_duprate_exp_denscurve_mqc = "duprate_exp_density_curve_mqc.pdf",
+    output_duprate_exp_denscurve_mqc = "duprate_exp_density_curve_mqc.txt",
     output_expression_histogram = "expression_hist.pdf",
     output_intercept_slope  = "intercept_slope.txt"
 )
@@ -40,8 +39,6 @@ if (!grepl("\\.bam$", input_bam)) {
   stop("--input_bam must be a BAM file (.bam), got: ", input_bam)
 }
 
-if(is.na(stranded) || (!(stranded %in% (0:2)))) stop("Strandedness must be a numeric value in 0(unstranded)/1(forward)/2(reverse)...")
-
 # Log parameters (stderr)
 message("> Input BAM:     ", input_bam)
 message("> Input GTF:     ", input_gtf)
@@ -60,8 +57,9 @@ dm <- analyzeDuprates(input_bam, input_gtf, stranded, paired, threads)
 if (all(dm$dupRate %in% c(0, NA))) {
   warning(
     "No duplicate-flagged reads found in ", input_bam, ". ",
-    "dupRadar expects a duplicate-marked BAM (e.g. Picard MarkDuplicates ",
-    "or samtools markdup); all duplication rates are 0.",
+    "dupRadar expects a duplicate-marked BAM; all duplication rates are 0. ",
+    "Mark duplicates first, e.g. with the biobox component ",
+    "gatk4/gatk4_markduplicates.",
     call. = FALSE
   )
 }
@@ -168,4 +166,3 @@ write.table(
     quote=FALSE, row.names=FALSE, col.names=FALSE, append=TRUE
 )
 message("> Done running dupRadar")
-print("Dupradar pipeline done.")
