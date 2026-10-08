@@ -1,6 +1,24 @@
 name: dupradar
-description: Assessment of duplication rates in RNA-Seq datasets
+description: |
+  Assess PCR duplication in RNA-Seq data with dupRadar.
+
+  In RNA-Seq, highly expressed genes are expected to have many duplicate reads,
+  so the overall duplication rate alone says little about library quality.
+  dupRadar counts reads per gene (with and without duplicates) and relates each
+  gene's duplication rate to its expression level. A high duplication rate in
+  lowly expressed genes points to technical duplication, e.g. from PCR
+  over-amplification or low library complexity.
+
+  The input BAM must already have duplicates marked (SAM flag `0x400`), e.g.
+  with `gatk4/gatk4_markduplicates`. Outputs are the per-gene duplication matrix,
+  the intercept and slope of the fitted duplication model, diagnostic plots,
+  and MultiQC custom-content files.
 keywords: [ rnaseq, duplication, genomics ]
+authors:
+  - __merge__: /src/_authors/emma_rousseau.yaml
+    roles: [ author ]
+  - __merge__: /src/_authors/hannes_demeyer.yaml
+    roles: [ author, maintainer ]
 links:
   homepage: https://bioconductor.org/packages/release/bioc/html/dupRadar.html
   documentation: https://bioconductor.org/packages/release/bioc/vignettes/dupRadar/inst/doc/dupRadar.html
