@@ -9,6 +9,8 @@
   - `gatk4/gatk4_learnreadorientationmodel`: Learn a read orientation bias model from the F1R2 counts of Mutect2.
   - `gatk4/gatk4_filtermutectcalls`: Filter the raw somatic calls of Mutect2.
 
+* `dupradar`: Assess duplication rates in RNA-Seq data (PR #154).
+
 ## MINOR CHANGES
 
 * `minimap2/minimap2_index`: Add `--preset`, `--kmer_size`, `--window_size` and
@@ -21,6 +23,8 @@
   tracked output (PR #248).
 
 ## BUG FIXES
+
+* `rseqc/rseqc_inferexperiment`: Update stale test fixtures to match the output of the currently installed RSeQC release.
 
 * `star/star_align_reads`: fixed a `duplicate parameter "readFilesCommand"` error that occurred when `--read_files_command` was set while the input files were gzipped or bzipped. The component now only derives a read files command when the user did not provide one (PR #246).
 
