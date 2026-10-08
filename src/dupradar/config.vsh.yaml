@@ -1,0 +1,103 @@
+name: dupradar
+description: Assessment of duplication rates in RNA-Seq datasets
+keywords: [ rnaseq, duplication, genomics ]
+links:
+  homepage: https://bioconductor.org/packages/release/bioc/html/dupRadar.html
+  documentation: https://bioconductor.org/packages/release/bioc/vignettes/dupRadar/inst/doc/dupRadar.html
+  repository: https://github.com/ssayols/dupRadar
+references: 
+  doi: "10.1186/s12859-016-1276-2"
+license: GPL-3.0
+
+argument_groups:
+- name: Input
+  arguments: 
+  - name: --id
+    type: string
+    description: Sample ID
+  - name: --input
+    type: file 
+    required: true
+    description: Path to input alignment file in BAM format
+  - name: --gtf_annotation
+    type: file 
+    required: true
+    description: Path to GTF annotation file.
+  - name: --paired
+    type: boolean_true
+    description: Add flag if input alignment file consists of paired reads
+  - name: --strandedness
+    type: integer
+    choices: [0, 1, 2]
+    description: |
+      Strandedness of input bam file reads (1 = forward, 2 = reverse or 0 = unstranded (default, 
+      applicable to paired reads))
+    example: 0
+    
+- name: Output
+  arguments: 
+  - name: --output_dupmatrix
+    type: file
+    direction: output
+    description: path to output file (txt) of duplicate tag counts
+    example: dup_matrix.txt
+  - name: --output_dup_intercept_mqc
+    type: file
+    direction: output
+    description: path to output file (txt) of multiqc intercept value DupRadar
+    example: dup_intercept_mqc.txt
+  - name: --output_duprate_exp_boxplot
+    type: file
+    direction: output
+    description: |
+      Path to output file (pdf) of distribution of expression box plot
+  - name: --output_duprate_exp_densplot
+    type: file
+    direction: output
+    description: |
+      Path to output file (pdf) of 2D density scatter plot of duplicate tag counts
+    example: duprate_exp_densityplot.pdf
+  - name: --output_duprate_exp_denscurve_mqc
+    type: file
+    direction: output
+    description: |
+      Path to output file (pdf) of density curve of gene duplication multiqc
+    example: duprate_exp_density_curve_mqc.txt
+  - name: --output_expression_histogram
+    type: file
+    direction: output
+    description: |
+      Path to output file (pdf) of distribution of RPK values per gene histogram
+    example: expression_hist.pdf
+  - name: --output_intercept_slope
+    type: file
+    direction: output
+    description: output file (txt) with progression of duplication rate values
+    example: intercept_slope.txt
+
+resources:
+  # Adapted from https://github.com/nf-core/rnaseq/blob/3.12.0/bin/dupradar.r
+  - type: r_script
+    path: dupradar.r
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - type: file
+    path: test_data
+    
+engines:
+  - type: docker
+    image: ubuntu:22.04
+    setup:   
+      - type: apt
+        packages: [ r-base ]
+      - type: r
+        bioc: [ dupRadar ]
+        packages: [ parallel, rlang ]
+      - type: docker
+        run: |
+          echo "DupRadar: $(Rscript -e "library(dupRadar); cat(as.character(packageVersion('dupRadar')))")" > /var/software_versions.txt
+        
+runners:
+  - type: executable  
+  - type: nextflow
