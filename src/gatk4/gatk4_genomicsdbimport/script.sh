@@ -34,9 +34,18 @@ if [[ -n "$par_header_index" && -z "$par_header" ]]; then
   echo "Error: --header_index requires --header." >&2
   exit 1
 fi
-# GATK fails with "/ by zero" when --header is used with --variant
-if [[ -n "$par_header" && -n "$par_variant" ]]; then
-  echo "Error: --header can only be used with --sample_name_map, not with --variant." >&2
+if [[ -n "$par_sample_name" && -n "$par_sample_name_map" ]]; then
+  echo "Error: --sample_name cannot be used together with --sample_name_map." >&2
+  exit 1
+fi
+if [[ -n "$par_sample_name" && -z "$par_variant" ]]; then
+  echo "Error: --sample_name requires --variant." >&2
+  exit 1
+fi
+# GATK fails with "/ by zero" when --header is used with --variant files
+# without a sample name map
+if [[ -n "$par_header" && -n "$par_variant" && -z "$par_sample_name" ]]; then
+  echo "Error: --header with --variant requires --sample_name." >&2
   exit 1
 fi
 
@@ -45,6 +54,22 @@ tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_genomicsdbimport.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 stage_vcfs_with_indexes "$tmp_dir" "$par_variant" "$par_variant_index" "--variant" "--variant" variant_args
+
+# Write a sample name map for the staged --variant files and pass it to GATK
+# in place of --variant
+sample_name_map="$par_sample_name_map"
+if [[ -n "$par_sample_name" ]]; then
+  IFS=';' read -ra sample_names <<< "$par_sample_name"
+  if [[ ${#sample_names[@]} -ne $(( ${#variant_args[@]} / 2 )) ]]; then
+    echo "Error: --sample_name must be given once for each file in --variant (got ${#sample_names[@]} sample name(s) and $(( ${#variant_args[@]} / 2 )) file(s))." >&2
+    exit 1
+  fi
+  sample_name_map="$tmp_dir/sample_name_map.tsv"
+  for i in "${!sample_names[@]}"; do
+    printf '%s\t%s\n' "${sample_names[$i]}" "${variant_args[$(( i * 2 + 1 ))]}"
+  done > "$sample_name_map"
+  variant_args=()
+fi
 if [[ -n "$par_header" ]]; then
   staged_header=$(stage_vcf_with_index "$tmp_dir" "$par_header" "$par_header_index" header) || exit 1
 fi
@@ -62,7 +87,7 @@ avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 # directory unless --overwrite-existing-genomicsdb-workspace is set, so
 # GATK must be the one to create it.
 cmd_args=(
-  ${par_sample_name_map:+--sample-name-map "$par_sample_name_map"}
+  ${sample_name_map:+--sample-name-map "$sample_name_map"}
   --genomicsdb-workspace-path "$par_genomicsdb_workspace_path"
   --intervals "$par_intervals"
   ${par_avoid_nio:+--avoid-nio true}
