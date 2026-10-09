@@ -233,4 +233,140 @@ check_file_contains "$meta_temp_dir/genomicsdb_workspace_engine/callset.json" "s
 
 log "✅ TEST 5 completed successfully"
 
+# --- Test Case 6: Index files in a different directory ---
+# In GATK 4.7.0.0, --header together with --variant fails with
+# "java.lang.ArithmeticException: / by zero", so --header is tested with
+# --sample_name_map
+log "Starting TEST 6: --variant_index and --header_index in a different directory"
+
+mkdir -p "$test_data_dir/separate"
+
+create_test_vcf_gz_with_separate_index "$test_data_dir/sample1.g.vcf" \
+  "$test_data_dir/separate/sample1.g.vcf.gz" "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi"
+create_test_vcf_gz_with_separate_index "$test_data_dir/sample2.g.vcf" \
+  "$test_data_dir/separate/sample2.g.vcf.gz" "$test_data_dir/separate_index/sample2.g.vcf.gz.tbi"
+create_test_vcf_gz_with_separate_index "$test_data_dir/sample1.g.vcf" \
+  "$test_data_dir/separate/header.vcf.gz" "$test_data_dir/separate_index/header.vcf.gz.tbi"
+
+log "Executing $meta_name with .vcf.gz --variant files and separate .tbi index files..."
+"$meta_executable" \
+  --variant "$test_data_dir/separate/sample1.g.vcf.gz" \
+  --variant "$test_data_dir/separate/sample2.g.vcf.gz" \
+  --variant_index "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi" \
+  --variant_index "$test_data_dir/separate_index/sample2.g.vcf.gz.tbi" \
+  --intervals "$test_data_dir/intervals.list" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_separate" 2> "$meta_temp_dir/test6.log"
+
+log "Validating TEST 6 --variant outputs..."
+check_file_exists "$meta_temp_dir/genomicsdb_workspace_separate/callset.json" "GenomicsDB callset.json (separate indexes)"
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_separate/callset.json" "sample1" "GenomicsDB callset.json sample1 (separate indexes)"
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_separate/callset.json" "sample2" "GenomicsDB callset.json sample2 (separate indexes)"
+check_file_not_contains "$meta_temp_dir/test6.log" "no index was provided" "run log (no indexing when indexes are given)"
+check_file_not_exists "$test_data_dir/separate/sample1.g.vcf.gz.tbi" "index next to the sample1 input"
+check_file_not_exists "$test_data_dir/separate/sample2.g.vcf.gz.tbi" "index next to the sample2 input"
+
+log "Executing $meta_name with --sample_name_map, a .vcf.gz --header and a separate .tbi index file..."
+"$meta_executable" \
+  --sample_name_map "$test_data_dir/sample_map.tsv" \
+  --intervals "$test_data_dir/intervals.list" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_separate_header" \
+  --header "$test_data_dir/separate/header.vcf.gz" \
+  --header_index "$test_data_dir/separate_index/header.vcf.gz.tbi" 2> "$meta_temp_dir/test6_header.log"
+
+log "Validating TEST 6 --header outputs..."
+check_file_exists "$meta_temp_dir/genomicsdb_workspace_separate_header/callset.json" "GenomicsDB callset.json (separate header index)"
+check_file_exists "$meta_temp_dir/genomicsdb_workspace_separate_header/vcfheader.vcf" "GenomicsDB vcfheader.vcf (separate header index)"
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_separate_header/callset.json" "sample2" "GenomicsDB callset.json sample2 (separate header index)"
+check_file_not_contains "$meta_temp_dir/test6_header.log" "no index was provided" "run log (no indexing when an index is given)"
+check_file_not_exists "$test_data_dir/separate/header.vcf.gz.tbi" "index next to the header input"
+
+log "✅ TEST 6 completed successfully"
+
+# --- Test Case 7: Unindexed .vcf.gz inputs ---
+log "Starting TEST 7: .vcf.gz inputs without index files"
+
+mkdir -p "$test_data_dir/no_index"
+bgzip -c "$test_data_dir/sample1.g.vcf" > "$test_data_dir/no_index/sample1.g.vcf.gz"
+bgzip -c "$test_data_dir/sample2.g.vcf" > "$test_data_dir/no_index/sample2.g.vcf.gz"
+bgzip -c "$test_data_dir/sample1.g.vcf" > "$test_data_dir/no_index/header.vcf.gz"
+
+log "Executing $meta_name with unindexed .vcf.gz --variant files..."
+"$meta_executable" \
+  --variant "$test_data_dir/no_index/sample1.g.vcf.gz" \
+  --variant "$test_data_dir/no_index/sample2.g.vcf.gz" \
+  --intervals "$test_data_dir/intervals.list" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_no_index" 2> "$meta_temp_dir/test7.log"
+
+log "Validating TEST 7 --variant outputs..."
+check_file_exists "$meta_temp_dir/genomicsdb_workspace_no_index/callset.json" "GenomicsDB callset.json (no indexes)"
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_no_index/callset.json" "sample1" "GenomicsDB callset.json sample1 (no indexes)"
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_no_index/callset.json" "sample2" "GenomicsDB callset.json sample2 (no indexes)"
+check_file_contains "$meta_temp_dir/test7.log" "no index was provided" "run log (indexing warning)"
+check_file_not_exists "$test_data_dir/no_index/sample1.g.vcf.gz.tbi" "index next to the sample1 input"
+
+log "Executing $meta_name with --sample_name_map and an unindexed .vcf.gz --header..."
+"$meta_executable" \
+  --sample_name_map "$test_data_dir/sample_map.tsv" \
+  --intervals "$test_data_dir/intervals.list" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_no_index_header" \
+  --header "$test_data_dir/no_index/header.vcf.gz" 2> "$meta_temp_dir/test7_header.log"
+
+log "Validating TEST 7 --header outputs..."
+check_file_exists "$meta_temp_dir/genomicsdb_workspace_no_index_header/vcfheader.vcf" "GenomicsDB vcfheader.vcf (no header index)"
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_no_index_header/callset.json" "sample2" "GenomicsDB callset.json sample2 (no header index)"
+check_file_contains "$meta_temp_dir/test7_header.log" "no index was provided" "run log (indexing warning)"
+check_file_not_exists "$test_data_dir/no_index/header.vcf.gz.tbi" "index next to the header input"
+
+log "✅ TEST 7 completed successfully"
+
+# --- Test Case 8: Index argument errors ---
+log "Starting TEST 8: Index argument errors"
+
+log "Executing $meta_name with 2 --variant files and 1 --variant_index file..."
+if "$meta_executable" \
+  --variant "$test_data_dir/separate/sample1.g.vcf.gz" \
+  --variant "$test_data_dir/separate/sample2.g.vcf.gz" \
+  --variant_index "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi" \
+  --intervals "$test_data_dir/intervals.list" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_mismatch" > "$meta_temp_dir/test8_mismatch.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with 2 --variant files and 1 --variant_index file"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test8_mismatch.log" "Error: --variant_index must be given once for each file in --variant" "error message"
+
+log "Executing $meta_name with --variant_index and no --variant..."
+if "$meta_executable" \
+  --sample_name_map "$test_data_dir/sample_map.tsv" \
+  --variant_index "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi" \
+  --intervals "$test_data_dir/intervals.list" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_variant_index" > "$meta_temp_dir/test8_variant.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --variant_index and no --variant"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test8_variant.log" "Error: --variant_index requires --variant" "error message"
+
+log "Executing $meta_name with --header_index and no --header..."
+if "$meta_executable" \
+  --sample_name_map "$test_data_dir/sample_map.tsv" \
+  --header_index "$test_data_dir/separate_index/header.vcf.gz.tbi" \
+  --intervals "$test_data_dir/intervals.list" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_header_index" > "$meta_temp_dir/test8_header.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --header_index and no --header"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test8_header.log" "Error: --header_index requires --header" "error message"
+
+log "Executing $meta_name with --header and --variant..."
+if "$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --header "$test_data_dir/sample1.g.vcf" \
+  --intervals "$test_data_dir/intervals.list" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_header_variant" > "$meta_temp_dir/test8_header_variant.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --header and --variant"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test8_header_variant.log" "Error: --header can only be used with --sample_name_map" "error message"
+
+log "✅ TEST 8 completed successfully"
+
 print_test_summary "All tests completed successfully"
