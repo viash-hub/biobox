@@ -48,10 +48,16 @@ Each companion file needs its own argument, and the script links it next to the 
 - **Reference**: `--reference`, `--reference_fai` and `--reference_dict`, staged with `stage_reference_trio`.
 - **Reads**: `--input` and `--bai`, staged with `stage_bam_bai`, or with `stage_bams_bais` for `multiple: true` (matched by order).
   GATK matches samples (for example Mutect2 `--normal-sample`) by the `SM` tag, not by file name so it is ok for files to be renamed during staging.
-- **VCF resources**: every VCF input has an optional `*_index` argument, staged with `stage_vcf_with_index`.
+- **VCF inputs**: every VCF input has an optional `*_index` argument, staged with `stage_vcf_with_index`, or with `stage_vcfs_with_indexes` for `multiple: true` (matched by order).
   Without an index, the helper copies the VCF, indexes it and writes a warning.
   This can be slow for large files such as gnomAD.
-  - A plain `.vcf` works without an index, because GATK indexes it in memory
+  If GATK does not need an index for a plain `.vcf`, pass `index_optional` as `true` so that the file is used as it is, without a copy.
+  - GATK reads some plain `.vcf` inputs from start to end, so they work without an index.
+    For example, `--variant` in CombineGVCFs, GenotypeGVCFs, SelectVariants, VariantFiltration and FilterMutectCalls, but only when no intervals are given ("must support random access to enable traversal by intervals").
+  - Inputs that GATK queries by interval need an index, also as a plain `.vcf` or BED file ("must support random access to enable queries by interval").
+    For example, BaseRecalibrator `--known_sites`, HaplotypeCaller `--dbsnp` and VariantFiltration `--mask`.
+  - Check each input in the container, it is not always clear from the GATK documentation.
+    For example, `--dbsnp` needs an index in GenotypeGVCFs but not in CombineGVCFs.
   - A `.vcf.gz` (or `.vcf.bgz`) without a `.tbi` fails ("An index is required but was not found")
   - A `.vcf.gz` made with `gzip` (not `bgzip`) cannot be indexed
 - **Intervals**: `--intervals` and `--exclude_intervals` can be BED, interval_list or VCF files.
