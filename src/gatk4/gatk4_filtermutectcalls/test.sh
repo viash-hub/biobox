@@ -75,7 +75,8 @@ fi
 check_file_exists "$meta_temp_dir/filtering_stats.tsv" "output filtering stats file"
 check_file_not_empty "$meta_temp_dir/filtering_stats.tsv" "output filtering stats file"
 check_file_not_exists "$meta_temp_dir/filtered.vcf.filteringStats.tsv" "default filtering stats file next to the output VCF"
-check_file_contains "$meta_temp_dir/test1.log" "Warning: no index was provided for '.*no_index/unfiltered.vcf'" "run log (copy warning for the unindexed --variant)"
+check_file_not_contains "$meta_temp_dir/test1.log" "no index was provided" "run log (plain --variant used without an index)"
+check_file_not_exists "$test_data_dir/no_index/unfiltered.vcf.idx" "index next to the plain --variant"
 
 log "✅ TEST 1 completed successfully"
 
