@@ -101,6 +101,14 @@ argument_groups:
           VCF file with the set of alleles to force-call regardless of
           evidence.
         example: alleles.vcf
+      - name: "--alleles_index"
+        type: file
+        description: |
+          Index file for `--alleles` (`.tbi` for a `.vcf.gz` file, `.idx`
+          for a `.vcf` file).
+
+          If not provided, a copy of `--alleles` is indexed before the run.
+        example: alleles.vcf.idx
       - name: "--annotation"
         alternatives: [-A]
         type: string
@@ -233,6 +241,14 @@ argument_groups:
           dbSNP VCF file used to annotate called variants with known
           variant IDs.
         example: dbsnp.vcf
+      - name: "--dbsnp_index"
+        type: file
+        description: |
+          Index file for `--dbsnp` (`.tbi` for a `.vcf.gz` file, `.idx` for
+          a `.vcf` file).
+
+          If not provided, a copy of `--dbsnp` is indexed before the run.
+        example: dbsnp.vcf.idx
       - name: "--disable_optimizations"
         type: boolean_true
         description: |
