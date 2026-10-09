@@ -41,6 +41,15 @@ argument_groups:
         description: Input VCF file containing variants to be filtered.
         required: true
         example: variants.vcf.gz
+      - name: "--variant_index"
+        type: file
+        description: |
+          Index file for `--variant` (`.tbi` for a `.vcf.gz` file, `.idx`
+          for a `.vcf` file).
+
+          If not provided, a copy of a bgzipped `--variant` file is indexed before
+          the run. A plain `.vcf` file does not need an index.
+        example: variants.vcf.gz.tbi
       - name: "--reference"
         alternatives: [-R]
         type: file
@@ -153,6 +162,16 @@ argument_groups:
           BED/VCF file of genomic regions used to mask (flag) variants
           that fall within (or near, see `--mask_extension`) them.
         example: mask.bed
+      - name: "--mask_index"
+        type: file
+        description: |
+          Index file for `--mask` (`.tbi` for a bgzipped file such as
+          `.vcf.gz`, `.idx` for a plain file such as `.vcf` or `.bed`).
+
+          GATK needs an index for every `--mask` file, also a plain BED or
+          VCF. If not provided, a copy of `--mask` is indexed before the
+          run.
+        example: mask.vcf.gz.tbi
       - name: "--mask_description"
         type: string
         description: Description to add to the FILTER field header line for the mask filter.
