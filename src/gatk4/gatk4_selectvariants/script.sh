@@ -42,6 +42,16 @@ if [[ -n "$par_discordance_index" && -z "$par_discordance" ]]; then
   exit 1
 fi
 
+move_output_index=""
+if [[ "$par_create_output_variant_index" != "false" ]]; then
+  if [[ -z "$par_output_index" ]]; then
+    echo "Error: --output_index is required unless --create_output_variant_index is false." >&2
+    exit 1
+  fi
+  move_output_index="true"
+  gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
+fi
+
 # Stage the --variant VCF and the comparison VCFs with their indexes and (if
 # provided) the reference trio into a temp dir so GATK can find the companion
 # files
@@ -151,3 +161,8 @@ cmd_args+=(
 
 # Run gatk SelectVariants
 gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" SelectVariants "${cmd_args[@]}"
+
+# Move the output index to --output_index, if requested
+if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
+  mv "$gatk_output_index" "$par_output_index"
+fi
