@@ -17,6 +17,16 @@ if [[ -n "$par_dbsnp_index" && -z "$par_dbsnp" ]]; then
   exit 1
 fi
 
+move_output_index=""
+if [[ "$par_create_output_variant_index" != "false" ]]; then
+  if [[ -z "$par_output_index" ]]; then
+    echo "Error: --output_index is required unless --create_output_variant_index is false." >&2
+    exit 1
+  fi
+  move_output_index="true"
+  gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
+fi
+
 # Stage the reference trio, BAM/BAI and VCF inputs into a temp dir using
 # matching basenames so GATK can find them
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_haplotypecaller.XXXXXX")
@@ -117,3 +127,8 @@ cmd_args=(
 
 # Run GATK HaplotypeCaller
 gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" HaplotypeCaller "${cmd_args[@]}"
+
+# Move the output index to --output_index, if requested
+if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
+  mv "$gatk_output_index" "$par_output_index"
+fi
