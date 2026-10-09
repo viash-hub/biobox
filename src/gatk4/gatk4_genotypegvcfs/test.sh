@@ -170,4 +170,110 @@ check_file_not_contains "$meta_temp_dir/output_genomicsdb.vcf" "<NON_REF>" "outp
 
 log "✅ TEST 5 completed successfully"
 
+# --- Test Case 6: Index files in a different directory ---
+log "Starting TEST 6: --variant_index, --dbsnp_index and --population_callset_index in a different directory"
+
+mkdir -p "$test_data_dir/separate"
+create_test_known_sites_vcf "$test_data_dir/known_sites.vcf" seq1 2000 100
+create_test_vcf_gz_with_separate_index "$test_data_dir/sample.g.vcf" \
+  "$test_data_dir/separate/sample.g.vcf.gz" "$test_data_dir/separate_index/sample.g.vcf.gz.tbi"
+create_test_vcf_gz_with_separate_index "$test_data_dir/known_sites.vcf" \
+  "$test_data_dir/separate/dbsnp.vcf.gz" "$test_data_dir/separate_index/dbsnp.vcf.gz.tbi"
+create_test_vcf_gz_with_separate_index "$test_data_dir/known_sites.vcf" \
+  "$test_data_dir/separate/population.vcf.gz" "$test_data_dir/separate_index/population.vcf.gz.tbi"
+
+log "Executing $meta_name with .vcf.gz inputs and separate .tbi index files..."
+"$meta_executable" \
+  --variant "$test_data_dir/separate/sample.g.vcf.gz" \
+  --variant_index "$test_data_dir/separate_index/sample.g.vcf.gz.tbi" \
+  --dbsnp "$test_data_dir/separate/dbsnp.vcf.gz" \
+  --dbsnp_index "$test_data_dir/separate_index/dbsnp.vcf.gz.tbi" \
+  --population_callset "$test_data_dir/separate/population.vcf.gz" \
+  --population_callset_index "$test_data_dir/separate_index/population.vcf.gz.tbi" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/output_separate.vcf" 2> "$meta_temp_dir/test6.log"
+
+log "Validating TEST 6 outputs..."
+check_file_exists "$meta_temp_dir/output_separate.vcf" "output VCF file (separate indexes)"
+check_file_contains "$meta_temp_dir/output_separate.vcf" "^##fileformat=VCF" "output VCF file header (separate indexes)"
+check_file_contains "$meta_temp_dir/output_separate.vcf" "sample1" "output VCF sample column (separate indexes)"
+check_file_not_contains "$meta_temp_dir/output_separate.vcf" "<NON_REF>" "output VCF should not contain GVCF placeholder allele (separate indexes)"
+check_file_not_contains "$meta_temp_dir/test6.log" "no index was provided" "run log (no indexing when indexes are given)"
+check_file_not_exists "$test_data_dir/separate/sample.g.vcf.gz.tbi" "index next to the --variant input"
+check_file_not_exists "$test_data_dir/separate/dbsnp.vcf.gz.tbi" "index next to the --dbsnp input"
+check_file_not_exists "$test_data_dir/separate/population.vcf.gz.tbi" "index next to the --population_callset input"
+
+log "✅ TEST 6 completed successfully"
+
+# --- Test Case 7: Unindexed .vcf.gz inputs ---
+log "Starting TEST 7: .vcf.gz inputs without index files"
+
+mkdir -p "$test_data_dir/no_index"
+bgzip -c "$test_data_dir/sample.g.vcf" > "$test_data_dir/no_index/sample.g.vcf.gz"
+bgzip -c "$test_data_dir/known_sites.vcf" > "$test_data_dir/no_index/dbsnp.vcf.gz"
+bgzip -c "$test_data_dir/known_sites.vcf" > "$test_data_dir/no_index/population.vcf.gz"
+
+log "Executing $meta_name with unindexed .vcf.gz inputs..."
+"$meta_executable" \
+  --variant "$test_data_dir/no_index/sample.g.vcf.gz" \
+  --dbsnp "$test_data_dir/no_index/dbsnp.vcf.gz" \
+  --population_callset "$test_data_dir/no_index/population.vcf.gz" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/output_no_index.vcf" 2> "$meta_temp_dir/test7.log"
+
+log "Validating TEST 7 outputs..."
+check_file_exists "$meta_temp_dir/output_no_index.vcf" "output VCF file (no indexes)"
+check_file_contains "$meta_temp_dir/output_no_index.vcf" "sample1" "output VCF sample column (no indexes)"
+check_file_contains "$meta_temp_dir/test7.log" "no index was provided" "run log (indexing warning)"
+check_file_not_exists "$test_data_dir/no_index/sample.g.vcf.gz.tbi" "index next to the --variant input"
+check_file_not_exists "$test_data_dir/no_index/dbsnp.vcf.gz.tbi" "index next to the --dbsnp input"
+check_file_not_exists "$test_data_dir/no_index/population.vcf.gz.tbi" "index next to the --population_callset input"
+
+log "✅ TEST 7 completed successfully"
+
+# --- Test Case 8: Index argument errors ---
+log "Starting TEST 8: Index argument errors"
+
+# Run $meta_executable with the given extra arguments, check that it fails and
+# that the log contains the expected error message
+expect_index_error() {
+  local message="$1"
+  local log_file="$2"
+  shift 2
+  if "$meta_executable" \
+    --reference "$test_data_dir/reference.fasta" \
+    --reference_fai "$test_data_dir/reference.fasta.fai" \
+    --reference_dict "$test_data_dir/reference.dict" \
+    --output "$meta_temp_dir/output_fail.vcf" \
+    "$@" > "$log_file" 2>&1; then
+    log_error "✗ $meta_name did not fail with: $*"
+    exit 1
+  fi
+  check_file_contains "$log_file" "$message" "error message"
+}
+
+log "Executing $meta_name with --variant_index and a GenomicsDB workspace --variant..."
+expect_index_error "Error: --variant_index cannot be used when --variant is a GenomicsDB workspace directory" \
+  "$meta_temp_dir/test8_workspace.log" \
+  --variant "$meta_temp_dir/genomicsdb_workspace" \
+  --variant_index "$test_data_dir/separate_index/sample.g.vcf.gz.tbi"
+
+log "Executing $meta_name with --dbsnp_index and no --dbsnp..."
+expect_index_error "Error: --dbsnp_index requires --dbsnp" \
+  "$meta_temp_dir/test8_dbsnp.log" \
+  --variant "$test_data_dir/sample.g.vcf" \
+  --dbsnp_index "$test_data_dir/separate_index/dbsnp.vcf.gz.tbi"
+
+log "Executing $meta_name with --population_callset_index and no --population_callset..."
+expect_index_error "Error: --population_callset_index requires --population_callset" \
+  "$meta_temp_dir/test8_population.log" \
+  --variant "$test_data_dir/sample.g.vcf" \
+  --population_callset_index "$test_data_dir/separate_index/population.vcf.gz.tbi"
+
+log "✅ TEST 8 completed successfully"
+
 print_test_summary "All tests completed successfully"
