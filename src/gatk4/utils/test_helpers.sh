@@ -174,6 +174,29 @@ create_test_known_sites_vcf() {
   log "✓ Wrote and indexed known-sites VCF: $vcf_path"
 }
 
+# Compress a VCF with bgzip and index it with tabix, then move the index to a
+# different directory. GATK cannot find the index next to the VCF, the same as
+# when Viash or Nextflow stage each file separately.
+#
+# Usage: create_test_vcf_gz_with_separate_index "/path/to/in.vcf" \
+#          "/path/to/out.vcf.gz" "/path/to/index_dir/out.vcf.gz.tbi"
+create_test_vcf_gz_with_separate_index() {
+  local vcf_path="$1"
+  local vcf_gz_path="$2"
+  local index_path="$3"
+
+  log "Writing bgzipped VCF with a separate index: $vcf_gz_path, $index_path"
+
+  mkdir -p "$(dirname "$vcf_gz_path")"
+  bgzip -c "$vcf_path" > "$vcf_gz_path"
+  tabix -f -p vcf "$vcf_gz_path"
+  mkdir -p "$(dirname "$index_path")"
+  mv "${vcf_gz_path}.tbi" "$index_path"
+
+  check_file_not_exists "${vcf_gz_path}.tbi" "index next to $vcf_gz_path"
+  check_file_exists "$index_path" "separate index for $vcf_gz_path"
+}
+
 # Somatic variant calling fixtures
 #
 # A 500bp single-contig ("chr1") reference with a known SNV at 1-based
