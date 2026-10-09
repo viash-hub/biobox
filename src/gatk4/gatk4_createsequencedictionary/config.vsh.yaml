@@ -14,7 +14,24 @@ links:
   documentation: https://gatk.broadinstitute.org/hc/en-us
   repository: https://github.com/broadinstitute/gatk
 references:
-  doi: 10.1101/201178
+  bibtex:
+    - |
+      @book{VanderAuwera2020,
+        author = {{Van der Auwera}, Geraldine A. and O'Connor, Brian D.},
+        title = {Genomics in the Cloud: Using Docker, GATK, and WDL in Terra},
+        edition = {1st},
+        publisher = {O'Reilly Media},
+        year = {2020},
+        isbn = {9781491975190}
+      }
+    - |
+      @misc{Picard2019toolkit,
+        title = {Picard toolkit},
+        year = {2019},
+        publisher = {Broad Institute},
+        journal = {Broad Institute, GitHub repository},
+        howpublished = {\url{https://broadinstitute.github.io/picard/}}
+      }
 license: Apache-2.0
 requirements:
   commands: [gatk]
