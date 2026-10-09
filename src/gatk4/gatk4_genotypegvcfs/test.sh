@@ -53,7 +53,8 @@ log "Executing $meta_name with basic parameters..."
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/output.vcf"
+  --output "$meta_temp_dir/output.vcf" \
+  --output_index "$meta_temp_dir/output.idx"
 
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/output.vcf" "output VCF file"
@@ -61,6 +62,9 @@ check_file_not_empty "$meta_temp_dir/output.vcf" "output VCF file"
 check_file_contains "$meta_temp_dir/output.vcf" "^##fileformat=VCF" "output VCF file header"
 check_file_contains "$meta_temp_dir/output.vcf" "sample1" "output VCF sample column"
 check_file_not_contains "$meta_temp_dir/output.vcf" "<NON_REF>" "output VCF should not contain GVCF placeholder allele"
+check_file_exists "$meta_temp_dir/output.idx" "output index file (Tribble index for a .vcf)"
+check_index_magic "$meta_temp_dir/output.idx" "TIDX" "output index file"
+check_file_not_exists "$meta_temp_dir/output.vcf.idx" "index next to the output VCF (moved to --output_index)"
 
 log "✅ TEST 1 completed successfully"
 
@@ -74,6 +78,7 @@ log "Executing $meta_name with additional options..."
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
   --output "$meta_temp_dir/output_options.vcf" \
+  --output_index "$meta_temp_dir/output_options.vcf.idx" \
   --include_non_variant_sites \
   --stand_call_conf 10.0 \
   --sample_ploidy 2
@@ -96,6 +101,7 @@ log "Executing $meta_name with --annotation, --annotations_to_exclude, --call_ge
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
   --output "$meta_temp_dir/output_annotations.vcf" \
+  --output_index "$meta_temp_dir/output_annotations.vcf.idx" \
   --annotation ChromosomeCounts \
   --annotations_to_exclude InbreedingCoeff \
   --call_genotypes \
@@ -159,7 +165,8 @@ log "Executing $meta_name with GenomicsDB workspace input..."
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/output_genomicsdb.vcf"
+  --output "$meta_temp_dir/output_genomicsdb.vcf" \
+  --output_index "$meta_temp_dir/output_genomicsdb.vcf.idx"
 
 log "Validating TEST 5 outputs..."
 check_file_exists "$meta_temp_dir/output_genomicsdb.vcf" "output VCF file (GenomicsDB input)"
@@ -193,7 +200,8 @@ log "Executing $meta_name with .vcf.gz inputs and separate .tbi index files..."
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/output_separate.vcf" 2> "$meta_temp_dir/test6.log"
+  --output "$meta_temp_dir/output_separate.vcf" \
+  --output_index "$meta_temp_dir/output_separate.vcf.idx" 2> "$meta_temp_dir/test6.log"
 
 log "Validating TEST 6 outputs..."
 check_file_exists "$meta_temp_dir/output_separate.vcf" "output VCF file (separate indexes)"
@@ -223,7 +231,8 @@ log "Executing $meta_name with unindexed .vcf.gz inputs..."
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/output_no_index.vcf" 2> "$meta_temp_dir/test7.log"
+  --output "$meta_temp_dir/output_no_index.vcf" \
+  --output_index "$meta_temp_dir/output_no_index.vcf.idx" 2> "$meta_temp_dir/test7.log"
 
 log "Validating TEST 7 outputs..."
 check_file_exists "$meta_temp_dir/output_no_index.vcf" "output VCF file (no indexes)"
@@ -249,6 +258,7 @@ expect_index_error() {
     --reference_fai "$test_data_dir/reference.fasta.fai" \
     --reference_dict "$test_data_dir/reference.dict" \
     --output "$meta_temp_dir/output_fail.vcf" \
+    --output_index "$meta_temp_dir/output_fail.vcf.idx" \
     "$@" > "$log_file" 2>&1; then
     log_error "✗ $meta_name did not fail with: $*"
     exit 1
@@ -275,5 +285,54 @@ expect_index_error "Error: --population_callset_index requires --population_call
   --population_callset_index "$test_data_dir/separate_index/population.vcf.gz.tbi"
 
 log "✅ TEST 8 completed successfully"
+
+# --- Test Case 9: Bgzipped output with an index in a different directory ---
+log "Starting TEST 9: .vcf.gz output with --output_index in a different directory"
+
+mkdir -p "$meta_temp_dir/gz_output" "$meta_temp_dir/gz_output_index"
+
+log "Executing $meta_name with a .vcf.gz --output and --output_index in a different directory..."
+"$meta_executable" \
+  --variant "$test_data_dir/sample.g.vcf" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/gz_output/output.vcf.gz" \
+  --output_index "$meta_temp_dir/gz_output_index/output.vcf.gz.tbi"
+
+log "Validating TEST 9 outputs..."
+check_file_exists "$meta_temp_dir/gz_output/output.vcf.gz" "output VCF file (bgzipped)"
+zcat "$meta_temp_dir/gz_output/output.vcf.gz" > "$meta_temp_dir/gz_output_index/output.vcf"
+check_file_contains "$meta_temp_dir/gz_output_index/output.vcf" "sample1" "output VCF (bgzipped) sample column"
+check_file_exists "$meta_temp_dir/gz_output_index/output.vcf.gz.tbi" "output index file (tabix index for a .vcf.gz)"
+check_index_magic "$meta_temp_dir/gz_output_index/output.vcf.gz.tbi" "TBI" "output index file"
+
+log "Checking that no index was left next to the output VCF..."
+found_files=$(find "$meta_temp_dir/gz_output" -type f -exec basename {} \; | sort)
+if [[ "$found_files" == "output.vcf.gz" ]]; then
+  log "✓ Output directory contains only the output VCF"
+else
+  log_error "✗ Output directory contains unexpected files: $(echo "$found_files" | tr '\n' ' ')"
+  exit 1
+fi
+
+log "✅ TEST 9 completed successfully"
+
+# --- Test Case 10: Missing --output_index ---
+log "Starting TEST 10: A missing --output_index fails"
+
+if "$meta_executable" \
+  --variant "$test_data_dir/sample.g.vcf" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/no_output_index.vcf" > "$meta_temp_dir/test10.log" 2>&1; then
+  log_error "✗ $meta_name did not fail without --output_index"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test10.log" "Error: --output_index is required unless --create_output_variant_index is false." "error message"
+check_file_not_exists "$meta_temp_dir/no_output_index.vcf" "output VCF (no run without --output_index)"
+
+log "✅ TEST 10 completed successfully"
 
 print_test_summary "All tests completed successfully"
