@@ -26,15 +26,26 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
-# Stage the reference trio into a temp dir using matching basenames so
-# GATK can find them.
+if [[ -n "$par_dbsnp_index" && -z "$par_dbsnp" ]]; then
+  echo "Error: --dbsnp_index requires --dbsnp." >&2
+  exit 1
+fi
+
+# Stage the inputs into a temp dir so GATK can find the companion files
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_combinegvcfs.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
-staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
+staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict") || exit 1
+# GATK reads a plain --variant VCF without an index, unless it must traverse
+# by intervals
+variant_index_optional=$([[ -z "$par_intervals" ]] && echo true || echo false)
+stage_vcfs_with_indexes "$tmp_dir" "$par_variant" "$par_variant_index" "--variant" "--variant" variant_args "$variant_index_optional"
+if [[ -n "$par_dbsnp" ]]; then
+  # GATK reads a plain --dbsnp VCF without an index
+  staged_dbsnp=$(stage_vcf_with_index "$tmp_dir" "$par_dbsnp" "$par_dbsnp_index" dbsnp true) || exit 1
+fi
 
 # Convert semicolon-separated multi-value arguments into repeated flags
-split_multiple_to_flags "$par_variant" "--variant" variant_args
 split_multiple_to_flags "$par_annotation" "--annotation" annotation_args
 split_multiple_to_flags "$par_annotation_group" "--annotation-group" annotation_group_args
 split_multiple_to_flags "$par_annotations_to_exclude" "--annotations-to-exclude" annotations_to_exclude_args
@@ -54,7 +65,7 @@ cmd_args=(
   ${par_call_genotypes:+--call-genotypes}
   ${par_combine_variants_distance:+--combine-variants-distance "$par_combine_variants_distance"}
   ${par_convert_to_base_pair_resolution:+--convert-to-base-pair-resolution}
-  ${par_dbsnp:+--dbsnp "$par_dbsnp"}
+  ${staged_dbsnp:+--dbsnp "$staged_dbsnp"}
   ${par_disable_tool_default_annotations:+--disable-tool-default-annotations}
   ${par_drop_somatic_filtering_annotations:+--drop-somatic-filtering-annotations}
   ${par_enable_all_annotations:+--enable-all-annotations}

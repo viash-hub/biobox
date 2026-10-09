@@ -46,7 +46,21 @@ argument_groups:
 
           Specify this argument once per input GVCF file.
         required: true
-        example: sample1.g.vcf
+        example: sample1.g.vcf.gz
+      - name: "--variant_index"
+        type: file
+        multiple: true
+        description: |
+          Index files for `--variant` (`.tbi` for a `.vcf.gz` file, `.idx`
+          for a `.vcf` file).
+
+          The index files are matched to `--variant` by order. If index files
+          are provided, one must be given for each `--variant` file.
+
+          If not provided, a copy of each bgzipped `--variant` file is indexed
+          before the run. A plain `.vcf` file does not need an index, unless
+          `--intervals` is given.
+        example: sample1.g.vcf.gz.tbi
       - name: "--reference"
         alternatives: [-R]
         type: file
@@ -205,7 +219,16 @@ argument_groups:
         description: |
           dbSNP VCF file used to annotate the combined GVCF with known
           variant IDs.
-        example: dbsnp.vcf
+        example: dbsnp.vcf.gz
+      - name: "--dbsnp_index"
+        type: file
+        description: |
+          Index file for `--dbsnp` (`.tbi` for a `.vcf.gz` file, `.idx` for a
+          `.vcf` file).
+
+          If not provided, a copy of a bgzipped `--dbsnp` file is indexed before
+          the run. A plain `.vcf` file does not need an index.
+        example: dbsnp.vcf.gz.tbi
       - name: "--disable_tool_default_annotations"
         type: boolean_true
         description: |

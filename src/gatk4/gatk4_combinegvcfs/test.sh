@@ -162,4 +162,102 @@ check_file_not_exists "$meta_temp_dir/combined_engine.g.vcf.idx" "combined GVCF 
 
 log "✅ TEST 4 completed successfully"
 
+# --- Test Case 5: Index files in a different directory ---
+log "Starting TEST 5: --variant_index and --dbsnp_index in a different directory"
+
+mkdir -p "$test_data_dir/separate"
+
+create_test_vcf_gz_with_separate_index "$test_data_dir/sample1.g.vcf" \
+  "$test_data_dir/separate/sample1.g.vcf.gz" "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi"
+create_test_vcf_gz_with_separate_index "$test_data_dir/sample2.g.vcf" \
+  "$test_data_dir/separate/sample2.g.vcf.gz" "$test_data_dir/separate_index/sample2.g.vcf.gz.tbi"
+create_test_known_sites_vcf "$test_data_dir/dbsnp.vcf" seq1 2000 100
+create_test_vcf_gz_with_separate_index "$test_data_dir/dbsnp.vcf" \
+  "$test_data_dir/separate/dbsnp.vcf.gz" "$test_data_dir/separate_index/dbsnp.vcf.gz.tbi"
+
+log "Executing $meta_name with .vcf.gz inputs and separate .tbi index files..."
+"$meta_executable" \
+  --variant "$test_data_dir/separate/sample1.g.vcf.gz" \
+  --variant "$test_data_dir/separate/sample2.g.vcf.gz" \
+  --variant_index "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi" \
+  --variant_index "$test_data_dir/separate_index/sample2.g.vcf.gz.tbi" \
+  --dbsnp "$test_data_dir/separate/dbsnp.vcf.gz" \
+  --dbsnp_index "$test_data_dir/separate_index/dbsnp.vcf.gz.tbi" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/combined_separate.g.vcf" 2> "$meta_temp_dir/test5.log"
+
+log "Validating TEST 5 outputs..."
+check_file_exists "$meta_temp_dir/combined_separate.g.vcf" "combined GVCF file (separate indexes)"
+check_file_contains "$meta_temp_dir/combined_separate.g.vcf" "^##fileformat=VCF" "combined GVCF (separate indexes) header"
+check_file_contains "$meta_temp_dir/combined_separate.g.vcf" "sample1" "combined GVCF (separate indexes) sample1 column"
+check_file_contains "$meta_temp_dir/combined_separate.g.vcf" "sample2" "combined GVCF (separate indexes) sample2 column"
+check_file_not_contains "$meta_temp_dir/test5.log" "no index was provided" "run log (no indexing when indexes are given)"
+check_file_not_exists "$test_data_dir/separate/sample1.g.vcf.gz.tbi" "index next to the sample1 input"
+check_file_not_exists "$test_data_dir/separate/sample2.g.vcf.gz.tbi" "index next to the sample2 input"
+check_file_not_exists "$test_data_dir/separate/dbsnp.vcf.gz.tbi" "index next to the dbsnp input"
+
+log "✅ TEST 5 completed successfully"
+
+# --- Test Case 6: Unindexed .vcf.gz inputs ---
+log "Starting TEST 6: .vcf.gz inputs without index files"
+
+mkdir -p "$test_data_dir/no_index"
+bgzip -c "$test_data_dir/sample1.g.vcf" > "$test_data_dir/no_index/sample1.g.vcf.gz"
+bgzip -c "$test_data_dir/sample2.g.vcf" > "$test_data_dir/no_index/sample2.g.vcf.gz"
+bgzip -c "$test_data_dir/dbsnp.vcf" > "$test_data_dir/no_index/dbsnp.vcf.gz"
+
+log "Executing $meta_name with unindexed .vcf.gz inputs..."
+"$meta_executable" \
+  --variant "$test_data_dir/no_index/sample1.g.vcf.gz" \
+  --variant "$test_data_dir/no_index/sample2.g.vcf.gz" \
+  --dbsnp "$test_data_dir/no_index/dbsnp.vcf.gz" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/combined_no_index.g.vcf" 2> "$meta_temp_dir/test6.log"
+
+log "Validating TEST 6 outputs..."
+check_file_exists "$meta_temp_dir/combined_no_index.g.vcf" "combined GVCF file (no indexes)"
+check_file_contains "$meta_temp_dir/combined_no_index.g.vcf" "sample1" "combined GVCF (no indexes) sample1 column"
+check_file_contains "$meta_temp_dir/combined_no_index.g.vcf" "sample2" "combined GVCF (no indexes) sample2 column"
+check_file_contains "$meta_temp_dir/test6.log" "no index was provided" "run log (indexing warning)"
+check_file_not_exists "$test_data_dir/no_index/sample1.g.vcf.gz.tbi" "index next to the sample1 input"
+check_file_not_exists "$test_data_dir/no_index/dbsnp.vcf.gz.tbi" "index next to the dbsnp input"
+
+log "✅ TEST 6 completed successfully"
+
+# --- Test Case 7: Index argument errors ---
+log "Starting TEST 7: Index argument errors"
+
+log "Executing $meta_name with 2 --variant files and 1 --variant_index file..."
+if "$meta_executable" \
+  --variant "$test_data_dir/separate/sample1.g.vcf.gz" \
+  --variant "$test_data_dir/separate/sample2.g.vcf.gz" \
+  --variant_index "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/combined_mismatch.g.vcf" > "$meta_temp_dir/test7_mismatch.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with 2 --variant files and 1 --variant_index file"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test7_mismatch.log" "Error: --variant_index must be given once for each file in --variant" "error message"
+
+log "Executing $meta_name with --dbsnp_index and no --dbsnp..."
+if "$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --dbsnp_index "$test_data_dir/separate_index/dbsnp.vcf.gz.tbi" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/combined_dbsnp_index.g.vcf" > "$meta_temp_dir/test7_dbsnp.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --dbsnp_index and no --dbsnp"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test7_dbsnp.log" "Error: --dbsnp_index requires --dbsnp" "error message"
+
+log "✅ TEST 7 completed successfully"
+
 print_test_summary "All tests"
