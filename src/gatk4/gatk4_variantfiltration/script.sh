@@ -26,6 +26,33 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
+# Check that the mask index is given together with the mask
+if [[ -n "$par_mask_index" && -z "$par_mask" ]]; then
+  echo "Error: --mask_index requires --mask." >&2
+  exit 1
+fi
+
+# Stage the --variant VCF and the --mask file with their indexes and (if
+# provided) the reference trio into a temp dir so GATK can find the companion
+# files
+tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_variantfiltration.XXXXXX")
+trap 'rm -rf "$tmp_dir"' EXIT
+
+# GATK reads a plain --variant VCF without an index
+staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant true) || exit 1
+
+# GATK needs an index for every --mask file, also a plain BED or VCF
+staged_mask=""
+if [[ -n "$par_mask" ]]; then
+  staged_mask=$(stage_vcf_with_index "$tmp_dir" "$par_mask" "$par_mask_index" mask) || exit 1
+fi
+
+reference_args=()
+if [[ -n "$par_reference" ]]; then
+  staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict") || exit 1
+  reference_args=(--reference "$staged_reference")
+fi
+
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
@@ -46,7 +73,7 @@ extra_args=(
   ${par_invalidate_previous_filters:+--invalidate-previous-filters}
   ${par_invert_filter_expression:+--invert-filter-expression}
   ${par_invert_genotype_filter_expression:+--invert-genotype-filter-expression}
-  ${par_mask:+--mask "$par_mask"}
+  ${staged_mask:+--mask "$staged_mask"}
   ${par_mask_description:+--mask-description "$par_mask_description"}
   ${par_mask_extension:+--mask-extension "$par_mask_extension"}
   ${par_mask_name:+--mask-name "$par_mask_name"}
@@ -54,20 +81,9 @@ extra_args=(
   ${par_set_filtered_genotype_to_no_call:+--set-filtered-genotype-to-no-call}
 )
 
-# Stage the reference trio into a temp dir with matching basenames so GATK
-# can find them
-tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_variantfiltration.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT
-
-reference_args=()
-if [[ -n "$par_reference" ]]; then
-  staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
-  reference_args=(--reference "$staged_reference")
-fi
-
 # Run gatk VariantFiltration
 gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" VariantFiltration \
-  --variant "$par_variant" \
+  --variant "$staged_variant" \
   --output "$par_output" \
   "${reference_args[@]}" \
   "${filter_expression_args[@]}" \

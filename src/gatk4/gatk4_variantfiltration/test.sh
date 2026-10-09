@@ -221,4 +221,148 @@ check_file_not_empty "$output_vcf5" "filtered VCF without reference"
 
 log "✅ TEST 4 completed successfully"
 
+# --- Test Case 5: Bgzipped --variant with a separate index ---
+log "Starting TEST 5: Bgzipped --variant with its index in a different directory"
+
+create_test_vcf_gz_with_separate_index "$input_vcf" \
+  "$test_data_dir/input.vcf.gz" "$test_data_dir/indexes/input.vcf.gz.tbi"
+
+output_vcf6="$meta_temp_dir/output6/filtered.vcf"
+mkdir -p "$(dirname "$output_vcf6")"
+
+log "Executing $meta_name with --variant .vcf.gz and --variant_index..."
+"$meta_executable" \
+  --variant "$test_data_dir/input.vcf.gz" \
+  --variant_index "$test_data_dir/indexes/input.vcf.gz.tbi" \
+  --output "$output_vcf6" \
+  --filter_expression "QD < 2.0" \
+  --filter_name "lowQD" 2>&1 | tee "$meta_temp_dir/test5.log"
+
+log "Validating TEST 5 outputs..."
+check_file_exists "$output_vcf6" "filtered VCF (from .vcf.gz)"
+check_file_contains "$output_vcf6" "^##fileformat=VCF" "filtered VCF (from .vcf.gz) header"
+check_file_contains "$output_vcf6" $'^seq1\t200\t.*\tlowQD\t' "record 2 (pos 200) of filtered VCF (from .vcf.gz)"
+check_file_not_contains "$meta_temp_dir/test5.log" "no index was provided" "run log (index was provided)"
+check_file_not_exists "$test_data_dir/input.vcf.gz.tbi" "index next to the input VCF"
+
+log "✅ TEST 5 completed successfully"
+
+# --- Test Case 6: Bgzipped --variant without an index ---
+log "Starting TEST 6: Bgzipped --variant without an index"
+
+bgzip -c "$input_vcf" > "$test_data_dir/input_no_index.vcf.gz"
+
+output_vcf7="$meta_temp_dir/output7/filtered.vcf"
+mkdir -p "$(dirname "$output_vcf7")"
+
+log "Executing $meta_name with --variant .vcf.gz and no index..."
+"$meta_executable" \
+  --variant "$test_data_dir/input_no_index.vcf.gz" \
+  --output "$output_vcf7" \
+  --filter_expression "QD < 2.0" \
+  --filter_name "lowQD" 2>&1 | tee "$meta_temp_dir/test6.log"
+
+log "Validating TEST 6 outputs..."
+check_file_exists "$output_vcf7" "filtered VCF (from .vcf.gz without index)"
+check_file_contains "$output_vcf7" $'^seq1\t200\t.*\tlowQD\t' "record 2 (pos 200) of filtered VCF (from .vcf.gz without index)"
+check_file_contains "$meta_temp_dir/test6.log" "Warning: no index was provided for '.*input_no_index.vcf.gz'" "run log (copy of --variant indexed)"
+check_file_not_exists "$test_data_dir/input_no_index.vcf.gz.tbi" "index next to the input VCF (a copy is indexed instead)"
+
+log "✅ TEST 6 completed successfully"
+
+# --- Test Case 7: Bgzipped VCF --mask with a separate index ---
+log "Starting TEST 7: Bgzipped VCF --mask with its index in a different directory"
+
+# Use an indexed --variant so that the run log has no index warnings
+create_test_vcf_gz_with_separate_index "$input_vcf3" \
+  "$test_data_dir/input3.vcf.gz" "$test_data_dir/indexes/input3.vcf.gz.tbi"
+create_test_vcf_gz_with_separate_index "$mask_vcf" \
+  "$test_data_dir/mask.vcf.gz" "$test_data_dir/indexes/mask.vcf.gz.tbi"
+
+output_vcf8="$meta_temp_dir/output8/filtered.vcf"
+mkdir -p "$(dirname "$output_vcf8")"
+
+log "Executing $meta_name with --mask .vcf.gz and --mask_index..."
+"$meta_executable" \
+  --variant "$test_data_dir/input3.vcf.gz" \
+  --variant_index "$test_data_dir/indexes/input3.vcf.gz.tbi" \
+  --output "$output_vcf8" \
+  --mask "$test_data_dir/mask.vcf.gz" \
+  --mask_index "$test_data_dir/indexes/mask.vcf.gz.tbi" \
+  --mask_name "MyMask" 2>&1 | tee "$meta_temp_dir/test7.log"
+
+log "Validating TEST 7 outputs..."
+check_file_exists "$output_vcf8" "filtered VCF (VCF mask)"
+check_file_contains "$output_vcf8" $'^seq1\t700\t.*\tMyMask\t' "record at pos 700 (overlaps mask) of filtered VCF (VCF mask)"
+check_file_contains "$output_vcf8" $'^seq1\t600\t.*\tPASS\t' "record at pos 600 (outside mask) of filtered VCF (VCF mask)"
+check_file_not_contains "$meta_temp_dir/test7.log" "no index was provided" "run log (indexes were provided)"
+check_file_not_exists "$test_data_dir/mask.vcf.gz.tbi" "index next to the --mask VCF"
+
+log "✅ TEST 7 completed successfully"
+
+# --- Test Case 8: Plain BED --mask with and without an index ---
+# GATK needs an index for a --mask file, also for a plain BED, so without
+# --mask_index a copy of the BED is indexed
+log "Starting TEST 8: Plain BED --mask with and without an index"
+
+printf 'seq1\t699\t700\n' > "$test_data_dir/mask.bed"
+
+output_vcf9="$meta_temp_dir/output9/filtered.vcf"
+mkdir -p "$(dirname "$output_vcf9")"
+
+log "Executing $meta_name with --mask .bed and no index..."
+"$meta_executable" \
+  --variant "$test_data_dir/input3.vcf.gz" \
+  --variant_index "$test_data_dir/indexes/input3.vcf.gz.tbi" \
+  --output "$output_vcf9" \
+  --mask "$test_data_dir/mask.bed" \
+  --mask_name "MyMask" 2>&1 | tee "$meta_temp_dir/test8.log"
+
+log "Validating TEST 8 outputs (BED mask without index)..."
+check_file_exists "$output_vcf9" "filtered VCF (BED mask)"
+check_file_contains "$output_vcf9" $'^seq1\t700\t.*\tMyMask\t' "record at pos 700 (overlaps mask) of filtered VCF (BED mask)"
+check_file_contains "$output_vcf9" $'^seq1\t600\t.*\tPASS\t' "record at pos 600 (outside mask) of filtered VCF (BED mask)"
+check_file_contains "$meta_temp_dir/test8.log" "Warning: no index was provided for '.*mask.bed'" "run log (copy of --mask indexed)"
+check_file_not_exists "$test_data_dir/mask.bed.idx" "index next to the --mask BED (a copy is indexed instead)"
+
+# Index a copy of the BED in a different directory
+mkdir -p "$test_data_dir/bed_index"
+cp "$test_data_dir/mask.bed" "$test_data_dir/bed_index/mask.bed"
+gatk IndexFeatureFile --input "$test_data_dir/bed_index/mask.bed" --verbosity ERROR
+check_file_exists "$test_data_dir/bed_index/mask.bed.idx" "separate index for the --mask BED"
+
+output_vcf10="$meta_temp_dir/output10/filtered.vcf"
+mkdir -p "$(dirname "$output_vcf10")"
+
+log "Executing $meta_name with --mask .bed and --mask_index..."
+"$meta_executable" \
+  --variant "$test_data_dir/input3.vcf.gz" \
+  --variant_index "$test_data_dir/indexes/input3.vcf.gz.tbi" \
+  --output "$output_vcf10" \
+  --mask "$test_data_dir/mask.bed" \
+  --mask_index "$test_data_dir/bed_index/mask.bed.idx" \
+  --mask_name "MyMask" 2>&1 | tee "$meta_temp_dir/test8_index.log"
+
+log "Validating TEST 8 outputs (BED mask with index)..."
+check_file_exists "$output_vcf10" "filtered VCF (indexed BED mask)"
+check_file_contains "$output_vcf10" $'^seq1\t700\t.*\tMyMask\t' "record at pos 700 (overlaps mask) of filtered VCF (indexed BED mask)"
+check_file_not_contains "$meta_temp_dir/test8_index.log" "no index was provided" "run log (indexes were provided)"
+
+log "✅ TEST 8 completed successfully"
+
+# --- Test Case 9: An index without its input fails ---
+log "Starting TEST 9: --mask_index without --mask"
+
+if "$meta_executable" \
+  --variant "$input_vcf" \
+  --mask_index "$test_data_dir/indexes/mask.vcf.gz.tbi" \
+  --output "$meta_temp_dir/index_only.vcf" > "$meta_temp_dir/test9.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --mask_index but no --mask"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test9.log" "Error: --mask_index requires --mask" "error message"
+check_file_not_exists "$meta_temp_dir/index_only.vcf" "output VCF (GATK did not run)"
+
+log "✅ TEST 9 completed successfully"
+
 print_test_summary "All tests"
