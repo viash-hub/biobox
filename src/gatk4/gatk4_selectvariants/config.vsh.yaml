@@ -40,6 +40,16 @@ argument_groups:
         description: Input VCF file containing variants to select from.
         required: true
         example: variants.vcf.gz
+      - name: "--variant_index"
+        type: file
+        description: |
+          Index file for `--variant` (`.tbi` for a `.vcf.gz` file, `.idx`
+          for a `.vcf` file).
+
+          If not provided, a copy of a bgzipped `--variant` file is indexed before
+          the run. A plain `.vcf` file does not need an index, unless
+          `--intervals` or `--exclude_intervals` is given.
+        example: variants.vcf.gz.tbi
       - name: "--reference"
         alternatives: [-R]
         type: file
@@ -84,11 +94,29 @@ argument_groups:
         type: file
         description: Output variants that are also called in this comparison VCF track.
         example: concordance.vcf.gz
+      - name: "--concordance_index"
+        type: file
+        description: |
+          Index file for `--concordance` (`.tbi` for a `.vcf.gz` file,
+          `.idx` for a `.vcf` file).
+
+          If not provided, a copy of `--concordance` is indexed before the
+          run.
+        example: concordance.vcf.gz.tbi
       - name: "--discordance"
         alternatives: [-disc]
         type: file
         description: Output variants that are not called in this comparison VCF track.
         example: discordance.vcf.gz
+      - name: "--discordance_index"
+        type: file
+        description: |
+          Index file for `--discordance` (`.tbi` for a `.vcf.gz` file,
+          `.idx` for a `.vcf` file).
+
+          If not provided, a copy of `--discordance` is indexed before the
+          run.
+        example: discordance.vcf.gz.tbi
       - name: "--drop_genotype_annotation"
         alternatives: [-DGA]
         type: string
