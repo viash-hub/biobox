@@ -1,5 +1,10 @@
 # biobox x.x.x
 
+## BREAKING CHANGES
+
+* `gatk4/*`: Add `--output_index` to declare the index of `--output` as an output (PR #xxx).
+  Previously GATK wrote the index next to `--output` but it was not an output of the component.
+
 ## NEW FUNCTIONALITY
 
 * `gatk4`: Add components for GATK4 somatic variant calling (PR #249):
