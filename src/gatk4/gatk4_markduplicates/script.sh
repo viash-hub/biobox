@@ -21,6 +21,16 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
+move_output_index=""
+if [[ -n "$par_create_index" ]]; then
+  if [[ -z "$par_output_index" ]]; then
+    echo "Error: --create_index requires --output_index." >&2
+    exit 1
+  fi
+  move_output_index="true"
+  gatk_output_index=$(gatk_output_bam_index_path "$par_output")
+fi
+
 # Create a temporary directory for GATK's own scratch space
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_markduplicates.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
@@ -69,3 +79,8 @@ cmd_args=(
 
 # Run gatk MarkDuplicates
 gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" MarkDuplicates "${cmd_args[@]}"
+
+# Move the output index to --output_index, if requested
+if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
+  mv "$gatk_output_index" "$par_output_index"
+fi
