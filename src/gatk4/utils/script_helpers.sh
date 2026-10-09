@@ -106,13 +106,23 @@ stage_bams_bais() {
 # `.idx` for Tribble indexes of plain `.vcf` files). If no index is given, the
 # file is copied and indexed with IndexFeatureFile.
 #
-# Usage: staged=$(stage_vcf_with_index "$tmp_dir" "$par_vcf" "$par_vcf_index" prefix)
+# For some input, GATK can read an uncompressed VCF without an index. For these,
+# set index_optional to "true" and the file will not be copied and indexed. Only
+# set it when GATK does not need random access to the input (check this in the container).
+#
+# Usage: staged=$(stage_vcf_with_index "$tmp_dir" "$par_vcf" "$par_vcf_index" prefix [index_optional])
 stage_vcf_with_index() {
   local tmp_dir="$1"
   local vcf="$2"
   local vcf_index="$3"
   local prefix="$4"
+  local index_optional="${5:-false}"
   local staged_vcf="$tmp_dir/${prefix}_$(basename "$vcf")"
+
+  if [[ -z "$vcf_index" && "$index_optional" == "true" && "$vcf" != *.gz && "$vcf" != *.bgz ]]; then
+    echo "$vcf"
+    return
+  fi
 
   if [[ -n "$vcf_index" ]]; then
     local index_ext
@@ -139,9 +149,48 @@ stage_vcf_with_index() {
   echo "$staged_vcf"
 }
 
+# Stage one or more VCFs given as a semicolon-separated `multiple: true`
+# argument value with stage_vcf_with_index, and build the repeated GATK flags
+# for them. The index files are matched by order. If index files are given,
+# there must be one for each file. If no index files are given, every file is
+# copied and indexed, unless index_optional is "true"
+# (see stage_vcf_with_index).
+#
+# Usage: stage_vcfs_with_indexes "$tmp_dir" "$par_vcfs" "$par_vcfs_index" \
+#          arg_name gatk_flag result_array_name [index_optional]
+stage_vcfs_with_indexes() {
+  local tmp_dir="$1"
+  local vcf_files="$2"
+  local vcf_indexes="$3"
+  local arg_name="$4"
+  local gatk_flag="$5"
+  local -n result_ref="$6"
+  local index_optional="${7:-false}"
+
+  local vcfs=()
+  local indexes=()
+  IFS=';' read -ra vcfs <<< "$vcf_files"
+  IFS=';' read -ra indexes <<< "$vcf_indexes"
+
+  if [[ ${#indexes[@]} -gt 0 && ${#indexes[@]} -ne ${#vcfs[@]} ]]; then
+    echo "Error: ${arg_name}_index must be given once for each file in $arg_name (got ${#indexes[@]} index file(s) and ${#vcfs[@]} file(s))." >&2
+    exit 1
+  fi
+
+  result_ref=()
+  local prefix="${arg_name#--}"
+  local i
+  for i in "${!vcfs[@]}"; do
+    local staged_vcf
+    staged_vcf=$(stage_vcf_with_index "$tmp_dir" "${vcfs[$i]}" "${indexes[$i]:-}" "${prefix}_$((i + 1))" "$index_optional") || exit 1
+    result_ref+=("$gatk_flag" "$staged_vcf")
+  done
+}
+
 # Stage one or more interval files (BED, interval_list, VCF) and build the
 # repeated GATK interval flags for them. VCF files are staged with
-# stage_vcf_with_index because GATK needs an index for a block-compressed VCF.
+# stage_vcf_with_index because GATK needs an index for a block-compressed VCF
+# (a plain VCF works without one, so it is not copied).
 # The index files are matched by order to the VCF files only, other interval
 # files are passed directly. If index files are given, there must be one for
 # each VCF file.
@@ -179,7 +228,7 @@ stage_interval_files() {
     file="${files[$i]}"
     if [[ "$file" == *.vcf || "$file" == *.vcf.gz || "$file" == *.vcf.bgz ]]; then
       local staged_file
-      staged_file=$(stage_vcf_with_index "$tmp_dir" "$file" "${indexes[$vcf_i]:-}" "${prefix}_$((i + 1))")
+      staged_file=$(stage_vcf_with_index "$tmp_dir" "$file" "${indexes[$vcf_i]:-}" "${prefix}_$((i + 1))" true) || exit 1
       result_ref+=("$gatk_flag" "$staged_file")
       vcf_i=$((vcf_i + 1))
     else
