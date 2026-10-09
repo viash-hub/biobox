@@ -88,6 +88,15 @@ argument_groups:
           The combined multi-sample GVCF output file.
         required: true
         example: combined.g.vcf
+      - name: "--output_index"
+        type: file
+        direction: output
+        description: |
+          Output index file for `--output` (`.tbi` for a bgzipped
+          `.vcf.gz` or `.vcf.bgz` file, `.idx` otherwise). Required when
+          `--create_output_variant_index` is `true`, ignored when it is `false`.
+        must_exist: false
+        example: combined.g.vcf.idx
 
   - name: "Options"
     arguments:
