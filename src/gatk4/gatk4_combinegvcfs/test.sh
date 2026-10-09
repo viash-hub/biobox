@@ -74,7 +74,8 @@ log "Executing $meta_name with basic parameters..."
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/combined.g.vcf"
+  --output "$meta_temp_dir/combined.g.vcf" \
+  --output_index "$meta_temp_dir/combined.idx"
 
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/combined.g.vcf" "combined GVCF file"
@@ -82,6 +83,9 @@ check_file_not_empty "$meta_temp_dir/combined.g.vcf" "combined GVCF file"
 check_file_contains "$meta_temp_dir/combined.g.vcf" "^##fileformat=VCF" "combined GVCF header"
 check_file_contains "$meta_temp_dir/combined.g.vcf" "sample1" "combined GVCF sample1 column"
 check_file_contains "$meta_temp_dir/combined.g.vcf" "sample2" "combined GVCF sample2 column"
+check_file_exists "$meta_temp_dir/combined.idx" "output index file (Tribble index for a .vcf)"
+check_index_magic "$meta_temp_dir/combined.idx" "TIDX" "output index file"
+check_file_not_exists "$meta_temp_dir/combined.g.vcf.idx" "index next to the output GVCF (moved to --output_index)"
 
 log "✅ TEST 1 completed successfully"
 
@@ -95,6 +99,7 @@ log "Executing $meta_name with --break_bands_at_multiples_of and --annotation_gr
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
   --output "$meta_temp_dir/combined_options.g.vcf" \
+  --output_index "$meta_temp_dir/combined_options.g.vcf.idx" \
   --break_bands_at_multiples_of 10 \
   --annotation_group StandardAnnotation
 
@@ -118,6 +123,7 @@ log "Executing $meta_name with --annotation, --annotations_to_exclude, --sites_o
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
   --output "$meta_temp_dir/combined_annotations.g.vcf" \
+  --output_index "$meta_temp_dir/combined_annotations.g.vcf.idx" \
   --annotation ChromosomeCounts \
   --annotations_to_exclude InbreedingCoeff \
   --sites_only_vcf_output \
@@ -186,7 +192,8 @@ log "Executing $meta_name with .vcf.gz inputs and separate .tbi index files..."
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/combined_separate.g.vcf" 2> "$meta_temp_dir/test5.log"
+  --output "$meta_temp_dir/combined_separate.g.vcf" \
+  --output_index "$meta_temp_dir/combined_separate.g.vcf.idx" 2> "$meta_temp_dir/test5.log"
 
 log "Validating TEST 5 outputs..."
 check_file_exists "$meta_temp_dir/combined_separate.g.vcf" "combined GVCF file (separate indexes)"
@@ -216,7 +223,8 @@ log "Executing $meta_name with unindexed .vcf.gz inputs..."
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/combined_no_index.g.vcf" 2> "$meta_temp_dir/test6.log"
+  --output "$meta_temp_dir/combined_no_index.g.vcf" \
+  --output_index "$meta_temp_dir/combined_no_index.g.vcf.idx" 2> "$meta_temp_dir/test6.log"
 
 log "Validating TEST 6 outputs..."
 check_file_exists "$meta_temp_dir/combined_no_index.g.vcf" "combined GVCF file (no indexes)"
@@ -239,7 +247,8 @@ if "$meta_executable" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/combined_mismatch.g.vcf" > "$meta_temp_dir/test7_mismatch.log" 2>&1; then
+  --output "$meta_temp_dir/combined_mismatch.g.vcf" \
+  --output_index "$meta_temp_dir/combined_mismatch.g.vcf.idx" > "$meta_temp_dir/test7_mismatch.log" 2>&1; then
   log_error "✗ $meta_name did not fail with 2 --variant files and 1 --variant_index file"
   exit 1
 fi
@@ -252,12 +261,65 @@ if "$meta_executable" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/combined_dbsnp_index.g.vcf" > "$meta_temp_dir/test7_dbsnp.log" 2>&1; then
+  --output "$meta_temp_dir/combined_dbsnp_index.g.vcf" \
+  --output_index "$meta_temp_dir/combined_dbsnp_index.g.vcf.idx" > "$meta_temp_dir/test7_dbsnp.log" 2>&1; then
   log_error "✗ $meta_name did not fail with --dbsnp_index and no --dbsnp"
   exit 1
 fi
 check_file_contains "$meta_temp_dir/test7_dbsnp.log" "Error: --dbsnp_index requires --dbsnp" "error message"
 
 log "✅ TEST 7 completed successfully"
+
+# --- Test Case 8: Bgzipped output with an index in a different directory ---
+log "Starting TEST 8: .g.vcf.gz output with --output_index in a different directory"
+
+mkdir -p "$meta_temp_dir/gz_output" "$meta_temp_dir/gz_output_index"
+
+log "Executing $meta_name with a .g.vcf.gz --output and --output_index in a different directory..."
+"$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/gz_output/combined.g.vcf.gz" \
+  --output_index "$meta_temp_dir/gz_output_index/combined.g.vcf.gz.tbi"
+
+log "Validating TEST 8 outputs..."
+check_file_exists "$meta_temp_dir/gz_output/combined.g.vcf.gz" "combined GVCF file (bgzipped)"
+zcat "$meta_temp_dir/gz_output/combined.g.vcf.gz" > "$meta_temp_dir/gz_output_index/combined.g.vcf"
+check_file_contains "$meta_temp_dir/gz_output_index/combined.g.vcf" "sample1" "combined GVCF (bgzipped) sample1 column"
+check_file_contains "$meta_temp_dir/gz_output_index/combined.g.vcf" "sample2" "combined GVCF (bgzipped) sample2 column"
+check_file_exists "$meta_temp_dir/gz_output_index/combined.g.vcf.gz.tbi" "output index file (tabix index for a .vcf.gz)"
+check_index_magic "$meta_temp_dir/gz_output_index/combined.g.vcf.gz.tbi" "TBI" "output index file"
+
+log "Checking that no index was left next to the output GVCF..."
+found_files=$(find "$meta_temp_dir/gz_output" -type f -exec basename {} \; | sort)
+if [[ "$found_files" == "combined.g.vcf.gz" ]]; then
+  log "✓ Output directory contains only the output GVCF"
+else
+  log_error "✗ Output directory contains unexpected files: $(echo "$found_files" | tr '\n' ' ')"
+  exit 1
+fi
+
+log "✅ TEST 8 completed successfully"
+
+# --- Test Case 9: Missing --output_index ---
+log "Starting TEST 9: A missing --output_index fails"
+
+if "$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/no_output_index.g.vcf" > "$meta_temp_dir/test9.log" 2>&1; then
+  log_error "✗ $meta_name did not fail without --output_index"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test9.log" "Error: --output_index is required unless --create_output_variant_index is false." "error message"
+check_file_not_exists "$meta_temp_dir/no_output_index.g.vcf" "output GVCF (no run without --output_index)"
+
+log "✅ TEST 9 completed successfully"
 
 print_test_summary "All tests"
