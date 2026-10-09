@@ -55,7 +55,18 @@ argument_groups:
           workspace and is automatically referenced with the required
           `gendb://` prefix.
         required: true
-        example: sample.g.vcf
+        example: sample.g.vcf.gz
+      - name: "--variant_index"
+        type: file
+        description: |
+          Index file for `--variant` (`.tbi` for a `.vcf.gz` file, `.idx` for
+          a `.vcf` file). Cannot be used with a GenomicsDB workspace
+          directory.
+
+          If not provided, a copy of a bgzipped `--variant` file is indexed before
+          the run. A plain `.vcf` file does not need an index, unless
+          `--intervals` is given.
+        example: sample.g.vcf.gz.tbi
       - name: "--reference"
         alternatives: [-R]
         type: file
@@ -215,7 +226,15 @@ argument_groups:
         description: |
           dbSNP VCF file used to annotate called variants with known
           variant IDs.
-        example: dbsnp.vcf
+        example: dbsnp.vcf.gz
+      - name: "--dbsnp_index"
+        type: file
+        description: |
+          Index file for `--dbsnp` (`.tbi` for a `.vcf.gz` file, `.idx` for a
+          `.vcf` file).
+
+          If not provided, a copy of `--dbsnp` is indexed before the run.
+        example: dbsnp.vcf.gz.tbi
       - name: "--disable_tool_default_annotations"
         type: boolean_true
         description: |
@@ -265,7 +284,7 @@ argument_groups:
         description: |
           How genotypes are assigned in the final VCF. Default:
           'USE_PLS_TO_ASSIGN'.
-        choices: 
+        choices:
           - SET_TO_NO_CALL
           - USE_PLS_TO_ASSIGN
           - USE_POSTERIORS_ANNOTATION
@@ -372,6 +391,15 @@ argument_groups:
           with `--num_reference_samples_if_no_call` and
           `--use_posteriors_to_calculate_qual`.
         example: population.vcf.gz
+      - name: "--population_callset_index"
+        type: file
+        description: |
+          Index file for `--population_callset` (`.tbi` for a `.vcf.gz` file,
+          `.idx` for a `.vcf` file).
+
+          If not provided, a copy of a bgzipped `--population_callset` file is
+          indexed before the run. A plain `.vcf` file does not need an index.
+        example: population.vcf.gz.tbi
       - name: "--sample_ploidy"
         alternatives: [-ploidy]
         type: integer
@@ -409,7 +437,7 @@ argument_groups:
           Restrict the output variants to ones that match the
           `--intervals` according to the specified matching mode.
         example: STARTS_IN
-        choices: 
+        choices:
           - STARTS_IN
           - ENDS_IN
           - OVERLAPS
