@@ -119,4 +119,76 @@ check_file_contains "$meta_temp_dir/recal_engine.table" "#:GATKReport" "recalibr
 
 log "✅ TEST 3 completed successfully"
 
+# --- Test Case 4: Bgzipped known-sites files with separate indexes ---
+log "Starting TEST 4: Bgzipped known-sites files with separate indexes"
+
+create_test_vcf_gz_with_separate_index "$known_sites1" \
+  "$test_data_dir/known_sites1.vcf.gz" "$test_data_dir/indexes/known_sites1.vcf.gz.tbi"
+create_test_vcf_gz_with_separate_index "$known_sites2" \
+  "$test_data_dir/known_sites2.vcf.gz" "$test_data_dir/indexes/known_sites2.vcf.gz.tbi"
+
+log "Executing $meta_name with --known_sites_index..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.sorted.bam" \
+  --bai "$test_data_dir/reads.sorted.bai" \
+  --reference "$test_data_dir/ref.fasta" \
+  --reference_fai "$test_data_dir/ref.fasta.fai" \
+  --reference_dict "$test_data_dir/ref.dict" \
+  --known_sites "$test_data_dir/known_sites1.vcf.gz" \
+  --known_sites "$test_data_dir/known_sites2.vcf.gz" \
+  --known_sites_index "$test_data_dir/indexes/known_sites1.vcf.gz.tbi" \
+  --known_sites_index "$test_data_dir/indexes/known_sites2.vcf.gz.tbi" \
+  --output "$meta_temp_dir/recal_gz.table"
+
+log "Validating TEST 4 outputs..."
+check_file_exists "$meta_temp_dir/recal_gz.table" "recalibration table (bgzipped known sites)"
+check_file_not_empty "$meta_temp_dir/recal_gz.table" "recalibration table (bgzipped known sites)"
+check_file_contains "$meta_temp_dir/recal_gz.table" "#:GATKReport" "recalibration table GATKReport header (bgzipped known sites)"
+check_file_not_exists "$test_data_dir/known_sites1.vcf.gz.tbi" "index next to the first known-sites input"
+check_file_not_exists "$test_data_dir/known_sites2.vcf.gz.tbi" "index next to the second known-sites input"
+
+log "✅ TEST 4 completed successfully"
+
+# --- Test Case 5: Bgzipped known-sites file without an index ---
+log "Starting TEST 5: Bgzipped known-sites file without an index"
+
+log "Executing $meta_name with a .vcf.gz known-sites file and no --known_sites_index..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.sorted.bam" \
+  --bai "$test_data_dir/reads.sorted.bai" \
+  --reference "$test_data_dir/ref.fasta" \
+  --reference_fai "$test_data_dir/ref.fasta.fai" \
+  --reference_dict "$test_data_dir/ref.dict" \
+  --known_sites "$test_data_dir/known_sites1.vcf.gz" \
+  --output "$meta_temp_dir/recal_no_index.table" 2> "$meta_temp_dir/test5.log"
+
+log "Validating TEST 5 outputs..."
+check_file_exists "$meta_temp_dir/recal_no_index.table" "recalibration table (no known-sites index)"
+check_file_contains "$meta_temp_dir/recal_no_index.table" "#:GATKReport" "recalibration table GATKReport header (no known-sites index)"
+check_file_contains "$meta_temp_dir/test5.log" "no index was provided" "warning for the missing index"
+check_file_not_exists "$test_data_dir/known_sites1.vcf.gz.tbi" "index next to the known-sites input"
+
+log "✅ TEST 5 completed successfully"
+
+# --- Test Case 6: Fewer --known_sites_index files than --known_sites files ---
+log "Starting TEST 6: Fewer --known_sites_index files than --known_sites files"
+
+log "Executing $meta_name with two known-sites files and one index (should fail)..."
+if "$meta_executable" \
+  --input "$test_data_dir/reads.sorted.bam" \
+  --bai "$test_data_dir/reads.sorted.bai" \
+  --reference "$test_data_dir/ref.fasta" \
+  --reference_fai "$test_data_dir/ref.fasta.fai" \
+  --reference_dict "$test_data_dir/ref.dict" \
+  --known_sites "$test_data_dir/known_sites1.vcf.gz" \
+  --known_sites "$test_data_dir/known_sites2.vcf.gz" \
+  --known_sites_index "$test_data_dir/indexes/known_sites1.vcf.gz.tbi" \
+  --output "$meta_temp_dir/recal_bad.table" > "$meta_temp_dir/test6.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with fewer --known_sites_index files than --known_sites files"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test6.log" "Error: --known_sites_index must be given once for each file in --known_sites" "error message"
+
+log "✅ TEST 6 completed successfully"
+
 print_test_summary "All tests"
