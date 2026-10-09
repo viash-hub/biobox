@@ -81,8 +81,8 @@ Examples:
 |---|---|---|---|
 | Mutect2 stats | `gatk4_mutect2` | `<output>.stats` | Required `--output_stats`, moved after the run |
 | FilterMutectCalls filtering stats | `gatk4_filtermutectcalls` | `<output>.filteringStats.tsv` | Required `--filtering_stats`, passed to GATK |
-| VCF index | `gatk4_mutect2`, `gatk4_filtermutectcalls` | `<output>.tbi` for `.vcf.gz`/`.vcf.bgz`, `<output>.idx` otherwise (`gatk_output_vcf_index_path`) | `--output_index`, required unless `--create_output_variant_index` is `false`, moved after the run |
-| BAM index | `gatk4_mutect2` | `<output without .bam>.bai` (`gatk_output_bam_index_path`) | For example `--bam_output_index`, required unless `--create_output_bam_index` is `false` |
+| VCF index | `gatk4_combinegvcfs`, `gatk4_filtermutectcalls`, `gatk4_genotypegvcfs`, `gatk4_haplotypecaller`, `gatk4_mutect2`, `gatk4_selectvariants`, `gatk4_variantfiltration` | `<output>.tbi` for `.vcf.gz`/`.vcf.bgz`, `<output>.idx` otherwise (`gatk_output_vcf_index_path`) | `--output_index`, required unless `--create_output_variant_index` is `false`, moved after the run |
+| BAM index | `gatk4_applybqsr`, `gatk4_markduplicates`, `gatk4_mutect2` | `<output without .bam>.bai` (`gatk_output_bam_index_path`) | For example `--output_index`, required unless `--create_output_bam_index` is `false` (`--create_index` is set for `gatk4_markduplicates`) |
 
 If two output arguments interact, the script should check the provided values are allowed before the run and stop with a clear error.
 
