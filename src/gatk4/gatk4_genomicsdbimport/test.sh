@@ -413,4 +413,89 @@ check_file_contains "$meta_temp_dir/test9_map.log" "Error: --sample_name cannot 
 
 log "✅ TEST 9 completed successfully"
 
+# --- Test Case 10: Multiple intervals, exclusion and interval VCF index ---
+log "Starting TEST 10: Two --intervals files (BED and VCF), --exclude_intervals and --intervals_index"
+
+mkdir -p "$test_data_dir/intervals"
+# Include seq1:100-200 (BED is 0-based) and seq1:1001-1020 (the 20bp REF
+# allele of the VCF record), exclude seq1:150-160
+printf 'seq1\t99\t200\n' > "$test_data_dir/intervals/include.bed"
+printf 'seq1\t149\t160\n' > "$test_data_dir/intervals/exclude.bed"
+{
+  echo "##fileformat=VCFv4.2"
+  echo "##contig=<ID=seq1,length=2000>"
+  printf '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n'
+  printf 'seq1\t1001\t.\tATCGATCGATCGATCGATCG\tA\t50\tPASS\t.\n'
+} > "$test_data_dir/intervals/include.vcf"
+create_test_vcf_gz_with_separate_index "$test_data_dir/intervals/include.vcf" \
+  "$test_data_dir/intervals/include.vcf.gz" "$test_data_dir/intervals_index/include.vcf.gz.tbi"
+
+# Print the GenomicsDB array directories (one for each imported interval,
+# named <contig>$<start>$<end>) in a workspace
+list_arrays() {
+  find "$1" -mindepth 1 -maxdepth 1 -type d -name 'seq1$*' -exec basename {} \; | LC_ALL=C sort | tr '\n' ' '
+}
+
+log "Executing $meta_name with two --intervals files and --exclude_intervals..."
+"$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --intervals "$test_data_dir/intervals/include.bed" \
+  --intervals "$test_data_dir/intervals/include.vcf.gz" \
+  --intervals_index "$test_data_dir/intervals_index/include.vcf.gz.tbi" \
+  --exclude_intervals "$test_data_dir/intervals/exclude.bed" \
+  --interval_set_rule UNION \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_intervals" 2> "$meta_temp_dir/test10.log"
+
+log "Validating TEST 10 outputs..."
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_intervals/callset.json" "sample1" "GenomicsDB callset.json sample1 (intervals)"
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_intervals/callset.json" "sample2" "GenomicsDB callset.json sample2 (intervals)"
+check_file_not_contains "$meta_temp_dir/test10.log" "no index was provided for '$test_data_dir/intervals/include.vcf.gz'" "run log (no indexing of the interval VCF when --intervals_index is given)"
+check_file_not_exists "$test_data_dir/intervals/include.vcf.gz.tbi" "index next to the interval VCF"
+
+arrays=$(list_arrays "$meta_temp_dir/genomicsdb_workspace_intervals")
+expected_arrays='seq1$100$149 seq1$1001$1020 seq1$161$200 '
+if [[ "$arrays" == "$expected_arrays" ]]; then
+  log "✓ Workspace has one array for each selected interval: $arrays"
+else
+  log_error "✗ Workspace arrays are '$arrays', expected '$expected_arrays'"
+  exit 1
+fi
+
+log "Executing $meta_name with two --intervals files and --merge_input_intervals..."
+"$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --intervals "$test_data_dir/intervals/include.bed" \
+  --intervals "$test_data_dir/intervals/include.vcf.gz" \
+  --intervals_index "$test_data_dir/intervals_index/include.vcf.gz.tbi" \
+  --merge_input_intervals \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_merged"
+
+arrays=$(list_arrays "$meta_temp_dir/genomicsdb_workspace_merged")
+expected_arrays='seq1$100$1020 '
+if [[ "$arrays" == "$expected_arrays" ]]; then
+  log "✓ Workspace has one merged array for the contig: $arrays"
+else
+  log_error "✗ Workspace arrays are '$arrays', expected '$expected_arrays'"
+  exit 1
+fi
+
+log "✅ TEST 10 completed successfully"
+
+# --- Test Case 11: Missing --intervals ---
+log "Starting TEST 11: A missing --intervals fails"
+
+if "$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_no_intervals" > "$meta_temp_dir/test11.log" 2>&1; then
+  log_error "✗ $meta_name did not fail without --intervals"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test11.log" "Error: --intervals is required." "error message"
+check_dir_not_exists "$meta_temp_dir/genomicsdb_workspace_no_intervals" "GenomicsDB workspace (no run without --intervals)"
+
+log "✅ TEST 11 completed successfully"
+
 print_test_summary "All tests completed successfully"
