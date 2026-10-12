@@ -213,8 +213,9 @@ argument_groups:
         type: double
         description: |
           Population allele fraction assigned to alleles that are not found
-          in `--germline_resource`. The default value (-1.0) makes Mutect2
-          derive a value from the data. Default: -1.0.
+          in `--germline_resource`. A negative value makes Mutect2 use a
+          fixed value: 5e-8 in tumor-only mode and 1e-6 when a normal sample
+          is given. Default: -1.0.
       - name: "--annotation"
         alternatives: [-A]
         type: string
@@ -344,6 +345,11 @@ argument_groups:
         description: |
           Minimum depth for a site to be considered callable in the Mutect2
           stats. Does not affect genotyping. Default: 10.
+      - name: "--disable_tool_default_annotations"
+        type: boolean_true
+        description: |
+          Disable all tool-default annotations. Only the annotations given
+          with `--annotation` and `--annotation_group` are added.
       - name: "--dont_use_soft_clipped_bases"
         type: boolean_true
         description: |
@@ -354,6 +360,11 @@ argument_groups:
         description: |
           Downsample a pool of reads that start within a range of one or
           more bases. Default: 1.
+      - name: "--enable_dynamic_read_disqualification_for_genotyping"
+        type: boolean_true
+        description: |
+          Use a less strict read disqualification for reads with low base
+          qualities during genotyping.
       - name: "--f1r2_max_depth"
         type: integer
         description: |
@@ -384,6 +395,11 @@ argument_groups:
         description: |
           Call all apparent germline sites, even though they will be
           filtered later.
+      - name: "--genotype_germline_sites_fraction"
+        type: double
+        description: |
+          Fraction of the germline sites to genotype, selected at random.
+          Only used with `--genotype_germline_sites`. Default: 1.0.
       - name: "--genotype_pon_sites"
         type: boolean_true
         description: |
@@ -422,6 +438,11 @@ argument_groups:
         description: |
           Maximum population allele frequency in tumor-only mode.
           Default: 0.01.
+      - name: "--max_read_length"
+        type: integer
+        description: |
+          Maximum length of the reads to keep (inclusive), used by the
+          tool-default read length read filter. Default: 2147483647.
       - name: "--max_reads_per_alignment_start"
         type: integer
         description: |
@@ -450,12 +471,23 @@ argument_groups:
         description: |
           Minimum support to not prune paths in the assembly graph.
           Default: 2.
+      - name: "--min_read_length"
+        type: integer
+        description: |
+          Minimum length of the reads to keep (inclusive), used by the
+          tool-default read length read filter. Default: 30.
       - name: "--minimum_allele_fraction"
         alternatives: [-min-AF]
         type: double
         description: |
           Lower bound of the variant allele fractions to consider when
           calculating the variant LOD. Default: 0.0.
+      - name: "--maximum_mapping_quality"
+        type: integer
+        description: |
+          Maximum mapping quality (inclusive) of the reads to keep, used by
+          the tool-default mapping quality read filter. If not set, there is
+          no maximum.
       - name: "--minimum_mapping_quality"
         type: integer
         description: |
