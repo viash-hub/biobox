@@ -207,4 +207,128 @@ check_file_not_exists "$test6_dir/no_index.bai" "index next to the output BAM"
 
 log "✅ TEST 6 completed successfully"
 
+# --- CRAM fixtures ---
+# The FASTA and its .fai sit in different directories so that the tests
+# show that the component stages them together.
+log "Creating reference and CRAM fixtures..."
+ref_dir="$test_data_dir/reference"
+ref_fai_dir="$test_data_dir/reference_fai"
+mkdir -p "$ref_dir" "$ref_fai_dir"
+reference="$ref_dir/reference.fasta"
+create_test_reference "$reference" 1 2000
+reference_fai="$ref_fai_dir/reference.fasta.fai"
+mv "${reference}.fai" "$reference_fai"
+
+input_cram="$test_data_dir/cram/input.cram"
+create_test_cram "$input_bam" "$reference" "$input_cram" "$test_data_dir/cram_index/input.cram.crai"
+
+# --- Test Case 7: CRAM input ---
+log "Starting TEST 7: CRAM and BAM input with --reference_sequence"
+
+test7_dir="$meta_temp_dir/test7"
+mkdir -p "$test7_dir"
+
+log "Executing $meta_name with a CRAM and a BAM --input..."
+"$meta_executable" \
+  --input "$input_cram" \
+  --input "$input_bam2" \
+  --output "$test7_dir/marked_duplicates.bam" \
+  --metrics "$test7_dir/marked_dup_metrics.txt" \
+  --reference_sequence "$reference" \
+  --reference_sequence_fai "$reference_fai"
+
+log "Validating TEST 7 outputs..."
+check_file_exists "$test7_dir/marked_duplicates.bam" "dedup-tagged output BAM"
+check_file_not_empty "$test7_dir/marked_duplicates.bam" "dedup-tagged output BAM"
+check_file_contains "$test7_dir/marked_dup_metrics.txt" "ESTIMATED_LIBRARY_SIZE" "duplication metrics file"
+expected_reads=$(( $(count_bam_reads "$input_bam") + $(count_bam_reads "$input_bam2") ))
+test7_reads=$(count_bam_reads "$test7_dir/marked_duplicates.bam")
+if [[ "$test7_reads" != "$expected_reads" ]]; then
+  log_error "✗ Output BAM has $test7_reads reads, expected $expected_reads"
+  exit 1
+fi
+log "✓ Output BAM has all $expected_reads input reads"
+
+log "✅ TEST 7 completed successfully"
+
+# --- Test Case 8: CRAM output with an index ---
+log "Starting TEST 8: BAM to CRAM output with --create_index"
+
+test8_dir="$meta_temp_dir/test8"
+test8_index_dir="$meta_temp_dir/test8_index"
+mkdir -p "$test8_dir" "$test8_index_dir"
+
+log "Executing $meta_name with a CRAM --output..."
+"$meta_executable" \
+  --input "$input_bam" \
+  --output "$test8_dir/marked_duplicates.cram" \
+  --metrics "$test8_dir/marked_dup_metrics.txt" \
+  --reference_sequence "$reference" \
+  --reference_sequence_fai "$reference_fai" \
+  --create_index \
+  --output_index "$test8_index_dir/marked.cram.bai"
+
+log "Validating TEST 8 outputs..."
+check_file_exists "$test8_dir/marked_duplicates.cram" "dedup-tagged output CRAM"
+check_file_not_empty "$test8_dir/marked_duplicates.cram" "dedup-tagged output CRAM"
+if [[ "$(head -c 4 "$test8_dir/marked_duplicates.cram")" != "CRAM" ]]; then
+  log_error "✗ Output does not have the CRAM magic bytes"
+  exit 1
+fi
+log "✓ Output has the CRAM magic bytes"
+check_file_exists "$test8_index_dir/marked.cram.bai" "output CRAM index"
+check_file_not_empty "$test8_index_dir/marked.cram.bai" "output CRAM index"
+if [[ "$(head -c 3 "$test8_index_dir/marked.cram.bai")" != "BAI" ]]; then
+  log_error "✗ Output index does not have the BAI magic bytes"
+  exit 1
+fi
+log "✓ Output index has the BAI magic bytes"
+check_file_not_exists "$test8_dir/marked_duplicates.cram.bai" "index next to the output CRAM (moved to --output_index)"
+check_file_not_exists "$test8_dir/marked_duplicates.bai" "index next to the output CRAM"
+check_file_not_exists "$test8_dir/marked_duplicates.cram.crai" "CRAI index next to the output CRAM"
+
+log "✅ TEST 8 completed successfully"
+
+# --- Test Case 9: Reference argument checks ---
+log "Starting TEST 9: CRAM requires --reference_sequence, which requires --reference_sequence_fai"
+
+test9_dir="$meta_temp_dir/test9"
+mkdir -p "$test9_dir"
+
+log "Executing $meta_name with a CRAM --input and no --reference_sequence..."
+if "$meta_executable" \
+  --input "$input_cram" \
+  --output "$test9_dir/cram_in.bam" \
+  --metrics "$test9_dir/cram_in_metrics.txt" > "$test9_dir/cram_in.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with a CRAM --input and no --reference_sequence"
+  exit 1
+fi
+check_file_contains "$test9_dir/cram_in.log" "Error: --reference_sequence is required for CRAM input or output." "error message"
+check_file_not_exists "$test9_dir/cram_in.bam" "output BAM (should not be written)"
+
+log "Executing $meta_name with a CRAM --output and no --reference_sequence..."
+if "$meta_executable" \
+  --input "$input_bam" \
+  --output "$test9_dir/cram_out.cram" \
+  --metrics "$test9_dir/cram_out_metrics.txt" > "$test9_dir/cram_out.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with a CRAM --output and no --reference_sequence"
+  exit 1
+fi
+check_file_contains "$test9_dir/cram_out.log" "Error: --reference_sequence is required for CRAM input or output." "error message"
+check_file_not_exists "$test9_dir/cram_out.cram" "output CRAM (should not be written)"
+
+log "Executing $meta_name with --reference_sequence and no --reference_sequence_fai..."
+if "$meta_executable" \
+  --input "$input_cram" \
+  --output "$test9_dir/no_fai.bam" \
+  --metrics "$test9_dir/no_fai_metrics.txt" \
+  --reference_sequence "$reference" > "$test9_dir/no_fai.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --reference_sequence and no --reference_sequence_fai"
+  exit 1
+fi
+check_file_contains "$test9_dir/no_fai.log" "Error: --reference_sequence_fai must be provided when --reference_sequence is set." "error message"
+check_file_not_exists "$test9_dir/no_fai.bam" "output BAM (should not be written)"
+
+log "✅ TEST 9 completed successfully"
+
 print_test_summary "All tests"

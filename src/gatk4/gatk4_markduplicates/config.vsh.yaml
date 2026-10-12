@@ -74,15 +74,18 @@ argument_groups:
         direction: output
         description: |
           Output file with duplicate reads marked (or removed, see
-          `--remove_duplicates`).
+          `--remove_duplicates`). Can be a `.bam`, `.sam` or `.cram`
+          file. A CRAM output requires `--reference_sequence`.
         required: true
         example: marked_duplicates.bam
       - name: "--output_index"
         type: file
         direction: output
         description: |
-          Output index file for `--output` (`<output without .bam>.bai`).
-          Required when `--create_index` is set, ignored otherwise.
+          Output index file for `--output`. Required when `--create_index`
+          is set, ignored otherwise. Picard writes a BAI format index for
+          both BAM and CRAM output. The BAI index of a CRAM file is not a
+          `.crai` index and samtools cannot read it.
         must_exist: false
         example: marked_duplicates.bai
       - name: "--metrics"
@@ -129,8 +132,8 @@ argument_groups:
         type: boolean_true
         description: |
           If set, create an index when writing a coordinate-sorted BAM
-          output file. The index is written to `--output_index`, which is
-          required when this is set.
+          or CRAM output file. The index is written to `--output_index`, which
+          is required when this is set.
       - name: "--duplex_umi"
         type: boolean_true
         description: |
@@ -239,9 +242,15 @@ argument_groups:
         alternatives: [-R]
         type: file
         description: |
-          Reference sequence FASTA file. Only required when the input
-          file is CRAM format.
+          Reference sequence FASTA file. Required when any `--input` file
+          or the `--output` file is CRAM. Requires `--reference_sequence_fai`.
         example: reference.fasta
+      - name: "--reference_sequence_fai"
+        type: file
+        description: |
+          FASTA index (`.fai`) for `--reference_sequence`. Required when
+          `--reference_sequence` is set.
+        example: reference.fasta.fai
       - name: "--remove_duplicates"
         type: boolean_true
         description: |
