@@ -237,6 +237,45 @@ stage_interval_files() {
   done
 }
 
+# Stage the interval files and build the GATK flags for all the arguments in
+# the shared "GATK Interval Options" group (interval_argument_group.yaml). The
+# argument values are read from the `par_*` variables of that group.
+#
+# Usage: stage_interval_arguments "$tmp_dir" result_array_name
+stage_interval_arguments() {
+  local tmp_dir="$1"
+  local -n interval_args_ref="$2"
+
+  local intervals_args=()
+  local exclude_intervals_args=()
+  stage_interval_files "$tmp_dir" "$par_intervals" "$par_intervals_index" \
+    --intervals --intervals intervals_args
+  stage_interval_files "$tmp_dir" "$par_exclude_intervals" "$par_exclude_intervals_index" \
+    --exclude_intervals --exclude-intervals exclude_intervals_args
+
+  interval_args_ref=(
+    "${intervals_args[@]}"
+    "${exclude_intervals_args[@]}"
+    ${par_interval_set_rule:+--interval-set-rule "$par_interval_set_rule"}
+    ${par_interval_merging_rule:+--interval-merging-rule "$par_interval_merging_rule"}
+    ${par_interval_padding:+--interval-padding "$par_interval_padding"}
+    ${par_interval_exclusion_padding:+--interval-exclusion-padding "$par_interval_exclusion_padding"}
+  )
+}
+
+# Print "true" if any of the shared interval arguments select intervals, and
+# "false" otherwise. GATK needs random access to the main input when it
+# traverses by intervals, so an unindexed plain VCF must be indexed.
+#
+# Usage: uses_intervals=$(gatk_uses_intervals)
+gatk_uses_intervals() {
+  if [[ -n "$par_intervals" || -n "$par_exclude_intervals" ]]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 # Print the path of the index that GATK writes next to a VCF output: a tabix
 # index for a bgzipped VCF (`.vcf.gz` or `.vcf.bgz`) and a Tribble index for
 # any other extension.
