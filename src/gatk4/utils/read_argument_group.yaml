@@ -1,0 +1,154 @@
+name: "GATK Read Filter Options"
+arguments:
+  - name: "--read_filter"
+    alternatives: [-RF]
+    type: string
+    multiple: true
+    description: |
+      Read filter(s) to apply before analysis, given by their GATK Java
+      class name (e.g. `MappingQualityReadFilter`). Can be specified
+      multiple times.
+    choices:
+      - AlignmentAgreesWithHeaderReadFilter
+      - AllowAllReadsReadFilter
+      - AmbiguousBaseReadFilter
+      - CigarContainsNoNOperator
+      - ExcessiveEndClippedReadFilter
+      - FirstOfPairReadFilter
+      - FlowBasedTPAttributeSymetricReadFilter
+      - FlowBasedTPAttributeValidReadFilter
+      - FragmentLengthReadFilter
+      - GoodCigarReadFilter
+      - HasReadGroupReadFilter
+      - HmerQualitySymetricReadFilter
+      - IntervalOverlapReadFilter
+      - JexlExpressionReadTagValueFilter
+      - LibraryReadFilter
+      - MappedReadFilter
+      - MappingQualityAvailableReadFilter
+      - MappingQualityNotZeroReadFilter
+      - MappingQualityReadFilter
+      - MatchingBasesAndQualsReadFilter
+      - MateDifferentStrandReadFilter
+      - MateDistantReadFilter
+      - MateOnSameContigOrNoMappedMateReadFilter
+      - MateUnmappedAndUnmappedReadFilter
+      - MetricsReadFilter
+      - NonChimericOriginalAlignmentReadFilter
+      - NonZeroFragmentLengthReadFilter
+      - NonZeroReferenceLengthAlignmentReadFilter
+      - NotDuplicateReadFilter
+      - NotOpticalDuplicateReadFilter
+      - NotProperlyPairedReadFilter
+      - NotSecondaryAlignmentReadFilter
+      - NotSupplementaryAlignmentReadFilter
+      - OverclippedReadFilter
+      - PairedReadFilter
+      - PassesVendorQualityCheckReadFilter
+      - PlatformReadFilter
+      - PlatformUnitReadFilter
+      - PrimaryLineReadFilter
+      - ProperlyPairedReadFilter
+      - ReadGroupBlackListReadFilter
+      - ReadGroupHasFlowOrderReadFilter
+      - ReadGroupReadFilter
+      - ReadLengthEqualsCigarLengthReadFilter
+      - ReadLengthReadFilter
+      - ReadNameReadFilter
+      - ReadStrandFilter
+      - ReadTagValueFilter
+      - SampleReadFilter
+      - SecondOfPairReadFilter
+      - SeqIsStoredReadFilter
+      - SoftClippedReadFilter
+      - ValidAlignmentEndReadFilter
+      - ValidAlignmentStartReadFilter
+      - WellformedFlowBasedReadFilter
+      - WellformedReadFilter
+  - name: "--disable_read_filter"
+    alternatives: [-DF]
+    type: string
+    multiple: true
+    description: |
+      Read filter(s) to disable before analysis, given by their GATK
+      Java class name. Can be specified multiple times.
+  - name: "--disable_tool_default_read_filters"
+    type: boolean_true
+    description: |
+      Disable all tool-default read filters. Many tools will not
+      function correctly without their default read filters enabled, so
+      use with caution.
+  - name: "--read_validation_stringency"
+    alternatives: [-VS]
+    type: string
+    description: |
+      Validation stringency for all SAM/BAM/CRAM files read by the tool.
+      `SILENT` can improve performance when the variable-length data of the
+      reads (bases, qualities, tags) do not otherwise need to be decoded.
+      Default: 'SILENT'.
+    choices: [STRICT, LENIENT, SILENT]
+  - name: "--inverted_read_filter"
+    alternatives: [-XRF]
+    type: string
+    multiple: true
+    description: |
+      Read filter(s) to apply with flipped acceptance and failure conditions,
+      given by their GATK Java class name. Applied after `--read_filter`.
+      Can be specified multiple times.
+    choices:
+      - AlignmentAgreesWithHeaderReadFilter
+      - AllowAllReadsReadFilter
+      - AmbiguousBaseReadFilter
+      - CigarContainsNoNOperator
+      - ExcessiveEndClippedReadFilter
+      - FirstOfPairReadFilter
+      - FlowBasedTPAttributeSymetricReadFilter
+      - FlowBasedTPAttributeValidReadFilter
+      - FragmentLengthReadFilter
+      - GoodCigarReadFilter
+      - HasReadGroupReadFilter
+      - HmerQualitySymetricReadFilter
+      - IntervalOverlapReadFilter
+      - JexlExpressionReadTagValueFilter
+      - LibraryReadFilter
+      - MappedReadFilter
+      - MappingQualityAvailableReadFilter
+      - MappingQualityNotZeroReadFilter
+      - MappingQualityReadFilter
+      - MatchingBasesAndQualsReadFilter
+      - MateDifferentStrandReadFilter
+      - MateDistantReadFilter
+      - MateOnSameContigOrNoMappedMateReadFilter
+      - MateUnmappedAndUnmappedReadFilter
+      - MetricsReadFilter
+      - NonChimericOriginalAlignmentReadFilter
+      - NonZeroFragmentLengthReadFilter
+      - NonZeroReferenceLengthAlignmentReadFilter
+      - NotDuplicateReadFilter
+      - NotOpticalDuplicateReadFilter
+      - NotProperlyPairedReadFilter
+      - NotSecondaryAlignmentReadFilter
+      - NotSupplementaryAlignmentReadFilter
+      - OverclippedReadFilter
+      - PairedReadFilter
+      - PassesVendorQualityCheckReadFilter
+      - PlatformReadFilter
+      - PlatformUnitReadFilter
+      - PrimaryLineReadFilter
+      - ProperlyPairedReadFilter
+      - ReadGroupBlackListReadFilter
+      - ReadGroupHasFlowOrderReadFilter
+      - ReadGroupReadFilter
+      - ReadLengthEqualsCigarLengthReadFilter
+      - ReadLengthReadFilter
+      - ReadNameReadFilter
+      - ReadStrandFilter
+      - ReadTagValueFilter
+      - SampleReadFilter
+      - SecondOfPairReadFilter
+      - SeqIsStoredReadFilter
+      - SoftClippedReadFilter
+      - ValidAlignmentEndReadFilter
+      - ValidAlignmentStartReadFilter
+      - WellformedFlowBasedReadFilter
+      - WellformedReadFilter
