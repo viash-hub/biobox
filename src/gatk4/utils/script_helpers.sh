@@ -275,6 +275,41 @@ stage_interval_arguments() {
   )
 }
 
+# Build the GATK flags for all the arguments in the shared "GATK Read Filter
+# Options" group (read_argument_group.yaml). The argument values are read from
+# the `par_*` variables of that group, and boolean_true values must already be
+# unset when they are "false".
+#
+# Usage: gatk_read_filter_args result_array_name
+gatk_read_filter_args() {
+  local -n read_filter_args_ref="$1"
+
+  local read_filter_flags=()
+  local disable_read_filter_flags=()
+  local inverted_read_filter_flags=()
+  local sample_flags=()
+  local library_flags=()
+  local read_group_black_list_flags=()
+  split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_flags
+  split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_flags
+  split_multiple_to_flags "$par_inverted_read_filter" "--inverted-read-filter" inverted_read_filter_flags
+  split_multiple_to_flags "$par_sample" "--sample" sample_flags
+  split_multiple_to_flags "$par_library" "--library" library_flags
+  split_multiple_to_flags "$par_read_group_black_list" "--read-group-black-list" read_group_black_list_flags
+
+  read_filter_args_ref=(
+    "${read_filter_flags[@]}"
+    "${disable_read_filter_flags[@]}"
+    "${inverted_read_filter_flags[@]}"
+    ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}
+    ${par_read_validation_stringency:+--read-validation-stringency "$par_read_validation_stringency"}
+    ${par_keep_read_group:+--keep-read-group "$par_keep_read_group"}
+    "${sample_flags[@]}"
+    "${library_flags[@]}"
+    "${read_group_black_list_flags[@]}"
+  )
+}
+
 # Print "true" if any of the shared interval arguments select intervals, and
 # "false" otherwise. GATK needs random access to the main input when it
 # traverses by intervals, so an unindexed plain VCF must be indexed.
