@@ -45,7 +45,7 @@ cmd_args=(
 )
 
 if [ -n "$par_meth" ]; then
-  # --meth does not accept -p and writes <in.fasta>.* and <in.fasta>.meth.*
+  # --meth does not accept prefix parameter (i.e. '-p') and writes <in.fasta>.* and <in.fasta>.meth.*
   # next to the input, so index a copy named after the output prefix
   cp "$par_input" "$output_prefix"
   bwa-mem3 index "${cmd_args[@]}" "$output_prefix"

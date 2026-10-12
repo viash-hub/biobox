@@ -3,10 +3,7 @@ namespace: bwa_mem3
 description: |
   Index sequences in the FASTA format for alignment with BWA-MEM3.
 
-  Produces the `.amb`, `.ann`, `.bwt.2bit.64` and `.pac` index files. Indexes built with
-  bwa-mem2 can be reused as-is; indexes built with bwa (v1) must be rebuilt.
-  Peak memory is roughly 12 bytes per base of doubled text (~72 GB for hg38), or roughly
-  twice that when `--meth` is used.
+  Produces the `.amb`, `.ann`, `.bwt.2bit.64` and `.pac` index files by default.
 keywords: [alignment, BWA, BWA-MEM, BWA-MEM3, reference, index, methylation]
 links:
   homepage: https://github.com/fg-labs/bwa-mem3

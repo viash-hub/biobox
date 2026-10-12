@@ -4,8 +4,8 @@
 
 * `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
 
-* `bwa_mem3`: Added support for bwa-mem3, a short-read aligner derived from bwa-mem2 with methylation alignment support (PR #xxx):
-  - `bwa_mem3/bwa_mem3_index`: Create BWA-MEM3 index files for a reference genome, optionally including a methylation (`--meth`) seed index.
+* `bwa_mem3`: Added support for bwa-mem3, a short-read aligner derived from bwa-mem2 with methylation alignment support:
+  - `bwa_mem3/bwa_mem3_index`: Create BWA-MEM3 index files for a reference genome, optionally including a methylation (`--meth`) seed index (PR #265).
 
 ## MINOR CHANGES
 
