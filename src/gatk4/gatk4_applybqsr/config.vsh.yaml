@@ -6,8 +6,9 @@ description: |
 
   This is the second pass of the GATK Base Quality Score Recalibration
   (BQSR) workflow. It applies the recalibration table produced by
-  `gatk4_baserecalibrator` to the input BAM, adjusting base quality scores
-  to correct for systematic technical errors in the sequencing process.
+  `gatk4_baserecalibrator` to the input BAM or CRAM file, adjusting base
+  quality scores to correct for systematic technical errors in the sequencing
+  process.
 keywords: [BQSR, base quality recalibration, GATK, GATK4, alignment]
 links:
   homepage: https://gatk.broadinstitute.org
@@ -40,14 +41,18 @@ argument_groups:
         alternatives: [-I]
         type: file
         description: |
-          Input BAM file containing reads to be recalibrated.
+          Input BAM or CRAM file containing reads to be recalibrated.
 
-          The file must be coordinate-sorted and indexed (see `--bai`).
+          The file must be coordinate-sorted and indexed (see `--read_index`).
+          A CRAM file needs `--reference` (with `--reference_fai` and
+          `--reference_dict`).
         required: true
         example: sample.bam
-      - name: "--bai"
+      - name: "--read_index"
         type: file
-        description: BAM index file (`.bai`) for the input BAM file.
+        description: |
+          Index file for `--input` (`.bai` for a BAM file, `.crai` or `.bai`
+          for a CRAM file).
         required: true
         example: sample.bam.bai
       - name: "--bqsr_recal_file"
@@ -64,8 +69,8 @@ argument_groups:
         description: |
           Reference sequence FASTA file.
 
-          If provided, `--reference_fai` and `--reference_dict` must be provided
-          too.
+          Required when `--input` or `--output` is a CRAM file. If provided,
+          `--reference_fai` and `--reference_dict` must be provided too.
         example: reference.fasta
       - name: "--reference_fai"
         type: file
@@ -82,14 +87,19 @@ argument_groups:
         alternatives: [-O]
         type: file
         direction: output
-        description: Recalibrated output BAM file.
+        description: |
+          Recalibrated output BAM or CRAM file. The format is set by the
+          extension (`.bam` or `.cram`). A CRAM output needs `--reference`.
         required: true
         example: output.bam
       - name: "--output_index"
         type: file
         direction: output
         description: |
-          Output index file for `--output` (`<output without .bam>.bai`).
+          Output index file for `--output`. GATK writes a BAI format index
+          for both BAM and CRAM output. For a CRAM file,  GATK can read it, but
+          samtools cannot.
+
           Required when `--create_output_bam_index` is `true`, ignored when
           it is `false`.
         must_exist: false
@@ -100,7 +110,7 @@ argument_groups:
       - name: "--allow_missing_read_group"
         type: boolean_true
         description: |
-          Do not throw an error when encountering a read group in the input BAM
+          Do not throw an error when encountering a read group in the input file
           that is not in the recalibration table.
       - name: "--emit_original_quals"
         type: boolean_true
@@ -143,7 +153,7 @@ argument_groups:
         alternatives: [-OQ]
         type: boolean_true
         description: |
-          Use the original base quality scores (`OQ` tag) from the input BAM
+          Use the original base quality scores (`OQ` tag) from the input file
           instead of the current ones.
 
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
