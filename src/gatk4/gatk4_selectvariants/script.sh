@@ -91,7 +91,7 @@ split_multiple_to_flags "$par_exclude_sample_name" "--exclude-sample-name" exclu
 split_multiple_to_flags "$par_keep_ids" "--keep-ids" keep_ids_args
 split_multiple_to_flags "$par_sample_name" "--sample-name" sample_name_args
 split_multiple_to_flags "$par_sample_expressions" "--sample-expressions" sample_expressions_args
-split_multiple_to_flags "$par_select_expressions" "--select" select_expressions_args
+split_multiple_to_flags "$par_select" "--select" select_args
 split_multiple_to_flags "$par_select_genotype_expressions" "--select-genotype-expressions" select_genotype_expressions_args
 split_multiple_to_flags "$par_select_type_to_include" "--select-type-to-include" select_type_to_include_args
 split_multiple_to_flags "$par_select_type_to_exclude" "--select-type-to-exclude" select_type_to_exclude_args
@@ -136,12 +136,13 @@ cmd_args=(
   ${par_restrict_alleles_to:+--restrict-alleles-to "$par_restrict_alleles_to"}
   "${sample_expressions_args[@]}"
   "${sample_name_args[@]}"
-  "${select_expressions_args[@]}"
+  "${select_args[@]}"
   "${select_genotype_expressions_args[@]}"
   ${par_select_random_fraction:+--select-random-fraction "$par_select_random_fraction"}
   "${select_type_to_exclude_args[@]}"
   "${select_type_to_include_args[@]}"
   ${par_set_filtered_gt_to_nocall:+--set-filtered-gt-to-nocall}
+  ${par_variant_output_filtering:+--variant-output-filtering "$par_variant_output_filtering"}
 )
 
 # Shared GATK engine and VCF output arguments (see utils/*_argument_group.yaml)
