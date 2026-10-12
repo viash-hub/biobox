@@ -38,6 +38,8 @@ If a new component needs new logic that another component could use, add it to t
   - Deprecated options
   - General engine options that are not in the shared argument groups
 - Include the settings for tool-default read filters when users need to change them
+- Build the flags of the shared read filter group with `gatk_read_filter_args`.
+  A read filter can only be in the `--read_filter` choices if the group also has the arguments it requires.
 - GATK lists `--input` (reads) for many tools, but a tool does not always use it.
   Check each tool before you add it.
 - An argument that GATK accepts as a string or a file needs two arguments so that Nextflow can stage the file.
@@ -96,7 +98,7 @@ Examples:
 | Mutect2 stats | `gatk4_mutect2` | `<output>.stats` | Required `--output_stats`, moved after the run |
 | FilterMutectCalls filtering stats | `gatk4_filtermutectcalls` | `<output>.filteringStats.tsv` | Required `--filtering_stats`, passed to GATK |
 | VCF index | `gatk4_combinegvcfs`, `gatk4_filtermutectcalls`, `gatk4_genotypegvcfs`, `gatk4_haplotypecaller`, `gatk4_mutect2`, `gatk4_selectvariants`, `gatk4_variantfiltration` | `<output>.tbi` for `.vcf.gz`/`.vcf.bgz`, `<output>.idx` otherwise (`gatk_output_vcf_index_path`) | `--output_index`, required unless `--create_output_variant_index` is `false`, moved after the run |
-| BAM/CRAM index | `gatk4_applybqsr`, `gatk4_markduplicates`, `gatk4_mutect2` | `<output without .bam>.bai` for BAM, `<output>.bai` (BAI format, not readable by samtools) for CRAM (`gatk_output_bam_index_path`) | For example `--output_index`, required unless `--create_output_bam_index` is `false` (`--create_index` is set for `gatk4_markduplicates`) |
+| BAM/CRAM index | `gatk4_applybqsr`, `gatk4_haplotypecaller`, `gatk4_markduplicates`, `gatk4_mutect2` | `<output without .bam>.bai` for BAM, `<output>.bai` (BAI format, not readable by samtools) for CRAM (`gatk_output_bam_index_path`) | For example `--output_index`, required unless `--create_output_bam_index` is `false` (`--create_index` is set for `gatk4_markduplicates`) |
 
 If two output arguments interact, the script should check the provided values are allowed before the run and stop with a clear error.
 
