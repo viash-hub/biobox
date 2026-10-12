@@ -35,15 +35,12 @@ fi
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_filtermutectcalls.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
-stage_interval_files "$tmp_dir" "$par_intervals" "$par_intervals_index" \
-  --intervals --intervals intervals_args
-stage_interval_files "$tmp_dir" "$par_exclude_intervals" "$par_exclude_intervals_index" \
-  --exclude_intervals --exclude-intervals exclude_intervals_args
+stage_interval_arguments "$tmp_dir" interval_args
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
 # GATK reads a plain --variant VCF without an index, unless it must traverse
-# by intervals
-variant_index_optional=$([[ -z "$par_intervals" && -z "$par_exclude_intervals" ]] && echo true || echo false)
+# by intervals (--intervals or --exclude_intervals)
+variant_index_optional=$([[ "$(gatk_uses_intervals)" == "true" ]] && echo false || echo true)
 staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
 
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
@@ -66,14 +63,12 @@ cmd_args=(
   "${contamination_table_args[@]}"
   "${tumor_segmentation_args[@]}"
   "${orientation_bias_artifact_priors_args[@]}"
-  "${intervals_args[@]}"
-  "${exclude_intervals_args[@]}"
+  "${interval_args[@]}"
   ${par_contamination_estimate:+--contamination-estimate "$par_contamination_estimate"}
   ${par_distance_on_haplotype:+--distance-on-haplotype "$par_distance_on_haplotype"}
   ${par_f_score_beta:+--f-score-beta "$par_f_score_beta"}
   ${par_false_discovery_rate:+--false-discovery-rate "$par_false_discovery_rate"}
   ${par_initial_threshold:+--initial-threshold "$par_initial_threshold"}
-  ${par_interval_set_rule:+--interval-set-rule "$par_interval_set_rule"}
   ${par_log_artifact_prior:+--log-artifact-prior "$par_log_artifact_prior"}
   ${par_log_indel_prior:+--log-indel-prior "$par_log_indel_prior"}
   ${par_log_snv_prior:+--log-snv-prior "$par_log_snv_prior"}
@@ -97,7 +92,6 @@ cmd_args=(
   ${par_unique_alt_read_count:+--unique-alt-read-count "$par_unique_alt_read_count"}
   ${par_variant_output_filtering:+--variant-output-filtering "$par_variant_output_filtering"}
   --tmp-dir "$tmp_dir"
-  ${par_interval_padding:+--interval-padding "$par_interval_padding"}
   ${par_sites_only_vcf_output:+--sites-only-vcf-output}
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
