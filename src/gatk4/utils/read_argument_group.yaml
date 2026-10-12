@@ -8,6 +8,10 @@ arguments:
       Read filter(s) to apply before analysis, given by their GATK Java
       class name (e.g. `MappingQualityReadFilter`). Can be specified
       multiple times.
+
+      `ReadGroupReadFilter`, `SampleReadFilter`, `LibraryReadFilter` and
+      `ReadGroupBlackListReadFilter` need `--keep_read_group`, `--sample`,
+      `--library` and `--read_group_black_list`.
     choices:
       - AlignmentAgreesWithHeaderReadFilter
       - AllowAllReadsReadFilter
@@ -21,8 +25,6 @@ arguments:
       - GoodCigarReadFilter
       - HasReadGroupReadFilter
       - HmerQualitySymetricReadFilter
-      - IntervalOverlapReadFilter
-      - JexlExpressionReadTagValueFilter
       - LibraryReadFilter
       - MappedReadFilter
       - MappingQualityAvailableReadFilter
@@ -45,18 +47,12 @@ arguments:
       - OverclippedReadFilter
       - PairedReadFilter
       - PassesVendorQualityCheckReadFilter
-      - PlatformReadFilter
-      - PlatformUnitReadFilter
       - PrimaryLineReadFilter
       - ProperlyPairedReadFilter
       - ReadGroupBlackListReadFilter
       - ReadGroupHasFlowOrderReadFilter
       - ReadGroupReadFilter
       - ReadLengthEqualsCigarLengthReadFilter
-      - ReadLengthReadFilter
-      - ReadNameReadFilter
-      - ReadStrandFilter
-      - ReadTagValueFilter
       - SampleReadFilter
       - SecondOfPairReadFilter
       - SeqIsStoredReadFilter
@@ -108,8 +104,6 @@ arguments:
       - GoodCigarReadFilter
       - HasReadGroupReadFilter
       - HmerQualitySymetricReadFilter
-      - IntervalOverlapReadFilter
-      - JexlExpressionReadTagValueFilter
       - LibraryReadFilter
       - MappedReadFilter
       - MappingQualityAvailableReadFilter
@@ -132,18 +126,12 @@ arguments:
       - OverclippedReadFilter
       - PairedReadFilter
       - PassesVendorQualityCheckReadFilter
-      - PlatformReadFilter
-      - PlatformUnitReadFilter
       - PrimaryLineReadFilter
       - ProperlyPairedReadFilter
       - ReadGroupBlackListReadFilter
       - ReadGroupHasFlowOrderReadFilter
       - ReadGroupReadFilter
       - ReadLengthEqualsCigarLengthReadFilter
-      - ReadLengthReadFilter
-      - ReadNameReadFilter
-      - ReadStrandFilter
-      - ReadTagValueFilter
       - SampleReadFilter
       - SecondOfPairReadFilter
       - SeqIsStoredReadFilter
@@ -152,3 +140,30 @@ arguments:
       - ValidAlignmentStartReadFilter
       - WellformedFlowBasedReadFilter
       - WellformedReadFilter
+  - name: "--keep_read_group"
+    type: string
+    description: |
+      The name of the read group to keep. Required by `ReadGroupReadFilter`.
+    example: rg1
+  - name: "--sample"
+    type: string
+    multiple: true
+    description: |
+      The name of the sample(s) to keep, filtering out all others. Required
+      by `SampleReadFilter`.
+    example: [sample1]
+  - name: "--library"
+    type: string
+    multiple: true
+    description: |
+      The name of the library to keep. Required by `LibraryReadFilter`.
+    example: [lib1]
+  - name: "--read_group_black_list"
+    type: string
+    multiple: true
+    description: |
+      A read group filter expression in the form "attribute:value", where
+      "attribute" is a two character read group attribute such as "RG" or
+      "PU". Read groups that match are removed. Required by
+      `ReadGroupBlackListReadFilter`.
+    example: ["PU:flowcell1.1"]
