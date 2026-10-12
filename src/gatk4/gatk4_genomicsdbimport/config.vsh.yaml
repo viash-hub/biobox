@@ -211,6 +211,7 @@ argument_groups:
           If set, enable checks on the sample name map written for
           `--sample_name`. Verifies that feature readers are valid and shows
           a warning if sample names do not match with the headers.
+  - __merge__: /src/gatk4/utils/engine_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
     description: |
       Unlike most other GATK tools, GenomicsDBImport requires at least one
@@ -227,8 +228,6 @@ argument_groups:
 #                        file URI. The files listed in the map are not
 #                        staged by Viash or Nextflow, so it is replaced by
 #                        `--variant` together with `--sample_name`.
-
-__merge__: /src/gatk4/utils/common_argument_groups.yaml
 
 resources:
   - type: bash_script

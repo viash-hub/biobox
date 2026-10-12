@@ -9,6 +9,7 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 # unset flags
 unset_if_false=(
+  par_lenient
   par_call_genotypes
   par_convert_to_base_pair_resolution
   par_disable_tool_default_annotations
@@ -17,7 +18,6 @@ unset_if_false=(
   par_ignore_variants_starting_outside_interval
   par_input_is_somatic
   par_sites_only_vcf_output
-  par_disable_tool_default_read_filters
   par_disable_sequence_dictionary_validation
 )
 
@@ -61,8 +61,6 @@ split_multiple_to_flags "$par_annotation" "--annotation" annotation_args
 split_multiple_to_flags "$par_annotation_group" "--annotation-group" annotation_group_args
 split_multiple_to_flags "$par_annotations_to_exclude" "--annotations-to-exclude" annotations_to_exclude_args
 split_multiple_to_flags "$par_founder_id" "--founder-id" founder_id_args
-split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
-split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
 
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
@@ -90,12 +88,8 @@ cmd_args=(
   ${par_variant_output_filtering:+--variant-output-filtering "$par_variant_output_filtering"}
   ${par_sites_only_vcf_output:+--sites-only-vcf-output}
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
-  ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
-  ${par_output_cram_version:+--output-cram-version "$par_output_cram_version"}
-  "${read_filter_args[@]}"
-  "${disable_read_filter_args[@]}"
-  ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}
   ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
+  ${par_lenient:+--lenient}
 )
 
 # Run GATK CombineGVCFs
