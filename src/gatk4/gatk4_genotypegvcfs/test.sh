@@ -71,7 +71,7 @@ log "✅ TEST 1 completed successfully"
 # --- Test Case 2: Options ---
 log "Starting TEST 2: Additional options"
 
-log "Executing $meta_name with additional options..."
+log "Executing $meta_name with additional options (--stand_call_conf is an alternative name)..."
 "$meta_executable" \
   --variant "$test_data_dir/sample.g.vcf" \
   --reference "$test_data_dir/reference.fasta" \
@@ -383,5 +383,68 @@ else
 fi
 
 log "✅ TEST 11 completed successfully"
+
+# --- Test Case 12: Forced output sites from a file and from strings ---
+log "Starting TEST 12: --force_output_intervals and --force_output_interval_strings"
+
+# Force seq1:600 with a BED file (0-based) and seq1:500 with a string
+printf 'seq1\t599\t600\n' > "$test_data_dir/force_sites.bed"
+
+log "Executing $meta_name with --force_output_intervals and --force_output_interval_strings..."
+"$meta_executable" \
+  --variant "$test_data_dir/sample.g.vcf" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/output_forced.vcf" \
+  --create_output_variant_index false \
+  --force_output_intervals "$test_data_dir/force_sites.bed" \
+  --force_output_interval_strings "seq1:500"
+
+log "Validating TEST 12 outputs..."
+check_file_exists "$meta_temp_dir/output_forced.vcf" "output VCF file (forced sites)"
+for pos in 500 600; do
+  if grep -v '^#' "$meta_temp_dir/output.vcf" | cut -f2 | grep -qx "$pos"; then
+    log_error "✗ Default output already has a record at seq1:$pos, so the test cannot check forced output"
+    exit 1
+  fi
+  if grep -v '^#' "$meta_temp_dir/output_forced.vcf" | cut -f2 | grep -qx "$pos"; then
+    log "✓ Output has a forced record at seq1:$pos"
+  else
+    log_error "✗ Output has no record at the forced site seq1:$pos"
+    exit 1
+  fi
+done
+
+log "✅ TEST 12 completed successfully"
+
+# --- Test Case 13: De novo and RMS mapping quality options ---
+log "Starting TEST 13: --denovo_depth_threshold, --denovo_parent_gq_threshold and --allow_old_rms_mapping_quality_annotation_data"
+
+# A trio pedigree: sample1 is the child of two parents that are not in the GVCF
+printf 'fam1\tsample1\tfather\tmother\t1\t0\nfam1\tfather\t0\t0\t1\t0\nfam1\tmother\t0\t0\t2\t0\n' > "$test_data_dir/trio.ped"
+
+log "Executing $meta_name with the de novo and RMS mapping quality options..."
+"$meta_executable" \
+  --variant "$test_data_dir/sample.g.vcf" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/output_new_options.vcf" \
+  --create_output_variant_index false \
+  --annotation RMSMappingQuality \
+  --annotation PossibleDeNovo \
+  --pedigree "$test_data_dir/trio.ped" \
+  --denovo_depth_threshold 5 \
+  --denovo_parent_gq_threshold 10 \
+  --allow_old_rms_mapping_quality_annotation_data \
+  --standard_min_confidence_threshold_for_calling 10.0
+
+log "Validating TEST 13 outputs..."
+check_file_exists "$meta_temp_dir/output_new_options.vcf" "output VCF file (new options)"
+check_file_contains "$meta_temp_dir/output_new_options.vcf" "^##fileformat=VCF" "output VCF (new options) header"
+check_file_contains "$meta_temp_dir/output_new_options.vcf" "sample1" "output VCF (new options) sample1 column"
+
+log "✅ TEST 13 completed successfully"
 
 print_test_summary "All tests completed successfully"
