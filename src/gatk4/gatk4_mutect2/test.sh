@@ -363,4 +363,44 @@ fi
 
 log "✅ TEST 8 completed successfully"
 
+# --- Test Case 9: Interval padding and merging rule ---
+log "Starting TEST 9: --interval_padding and --interval_merging_rule"
+
+# Positions 241-245, which end 5bp before the SNV at position 250
+printf 'chr1\t240\t245\n' > "$test_data_dir/near_250.bed"
+
+log "Executing $meta_name with an --intervals file next to the SNV, without padding..."
+"$meta_executable" \
+  --input "$test_data_dir/tumor.bam" \
+  --bai "$test_data_dir/tumor.bai" \
+  "${reference_args[@]}" \
+  --intervals "$test_data_dir/near_250.bed" \
+  --output "$meta_temp_dir/no_padding.vcf" \
+  --output_stats "$meta_temp_dir/no_padding.stats" \
+  --output_index "$meta_temp_dir/no_padding.idx"
+
+if grep -v '^#' "$meta_temp_dir/no_padding.vcf" | grep -q $'^chr1\t250\t'; then
+  log_error "✗ The chr1:250 SNV is in the output without padding"
+  exit 1
+fi
+log "✓ The chr1:250 SNV is not in the output (outside the interval)"
+
+log "Executing $meta_name with the same --intervals file, --interval_padding 5 and --interval_merging_rule OVERLAPPING_ONLY..."
+"$meta_executable" \
+  --input "$test_data_dir/tumor.bam" \
+  --bai "$test_data_dir/tumor.bai" \
+  "${reference_args[@]}" \
+  --intervals "$test_data_dir/near_250.bed" \
+  --interval_padding 5 \
+  --interval_merging_rule OVERLAPPING_ONLY \
+  --output "$meta_temp_dir/padding.vcf" \
+  --output_stats "$meta_temp_dir/padding.stats" \
+  --output_index "$meta_temp_dir/padding.idx"
+
+check_snv_called "$meta_temp_dir/padding.vcf" "output VCF file (padded interval)"
+check_file_contains "$meta_temp_dir/padding.vcf" "interval-padding 5" "output VCF command line (--interval_padding)"
+check_file_contains "$meta_temp_dir/padding.vcf" "interval-merging-rule OVERLAPPING_ONLY" "output VCF command line (--interval_merging_rule)"
+
+log "✅ TEST 9 completed successfully"
+
 print_test_summary "All tests"
