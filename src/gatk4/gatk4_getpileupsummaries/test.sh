@@ -81,7 +81,7 @@ log "Starting TEST 1: Sites in --variant used as intervals"
 log "Executing $meta_name with the --variant VCF as --intervals, without indexes or --reference..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/common_snps.vcf" \
   --maximum_population_allele_frequency 0.5 \
@@ -102,7 +102,7 @@ log "Starting TEST 2: BED intervals and reference"
 log "Executing $meta_name with a BED --intervals file and the reference trio..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/site_50.bed" \
   --reference "$test_data_dir/reference.fasta" \
@@ -131,7 +131,7 @@ check_file_exists "$test_data_dir/indexed/common_snps.vcf.gz.tbi" "pre-built tab
 log "Executing $meta_name with a .idx --variant_index and a .tbi --intervals_index..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/indexed/common_snps.vcf" \
   --variant_index "$test_data_dir/indexed/common_snps.vcf.idx" \
   --intervals "$test_data_dir/indexed/common_snps.vcf.gz" \
@@ -152,7 +152,7 @@ log "Starting TEST 4: Interval set rules"
 log "Executing $meta_name with a BED and a VCF --intervals file (default UNION)..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/site_50.bed" \
   --intervals "$test_data_dir/site_150.vcf" \
@@ -165,7 +165,7 @@ check_file_contains "$meta_temp_dir/pileups_union.table" $'chr1\t150\t1\t2\t0\t0
 log "Executing $meta_name with a whole-contig BED and a VCF --intervals file (INTERSECTION)..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/whole_contig.bed" \
   --intervals "$test_data_dir/site_150.vcf" \
@@ -184,7 +184,7 @@ log "Starting TEST 5: Excluded intervals and allele frequency options"
 log "Executing $meta_name with a BED --exclude_intervals file..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/common_snps.vcf" \
   --exclude_intervals "$test_data_dir/site_50.bed" \
@@ -203,7 +203,7 @@ log "Executing $meta_name with a BED and an unindexed .vcf.gz --exclude_interval
 bgzip -c "$test_data_dir/site_150.vcf" > "$test_data_dir/site_150.vcf.gz"
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/whole_contig.bed" \
   --exclude_intervals "$test_data_dir/site_50.bed" \
@@ -217,7 +217,7 @@ check_file_not_contains "$meta_temp_dir/pileups_excluded_both.table" $'chr1\t150
 log "Executing $meta_name with the default --maximum_population_allele_frequency (0.2)..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/common_snps.vcf" \
   --output "$meta_temp_dir/pileups_default_af.table"
@@ -228,7 +228,7 @@ check_file_not_contains "$meta_temp_dir/pileups_default_af.table" $'chr1\t150\t'
 log "Executing $meta_name with --minimum_population_allele_frequency 0.35..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/common_snps.vcf" \
   --minimum_population_allele_frequency 0.35 \
@@ -246,7 +246,7 @@ log "Starting TEST 6: Minimum mapping quality"
 log "Executing $meta_name on MQ 40 reads with the default --minimum_mapping_quality (50)..."
 "$meta_executable" \
   --input "$test_data_dir/reads_mq40.bam" \
-  --bai "$test_data_dir/reads_mq40.bai" \
+  --read_index "$test_data_dir/reads_mq40.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/common_snps.vcf" \
   --maximum_population_allele_frequency 0.5 \
@@ -260,7 +260,7 @@ check_file_not_contains "$meta_temp_dir/pileups_mq_default.table" $'chr1\t150\t'
 log "Executing $meta_name on MQ 40 reads with --minimum_mapping_quality 30..."
 "$meta_executable" \
   --input "$test_data_dir/reads_mq40.bam" \
-  --bai "$test_data_dir/reads_mq40.bai" \
+  --read_index "$test_data_dir/reads_mq40.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/common_snps.vcf" \
   --maximum_population_allele_frequency 0.5 \
@@ -276,7 +276,7 @@ log "Starting TEST 7: --intervals_index count mismatch fails"
 
 if "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/site_50.bed" \
   --intervals_index "$test_data_dir/indexed/common_snps.vcf.idx" \
@@ -295,7 +295,7 @@ log "Executing $meta_name with an unindexed .vcf.bgz --intervals file..."
 bgzip -c "$test_data_dir/site_150.vcf" > "$test_data_dir/site_150.vcf.bgz"
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/site_150.vcf.bgz" \
   --maximum_population_allele_frequency 0.5 \
@@ -308,7 +308,7 @@ check_file_contains "$meta_temp_dir/test8_bgz.log" "Warning: no index was provid
 gzip -c "$test_data_dir/common_snps.vcf" > "$test_data_dir/plain_gzip.vcf.gz"
 if "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/plain_gzip.vcf.gz" \
   --intervals "$test_data_dir/site_50.bed" \
   --output "$meta_temp_dir/pileups_gzip.table" > "$meta_temp_dir/test8_gzip.log" 2>&1; then
@@ -329,7 +329,7 @@ printf 'chr1\t145\t148\n' > "$test_data_dir/near_150.bed"
 log "Executing $meta_name with an --intervals file next to position 150, without padding..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/near_150.bed" \
   --maximum_population_allele_frequency 0.5 \
@@ -340,7 +340,7 @@ check_file_not_contains "$meta_temp_dir/pileups_no_padding.table" $'chr1\t150\t'
 log "Executing $meta_name with the same --intervals file and --interval_padding 2..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/near_150.bed" \
   --interval_padding 2 \
@@ -352,7 +352,7 @@ check_file_contains "$meta_temp_dir/pileups_padding.table" $'chr1\t150\t1\t2\t0\
 log "Executing $meta_name with the same file as --exclude_intervals and --interval_exclusion_padding 2..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/whole_contig.bed" \
   --exclude_intervals "$test_data_dir/near_150.bed" \
@@ -370,7 +370,7 @@ log "Starting TEST 10: No --intervals fails"
 
 if "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --output "$meta_temp_dir/pileups_no_intervals.table" > "$meta_temp_dir/test10.log" 2>&1; then
   log_error "✗ $meta_name did not fail without --intervals"
@@ -387,7 +387,7 @@ log "Starting TEST 11: --interval_strings without an --intervals file"
 log "Executing $meta_name with only --interval_strings..."
 "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
-  --bai "$test_data_dir/reads.bai" \
+  --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --interval_strings "chr1:140-160" \
   --maximum_population_allele_frequency 0.5 \
@@ -397,5 +397,45 @@ check_file_contains "$meta_temp_dir/pileups_strings.table" $'chr1\t150\t' "posit
 check_file_not_contains "$meta_temp_dir/pileups_strings.table" $'chr1\t50\t' "position 50 (outside the interval string)"
 
 log "✅ TEST 11 completed successfully"
+
+# --- Test Case 12: CRAM input with its index in another directory ---
+log "Starting TEST 12: CRAM --input with a --read_index in another directory"
+
+create_test_cram "$test_data_dir/reads.bam" "$test_data_dir/reference.fasta" \
+  "$test_data_dir/cram/reads.cram" "$test_data_dir/cram_index/reads_index.crai"
+
+"$meta_executable" \
+  --input "$test_data_dir/cram/reads.cram" \
+  --read_index "$test_data_dir/cram_index/reads_index.crai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --intervals "$test_data_dir/common_snps.vcf" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --maximum_population_allele_frequency 0.5 \
+  --output "$meta_temp_dir/pileups_cram.table"
+
+log "Validating TEST 12 outputs..."
+check_file_contains "$meta_temp_dir/pileups_cram.table" $'chr1\t50\t2\t1\t0\t0.3' "position 50 counts (CRAM input)"
+check_file_contains "$meta_temp_dir/pileups_cram.table" $'chr1\t150\t1\t2\t0\t0.4' "position 150 counts (CRAM input)"
+
+log "✅ TEST 12 completed successfully"
+
+# --- Test Case 13: CRAM input without --reference ---
+log "Starting TEST 13: CRAM --input without --reference fails"
+
+if "$meta_executable" \
+  --input "$test_data_dir/cram/reads.cram" \
+  --read_index "$test_data_dir/cram_index/reads_index.crai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --intervals "$test_data_dir/common_snps.vcf" \
+  --output "$meta_temp_dir/pileups_cram_no_ref.table" > "$meta_temp_dir/test13.log" 2>&1; then
+  log_error "✗ $meta_name did not fail for a CRAM input without --reference"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test13.log" "Error: --reference is required for CRAM input." "error message"
+check_file_not_contains "$meta_temp_dir/test13.log" "GetPileupSummaries done" "run log (GATK did not run)"
+
+log "✅ TEST 13 completed successfully"
 
 print_test_summary "All tests"
