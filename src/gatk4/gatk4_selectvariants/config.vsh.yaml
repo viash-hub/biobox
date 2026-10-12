@@ -151,13 +151,6 @@ argument_groups:
         multiple: true
         description: List of variant rsIDs to exclude. Can be specified multiple times.
         example: [rs123]
-      - name: "--exclude_intervals"
-        alternatives: [-XL]
-        type: file
-        description: |
-          One or more genomic intervals to exclude from processing,
-          provided as a file (e.g. BED, interval_list).
-        example: exclude_intervals.bed
       - name: "--exclude_non_variants"
         type: boolean_true
         description: Don't include non-variant sites in the output VCF.
@@ -180,13 +173,6 @@ argument_groups:
         description: |
           Ignore `NON_REF` alleles when determining variant type. Required
           for filtering GVCF files by type.
-      - name: "--intervals"
-        alternatives: [-L]
-        type: file
-        description: |
-          One or more genomic intervals over which to operate, provided
-          as a file (e.g. BED, interval_list).
-        example: intervals.bed
       - name: "--invert_mendelian_violation"
         type: boolean_true
         description: Output non-Mendelian-violation sites only.
@@ -329,6 +315,7 @@ argument_groups:
       - name: "--set_filtered_gt_to_nocall"
         type: boolean_true
         description: Set filtered genotypes to no-call.
+  - __merge__: /src/gatk4/utils/interval_argument_group.yaml
 
 __merge__: /src/gatk4/utils/common_argument_groups.yaml
 
