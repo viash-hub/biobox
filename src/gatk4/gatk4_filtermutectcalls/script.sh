@@ -9,10 +9,10 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 # unset "false" flags
 unset_if_false=(
+  par_lenient
   par_microbial_mode
   par_mitochondria_mode
   par_sites_only_vcf_output
-  par_disable_tool_default_read_filters
   par_disable_sequence_dictionary_validation
 )
 
@@ -50,8 +50,6 @@ avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 split_multiple_to_flags "$par_contamination_table" "--contamination-table" contamination_table_args
 split_multiple_to_flags "$par_tumor_segmentation" "--tumor-segmentation" tumor_segmentation_args
 split_multiple_to_flags "$par_orientation_bias_artifact_priors" "--orientation-bias-artifact-priors" orientation_bias_artifact_priors_args
-split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
-split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
 
 # Build command arguments array
 cmd_args=(
@@ -94,12 +92,8 @@ cmd_args=(
   --tmp-dir "$tmp_dir"
   ${par_sites_only_vcf_output:+--sites-only-vcf-output}
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
-  ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
-  ${par_output_cram_version:+--output-cram-version "$par_output_cram_version"}
-  "${read_filter_args[@]}"
-  "${disable_read_filter_args[@]}"
-  ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}
   ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
+  ${par_lenient:+--lenient}
 )
 
 # Run GATK FilterMutectCalls

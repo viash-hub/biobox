@@ -177,9 +177,9 @@ argument_groups:
         type: boolean_true
         description: Use the base quality scores from the `OQ` tag instead of the current ones.
 
+  - __merge__: /src/gatk4/utils/engine_argument_group.yaml
+  - __merge__: /src/gatk4/utils/read_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
-
-__merge__: /src/gatk4/utils/common_argument_groups.yaml
 
 resources:
   - type: bash_script

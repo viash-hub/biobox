@@ -150,7 +150,7 @@ log "Starting TEST 4: Shared GATK engine options"
 
 mkdir -p "$meta_temp_dir/test4"
 
-log "Executing $meta_name with --interval_padding, --sites_only_vcf_output, --create_output_variant_index false, --create_output_bam_index false..."
+log "Executing $meta_name with --interval_padding, --read_validation_stringency, --lenient and --create_output_bam_index false..."
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
   --read_index "$test_data_dir/sample.sorted.bai" \
@@ -160,8 +160,8 @@ log "Executing $meta_name with --interval_padding, --sites_only_vcf_output, --cr
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test4/output.bam" \
   --interval_padding 10 \
-  --sites_only_vcf_output \
-  --create_output_variant_index false \
+  --read_validation_stringency LENIENT \
+  --lenient \
   --create_output_bam_index false
 
 log "Validating TEST 4 outputs..."
@@ -339,5 +339,34 @@ check_file_contains "$meta_temp_dir/test9/run.log" "Error: --reference is requir
 check_file_not_exists "$meta_temp_dir/test9/output.bam" "output BAM (should not be written)"
 
 log "✅ TEST 9 completed successfully"
+
+# --- Test Case 10: Inverted read filter ---
+log "Starting TEST 10: --inverted_read_filter"
+
+mkdir -p "$meta_temp_dir/test10"
+
+# All test reads are mapped, so the inverted MappedReadFilter removes all of them
+log "Executing $meta_name with --inverted_read_filter MappedReadFilter..."
+"$meta_executable" \
+  --input "$test_data_dir/sample.sorted.bam" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --bqsr_recal_file "$recal_table" \
+  --output "$meta_temp_dir/test10/output.bam" \
+  --output_index "$meta_temp_dir/test10/output.bai" \
+  --inverted_read_filter MappedReadFilter
+
+log "Validating TEST 10 outputs..."
+read_count=$(samtools view -c "$meta_temp_dir/test10/output.bam")
+if [[ "$read_count" -eq 0 ]]; then
+  log "✓ Output BAM has no reads with the inverted MappedReadFilter"
+else
+  log_error "✗ Output BAM has $read_count reads, expected 0 with the inverted MappedReadFilter"
+  exit 1
+fi
+
+log "✅ TEST 10 completed successfully"
 
 print_test_summary "All tests"

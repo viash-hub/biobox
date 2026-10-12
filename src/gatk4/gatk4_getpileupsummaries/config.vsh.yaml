@@ -124,6 +124,8 @@ argument_groups:
           low value increases accuracy at the expense of speed.
           Default: 0.01.
 
+  - __merge__: /src/gatk4/utils/engine_argument_group.yaml
+  - __merge__: /src/gatk4/utils/read_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
     description: |
       At least one interval (`--intervals` or `--interval_strings`) is
@@ -133,8 +135,6 @@ argument_groups:
       `--intervals`. To summarize only the sites in a set of targets, give
       a target BED file and the `--variant` VCF to `--intervals` and use
       `--interval_set_rule INTERSECTION`.
-
-__merge__: /src/gatk4/utils/common_argument_groups.yaml
 
 resources:
   - type: bash_script

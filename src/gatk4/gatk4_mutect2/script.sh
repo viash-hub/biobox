@@ -9,6 +9,7 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 # unset "false" flags
 unset_if_false=(
+  par_lenient
   par_create_bam_output
   par_create_f1r2_tar_gz
   par_dont_use_soft_clipped_bases
@@ -97,6 +98,7 @@ split_multiple_to_flags "$par_annotations_to_exclude" "--annotations-to-exclude"
 split_multiple_to_flags "$par_kmer_size" "--kmer-size" kmer_size_args
 split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
 split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
+split_multiple_to_flags "$par_inverted_read_filter" "--inverted-read-filter" inverted_read_filter_args
 
 # Build command arguments array
 cmd_args=(
@@ -155,6 +157,9 @@ cmd_args=(
   "${disable_read_filter_args[@]}"
   ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}
   ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
+  ${par_lenient:+--lenient}
+  ${par_read_validation_stringency:+--read-validation-stringency "$par_read_validation_stringency"}
+  "${inverted_read_filter_args[@]}"
 )
 
 # Run GATK Mutect2
