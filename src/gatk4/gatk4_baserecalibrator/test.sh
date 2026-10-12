@@ -48,7 +48,7 @@ check_file_exists "$known_sites1.idx" "known-sites VCF index file"
 log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/ref.fasta" \
   --reference_fai "$test_data_dir/ref.fasta.fai" \
   --reference_dict "$test_data_dir/ref.dict" \
@@ -73,7 +73,7 @@ check_file_exists "$known_sites2.idx" "second known-sites VCF index file"
 log "Executing $meta_name with multiple known-sites files and custom options..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/ref.fasta" \
   --reference_fai "$test_data_dir/ref.fasta.fai" \
   --reference_dict "$test_data_dir/ref.dict" \
@@ -102,7 +102,7 @@ log "Starting TEST 3: Shared GATK engine options"
 log "Executing $meta_name with --interval_padding, --read_filter and --disable_tool_default_read_filters..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/ref.fasta" \
   --reference_fai "$test_data_dir/ref.fasta.fai" \
   --reference_dict "$test_data_dir/ref.dict" \
@@ -130,7 +130,7 @@ create_test_vcf_gz_with_separate_index "$known_sites2" \
 log "Executing $meta_name with --known_sites_index..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/ref.fasta" \
   --reference_fai "$test_data_dir/ref.fasta.fai" \
   --reference_dict "$test_data_dir/ref.dict" \
@@ -155,7 +155,7 @@ log "Starting TEST 5: Bgzipped known-sites file without an index"
 log "Executing $meta_name with a .vcf.gz known-sites file and no --known_sites_index..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/ref.fasta" \
   --reference_fai "$test_data_dir/ref.fasta.fai" \
   --reference_dict "$test_data_dir/ref.dict" \
@@ -176,7 +176,7 @@ log "Starting TEST 6: Fewer --known_sites_index files than --known_sites files"
 log "Executing $meta_name with two known-sites files and one index (should fail)..."
 if "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/ref.fasta" \
   --reference_fai "$test_data_dir/ref.fasta.fai" \
   --reference_dict "$test_data_dir/ref.dict" \
@@ -206,7 +206,7 @@ create_test_vcf_gz_with_separate_index "$test_data_dir/intervals_site.vcf" \
 log "Executing $meta_name with two --intervals files, --intervals_index and --interval_set_rule INTERSECTION..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/ref.fasta" \
   --reference_fai "$test_data_dir/ref.fasta.fai" \
   --reference_dict "$test_data_dir/ref.dict" \
@@ -231,5 +231,42 @@ else
 fi
 
 log "✅ TEST 7 completed successfully"
+
+# --- Test Case 8: CRAM input with a separate index ---
+log "Starting TEST 8: CRAM --input with its .crai in another directory"
+
+create_test_cram "$test_data_dir/reads.sorted.bam" "$test_data_dir/ref.fasta" \
+  "$test_data_dir/cram/reads.cram" "$test_data_dir/cram_index/reads.cram.crai"
+check_file_not_exists "$test_data_dir/cram/reads.cram.crai" "index next to the CRAM input"
+
+log "Executing $meta_name with a CRAM --input and --read_index..."
+"$meta_executable" \
+  --input "$test_data_dir/cram/reads.cram" \
+  --read_index "$test_data_dir/cram_index/reads.cram.crai" \
+  --reference "$test_data_dir/ref.fasta" \
+  --reference_fai "$test_data_dir/ref.fasta.fai" \
+  --reference_dict "$test_data_dir/ref.dict" \
+  --known_sites "$known_sites1" \
+  --output "$meta_temp_dir/recal_cram.table"
+
+log "Validating TEST 8 outputs..."
+check_file_exists "$meta_temp_dir/recal_cram.table" "recalibration table (CRAM input)"
+check_file_contains "$meta_temp_dir/recal_cram.table" "#:GATKReport" "recalibration table GATKReport header (CRAM input)"
+
+# The CRAM has the same reads as the BAM, so the read group row of
+# RecalTable0 must be the same as for the BAM input in TEST 1
+observations() {
+  awk '/^#:GATKTable:RecalTable0:/ {in_table = 1; next} in_table && $1 == "rg1" {print $5; exit}' "$1"
+}
+cram_observations=$(observations "$meta_temp_dir/recal_cram.table")
+bam_observations=$(observations "$meta_temp_dir/recal1.table")
+if [[ -n "$cram_observations" && "$cram_observations" == "$bam_observations" ]]; then
+  log "✓ recalibration table from the CRAM input has the same observations as from the BAM input ($cram_observations)"
+else
+  log_error "✗ recalibration table from the CRAM input has '$cram_observations' observations, expected '$bam_observations'"
+  exit 1
+fi
+
+log "✅ TEST 8 completed successfully"
 
 print_test_summary "All tests"
