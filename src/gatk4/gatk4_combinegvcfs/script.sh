@@ -10,6 +10,7 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 # unset flags
 unset_if_false=(
   par_lenient
+  par_allow_old_rms_mapping_quality_annotation_data
   par_call_genotypes
   par_convert_to_base_pair_resolution
   par_disable_tool_default_annotations
@@ -67,6 +68,7 @@ avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
 # Build command arguments array
 cmd_args=(
+  ${par_allow_old_rms_mapping_quality_annotation_data:+--allow-old-rms-mapping-quality-annotation-data}
   "${annotation_args[@]}"
   "${annotation_group_args[@]}"
   "${annotations_to_exclude_args[@]}"
@@ -75,6 +77,8 @@ cmd_args=(
   ${par_combine_variants_distance:+--combine-variants-distance "$par_combine_variants_distance"}
   ${par_convert_to_base_pair_resolution:+--convert-to-base-pair-resolution}
   ${staged_dbsnp:+--dbsnp "$staged_dbsnp"}
+  ${par_denovo_depth_threshold:+--denovo-depth-threshold "$par_denovo_depth_threshold"}
+  ${par_denovo_parent_gq_threshold:+--denovo-parent-gq-threshold "$par_denovo_parent_gq_threshold"}
   ${par_disable_tool_default_annotations:+--disable-tool-default-annotations}
   ${par_drop_somatic_filtering_annotations:+--drop-somatic-filtering-annotations}
   ${par_enable_all_annotations:+--enable-all-annotations}
@@ -82,7 +86,7 @@ cmd_args=(
   ${par_ignore_variants_starting_outside_interval:+--ignore-variants-starting-outside-interval}
   ${par_input_is_somatic:+--input-is-somatic}
   "${interval_args[@]}"
-  ${par_max_variants_per_shard:+--max-variants-per-shard "$par_max_variants_per_shard"}
+  ${par_max_distance:+--max-distance "$par_max_distance"}
   ${par_pedigree:+--pedigree "$par_pedigree"}
   ${par_ref_padding:+--ref-padding "$par_ref_padding"}
   ${par_variant_output_filtering:+--variant-output-filtering "$par_variant_output_filtering"}
