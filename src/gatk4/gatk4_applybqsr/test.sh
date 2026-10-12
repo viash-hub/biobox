@@ -189,4 +189,49 @@ check_file_not_exists "$meta_temp_dir/test5/output.bam" "output BAM (should not 
 
 log "✅ TEST 5 completed successfully"
 
+# --- Test Case 6: Multiple interval files with exclusions ---
+log "Starting TEST 6: Multiple --intervals files (BED and bgzipped VCF) with --exclude_intervals"
+
+mkdir -p "$meta_temp_dir/test6"
+
+# Reads start at 1, 101, ..., 1901 (100bp each). The area is the union
+# of seq1:1-600 (BED) and seq1:1550 (VCF), minus seq1:201-300 (BED).
+printf 'seq1\t0\t600\n' > "$test_data_dir/intervals_a.bed"
+printf 'seq1\t200\t300\n' > "$test_data_dir/exclude.bed"
+create_test_known_sites_vcf "$test_data_dir/intervals_site.vcf" seq1 2000 1550
+create_test_vcf_gz_with_separate_index "$test_data_dir/intervals_site.vcf" \
+  "$test_data_dir/intervals_site.vcf.gz" "$test_data_dir/interval_indexes/intervals_site.vcf.gz.tbi"
+
+log "Executing $meta_name with two --intervals files, --intervals_index and --exclude_intervals..."
+"$meta_executable" \
+  --input "$test_data_dir/sample.sorted.bam" \
+  --bai "$test_data_dir/sample.sorted.bai" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --bqsr_recal_file "$recal_table" \
+  --output "$meta_temp_dir/test6/output.bam" \
+  --output_index "$meta_temp_dir/test6/output.bai" \
+  --intervals "$test_data_dir/intervals_a.bed" \
+  --intervals "$test_data_dir/intervals_site.vcf.gz" \
+  --intervals_index "$test_data_dir/interval_indexes/intervals_site.vcf.gz.tbi" \
+  --interval_set_rule UNION \
+  --exclude_intervals "$test_data_dir/exclude.bed"
+
+log "Validating TEST 6 outputs..."
+check_file_exists "$meta_temp_dir/test6/output.bam" "recalibrated BAM (multiple intervals)"
+check_file_exists "$meta_temp_dir/test6/output.bai" "output BAM index (multiple intervals)"
+
+# ApplyBQSR writes the reads that overlap the area
+read_starts=$(samtools view "$meta_temp_dir/test6/output.bam" | cut -f4 | tr '\n' ' ')
+expected_starts="1 101 301 401 501 1501 "
+if [[ "$read_starts" == "$expected_starts" ]]; then
+  log "✓ output BAM only has the reads in the selected territory: $read_starts"
+else
+  log_error "✗ output BAM read starts are '$read_starts', expected '$expected_starts'"
+  exit 1
+fi
+
+log "✅ TEST 6 completed successfully"
+
 print_test_summary "All tests"

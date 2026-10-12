@@ -107,25 +107,11 @@ argument_groups:
         description: |
           Emit the original base qualities under the `OQ` tag, alongside the
           recalibrated qualities.
-      - name: "--exclude_intervals"
-        alternatives: [-XL]
-        type: file
-        description: |
-          One or more genomic intervals to exclude from processing, provided as
-          a file (e.g. BED, interval_list).
-        example: exclude_intervals.bed
       - name: "--global_qscore_prior"
         type: double
         description: |
           Global Q-score Bayesian prior to use for BQSR. A negative value
           disables this behavior. Default: -1.0.
-      - name: "--intervals"
-        alternatives: [-L]
-        type: file
-        description: |
-          One or more genomic intervals over which to operate, provided as
-          a file (e.g. BED, interval_list).
-        example: intervals.bed
       - name: "--preserve_qscores_less_than"
         type: integer
         description: |
@@ -159,6 +145,8 @@ argument_groups:
         description: |
           Use the original base quality scores (`OQ` tag) from the input BAM
           instead of the current ones.
+
+  - __merge__: /src/gatk4/utils/interval_argument_group.yaml
 
 __merge__: /src/gatk4/utils/common_argument_groups.yaml
 
