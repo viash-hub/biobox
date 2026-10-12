@@ -59,8 +59,8 @@ tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_selectvariants.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 # GATK reads a plain --variant VCF without an index, unless it must traverse
-# by intervals
-variant_index_optional=$([[ -z "$par_intervals" && -z "$par_exclude_intervals" ]] && echo true || echo false)
+# by intervals (--intervals or --exclude_intervals)
+variant_index_optional=$([[ "$(gatk_uses_intervals)" == "true" ]] && echo false || echo true)
 staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
 
 staged_concordance=""
@@ -77,6 +77,7 @@ if [[ -n "$par_reference" ]]; then
   staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict") || exit 1
   reference_args=(--reference "$staged_reference")
 fi
+stage_interval_arguments "$tmp_dir" interval_args
 
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
@@ -110,12 +111,11 @@ cmd_args=(
   "${drop_info_annotation_args[@]}"
   ${par_exclude_filtered:+--exclude-filtered}
   "${exclude_ids_args[@]}"
-  ${par_exclude_intervals:+--exclude-intervals "$par_exclude_intervals"}
   ${par_exclude_non_variants:+--exclude-non-variants}
   "${exclude_sample_expressions_args[@]}"
   "${exclude_sample_name_args[@]}"
   ${par_ignore_non_ref_in_types:+--ignore-non-ref-in-types}
-  ${par_intervals:+--intervals "$par_intervals"}
+  "${interval_args[@]}"
   ${par_invert_mendelian_violation:+--invert-mendelian-violation}
   ${par_invert_select:+--invertSelect}
   "${keep_ids_args[@]}"
@@ -148,7 +148,6 @@ cmd_args=(
 
 # Shared "GATK Engine Options" arguments (see common_argument_groups.yaml)
 cmd_args+=(
-  ${par_interval_padding:+--interval-padding "$par_interval_padding"}
   ${par_sites_only_vcf_output:+--sites-only-vcf-output}
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
