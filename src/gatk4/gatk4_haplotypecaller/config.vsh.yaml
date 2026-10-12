@@ -41,19 +41,25 @@ argument_groups:
       - name: "--input"
         alternatives: [-I]
         type: file
+        multiple: true
         description: |
-          Input BAM or CRAM file containing reads to call variants from.
+          Input BAM or CRAM file(s) containing reads to call variants from.
+          BAM and CRAM files can be mixed. Give more than one file to call
+          the samples in all files together into one VCF.
 
-          The file must be coordinate-sorted and indexed (see `--read_index`).
-          A CRAM file is decoded with `--reference`.
+          The files must be coordinate-sorted and indexed (see
+          `--read_index`). A CRAM file is decoded with `--reference`.
         required: true
-        example: sample.bam
+        example: [sample.bam]
       - name: "--read_index"
         type: file
+        multiple: true
         description: |
-          Index file for `--input` (`.bai` for BAM, `.crai` or `.bai` for CRAM).
+          Index file(s) for `--input` (`.bai` for BAM, `.crai` or `.bai` for
+          CRAM), one for each input file. They are matched to `--input` by
+          order.
         required: true
-        example: sample.bam.bai
+        example: [sample.bam.bai]
       - name: "--reference"
         alternatives: [-R]
         type: file
@@ -93,6 +99,29 @@ argument_groups:
           `--create_output_variant_index` is `true`, ignored when it is `false`.
         must_exist: false
         example: output.vcf.idx
+      - name: "--create_bam_output"
+        type: boolean_true
+        description: |
+          Write the assembled haplotypes to `--bam_output`.
+      - name: "--bam_output"
+        alternatives: [-bamout]
+        type: file
+        direction: output
+        description: |
+          Output BAM file with the assembled haplotypes (see
+          `--bam_writer_type`). Required when `--create_bam_output` is
+          `true`, ignored when it is `false`.
+        must_exist: false
+        example: bamout.bam
+      - name: "--bam_output_index"
+        type: file
+        direction: output
+        description: |
+          Output index file (`.bai`) for `--bam_output`. Required when
+          `--create_bam_output` is `true` and `--create_output_bam_index`
+          is `true`, ignored otherwise.
+        must_exist: false
+        example: bamout.bai
 
   - name: "Options"
     arguments:
@@ -234,11 +263,30 @@ argument_groups:
         description: |
           Number of additional bases of context to include around each
           assembly region. Default: 100.
+      - name: "--bam_writer_type"
+        type: string
+        description: |
+          Which haplotypes to write to `--bam_output`.
+          Default: 'CALLED_HAPLOTYPES'.
+        choices:
+          - ALL_POSSIBLE_HAPLOTYPES
+          - CALLED_HAPLOTYPES
+          - NO_HAPLOTYPES
+          - CALLED_HAPLOTYPES_NO_READS
       - name: "--base_quality_score_threshold"
         type: integer
         description: |
           Base qualities below this threshold will be reduced to the
           minimum (6). Default: 18.
+      - name: "--contamination_fraction_per_sample_file"
+        alternatives: [-contamination-file]
+        type: file
+        description: |
+          Tab-separated file with the fraction of contamination in the
+          sequencing data of each sample to aggressively remove. Each line
+          is "<SampleID><TAB><Contamination>" (the contamination is a
+          double), with no header.
+        example: contamination.tsv
       - name: "--contamination_fraction_to_filter"
         alternatives: [-contamination]
         type: double
@@ -260,10 +308,30 @@ argument_groups:
 
           If not provided, a copy of `--dbsnp` is indexed before the run.
         example: dbsnp.vcf.idx
+      - name: "--denovo_depth_threshold"
+        type: integer
+        description: |
+          Minimum depth (DP) for all trio members to be considered for de novo
+          calculation. Only valid if the `PossibleDeNovo` annotation is used.
+          Default: 0.
+      - name: "--denovo_parent_gq_threshold"
+        type: integer
+        description: |
+          Minimum genotype quality for parents to be considered for de novo
+          calculation (separate from the GQ threshold for the full trio). Only
+          valid if the `PossibleDeNovo` annotation is used. Default: 20.
       - name: "--disable_optimizations"
         type: boolean_true
         description: |
           Don't skip calculations in assembly regions with no variants.
+      - name: "--disable_tool_default_annotations"
+        type: boolean_true
+        description: |
+          Disable all tool default annotations.
+      - name: "--do_not_run_physical_phasing"
+        type: boolean_true
+        description: |
+          Disable physical phasing.
       - name: "--dont_use_soft_clipped_bases"
         type: boolean_true
         description: |
@@ -289,6 +357,11 @@ argument_groups:
         description: |
           If set, all regions are marked as active, disabling the active
           region detection step.
+      - name: "--force_call_filtered_alleles"
+        alternatives: [-genotype-filtered-alleles]
+        type: boolean_true
+        description: |
+          Force-call the filtered alleles in `--alleles`.
       - name: "--founder_id"
         type: string
         multiple: true
@@ -305,6 +378,7 @@ argument_groups:
           Exclusive upper bounds for reference confidence GQ bands (must
           be in `[1, 100]` and specified in increasing order). Only
           relevant when `--emit_ref_confidence` is set to `GVCF`.
+          Default: 1 to 60 in steps of 1, then 70, 80, 90, 99.
       - name: "--heterozygosity"
         type: double
         description: |
@@ -325,6 +399,14 @@ argument_groups:
         description: |
           Kmer size(s) to use in the read threading assembler. Default:
           10, 25.
+      - name: "--mapping_quality_threshold_for_genotyping"
+        type: integer
+        description: |
+          Mapping quality threshold to discount reads from the genotyper,
+          after the active region detection and assembly steps but before
+          genotyping. In contrast, `--minimum_mapping_quality` removes reads
+          from all steps. To genotype with a different threshold, set both
+          arguments. Default: 20.
       - name: "--max_alternate_alleles"
         type: integer
         description: |
@@ -333,6 +415,16 @@ argument_groups:
         type: integer
         description: |
           Maximum size of an assembly region. Default: 300.
+      - name: "--max_genotype_count"
+        type: integer
+        description: |
+          Maximum number of genotypes to consider at any site. Default: 1024.
+      - name: "--max_mnp_distance"
+        alternatives: [-mnp-dist]
+        type: integer
+        description: |
+          Two or more phased substitutions separated by this distance or
+          less are merged into MNPs. Default: 0.
       - name: "--max_reads_per_alignment_start"
         type: integer
         description: |
@@ -340,6 +432,11 @@ argument_groups:
 
           Reads above this threshold will be downsampled. Set to `0` to
           disable. Default: 50.
+      - name: "--maximum_mapping_quality"
+        type: integer
+        description: |
+          Maximum mapping quality of the reads to keep (inclusive). If not
+          set, there is no maximum.
       - name: "--min_assembly_region_size"
         type: integer
         description: |
@@ -360,6 +457,11 @@ argument_groups:
         description: |
           Minimum mapping quality required to consider a read for calling.
           Default: 20.
+      - name: "--num_reference_samples_if_no_call"
+        type: integer
+        description: |
+          Number of hom-ref genotypes to infer at sites not present in a
+          `--population_callset` panel. Default: 0.
       - name: "--output_mode"
         type: string
         description: |
@@ -389,6 +491,23 @@ argument_groups:
           genotyping models, overriding the default ploidy (and
           `--sample_ploidy`) in specific regions (e.g. sex chromosomes).
         example: ploidy_regions.bed
+      - name: "--population_callset"
+        alternatives: [-population]
+        type: file
+        description: |
+          Callset (VCF) used to calculate genotype priors. Used together
+          with `--num_reference_samples_if_no_call` and
+          `--use_posteriors_to_calculate_qual`.
+        example: population.vcf.gz
+      - name: "--population_callset_index"
+        type: file
+        description: |
+          Index file for `--population_callset` (`.tbi` for a `.vcf.gz` file,
+          `.idx` for a `.vcf` file).
+
+          If not provided, a copy of `--population_callset` is indexed
+          before the run.
+        example: population.vcf.gz.tbi
       - name: "--sample_name"
         alternatives: [-ALIAS]
         type: string
@@ -400,16 +519,23 @@ argument_groups:
         description: |
           Ploidy (number of chromosomes) per sample. For pooled data, set
           to (number of samples in each pool * sample ploidy). Default: 2.
-      - name: "--stand_call_conf"
-        alternatives: [-stand-call-conf]
+      - name: "--standard_min_confidence_threshold_for_calling"
+        alternatives: [-stand-call-conf, --stand_call_conf]
         type: double
         description: |
           The minimum phred-scaled confidence threshold at which variants
-          should be called. Default: 30.
+          should be called. Default: 30.0.
+      - name: "--use_posteriors_to_calculate_qual"
+        alternatives: [-gp-qual]
+        type: boolean_true
+        description: |
+          If available, use the genotype posterior probabilities (see
+          `--population_callset`) to calculate the site QUAL.
 
   - __merge__: /src/gatk4/utils/engine_argument_group.yaml
   - __merge__: /src/gatk4/utils/read_argument_group.yaml
   - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
+  - __merge__: /src/gatk4/utils/bam_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
 
 resources:
