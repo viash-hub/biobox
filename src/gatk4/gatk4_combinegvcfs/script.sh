@@ -47,13 +47,14 @@ trap 'rm -rf "$tmp_dir"' EXIT
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict") || exit 1
 # GATK reads a plain --variant VCF without an index, unless it must traverse
-# by intervals
-variant_index_optional=$([[ -z "$par_intervals" ]] && echo true || echo false)
+# by intervals (--intervals or --exclude_intervals)
+variant_index_optional=$([[ "$(gatk_uses_intervals)" == "true" ]] && echo false || echo true)
 stage_vcfs_with_indexes "$tmp_dir" "$par_variant" "$par_variant_index" "--variant" "--variant" variant_args "$variant_index_optional"
 if [[ -n "$par_dbsnp" ]]; then
   # GATK reads a plain --dbsnp VCF without an index
   staged_dbsnp=$(stage_vcf_with_index "$tmp_dir" "$par_dbsnp" "$par_dbsnp_index" dbsnp true) || exit 1
 fi
+stage_interval_arguments "$tmp_dir" interval_args
 
 # Convert semicolon-separated multi-value arguments into repeated flags
 split_multiple_to_flags "$par_annotation" "--annotation" annotation_args
@@ -82,12 +83,11 @@ cmd_args=(
   "${founder_id_args[@]}"
   ${par_ignore_variants_starting_outside_interval:+--ignore-variants-starting-outside-interval}
   ${par_input_is_somatic:+--input-is-somatic}
-  ${par_intervals:+--intervals "$par_intervals"}
+  "${interval_args[@]}"
   ${par_max_variants_per_shard:+--max-variants-per-shard "$par_max_variants_per_shard"}
   ${par_pedigree:+--pedigree "$par_pedigree"}
   ${par_ref_padding:+--ref-padding "$par_ref_padding"}
   ${par_variant_output_filtering:+--variant-output-filtering "$par_variant_output_filtering"}
-  ${par_interval_padding:+--interval-padding "$par_interval_padding"}
   ${par_sites_only_vcf_output:+--sites-only-vcf-output}
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
