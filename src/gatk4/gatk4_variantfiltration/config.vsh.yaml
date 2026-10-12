@@ -208,6 +208,13 @@ argument_groups:
           Set genotypes that fail `--genotype_filter_expression` to
           no-call (`./.`) instead of leaving the original genotype call
           annotated with a FORMAT `FT` filter name.
+      - name: "--variant_output_filtering"
+        type: string
+        choices: [STARTS_IN, ENDS_IN, OVERLAPS, CONTAINED, ANYWHERE]
+        description: |
+          Restrict the output variants to ones that match the
+          `--intervals` according to the specified matching mode.
+        example: STARTS_IN
 
   - __merge__: /src/gatk4/utils/engine_argument_group.yaml
   - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
