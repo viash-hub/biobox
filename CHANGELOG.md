@@ -83,6 +83,9 @@
 
 * `cellranger_mkref`: updated Cell Ranger to v10 (PR #240).
 
+* `bwa_mem3`: Added support for bwa-mem3, a short-read aligner derived from bwa-mem2 with methylation alignment support:
+  - `bwa_mem3/bwa_mem3_index`: Create BWA-MEM3 index files for a reference genome, optionally including a methylation (`--meth`) seed index (PR #265).
+
 ## MINOR CHANGES
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
