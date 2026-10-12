@@ -43,21 +43,28 @@ argument_groups:
       - name: "--input"
         alternatives: [-I]
         type: file
+        multiple: true
         description: |
-          Input BAM or CRAM file containing reads to be recalibrated.
+          One or more input BAM or CRAM files containing reads to be
+          recalibrated. The reads from all files are used to make one
+          recalibration table, for example for a sample sequenced on
+          several lanes.
 
-          The file must be coordinate-sorted and indexed (see `--read_index`).
-          A CRAM file needs `--reference` (with `--reference_fai` and
-          `--reference_dict`).
+          The files must be coordinate-sorted and indexed (see
+          `--read_index`).
         required: true
-        example: sample.bam
+        example: [sample.bam]
       - name: "--read_index"
         type: file
+        multiple: true
         description: |
-          Index file for `--input` (`.bai` for a BAM file, `.crai` or `.bai`
+          Index files for `--input` (`.bai` for a BAM file, `.crai` or `.bai`
           for a CRAM file).
+
+          The index files are matched to `--input` by order. One index file
+          must be given for each `--input` file.
         required: true
-        example: sample.bam.bai
+        example: [sample.bam.bai]
       - name: "--reference"
         alternatives: [-R]
         type: file
