@@ -91,6 +91,7 @@ extra_args=(
   ${par_mask_name:+--mask-name "$par_mask_name"}
   ${par_missing_values_evaluate_as_failing:+--missing-values-evaluate-as-failing}
   ${par_set_filtered_genotype_to_no_call:+--set-filtered-genotype-to-no-call}
+  ${par_variant_output_filtering:+--variant-output-filtering "$par_variant_output_filtering"}
 )
 
 # Run gatk VariantFiltration
