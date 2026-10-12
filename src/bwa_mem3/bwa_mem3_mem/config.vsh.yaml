@@ -1,0 +1,533 @@
+name: bwa_mem3_mem
+namespace: bwa_mem3
+description: |
+  bwa-mem3 mem aligns one or two FASTQ files against an indexed reference and writes SAM (default) or BAM (--bam_compression).
+  It is a drop-in replacement for bwa-mem2 mem and supports all standard bwa-mem flags.
+keywords: [alignment, BWA, BWA-MEM, BWA-MEM3, mapping, methylation]
+links:
+  homepage: https://github.com/fg-labs/bwa-mem3
+  documentation: https://bwa-mem3.readthedocs.io/en/latest/cli/mem.html
+  repository: https://github.com/fg-labs/bwa-mem3
+license: MIT
+requirements:
+  commands: [bwa-mem3]
+authors:
+  - __merge__: /src/_authors/hannes_de_meyer.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--index"
+        type: file
+        description: BWA index base name (prefix of .amb, .ann, .bwt.2bit.64, .pac files).
+        required: true
+        example: "path/to/reference.fasta"
+      - name: "--reads1"
+        type: file
+        description: Input FASTQ file with first reads in pair (R1) or single-end reads.
+        required: true
+        example: "path/to/reads_R1.fastq"
+      - name: "--reads2"
+        type: file
+        description: Input FASTQ file with second reads in pair (R2). Optional for single-end.
+        example: "path/to/reads_R2.fastq"
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-o]
+        type: file
+        direction: output
+        description: Output SAM file, or BAM file when `--bam_compression` is set. If not specified, output goes to stdout.
+        example: "path/to/output.sam"
+
+  - name: "BAM Options"
+    arguments:
+      - name: "--bam_compression"
+        type: integer
+        description: |
+          Write BAM instead of SAM, at this BGZF compression level. 0 is uncompressed BAM: no
+          double compression when the output goes straight into a sorter, and roughly 10-15% faster
+          end-to-end. 1-9 are deflate levels; use e.g. 6 when the BAM is the final product.
+          If not set, SAM text is written.
+        min: 0
+        max: 9
+        example: 0
+      - name: "--bam_threads"
+        type: integer
+        description: |
+          BGZF compression threads for BAM output; 0 = serial on the writer thread.
+          Default is the number of threads / 8.
+        min: 0
+
+  - name: "Algorithm Options"
+    arguments:
+      - name: "--min_seed_length"
+        alternatives: [-k]
+        type: integer
+        description: Minimum seed length.
+        default: 19
+      - name: "--band_width"
+        alternatives: [-w]
+        type: integer
+        description: Band width for banded alignment.
+        default: 100
+      - name: "--dropoff"
+        alternatives: [-d]
+        type: integer
+        description: Off-diagonal X-dropoff. Scaled by `--match_score` unless set. Default is 100.
+        example: 100
+      - name: "--reseed_ratio"
+        alternatives: [-r]
+        type: double
+        description: Look for internal seeds inside a seed longer than {-k} * FLOAT.
+        default: 1.5
+      - name: "--seed_occurrence"
+        alternatives: [-y]
+        type: integer
+        description: Seed occurrence for the 3rd round seeding. Set to 0 by `--fast`. Default is 20.
+        example: 20
+      - name: "--skip_seeds"
+        alternatives: [-c]
+        type: integer
+        description: Skip seeds with more than INT occurrences.
+        default: 500
+      - name: "--smem_dedup"
+        type: boolean_true
+        description: |
+          Dedup identical SMEMs before chaining: fewer SA lookups, ~10% fewer. NOT byte-identical
+          (changes XS/secondary on a small fraction of reads).
+      - name: "--dedup"
+        type: string
+        description: |
+          Extension-DP job dedup: `off`, `on` (dedup identical jobs within each batch), or `auto`
+          (measure net benefit at runtime, latch, and periodically re-probe). Alignment records are
+          byte-identical in every mode.
+        choices: [auto, "on", "off"]
+        default: auto
+      - name: "--dedup_reads"
+        type: string
+        description: |
+          Whole-read-pair memoization: `off`, `on`, or `auto` (measure the duplicate rate and net
+          benefit at runtime, latch, and periodically re-probe). Aligns once per distinct pair within a
+          chunk and replays the per-read SAM stage, so alignment records are byte-identical in every mode.
+          Benefits amplicon/UMI panels with PCR duplicates; ~no effect on WGS/exome.
+        choices: [auto, "on", "off"]
+        default: auto
+      - name: "--ks_dedup"
+        type: string
+        description: |
+          Cross-read SA-interval dedup: `off`, `on` (resolve each distinct (k,s) suffix-array interval
+          once per SA-resolve chunk and copy the coordinates to the reads that repeat it), or `auto`
+          (measure net benefit at runtime, latch, and periodically re-probe). Alignment records are
+          byte-identical in every mode.
+        choices: [auto, "on", "off"]
+        default: auto
+      - name: "--huge_pages"
+        type: boolean_true
+        description: |
+          Back the index with 1 GB huge pages via mimalloc when the host has enough free 1 GB pages
+          reserved; cuts dTLB misses in seeding. Linux only; alignment records byte-identical; safe
+          no-op otherwise.
+      - name: "--keep_contained_ext"
+        type: boolean_true
+        description: |
+          Opt out of the default contained-seed extension skip and run the reference extension path
+          instead. The skip is byte-identical to the reference path, so this flag only removes the
+          speedup. Escape hatch / bit-exact A-B handle against older binaries.
+      - name: "--max_extend_chains"
+        type: integer
+        description: |
+          Cap chains extended per read to the top-INT by weight; ~23% less alignment CPU,
+          high-confidence placement unaffected; ignored for reads with >4096 chains. NOT byte-identical
+          (0 = off). Default is 0.
+        example: 0
+        min: 0
+      - name: "--adaptive_band"
+        type: boolean_true
+        description: |
+          Adaptive banded-SW: start tight and expand each pair to its chain-geometry band on
+          long-extension reads; ~1.3x on medium reads (~240bp), no-op on short reads. NOT byte-identical.
+      - name: "--no_adaptive_band"
+        type: boolean_true
+        description: |
+          Disable adaptive banded-SW (exact, byte-identical full-width extension; also disables the
+          certified band). Overrides `--adaptive_band` and the adaptive band that `--fast` enables.
+      - name: "--no_band_cert"
+        type: boolean_true
+        description: |
+          Disable the certified adaptive extension band (on by default): run the full-width extension
+          ladder for every pair. The certified band is byte-identical to full-width, so this only
+          removes the speedup. No effect under `--fast`, `--adaptive_band` or `--no_adaptive_band`.
+      - name: "--extend_mate_concordant"
+        type: string
+        description: |
+          When `--max_extend_chains` caps a PE read, also keep any chain concordant (same contig, FR,
+          within INT bp) with a mate chain. `auto` = window is the estimated proper-pair insert high
+          bound; an integer = fixed window in bp; 0 = off. NOT byte-identical. Default is 0 (off).
+        example: "0"
+      - name: "--extend_tie_frac"
+        type: double
+        description: |
+          Extend a chain (ranked at/after `--extend_tie_floor`) only if its integer weight is
+          >= floor(FLOAT * the best chain's weight). Complements `--max_extend_chains` and also gates on
+          its own when that cap is off. NOT byte-identical (0 = off). Default is 0.
+        example: 0
+        min: 0
+        max: 1
+      - name: "--extend_csub"
+        type: boolean_true
+        description: |
+          When `--extend_tie_frac` / `--max_extend_chains` drops chains, seed the primary's competitor
+          score with a calibrated estimate of the best dropped chain so MAPQ is not inflated by the
+          pruning. NOT byte-identical.
+      - name: "--extend_tie_floor"
+        type: integer
+        description: |
+          Extend at least the top-INT chains regardless of `--extend_tie_frac`, but only within
+          `--max_extend_chains`. 0 = no floor. Only meaningful with `--extend_tie_frac` > 0. Default is 0.
+        example: 0
+        min: 0
+      - name: "--chain_drop"
+        alternatives: [-D]
+        type: double
+        description: Drop chains shorter than FLOAT fraction of the longest overlapping chain.
+        default: 0.5
+      - name: "--seeded_bases"
+        alternatives: [-W]
+        type: integer
+        description: Discard a chain if seeded bases shorter than INT.
+        default: 0
+      - name: "--min_ext_len"
+        type: integer
+        description: |
+          Skip Smith-Waterman extension of short seeds: a seed shorter than INT bp is dropped before
+          banded Smith-Waterman only if its chain still has a longer anchor seed. Recall-safe; ~10% less
+          alignment CPU at the recommended value of 30. Set to 30 by `--fast`. NOT byte-identical
+          (0 = off). Default is 0.
+        example: 0
+        min: 0
+      - name: "--mate_rescue"
+        alternatives: [-m]
+        type: integer
+        description: Perform at most INT rounds of mate rescues for each read. Set to 10 by `--fast`. Default is 50.
+        example: 50
+      - name: "--rescue_kmer"
+        type: integer
+        description: |
+          Band the mate-rescue Smith-Waterman to a K-mer exact-match anchor diagonal, falling back to
+          the full insert window when there is no anchor. K is 1-16 (0 = off). Enabled with K=6 by
+          `--fast`. NOT byte-identical. Default is 0 (off).
+        example: 0
+        min: 0
+        max: 16
+      - name: "--rescue_band"
+        type: integer
+        description: Half-width (bp) of the band around the `--rescue_kmer` anchor diagonal. Default is 50.
+        example: 50
+        min: 1
+        max: 1000000
+      - name: "--rescue_skip"
+        type: boolean_true
+        description: |
+          Skip the mate-rescue Smith-Waterman outright when no K-mer anchor clears the vote floor,
+          instead of falling back to the full window. Requires `--rescue_kmer`. Drops rescues rather
+          than shortening them, so it can lose alignments. Not part of `--fast`.
+      - name: "--skip_mate_rescue"
+        alternatives: [-S]
+        type: boolean_true
+        description: Skip mate rescue.
+      - name: "--skip_pairing"
+        alternatives: [-P]
+        type: boolean_true
+        description: Skip pairing; mate rescue performed unless -S also in use.
+      - name: "--hic"
+        type: boolean_true
+        description: |
+          Map Hi-C reads; equivalent to -5SP (`-P` alone still runs mate rescue; use `--hic` to skip
+          it too).
+      - name: "--fast"
+        type: boolean_true
+        description: |
+          Speed preset: -m 10 -y 0 --rescue-kmer=6 --max-extend-chains 20 --smem-dedup --adaptive-band
+          --extend-mate-concordant --extend-tie-frac 0.95 --extend-tie-floor 1 --extend-csub
+          (under --meth: --max-extend-chains 10). Explicit options override where applicable. Also
+          implies `--chunk_cap 256000000`. NOT byte-identical to the default (divergence confined to the
+          low-confidence tail).
+      - name: "--compat"
+        type: string
+        description: |
+          Shape output to be byte-identical to a reference aligner: `bwa-mem2` (v2.2.1, alias `mem2`)
+          or `bwa-mem` (bwa 0.7.19). Refuses bwa-mem3-only options that change alignments/MAPQ
+          (`--smem_dedup`, `--adaptive_band`, `--max_extend_chains`, `--min_ext_len`,
+          `--extend_tie_frac`, `--rescue_kmer`, `--supp_rep_hard_cap`, `--seed_order`, `--chunk_cap`,
+          `--proper_pair_from_emitted`) unless `--compat_allow_divergent` is set; `--fast` and `--meth`
+          are always refused.
+        choices: [bwa-mem2, mem2, bwa-mem, "off"]
+        default: "off"
+      - name: "--compat_allow_divergent"
+        type: boolean_true
+        description: |
+          Downgrade the `--compat` refusal to a warning: keep the target's output conventions while
+          still running a bwa-mem3-only option. Output is then NOT byte-identical to the target. Does
+          not relax `--fast`/`--meth`. No effect without `--compat`.
+
+  - name: "Scoring Options"
+    arguments:
+      - name: "--match_score"
+        alternatives: [-A]
+        type: integer
+        description: |
+          Score for a sequence match, which scales options -TdBOELU unless overridden. Default is 1.
+        example: 1
+      - name: "--mismatch_penalty"
+        alternatives: [-B]
+        type: integer
+        description: Penalty for a mismatch. Set to 2 by `--meth_scoring collapsed`. Default is 4.
+        example: 4
+      - name: "--gap_open_penalty"
+        alternatives: [-O]
+        type: string
+        description: Gap open penalties for deletions and insertions. Default is 6,6.
+        example: "6,6"
+      - name: "--gap_extend_penalty"
+        alternatives: [-E]
+        type: string
+        description: |
+          Gap extension penalty (must be positive); a gap of size k costs '{-O} + {-E}*k'. Default is 1,1.
+        example: "1,1"
+      - name: "--clipping_penalty"
+        alternatives: [-L]
+        type: string
+        description: Penalty for 5'- and 3'-end clipping. Default is 5,5.
+        example: "5,5"
+      - name: "--unpaired_penalty"
+        alternatives: [-U]
+        type: integer
+        description: Penalty for an unpaired read pair. Default is 17.
+        example: 17
+
+  - name: "Input/Output Options"
+    arguments:
+      - name: "--smart_pairing"
+        alternatives: [-p]
+        type: boolean_true
+        description: Smart pairing (ignoring in2.fq).
+      - name: "--read_group"
+        alternatives: [-R]
+        type: string
+        description: Read group header line such as '@RG\tID:foo\tSM:bar'.
+        example: "@RG\tID:sample1\tSM:sample1"
+      - name: "--header"
+        alternatives: [-H]
+        type: string
+        description: Insert STR to header if it starts with @; or insert lines in FILE.
+      - name: "--ignore_alt"
+        alternatives: [-j]
+        type: boolean_true
+        description: Treat ALT contigs as part of the primary assembly (i.e. ignore <idxbase>.alt file).
+      - name: "--primary_5prime"
+        alternatives: ["-5"]
+        type: boolean_true
+        description: For split alignment, take the alignment with the smallest coordinate as primary.
+      - name: "--keep_mapq"
+        alternatives: [-q]
+        type: boolean_true
+        description: Don't modify mapQ of supplementary alignments.
+      - name: "--batch_size"
+        alternatives: [-K]
+        type: long
+        description: Process INT input bases in each batch regardless of nThreads (for reproducibility).
+      - name: "--chunk_cap"
+        type: long
+        description: |
+          Upper bound (bases) on the default nThreads-scaled batch size; 0 = off. Capping
+          re-partitions the input and is NOT byte-identical. Prefer `--batch_size` for a fixed batch
+          size and reproducibility. Set to 256000000 by `--fast`. Default is 0.
+        example: 0
+        min: 0
+      - name: "--cohort_slices"
+        type: integer
+        description: |
+          Read the first batch as a ramp of up to INT growing slices, so alignment starts before the
+          whole batch has been read. 0 = off. Output is unchanged. Overridden by the
+          BWA_MEM3_COHORT_SLICES environment variable.
+        min: 0
+        max: 20
+        default: 6
+      - name: "--cohort_ramp_first"
+        type: long
+        description: |
+          Bases in the first ramp slice; capped at half the batch. 0 selects the fractional shape
+          (batch / ratio^slices). Output-neutral. Overridden by the BWA_MEM3_COHORT_RAMP_FIRST
+          environment variable.
+        min: 0
+        default: 16000000
+      - name: "--cohort_ramp_ratio"
+        type: double
+        description: |
+          Growth factor between consecutive ramp slices. Output-neutral. Overridden by the
+          BWA_MEM3_COHORT_RAMP_RATIO environment variable.
+        default: 1.6
+      - name: "--verbosity"
+        alternatives: [-v]
+        type: integer
+        description: Verbosity level (1=error, 2=warning, 3=message, 4+=debugging).
+        choices: [1, 2, 3, 4]
+        default: 3
+      - name: "--min_score"
+        alternatives: [-T]
+        type: integer
+        description: Minimum score to output. Scaled by `--match_score` unless set. Default is 30.
+        example: 30
+      - name: "--max_hits_xa"
+        type: string
+        description: |
+          If there are <INT hits with score > `--xa_score_fraction` of the max score, output all in XA.
+          The second value applies to alternative hits on ALT contigs.
+        default: "5,200"
+      - name: "--xa_score_fraction"
+        alternatives: [-z]
+        type: double
+        description: The fraction of the max score to use with `--max_hits_xa`.
+        default: 0.8
+      - name: "--output_xb"
+        alternatives: [-u]
+        type: boolean_true
+        description: Output XB instead of XA; XB is XA with the alignment score and mapping quality added.
+      - name: "--output_all"
+        alternatives: [-a]
+        type: boolean_true
+        description: Output all alignments for SE or unpaired PE.
+      - name: "--append_comment"
+        alternatives: [-C]
+        type: boolean_true
+        description: Append FASTA/FASTQ comment to SAM output.
+      - name: "--output_ref_header"
+        alternatives: [-V]
+        type: boolean_true
+        description: Output the reference FASTA header in the XR tag.
+      - name: "--soft_clipping"
+        alternatives: [-Y]
+        type: boolean_true
+        description: Use soft clipping for supplementary alignments.
+      - name: "--mark_secondary"
+        alternatives: [-M]
+        type: boolean_true
+        description: Mark shorter split hits as secondary.
+      - name: "--insert_size"
+        alternatives: [-I]
+        type: string
+        description: |
+          Specify the mean, standard deviation (10% of the mean if absent), max (4 sigma from the mean
+          if absent) and min of the insert size distribution. Sets the FR distribution only and skips
+          inference, so FF/RF/RR get no proper-pair flag or mate rescue. Default is inferred from the data.
+        example: "500,50,800,100"
+
+  - name: "Methylation Options"
+    arguments:
+      - name: "--meth"
+        type: string
+        description: |
+          Enable inline bwameth-style C->T/G->A read conversion and meth-aware record emission
+          (XM:Z/XG:Z/XR:Z), using this chemistry. Requires an index built with
+          `bwa_mem3_index --meth`.
+            * `emseq`: bisulfite/EM-seq, UNmethylated C converts.
+            * `taps`: TET-assisted pyridine borane, METHYLATED C converts; also defaults
+              `--meth_scoring` to `neutral`. Running TAPS data as `emseq` inverts every
+              methylation call.
+        choices: [emseq, taps]
+        example: emseq
+      - name: "--meth_scoring"
+        type: string
+        description: |
+          Scoring mode. Default is `collapsed` for emseq and `neutral` for taps.
+            * `collapsed`: C/T (and G/A) interchangeable, bwameth-compatible placement (sets -B 2).
+            * `genomic`: free only the conversion direction, scored as a full match; variants outside
+              the conversion direction are counted in NM (-B 4).
+            * `neutral`: free only the conversion direction but score it 0; best for TAPS (-B 4).
+        choices: [collapsed, genomic, neutral]
+        example: collapsed
+      - name: "--meth_seed_prune"
+        type: string
+        description: |
+          Prune the 3-letter alphabet's short, repetitive spurious SMEMs before SA resolution: ~30%
+          faster `--meth` at ~0 accuracy cost.
+            * `spec30`: per-read two-regime rule.
+            * `baseline`: drop len<25 & SA-count>1.
+            * `off`: restore the un-pruned seeding (byte-identical).
+          Default is `spec30` under `--meth`.
+        choices: [spec30, baseline, "off"]
+        example: spec30
+      - name: "--meth_tags"
+        type: string
+        description: |
+          Which Bismark tags to emit: `all`, `none`, a comma-separated list (e.g. `XR,XG`), or
+          exclusions prefixed with `-` (e.g. `-XM`). XM:Z dominates the BAM's aux payload; `-XM` drops
+          it for callers that recompute from the reference (MethylDackel, biscuit). Keep XM for
+          Bismark-family tools. Default is all.
+        example: "all"
+      - name: "--set_as_failed"
+        type: string
+        description: Flag alignments to the matching strand (`f` or `r`) as QC-fail (0x200).
+        choices: [f, r]
+      - name: "--chimera_qc"
+        type: boolean_true
+        description: |
+          Enable the bwameth.py-style longest-match <44% chimera heuristic (sets 0x200, clears 0x2,
+          caps MAPQ at 1).
+
+  - name: "Supplementary MAPQ Rescoring Options"
+    arguments:
+      - name: "--supp_rep_hard_cap"
+        type: integer
+        description: |
+          Force MAPQ=0 for supplementary alignments whose chain contains any seed with >=INT genome
+          occurrences (i.e. the supplementary region is repetitive on its own). 0 disables. Typical
+          values 5-20; lower = more aggressive. Primary MAPQ is unaffected. Default is 0.
+        example: 0
+        min: 0
+      - name: "--proper_pair_from_emitted"
+        type: boolean_true
+        description: |
+          Derive the proper-pair FLAG bit (0x2) from the alignment actually emitted rather than the
+          top-scoring one (as bwa and bwa-mem2 do). Only has an effect when the index has a .alt
+          sidecar.
+
+  - name: "Seed Ordering Options"
+    arguments:
+      - name: "--seed_order"
+        type: string
+        description: Seed emission order before chaining. Default is off.
+        choices: ["off", local-longest, global-longest, absorb-count, most-absorb]
+        example: "off"
+
+  - name: "Input Reader Options"
+    arguments:
+      - name: "--legacy_reader"
+        type: boolean_true
+        description: |
+          Use the legacy gzFile/kseq input reader instead of the default content-detecting fast reader
+          (escape hatch / A-B baseline).
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bwa-mem3:0.14.1--h8d53bd0_0
+    setup:
+      - type: docker
+        run: |
+          bwa-mem3 version 2>&1 | head -1 | sed 's/^/bwa-mem3: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
