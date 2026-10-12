@@ -432,4 +432,59 @@ check_file_exists "$meta_temp_dir/cram_normal.idx" "output index file (CRAM inpu
 
 log "✅ TEST 10 completed successfully"
 
+# --- Test Case 11: Read length read filter ---
+log "Starting TEST 11: --min_read_length"
+
+# All tumor reads are 100bp, so a minimum length of 101 removes all of them
+log "Executing $meta_name with --min_read_length 101..."
+"$meta_executable" \
+  --input "$test_data_dir/tumor.bam" \
+  --read_index "$test_data_dir/tumor.bai" \
+  "${reference_args[@]}" \
+  --min_read_length 101 \
+  --output "$meta_temp_dir/min_read_length.vcf" \
+  --output_stats "$meta_temp_dir/min_read_length.stats" \
+  --output_index "$meta_temp_dir/min_read_length.idx" > "$meta_temp_dir/test11.log" 2>&1
+
+log "Validating TEST 11 outputs..."
+check_file_contains "$meta_temp_dir/test11.log" "16 read(s) filtered by: ReadLengthReadFilter" "run log (all 16 reads filtered)"
+if grep -v '^#' "$meta_temp_dir/min_read_length.vcf" | grep -q .; then
+  log_error "✗ output VCF has calls, expected none when all reads are filtered"
+  exit 1
+fi
+log "✓ output VCF has no calls when all reads are filtered"
+
+log "✅ TEST 11 completed successfully"
+
+# --- Test Case 12: Other read filter, genotyping and annotation options ---
+log "Starting TEST 12: --max_read_length, --maximum_mapping_quality, --genotype_germline_sites_fraction and annotation options"
+
+log "Executing $meta_name with the options..."
+"$meta_executable" \
+  --input "$test_data_dir/tumor.bam" \
+  --read_index "$test_data_dir/tumor.bai" \
+  "${reference_args[@]}" \
+  --min_read_length 50 \
+  --max_read_length 100 \
+  --maximum_mapping_quality 60 \
+  --genotype_germline_sites \
+  --genotype_germline_sites_fraction 0.5 \
+  --enable_dynamic_read_disqualification_for_genotyping \
+  --disable_tool_default_annotations \
+  --output "$meta_temp_dir/options2.vcf" \
+  --output_stats "$meta_temp_dir/options2.stats" \
+  --output_index "$meta_temp_dir/options2.idx" > "$meta_temp_dir/test12.log" 2>&1
+
+log "Validating TEST 12 outputs..."
+check_snv_called "$meta_temp_dir/options2.vcf" "output VCF file (options)"
+check_file_contains "$meta_temp_dir/test12.log" "0 read(s) filtered by: ReadLengthReadFilter" "run log (no reads filtered by length)"
+check_file_contains "$meta_temp_dir/test12.log" "0 read(s) filtered by: MappingQualityReadFilter" "run log (no reads filtered by mapping quality)"
+check_file_contains "$meta_temp_dir/options2.vcf" "max-read-length 100" "output VCF command line (--max_read_length)"
+check_file_contains "$meta_temp_dir/options2.vcf" "maximum-mapping-quality 60" "output VCF command line (--maximum_mapping_quality)"
+check_file_contains "$meta_temp_dir/options2.vcf" "genotype-germline-sites-fraction 0.5" "output VCF command line (--genotype_germline_sites_fraction)"
+check_file_contains "$meta_temp_dir/options2.vcf" "enable-dynamic-read-disqualification-for-genotyping true" "output VCF command line (--enable_dynamic_read_disqualification_for_genotyping)"
+check_file_contains "$meta_temp_dir/options2.vcf" "disable-tool-default-annotations true" "output VCF command line (--disable_tool_default_annotations)"
+
+log "✅ TEST 12 completed successfully"
+
 print_test_summary "All tests"
