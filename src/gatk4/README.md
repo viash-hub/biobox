@@ -47,8 +47,12 @@ For some file types, GATK finds companion files (like indexes) by name next to t
 Each companion file needs its own argument, and the script links it next to the main file in a temporary directory.
 
 - **Reference**: `--reference`, `--reference_fai` and `--reference_dict`, staged with `stage_reference_trio`.
-- **Reads**: `--input` and `--bai`, staged with `stage_bam_bai`, or with `stage_bams_bais` for `multiple: true` (matched by order).
-  GATK matches samples (for example Mutect2 `--normal-sample`) by the `SM` tag, not by file name so it is ok for files to be renamed during staging.
+- **Reads**: `--input` (BAM or CRAM) and `--read_index`, passed with GATK `--read-index` by `gatk_read_args` (matched by order for `multiple: true`).
+  `--read-index` accepts an index with any name, so read files do not need to be staged.
+  GATK finds a CRAM index next to the file as `.cram.crai`, `.crai` or `.cram.bai`, but not `.bai`.
+  A CRAM needs the reference FASTA, GATK checks it against the MD5 in the CRAM header.
+- **Picard reference**: Picard tools (for example MarkDuplicates) use the reference only for CRAM files and need the `.fai` but not the `.dict`.
+  Stage them with `stage_reference_fai`.
 - **VCF inputs**: every VCF input has an optional `*_index` argument, staged with `stage_vcf_with_index`, or with `stage_vcfs_with_indexes` for `multiple: true` (matched by order).
   Without an index, the helper copies the VCF, indexes it and writes a warning.
   This can be slow for large files such as gnomAD.
@@ -88,7 +92,7 @@ Examples:
 | Mutect2 stats | `gatk4_mutect2` | `<output>.stats` | Required `--output_stats`, moved after the run |
 | FilterMutectCalls filtering stats | `gatk4_filtermutectcalls` | `<output>.filteringStats.tsv` | Required `--filtering_stats`, passed to GATK |
 | VCF index | `gatk4_combinegvcfs`, `gatk4_filtermutectcalls`, `gatk4_genotypegvcfs`, `gatk4_haplotypecaller`, `gatk4_mutect2`, `gatk4_selectvariants`, `gatk4_variantfiltration` | `<output>.tbi` for `.vcf.gz`/`.vcf.bgz`, `<output>.idx` otherwise (`gatk_output_vcf_index_path`) | `--output_index`, required unless `--create_output_variant_index` is `false`, moved after the run |
-| BAM index | `gatk4_applybqsr`, `gatk4_markduplicates`, `gatk4_mutect2` | `<output without .bam>.bai` (`gatk_output_bam_index_path`) | For example `--output_index`, required unless `--create_output_bam_index` is `false` (`--create_index` is set for `gatk4_markduplicates`) |
+| BAM/CRAM index | `gatk4_applybqsr`, `gatk4_markduplicates`, `gatk4_mutect2` | `<output without .bam>.bai` for BAM, `<output>.bai` (BAI format, not readable by samtools) for CRAM (`gatk_output_bam_index_path`) | For example `--output_index`, required unless `--create_output_bam_index` is `false` (`--create_index` is set for `gatk4_markduplicates`) |
 
 If two output arguments interact, the script should check the provided values are allowed before the run and stop with a clear error.
 
