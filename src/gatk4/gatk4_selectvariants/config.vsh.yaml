@@ -47,8 +47,8 @@ argument_groups:
           for a `.vcf` file).
 
           If not provided, a copy of a bgzipped `--variant` file is indexed before
-          the run. A plain `.vcf` file does not need an index, unless
-          `--intervals` or `--exclude_intervals` is given.
+          the run. A plain `.vcf` file does not need an index, unless an
+          interval argument (for example `--intervals`) is given.
         example: variants.vcf.gz.tbi
       - name: "--reference"
         alternatives: [-R]

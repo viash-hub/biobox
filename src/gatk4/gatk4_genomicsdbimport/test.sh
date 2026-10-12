@@ -493,9 +493,29 @@ if "$meta_executable" \
   log_error "✗ $meta_name did not fail without --intervals"
   exit 1
 fi
-check_file_contains "$meta_temp_dir/test11.log" "Error: --intervals is required." "error message"
+check_file_contains "$meta_temp_dir/test11.log" "Error: --intervals or --interval_strings is required." "error message"
 check_dir_not_exists "$meta_temp_dir/genomicsdb_workspace_no_intervals" "GenomicsDB workspace (no run without --intervals)"
 
 log "✅ TEST 11 completed successfully"
+
+# --- Test Case 12: Only --interval_strings ---
+log "Starting TEST 12: --interval_strings without an --intervals file"
+
+log "Executing $meta_name with only --interval_strings..."
+"$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --interval_strings "seq1:100-200" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_strings"
+
+arrays=$(list_arrays "$meta_temp_dir/genomicsdb_workspace_strings")
+if [[ "$arrays" == 'seq1$100$200 ' ]]; then
+  log "✓ GenomicsDB workspace has one array for the interval string: $arrays"
+else
+  log_error "✗ GenomicsDB workspace has arrays '$arrays', expected 'seq1\$100\$200 '"
+  exit 1
+fi
+
+log "✅ TEST 12 completed successfully"
 
 print_test_summary "All tests completed successfully"
