@@ -50,54 +50,59 @@ stage_reference_trio() {
   echo "$tmp_dir/reference.fasta"
 }
 
-# Symlink a BAM and its .bai companion into a temp dir under matching
-# basenames, so GATK can find them
+# Build the GATK flags for one or more read files (BAM or CRAM) and their
+# indexes. The indexes are passed with --read-index, so they can have any name
+# and do not need to be staged next to the read files. GATK matches them to the
+# read files by order, and a wrong order gives an unclear error, so this stops
+# with an error if the number of read files and indexes is different.
 #
-# Usage: staged=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
-stage_bam_bai() {
-  local tmp_dir="$1"
-  local input_bam="$2"
-  local input_bai="$3"
+# Usage: gatk_read_args "$par_input" "$par_read_index" result_array_name
+gatk_read_args() {
+  local input_files="$1"
+  local index_files="$2"
+  local -n result_ref="$3"
 
-  # Create links, explicitly exit on failure
-  ln -s "$(readlink -f "$input_bam")" "$tmp_dir/sample.bam" || exit 1
-  ln -s "$(readlink -f "$input_bai")" "$tmp_dir/sample.bai" || exit 1
+  local inputs=()
+  local indexes=()
+  IFS=';' read -ra inputs <<< "$input_files"
+  IFS=';' read -ra indexes <<< "$index_files"
 
-  echo "$tmp_dir/sample.bam"
-}
-
-# Symlink one or more BAMs and their .bai companions into a temp dir under
-# matching basenames, so GATK can find them. The BAMs and BAIs are given as
-# semicolon-separated `multiple: true` argument values and are matched by
-# order. Stops with an error if the number of BAMs and BAIs is different.
-#
-# Usage: stage_bams_bais "$tmp_dir" "$par_input" "$par_bai" result_array_name
-stage_bams_bais() {
-  local tmp_dir="$1"
-  local input_bams="$2"
-  local input_bais="$3"
-  local -n result_ref="$4"
-
-  local bams=()
-  local bais=()
-  IFS=';' read -ra bams <<< "$input_bams"
-  IFS=';' read -ra bais <<< "$input_bais"
-
-  if [[ ${#bams[@]} -ne ${#bais[@]} ]]; then
-    echo "Error: --input and --bai must be given the same number of times (got ${#bams[@]} BAM file(s) and ${#bais[@]} BAI file(s))." >&2
+  if [[ ${#inputs[@]} -ne ${#indexes[@]} ]]; then
+    echo "Error: --read_index must be given once for each file in --input (got ${#inputs[@]} read file(s) and ${#indexes[@]} index file(s))." >&2
     exit 1
   fi
 
-  # Stage to the original basename with a prefix to avoid collisions
   result_ref=()
-  local i
-  for i in "${!bams[@]}"; do
-    local staged_bam
-    staged_bam="$tmp_dir/input_$((i + 1))_$(basename "${bams[$i]}")"
-    ln -s "$(readlink -f "${bams[$i]}")" "$staged_bam"
-    ln -s "$(readlink -f "${bais[$i]}")" "${staged_bam%.bam}.bai"
-    result_ref+=("$staged_bam")
+  local file
+  for file in "${inputs[@]}"; do
+    result_ref+=(--input "$file")
   done
+  for file in "${indexes[@]}"; do
+    result_ref+=(--read-index "$file")
+  done
+}
+
+# Symlink a reference FASTA and its .fai into a temp dir under matching
+# basenames. For tools that do not need the .dict (for example Picard tools,
+# which use the reference only for CRAM files).
+#
+# Usage: staged=$(stage_reference_fai "$tmp_dir" "$par_reference" "$par_reference_fai" arg_name)
+stage_reference_fai() {
+  local tmp_dir="$1"
+  local reference="$2"
+  local reference_fai="$3"
+  local arg_name="$4"
+
+  if [[ -z "$reference_fai" ]]; then
+    echo "Error: ${arg_name}_fai must be provided when $arg_name is set." >&2
+    exit 1
+  fi
+
+  # Create links, explicitly exit on failure
+  ln -s "$(readlink -f "$reference")" "$tmp_dir/reference.fasta" || exit 1
+  ln -s "$(readlink -f "$reference_fai")" "$tmp_dir/reference.fasta.fai" || exit 1
+
+  echo "$tmp_dir/reference.fasta"
 }
 
 # Stage a VCF (or other feature file) into a temp dir so that GATK can find
@@ -296,11 +301,15 @@ gatk_output_vcf_index_path() {
   esac
 }
 
-# Print the path of the index that GATK writes next to a BAM output
-# (`<output without .bam>.bai`).
+# Print the path of the index that GATK writes next to a BAM or CRAM output:
+# `<output without .bam>.bai` for a BAM file and `<output>.bai` for a CRAM
+# file (a BAI format index, not a .crai).
 #
 # Usage: gatk_index=$(gatk_output_bam_index_path "$par_bam_output")
 gatk_output_bam_index_path() {
   local output="$1"
-  echo "${output%.bam}.bai"
+  case "$output" in
+    *.cram) echo "${output}.bai" ;;
+    *) echo "${output%.bam}.bai" ;;
+  esac
 }
