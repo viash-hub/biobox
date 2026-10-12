@@ -137,13 +137,6 @@ argument_groups:
         type: integer
         description: |
           Default quality for the base insertions covariate. Default: 45.
-      - name: "--intervals"
-        alternatives: [-L]
-        type: file
-        description: |
-          One or more genomic intervals over which to operate, provided as
-          a file (e.g. BED, interval_list).
-        example: intervals.bed
       - name: "--low_quality_tail"
         type: integer
         description: |
@@ -179,6 +172,8 @@ argument_groups:
         alternatives: [-OQ]
         type: boolean_true
         description: Use the base quality scores from the `OQ` tag instead of the current ones.
+
+  - __merge__: /src/gatk4/utils/interval_argument_group.yaml
 
 __merge__: /src/gatk4/utils/common_argument_groups.yaml
 
