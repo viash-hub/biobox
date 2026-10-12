@@ -27,8 +27,8 @@ if [[ "$par_create_output_variant_index" != "false" ]]; then
   gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
 fi
 
-# Stage the reference trio, BAM/BAI and VCF inputs into a temp dir using
-# matching basenames so GATK can find them
+# Stage the reference trio, BAM/BAI, VCF inputs and interval files into a temp
+# dir using matching basenames so GATK can find them
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_haplotypecaller.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
@@ -41,6 +41,7 @@ fi
 if [[ -n "$par_dbsnp" ]]; then
   staged_dbsnp=$(stage_vcf_with_index "$tmp_dir" "$par_dbsnp" "$par_dbsnp_index" dbsnp) || exit 1
 fi
+stage_interval_arguments "$tmp_dir" interval_args
 
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
@@ -97,7 +98,7 @@ cmd_args=(
   ${par_heterozygosity:+--heterozygosity "$par_heterozygosity"}
   ${par_heterozygosity_stdev:+--heterozygosity-stdev "$par_heterozygosity_stdev"}
   ${par_indel_heterozygosity:+--indel-heterozygosity "$par_indel_heterozygosity"}
-  ${par_intervals:+--intervals "$par_intervals"}
+  "${interval_args[@]}"
   "${kmer_size_args[@]}"
   ${par_max_alternate_alleles:+--max-alternate-alleles "$par_max_alternate_alleles"}
   ${par_max_assembly_region_size:+--max-assembly-region-size "$par_max_assembly_region_size"}
@@ -114,7 +115,6 @@ cmd_args=(
   ${par_sample_ploidy:+--sample-ploidy "$par_sample_ploidy"}
   ${par_stand_call_conf:+--standard-min-confidence-threshold-for-calling "$par_stand_call_conf"}
   --tmp-dir "$tmp_dir"
-  ${par_interval_padding:+--interval-padding "$par_interval_padding"}
   ${par_sites_only_vcf_output:+--sites-only-vcf-output}
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
