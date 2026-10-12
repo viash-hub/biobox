@@ -19,7 +19,13 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
-# Stage the interval files, the BAM/BAI, the --variant VCF with its index and
+# A CRAM file can only be decoded with the reference
+if [[ "$par_input" == *.cram && -z "$par_reference" ]]; then
+  echo "Error: --reference is required for CRAM input." >&2
+  exit 1
+fi
+
+# Stage the interval files, the --variant VCF with its index and
 # (if provided) the reference trio into a temp dir so GATK can find the
 # companion files
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_getpileupsummaries.XXXXXX")
@@ -35,7 +41,7 @@ fi
 # (possibly slow) indexing of --variant
 stage_interval_arguments "$tmp_dir" interval_args
 
-staged_bam=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
+gatk_read_args "$par_input" "$par_read_index" read_args
 staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant)
 
 reference_args=()
@@ -53,7 +59,7 @@ split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disab
 
 # Build command arguments array
 cmd_args=(
-  --input "$staged_bam"
+  "${read_args[@]}"
   --variant "$staged_variant"
   "${interval_args[@]}"
   --output "$par_output"

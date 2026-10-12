@@ -39,14 +39,16 @@ argument_groups:
         alternatives: [-I]
         type: file
         description: |
-          Input BAM file containing the reads to summarize.
+          Input BAM or CRAM file containing the reads to summarize.
 
-          The file must be coordinate-sorted and indexed (see `--bai`).
+          The file must be coordinate-sorted and indexed (see `--read_index`).
+          A CRAM file requires `--reference`.
         required: true
         example: sample.bam
-      - name: "--bai"
+      - name: "--read_index"
         type: file
-        description: BAM index file (`.bai`) for the input BAM file.
+        description: |
+          Index file for `--input` (`.bai` for BAM, `.crai` or `.bai` for CRAM).
         required: true
         example: sample.bam.bai
       - name: "--variant"
@@ -71,8 +73,8 @@ argument_groups:
         description: |
           Reference sequence FASTA file.
 
-          Optional, but if provided, `--reference_fai` and `--reference_dict`
-          must be provided too.
+          Required if `--input` is a CRAM file. If provided,
+          `--reference_fai` and `--reference_dict` must be provided too.
         example: reference.fasta
       - name: "--reference_fai"
         type: file
