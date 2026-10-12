@@ -41,7 +41,7 @@ mkdir -p "$meta_temp_dir/indexes"
 log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -65,7 +65,7 @@ log "Starting TEST 2: Bgzipped GVCF output mode"
 log "Executing $meta_name with --emit_ref_confidence GVCF and a .g.vcf.gz output..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -94,7 +94,7 @@ log "Starting TEST 3: Assembly and genotyping tuning options"
 log "Executing $meta_name with sample-ploidy, output-mode, annotation and other tuning options..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -128,7 +128,7 @@ log "Starting TEST 4: Shared GATK engine options"
 log "Executing $meta_name with --interval_padding, --sites_only_vcf_output, --create_output_variant_index false..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -165,7 +165,7 @@ create_test_vcf_gz_with_separate_index "$test_data_dir/sites.vcf" \
 log "Executing $meta_name with --dbsnp_index and --alleles_index..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -192,7 +192,7 @@ log "Starting TEST 6: Bgzipped --alleles file without an index"
 log "Executing $meta_name with a .vcf.gz --alleles file and no --alleles_index..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -214,7 +214,7 @@ log "Starting TEST 7: --dbsnp_index without --dbsnp"
 log "Executing $meta_name with --dbsnp_index and no --dbsnp (should fail)..."
 if "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -232,7 +232,7 @@ log "Starting TEST 8: A missing --output_index fails"
 
 if "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -258,7 +258,7 @@ create_test_vcf_gz_with_separate_index "$test_data_dir/intervals_site.vcf" \
 log "Executing $meta_name with two --intervals files, --intervals_index and --exclude_intervals..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
-  --bai "$test_data_dir/reads.sorted.bai" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -294,5 +294,48 @@ else
 fi
 
 log "✅ TEST 9 completed successfully"
+
+# --- Test Case 10: CRAM input with its index in another directory ---
+log "Starting TEST 10: CRAM --input with a --read_index in another directory"
+
+# The somatic fixtures have a SNV (chr1:250 T>A) in half of the reads, so the
+# calls from the BAM and the CRAM input can be compared
+mkdir -p "$test_data_dir/snv"
+create_test_somatic_reference "$test_data_dir/snv/reference.fasta"
+create_test_somatic_bam "$test_data_dir/snv/sample.bam" snv_sample rg1 mixed
+create_test_cram "$test_data_dir/snv/sample.bam" "$test_data_dir/snv/reference.fasta" \
+  "$test_data_dir/cram/sample.cram" "$test_data_dir/cram_index/sample_index.crai"
+
+for format in bam cram; do
+  if [[ "$format" == "bam" ]]; then
+    reads="$test_data_dir/snv/sample.bam"
+    reads_index="$test_data_dir/snv/sample.bai"
+  else
+    reads="$test_data_dir/cram/sample.cram"
+    reads_index="$test_data_dir/cram_index/sample_index.crai"
+  fi
+  log "Executing $meta_name with the $format input..."
+  "$meta_executable" \
+    --input "$reads" \
+    --read_index "$reads_index" \
+    --reference "$test_data_dir/snv/reference.fasta" \
+    --reference_fai "$test_data_dir/snv/reference.fasta.fai" \
+    --reference_dict "$test_data_dir/snv/reference.dict" \
+    --output "$meta_temp_dir/snv_$format.vcf" \
+    --output_index "$meta_temp_dir/snv_$format.vcf.idx"
+done
+
+log "Validating TEST 10 outputs..."
+check_file_contains "$meta_temp_dir/snv_cram.vcf" $'^chr1\t250\t.\tT\tA\t' "SNV chr1:250 T>A called from the CRAM input"
+bam_records=$(grep -v '^#' "$meta_temp_dir/snv_bam.vcf")
+cram_records=$(grep -v '^#' "$meta_temp_dir/snv_cram.vcf")
+if [[ "$cram_records" == "$bam_records" ]]; then
+  log "✓ CRAM input gives the same calls as the BAM input"
+else
+  log_error "✗ CRAM input gives different calls from the BAM input"
+  exit 1
+fi
+
+log "✅ TEST 10 completed successfully"
 
 print_test_summary "All tests"
