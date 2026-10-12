@@ -25,10 +25,7 @@ stage_vcfs_with_indexes "$tmp_dir" "$par_known_sites" "$par_known_sites_index" \
   --known_sites --known-sites known_sites_args
 stage_interval_arguments "$tmp_dir" interval_args
 
-# Convert semicolon-separated arguments to repeated flags
-split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
-split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
-split_multiple_to_flags "$par_inverted_read_filter" "--inverted-read-filter" inverted_read_filter_args
+gatk_read_filter_args read_filter_args
 
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
@@ -50,12 +47,8 @@ cmd_args=(
   ${par_quantizing_levels:+--quantizing-levels "$par_quantizing_levels"}
   ${par_use_original_qualities:+--use-original-qualities}
   "${read_filter_args[@]}"
-  "${disable_read_filter_args[@]}"
-  ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}
   ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
   ${par_lenient:+--lenient}
-  ${par_read_validation_stringency:+--read-validation-stringency "$par_read_validation_stringency"}
-  "${inverted_read_filter_args[@]}"
 )
 
 # Run GATK BaseRecalibrator
