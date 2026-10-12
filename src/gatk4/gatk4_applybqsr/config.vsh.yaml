@@ -40,21 +40,28 @@ argument_groups:
       - name: "--input"
         alternatives: [-I]
         type: file
+        multiple: true
         description: |
-          Input BAM or CRAM file containing reads to be recalibrated.
+          One or more input BAM or CRAM files containing reads to be
+          recalibrated. The reads from all files are written to one
+          `--output` file.
 
-          The file must be coordinate-sorted and indexed (see `--read_index`).
-          A CRAM file needs `--reference` (with `--reference_fai` and
-          `--reference_dict`).
+          The files must be coordinate-sorted and indexed (see
+          `--read_index`). A CRAM file needs `--reference` (with
+          `--reference_fai` and `--reference_dict`).
         required: true
-        example: sample.bam
+        example: [sample.bam]
       - name: "--read_index"
         type: file
+        multiple: true
         description: |
-          Index file for `--input` (`.bai` for a BAM file, `.crai` or `.bai`
+          Index files for `--input` (`.bai` for a BAM file, `.crai` or `.bai`
           for a CRAM file).
+
+          The index files are matched to `--input` by order. One index file
+          must be given for each `--input` file.
         required: true
-        example: sample.bam.bai
+        example: [sample.bam.bai]
       - name: "--bqsr_recal_file"
         alternatives: [-bqsr]
         type: file
@@ -69,8 +76,9 @@ argument_groups:
         description: |
           Reference sequence FASTA file.
 
-          Required when `--input` or `--output` is a CRAM file. If provided,
-          `--reference_fai` and `--reference_dict` must be provided too.
+          Required when an `--input` file or `--output` is a CRAM file. If
+          provided, `--reference_fai` and `--reference_dict` must be provided
+          too.
         example: reference.fasta
       - name: "--reference_fai"
         type: file
@@ -133,12 +141,13 @@ argument_groups:
           Quantize quality scores to a given number of levels.
 
           Set to `0` to disable quantization. Default: 0. Mutually
-          exclusive with `--static_quantized_quals`.
+          exclusive with `--static_quantized_quals` and cannot be used with
+          `--round_down_quantized`.
       - name: "--round_down_quantized"
         type: boolean_true
         description: |
           Round quantized quality scores down to the nearest quantized value.
-          Cannot be used with `--quantization_levels`.
+          Cannot be used with `--quantize_quals`.
       - name: "--static_quantized_quals"
         type: integer
         multiple: true
