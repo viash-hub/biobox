@@ -64,10 +64,7 @@ tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_mutect2.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 stage_bams_bais "$tmp_dir" "$par_input" "$par_bai" staged_bams
-stage_interval_files "$tmp_dir" "$par_intervals" "$par_intervals_index" \
-  --intervals --intervals intervals_args
-stage_interval_files "$tmp_dir" "$par_exclude_intervals" "$par_exclude_intervals_index" \
-  --exclude_intervals --exclude-intervals exclude_intervals_args
+stage_interval_arguments "$tmp_dir" interval_args
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
 
@@ -110,8 +107,7 @@ cmd_args=(
   --native-pair-hmm-threads "${meta_cpus:-1}"
   "${normal_sample_args[@]}"
   "${resource_args[@]}"
-  "${intervals_args[@]}"
-  "${exclude_intervals_args[@]}"
+  "${interval_args[@]}"
   ${par_create_f1r2_tar_gz:+--f1r2-tar-gz "$par_f1r2_tar_gz"}
   ${par_create_bam_output:+--bam-output "$par_bam_output"}
   ${par_active_probability_threshold:+--active-probability-threshold "$par_active_probability_threshold"}
@@ -134,7 +130,6 @@ cmd_args=(
   ${par_genotype_pon_sites:+--genotype-pon-sites}
   ${par_ignore_itr_artifacts:+--ignore-itr-artifacts}
   ${par_initial_tumor_lod:+--initial-tumor-lod "$par_initial_tumor_lod"}
-  ${par_interval_set_rule:+--interval-set-rule "$par_interval_set_rule"}
   "${kmer_size_args[@]}"
   ${par_max_assembly_region_size:+--max-assembly-region-size "$par_max_assembly_region_size"}
   ${par_max_mnp_distance:+--max-mnp-distance "$par_max_mnp_distance"}
@@ -153,7 +148,6 @@ cmd_args=(
   ${par_pcr_snv_qual:+--pcr-snv-qual "$par_pcr_snv_qual"}
   ${par_tumor_lod_to_emit:+--tumor-lod-to-emit "$par_tumor_lod_to_emit"}
   --tmp-dir "$tmp_dir"
-  ${par_interval_padding:+--interval-padding "$par_interval_padding"}
   ${par_sites_only_vcf_output:+--sites-only-vcf-output}
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
