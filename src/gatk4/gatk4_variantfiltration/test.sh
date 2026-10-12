@@ -419,4 +419,76 @@ check_file_not_exists "$meta_temp_dir/no_output_index.vcf" "output VCF (GATK did
 
 log "✅ TEST 11 completed successfully"
 
+# --- Test Case 12: Multiple interval files with a plain unindexed --variant ---
+log "Starting TEST 12: Multiple --intervals files (BED and bgzipped VCF) with --exclude_intervals"
+
+intervals_input_vcf="$test_data_dir/intervals_input.vcf"
+{
+  printf '##fileformat=VCFv4.2\n'
+  printf '##contig=<ID=seq1,length=1000>\n'
+  printf '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n'
+  for pos in 100 200 300 400 500 600 700 800 900; do
+    printf 'seq1\t%d\t.\tG\tA\t100\t.\t.\n' "$pos"
+  done
+} > "$intervals_input_vcf"
+check_file_exists "$intervals_input_vcf" "input VCF (records at 100, 200, ..., 900)"
+
+# The territory is the union of seq1:1-450 (BED) and seq1:800 (VCF), minus
+# seq1:151-250 (BED)
+printf 'seq1\t0\t450\n' > "$test_data_dir/intervals_a.bed"
+printf 'seq1\t150\t250\n' > "$test_data_dir/exclude.bed"
+create_test_known_sites_vcf "$test_data_dir/intervals_site.vcf" seq1 1000 800
+create_test_vcf_gz_with_separate_index "$test_data_dir/intervals_site.vcf" \
+  "$test_data_dir/intervals_site.vcf.gz" "$test_data_dir/interval_indexes/intervals_site.vcf.gz.tbi"
+
+output_vcf12="$meta_temp_dir/output12/filtered.vcf"
+mkdir -p "$(dirname "$output_vcf12")"
+
+log "Executing $meta_name with a plain unindexed --variant, two --intervals files, --intervals_index and --exclude_intervals..."
+"$meta_executable" \
+  --variant "$intervals_input_vcf" \
+  --output "$output_vcf12" \
+  --output_index "$output_vcf12.idx" \
+  --intervals "$test_data_dir/intervals_a.bed" \
+  --intervals "$test_data_dir/intervals_site.vcf.gz" \
+  --intervals_index "$test_data_dir/interval_indexes/intervals_site.vcf.gz.tbi" \
+  --interval_set_rule UNION \
+  --exclude_intervals "$test_data_dir/exclude.bed" 2>&1 | tee "$meta_temp_dir/test12.log"
+
+log "Validating TEST 12 outputs..."
+check_file_exists "$output_vcf12" "filtered VCF (multiple intervals)"
+check_file_exists "$output_vcf12.idx" "output index (multiple intervals)"
+check_file_contains "$meta_temp_dir/test12.log" "Warning: no index was provided for '.*intervals_input.vcf'" "run log (copy of --variant indexed for traversal by intervals)"
+check_file_not_exists "$intervals_input_vcf.idx" "index next to the input VCF (a copy is indexed instead)"
+
+record_positions=$(grep -v '^#' "$output_vcf12" | cut -f2 | tr '\n' ' ')
+expected_positions="100 300 400 800 "
+if [[ "$record_positions" == "$expected_positions" ]]; then
+  log "✓ filtered VCF only has the records in the selected territory: $record_positions"
+else
+  log_error "✗ filtered VCF record positions are '$record_positions', expected '$expected_positions'"
+  exit 1
+fi
+
+output_vcf12b="$meta_temp_dir/output12b/filtered.vcf"
+mkdir -p "$(dirname "$output_vcf12b")"
+
+log "Executing $meta_name with a plain unindexed --variant and no intervals..."
+"$meta_executable" \
+  --variant "$intervals_input_vcf" \
+  --output "$output_vcf12b" \
+  --output_index "$output_vcf12b.idx" 2>&1 | tee "$meta_temp_dir/test12b.log"
+
+check_file_exists "$output_vcf12b" "filtered VCF (no intervals)"
+check_file_not_contains "$meta_temp_dir/test12b.log" "no index was provided" "run log (plain --variant used without an index)"
+record_count=$(grep -vc '^#' "$output_vcf12b")
+if [[ "$record_count" == "9" ]]; then
+  log "✓ filtered VCF (no intervals) has all 9 records"
+else
+  log_error "✗ filtered VCF (no intervals) has $record_count records, expected 9"
+  exit 1
+fi
+
+log "✅ TEST 12 completed successfully"
+
 print_test_summary "All tests"
