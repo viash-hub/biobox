@@ -376,9 +376,26 @@ if "$meta_executable" \
   log_error "✗ $meta_name did not fail without --intervals"
   exit 1
 fi
-check_file_contains "$meta_temp_dir/test10.log" "Error: --intervals is required." "error message"
+check_file_contains "$meta_temp_dir/test10.log" "Error: --intervals or --interval_strings is required." "error message"
 check_file_not_contains "$meta_temp_dir/test10.log" "GetPileupSummaries done" "run log (GATK did not run)"
 
 log "✅ TEST 10 completed successfully"
+
+# --- Test Case 11: Only --interval_strings ---
+log "Starting TEST 11: --interval_strings without an --intervals file"
+
+log "Executing $meta_name with only --interval_strings..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.bam" \
+  --bai "$test_data_dir/reads.bai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --interval_strings "chr1:140-160" \
+  --maximum_population_allele_frequency 0.5 \
+  --output "$meta_temp_dir/pileups_strings.table"
+
+check_file_contains "$meta_temp_dir/pileups_strings.table" $'chr1\t150\t' "position 150 (in the interval string)"
+check_file_not_contains "$meta_temp_dir/pileups_strings.table" $'chr1\t50\t' "position 50 (outside the interval string)"
+
+log "✅ TEST 11 completed successfully"
 
 print_test_summary "All tests"

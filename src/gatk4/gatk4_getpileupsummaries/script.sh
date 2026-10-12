@@ -25,9 +25,9 @@ done
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_getpileupsummaries.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
-# GetPileupSummaries needs at least one interval file
-if [[ -z "$par_intervals" ]]; then
-  echo "Error: --intervals is required." >&2
+# GetPileupSummaries needs at least one interval
+if [[ -z "$par_intervals" && -z "$par_interval_strings" ]]; then
+  echo "Error: --intervals or --interval_strings is required." >&2
   exit 1
 fi
 
