@@ -248,14 +248,21 @@ stage_interval_arguments() {
 
   local intervals_args=()
   local exclude_intervals_args=()
+  local interval_strings_args=()
+  local exclude_interval_strings_args=()
   stage_interval_files "$tmp_dir" "$par_intervals" "$par_intervals_index" \
     --intervals --intervals intervals_args
   stage_interval_files "$tmp_dir" "$par_exclude_intervals" "$par_exclude_intervals_index" \
     --exclude_intervals --exclude-intervals exclude_intervals_args
+  split_multiple_to_flags "$par_interval_strings" "--intervals" interval_strings_args
+  split_multiple_to_flags "$par_exclude_interval_strings" "--exclude-intervals" exclude_interval_strings_args
 
+  # GATK accepts a mixture of interval files and strings, files are given first
   interval_args_ref=(
     "${intervals_args[@]}"
+    "${interval_strings_args[@]}"
     "${exclude_intervals_args[@]}"
+    "${exclude_interval_strings_args[@]}"
     ${par_interval_set_rule:+--interval-set-rule "$par_interval_set_rule"}
     ${par_interval_merging_rule:+--interval-merging-rule "$par_interval_merging_rule"}
     ${par_interval_padding:+--interval-padding "$par_interval_padding"}
@@ -269,7 +276,7 @@ stage_interval_arguments() {
 #
 # Usage: uses_intervals=$(gatk_uses_intervals)
 gatk_uses_intervals() {
-  if [[ -n "$par_intervals" || -n "$par_exclude_intervals" ]]; then
+  if [[ -n "$par_intervals" || -n "$par_interval_strings" || -n "$par_exclude_intervals" || -n "$par_exclude_interval_strings" ]]; then
     echo "true"
   else
     echo "false"
