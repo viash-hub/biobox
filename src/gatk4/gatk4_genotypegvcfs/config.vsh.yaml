@@ -65,7 +65,7 @@ argument_groups:
 
           If not provided, a copy of a bgzipped `--variant` file is indexed before
           the run. A plain `.vcf` file does not need an index, unless
-          `--intervals` is given.
+          `--intervals` or `--exclude_intervals` is given.
         example: sample.g.vcf.gz.tbi
       - name: "--reference"
         alternatives: [-R]
@@ -335,13 +335,6 @@ argument_groups:
         description: |
           Finalize the input GVCF according to somatic (i.e. Mutect2)
           TLODs (BETA feature).
-      - name: "--intervals"
-        alternatives: [-L]
-        type: file
-        description: |
-          One or more genomic intervals over which to operate, provided as
-          a file (e.g. BED, interval_list).
-        example: intervals.bed
       - name: "--keep_combined_raw_annotations"
         alternatives: [-keep-combined]
         type: boolean_true
@@ -452,6 +445,7 @@ argument_groups:
           - OVERLAPS
           - CONTAINED
           - ANYWHERE
+  - __merge__: /src/gatk4/utils/interval_argument_group.yaml
 
 __merge__: /src/gatk4/utils/common_argument_groups.yaml
 
