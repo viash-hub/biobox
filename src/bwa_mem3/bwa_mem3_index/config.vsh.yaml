@@ -1,0 +1,95 @@
+name: bwa_mem3_index
+namespace: bwa_mem3
+description: |
+  Index sequences in the FASTA format for alignment with BWA-MEM3.
+
+  Produces the `.amb`, `.ann`, `.bwt.2bit.64` and `.pac` index files. Indexes built with
+  bwa-mem2 can be reused as-is; indexes built with bwa (v1) must be rebuilt.
+  Peak memory is roughly 12 bytes per base of doubled text (~72 GB for hg38), or roughly
+  twice that when `--meth` is used.
+keywords: [alignment, BWA, BWA-MEM, BWA-MEM3, reference, index, methylation]
+links:
+  homepage: https://github.com/fg-labs/bwa-mem3
+  documentation: https://bwa-mem3.readthedocs.io/en/latest/user-guide/indexing.html
+  repository: https://github.com/fg-labs/bwa-mem3
+license: MIT
+requirements:
+  commands: [bwa-mem3]
+authors:
+  - __merge__: /src/_authors/hannes_de_meyer.yaml
+    roles: [ author, maintainer ]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--input"
+        type: file
+        description: Input FASTA file to be indexed.
+        required: true
+        example: "path/to/reference.fasta"
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        type: file
+        direction: output
+        required: true
+        description: |
+          Output directory containing the BWA-MEM3 index files (`.amb`, `.ann`, `.bwt.2bit.64`, `.pac`).
+          With `--meth`, the converted seed index (`.meth.amb`, `.meth.ann`, `.meth.bwt.2bit.64`,
+          `.meth.pac`) and the intermediate `.meth.fa` are written here as well. With
+          `--emit_unpacked_ref`, the `.0123` file is also written.
+        example: 'path/to/bwa_index/'
+
+  - name: "Options"
+    arguments:
+      - name: "--prefix"
+        alternatives: [-p]
+        type: string
+        description: |
+          Prefix of the index files inside the output directory, e.g. `hg38` produces `hg38.pac`.
+          Defaults to the input FASTA file name without its extension (`.fasta`, `.fa` or `.fna`,
+          optionally followed by `.gz`), e.g. `hg38.fa.gz` produces `hg38.pac`.
+        example: hg38
+      - name: "--emit_unpacked_ref"
+        type: boolean_true
+        description: |
+          Also write the unpacked `<prefix>.0123` reference (about 8x the size of `.pac`). It is no
+          longer written by default, but external tools such as bwa-mem2 may still need it.
+      - name: "--meth"
+        type: boolean_true
+        description: |
+          Build a bisulfite-aware dual index: a normal FM-index over the original reference (at the bare
+          prefix), plus a converted seed index under the `.meth` prefix. The seed index is built over a
+          per-strand-converted FASTA (`<prefix>.meth.fa`) whose contigs are doubled (f-prefixed C->T,
+          r-prefixed G->A).
+      - name: "--sa_sample_rate"
+        alternatives: [-u]
+        type: integer
+        description: |
+          Suffix-array sample rate: one row in `1 << INT` is stored. Smaller values give faster lookups
+          but use more disk and memory. Valid range is 0 to 6.
+        min: 0
+        max: 6
+        example: 3
+
+resources:
+  - type: bash_script
+    path: script.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+
+engines:
+  - type: docker
+    image: quay.io/biocontainers/bwa-mem3:0.14.1--h8d53bd0_0
+    setup:
+      - type: docker
+        run: |
+          bwa-mem3 version 2>&1 | head -1 | sed 's/^/bwa-mem3: /' > /var/software_versions.txt
+
+runners:
+  - type: executable
+  - type: nextflow
