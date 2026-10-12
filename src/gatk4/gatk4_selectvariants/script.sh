@@ -9,6 +9,7 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 # unset flags
 unset_if_false=(
+  par_lenient
   par_apply_jexl_filters_first
   par_call_genotypes
   par_exclude_filtered
@@ -23,7 +24,6 @@ unset_if_false=(
   par_remove_unused_alternates
   par_set_filtered_gt_to_nocall
   par_sites_only_vcf_output
-  par_disable_tool_default_read_filters
   par_disable_sequence_dictionary_validation
 )
 
@@ -83,8 +83,6 @@ stage_interval_arguments "$tmp_dir" interval_args
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
 # Convert semicolon-separated arguments into repeated flags
-split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
-split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
 split_multiple_to_flags "$par_drop_genotype_annotation" "--drop-genotype-annotation" drop_genotype_annotation_args
 split_multiple_to_flags "$par_drop_info_annotation" "--drop-info-annotation" drop_info_annotation_args
 split_multiple_to_flags "$par_exclude_ids" "--exclude-ids" exclude_ids_args
@@ -146,16 +144,12 @@ cmd_args=(
   ${par_set_filtered_gt_to_nocall:+--set-filtered-gt-to-nocall}
 )
 
-# Shared "GATK Engine Options" arguments (see common_argument_groups.yaml)
+# Shared GATK engine and VCF output arguments (see utils/*_argument_group.yaml)
 cmd_args+=(
   ${par_sites_only_vcf_output:+--sites-only-vcf-output}
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
-  ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
-  ${par_output_cram_version:+--output-cram-version "$par_output_cram_version"}
-  "${read_filter_args[@]}"
-  "${disable_read_filter_args[@]}"
-  ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}
   ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
+  ${par_lenient:+--lenient}
 )
 
 # Run gatk SelectVariants

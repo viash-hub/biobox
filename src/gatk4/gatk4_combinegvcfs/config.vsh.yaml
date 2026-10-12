@@ -293,6 +293,8 @@ argument_groups:
           Restrict the output variants to ones that match the
           `--intervals` according to the specified matching mode.
         example: STARTS_IN
+  - __merge__: /src/gatk4/utils/engine_argument_group.yaml
+  - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
     description: |
       CombineGVCFs only writes a GVCF block that ends inside an interval. A
@@ -304,8 +306,6 @@ argument_groups:
 
       To limit the records of a GVCF to a region, use SelectVariants. To
       genotype a region, give the intervals to GenotypeGVCFs.
-
-__merge__: /src/gatk4/utils/common_argument_groups.yaml
 
 resources:
   - type: bash_script

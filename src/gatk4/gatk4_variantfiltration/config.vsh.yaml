@@ -209,9 +209,9 @@ argument_groups:
           no-call (`./.`) instead of leaving the original genotype call
           annotated with a FORMAT `FT` filter name.
 
+  - __merge__: /src/gatk4/utils/engine_argument_group.yaml
+  - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
-
-__merge__: /src/gatk4/utils/common_argument_groups.yaml
 
 resources:
   - type: bash_script

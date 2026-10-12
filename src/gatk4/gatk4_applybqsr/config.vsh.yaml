@@ -156,9 +156,10 @@ argument_groups:
           Use the original base quality scores (`OQ` tag) from the input file
           instead of the current ones.
 
+  - __merge__: /src/gatk4/utils/engine_argument_group.yaml
+  - __merge__: /src/gatk4/utils/read_argument_group.yaml
+  - __merge__: /src/gatk4/utils/bam_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
-
-__merge__: /src/gatk4/utils/common_argument_groups.yaml
 
 resources:
   - type: bash_script
