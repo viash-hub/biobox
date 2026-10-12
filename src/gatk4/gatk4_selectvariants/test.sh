@@ -464,4 +464,65 @@ check_file_not_exists "$test_data_dir/strings/variants.vcf.idx" "index next to t
 
 log "✅ TEST 15 completed successfully"
 
+# --- Test Case 16: --variant_output_filtering ---
+log "Starting TEST 16: --variant_output_filtering STARTS_IN"
+
+# indel2 (seq1:400-403) overlaps seq1:402-410 but does not start in it
+log "Executing $meta_name with --interval_strings and no --variant_output_filtering..."
+"$meta_executable" \
+  --variant "$test_data_dir/strings/variants.vcf" \
+  --output "$meta_temp_dir/filtering_default.vcf" \
+  --create_output_variant_index false \
+  --interval_strings "seq1:190-210" \
+  --interval_strings "seq1:402-410"
+
+log "Executing $meta_name with --interval_strings and --variant_output_filtering STARTS_IN..."
+"$meta_executable" \
+  --variant "$test_data_dir/strings/variants.vcf" \
+  --output "$meta_temp_dir/filtering_starts_in.vcf" \
+  --create_output_variant_index false \
+  --interval_strings "seq1:190-210" \
+  --interval_strings "seq1:402-410" \
+  --variant_output_filtering STARTS_IN
+
+log "Validating TEST 16 outputs..."
+selected_ids=$(grep -v '^#' "$meta_temp_dir/filtering_default.vcf" | cut -f3 | tr '\n' ' ')
+if [[ "$selected_ids" == "snp2 indel2 " ]]; then
+  log "✓ Without a filtering mode, the output has the records that overlap the intervals: $selected_ids"
+else
+  log_error "✗ Output has records '$selected_ids', expected 'snp2 indel2 '"
+  exit 1
+fi
+selected_ids=$(grep -v '^#' "$meta_temp_dir/filtering_starts_in.vcf" | cut -f3 | tr '\n' ' ')
+if [[ "$selected_ids" == "snp2 " ]]; then
+  log "✓ With STARTS_IN, the output has only the records that start in the intervals: $selected_ids"
+else
+  log_error "✗ Output has records '$selected_ids', expected 'snp2 '"
+  exit 1
+fi
+
+log "✅ TEST 16 completed successfully"
+
+# --- Test Case 17: --select and its alternative name ---
+log "Starting TEST 17: --select and --select_expressions"
+
+for select_arg in --select --select_expressions; do
+  log "Executing $meta_name with $select_arg 'DP > 24'..."
+  "$meta_executable" \
+    --variant "$test_data_dir/strings/variants.vcf" \
+    --output "$meta_temp_dir/select${select_arg}.vcf" \
+    --create_output_variant_index false \
+    "$select_arg" "DP > 24"
+
+  selected_ids=$(grep -v '^#' "$meta_temp_dir/select${select_arg}.vcf" | cut -f3 | tr '\n' ' ')
+  if [[ "$selected_ids" == "snp2 indel2 " ]]; then
+    log "✓ $select_arg kept the records with DP > 24: $selected_ids"
+  else
+    log_error "✗ Output has records '$selected_ids', expected 'snp2 indel2 '"
+    exit 1
+  fi
+done
+
+log "✅ TEST 17 completed successfully"
+
 print_test_summary "All tests completed successfully"
