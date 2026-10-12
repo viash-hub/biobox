@@ -322,4 +322,62 @@ check_file_not_exists "$meta_temp_dir/no_output_index.g.vcf" "output GVCF (no ru
 
 log "✅ TEST 9 completed successfully"
 
+# --- Test Case 10: Multiple intervals, exclusion and interval VCF index ---
+log "Starting TEST 10: Two --intervals files (BED and VCF), --exclude_intervals and --intervals_index"
+
+mkdir -p "$test_data_dir/intervals"
+# Include seq1:100-200 (BED is 0-based) and seq1:1001-1020 (the 20bp REF
+# allele of the VCF record), exclude seq1:150-160
+printf 'seq1\t99\t200\n' > "$test_data_dir/intervals/include.bed"
+printf 'seq1\t149\t160\n' > "$test_data_dir/intervals/exclude.bed"
+{
+  echo "##fileformat=VCFv4.2"
+  echo "##contig=<ID=seq1,length=2000>"
+  printf '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n'
+  printf 'seq1\t1001\t.\tATCGATCGATCGATCGATCG\tA\t50\tPASS\t.\n'
+} > "$test_data_dir/intervals/include.vcf"
+create_test_vcf_gz_with_separate_index "$test_data_dir/intervals/include.vcf" \
+  "$test_data_dir/intervals/include.vcf.gz" "$test_data_dir/intervals_index/include.vcf.gz.tbi"
+
+log "Executing $meta_name with two --intervals files and --exclude_intervals..."
+"$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/combined_intervals.g.vcf" \
+  --output_index "$meta_temp_dir/combined_intervals.g.vcf.idx" \
+  --intervals "$test_data_dir/intervals/include.bed" \
+  --intervals "$test_data_dir/intervals/include.vcf.gz" \
+  --intervals_index "$test_data_dir/intervals_index/include.vcf.gz.tbi" \
+  --exclude_intervals "$test_data_dir/intervals/exclude.bed" \
+  --interval_set_rule UNION \
+  --convert_to_base_pair_resolution 2> "$meta_temp_dir/test10.log"
+
+log "Validating TEST 10 outputs..."
+check_file_exists "$meta_temp_dir/combined_intervals.g.vcf" "combined GVCF file (intervals)"
+check_file_not_contains "$meta_temp_dir/test10.log" "no index was provided for '$test_data_dir/intervals/include.vcf.gz'" "run log (no indexing of the interval VCF when --intervals_index is given)"
+check_file_not_exists "$test_data_dir/intervals/include.vcf.gz.tbi" "index next to the interval VCF"
+
+# CombineGVCFs only writes a reference block where it ends inside an
+# interval, and warns when an interval cuts a block. Here each sample is one
+# block (seq1:1-2000), so the records come only from
+# --convert_to_base_pair_resolution. The first record of each interval has the
+# position of the part of the block before it, not the interval start: POS 1
+# (for 1-100), 150 (for 150-161) and 201 (for 201-1001).
+check_file_contains "$meta_temp_dir/test10.log" "cuts in the middle of one or more gVCF blocks" "run log (GATK warning about cut blocks)"
+expected_positions=$( { echo 1; seq 101 150; seq 162 201; seq 1002 1020; } | tr '\n' ' ')
+actual_positions=$(grep -v '^#' "$meta_temp_dir/combined_intervals.g.vcf" | cut -f2 | tr '\n' ' ')
+if [[ "$actual_positions" == "$expected_positions" ]]; then
+  log "✓ Output has the expected record positions for the selected intervals"
+else
+  log_error "✗ Output record positions differ from the expected positions"
+  log_error "  expected: $expected_positions"
+  log_error "  actual:   $actual_positions"
+  exit 1
+fi
+
+log "✅ TEST 10 completed successfully"
+
 print_test_summary "All tests"
