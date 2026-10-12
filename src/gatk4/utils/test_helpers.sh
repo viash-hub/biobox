@@ -197,6 +197,31 @@ create_test_vcf_gz_with_separate_index() {
   check_file_exists "$index_path" "separate index for $vcf_gz_path"
 }
 
+# Convert a BAM to CRAM with samtools and index it (`.crai`). If an index
+# path is given, the index is moved there.
+#
+# Usage: create_test_cram "/path/to/in.bam" "/path/to/reference.fasta" \
+#          "/path/to/out.cram" ["/path/to/index_dir/out.cram.crai"]
+create_test_cram() {
+  local bam_path="$1"
+  local reference_path="$2"
+  local cram_path="$3"
+  local index_path="${4:-}"
+
+  log "Writing CRAM: $cram_path"
+
+  mkdir -p "$(dirname "$cram_path")"
+  samtools view -C -T "$reference_path" -o "$cram_path" "$bam_path"
+  samtools index "$cram_path"
+  if [[ -n "$index_path" ]]; then
+    mkdir -p "$(dirname "$index_path")"
+    mv "${cram_path}.crai" "$index_path"
+  fi
+
+  check_file_exists "$cram_path" "CRAM file"
+  check_file_exists "${index_path:-${cram_path}.crai}" "CRAM index"
+}
+
 # Check the magic bytes of an index file: "TBI" for a tabix index (after
 # decompression), "TIDX" for a Tribble index
 #
