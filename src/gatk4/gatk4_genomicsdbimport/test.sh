@@ -511,4 +511,4 @@ fi
 
 log "✅ TEST 12 completed successfully"
 
-print_test_summary "All tests completed successfully"
+print_test_summary "All tests"

@@ -7,90 +7,44 @@ set -eo pipefail
 
 source "$meta_resources_dir/gatk4/script_helpers.sh"
 
-# unset "false" flags
-unset_if_false=(
-  par_lenient
-  par_create_bam_output
-  par_create_f1r2_tar_gz
-  par_disable_tool_default_annotations
-  par_dont_use_soft_clipped_bases
-  par_enable_dynamic_read_disqualification_for_genotyping
-  par_force_active
-  par_force_call_filtered_alleles
-  par_genotype_germline_sites
-  par_genotype_pon_sites
-  par_ignore_itr_artifacts
+# Unset "false" flags
+unset_if_false \
+  par_create_bam_output \
+  par_create_f1r2_tar_gz \
+  par_disable_tool_default_annotations \
+  par_dont_use_soft_clipped_bases \
+  par_enable_dynamic_read_disqualification_for_genotyping \
+  par_force_active \
+  par_force_call_filtered_alleles \
+  par_genotype_germline_sites \
+  par_genotype_pon_sites \
+  par_ignore_itr_artifacts \
   par_mitochondria_mode
-  par_sites_only_vcf_output
-  par_disable_tool_default_read_filters
-  par_disable_sequence_dictionary_validation
-)
 
-for par in "${unset_if_false[@]}"; do
-  test_val="${!par}"
-  [[ "$test_val" == "false" ]] && unset $par
-done
-
-move_output_index=""
-if [[ "$par_create_output_variant_index" != "false" ]]; then
-  if [[ -z "$par_output_index" ]]; then
-    echo "Error: --output_index is required unless --create_output_variant_index is false." >&2
-    exit 1
-  fi
-  move_output_index="true"
-  gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
-fi
-
-if [[ -n "$par_create_f1r2_tar_gz" && -z "$par_f1r2_tar_gz" ]]; then
-  echo "Error: --create_f1r2_tar_gz requires --f1r2_tar_gz." >&2
-  exit 1
-fi
-
-move_bam_output_index=""
-if [[ -n "$par_create_bam_output" ]]; then
-  if [[ -z "$par_bam_output" ]]; then
-    echo "Error: --create_bam_output requires --bam_output." >&2
-    exit 1
-  fi
+# Check the arguments
+require_output_index "$par_output_index" "$par_create_output_variant_index" \
+  --output_index --create_output_variant_index
+require_output_if_created "$par_create_f1r2_tar_gz" "$par_f1r2_tar_gz" --create_f1r2_tar_gz --f1r2_tar_gz
+require_output_if_created "$par_create_bam_output" "$par_bam_output" --create_bam_output --bam_output
+if is_true "$par_create_bam_output"; then
   if [[ "$par_bam_output" == *.cram ]]; then
     echo "Error: --bam_output must be a BAM file, GATK cannot write CRAM here." >&2
     exit 1
   fi
-  if [[ "$par_create_output_bam_index" != "false" ]]; then
-    if [[ -z "$par_bam_output_index" ]]; then
-      echo "Error: --create_bam_output requires --bam_output_index unless --create_output_bam_index is false." >&2
-      exit 1
-    fi
-    move_bam_output_index="true"
-    gatk_bam_output_index=$(gatk_output_bam_index_path "$par_bam_output")
-  fi
+  require_output_index "$par_bam_output_index" "$par_create_output_bam_index" \
+    --bam_output_index --create_output_bam_index
 fi
 
-# Stage the inputs into a temp dir so GATK can find the companion files
-tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_mutect2.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT
+setup_tmp_dir
 
+# Stage the inputs in a temp dir so that GATK can find the companion files
 gatk_read_args "$par_input" "$par_read_index" read_args
 stage_interval_arguments "$tmp_dir" interval_args
-
-staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
-
+staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict") || exit 1
 resource_args=()
-if [[ -n "$par_germline_resource" ]]; then
-  staged_germline_resource=$(stage_vcf_with_index "$tmp_dir" "$par_germline_resource" "$par_germline_resource_index" germline_resource)
-  resource_args+=(--germline-resource "$staged_germline_resource")
-fi
-if [[ -n "$par_panel_of_normals" ]]; then
-  staged_panel_of_normals=$(stage_vcf_with_index "$tmp_dir" "$par_panel_of_normals" "$par_panel_of_normals_index" panel_of_normals)
-  resource_args+=(--panel-of-normals "$staged_panel_of_normals")
-fi
-if [[ -n "$par_alleles" ]]; then
-  staged_alleles=$(stage_vcf_with_index "$tmp_dir" "$par_alleles" "$par_alleles_index" alleles)
-  resource_args+=(--alleles "$staged_alleles")
-fi
-
-# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
+stage_optional_vcf "$tmp_dir" "$par_germline_resource" "$par_germline_resource_index" --germline_resource resource_args
+stage_optional_vcf "$tmp_dir" "$par_panel_of_normals" "$par_panel_of_normals_index" --panel_of_normals resource_args
+stage_optional_vcf "$tmp_dir" "$par_alleles" "$par_alleles_index" --alleles resource_args
 
 # Convert semicolon-separated arguments to repeated flags
 split_multiple_to_flags "$par_normal_sample" "--normal-sample" normal_sample_args
@@ -99,6 +53,9 @@ split_multiple_to_flags "$par_annotation_group" "--annotation-group" annotation_
 split_multiple_to_flags "$par_annotations_to_exclude" "--annotations-to-exclude" annotations_to_exclude_args
 split_multiple_to_flags "$par_kmer_size" "--kmer-size" kmer_size_args
 gatk_read_filter_args read_filter_args
+gatk_vcf_output_args vcf_output_args
+gatk_bam_output_args bam_output_args
+gatk_engine_args "$tmp_dir" engine_args
 
 # Build command arguments array
 cmd_args=(
@@ -154,18 +111,14 @@ cmd_args=(
   ${par_pcr_indel_qual:+--pcr-indel-qual "$par_pcr_indel_qual"}
   ${par_pcr_snv_qual:+--pcr-snv-qual "$par_pcr_snv_qual"}
   ${par_tumor_lod_to_emit:+--tumor-lod-to-emit "$par_tumor_lod_to_emit"}
-  --tmp-dir "$tmp_dir"
-  ${par_sites_only_vcf_output:+--sites-only-vcf-output}
-  ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
-  ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
-  ${par_output_cram_version:+--output-cram-version "$par_output_cram_version"}
+  "${vcf_output_args[@]}"
+  "${bam_output_args[@]}"
   "${read_filter_args[@]}"
-  ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
-  ${par_lenient:+--lenient}
+  "${engine_args[@]}"
 )
 
 # Run GATK Mutect2
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" Mutect2 "${cmd_args[@]}"
+run_gatk Mutect2 "${cmd_args[@]}"
 
 # Mutect2 has no argument to set the path of its stats file. It always writes
 # it next to the output VCF, so move it to --output_stats.
@@ -173,10 +126,10 @@ if [[ ! "${par_output}.stats" -ef "$par_output_stats" ]]; then
   mv "${par_output}.stats" "$par_output_stats"
 fi
 
-# Move indexes if requested
-if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
-  mv "$gatk_output_index" "$par_output_index"
+# Move the output indexes to --output_index and --bam_output_index
+if [[ "$par_create_output_variant_index" != "false" ]]; then
+  move_output_index "$(gatk_output_vcf_index_path "$par_output")" "$par_output_index"
 fi
-if [[ -n "$move_bam_output_index" && ! "$gatk_bam_output_index" -ef "$par_bam_output_index" ]]; then
-  mv "$gatk_bam_output_index" "$par_bam_output_index"
+if is_true "$par_create_bam_output" && [[ "$par_create_output_bam_index" != "false" ]]; then
+  move_output_index "$(gatk_output_bam_index_path "$par_bam_output")" "$par_bam_output_index"
 fi

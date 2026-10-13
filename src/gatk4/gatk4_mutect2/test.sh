@@ -293,12 +293,14 @@ check_fails_with() {
 check_fails_with "Error: --output_index is required unless" "$meta_temp_dir/test6_output_index.log"
 check_fails_with "Error: --create_bam_output requires --bam_output\." "$meta_temp_dir/test6_bam_output.log" \
   --output_index "$meta_temp_dir/fail.idx" --create_bam_output
-check_fails_with "Error: --create_bam_output requires --bam_output_index" "$meta_temp_dir/test6_bam_output_index.log" \
+check_fails_with "Error: --bam_output_index is required unless --create_output_bam_index is false." "$meta_temp_dir/test6_bam_output_index.log" \
   --output_index "$meta_temp_dir/fail.idx" --create_bam_output --bam_output "$meta_temp_dir/fail.bam"
 check_fails_with "Error: --bam_output must be a BAM file, GATK cannot write CRAM here." "$meta_temp_dir/test6_bam_output_cram.log" \
   --output_index "$meta_temp_dir/fail.idx" --create_bam_output --bam_output "$meta_temp_dir/fail.cram" \
   --bam_output_index "$meta_temp_dir/fail.crai"
 check_file_not_contains "$meta_temp_dir/test6_bam_output_cram.log" "Mutect2 done" "run log (GATK did not run)"
+check_fails_with "Error: --alleles_index requires --alleles." "$meta_temp_dir/test6_alleles_index.log" \
+  --output_index "$meta_temp_dir/fail.idx" --alleles_index "$test_data_dir/indexed/pon.vcf.idx"
 
 log "✅ TEST 6 completed successfully"
 

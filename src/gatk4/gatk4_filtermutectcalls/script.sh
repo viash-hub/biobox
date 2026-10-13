@@ -7,49 +7,31 @@ set -eo pipefail
 
 source "$meta_resources_dir/gatk4/script_helpers.sh"
 
-# unset "false" flags
-unset_if_false=(
-  par_lenient
-  par_microbial_mode
+# Unset "false" flags
+unset_if_false \
+  par_microbial_mode \
   par_mitochondria_mode
-  par_sites_only_vcf_output
-  par_disable_sequence_dictionary_validation
-)
 
-for par in "${unset_if_false[@]}"; do
-  test_val="${!par}"
-  [[ "$test_val" == "false" ]] && unset $par
-done
+# Check the arguments
+require_output_index "$par_output_index" "$par_create_output_variant_index" \
+  --output_index --create_output_variant_index
 
-move_output_index=""
-if [[ "$par_create_output_variant_index" != "false" ]]; then
-  if [[ -z "$par_output_index" ]]; then
-    echo "Error: --output_index is required unless --create_output_variant_index is false." >&2
-    exit 1
-  fi
-  move_output_index="true"
-  gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
-fi
+setup_tmp_dir
 
-# Stage the inputs into a temp dir so GATK can find the companion files
-tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_filtermutectcalls.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT
-
+# Stage the inputs in a temp dir so that GATK can find the companion files
 stage_interval_arguments "$tmp_dir" interval_args
-
-staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
+staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict") || exit 1
 # GATK reads a plain --variant VCF without an index, unless it must traverse
 # by intervals (any interval argument)
 variant_index_optional=$([[ "$(gatk_uses_intervals)" == "true" ]] && echo false || echo true)
 staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
 
-# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
-
 # Convert semicolon-separated arguments to repeated flags
 split_multiple_to_flags "$par_contamination_table" "--contamination-table" contamination_table_args
 split_multiple_to_flags "$par_tumor_segmentation" "--tumor-segmentation" tumor_segmentation_args
 split_multiple_to_flags "$par_orientation_bias_artifact_priors" "--orientation-bias-artifact-priors" orientation_bias_artifact_priors_args
+gatk_vcf_output_args vcf_output_args
+gatk_engine_args "$tmp_dir" engine_args
 
 # Build command arguments array
 cmd_args=(
@@ -89,17 +71,14 @@ cmd_args=(
   ${par_threshold_strategy:+--threshold-strategy "$par_threshold_strategy"}
   ${par_unique_alt_read_count:+--unique-alt-read-count "$par_unique_alt_read_count"}
   ${par_variant_output_filtering:+--variant-output-filtering "$par_variant_output_filtering"}
-  --tmp-dir "$tmp_dir"
-  ${par_sites_only_vcf_output:+--sites-only-vcf-output}
-  ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
-  ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
-  ${par_lenient:+--lenient}
+  "${vcf_output_args[@]}"
+  "${engine_args[@]}"
 )
 
 # Run GATK FilterMutectCalls
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" FilterMutectCalls "${cmd_args[@]}"
+run_gatk FilterMutectCalls "${cmd_args[@]}"
 
-# Move the output index to --output_index, if requested
-if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
-  mv "$gatk_output_index" "$par_output_index"
+# Move the output index to --output_index
+if [[ "$par_create_output_variant_index" != "false" ]]; then
+  move_output_index "$(gatk_output_vcf_index_path "$par_output")" "$par_output_index"
 fi

@@ -7,82 +7,39 @@ set -eo pipefail
 
 source "$meta_resources_dir/gatk4/script_helpers.sh"
 
-# unset flags
-unset_if_false=(
-  par_lenient
-  par_apply_jexl_filters_first
-  par_call_genotypes
-  par_exclude_filtered
-  par_exclude_non_variants
-  par_ignore_non_ref_in_types
-  par_invert_mendelian_violation
-  par_invert_select
-  par_keep_original_ac
-  par_keep_original_dp
-  par_mendelian_violation
-  par_preserve_alleles
-  par_remove_unused_alternates
+unset_if_false \
+  par_apply_jexl_filters_first \
+  par_call_genotypes \
+  par_exclude_filtered \
+  par_exclude_non_variants \
+  par_ignore_non_ref_in_types \
+  par_invert_mendelian_violation \
+  par_invert_select \
+  par_keep_original_ac \
+  par_keep_original_dp \
+  par_mendelian_violation \
+  par_preserve_alleles \
+  par_remove_unused_alternates \
   par_set_filtered_gt_to_nocall
-  par_sites_only_vcf_output
-  par_disable_sequence_dictionary_validation
-)
 
-for par in "${unset_if_false[@]}"; do
-  test_val="${!par}"
-  [[ "$test_val" == "false" ]] && unset $par
-done
+# Check the arguments
+require_output_index "$par_output_index" "$par_create_output_variant_index" \
+  --output_index --create_output_variant_index
 
-# Check that each index is given together with its input
-if [[ -n "$par_concordance_index" && -z "$par_concordance" ]]; then
-  echo "Error: --concordance_index requires --concordance." >&2
-  exit 1
-fi
-if [[ -n "$par_discordance_index" && -z "$par_discordance" ]]; then
-  echo "Error: --discordance_index requires --discordance." >&2
-  exit 1
-fi
-
-move_output_index=""
-if [[ "$par_create_output_variant_index" != "false" ]]; then
-  if [[ -z "$par_output_index" ]]; then
-    echo "Error: --output_index is required unless --create_output_variant_index is false." >&2
-    exit 1
-  fi
-  move_output_index="true"
-  gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
-fi
-
-# Stage the --variant VCF and the comparison VCFs with their indexes and (if
-# provided) the reference trio into a temp dir so GATK can find the companion
-# files
-tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_selectvariants.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT
+# Stage the inputs in a temp dir so that GATK can find the companion files
+setup_tmp_dir
 
 # GATK reads a plain --variant VCF without an index, unless it must traverse
 # by intervals (any interval argument)
 variant_index_optional=$([[ "$(gatk_uses_intervals)" == "true" ]] && echo false || echo true)
 staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
-
-staged_concordance=""
-if [[ -n "$par_concordance" ]]; then
-  staged_concordance=$(stage_vcf_with_index "$tmp_dir" "$par_concordance" "$par_concordance_index" concordance) || exit 1
-fi
-staged_discordance=""
-if [[ -n "$par_discordance" ]]; then
-  staged_discordance=$(stage_vcf_with_index "$tmp_dir" "$par_discordance" "$par_discordance_index" discordance) || exit 1
-fi
-
-reference_args=()
-if [[ -n "$par_reference" ]]; then
-  staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict") || exit 1
-  reference_args=(--reference "$staged_reference")
-fi
+comparison_args=()
+stage_optional_vcf "$tmp_dir" "$par_concordance" "$par_concordance_index" --concordance comparison_args
+stage_optional_vcf "$tmp_dir" "$par_discordance" "$par_discordance_index" --discordance comparison_args
+stage_optional_reference "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict" reference_args
 stage_interval_arguments "$tmp_dir" interval_args
 
-# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
-
-# Convert semicolon-separated arguments into repeated flags
+# Convert semicolon-separated multi-value arguments into repeated flags
 split_multiple_to_flags "$par_drop_genotype_annotation" "--drop-genotype-annotation" drop_genotype_annotation_args
 split_multiple_to_flags "$par_drop_info_annotation" "--drop-info-annotation" drop_info_annotation_args
 split_multiple_to_flags "$par_exclude_ids" "--exclude-ids" exclude_ids_args
@@ -96,6 +53,9 @@ split_multiple_to_flags "$par_select_genotype_expressions" "--select-genotype-ex
 split_multiple_to_flags "$par_select_type_to_include" "--select-type-to-include" select_type_to_include_args
 split_multiple_to_flags "$par_select_type_to_exclude" "--select-type-to-exclude" select_type_to_exclude_args
 
+gatk_engine_args "$tmp_dir" engine_args
+gatk_vcf_output_args vcf_output_args
+
 # Build command arguments array
 cmd_args=(
   --variant "$staged_variant"
@@ -103,8 +63,7 @@ cmd_args=(
   "${reference_args[@]}"
   ${par_apply_jexl_filters_first:+--apply-jexl-filters-first}
   ${par_call_genotypes:+--call-genotypes}
-  ${staged_concordance:+--concordance "$staged_concordance"}
-  ${staged_discordance:+--discordance "$staged_discordance"}
+  "${comparison_args[@]}"
   "${drop_genotype_annotation_args[@]}"
   "${drop_info_annotation_args[@]}"
   ${par_exclude_filtered:+--exclude-filtered}
@@ -143,20 +102,14 @@ cmd_args=(
   "${select_type_to_include_args[@]}"
   ${par_set_filtered_gt_to_nocall:+--set-filtered-gt-to-nocall}
   ${par_variant_output_filtering:+--variant-output-filtering "$par_variant_output_filtering"}
+  "${vcf_output_args[@]}"
+  "${engine_args[@]}"
 )
 
-# Shared GATK engine and VCF output arguments (see utils/*_argument_group.yaml)
-cmd_args+=(
-  ${par_sites_only_vcf_output:+--sites-only-vcf-output}
-  ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
-  ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
-  ${par_lenient:+--lenient}
-)
+# Run GATK SelectVariants
+run_gatk SelectVariants "${cmd_args[@]}"
 
-# Run gatk SelectVariants
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" SelectVariants "${cmd_args[@]}"
-
-# Move the output index to --output_index, if requested
-if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
-  mv "$gatk_output_index" "$par_output_index"
+# Move the output index to --output_index
+if [[ "$par_create_output_variant_index" != "false" ]]; then
+  move_output_index "$(gatk_output_vcf_index_path "$par_output")" "$par_output_index"
 fi

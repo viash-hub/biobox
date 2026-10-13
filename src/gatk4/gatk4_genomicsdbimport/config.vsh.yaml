@@ -44,7 +44,7 @@ argument_groups:
 
           Each file must contain data for only a single sample. Either this
           or `--sample_name_map` must be specified.
-        example: sample1.g.vcf.gz
+        example: [sample1.g.vcf.gz, sample2.g.vcf.gz]
       - name: "--variant_index"
         type: file
         multiple: true
@@ -55,7 +55,7 @@ argument_groups:
           The index files are matched to `--variant` by order. If index files
           are provided, one must be given for each `--variant` file. If not
           provided, a copy of each `--variant` file is indexed before the run.
-        example: sample1.g.vcf.gz.tbi
+        example: [sample1.g.vcf.gz.tbi]
       - name: "--sample_name_map"
         type: file
         description: |
