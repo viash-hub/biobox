@@ -1,5 +1,4 @@
 name: gatk4_learnreadorientationmodel
-namespace: gatk4
 description: |
   Learns a read orientation bias model from the F1R2 counts collected by
   `gatk4 Mutect2`.
@@ -10,27 +9,6 @@ description: |
   used by `gatk4 FilterMutectCalls` (`--orientation_bias_artifact_priors`)
   to filter orientation bias artifacts from the somatic calls.
 keywords: [variant calling, somatic, GATK, GATK4, Mutect2, orientation bias]
-links:
-  homepage: https://gatk.broadinstitute.org
-  documentation: https://gatk.broadinstitute.org/hc/en-us
-  repository: https://github.com/broadinstitute/gatk
-references:
-  bibtex:
-    - |
-      @book{VanderAuwera2020,
-        author = {{Van der Auwera}, Geraldine A. and O'Connor, Brian D.},
-        title = {Genomics in the Cloud: Using Docker, GATK, and WDL in Terra},
-        edition = {1st},
-        publisher = {O'Reilly Media},
-        year = {2020},
-        isbn = {9781491975190}
-      }
-license: Apache-2.0
-requirements:
-  commands: [gatk]
-authors:
-  - __merge__: /src/_authors/luke_zappia.yaml
-    roles: [author, maintainer]
 
 argument_groups:
   - name: "Input"
@@ -79,22 +57,6 @@ argument_groups:
           Give up on the EM algorithm after this many iterations.
           Default: 20.
 
-resources:
-  - type: bash_script
-    path: script.sh
-  - path: /src/gatk4/utils/script_helpers.sh
-    dest: gatk4/script_helpers.sh
-
-test_resources:
-  - type: bash_script
-    path: test.sh
-  - path: /src/_utils/test_helpers.sh
-  - path: /src/gatk4/utils/test_helpers.sh
-    dest: gatk4/test_helpers.sh
-
-engines:
-  - __merge__: /src/gatk4/utils/common_engines.yaml
-
-runners:
-  - type: executable
-  - type: nextflow
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml

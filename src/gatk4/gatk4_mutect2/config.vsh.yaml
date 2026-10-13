@@ -1,5 +1,4 @@
 name: gatk4_mutect2
-namespace: gatk4
 description: |
   Calls somatic SNVs and indels via local assembly of haplotypes.
 
@@ -14,29 +13,9 @@ description: |
   counts and `gatk4 FilterMutectCalls` on the VCF and stats files to get
   the filtered somatic calls.
 keywords: [variant calling, somatic, GATK, GATK4, Mutect2, SNV, indel]
-links:
-  homepage: https://gatk.broadinstitute.org
-  documentation: https://gatk.broadinstitute.org/hc/en-us
-  repository: https://github.com/broadinstitute/gatk
 references:
   doi:
     - 10.1101/861054
-  bibtex:
-    - |
-      @book{VanderAuwera2020,
-        author = {{Van der Auwera}, Geraldine A. and O'Connor, Brian D.},
-        title = {Genomics in the Cloud: Using Docker, GATK, and WDL in Terra},
-        edition = {1st},
-        publisher = {O'Reilly Media},
-        year = {2020},
-        isbn = {9781491975190}
-      }
-license: Apache-2.0
-requirements:
-  commands: [gatk]
-authors:
-  - __merge__: /src/_authors/luke_zappia.yaml
-    roles: [author, maintainer]
 
 argument_groups:
   - name: "Input"
@@ -55,30 +34,14 @@ argument_groups:
           identified with `--normal_sample`.
         required: true
         example: [tumor.bam, normal.bam]
-      - name: "--read_index"
-        type: file
-        multiple: true
-        description: |
-          Index file(s) for `--input` (`.bai` for BAM, `.crai` or `.bai` for
-          CRAM), one for each input file. They are matched to `--input` by order.
-        required: true
+      - __merge__: /src/gatk4/utils/arguments/read_index.yaml
         example: [tumor.bam.bai, normal.bam.bai]
-      - name: "--reference"
-        alternatives: [-R]
-        type: file
-        description: Reference sequence FASTA file.
+      - __merge__: /src/gatk4/utils/arguments/reference.yaml
         required: true
-        example: reference.fasta
-      - name: "--reference_fai"
-        type: file
-        description: FASTA index file (`.fai`) for the reference sequence.
+      - __merge__: /src/gatk4/utils/arguments/reference_fai.yaml
         required: true
-        example: reference.fasta.fai
-      - name: "--reference_dict"
-        type: file
-        description: Sequence dictionary (`.dict`) file for the reference sequence.
+      - __merge__: /src/gatk4/utils/arguments/reference_dict.yaml
         required: true
-        example: reference.dict
       - name: "--normal_sample"
         alternatives: [-normal]
         type: string
@@ -148,6 +111,8 @@ argument_groups:
           input to `gatk4 FilterMutectCalls`.
         required: true
         example: unfiltered.vcf.gz
+      - __merge__: /src/gatk4/utils/arguments/vcf_output_index.yaml
+        example: unfiltered.vcf.gz.tbi
       - name: "--output_stats"
         type: file
         direction: output
@@ -156,15 +121,6 @@ argument_groups:
           `gatk4 FilterMutectCalls` (`--stats`).
         required: true
         example: unfiltered.vcf.gz.stats
-      - name: "--output_index"
-        type: file
-        direction: output
-        description: |
-          Output index file for `--output` (`.tbi` for a bgzipped
-          `.vcf.gz` or `.vcf.bgz` file, `.idx` otherwise). Required when
-          `--create_output_variant_index` is `true`, ignored when it is `false`.
-        must_exist: false
-        example: unfiltered.vcf.gz.tbi
       - name: "--create_f1r2_tar_gz"
         type: boolean_true
         description: |
@@ -177,37 +133,9 @@ argument_groups:
           `--create_f1r2_tar_gz` is `true`, ignored when it is `false`.
         must_exist: false
         example: f1r2.tar.gz
-      - name: "--create_bam_output"
-        type: boolean_true
-        description: |
-          Write the assembled haplotypes to `--bam_output`.
-      - name: "--bam_output"
-        alternatives: [-bamout]
-        type: file
-        direction: output
-        description: |
-          Output BAM file with the assembled haplotypes (see
-          `--bam_writer_type`). Required when `--create_bam_output` is
-          `true`, ignored when it is `false`.
-        must_exist: false
-        example: bamout.bam
-      - name: "--bam_output_index"
-        type: file
-        direction: output
-        description: |
-          Output index file (`.bai`) for `--bam_output`. Required when
-          `--create_bam_output` is `true` and `--create_output_bam_index`
-          is `true`, ignored otherwise.
-        must_exist: false
-        example: bamout.bai
 
   - name: "Options"
     arguments:
-      - name: "--active_probability_threshold"
-        type: double
-        description: |
-          Minimum probability for a locus to be considered active.
-          Default: 0.002.
       - name: "--af_of_alleles_not_in_resource"
         alternatives: [-default-af]
         type: double
@@ -216,144 +144,11 @@ argument_groups:
           in `--germline_resource`. A negative value makes Mutect2 use a
           fixed value: 5e-8 in tumor-only mode and 1e-6 when a normal sample
           is given. Default: -1.0.
-      - name: "--annotation"
-        alternatives: [-A]
-        type: string
-        multiple: true
-        description: |
-          One or more specific annotations to add to variant calls, e.g.
-          `OrientationBiasReadCounts`.
-        example: [OrientationBiasReadCounts]
-        choices:
-          - AlleleFraction
-          - AllelePseudoDepth
-          - AS_BaseQualityRankSumTest
-          - AS_FisherStrand
-          - AS_InbreedingCoeff
-          - AS_MappingQualityRankSumTest
-          - AS_QualByDepth
-          - AS_ReadPosRankSumTest
-          - AS_RMSMappingQuality
-          - AS_StrandBiasMutectAnnotation
-          - AS_StrandOddsRatio
-          - AssemblyComplexity
-          - BaseQuality
-          - BaseQualityHistogram
-          - BaseQualityRankSumTest
-          - ChromosomeCounts
-          - ClippingRankSumTest
-          - CountNs
-          - Coverage
-          - CycleSkipStatus
-          - DepthPerAlleleBySample
-          - DepthPerSampleHC
-          - ExcessHet
-          - FisherStrand
-          - FragmentDepthPerAlleleBySample
-          - FragmentLength
-          - GcContent
-          - GenotypeSummaries
-          - HaplotypeFilteringAnnotation
-          - HmerIndelLength
-          - HmerIndelNuc
-          - HmerMotifs
-          - InbreedingCoeff
-          - IndelClassify
-          - IndelLength
-          - LikelihoodRankSumTest
-          - MappingQuality
-          - MappingQualityRankSumTest
-          - MappingQualityZero
-          - OrientationBiasReadCounts
-          - OriginalAlignment
-          - PossibleDeNovo
-          - QualByDepth
-          - RawGtCount
-          - ReadPosition
-          - ReadPosRankSumTest
-          - ReferenceBases
-          - RMSMappingQuality
-          - SampleList
-          - StrandBiasBySample
-          - StrandOddsRatio
-          - TandemRepeat
-          - TransmittedSingleton
-          - UniqueAltReadCount
-          - VariantType
-      - name: "--annotation_group"
-        alternatives: [-G]
-        type: string
-        multiple: true
-        description: |
-          One or more groups of annotations to apply to variant calls.
-        example: [StandardMutectAnnotation]
-        choices:
-          - AlleleSpecificAnnotation
-          - AS_StandardAnnotation
-          - GenotypeAnnotation
-          - InfoFieldAnnotation
-          - JumboGenotypeAnnotation
-          - JumboInfoAnnotation
-          - ReducibleAnnotation
-          - StandardAnnotation
-          - StandardFlowBasedAnnotation
-          - StandardHCAnnotation
-          - StandardMutectAnnotation
-          - VariantAnnotation
-      - name: "--annotations_to_exclude"
-        alternatives: [-AX]
-        type: string
-        multiple: true
-        description: |
-          One or more specific annotations to exclude from variant calls.
-        example: [TandemRepeat]
-        choices:
-          - AS_StrandBiasMutectAnnotation
-          - BaseQuality
-          - Coverage
-          - DepthPerAlleleBySample
-          - DepthPerSampleHC
-          - FragmentDepthPerAlleleBySample
-          - FragmentLength
-          - MappingQuality
-          - OrientationBiasReadCounts
-          - ReadPosition
-          - StrandBiasBySample
-          - TandemRepeat
-      - name: "--assembly_region_padding"
-        type: integer
-        description: |
-          Number of additional bases of context to include around each
-          assembly region. Default: 100.
-      - name: "--bam_writer_type"
-        type: string
-        description: |
-          Which haplotypes to write to `--bam_output`.
-          Default: 'CALLED_HAPLOTYPES'.
-        choices:
-          - ALL_POSSIBLE_HAPLOTYPES
-          - CALLED_HAPLOTYPES
-          - NO_HAPLOTYPES
-          - CALLED_HAPLOTYPES_NO_READS
-      - name: "--base_quality_score_threshold"
-        type: integer
-        description: |
-          Base qualities below this threshold are reduced to the minimum
-          (6). Default: 18.
       - name: "--callable_depth"
         type: integer
         description: |
           Minimum depth for a site to be considered callable in the Mutect2
           stats. Does not affect genotyping. Default: 10.
-      - name: "--disable_tool_default_annotations"
-        type: boolean_true
-        description: |
-          Disable all tool-default annotations. Only the annotations given
-          with `--annotation` and `--annotation_group` are added.
-      - name: "--dont_use_soft_clipped_bases"
-        type: boolean_true
-        description: |
-          Do not analyze soft-clipped bases in the reads.
       - name: "--downsampling_stride"
         alternatives: [-stride]
         type: integer
@@ -380,16 +175,6 @@ argument_groups:
         description: |
           Exclude bases below this quality from the F1R2 pileup.
           Default: 20.
-      - name: "--force_active"
-        type: boolean_true
-        description: |
-          If set, all regions are marked as active, disabling the active
-          region detection step.
-      - name: "--force_call_filtered_alleles"
-        alternatives: [-genotype-filtered-alleles]
-        type: boolean_true
-        description: |
-          Force-call the filtered alleles in `--alleles`.
       - name: "--genotype_germline_sites"
         type: boolean_true
         description: |
@@ -415,16 +200,6 @@ argument_groups:
         type: double
         description: |
           Log 10 odds threshold to consider a pileup active. Default: 2.0.
-      - name: "--kmer_size"
-        type: integer
-        multiple: true
-        description: |
-          Kmer size(s) to use in the read threading assembler. Default:
-          10, 25.
-      - name: "--max_assembly_region_size"
-        type: integer
-        description: |
-          Maximum size of an assembly region. Default: 300.
       - name: "--max_mnp_distance"
         alternatives: [-mnp-dist]
         type: integer
@@ -443,34 +218,12 @@ argument_groups:
         description: |
           Maximum length of the reads to keep (inclusive), used by the
           tool-default read length read filter. Default: 2147483647.
-      - name: "--max_reads_per_alignment_start"
-        type: integer
-        description: |
-          Maximum number of reads to retain per alignment start position.
-
-          Reads above this threshold will be downsampled. Set to `0` to
-          disable. Default: 50.
       - name: "--max_suspicious_reads_per_alignment_start"
         type: integer
         description: |
           Maximum number of suspicious reads (mediocre mapping quality or
           too many substitutions) allowed in a downsampling stride. Set to
           `0` to disable. Default: 0.
-      - name: "--min_assembly_region_size"
-        type: integer
-        description: |
-          Minimum size of an assembly region. Default: 50.
-      - name: "--min_base_quality_score"
-        alternatives: [-mbq]
-        type: integer
-        description: |
-          Minimum base quality required to consider a base for calling.
-          Default: 10.
-      - name: "--min_pruning"
-        type: integer
-        description: |
-          Minimum support to not prune paths in the assembly graph.
-          Default: 2.
       - name: "--min_read_length"
         type: integer
         description: |
@@ -502,15 +255,6 @@ argument_groups:
         description: |
           Log 10 odds threshold for calling a normal variant non-germline.
           Default: 2.2.
-      - name: "--pcr_indel_model"
-        type: string
-        description: |
-          The PCR indel model to use.
-
-          Set this parameter to `NONE` to disable the PCR indel model, for
-          example when using PCR-free sequencing data. Default:
-          'CONSERVATIVE'.
-        choices: [NONE, HOSTILE, AGGRESSIVE, CONSERVATIVE]
       - name: "--pcr_indel_qual"
         type: integer
         description: |
@@ -527,28 +271,40 @@ argument_groups:
         description: |
           Log 10 odds threshold to emit a variant to the VCF. Default: 3.0.
 
+  - __merge__: /src/gatk4/utils/annotation_argument_group.yaml
+    arguments:
+      - name: "--annotations_to_exclude"
+        alternatives: [-AX]
+        type: string
+        multiple: true
+        description: |
+          One or more specific annotations to exclude from variant calls.
+        example: [TandemRepeat]
+        choices:
+          - AS_StrandBiasMutectAnnotation
+          - BaseQuality
+          - Coverage
+          - DepthPerAlleleBySample
+          - DepthPerSampleHC
+          - FragmentDepthPerAlleleBySample
+          - FragmentLength
+          - MappingQuality
+          - OrientationBiasReadCounts
+          - ReadPosition
+          - StrandBiasBySample
+          - TandemRepeat
+      - name: "--disable_tool_default_annotations"
+        type: boolean_true
+        description: |
+          Disable all tool-default annotations. Only the annotations given
+          with `--annotation` and `--annotation_group` are added.
+  - __merge__: /src/gatk4/utils/assembly_argument_group.yaml
   - __merge__: /src/gatk4/utils/engine_argument_group.yaml
   - __merge__: /src/gatk4/utils/read_argument_group.yaml
   - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/bam_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
 
-resources:
-  - type: bash_script
-    path: script.sh
-  - path: /src/gatk4/utils/script_helpers.sh
-    dest: gatk4/script_helpers.sh
-
-test_resources:
-  - type: bash_script
-    path: test.sh
-  - path: /src/_utils/test_helpers.sh
-  - path: /src/gatk4/utils/test_helpers.sh
-    dest: gatk4/test_helpers.sh
-
-engines:
-  - __merge__: /src/gatk4/utils/common_engines.yaml
-
-runners:
-  - type: executable
-  - type: nextflow
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml

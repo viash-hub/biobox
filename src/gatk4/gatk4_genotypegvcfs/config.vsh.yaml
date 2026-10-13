@@ -1,5 +1,4 @@
 name: gatk4_genotypegvcfs
-namespace: gatk4
 description: |
   Perform joint genotyping on one or more samples previously called with
   HaplotypeCaller in GVCF mode.
@@ -11,29 +10,9 @@ description: |
   from `gatk4 CombineGVCFs`), or a GenomicsDB workspace produced by
   `gatk4 GenomicsDBImport`.
 keywords: [variant calling, germline, joint genotyping, GATK, GATK4, VCF, GVCF]
-links:
-  homepage: https://gatk.broadinstitute.org
-  documentation: https://gatk.broadinstitute.org/hc/en-us
-  repository: https://github.com/broadinstitute/gatk
 references:
   doi:
     - 10.1101/201178
-  bibtex:
-    - |
-      @book{VanderAuwera2020,
-        author = {{Van der Auwera}, Geraldine A. and O'Connor, Brian D.},
-        title = {Genomics in the Cloud: Using Docker, GATK, and WDL in Terra},
-        edition = {1st},
-        publisher = {O'Reilly Media},
-        year = {2020},
-        isbn = {9781491975190}
-      }
-license: Apache-2.0
-requirements:
-  commands: [gatk]
-authors:
-  - __merge__: /src/_authors/luke_zappia.yaml
-    roles: [author, maintainer]
 
 argument_groups:
   - name: "Input"
@@ -67,22 +46,12 @@ argument_groups:
           the run. A plain `.vcf` file does not need an index, unless an
           interval argument (for example `--intervals`) is given.
         example: sample.g.vcf.gz.tbi
-      - name: "--reference"
-        alternatives: [-R]
-        type: file
-        description: Reference sequence FASTA file.
+      - __merge__: /src/gatk4/utils/arguments/reference.yaml
         required: true
-        example: reference.fasta
-      - name: "--reference_fai"
-        type: file
-        description: FASTA index file (`.fai`) for the reference sequence.
+      - __merge__: /src/gatk4/utils/arguments/reference_fai.yaml
         required: true
-        example: reference.fasta.fai
-      - name: "--reference_dict"
-        type: file
-        description: Sequence dictionary (`.dict`) file for the reference sequence.
+      - __merge__: /src/gatk4/utils/arguments/reference_dict.yaml
         required: true
-        example: reference.dict
 
   - name: "Output"
     arguments:
@@ -95,14 +64,7 @@ argument_groups:
           format (`.vcf`/`.vcf.gz`).
         required: true
         example: output.vcf
-      - name: "--output_index"
-        type: file
-        direction: output
-        description: |
-          Output index file for `--output` (`.tbi` for a bgzipped
-          `.vcf.gz` or `.vcf.bgz` file, `.idx` otherwise). Required when
-          `--create_output_variant_index` is `true`, ignored when it is `false`.
-        must_exist: false
+      - __merge__: /src/gatk4/utils/arguments/vcf_output_index.yaml
         example: output.vcf.idx
 
   - name: "Options"
@@ -123,113 +85,6 @@ argument_groups:
         description: |
           Annotate records with the number of alternate alleles that were
           discovered (but not necessarily genotyped) at a given site.
-      - name: "--annotation"
-        alternatives: [-A]
-        type: string
-        multiple: true
-        description: |
-          One or more specific annotations to add to variant calls, e.g.
-          `ChromosomeCounts` or `InbreedingCoeff`.
-        example: [ChromosomeCounts]
-        choices:
-          - AlleleFraction
-          - AllelePseudoDepth
-          - AS_BaseQualityRankSumTest
-          - AS_FisherStrand
-          - AS_InbreedingCoeff
-          - AS_MappingQualityRankSumTest
-          - AS_QualByDepth
-          - AS_ReadPosRankSumTest
-          - AS_RMSMappingQuality
-          - AS_StrandBiasMutectAnnotation
-          - AS_StrandOddsRatio
-          - AssemblyComplexity
-          - BaseQuality
-          - BaseQualityHistogram
-          - BaseQualityRankSumTest
-          - ChromosomeCounts
-          - ClippingRankSumTest
-          - CountNs
-          - Coverage
-          - CycleSkipStatus
-          - DepthPerAlleleBySample
-          - DepthPerSampleHC
-          - ExcessHet
-          - FisherStrand
-          - FragmentDepthPerAlleleBySample
-          - FragmentLength
-          - GcContent
-          - GenotypeSummaries
-          - HaplotypeFilteringAnnotation
-          - HmerIndelLength
-          - HmerIndelNuc
-          - HmerMotifs
-          - InbreedingCoeff
-          - IndelClassify
-          - IndelLength
-          - LikelihoodRankSumTest
-          - MappingQuality
-          - MappingQualityRankSumTest
-          - MappingQualityZero
-          - OrientationBiasReadCounts
-          - OriginalAlignment
-          - PossibleDeNovo
-          - QualByDepth
-          - RawGtCount
-          - ReadPosition
-          - ReadPosRankSumTest
-          - ReferenceBases
-          - RMSMappingQuality
-          - SampleList
-          - StrandBiasBySample
-          - StrandOddsRatio
-          - TandemRepeat
-          - TransmittedSingleton
-          - UniqueAltReadCount
-          - VariantType
-      - name: "--annotation_group"
-        alternatives: [-G]
-        type: string
-        multiple: true
-        description: |
-          One or more groups of annotations to apply to variant calls.
-
-          Common values include `StandardAnnotation` and, for
-          allele-specific annotations, `AS_StandardAnnotation`.
-        choices:
-          - AlleleSpecificAnnotation
-          - AS_StandardAnnotation
-          - GenotypeAnnotation
-          - InfoFieldAnnotation
-          - JumboGenotypeAnnotation
-          - JumboInfoAnnotation
-          - ReducibleAnnotation
-          - StandardAnnotation
-          - StandardFlowBasedAnnotation
-          - StandardHCAnnotation
-          - StandardMutectAnnotation
-          - VariantAnnotation
-      - name: "--annotations_to_exclude"
-        alternatives: [-AX]
-        type: string
-        multiple: true
-        description: |
-          One or more specific annotations to exclude from variant calls,
-          e.g. `RMSMappingQuality` or `FisherStrand`.
-        example: [RMSMappingQuality]
-        choices:
-          - BaseQualityRankSumTest
-          - ChromosomeCounts
-          - Coverage
-          - DepthPerAlleleBySample
-          - ExcessHet
-          - FisherStrand
-          - InbreedingCoeff
-          - MappingQualityRankSumTest
-          - QualByDepth
-          - ReadPosRankSumTest
-          - RMSMappingQuality
-          - StrandOddsRatio
       - name: "--call_genotypes"
         type: boolean_true
         description: |
@@ -261,14 +116,6 @@ argument_groups:
           Minimum genotype quality for parents to be considered for de novo
           calculation (separate from the GQ threshold for the full trio). Only
           valid if the `PossibleDeNovo` annotation is used. Default: 20.
-      - name: "--disable_tool_default_annotations"
-        type: boolean_true
-        description: |
-          Disable all tool default annotations.
-      - name: "--enable_all_annotations"
-        type: boolean_true
-        description: |
-          Use all possible annotations (not for the faint of heart).
       - name: "--force_output_intervals"
         type: file
         multiple: true
@@ -452,38 +299,42 @@ argument_groups:
         description: |
           If available, use the genotype posterior probabilities (see
           `--population_callset`) to calculate the site QUAL.
-      - name: "--variant_output_filtering"
+      - __merge__: /src/gatk4/utils/arguments/variant_output_filtering.yaml
+  - __merge__: /src/gatk4/utils/annotation_argument_group.yaml
+    arguments:
+      - name: "--annotations_to_exclude"
+        alternatives: [-AX]
         type: string
+        multiple: true
         description: |
-          Restrict the output variants to ones that match the
-          `--intervals` according to the specified matching mode.
-        example: STARTS_IN
+          One or more specific annotations to exclude from variant calls,
+          e.g. `RMSMappingQuality` or `FisherStrand`.
+        example: [RMSMappingQuality]
         choices:
-          - STARTS_IN
-          - ENDS_IN
-          - OVERLAPS
-          - CONTAINED
-          - ANYWHERE
+          - BaseQualityRankSumTest
+          - ChromosomeCounts
+          - Coverage
+          - DepthPerAlleleBySample
+          - ExcessHet
+          - FisherStrand
+          - InbreedingCoeff
+          - MappingQualityRankSumTest
+          - QualByDepth
+          - ReadPosRankSumTest
+          - RMSMappingQuality
+          - StrandOddsRatio
+      - name: "--disable_tool_default_annotations"
+        type: boolean_true
+        description: |
+          Disable all tool default annotations.
+      - name: "--enable_all_annotations"
+        type: boolean_true
+        description: |
+          Use all possible annotations (not for the faint of heart).
   - __merge__: /src/gatk4/utils/engine_argument_group.yaml
   - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
 
-resources:
-  - type: bash_script
-    path: script.sh
-  - path: /src/gatk4/utils/script_helpers.sh
-    dest: gatk4/script_helpers.sh
-
-test_resources:
-  - type: bash_script
-    path: test.sh
-  - path: /src/_utils/test_helpers.sh
-  - path: /src/gatk4/utils/test_helpers.sh
-    dest: gatk4/test_helpers.sh
-
-engines:
-  - __merge__: /src/gatk4/utils/common_engines.yaml
-
-runners:
-  - type: executable
-  - type: nextflow
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml
