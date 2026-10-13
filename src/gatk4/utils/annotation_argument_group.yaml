@@ -1,0 +1,85 @@
+name: "GATK Annotation Options"
+arguments:
+  - name: "--annotation"
+    alternatives: [-A]
+    type: string
+    multiple: true
+    description: |
+      One or more specific annotations to add to variant calls.
+    example: [ChromosomeCounts]
+    choices:
+      - AlleleFraction
+      - AllelePseudoDepth
+      - AS_BaseQualityRankSumTest
+      - AS_FisherStrand
+      - AS_InbreedingCoeff
+      - AS_MappingQualityRankSumTest
+      - AS_QualByDepth
+      - AS_ReadPosRankSumTest
+      - AS_RMSMappingQuality
+      - AS_StrandBiasMutectAnnotation
+      - AS_StrandOddsRatio
+      - AssemblyComplexity
+      - BaseQuality
+      - BaseQualityHistogram
+      - BaseQualityRankSumTest
+      - ChromosomeCounts
+      - ClippingRankSumTest
+      - CountNs
+      - Coverage
+      - CycleSkipStatus
+      - DepthPerAlleleBySample
+      - DepthPerSampleHC
+      - ExcessHet
+      - FisherStrand
+      - FragmentDepthPerAlleleBySample
+      - FragmentLength
+      - GcContent
+      - GenotypeSummaries
+      - HaplotypeFilteringAnnotation
+      - HmerIndelLength
+      - HmerIndelNuc
+      - HmerMotifs
+      - InbreedingCoeff
+      - IndelClassify
+      - IndelLength
+      - LikelihoodRankSumTest
+      - MappingQuality
+      - MappingQualityRankSumTest
+      - MappingQualityZero
+      - OrientationBiasReadCounts
+      - OriginalAlignment
+      - PossibleDeNovo
+      - QualByDepth
+      - RawGtCount
+      - ReadPosition
+      - ReadPosRankSumTest
+      - ReferenceBases
+      - RMSMappingQuality
+      - SampleList
+      - StrandBiasBySample
+      - StrandOddsRatio
+      - TandemRepeat
+      - TransmittedSingleton
+      - UniqueAltReadCount
+      - VariantType
+  - name: "--annotation_group"
+    alternatives: [-G]
+    type: string
+    multiple: true
+    description: |
+      One or more groups of annotations to apply to variant calls.
+    example: [StandardAnnotation]
+    choices:
+      - AlleleSpecificAnnotation
+      - AS_StandardAnnotation
+      - GenotypeAnnotation
+      - InfoFieldAnnotation
+      - JumboGenotypeAnnotation
+      - JumboInfoAnnotation
+      - ReducibleAnnotation
+      - StandardAnnotation
+      - StandardFlowBasedAnnotation
+      - StandardHCAnnotation
+      - StandardMutectAnnotation
+      - VariantAnnotation

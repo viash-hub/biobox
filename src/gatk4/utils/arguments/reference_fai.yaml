@@ -1,0 +1,4 @@
+name: "--reference_fai"
+type: file
+description: FASTA index file (`.fai`) for the reference sequence.
+example: reference.fasta.fai

@@ -1,0 +1,11 @@
+name: "--variant_output_filtering"
+type: string
+description: |
+  Restrict the output variants to the ones that match `--intervals`
+  by this matching mode: `STARTS_IN` (starts in any of the
+  intervals), `ENDS_IN` (ends in any of the intervals), `OVERLAPS`
+  (overlaps any of the intervals), `CONTAINED` (contained
+  completely in a contiguous block of intervals without overlap) or
+  `ANYWHERE` (no filtering). By default no matching mode is set.
+example: STARTS_IN
+choices: [STARTS_IN, ENDS_IN, OVERLAPS, CONTAINED, ANYWHERE]
