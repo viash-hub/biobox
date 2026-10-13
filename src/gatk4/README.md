@@ -9,17 +9,26 @@ All GATK4 components use the shared files in [`utils/`](utils/).
 
 | File | Use |
 |---|---|
+| `common_metadata.yaml` | Links, the GATK book citation, license, requirements and authors. Merged at the root of every component config. Components add their own citations. |
+| `common_resources.yaml` | Resources (`script.sh`, `script_helpers.sh`), test resources, engines and runners. Merged at the root of every component config. |
 | `common_engines.yaml` | Shared engine definition merged into component configs. Change the container here to update all components. |
 | `engine_argument_group.yaml` | General GATK engine arguments. Merged into `argument_groups` for every component that runs a GATK engine tool (not Picard tools or tools without GATK engine options). |
 | `read_argument_group.yaml` | Read filter and read validation arguments. Merged into `argument_groups` for every component whose tool reads BAM/CRAM files. |
 | `vcf_output_argument_group.yaml` | VCF output arguments. Merged into `argument_groups` for every component that writes a VCF. |
 | `bam_output_argument_group.yaml` | BAM/CRAM output arguments. Merged into `argument_groups` for every component that writes a BAM or CRAM file. |
 | `interval_argument_group.yaml` | Interval arguments (`--intervals`, `--exclude_intervals`, their indexes, the interval rules and padding). Merged into `argument_groups` for every component that supports intervals. |
+| `annotation_argument_group.yaml` | `--annotation` and `--annotation_group`. Merged into `argument_groups` for every component that annotates variant calls. Components add their own annotation arguments (for example `--annotations_to_exclude`, which has tool-specific choices) with `arguments:` on the same item. |
+| `assembly_argument_group.yaml` | Local assembly arguments shared by HaplotypeCaller and Mutect2, including the assembled-haplotype BAM output (`--create_bam_output`, `--bam_output`, `--bam_output_index`). |
+| `arguments/` | Single-argument files (`reference.yaml`, `reference_fai.yaml`, `reference_dict.yaml`, `read_index.yaml`, `vcf_output_index.yaml`, `variant_output_filtering.yaml`), merged with `__merge__` inside an `arguments:` list. Use them only where a component must override a field (for example `required: true`) or put the argument in its own group. |
 | `script_helpers.sh` | Staging and argument helpers for `script.sh` (see below). |
 | `test_helpers.sh` | Synthetic test file fixtures and other shared helpers for `test.sh`. |
 
 Use the helpers instead of writing the same logic again in a component.
 Merge only the shared argument groups that apply to the tool, so that each component has only arguments that change what the tool does.
+Prefer groups over single-argument files.
+A component can add arguments to a merged group and override the group `description`, but it cannot change individual arguments of the group.
+Merge the root files at the end of the config, because a block scalar at the end of a YAML file loses its trailing newline.
+List fields (`choices`, list `example`) of a merged argument cannot be shortened, so shared files only use string examples.
 If a new component needs new logic that another component could use, add it to the helpers.
 
 ## Arguments
@@ -46,6 +55,11 @@ If a new component needs new logic that another component could use, add it to t
   Check to see if these need to be mutually exclusive or if the tool accepts a mixture of strings and files.
 - When you generate `choices` from `help.txt` carefully check the list.
   Possible values may be split over lines or only be listed in the description.
+- Write a description that contains `: ` (for example "Default: 0.") as a block scalar (`description: |`).
+  In a one-line plain scalar, the `: ` breaks the YAML parsing.
+- Pass a `boolean_true` argument as a flag with no value to GATK engine tools (for example `--lenient`).
+  Picard tools (for example MarkDuplicates) need a value (`--CREATE_INDEX true`).
+  Unset `boolean_true` arguments that are `false` with `unset_if_false`, so that `${par_x:+--flag}` works.
 
 ## Companion files
 
@@ -111,14 +125,14 @@ The Viash Nextflow runner always gives every output argument a default path (`$i
 This is handled by adding a matching `--create_*` boolean argument and setting `must_exist: false` on the output path argument.
 The script should only create the output when `--create_*` is `true`.
 If `--create_*` is `true` and no output path is provided the script should error.
+Use `require_output_if_created` for this check, and `require_output_index` and `move_output_index` for index outputs.
 
 ## Resources
 
-Set the JVM heap from `meta_memory_mb` with a fallback:
+Run GATK and Picard tools with `run_gatk`, which sets the JVM heap from `meta_memory_mb` with a fallback:
 
 ```bash
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" <Tool> "${cmd_args[@]}"
+run_gatk <Tool> "${cmd_args[@]}"
 ```
 
 The `gatk` launcher has no default heap size of its own so a value must be set.
@@ -141,7 +155,13 @@ Follow the [GATK citation advice](https://gatk.broadinstitute.org/hc/en-us/artic
 
 ## Testing
 
-- The `test_helpers.sh` script has functions for creating synthetic test fixtures
+- The `test_helpers.sh` script has functions for creating synthetic test fixtures and for common checks:
+  - `gatk4_test_init` sets up the test environment and the `test_data_dir`
+  - `check_fails_with` runs a command that must fail and checks its error message
+  - `check_vcf_column`, `check_vcf_record_count`, `check_vcf_has_record` and `check_vcf_lacks_record` check VCF records
+  - `check_index_moved` checks that an index output is at the requested path and not next to the output
+  - `check_index_magic` checks the file signature of a `.tbi` or Tribble index
+- Use a local `reference_args` array when a test gives the same reference files many times
 - The GATK image has `samtools`, `bgzip` and `tabix` available for creating additional test files, as well as all GATK tools
 - Confirm expected behavior in the real container, not only in the GATK documentation.
   For example, side file names, index requirements and tool-default read filters.

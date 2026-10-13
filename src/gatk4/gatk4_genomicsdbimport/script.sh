@@ -7,34 +7,19 @@ set -eo pipefail
 
 source "$meta_resources_dir/gatk4/script_helpers.sh"
 
-# unset flags
-unset_if_false=(
-  par_lenient
-  par_avoid_nio
-  par_bypass_feature_reader
-  par_consolidate
-  par_merge_input_intervals
-  par_overwrite_existing_genomicsdb_workspace
-  par_genomicsdb_shared_posixfs_optimizations
+unset_if_false \
+  par_avoid_nio \
+  par_bypass_feature_reader \
+  par_consolidate \
+  par_merge_input_intervals \
+  par_overwrite_existing_genomicsdb_workspace \
+  par_genomicsdb_shared_posixfs_optimizations \
   par_validate_sample_name_map
-  par_disable_sequence_dictionary_validation
-)
 
-for par in "${unset_if_false[@]}"; do
-  test_val="${!par}"
-  [[ "$test_val" == "false" ]] && unset $par
-done
-
-if [[ -z "$par_intervals" && -z "$par_interval_strings" ]]; then
-  echo "Error: --intervals or --interval_strings is required." >&2
-  exit 1
-fi
+# Check the arguments
+require_intervals
 if [[ -n "$par_variant_index" && -z "$par_variant" ]]; then
   echo "Error: --variant_index requires --variant." >&2
-  exit 1
-fi
-if [[ -n "$par_header_index" && -z "$par_header" ]]; then
-  echo "Error: --header_index requires --header." >&2
   exit 1
 fi
 if [[ -n "$par_sample_name" && -n "$par_sample_name_map" ]]; then
@@ -52,9 +37,8 @@ if [[ -n "$par_header" && -n "$par_variant" && -z "$par_sample_name" ]]; then
   exit 1
 fi
 
-# Stage the inputs into a temp dir so GATK can find the companion files
-tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_genomicsdbimport.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT
+# Stage the inputs in a temp dir so that GATK can find the companion files
+setup_tmp_dir
 
 stage_vcfs_with_indexes "$tmp_dir" "$par_variant" "$par_variant_index" "--variant" "--variant" variant_args
 stage_interval_arguments "$tmp_dir" interval_args
@@ -74,14 +58,10 @@ if [[ -n "$par_sample_name" ]]; then
   done > "$sample_name_map"
   variant_args=()
 fi
-if [[ -n "$par_header" ]]; then
-  staged_header=$(stage_vcf_with_index "$tmp_dir" "$par_header" "$par_header_index" header) || exit 1
-fi
+header_args=()
+stage_optional_vcf "$tmp_dir" "$par_header" "$par_header_index" --header header_args
 
-# Convert semicolon-separated multi-value arguments into repeated flags
-
-# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
+gatk_engine_args "$tmp_dir" engine_args
 
 # Build command arguments array
 # Note: do NOT create the output directory ourselves. GenomicsDBImport
@@ -89,29 +69,26 @@ avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 # directory unless --overwrite-existing-genomicsdb-workspace is set, so
 # GATK must be the one to create it.
 cmd_args=(
+  "${variant_args[@]}"
   ${sample_name_map:+--sample-name-map "$sample_name_map"}
   --genomicsdb-workspace-path "$par_genomicsdb_workspace_path"
   "${interval_args[@]}"
-  ${par_avoid_nio:+--avoid-nio true}
+  ${par_avoid_nio:+--avoid-nio}
   ${par_batch_size:+--batch-size "$par_batch_size"}
-  ${par_bypass_feature_reader:+--bypass-feature-reader true}
-  ${par_consolidate:+--consolidate true}
+  ${par_bypass_feature_reader:+--bypass-feature-reader}
+  ${par_consolidate:+--consolidate}
   ${par_genomicsdb_segment_size:+--genomicsdb-segment-size "$par_genomicsdb_segment_size"}
-  ${par_genomicsdb_shared_posixfs_optimizations:+--genomicsdb-shared-posixfs-optimizations true}
+  ${par_genomicsdb_shared_posixfs_optimizations:+--genomicsdb-shared-posixfs-optimizations}
   ${par_genomicsdb_vcf_buffer_size:+--genomicsdb-vcf-buffer-size "$par_genomicsdb_vcf_buffer_size"}
-  ${staged_header:+--header "$staged_header"}
+  "${header_args[@]}"
   ${par_max_num_intervals_to_import_in_parallel:+--max-num-intervals-to-import-in-parallel "$par_max_num_intervals_to_import_in_parallel"}
   ${par_merge_contigs_into_num_partitions:+--merge-contigs-into-num-partitions "$par_merge_contigs_into_num_partitions"}
-  ${par_merge_input_intervals:+--merge-input-intervals true}
-  ${par_overwrite_existing_genomicsdb_workspace:+--overwrite-existing-genomicsdb-workspace true}
+  ${par_merge_input_intervals:+--merge-input-intervals}
+  ${par_overwrite_existing_genomicsdb_workspace:+--overwrite-existing-genomicsdb-workspace}
   ${par_reader_threads:+--reader-threads "$par_reader_threads"}
-  ${par_validate_sample_name_map:+--validate-sample-name-map true}
-  ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
-  ${par_lenient:+--lenient}
+  ${par_validate_sample_name_map:+--validate-sample-name-map}
+  "${engine_args[@]}"
 )
 
 # Run GATK GenomicsDBImport
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" GenomicsDBImport \
-  "${variant_args[@]}" \
-  "${cmd_args[@]}" \
-  --tmp-dir "$tmp_dir"
+run_gatk GenomicsDBImport "${cmd_args[@]}"

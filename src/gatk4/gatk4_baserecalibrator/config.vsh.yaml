@@ -1,5 +1,4 @@
 name: gatk4_baserecalibrator
-namespace: gatk4
 description: |
   First pass of the Base Quality Score Recalibration (BQSR) process.
 
@@ -13,29 +12,9 @@ description: |
   is consumed by `gatk4 ApplyBQSR` to recalibrate the base quality scores
   in the original BAM or CRAM file.
 keywords: [base quality score recalibration, BQSR, GATK, GATK4, preprocessing]
-links:
-  homepage: https://gatk.broadinstitute.org
-  documentation: https://gatk.broadinstitute.org/hc/en-us
-  repository: https://github.com/broadinstitute/gatk
 references:
   doi:
     - 10.1038/ng.806
-  bibtex:
-    - |
-      @book{VanderAuwera2020,
-        author = {{Van der Auwera}, Geraldine A. and O'Connor, Brian D.},
-        title = {Genomics in the Cloud: Using Docker, GATK, and WDL in Terra},
-        edition = {1st},
-        publisher = {O'Reilly Media},
-        year = {2020},
-        isbn = {9781491975190}
-      }
-license: Apache-2.0
-requirements:
-  commands: [gatk]
-authors:
-  - __merge__: /src/_authors/luke_zappia.yaml
-    roles: [author, maintainer]
 
 argument_groups:
   - name: "Input"
@@ -54,33 +33,14 @@ argument_groups:
           `--read_index`).
         required: true
         example: [sample.bam]
-      - name: "--read_index"
-        type: file
-        multiple: true
-        description: |
-          Index files for `--input` (`.bai` for a BAM file, `.crai` or `.bai`
-          for a CRAM file).
-
-          The index files are matched to `--input` by order. One index file
-          must be given for each `--input` file.
-        required: true
+      - __merge__: /src/gatk4/utils/arguments/read_index.yaml
         example: [sample.bam.bai]
-      - name: "--reference"
-        alternatives: [-R]
-        type: file
-        description: Reference sequence FASTA file.
+      - __merge__: /src/gatk4/utils/arguments/reference.yaml
         required: true
-        example: reference.fasta
-      - name: "--reference_fai"
-        type: file
-        description: FASTA index file (`.fai`) for the reference sequence.
+      - __merge__: /src/gatk4/utils/arguments/reference_fai.yaml
         required: true
-        example: reference.fasta.fai
-      - name: "--reference_dict"
-        type: file
-        description: Sequence dictionary (`.dict`) file for the reference sequence.
+      - __merge__: /src/gatk4/utils/arguments/reference_dict.yaml
         required: true
-        example: reference.dict
       - name: "--known_sites"
         type: file
         multiple: true
@@ -188,23 +148,6 @@ argument_groups:
   - __merge__: /src/gatk4/utils/read_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
 
-resources:
-  - type: bash_script
-    path: script.sh
-  - path: /src/gatk4/utils/script_helpers.sh
-    dest: gatk4/script_helpers.sh
-
-test_resources:
-  - type: bash_script
-    path: test.sh
-  - path: /src/_utils/test_helpers.sh
-  - path: /src/gatk4/utils/test_helpers.sh
-    dest: gatk4/test_helpers.sh
-
-# Docker engine setup shared identically across the whole gatk4 family.
-engines:
-  - __merge__: /src/gatk4/utils/common_engines.yaml
-
-runners:
-  - type: executable
-  - type: nextflow
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml

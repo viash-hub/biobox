@@ -7,56 +7,22 @@ set -eo pipefail
 
 source "$meta_resources_dir/gatk4/script_helpers.sh"
 
-# unset "false" flags
-unset_if_false=(
-  par_lenient
-  par_disable_tool_default_read_filters
-  par_disable_sequence_dictionary_validation
-)
+# Check the arguments
+require_reference_for_cram "$par_reference" --reference "$par_input"
+require_intervals
 
-for par in "${unset_if_false[@]}"; do
-  test_val="${!par}"
-  [[ "$test_val" == "false" ]] && unset $par
-done
+setup_tmp_dir
 
-# A CRAM file can only be decoded with the reference
-IFS=';' read -ra input_files <<< "$par_input"
-for input_file in "${input_files[@]}"; do
-  if [[ "$input_file" == *.cram && -z "$par_reference" ]]; then
-    echo "Error: --reference is required for CRAM input." >&2
-    exit 1
-  fi
-done
-
-# Stage the interval files, the --variant VCF with its index and
-# (if provided) the reference trio into a temp dir so GATK can find the
-# companion files
-tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_getpileupsummaries.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT
-
-# GetPileupSummaries needs at least one interval
-if [[ -z "$par_intervals" && -z "$par_interval_strings" ]]; then
-  echo "Error: --intervals or --interval_strings is required." >&2
-  exit 1
-fi
-
+# Stage the inputs in a temp dir so that GATK can find the companion files.
 # Stage the interval files first, so an index count mismatch fails before the
-# (possibly slow) indexing of --variant
+# (possibly slow) indexing of --variant.
 stage_interval_arguments "$tmp_dir" interval_args
-
 gatk_read_args "$par_input" "$par_read_index" read_args
-staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant)
-
-reference_args=()
-if [[ -n "$par_reference" ]]; then
-  staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
-  reference_args=(--reference "$staged_reference")
-fi
-
-# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
+staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant) || exit 1
+stage_optional_reference "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict" reference_args
 
 gatk_read_filter_args read_filter_args
+gatk_engine_args "$tmp_dir" engine_args
 
 # Build command arguments array
 cmd_args=(
@@ -70,11 +36,9 @@ cmd_args=(
   ${par_maximum_mapping_quality:+--maximum-mapping-quality "$par_maximum_mapping_quality"}
   ${par_minimum_mapping_quality:+--minimum-mapping-quality "$par_minimum_mapping_quality"}
   ${par_minimum_population_allele_frequency:+--minimum-population-allele-frequency "$par_minimum_population_allele_frequency"}
-  --tmp-dir "$tmp_dir"
   "${read_filter_args[@]}"
-  ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
-  ${par_lenient:+--lenient}
+  "${engine_args[@]}"
 )
 
 # Run GATK GetPileupSummaries
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" GetPileupSummaries "${cmd_args[@]}"
+run_gatk GetPileupSummaries "${cmd_args[@]}"
