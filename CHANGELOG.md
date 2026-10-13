@@ -21,7 +21,7 @@
   - Add `--interval_set_rule`, `--interval_merging_rule` and `--interval_exclusion_padding` arguments
   - `gatk4_variantfiltration` now supports intervals
 
-* `gatk4/*`: Add `--interval_strings` and `--exclude_interval_strings` to give intervals as strings (PR #xxx).
+* `gatk4/*`: Add `--interval_strings` and `--exclude_interval_strings` to give intervals as strings (PR #271).
   - They can be combined with the `--intervals` and `--exclude_intervals` files
   - `gatk4_genomicsdbimport` and `gatk4_getpileupsummaries` need at least one of `--intervals` or `--interval_strings`
 
