@@ -14,16 +14,10 @@ gatk4_test_init
 create_test_mutect2_outputs "$test_data_dir"
 check_file_exists "$test_data_dir/f1r2.tar.gz" "F1R2 tarball from the tumor/normal Mutect2 run"
 
-# A second F1R2 tarball from a tumor-only Mutect2 run, to stand in for the
-# output of a second shard of a scattered Mutect2 run
-log "Running Mutect2 in tumor-only mode for a second F1R2 tarball..."
-gatk Mutect2 \
-  --reference "$test_data_dir/reference.fasta" \
-  --input "$test_data_dir/tumor.bam" \
-  --output "$test_data_dir/tumor_only.vcf" \
-  --f1r2-tar-gz "$test_data_dir/f1r2_tumor_only.tar.gz" \
-  --verbosity ERROR
-check_file_exists "$test_data_dir/f1r2_tumor_only.tar.gz" "F1R2 tarball from the tumor-only Mutect2 run"
+# A copy of the F1R2 tarball under another name, to stand in for the output of
+# a second shard of a scattered Mutect2 run
+mkdir -p "$test_data_dir/shard2"
+cp "$test_data_dir/f1r2.tar.gz" "$test_data_dir/shard2/f1r2_shard2.tar.gz"
 
 # Check that a read orientation model tarball contains the prior tables
 check_orientation_model() {
@@ -38,8 +32,8 @@ check_orientation_model() {
   fi
 }
 
-# --- Test Case 1: Default parameters ---
-log "Starting TEST 1: Default parameters"
+# --- Test Case 1: Basic run (defaults) ---
+log "Starting TEST 1: Basic run (defaults)"
 
 log "Executing $meta_name with a single F1R2 tarball..."
 "$meta_executable" \
@@ -51,34 +45,25 @@ check_orientation_model "$meta_temp_dir/model.tar.gz"
 
 log "✅ TEST 1 completed successfully"
 
-# --- Test Case 2: Multiple F1R2 tarballs ---
-log "Starting TEST 2: Multiple F1R2 tarballs"
+# --- Test Case 2: Inputs and tool options ---
+log "Starting TEST 2: Two F1R2 tarballs and EM options"
 
-log "Executing $meta_name with two F1R2 tarballs..."
+log "Executing $meta_name with two F1R2 tarballs, --convergence_threshold, --max_depth and --num_em_iterations..."
 "$meta_executable" \
   --input "$test_data_dir/f1r2.tar.gz" \
-  --input "$test_data_dir/f1r2_tumor_only.tar.gz" \
-  --output "$meta_temp_dir/model_multiple.tar.gz"
-
-log "Validating TEST 2 outputs..."
-check_orientation_model "$meta_temp_dir/model_multiple.tar.gz"
-
-log "✅ TEST 2 completed successfully"
-
-# --- Test Case 3: EM options ---
-log "Starting TEST 3: EM options"
-
-log "Executing $meta_name with --convergence_threshold, --max_depth and --num_em_iterations..."
-"$meta_executable" \
-  --input "$test_data_dir/f1r2.tar.gz" \
+  --input "$test_data_dir/shard2/f1r2_shard2.tar.gz" \
   --output "$meta_temp_dir/model_options.tar.gz" \
   --convergence_threshold 0.001 \
   --max_depth 100 \
-  --num_em_iterations 10
+  --num_em_iterations 10 2>&1 | tee "$meta_temp_dir/test2.log"
 
-log "Validating TEST 3 outputs..."
+log "Validating TEST 2 outputs..."
 check_orientation_model "$meta_temp_dir/model_options.tar.gz"
+check_file_contains "$meta_temp_dir/test2.log" "input .*f1r2_shard2.tar.gz" "run log command line (second --input)"
+check_file_contains "$meta_temp_dir/test2.log" "convergence-threshold 0.001" "run log command line (--convergence_threshold)"
+check_file_contains "$meta_temp_dir/test2.log" "max-depth 100" "run log command line (--max_depth)"
+check_file_contains "$meta_temp_dir/test2.log" "num-em-iterations 10" "run log command line (--num_em_iterations)"
 
-log "✅ TEST 3 completed successfully"
+log "✅ TEST 2 completed successfully"
 
 print_test_summary "All tests"

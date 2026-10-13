@@ -9,7 +9,10 @@ source "$meta_resources_dir/gatk4/test_helpers.sh"
 
 gatk4_test_init
 
-# --- Build a small VCF with 2 SNPs and 2 indels ---
+# --- Shared fixtures ---
+
+# A small VCF with 2 SNPs and 2 indels. indel1 (A -> ATG) is a 2bp insertion,
+# indel2 (ATTG -> A) is a 3bp deletion.
 log "Writing hand-crafted test VCF with SNP and indel records..."
 cat > "$test_data_dir/variants.vcf" << 'EOF'
 ##fileformat=VCFv4.2
@@ -25,122 +28,103 @@ seq1	400	indel2	ATTG	A	65	PASS	DP=30	GT:DP	1/1:30
 EOF
 check_file_exists "$test_data_dir/variants.vcf" "hand-crafted test VCF"
 
-# --- Test Case 1: Select only SNPs ---
-log "Starting TEST 1: Select only SNP records"
+# A reference that matches the seq1 contig of the test VCF
+reference_fasta="$test_data_dir/reference.fasta"
+create_test_reference "$reference_fasta" 1 1000
+
+# Bgzipped --variant with its index in a different directory, and without an
+# index
+create_test_vcf_gz_with_separate_index "$test_data_dir/variants.vcf" \
+  "$test_data_dir/variants.vcf.gz" "$test_data_dir/indexes/variants.vcf.gz.tbi"
+bgzip -c "$test_data_dir/variants.vcf" > "$test_data_dir/variants_no_index.vcf.gz"
+
+# A bgzipped comparison VCF with only the snp1 and indel2 records, with its
+# index in a different directory
+grep -v -e "snp2" -e "indel1" "$test_data_dir/variants.vcf" > "$test_data_dir/comparison.vcf"
+create_test_vcf_gz_with_separate_index "$test_data_dir/comparison.vcf" \
+  "$test_data_dir/comparison.vcf.gz" "$test_data_dir/indexes/comparison.vcf.gz.tbi"
+
+# Interval files. The intersection of seq1:50-350 (BED is 0-based) and the
+# sites in variants.vcf is snp1, snp2 and indel1. The exclusion of
+# seq1:250-350 removes indel1.
+mkdir -p "$test_data_dir/intervals"
+printf 'seq1\t49\t350\n' > "$test_data_dir/intervals/include.bed"
+printf 'seq1\t249\t350\n' > "$test_data_dir/intervals/exclude.bed"
+create_test_vcf_gz_with_separate_index "$test_data_dir/variants.vcf" \
+  "$test_data_dir/intervals/sites.vcf.gz" "$test_data_dir/intervals_index/sites.vcf.gz.tbi"
+echo "seq1:50-250" > "$test_data_dir/intervals/region.intervals"
 
 mkdir -p "$meta_temp_dir/indexes"
 
-log "Executing $meta_name with --select_type_to_include SNP..."
+# --- Test Case 1: Basic run ---
+log "Starting TEST 1: Plain --variant without options"
+
 "$meta_executable" \
   --variant "$test_data_dir/variants.vcf" \
-  --output "$meta_temp_dir/snps_only.vcf" \
-  --output_index "$meta_temp_dir/indexes/snps_only.idx" \
-  --select_type_to_include SNP
+  --output "$meta_temp_dir/all.vcf" \
+  --output_index "$meta_temp_dir/indexes/all.idx" 2> "$meta_temp_dir/test1.log"
 
 log "Validating TEST 1 outputs..."
-check_file_exists "$meta_temp_dir/snps_only.vcf" "SNP-only output VCF"
-check_file_not_empty "$meta_temp_dir/snps_only.vcf" "SNP-only output VCF"
-check_file_contains "$meta_temp_dir/snps_only.vcf" "^##fileformat=VCF" "SNP-only output VCF header"
-
-check_vcf_record_count "$meta_temp_dir/snps_only.vcf" 2 "SNP-only output VCF"
-
-check_file_contains "$meta_temp_dir/snps_only.vcf" "snp1" "SNP-only output VCF (snp1 record)"
-check_file_contains "$meta_temp_dir/snps_only.vcf" "snp2" "SNP-only output VCF (snp2 record)"
-check_file_not_contains "$meta_temp_dir/snps_only.vcf" "indel1" "SNP-only output VCF (indel1 record should be absent)"
-check_file_not_contains "$meta_temp_dir/snps_only.vcf" "indel2" "SNP-only output VCF (indel2 record should be absent)"
-check_index_moved "$meta_temp_dir/indexes/snps_only.idx" "$meta_temp_dir/snps_only.vcf.idx" "output index file"
-check_file_not_empty "$meta_temp_dir/indexes/snps_only.idx" "output index file"
+check_file_not_empty "$meta_temp_dir/all.vcf" "output VCF (all records)"
+check_file_contains "$meta_temp_dir/all.vcf" "^##fileformat=VCF" "output VCF (all records) header"
+check_vcf_column "$meta_temp_dir/all.vcf" 3 "snp1 snp2 indel1 indel2" "output VCF (all records)"
+check_file_not_contains "$meta_temp_dir/test1.log" "no index was provided" "run log (plain VCF used without an index)"
+check_file_not_exists "$test_data_dir/variants.vcf.idx" "index next to the plain input"
+check_index_moved "$meta_temp_dir/indexes/all.idx" "$meta_temp_dir/all.vcf.idx" "output index file"
+check_file_not_empty "$meta_temp_dir/indexes/all.idx" "output index file"
 
 log "✅ TEST 1 completed successfully"
 
-# --- Test Case 2: Select only indels ---
-log "Starting TEST 2: Select only INDEL records"
+# --- Test Case 2: Inputs and indexes ---
+log "Starting TEST 2: Input index handling and output options"
 
-log "Executing $meta_name with --select_type_to_include INDEL..."
+# Run 1: --concordance removes snp2 and indel1, SNP selection removes indel2
+log "Executing $meta_name with indexed .vcf.gz --variant and --concordance, --reference, SNP selection and a .vcf.gz output..."
 "$meta_executable" \
-  --variant "$test_data_dir/variants.vcf" \
-  --output "$meta_temp_dir/indels_only.vcf" \
-  --output_index "$meta_temp_dir/indels_only.vcf.idx" \
-  --select_type_to_include INDEL
+  --variant "$test_data_dir/variants.vcf.gz" \
+  --variant_index "$test_data_dir/indexes/variants.vcf.gz.tbi" \
+  --concordance "$test_data_dir/comparison.vcf.gz" \
+  --concordance_index "$test_data_dir/indexes/comparison.vcf.gz.tbi" \
+  --reference "$reference_fasta" \
+  --reference_fai "${reference_fasta}.fai" \
+  --reference_dict "${reference_fasta%.fasta}.dict" \
+  --select_type_to_include SNP \
+  --output "$meta_temp_dir/indexed.vcf.gz" \
+  --output_index "$meta_temp_dir/indexes/indexed.tbi" 2> "$meta_temp_dir/test2_indexed.log"
 
-log "Validating TEST 2 outputs..."
-check_file_exists "$meta_temp_dir/indels_only.vcf" "INDEL-only output VCF"
-check_file_not_empty "$meta_temp_dir/indels_only.vcf" "INDEL-only output VCF"
-check_file_contains "$meta_temp_dir/indels_only.vcf" "^##fileformat=VCF" "INDEL-only output VCF header"
+log "Validating TEST 2 outputs (indexed inputs)..."
+check_file_exists "$meta_temp_dir/indexed.vcf.gz" "bgzipped output VCF"
+check_vcf_column "$meta_temp_dir/indexed.vcf.gz" 3 "snp1" "bgzipped output VCF (SNPs in the comparison VCF)"
+check_file_not_contains "$meta_temp_dir/test2_indexed.log" "no index was provided" "run log (indexes were provided)"
+check_file_not_exists "$test_data_dir/variants.vcf.gz.tbi" "index next to the input VCF"
+check_file_not_exists "$test_data_dir/comparison.vcf.gz.tbi" "index next to the --concordance VCF"
+check_index_moved "$meta_temp_dir/indexes/indexed.tbi" "$meta_temp_dir/indexed.vcf.gz.tbi" "output index file"
+check_file_not_empty "$meta_temp_dir/indexes/indexed.tbi" "output index file"
+# --reference has no effect on the selected records
+zcat "$meta_temp_dir/indexed.vcf.gz" > "$meta_temp_dir/indexed.vcf"
+check_file_contains "$meta_temp_dir/indexed.vcf" "^##GATKCommandLine=.* --reference [^ ]*/reference.fasta " "GATK command line (--reference)"
 
-check_vcf_record_count "$meta_temp_dir/indels_only.vcf" 2 "INDEL-only output VCF"
-
-check_file_contains "$meta_temp_dir/indels_only.vcf" "indel1" "INDEL-only output VCF (indel1 record)"
-check_file_contains "$meta_temp_dir/indels_only.vcf" "indel2" "INDEL-only output VCF (indel2 record)"
-check_file_not_contains "$meta_temp_dir/indels_only.vcf" "snp1" "INDEL-only output VCF (snp1 record should be absent)"
-check_file_not_contains "$meta_temp_dir/indels_only.vcf" "snp2" "INDEL-only output VCF (snp2 record should be absent)"
-
-log "✅ TEST 2 completed successfully"
-
-# --- Test Case 3: Select variants by rsID (--keep_ids) ---
-log "Starting TEST 3: Select variants by rsID"
-
-log "Executing $meta_name with --keep_ids snp1;indel2..."
+# Run 2: SNP selection removes the indels, --select_expressions "DP > 24"
+# removes snp1
+log "Executing $meta_name with unindexed .vcf.gz --variant, SNP selection, --select_expressions and engine options..."
 "$meta_executable" \
-  --variant "$test_data_dir/variants.vcf" \
-  --output "$meta_temp_dir/keep_ids.vcf" \
-  --output_index "$meta_temp_dir/keep_ids.vcf.idx" \
-  --keep_ids "snp1;indel2"
-
-log "Validating TEST 3 outputs..."
-check_file_exists "$meta_temp_dir/keep_ids.vcf" "keep-ids output VCF"
-check_file_not_empty "$meta_temp_dir/keep_ids.vcf" "keep-ids output VCF"
-
-check_vcf_record_count "$meta_temp_dir/keep_ids.vcf" 2 "keep-ids output VCF"
-
-check_file_contains "$meta_temp_dir/keep_ids.vcf" "snp1" "keep-ids output VCF (snp1 record)"
-check_file_contains "$meta_temp_dir/keep_ids.vcf" "indel2" "keep-ids output VCF (indel2 record)"
-check_file_not_contains "$meta_temp_dir/keep_ids.vcf" "snp2" "keep-ids output VCF (snp2 record should be absent)"
-check_file_not_contains "$meta_temp_dir/keep_ids.vcf" "indel1" "keep-ids output VCF (indel1 record should be absent)"
-
-log "✅ TEST 3 completed successfully"
-
-# --- Test Case 4: Restrict indel size (--max_indel_size / --min_indel_size) ---
-# indel1 (A -> ATG) is a 2bp insertion, indel2 (ATTG -> A) is a 3bp deletion.
-log "Starting TEST 4: Restrict indel size with --max_indel_size"
-
-log "Executing $meta_name with --select_type_to_include INDEL --max_indel_size 2..."
-"$meta_executable" \
-  --variant "$test_data_dir/variants.vcf" \
-  --output "$meta_temp_dir/small_indels.vcf" \
-  --output_index "$meta_temp_dir/small_indels.vcf.idx" \
-  --select_type_to_include INDEL \
-  --max_indel_size 2
-
-log "Validating TEST 4 outputs..."
-check_file_exists "$meta_temp_dir/small_indels.vcf" "small-indels output VCF"
-check_file_not_empty "$meta_temp_dir/small_indels.vcf" "small-indels output VCF"
-
-check_vcf_record_count "$meta_temp_dir/small_indels.vcf" 1 "small-indels output VCF"
-
-check_file_contains "$meta_temp_dir/small_indels.vcf" "indel1" "small-indels output VCF (indel1 record)"
-check_file_not_contains "$meta_temp_dir/small_indels.vcf" "indel2" "small-indels output VCF (indel2 record should be absent, 3bp > max)"
-
-log "✅ TEST 4 completed successfully"
-
-# --- Test Case 5: Shared GATK engine options ---
-log "Starting TEST 5: Shared GATK engine options"
-
-log "Executing $meta_name with --interval_padding, --sites_only_vcf_output, --create_output_variant_index false..."
-"$meta_executable" \
-  --variant "$test_data_dir/variants.vcf" \
-  --output "$meta_temp_dir/output_engine.vcf" \
+  --variant "$test_data_dir/variants_no_index.vcf.gz" \
+  --select_type_to_include SNP \
+  --select_expressions "DP > 24" \
+  --output "$meta_temp_dir/no_index.vcf" \
   --interval_padding 10 \
   --sites_only_vcf_output \
-  --create_output_variant_index false
+  --create_output_variant_index false 2> "$meta_temp_dir/test2_no_index.log"
 
-log "Validating TEST 5 outputs..."
-check_file_exists "$meta_temp_dir/output_engine.vcf" "output VCF file (engine options)"
-check_file_not_empty "$meta_temp_dir/output_engine.vcf" "output VCF file (engine options)"
-check_file_not_exists "$meta_temp_dir/output_engine.vcf.idx" "output VCF index (should not exist with --create_output_variant_index false)"
+log "Validating TEST 2 outputs (unindexed input, engine options)..."
+check_vcf_column "$meta_temp_dir/no_index.vcf" 3 "snp2" "output VCF (SNPs with DP > 24)"
+check_file_contains "$meta_temp_dir/test2_no_index.log" "Warning: no index was provided for '.*variants_no_index.vcf.gz'" "run log (copy of --variant indexed)"
+check_file_not_exists "$test_data_dir/variants_no_index.vcf.gz.tbi" "index next to the input VCF (a copy is indexed instead)"
+check_file_not_exists "$meta_temp_dir/no_index.vcf.idx" "output VCF index (should not exist with --create_output_variant_index false)"
+check_file_contains "$meta_temp_dir/no_index.vcf" "^##GATKCommandLine=.* --interval-padding 10 " "GATK command line (--interval_padding)"
 
 log "Checking that --sites_only_vcf_output dropped the FORMAT/genotype columns..."
-chrom_line=$(grep "^#CHROM" "$meta_temp_dir/output_engine.vcf")
+chrom_line=$(grep "^#CHROM" "$meta_temp_dir/no_index.vcf")
 if [[ "$chrom_line" == *"FORMAT"* || "$chrom_line" == *"sample1"* ]]; then
   log_error "✗ #CHROM header still contains FORMAT/sample columns despite --sites_only_vcf_output: $chrom_line"
   exit 1
@@ -148,191 +132,12 @@ else
   log "✓ #CHROM header has no FORMAT/sample columns (as expected): $chrom_line"
 fi
 
-log "✅ TEST 5 completed successfully"
+log "✅ TEST 2 completed successfully"
 
-# --- Test Case 6: Optional --reference trio ---
-log "Starting TEST 6: Optional --reference"
+# --- Test Case 3: Intervals ---
+log "Starting TEST 3: Interval files, interval strings and --variant_output_filtering"
 
-log "Creating synthetic reference matching the test VCF's seq1 contig..."
-reference_fasta="$test_data_dir/reference.fasta"
-create_test_reference "$reference_fasta" 1 1000
-
-log "Executing $meta_name with --reference..."
-"$meta_executable" \
-  --variant "$test_data_dir/variants.vcf" \
-  --output "$meta_temp_dir/with_reference.vcf" \
-  --output_index "$meta_temp_dir/with_reference.vcf.idx" \
-  --reference "$reference_fasta" \
-  --reference_fai "${reference_fasta}.fai" \
-  --reference_dict "${reference_fasta%.fasta}.dict" \
-  --select_type_to_include SNP
-
-log "Validating TEST 6 outputs..."
-check_file_exists "$meta_temp_dir/with_reference.vcf" "output VCF file (with reference)"
-check_file_not_empty "$meta_temp_dir/with_reference.vcf" "output VCF file (with reference)"
-
-check_vcf_record_count "$meta_temp_dir/with_reference.vcf" 2 "output VCF (with reference)"
-
-log "✅ TEST 6 completed successfully"
-
-# --- Test Case 7: Bgzipped --variant with a separate index ---
-log "Starting TEST 7: Bgzipped --variant with its index in a different directory"
-
-create_test_vcf_gz_with_separate_index "$test_data_dir/variants.vcf" \
-  "$test_data_dir/variants.vcf.gz" "$test_data_dir/indexes/variants.vcf.gz.tbi"
-
-log "Executing $meta_name with --variant .vcf.gz and --variant_index..."
-"$meta_executable" \
-  --variant "$test_data_dir/variants.vcf.gz" \
-  --variant_index "$test_data_dir/indexes/variants.vcf.gz.tbi" \
-  --output "$meta_temp_dir/from_vcf_gz.vcf" \
-  --output_index "$meta_temp_dir/from_vcf_gz.vcf.idx" \
-  --select_type_to_include SNP 2>&1 | tee "$meta_temp_dir/test7.log"
-
-log "Validating TEST 7 outputs..."
-check_file_exists "$meta_temp_dir/from_vcf_gz.vcf" "output VCF file (from .vcf.gz)"
-check_file_contains "$meta_temp_dir/from_vcf_gz.vcf" "^##fileformat=VCF" "output VCF file (from .vcf.gz) header"
-check_file_contains "$meta_temp_dir/from_vcf_gz.vcf" "snp1" "output VCF file (from .vcf.gz) (snp1 record)"
-check_file_contains "$meta_temp_dir/from_vcf_gz.vcf" "snp2" "output VCF file (from .vcf.gz) (snp2 record)"
-check_file_not_contains "$meta_temp_dir/from_vcf_gz.vcf" "indel1" "output VCF file (from .vcf.gz) (indel1 record should be absent)"
-check_file_not_contains "$meta_temp_dir/test7.log" "no index was provided" "run log (index was provided)"
-check_file_not_exists "$test_data_dir/variants.vcf.gz.tbi" "index next to the input VCF"
-
-log "✅ TEST 7 completed successfully"
-
-# --- Test Case 8: Bgzipped --variant without an index ---
-log "Starting TEST 8: Bgzipped --variant without an index"
-
-bgzip -c "$test_data_dir/variants.vcf" > "$test_data_dir/variants_no_index.vcf.gz"
-
-log "Executing $meta_name with --variant .vcf.gz and no index..."
-"$meta_executable" \
-  --variant "$test_data_dir/variants_no_index.vcf.gz" \
-  --output "$meta_temp_dir/from_vcf_gz_no_index.vcf" \
-  --output_index "$meta_temp_dir/from_vcf_gz_no_index.vcf.idx" \
-  --select_type_to_include SNP 2>&1 | tee "$meta_temp_dir/test8.log"
-
-log "Validating TEST 8 outputs..."
-check_file_exists "$meta_temp_dir/from_vcf_gz_no_index.vcf" "output VCF file (from .vcf.gz without index)"
-check_file_contains "$meta_temp_dir/from_vcf_gz_no_index.vcf" "snp1" "output VCF file (from .vcf.gz without index) (snp1 record)"
-check_file_contains "$meta_temp_dir/test8.log" "Warning: no index was provided for '.*variants_no_index.vcf.gz'" "run log (copy of --variant indexed)"
-check_file_not_exists "$test_data_dir/variants_no_index.vcf.gz.tbi" "index next to the input VCF (a copy is indexed instead)"
-
-log "✅ TEST 8 completed successfully"
-
-# --- Test Case 9: --concordance with a separate index ---
-log "Starting TEST 9: Bgzipped --concordance with its index in a different directory"
-
-# The comparison VCF has only the snp1 and indel2 records
-grep -v -e "snp2" -e "indel1" "$test_data_dir/variants.vcf" > "$test_data_dir/comparison.vcf"
-create_test_vcf_gz_with_separate_index "$test_data_dir/comparison.vcf" \
-  "$test_data_dir/comparison.vcf.gz" "$test_data_dir/indexes/comparison.vcf.gz.tbi"
-
-log "Executing $meta_name with --concordance and --concordance_index..."
-"$meta_executable" \
-  --variant "$test_data_dir/variants.vcf" \
-  --concordance "$test_data_dir/comparison.vcf.gz" \
-  --concordance_index "$test_data_dir/indexes/comparison.vcf.gz.tbi" \
-  --output "$meta_temp_dir/concordance.vcf" \
-  --output_index "$meta_temp_dir/concordance.vcf.idx"
-
-log "Validating TEST 9 outputs..."
-check_file_exists "$meta_temp_dir/concordance.vcf" "concordance output VCF"
-check_vcf_record_count "$meta_temp_dir/concordance.vcf" 2 "concordance output VCF"
-check_file_contains "$meta_temp_dir/concordance.vcf" "snp1" "concordance output VCF (snp1 record)"
-check_file_contains "$meta_temp_dir/concordance.vcf" "indel2" "concordance output VCF (indel2 record)"
-check_file_not_contains "$meta_temp_dir/concordance.vcf" "snp2" "concordance output VCF (snp2 record should be absent)"
-check_file_not_exists "$test_data_dir/comparison.vcf.gz.tbi" "index next to the --concordance VCF"
-
-log "✅ TEST 9 completed successfully"
-
-# --- Test Case 10: An index without its input fails ---
-log "Starting TEST 10: --concordance_index without --concordance"
-
-check_fails_with "Error: --concordance_index requires --concordance" "$meta_temp_dir/test10.log" \
-  "$meta_executable" \
-  --variant "$test_data_dir/variants.vcf" \
-  --concordance_index "$test_data_dir/indexes/comparison.vcf.gz.tbi" \
-  --output "$meta_temp_dir/index_only.vcf" \
-  --output_index "$meta_temp_dir/index_only.vcf.idx"
-check_file_not_exists "$meta_temp_dir/index_only.vcf" "output VCF (GATK did not run)"
-
-log "✅ TEST 10 completed successfully"
-
-# --- Test Case 11: Plain --variant without an index ---
-log "Starting TEST 11: Plain --variant without an index, with and without --intervals"
-
-mkdir -p "$test_data_dir/plain"
-cp "$test_data_dir/variants.vcf" "$test_data_dir/plain/variants.vcf"
-echo "seq1:50-250" > "$test_data_dir/plain/region.intervals"
-
-log "Executing $meta_name with a plain --variant and no --intervals..."
-"$meta_executable" \
-  --variant "$test_data_dir/plain/variants.vcf" \
-  --output "$meta_temp_dir/plain_all.vcf" \
-  --output_index "$meta_temp_dir/plain_all.vcf.idx" 2> "$meta_temp_dir/test11_all.log"
-
-log "Validating TEST 11 outputs without --intervals..."
-check_file_contains "$meta_temp_dir/plain_all.vcf" "indel2" "output VCF (all records)"
-check_file_not_contains "$meta_temp_dir/test11_all.log" "no index was provided" "run log (plain VCF used without an index)"
-check_file_not_exists "$test_data_dir/plain/variants.vcf.idx" "index next to the plain input"
-
-log "Executing $meta_name with a plain --variant and --intervals..."
-"$meta_executable" \
-  --variant "$test_data_dir/plain/variants.vcf" \
-  --intervals "$test_data_dir/plain/region.intervals" \
-  --output "$meta_temp_dir/plain_region.vcf" \
-  --output_index "$meta_temp_dir/plain_region.vcf.idx" 2> "$meta_temp_dir/test11_region.log"
-
-log "Validating TEST 11 outputs with --intervals..."
-check_file_contains "$meta_temp_dir/plain_region.vcf" "snp2" "output VCF (record in the interval)"
-check_file_not_contains "$meta_temp_dir/plain_region.vcf" "indel2" "output VCF (record outside the interval)"
-check_file_contains "$meta_temp_dir/test11_region.log" "no index was provided" "run log (indexing warning with --intervals)"
-check_file_not_exists "$test_data_dir/plain/variants.vcf.idx" "index next to the plain input"
-
-log "✅ TEST 11 completed successfully"
-
-# --- Test Case 12: Bgzipped output with an output index ---
-log "Starting TEST 12: Bgzipped output with its index in a different directory"
-
-log "Executing $meta_name with a .vcf.gz --output and --output_index..."
-"$meta_executable" \
-  --variant "$test_data_dir/variants.vcf" \
-  --output "$meta_temp_dir/snps_only.vcf.gz" \
-  --output_index "$meta_temp_dir/indexes/snps_only.tbi" \
-  --select_type_to_include SNP
-
-log "Validating TEST 12 outputs..."
-check_file_exists "$meta_temp_dir/snps_only.vcf.gz" "bgzipped output VCF"
-check_vcf_record_count "$meta_temp_dir/snps_only.vcf.gz" 2 "bgzipped output VCF"
-check_index_moved "$meta_temp_dir/indexes/snps_only.tbi" "$meta_temp_dir/snps_only.vcf.gz.tbi" "output index file"
-check_file_not_empty "$meta_temp_dir/indexes/snps_only.tbi" "output index file"
-
-log "✅ TEST 12 completed successfully"
-
-# --- Test Case 13: Missing --output_index ---
-log "Starting TEST 13: A missing --output_index fails"
-
-check_fails_with "Error: --output_index is required unless --create_output_variant_index is false." "$meta_temp_dir/test13.log" \
-  "$meta_executable" \
-  --variant "$test_data_dir/variants.vcf" \
-  --output "$meta_temp_dir/no_output_index.vcf"
-check_file_not_exists "$meta_temp_dir/no_output_index.vcf" "output VCF (GATK did not run)"
-
-log "✅ TEST 13 completed successfully"
-
-# --- Test Case 14: Multiple intervals, intersection and exclusion ---
-log "Starting TEST 14: Two --intervals files (BED and VCF) with --interval_set_rule INTERSECTION and --exclude_intervals"
-
-mkdir -p "$test_data_dir/intervals"
-# The intersection of seq1:50-350 (BED is 0-based) and the sites in
-# variants.vcf is snp1, snp2 and indel1. The exclusion of seq1:250-350
-# removes indel1.
-printf 'seq1\t49\t350\n' > "$test_data_dir/intervals/include.bed"
-printf 'seq1\t249\t350\n' > "$test_data_dir/intervals/exclude.bed"
-create_test_vcf_gz_with_separate_index "$test_data_dir/variants.vcf" \
-  "$test_data_dir/intervals/sites.vcf.gz" "$test_data_dir/intervals_index/sites.vcf.gz.tbi"
-
+# Run 1: two --intervals files, INTERSECTION and --exclude_intervals
 log "Executing $meta_name with two --intervals files, INTERSECTION and --exclude_intervals..."
 "$meta_executable" \
   --variant "$test_data_dir/variants.vcf" \
@@ -342,91 +147,104 @@ log "Executing $meta_name with two --intervals files, INTERSECTION and --exclude
   --interval_set_rule INTERSECTION \
   --exclude_intervals "$test_data_dir/intervals/exclude.bed" \
   --output "$meta_temp_dir/intervals.vcf" \
-  --output_index "$meta_temp_dir/intervals.vcf.idx" 2> "$meta_temp_dir/test14.log"
+  --output_index "$meta_temp_dir/intervals.vcf.idx" 2> "$meta_temp_dir/test3_intervals.log"
 
-log "Validating TEST 14 outputs..."
-check_file_exists "$meta_temp_dir/intervals.vcf" "output VCF (intervals)"
-check_file_not_contains "$meta_temp_dir/test14.log" "no index was provided for '$test_data_dir/intervals/sites.vcf.gz'" "run log (no indexing of the interval VCF when --intervals_index is given)"
+log "Validating TEST 3 outputs (interval files)..."
+check_file_not_contains "$meta_temp_dir/test3_intervals.log" "no index was provided for '$test_data_dir/intervals/sites.vcf.gz'" "run log (no indexing of the interval VCF when --intervals_index is given)"
 check_file_not_exists "$test_data_dir/intervals/sites.vcf.gz.tbi" "index next to the interval VCF"
-
 check_vcf_column "$meta_temp_dir/intervals.vcf" 3 "snp1 snp2" "output VCF (records in the selected intervals)"
 
-log "✅ TEST 14 completed successfully"
-
-# --- Test Case 15: Interval strings ---
-log "Starting TEST 15: --interval_strings and --exclude_interval_strings"
-
-mkdir -p "$test_data_dir/strings"
-cp "$test_data_dir/variants.vcf" "$test_data_dir/strings/variants.vcf"
-echo "seq1:50-250" > "$test_data_dir/strings/region.intervals"
-
+# Run 2: an --intervals file (seq1:50-250) and an interval string
+# (seq1:380-420), minus an excluded string (seq1:190-210)
 log "Executing $meta_name with an --intervals file, --interval_strings and --exclude_interval_strings..."
 "$meta_executable" \
-  --variant "$test_data_dir/strings/variants.vcf" \
+  --variant "$test_data_dir/variants.vcf" \
   --output "$meta_temp_dir/strings_mixed.vcf" \
   --output_index "$meta_temp_dir/strings_mixed.vcf.idx" \
-  --intervals "$test_data_dir/strings/region.intervals" \
+  --intervals "$test_data_dir/intervals/region.intervals" \
   --interval_strings "seq1:380-420" \
-  --exclude_interval_strings "seq1:190-210" 2> "$meta_temp_dir/test15_mixed.log"
+  --exclude_interval_strings "seq1:190-210" 2> "$meta_temp_dir/test3_mixed.log"
 
-log "Validating TEST 15 outputs with mixed intervals..."
+log "Validating TEST 3 outputs (mixed intervals)..."
 check_vcf_column "$meta_temp_dir/strings_mixed.vcf" 3 "snp1 indel2" "output VCF (interval file and string, minus the excluded string)"
+check_file_contains "$meta_temp_dir/test3_mixed.log" "no index was provided" "run log (indexing warning with --intervals)"
+check_file_not_exists "$test_data_dir/variants.vcf.idx" "index next to the plain input"
 
-log "Executing $meta_name with a plain --variant and only --interval_strings..."
+# Runs 3 and 4: indel2 (seq1:400-403) overlaps seq1:402-410 but does not start
+# in it
+log "Executing $meta_name with only --interval_strings and no --variant_output_filtering..."
 "$meta_executable" \
-  --variant "$test_data_dir/strings/variants.vcf" \
-  --output "$meta_temp_dir/strings_only.vcf" \
-  --output_index "$meta_temp_dir/strings_only.vcf.idx" \
-  --interval_strings "seq1:290-310" 2> "$meta_temp_dir/test15_only.log"
-
-log "Validating TEST 15 outputs with only interval strings..."
-check_vcf_column "$meta_temp_dir/strings_only.vcf" 3 "indel1" "output VCF (interval string only)"
-check_file_contains "$meta_temp_dir/test15_only.log" "no index was provided" "run log (plain --variant indexed when interval strings are given)"
-check_file_not_exists "$test_data_dir/strings/variants.vcf.idx" "index next to the plain input"
-
-log "✅ TEST 15 completed successfully"
-
-# --- Test Case 16: --variant_output_filtering ---
-log "Starting TEST 16: --variant_output_filtering STARTS_IN"
-
-# indel2 (seq1:400-403) overlaps seq1:402-410 but does not start in it
-log "Executing $meta_name with --interval_strings and no --variant_output_filtering..."
-"$meta_executable" \
-  --variant "$test_data_dir/strings/variants.vcf" \
+  --variant "$test_data_dir/variants.vcf" \
   --output "$meta_temp_dir/filtering_default.vcf" \
   --create_output_variant_index false \
   --interval_strings "seq1:190-210" \
-  --interval_strings "seq1:402-410"
+  --interval_strings "seq1:402-410" 2> "$meta_temp_dir/test3_strings.log"
 
-log "Executing $meta_name with --interval_strings and --variant_output_filtering STARTS_IN..."
+log "Executing $meta_name with only --interval_strings and --variant_output_filtering STARTS_IN..."
 "$meta_executable" \
-  --variant "$test_data_dir/strings/variants.vcf" \
+  --variant "$test_data_dir/variants.vcf" \
   --output "$meta_temp_dir/filtering_starts_in.vcf" \
   --create_output_variant_index false \
   --interval_strings "seq1:190-210" \
   --interval_strings "seq1:402-410" \
   --variant_output_filtering STARTS_IN
 
-log "Validating TEST 16 outputs..."
+log "Validating TEST 3 outputs (--variant_output_filtering)..."
 check_vcf_column "$meta_temp_dir/filtering_default.vcf" 3 "snp2 indel2" "output VCF (no filtering mode, records that overlap the intervals)"
+check_file_contains "$meta_temp_dir/test3_strings.log" "no index was provided" "run log (plain --variant indexed when interval strings are given)"
+check_file_not_exists "$test_data_dir/variants.vcf.idx" "index next to the plain input"
 check_vcf_column "$meta_temp_dir/filtering_starts_in.vcf" 3 "snp2" "output VCF (STARTS_IN, records that start in the intervals)"
 
-log "✅ TEST 16 completed successfully"
+log "✅ TEST 3 completed successfully"
 
-# --- Test Case 17: --select and its alternative name ---
-log "Starting TEST 17: --select and --select_expressions"
+# --- Test Case 4: Tool options ---
+log "Starting TEST 4: Record selection options"
 
-for select_arg in --select --select_expressions; do
-  log "Executing $meta_name with $select_arg 'DP > 24'..."
+# Run 1: --keep_ids removes snp2 and indel1, --select "DP > 24" removes snp1
+log "Executing $meta_name with --keep_ids 'snp1;indel2' and --select 'DP > 24'..."
+"$meta_executable" \
+  --variant "$test_data_dir/variants.vcf" \
+  --output "$meta_temp_dir/keep_ids_select.vcf" \
+  --create_output_variant_index false \
+  --keep_ids "snp1;indel2" \
+  --select "DP > 24"
+
+log "Validating TEST 4 outputs (--keep_ids, --select)..."
+check_vcf_column "$meta_temp_dir/keep_ids_select.vcf" 3 "indel2" "output VCF (kept IDs with DP > 24)"
+
+# Run 2: INDEL selection removes the SNPs, --max_indel_size 2 removes indel2
+log "Executing $meta_name with --select_type_to_include INDEL --max_indel_size 2..."
+"$meta_executable" \
+  --variant "$test_data_dir/variants.vcf" \
+  --output "$meta_temp_dir/small_indels.vcf" \
+  --create_output_variant_index false \
+  --select_type_to_include INDEL \
+  --max_indel_size 2
+
+log "Validating TEST 4 outputs (INDEL selection, --max_indel_size)..."
+check_vcf_column "$meta_temp_dir/small_indels.vcf" 3 "indel1" "output VCF (indels of 2bp or less)"
+
+log "✅ TEST 4 completed successfully"
+
+# --- Test Case 5: Argument errors ---
+log "Starting TEST 5: Argument errors"
+
+log "Executing $meta_name with --concordance_index and no --concordance..."
+check_fails_with "Error: --concordance_index requires --concordance" "$meta_temp_dir/test5_concordance.log" \
   "$meta_executable" \
-    --variant "$test_data_dir/strings/variants.vcf" \
-    --output "$meta_temp_dir/select${select_arg}.vcf" \
-    --create_output_variant_index false \
-    "$select_arg" "DP > 24"
+  --variant "$test_data_dir/variants.vcf" \
+  --concordance_index "$test_data_dir/indexes/comparison.vcf.gz.tbi" \
+  --output "$meta_temp_dir/index_only.vcf" \
+  --output_index "$meta_temp_dir/index_only.vcf.idx"
+check_file_not_exists "$meta_temp_dir/index_only.vcf" "output VCF (GATK did not run)"
 
-  check_vcf_column "$meta_temp_dir/select${select_arg}.vcf" 3 "snp2 indel2" "output VCF ($select_arg 'DP > 24')"
-done
+log "Executing $meta_name without --output_index..."
+check_fails_with "Error: --output_index is required unless --create_output_variant_index is false." "$meta_temp_dir/test5_output_index.log" \
+  "$meta_executable" \
+  --variant "$test_data_dir/variants.vcf" \
+  --output "$meta_temp_dir/no_output_index.vcf"
+check_file_not_exists "$meta_temp_dir/no_output_index.vcf" "output VCF (GATK did not run)"
 
-log "✅ TEST 17 completed successfully"
+log "✅ TEST 5 completed successfully"
 
 print_test_summary "All tests"

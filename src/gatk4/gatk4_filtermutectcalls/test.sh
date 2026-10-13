@@ -24,6 +24,20 @@ mkdir -p "$test_data_dir/indexed"
 bgzip -c "$test_data_dir/unfiltered.vcf" > "$test_data_dir/indexed/unfiltered.vcf.gz"
 tabix -p vcf "$test_data_dir/indexed/unfiltered.vcf.gz"
 
+log "Writing contamination and tumor segmentation tables..."
+printf 'sample\tcontamination\terror\ntumor\t0.02\t0.01\n' > "$test_data_dir/contamination.table"
+printf 'contig\tstart\tend\tminor_allele_fraction\nchr1\t1\t500\t0.5\n' > "$test_data_dir/segmentation.table"
+
+log "Learning a read orientation model from the F1R2 counts..."
+gatk LearnReadOrientationModel \
+  --input "$test_data_dir/f1r2.tar.gz" \
+  --output "$test_data_dir/read_orientation_model.tar.gz" \
+  --verbosity ERROR
+check_file_exists "$test_data_dir/read_orientation_model.tar.gz" "read orientation model"
+
+# Positions 241-245, which end 5bp before the call at position 250
+printf 'chr1\t240\t245\n' > "$test_data_dir/near_250.bed"
+
 reference_args=(
   --reference "$test_data_dir/reference.fasta"
   --reference_fai "$test_data_dir/reference.fasta.fai"
@@ -33,8 +47,8 @@ reference_args=(
 # Regex prefix for the chr1:250 call up to its FILTER column (column 7)
 call_250_filter=$'^chr1\t250\t([^\t]*\t){4}'
 
-# --- Test Case 1: Required inputs only ---
-log "Starting TEST 1: Required inputs only"
+# --- Test Case 1: Basic run (required inputs) ---
+log "Starting TEST 1: Basic run (required inputs)"
 
 log "Executing $meta_name with an unindexed --variant and --stats..."
 "$meta_executable" \
@@ -57,21 +71,12 @@ check_file_not_exists "$test_data_dir/no_index/unfiltered.vcf.idx" "index next t
 
 log "✅ TEST 1 completed successfully"
 
-# --- Test Case 2: All optional filtering inputs and an output index ---
-log "Starting TEST 2: All optional filtering inputs and an output index"
+# --- Test Case 2: Optional inputs and filter options ---
+log "Starting TEST 2: Optional inputs, output index and filter options"
 
-log "Writing contamination and tumor segmentation tables..."
-printf 'sample\tcontamination\terror\ntumor\t0.02\t0.01\n' > "$test_data_dir/contamination.table"
-printf 'contig\tstart\tend\tminor_allele_fraction\nchr1\t1\t500\t0.5\n' > "$test_data_dir/segmentation.table"
-
-log "Learning a read orientation model from the F1R2 counts..."
-gatk LearnReadOrientationModel \
-  --input "$test_data_dir/f1r2.tar.gz" \
-  --output "$test_data_dir/read_orientation_model.tar.gz" \
-  --verbosity ERROR
-check_file_exists "$test_data_dir/read_orientation_model.tar.gz" "read orientation model"
-
-log "Executing $meta_name with an indexed .vcf.gz --variant and all optional filtering inputs..."
+# The alternate reads of the fixture are all on the forward strand, so a
+# minimum of 1 alternate read per strand filters the call
+log "Executing $meta_name with an indexed .vcf.gz --variant, all optional filtering inputs, --threshold_strategy CONSTANT and --min_reads_per_strand 1..."
 "$meta_executable" \
   --variant "$test_data_dir/indexed/unfiltered.vcf.gz" \
   --variant_index "$test_data_dir/indexed/unfiltered.vcf.gz.tbi" \
@@ -80,87 +85,34 @@ log "Executing $meta_name with an indexed .vcf.gz --variant and all optional fil
   --contamination_table "$test_data_dir/contamination.table" \
   --tumor_segmentation "$test_data_dir/segmentation.table" \
   --orientation_bias_artifact_priors "$test_data_dir/read_orientation_model.tar.gz" \
+  --threshold_strategy CONSTANT \
+  --initial_threshold 0.1 \
+  --min_reads_per_strand 1 \
   --output "$meta_temp_dir/filtered_all.vcf.gz" \
   --output_index "$meta_temp_dir/filtered_all.tbi" \
   --filtering_stats "$meta_temp_dir/filtering_stats_all.tsv" 2>&1 | tee "$meta_temp_dir/test2.log"
 
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/filtered_all.vcf.gz" "output VCF file"
-check_vcf_has_record "$meta_temp_dir/filtered_all.vcf.gz" "${call_250_filter}"$'([^.\t][^\t]*|\\.[^\t]+)\t' "output VCF (chr1:250 call has a FILTER value)"
+check_vcf_has_record "$meta_temp_dir/filtered_all.vcf.gz" "${call_250_filter}"$'[^\t]*strict_strand' "output VCF (chr1:250 call has the strict_strand filter)"
 check_index_moved "$meta_temp_dir/filtered_all.tbi" "$meta_temp_dir/filtered_all.vcf.gz.tbi" "output index file"
 check_file_exists "$meta_temp_dir/filtering_stats_all.tsv" "output filtering stats file"
 check_file_not_contains "$meta_temp_dir/test2.log" "Warning: no index was provided" "run log (no copy warning when the index is given)"
+zcat "$meta_temp_dir/filtered_all.vcf.gz" > "$meta_temp_dir/filtered_all.vcf"
+check_file_contains "$meta_temp_dir/filtered_all.vcf" "contamination-table" "output VCF command line (--contamination_table)"
+check_file_contains "$meta_temp_dir/filtered_all.vcf" "tumor-segmentation" "output VCF command line (--tumor_segmentation)"
+check_file_contains "$meta_temp_dir/filtered_all.vcf" "orientation-bias-artifact-priors" "output VCF command line (--orientation_bias_artifact_priors)"
+check_file_contains "$meta_temp_dir/filtered_all.vcf" "threshold-strategy CONSTANT" "output VCF command line (--threshold_strategy)"
+check_file_contains "$meta_temp_dir/filtered_all.vcf" "initial-threshold 0.1" "output VCF command line (--initial_threshold)"
 
 log "✅ TEST 2 completed successfully"
 
-# --- Test Case 3: Threshold and hard filter options ---
-log "Starting TEST 3: Threshold and hard filter options"
-
-# The alternate reads of the fixture are all on the forward strand, so a
-# minimum of 1 alternate read per strand filters the call
-log "Executing $meta_name with --threshold_strategy CONSTANT and --min_reads_per_strand 1..."
-"$meta_executable" \
-  --variant "$test_data_dir/unfiltered.vcf" \
-  --stats "$test_data_dir/unfiltered.vcf.stats" \
-  "${reference_args[@]}" \
-  --threshold_strategy CONSTANT \
-  --initial_threshold 0.1 \
-  --min_reads_per_strand 1 \
-  --output "$meta_temp_dir/filtered_strand.vcf" \
-  --output_index "$meta_temp_dir/filtered_strand.idx" \
-  --filtering_stats "$meta_temp_dir/filtering_stats_strand.tsv"
-
-log "Validating TEST 3 outputs..."
-check_vcf_has_record "$meta_temp_dir/filtered_strand.vcf" "${call_250_filter}"$'[^\t]*strict_strand' "output VCF (chr1:250 call has the strict_strand filter)"
-check_file_contains "$meta_temp_dir/filtered_strand.vcf" "threshold-strategy CONSTANT" "output VCF command line (--threshold_strategy)"
-
-log "✅ TEST 3 completed successfully"
-
-# --- Test Case 4: Intervals and output index without index creation ---
-log "Starting TEST 4: Intervals, and --output_index without index creation"
-
-printf 'chr1\t0\t100\n' > "$test_data_dir/no_calls.bed"
+# --- Test Case 3: Intervals and index options ---
+log "Starting TEST 3: Interval padding, and --output_index without index creation"
 
 # The --output_index path is set with --create_output_variant_index false, the
 # same as the Nextflow runner does, so it must be ignored
-log "Executing $meta_name with an --intervals BED file that has no calls..."
-"$meta_executable" \
-  --variant "$test_data_dir/unfiltered.vcf" \
-  --stats "$test_data_dir/unfiltered.vcf.stats" \
-  "${reference_args[@]}" \
-  --intervals "$test_data_dir/no_calls.bed" \
-  --output "$meta_temp_dir/filtered_intervals.vcf" \
-  --output_index "$meta_temp_dir/filtered_intervals.idx" \
-  --create_output_variant_index false \
-  --filtering_stats "$meta_temp_dir/filtering_stats_intervals.tsv"
-
-log "Validating TEST 4 outputs..."
-check_vcf_record_count "$meta_temp_dir/filtered_intervals.vcf" 0 "output VCF (no calls in --intervals)"
-check_file_not_exists "$meta_temp_dir/filtered_intervals.idx" "output index file"
-check_file_not_exists "$meta_temp_dir/filtered_intervals.vcf.idx" "index next to the output VCF"
-
-log "✅ TEST 4 completed successfully"
-
-# --- Test Case 5: Missing --output_index ---
-log "Starting TEST 5: A missing --output_index fails"
-
-check_fails_with "Error: --output_index is required unless" "$meta_temp_dir/test5.log" \
-  "$meta_executable" \
-  --variant "$test_data_dir/unfiltered.vcf" \
-  --stats "$test_data_dir/unfiltered.vcf.stats" \
-  "${reference_args[@]}" \
-  --output "$meta_temp_dir/no_output_index.vcf" \
-  --filtering_stats "$meta_temp_dir/no_output_index.tsv"
-
-log "✅ TEST 5 completed successfully"
-
-# --- Test Case 6: Interval padding ---
-log "Starting TEST 6: --interval_padding and --interval_exclusion_padding"
-
-# Positions 241-245, which end 5bp before the call at position 250
-printf 'chr1\t240\t245\n' > "$test_data_dir/near_250.bed"
-
-log "Executing $meta_name with an --intervals file next to the call, without padding..."
+log "Executing $meta_name with an --intervals file next to the call, without padding and without an output index..."
 "$meta_executable" \
   --variant "$test_data_dir/no_index/unfiltered.vcf" \
   --stats "$test_data_dir/unfiltered.vcf.stats" \
@@ -168,9 +120,12 @@ log "Executing $meta_name with an --intervals file next to the call, without pad
   --intervals "$test_data_dir/near_250.bed" \
   --output "$meta_temp_dir/filtered_no_padding.vcf" \
   --output_index "$meta_temp_dir/filtered_no_padding.idx" \
+  --create_output_variant_index false \
   --filtering_stats "$meta_temp_dir/filtering_stats_no_padding.tsv"
 
 check_vcf_lacks_record "$meta_temp_dir/filtered_no_padding.vcf" $'^chr1\t250\t' "output VCF (chr1:250 call outside the interval)"
+check_file_not_exists "$meta_temp_dir/filtered_no_padding.idx" "output index file"
+check_file_not_exists "$meta_temp_dir/filtered_no_padding.vcf.idx" "index next to the output VCF"
 
 log "Executing $meta_name with the same --intervals file and --interval_padding 5..."
 "$meta_executable" \
@@ -201,6 +156,19 @@ log "Executing $meta_name with the same file as --exclude_intervals and --interv
 check_vcf_lacks_record "$meta_temp_dir/filtered_exclusion_padding.vcf" $'^chr1\t250\t' "output VCF (chr1:250 call in the padded excluded interval)"
 check_file_not_exists "$test_data_dir/no_index/unfiltered.vcf.idx" "index next to the plain --variant"
 
-log "✅ TEST 6 completed successfully"
+log "✅ TEST 3 completed successfully"
+
+# --- Test Case 4: Argument errors ---
+log "Starting TEST 4: Argument errors"
+
+check_fails_with "Error: --output_index is required unless" "$meta_temp_dir/test4_output_index.log" \
+  "$meta_executable" \
+  --variant "$test_data_dir/unfiltered.vcf" \
+  --stats "$test_data_dir/unfiltered.vcf.stats" \
+  "${reference_args[@]}" \
+  --output "$meta_temp_dir/no_output_index.vcf" \
+  --filtering_stats "$meta_temp_dir/no_output_index.tsv"
+
+log "✅ TEST 4 completed successfully"
 
 print_test_summary "All tests"
