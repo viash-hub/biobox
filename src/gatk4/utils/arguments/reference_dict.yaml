@@ -1,0 +1,4 @@
+name: "--reference_dict"
+type: file
+description: Sequence dictionary (`.dict`) file for the reference sequence.
+example: reference.dict
