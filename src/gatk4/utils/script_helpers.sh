@@ -485,6 +485,59 @@ gatk_bam_output_args() {
   )
 }
 
+# Build the GATK flags for the shared "GATK Annotation Options" group
+# (annotation_argument_group.yaml). The component adds the flags for its own
+# annotation arguments (for example `--annotations-to-exclude`).
+#
+# Usage: gatk_annotation_args result_array_name
+gatk_annotation_args() {
+  local -n annotation_args_ref="$1"
+
+  local annotation_flags=()
+  local annotation_group_flags=()
+  split_multiple_to_flags "$par_annotation" "--annotation" annotation_flags
+  split_multiple_to_flags "$par_annotation_group" "--annotation-group" annotation_group_flags
+  annotation_args_ref=("${annotation_flags[@]}" "${annotation_group_flags[@]}")
+}
+
+# Build the GATK flags for the shared "GATK Assembly Options" group
+# (assembly_argument_group.yaml). The checks for `--bam_output` and the move of
+# `--bam_output_index` stay in the component script.
+#
+# Usage: gatk_assembly_args result_array_name
+gatk_assembly_args() {
+  local -n assembly_args_ref="$1"
+
+  local kmer_size_flags=()
+  split_multiple_to_flags "$par_kmer_size" "--kmer-size" kmer_size_flags
+
+  assembly_args_ref=(
+    ${par_active_probability_threshold:+--active-probability-threshold "$par_active_probability_threshold"}
+    ${par_assembly_region_padding:+--assembly-region-padding "$par_assembly_region_padding"}
+    ${par_bam_writer_type:+--bam-writer-type "$par_bam_writer_type"}
+    ${par_base_quality_score_threshold:+--base-quality-score-threshold "$par_base_quality_score_threshold"}
+    "${kmer_size_flags[@]}"
+    ${par_max_assembly_region_size:+--max-assembly-region-size "$par_max_assembly_region_size"}
+    ${par_max_reads_per_alignment_start:+--max-reads-per-alignment-start "$par_max_reads_per_alignment_start"}
+    ${par_min_assembly_region_size:+--min-assembly-region-size "$par_min_assembly_region_size"}
+    ${par_min_base_quality_score:+--min-base-quality-score "$par_min_base_quality_score"}
+    ${par_min_pruning:+--min-pruning "$par_min_pruning"}
+    ${par_pcr_indel_model:+--pcr-indel-model "$par_pcr_indel_model"}
+  )
+  if is_true "${par_create_bam_output:-}"; then
+    assembly_args_ref+=(--bam-output "$par_bam_output")
+  fi
+  if is_true "${par_dont_use_soft_clipped_bases:-}"; then
+    assembly_args_ref+=(--dont-use-soft-clipped-bases)
+  fi
+  if is_true "${par_force_active:-}"; then
+    assembly_args_ref+=(--force-active)
+  fi
+  if is_true "${par_force_call_filtered_alleles:-}"; then
+    assembly_args_ref+=(--force-call-filtered-alleles)
+  fi
+}
+
 # Build the GATK flags for all the arguments in the shared "GATK Read Filter
 # Options" group (read_argument_group.yaml). The argument values are read from
 # the `par_*` variables of that group.
