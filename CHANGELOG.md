@@ -8,15 +8,15 @@
 * `gatk4/*`: Rename `--bai` to `--read_index` (PR #272).
   The index is now passed to GATK with `--read-index`, so it can be a `.bai` for a BAM file or a `.crai` for a CRAM file.
 
-* `gatk4`: Split the shared GATK engine arguments into engine, read filter, VCF output and BAM output groups (PR #xxx).
+* `gatk4`: Split the shared GATK engine arguments into engine, read filter, VCF output and BAM output groups (PR #273).
   Each component now has only the shared arguments that apply to its tool.
 
-* `gatk4/*`: Remove arguments that do not work as a component argument (PR #xxx).
+* `gatk4/*`: Remove arguments that do not work as a component argument (PR #273).
   - Remove 8 read filters from the `--read_filter` choices, because they need a setting that the components do not have
   - `gatk4_combinegvcfs`, `gatk4_genotypegvcfs`: Remove `--max_variants_per_shard`, because GATK then writes shard files and nothing at `--output`
   - `gatk4_genotypegvcfs`: Remove `--only_output_calls_starting_in_intervals`, which GATK marks as deprecated (use `--variant_output_filtering STARTS_IN`)
 
-* `gatk4/*`: Rename arguments to follow the GATK argument names (PR #xxx).
+* `gatk4/*`: Rename arguments to follow the GATK argument names (PR #273).
   The old names are kept as alternatives.
   - `gatk4_haplotypecaller`, `gatk4_genotypegvcfs`: `--stand_call_conf` is now `--standard_min_confidence_threshold_for_calling`
   - `gatk4_selectvariants`: `--select_expressions` is now `--select`
@@ -37,9 +37,9 @@
 
 ## MINOR CHANGES
 
-* `gatk4/*`: Add `--lenient` to all components with GATK engine options, and `--read_validation_stringency` and `--inverted_read_filter` to the components that read BAM/CRAM files (PR #xxx).
+* `gatk4/*`: Add `--lenient` to all components with GATK engine options, and `--read_validation_stringency` and `--inverted_read_filter` to the components that read BAM/CRAM files (PR #273).
 
-* `gatk4/*`: Add missing arguments (PR #xxx).
+* `gatk4/*`: Add missing arguments (PR #273).
   - Add `--keep_read_group`, `--sample`, `--library` and `--read_group_black_list` for the read filters that need them
   - `gatk4_applybqsr`, `gatk4_baserecalibrator`, `gatk4_getpileupsummaries`, `gatk4_haplotypecaller`: `--input` and `--read_index` can now be given more than once
   - `gatk4_haplotypecaller`: Add `--bam_output` (with `--create_bam_output` and `--bam_output_index`), `--bam_writer_type`, `--maximum_mapping_quality`, `--mapping_quality_threshold_for_genotyping`, `--do_not_run_physical_phasing`, `--force_call_filtered_alleles`, `--disable_tool_default_annotations`, `--max_mnp_distance`, `--population_callset` (with `--population_callset_index`), `--num_reference_samples_if_no_call`, `--use_posteriors_to_calculate_qual`, `--contamination_fraction_per_sample_file`, `--max_genotype_count`, `--denovo_depth_threshold` and `--denovo_parent_gq_threshold`
@@ -49,7 +49,7 @@
   - `gatk4_genotypegvcfs`: Add `--allow_old_rms_mapping_quality_annotation_data`, `--denovo_depth_threshold`, `--denovo_parent_gq_threshold` and `--force_output_interval_strings`
   - `gatk4_selectvariants` and `gatk4_variantfiltration`: Add `--variant_output_filtering`
 
-* `gatk4/*`: Fix argument descriptions (PR #xxx).
+* `gatk4/*`: Fix argument descriptions (PR #273).
   - `gatk4_mutect2`: `--af_of_alleles_not_in_resource` uses a fixed value when it is negative, it is not derived from the data
   - `gatk4_applybqsr`: `--round_down_quantized` and `--quantize_quals` refer to the correct arguments
   - Add the missing defaults to the descriptions of several arguments
