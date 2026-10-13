@@ -8,14 +8,10 @@ set -eo pipefail
 source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 unset_if_false \
-  par_create_bam_output \
   par_disable_optimizations \
   par_disable_tool_default_annotations \
   par_do_not_run_physical_phasing \
-  par_dont_use_soft_clipped_bases \
   par_floor_blocks \
-  par_force_active \
-  par_force_call_filtered_alleles \
   par_use_posteriors_to_calculate_qual
 
 # Check the arguments
@@ -45,12 +41,11 @@ stage_optional_vcf "$tmp_dir" "$par_population_callset" "$par_population_callset
 stage_interval_arguments "$tmp_dir" interval_args
 
 # Convert semicolon-separated arguments to repeated flags
-split_multiple_to_flags "$par_annotation" "--annotation" annotation_args
-split_multiple_to_flags "$par_annotation_group" "--annotation-group" annotation_group_args
+gatk_annotation_args annotation_args
 split_multiple_to_flags "$par_annotations_to_exclude" "--annotations-to-exclude" annotations_to_exclude_args
 split_multiple_to_flags "$par_founder_id" "--founder-id" founder_id_args
 split_multiple_to_flags "$par_gvcf_gq_bands" "--gvcf-gq-bands" gvcf_gq_bands_args
-split_multiple_to_flags "$par_kmer_size" "--kmer-size" kmer_size_args
+gatk_assembly_args assembly_args
 gatk_engine_args "$tmp_dir" engine_args
 gatk_vcf_output_args vcf_output_args
 gatk_bam_output_args bam_output_args
@@ -63,15 +58,10 @@ cmd_args=(
   --reference "$staged_reference"
   --native-pair-hmm-threads "${meta_cpus:-1}"
   "${vcf_args[@]}"
-  ${par_active_probability_threshold:+--active-probability-threshold "$par_active_probability_threshold"}
+  "${assembly_args[@]}"
   ${par_activeregion_alt_multiplier:+--activeregion-alt-multiplier "$par_activeregion_alt_multiplier"}
   "${annotation_args[@]}"
-  "${annotation_group_args[@]}"
   "${annotations_to_exclude_args[@]}"
-  ${par_assembly_region_padding:+--assembly-region-padding "$par_assembly_region_padding"}
-  ${par_create_bam_output:+--bam-output "$par_bam_output"}
-  ${par_bam_writer_type:+--bam-writer-type "$par_bam_writer_type"}
-  ${par_base_quality_score_threshold:+--base-quality-score-threshold "$par_base_quality_score_threshold"}
   ${par_contamination_fraction_per_sample_file:+--contamination-fraction-per-sample-file "$par_contamination_fraction_per_sample_file"}
   ${par_contamination_fraction_to_filter:+--contamination-fraction-to-filter "$par_contamination_fraction_to_filter"}
   ${par_denovo_depth_threshold:+--denovo-depth-threshold "$par_denovo_depth_threshold"}
@@ -79,32 +69,22 @@ cmd_args=(
   ${par_disable_optimizations:+--disable-optimizations}
   ${par_disable_tool_default_annotations:+--disable-tool-default-annotations}
   ${par_do_not_run_physical_phasing:+--do-not-run-physical-phasing}
-  ${par_dont_use_soft_clipped_bases:+--dont-use-soft-clipped-bases}
   ${par_emit_ref_confidence:+--emit-ref-confidence "$par_emit_ref_confidence"}
   ${par_floor_blocks:+--floor-blocks}
-  ${par_force_active:+--force-active}
-  ${par_force_call_filtered_alleles:+--force-call-filtered-alleles}
   "${founder_id_args[@]}"
   "${gvcf_gq_bands_args[@]}"
   ${par_heterozygosity:+--heterozygosity "$par_heterozygosity"}
   ${par_heterozygosity_stdev:+--heterozygosity-stdev "$par_heterozygosity_stdev"}
   ${par_indel_heterozygosity:+--indel-heterozygosity "$par_indel_heterozygosity"}
   "${interval_args[@]}"
-  "${kmer_size_args[@]}"
   ${par_mapping_quality_threshold_for_genotyping:+--mapping-quality-threshold-for-genotyping "$par_mapping_quality_threshold_for_genotyping"}
   ${par_max_alternate_alleles:+--max-alternate-alleles "$par_max_alternate_alleles"}
-  ${par_max_assembly_region_size:+--max-assembly-region-size "$par_max_assembly_region_size"}
   ${par_max_genotype_count:+--max-genotype-count "$par_max_genotype_count"}
   ${par_max_mnp_distance:+--max-mnp-distance "$par_max_mnp_distance"}
-  ${par_max_reads_per_alignment_start:+--max-reads-per-alignment-start "$par_max_reads_per_alignment_start"}
   ${par_maximum_mapping_quality:+--maximum-mapping-quality "$par_maximum_mapping_quality"}
-  ${par_min_assembly_region_size:+--min-assembly-region-size "$par_min_assembly_region_size"}
-  ${par_min_base_quality_score:+--min-base-quality-score "$par_min_base_quality_score"}
-  ${par_min_pruning:+--min-pruning "$par_min_pruning"}
   ${par_minimum_mapping_quality:+--minimum-mapping-quality "$par_minimum_mapping_quality"}
   ${par_num_reference_samples_if_no_call:+--num-reference-samples-if-no-call "$par_num_reference_samples_if_no_call"}
   ${par_output_mode:+--output-mode "$par_output_mode"}
-  ${par_pcr_indel_model:+--pcr-indel-model "$par_pcr_indel_model"}
   ${par_pedigree:+--pedigree "$par_pedigree"}
   ${par_ploidy_regions:+--ploidy-regions "$par_ploidy_regions"}
   ${par_sample_name:+--sample-name "$par_sample_name"}
