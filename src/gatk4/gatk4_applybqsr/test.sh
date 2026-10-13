@@ -60,7 +60,7 @@ mkdir -p "$meta_temp_dir/test1" "$meta_temp_dir/test1_index"
 log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
-  --bai "$test_data_dir/sample.sorted.bai" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -97,7 +97,7 @@ check_file_exists "$intervals_bed" "intervals BED file"
 log "Executing $meta_name with advanced parameters..."
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
-  --bai "$test_data_dir/sample.sorted.bai" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -133,7 +133,7 @@ mkdir -p "$meta_temp_dir/test3"
 log "Executing $meta_name without a reference..."
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
-  --bai "$test_data_dir/sample.sorted.bai" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test3/output.bam" \
   --output_index "$meta_temp_dir/test3/output.bai"
@@ -153,7 +153,7 @@ mkdir -p "$meta_temp_dir/test4"
 log "Executing $meta_name with --interval_padding, --sites_only_vcf_output, --create_output_variant_index false, --create_output_bam_index false..."
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
-  --bai "$test_data_dir/sample.sorted.bai" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -178,7 +178,7 @@ mkdir -p "$meta_temp_dir/test5"
 
 if "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
-  --bai "$test_data_dir/sample.sorted.bai" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test5/output.bam" > "$meta_temp_dir/test5/run.log" 2>&1; then
   log_error "✗ $meta_name did not fail without --output_index"
@@ -205,7 +205,7 @@ create_test_vcf_gz_with_separate_index "$test_data_dir/intervals_site.vcf" \
 log "Executing $meta_name with two --intervals files, --intervals_index and --exclude_intervals..."
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
-  --bai "$test_data_dir/sample.sorted.bai" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
@@ -233,5 +233,111 @@ else
 fi
 
 log "✅ TEST 6 completed successfully"
+
+# --- Test Case 7: CRAM input with a separate index ---
+log "Starting TEST 7: CRAM --input with its .crai in another directory"
+
+mkdir -p "$meta_temp_dir/test7"
+
+create_test_cram "$test_data_dir/sample.sorted.bam" "$test_data_dir/reference.fasta" \
+  "$test_data_dir/cram/sample.cram" "$test_data_dir/cram_index/sample.cram.crai"
+check_file_not_exists "$test_data_dir/cram/sample.cram.crai" "index next to the CRAM input"
+
+log "Executing $meta_name with a CRAM --input and --read_index..."
+"$meta_executable" \
+  --input "$test_data_dir/cram/sample.cram" \
+  --read_index "$test_data_dir/cram_index/sample.cram.crai" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --bqsr_recal_file "$recal_table" \
+  --output "$meta_temp_dir/test7/output.bam" \
+  --output_index "$meta_temp_dir/test7/output.bai"
+
+log "Validating TEST 7 outputs..."
+check_file_exists "$meta_temp_dir/test7/output.bam" "recalibrated BAM from CRAM input"
+check_file_exists "$meta_temp_dir/test7/output.bai" "output BAM index from CRAM input"
+
+gatk ValidateSamFile \
+  --INPUT "$meta_temp_dir/test7/output.bam" \
+  --MODE SUMMARY \
+  --VERBOSITY ERROR \
+  > "$meta_temp_dir/test7/validate.log" 2>&1 || true
+check_file_not_contains "$meta_temp_dir/test7/validate.log" "ERROR:" "ValidateSamFile summary (no ERROR-level issues)"
+
+read_count=$(samtools view -c "$meta_temp_dir/test7/output.bam")
+if [[ "$read_count" == "20" ]]; then
+  log "✓ output BAM has all $read_count reads of the CRAM input"
+else
+  log_error "✗ output BAM has $read_count reads, expected 20"
+  exit 1
+fi
+
+log "✅ TEST 7 completed successfully"
+
+# --- Test Case 8: CRAM output ---
+log "Starting TEST 8: CRAM --output with --output_index in another directory"
+
+mkdir -p "$meta_temp_dir/test8" "$meta_temp_dir/test8_index"
+
+log "Executing $meta_name with a CRAM --output..."
+"$meta_executable" \
+  --input "$test_data_dir/sample.sorted.bam" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --bqsr_recal_file "$recal_table" \
+  --output "$meta_temp_dir/test8/output.cram" \
+  --output_index "$meta_temp_dir/test8_index/output.cram.bai"
+
+log "Validating TEST 8 outputs..."
+check_file_exists "$meta_temp_dir/test8/output.cram" "recalibrated CRAM"
+check_file_exists "$meta_temp_dir/test8_index/output.cram.bai" "output CRAM index"
+check_file_not_exists "$meta_temp_dir/test8/output.cram.bai" "index next to the output CRAM (moved to --output_index)"
+check_file_not_exists "$meta_temp_dir/test8/output.cram.crai" "CRAI index next to the output CRAM"
+check_file_not_exists "$meta_temp_dir/test8/output.bai" "BAI index next to the output CRAM"
+
+if [[ "$(head -c 4 "$meta_temp_dir/test8/output.cram")" == "CRAM" ]]; then
+  log "✓ output has the CRAM magic bytes"
+else
+  log_error "✗ output does not have the CRAM magic bytes"
+  exit 1
+fi
+if [[ "$(head -c 4 "$meta_temp_dir/test8_index/output.cram.bai")" == $'BAI\x01' ]]; then
+  log "✓ output index has the BAI magic bytes"
+else
+  log_error "✗ output index does not have the BAI magic bytes"
+  exit 1
+fi
+
+gatk ValidateSamFile \
+  --INPUT "$meta_temp_dir/test8/output.cram" \
+  --REFERENCE_SEQUENCE "$test_data_dir/reference.fasta" \
+  --MODE SUMMARY \
+  --VERBOSITY ERROR \
+  > "$meta_temp_dir/test8/validate.log" 2>&1 || true
+check_file_not_contains "$meta_temp_dir/test8/validate.log" "ERROR:" "ValidateSamFile summary (no ERROR-level issues)"
+
+log "✅ TEST 8 completed successfully"
+
+# --- Test Case 9: CRAM input without a reference ---
+log "Starting TEST 9: CRAM --input without --reference"
+
+mkdir -p "$meta_temp_dir/test9"
+
+if "$meta_executable" \
+  --input "$test_data_dir/cram/sample.cram" \
+  --read_index "$test_data_dir/cram_index/sample.cram.crai" \
+  --bqsr_recal_file "$recal_table" \
+  --output "$meta_temp_dir/test9/output.bam" \
+  --output_index "$meta_temp_dir/test9/output.bai" > "$meta_temp_dir/test9/run.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with a CRAM --input and no --reference"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test9/run.log" "Error: --reference is required for CRAM input or output." "error message"
+check_file_not_exists "$meta_temp_dir/test9/output.bam" "output BAM (should not be written)"
+
+log "✅ TEST 9 completed successfully"
 
 print_test_summary "All tests"

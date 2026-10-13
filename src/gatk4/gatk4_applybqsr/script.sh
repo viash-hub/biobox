@@ -22,6 +22,11 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
+if [[ ( "$par_input" == *.cram || "$par_output" == *.cram ) && -z "$par_reference" ]]; then
+  echo "Error: --reference is required for CRAM input or output." >&2
+  exit 1
+fi
+
 move_output_index=""
 if [[ "$par_create_output_bam_index" != "false" ]]; then
   if [[ -z "$par_output_index" ]]; then
@@ -32,12 +37,13 @@ if [[ "$par_create_output_bam_index" != "false" ]]; then
   gatk_output_index=$(gatk_output_bam_index_path "$par_output")
 fi
 
-# Stage the BAM/BAI, the interval files and the reference (if provided) into
-# a temp dir using matching basenames so GATK can find them.
+# Stage the interval files and the reference (if provided) into a temp dir
+# using matching basenames so GATK can find them. The read index is passed
+# with --read-index, so it does not need to be staged.
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_applybqsr.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
-staged_bam=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
+gatk_read_args "$par_input" "$par_read_index" read_args
 stage_interval_arguments "$tmp_dir" interval_args
 
 reference_args=()
@@ -72,7 +78,7 @@ split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disab
 
 # Build command arguments array
 cmd_args=(
-  --input "$staged_bam"
+  "${read_args[@]}"
   "${reference_args[@]}"
   --bqsr-recal-file "$par_bqsr_recal_file"
   --output "$par_output"

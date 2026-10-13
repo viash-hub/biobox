@@ -58,9 +58,9 @@ log "Starting TEST 1: Tumor-normal mode"
 log "Executing $meta_name with a tumor and a normal BAM..."
 "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
-  --bai "$test_data_dir/tumor.bai" \
+  --read_index "$test_data_dir/tumor.bai" \
   --input "$test_data_dir/normal.bam" \
-  --bai "$test_data_dir/normal.bai" \
+  --read_index "$test_data_dir/normal.bai" \
   --normal_sample normal \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/tumor_normal.vcf" \
@@ -92,7 +92,7 @@ log "Executing $meta_name with only a tumor BAM, --output_stats next to --output
 mkdir -p "$meta_temp_dir/tumor_only"
 "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
-  --bai "$test_data_dir/tumor.bai" \
+  --read_index "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/tumor_only/tumor_only.vcf.gz" \
   --output_stats "$meta_temp_dir/tumor_only/tumor_only.vcf.gz.stats" \
@@ -149,9 +149,9 @@ printf 'chr1\t199\t300\n' > "$test_data_dir/intervals.bed"
 log "Executing $meta_name with an unindexed --germline_resource, an indexed --panel_of_normals and --intervals..."
 "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
-  --bai "$test_data_dir/tumor.bai" \
+  --read_index "$test_data_dir/tumor.bai" \
   --input "$test_data_dir/normal.bam" \
-  --bai "$test_data_dir/normal.bai" \
+  --read_index "$test_data_dir/normal.bai" \
   --normal_sample normal \
   "${reference_args[@]}" \
   --germline_resource "$test_data_dir/germline_resource.vcf" \
@@ -177,9 +177,9 @@ log "Starting TEST 4: Bamout and calling options"
 log "Executing $meta_name with --bam_output and calling, annotation and assembly options..."
 "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
-  --bai "$test_data_dir/tumor.bai" \
+  --read_index "$test_data_dir/tumor.bai" \
   --input "$test_data_dir/normal.bam" \
-  --bai "$test_data_dir/normal.bai" \
+  --read_index "$test_data_dir/normal.bai" \
   --normal_sample normal \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/options.vcf" \
@@ -220,7 +220,7 @@ log "Starting TEST 5: Minimum mapping quality"
 log "Executing $meta_name on MQ 15 reads with the default --minimum_mapping_quality (20)..."
 "$meta_executable" \
   --input "$test_data_dir/tumor_mq15.bam" \
-  --bai "$test_data_dir/tumor_mq15.bai" \
+  --read_index "$test_data_dir/tumor_mq15.bai" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/mq_default.vcf" \
   --output_stats "$meta_temp_dir/mq_default.stats" \
@@ -231,7 +231,7 @@ check_file_contains "$meta_temp_dir/test5_default.log" "16 read(s) filtered by: 
 log "Executing $meta_name on MQ 15 reads with --minimum_mapping_quality 10..."
 "$meta_executable" \
   --input "$test_data_dir/tumor_mq15.bam" \
-  --bai "$test_data_dir/tumor_mq15.bai" \
+  --read_index "$test_data_dir/tumor_mq15.bai" \
   "${reference_args[@]}" \
   --minimum_mapping_quality 10 \
   --output "$meta_temp_dir/mq10.vcf" \
@@ -242,25 +242,25 @@ check_file_contains "$meta_temp_dir/test5_mq10.log" "0 read(s) filtered by: Mapp
 
 log "✅ TEST 5 completed successfully"
 
-# --- Test Case 6: --input and --bai count mismatch ---
+# --- Test Case 6: Invalid argument combinations ---
 log "Starting TEST 6: Invalid argument combinations fail"
 
 if "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
   --input "$test_data_dir/normal.bam" \
-  --bai "$test_data_dir/tumor.bai" \
+  --read_index "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/mismatch.vcf" \
   --output_stats "$meta_temp_dir/mismatch.stats" \
   --output_index "$meta_temp_dir/mismatch.idx" > "$meta_temp_dir/test6.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with 2 --input files and 1 --bai file"
+  log_error "✗ $meta_name did not fail with 2 --input files and 1 --read_index file"
   exit 1
 fi
-check_file_contains "$meta_temp_dir/test6.log" "Error: --input and --bai must be given the same number of times" "error message"
+check_file_contains "$meta_temp_dir/test6.log" "Error: --read_index must be given once for each file in --input" "error message"
 
 if "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
-  --bai "$test_data_dir/tumor.bai" \
+  --read_index "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/no_f1r2.vcf" \
   --output_stats "$meta_temp_dir/no_f1r2.stats" \
@@ -279,7 +279,7 @@ check_fails_with() {
   shift 2
   if "$meta_executable" \
     --input "$test_data_dir/tumor.bam" \
-    --bai "$test_data_dir/tumor.bai" \
+    --read_index "$test_data_dir/tumor.bai" \
     "${reference_args[@]}" \
     --output "$meta_temp_dir/fail.vcf" \
     --output_stats "$meta_temp_dir/fail.stats" \
@@ -295,6 +295,10 @@ check_fails_with "Error: --create_bam_output requires --bam_output\." "$meta_tem
   --output_index "$meta_temp_dir/fail.idx" --create_bam_output
 check_fails_with "Error: --create_bam_output requires --bam_output_index" "$meta_temp_dir/test6_bam_output_index.log" \
   --output_index "$meta_temp_dir/fail.idx" --create_bam_output --bam_output "$meta_temp_dir/fail.bam"
+check_fails_with "Error: --bam_output must be a BAM file, GATK cannot write CRAM here." "$meta_temp_dir/test6_bam_output_cram.log" \
+  --output_index "$meta_temp_dir/fail.idx" --create_bam_output --bam_output "$meta_temp_dir/fail.cram" \
+  --bam_output_index "$meta_temp_dir/fail.crai"
+check_file_not_contains "$meta_temp_dir/test6_bam_output_cram.log" "Mutect2 done" "run log (GATK did not run)"
 
 log "✅ TEST 6 completed successfully"
 
@@ -303,7 +307,7 @@ log "Starting TEST 7: --output_index is ignored when --create_output_variant_ind
 
 "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
-  --bai "$test_data_dir/tumor.bai" \
+  --read_index "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/no_index.vcf.bgz" \
   --output_stats "$meta_temp_dir/no_index.stats" \
@@ -317,7 +321,7 @@ check_file_not_exists "$meta_temp_dir/no_index.vcf.bgz.tbi" "index next to the o
 log "Executing $meta_name with a .vcf.bgz output and --output_index..."
 "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
-  --bai "$test_data_dir/tumor.bai" \
+  --read_index "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/bgz.vcf.bgz" \
   --output_stats "$meta_temp_dir/bgz.stats" \
@@ -344,7 +348,7 @@ gatk IndexFeatureFile --input "$test_data_dir/indexed/alleles.vcf" --verbosity E
 log "Executing $meta_name with --alleles and --alleles_index..."
 "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
-  --bai "$test_data_dir/tumor.bai" \
+  --read_index "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --alleles "$test_data_dir/indexed/alleles.vcf" \
   --alleles_index "$test_data_dir/indexed/alleles.vcf.idx" \
@@ -372,7 +376,7 @@ printf 'chr1\t240\t245\n' > "$test_data_dir/near_250.bed"
 log "Executing $meta_name with an --intervals file next to the SNV, without padding..."
 "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
-  --bai "$test_data_dir/tumor.bai" \
+  --read_index "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --intervals "$test_data_dir/near_250.bed" \
   --output "$meta_temp_dir/no_padding.vcf" \
@@ -388,7 +392,7 @@ log "✓ The chr1:250 SNV is not in the output (outside the interval)"
 log "Executing $meta_name with the same --intervals file, --interval_padding 5 and --interval_merging_rule OVERLAPPING_ONLY..."
 "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
-  --bai "$test_data_dir/tumor.bai" \
+  --read_index "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --intervals "$test_data_dir/near_250.bed" \
   --interval_padding 5 \
@@ -402,5 +406,30 @@ check_file_contains "$meta_temp_dir/padding.vcf" "interval-padding 5" "output VC
 check_file_contains "$meta_temp_dir/padding.vcf" "interval-merging-rule OVERLAPPING_ONLY" "output VCF command line (--interval_merging_rule)"
 
 log "✅ TEST 9 completed successfully"
+
+# --- Test Case 10: Tumor CRAM and normal BAM ---
+log "Starting TEST 10: A tumor CRAM with a --read_index in another directory and a normal BAM"
+
+create_test_cram "$test_data_dir/tumor.bam" "$test_data_dir/reference.fasta" \
+  "$test_data_dir/cram/tumor.cram" "$test_data_dir/cram_index/tumor_index.crai"
+
+"$meta_executable" \
+  --input "$test_data_dir/cram/tumor.cram" \
+  --read_index "$test_data_dir/cram_index/tumor_index.crai" \
+  --input "$test_data_dir/normal.bam" \
+  --read_index "$test_data_dir/normal.bai" \
+  --normal_sample normal \
+  "${reference_args[@]}" \
+  --output "$meta_temp_dir/cram_normal.vcf" \
+  --output_stats "$meta_temp_dir/cram_normal.stats" \
+  --output_index "$meta_temp_dir/cram_normal.idx"
+
+log "Validating TEST 10 outputs..."
+check_file_contains "$meta_temp_dir/cram_normal.vcf" "^##normal_sample=normal" "output VCF normal sample header (CRAM input)"
+check_file_contains "$meta_temp_dir/cram_normal.vcf" "^##tumor_sample=tumor" "output VCF tumor sample header (CRAM input)"
+check_snv_called "$meta_temp_dir/cram_normal.vcf" "output VCF file (CRAM input)"
+check_file_exists "$meta_temp_dir/cram_normal.idx" "output index file (CRAM input)"
+
+log "✅ TEST 10 completed successfully"
 
 print_test_summary "All tests"

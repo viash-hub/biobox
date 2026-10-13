@@ -49,6 +49,10 @@ if [[ -n "$par_create_bam_output" ]]; then
     echo "Error: --create_bam_output requires --bam_output." >&2
     exit 1
   fi
+  if [[ "$par_bam_output" == *.cram ]]; then
+    echo "Error: --bam_output must be a BAM file, GATK cannot write CRAM here." >&2
+    exit 1
+  fi
   if [[ "$par_create_output_bam_index" != "false" ]]; then
     if [[ -z "$par_bam_output_index" ]]; then
       echo "Error: --create_bam_output requires --bam_output_index unless --create_output_bam_index is false." >&2
@@ -63,15 +67,10 @@ fi
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_mutect2.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
-stage_bams_bais "$tmp_dir" "$par_input" "$par_bai" staged_bams
+gatk_read_args "$par_input" "$par_read_index" read_args
 stage_interval_arguments "$tmp_dir" interval_args
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
-
-input_args=()
-for staged_bam in "${staged_bams[@]}"; do
-  input_args+=(--input "$staged_bam")
-done
 
 resource_args=()
 if [[ -n "$par_germline_resource" ]]; then
@@ -101,7 +100,7 @@ split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disab
 
 # Build command arguments array
 cmd_args=(
-  "${input_args[@]}"
+  "${read_args[@]}"
   --output "$par_output"
   --reference "$staged_reference"
   --native-pair-hmm-threads "${meta_cpus:-1}"

@@ -5,7 +5,15 @@
 * `gatk4/*`: Add `--output_index` to declare the index of `--output` as an output (PR #269).
   Previously GATK wrote the index next to `--output` but it was not an output of the component.
 
+* `gatk4/*`: Rename `--bai` to `--read_index` (PR #272).
+  The index is now passed to GATK with `--read-index`, so it can be a `.bai` for a BAM file or a `.crai` for a CRAM file.
+
 ## NEW FUNCTIONALITY
+
+* `gatk4/*`: Add CRAM support (PR #272).
+  - All GATK4 components that read reads accept CRAM files with a `.crai` index
+  - `gatk4_applybqsr` and `gatk4_markduplicates` can write CRAM files
+  - `gatk4_markduplicates`: Add `--reference_sequence_fai`, the reference is required for CRAM input or output
 
 * `gatk4`: Add components for GATK4 somatic variant calling (PR #249):
   - `gatk4/gatk4_mutect2`: Call somatic SNVs and indels in tumor-normal or tumor-only mode.
