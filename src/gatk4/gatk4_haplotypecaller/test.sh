@@ -36,6 +36,8 @@ check_file_exists "$test_data_dir/reads.sorted.bai" "BAM index file"
 # --- Test Case 1: Default parameters ---
 log "Starting TEST 1: Default parameters"
 
+mkdir -p "$meta_temp_dir/indexes"
+
 log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
@@ -43,37 +45,46 @@ log "Executing $meta_name with basic parameters..."
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/output.vcf"
+  --output "$meta_temp_dir/output.vcf" \
+  --output_index "$meta_temp_dir/indexes/output.idx"
 
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/output.vcf" "output VCF file"
 check_file_not_empty "$meta_temp_dir/output.vcf" "output VCF file"
 check_file_contains "$meta_temp_dir/output.vcf" "^##fileformat=VCF" "output VCF file header"
 check_file_contains "$meta_temp_dir/output.vcf" "sample1" "output VCF sample column"
+check_file_exists "$meta_temp_dir/indexes/output.idx" "output index file"
+check_file_not_empty "$meta_temp_dir/indexes/output.idx" "output index file"
+check_file_not_exists "$meta_temp_dir/output.vcf.idx" "index next to the output VCF (moved to --output_index)"
 
 log "✅ TEST 1 completed successfully"
 
 # --- Test Case 2: GVCF mode ---
-log "Starting TEST 2: GVCF output mode"
+log "Starting TEST 2: Bgzipped GVCF output mode"
 
-log "Executing $meta_name with --emit_ref_confidence GVCF..."
+log "Executing $meta_name with --emit_ref_confidence GVCF and a .g.vcf.gz output..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --bai "$test_data_dir/reads.sorted.bai" \
   --reference "$test_data_dir/reference.fasta" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/output.g.vcf" \
+  --output "$meta_temp_dir/output.g.vcf.gz" \
+  --output_index "$meta_temp_dir/indexes/output.g.tbi" \
   --emit_ref_confidence GVCF \
   --gvcf_gq_bands 20 \
   --gvcf_gq_bands 60 \
   --floor_blocks
 
 log "Validating TEST 2 outputs..."
-check_file_exists "$meta_temp_dir/output.g.vcf" "output GVCF file"
+check_file_exists "$meta_temp_dir/output.g.vcf.gz" "output GVCF file"
+zcat "$meta_temp_dir/output.g.vcf.gz" > "$meta_temp_dir/output.g.vcf"
 check_file_not_empty "$meta_temp_dir/output.g.vcf" "output GVCF file"
 check_file_contains "$meta_temp_dir/output.g.vcf" "^##fileformat=VCF" "output VCF file header"
 check_file_contains "$meta_temp_dir/output.g.vcf" "^##GVCFBlock" "output GVCF block header"
+check_file_exists "$meta_temp_dir/indexes/output.g.tbi" "output index file"
+check_file_not_empty "$meta_temp_dir/indexes/output.g.tbi" "output index file"
+check_file_not_exists "$meta_temp_dir/output.g.vcf.gz.tbi" "index next to the output GVCF (moved to --output_index)"
 
 log "✅ TEST 2 completed successfully"
 
@@ -88,6 +99,7 @@ log "Executing $meta_name with sample-ploidy, output-mode, annotation and other 
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
   --output "$meta_temp_dir/output_tuned.vcf" \
+  --output_index "$meta_temp_dir/output_tuned.vcf.idx" \
   --sample_ploidy 2 \
   --output_mode EMIT_ALL_CONFIDENT_SITES \
   --dont_use_soft_clipped_bases \
@@ -161,7 +173,8 @@ log "Executing $meta_name with --dbsnp_index and --alleles_index..."
   --dbsnp_index "$test_data_dir/indexes/dbsnp.vcf.gz.tbi" \
   --alleles "$test_data_dir/alleles.vcf.gz" \
   --alleles_index "$test_data_dir/indexes/alleles.vcf.gz.tbi" \
-  --output "$meta_temp_dir/output_vcf_inputs.vcf"
+  --output "$meta_temp_dir/output_vcf_inputs.vcf" \
+  --output_index "$meta_temp_dir/output_vcf_inputs.vcf.idx"
 
 log "Validating TEST 5 outputs..."
 check_file_exists "$meta_temp_dir/output_vcf_inputs.vcf" "output VCF file (VCF inputs)"
@@ -184,7 +197,8 @@ log "Executing $meta_name with a .vcf.gz --alleles file and no --alleles_index..
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
   --alleles "$test_data_dir/alleles.vcf.gz" \
-  --output "$meta_temp_dir/output_no_index.vcf" 2> "$meta_temp_dir/test6.log"
+  --output "$meta_temp_dir/output_no_index.vcf" \
+  --output_index "$meta_temp_dir/output_no_index.vcf.idx" 2> "$meta_temp_dir/test6.log"
 
 log "Validating TEST 6 outputs..."
 check_file_exists "$meta_temp_dir/output_no_index.vcf" "output VCF file (no --alleles index)"
@@ -212,5 +226,22 @@ fi
 check_file_contains "$meta_temp_dir/test7.log" "Error: --dbsnp_index requires --dbsnp" "error message"
 
 log "✅ TEST 7 completed successfully"
+
+# --- Test Case 8: Missing --output_index ---
+log "Starting TEST 8: A missing --output_index fails"
+
+if "$meta_executable" \
+  --input "$test_data_dir/reads.sorted.bam" \
+  --bai "$test_data_dir/reads.sorted.bai" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/no_output_index.vcf" > "$meta_temp_dir/test8.log" 2>&1; then
+  log_error "✗ $meta_name did not fail without --output_index"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test8.log" "Error: --output_index is required unless --create_output_variant_index is false." "error message"
+
+log "✅ TEST 8 completed successfully"
 
 print_test_summary "All tests"

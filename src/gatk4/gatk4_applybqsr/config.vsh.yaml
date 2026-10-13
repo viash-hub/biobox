@@ -85,6 +85,15 @@ argument_groups:
         description: Recalibrated output BAM file.
         required: true
         example: output.bam
+      - name: "--output_index"
+        type: file
+        direction: output
+        description: |
+          Output index file for `--output` (`<output without .bam>.bai`).
+          Required when `--create_output_bam_index` is `true`, ignored when
+          it is `false`.
+        must_exist: false
+        example: output.bai
 
   - name: "Options"
     arguments:

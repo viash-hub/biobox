@@ -53,7 +53,7 @@ EOF
 check_file_exists "$input_vcf" "input VCF"
 
 output_vcf="$meta_temp_dir/output1/filtered.vcf"
-mkdir -p "$(dirname "$output_vcf")"
+mkdir -p "$(dirname "$output_vcf")" "$meta_temp_dir/indexes"
 
 log "Executing $meta_name with --filter_expression/--filter_name pairs..."
 "$meta_executable" \
@@ -62,6 +62,7 @@ log "Executing $meta_name with --filter_expression/--filter_name pairs..."
   --reference_fai "$ref_fai" \
   --reference_dict "$ref_dict" \
   --output "$output_vcf" \
+  --output_index "$meta_temp_dir/indexes/filtered1.idx" \
   --filter_expression "QD < 2.0" \
   --filter_name "lowQD" \
   --filter_expression "FS > 60.0" \
@@ -70,6 +71,9 @@ log "Executing $meta_name with --filter_expression/--filter_name pairs..."
 log "Validating TEST 1 outputs..."
 check_file_exists "$output_vcf" "filtered VCF"
 check_file_not_empty "$output_vcf" "filtered VCF"
+check_file_exists "$meta_temp_dir/indexes/filtered1.idx" "output index file"
+check_file_not_empty "$meta_temp_dir/indexes/filtered1.idx" "output index file"
+check_file_not_exists "$output_vcf.idx" "index next to the output VCF (moved to --output_index)"
 
 # Extract the FILTER column for each record so assertions can't be confused
 # by filter names appearing in other records.
@@ -143,6 +147,7 @@ log "Executing $meta_name with --mask, --genotype_filter_expression and --set_fi
   --reference_fai "$ref_fai" \
   --reference_dict "$ref_dict" \
   --output "$output_vcf3" \
+  --output_index "$output_vcf3.idx" \
   --mask "$mask_vcf" \
   --mask_name "MyMask" \
   --mask_extension 10 \
@@ -212,6 +217,7 @@ log "Executing $meta_name without a reference..."
 "$meta_executable" \
   --variant "$input_vcf" \
   --output "$output_vcf5" \
+  --output_index "$output_vcf5.idx" \
   --filter_expression "QD < 2.0" \
   --filter_name "lowQD"
 
@@ -235,6 +241,7 @@ log "Executing $meta_name with --variant .vcf.gz and --variant_index..."
   --variant "$test_data_dir/input.vcf.gz" \
   --variant_index "$test_data_dir/indexes/input.vcf.gz.tbi" \
   --output "$output_vcf6" \
+  --output_index "$output_vcf6.idx" \
   --filter_expression "QD < 2.0" \
   --filter_name "lowQD" 2>&1 | tee "$meta_temp_dir/test5.log"
 
@@ -259,6 +266,7 @@ log "Executing $meta_name with --variant .vcf.gz and no index..."
 "$meta_executable" \
   --variant "$test_data_dir/input_no_index.vcf.gz" \
   --output "$output_vcf7" \
+  --output_index "$output_vcf7.idx" \
   --filter_expression "QD < 2.0" \
   --filter_name "lowQD" 2>&1 | tee "$meta_temp_dir/test6.log"
 
@@ -287,6 +295,7 @@ log "Executing $meta_name with --mask .vcf.gz and --mask_index..."
   --variant "$test_data_dir/input3.vcf.gz" \
   --variant_index "$test_data_dir/indexes/input3.vcf.gz.tbi" \
   --output "$output_vcf8" \
+  --output_index "$output_vcf8.idx" \
   --mask "$test_data_dir/mask.vcf.gz" \
   --mask_index "$test_data_dir/indexes/mask.vcf.gz.tbi" \
   --mask_name "MyMask" 2>&1 | tee "$meta_temp_dir/test7.log"
@@ -315,6 +324,7 @@ log "Executing $meta_name with --mask .bed and no index..."
   --variant "$test_data_dir/input3.vcf.gz" \
   --variant_index "$test_data_dir/indexes/input3.vcf.gz.tbi" \
   --output "$output_vcf9" \
+  --output_index "$output_vcf9.idx" \
   --mask "$test_data_dir/mask.bed" \
   --mask_name "MyMask" 2>&1 | tee "$meta_temp_dir/test8.log"
 
@@ -339,6 +349,7 @@ log "Executing $meta_name with --mask .bed and --mask_index..."
   --variant "$test_data_dir/input3.vcf.gz" \
   --variant_index "$test_data_dir/indexes/input3.vcf.gz.tbi" \
   --output "$output_vcf10" \
+  --output_index "$output_vcf10.idx" \
   --mask "$test_data_dir/mask.bed" \
   --mask_index "$test_data_dir/bed_index/mask.bed.idx" \
   --mask_name "MyMask" 2>&1 | tee "$meta_temp_dir/test8_index.log"
@@ -364,5 +375,48 @@ check_file_contains "$meta_temp_dir/test9.log" "Error: --mask_index requires --m
 check_file_not_exists "$meta_temp_dir/index_only.vcf" "output VCF (GATK did not run)"
 
 log "✅ TEST 9 completed successfully"
+
+# --- Test Case 10: Bgzipped output with an output index ---
+log "Starting TEST 10: Bgzipped output with its index in a different directory"
+
+output_vcf11="$meta_temp_dir/output11/filtered.vcf.gz"
+mkdir -p "$(dirname "$output_vcf11")"
+
+log "Executing $meta_name with a .vcf.gz --output and --output_index..."
+"$meta_executable" \
+  --variant "$input_vcf" \
+  --output "$output_vcf11" \
+  --output_index "$meta_temp_dir/indexes/filtered11.tbi" \
+  --filter_expression "QD < 2.0" \
+  --filter_name "lowQD"
+
+log "Validating TEST 10 outputs..."
+check_file_exists "$output_vcf11" "bgzipped filtered VCF"
+record200_filter=$(zcat "$output_vcf11" | awk -F'\t' '$2==200 {print $7}')
+if [[ "$record200_filter" == "lowQD" ]]; then
+  log "✓ record 2 (pos 200) FILTER is lowQD"
+else
+  log_error "✗ record 2 (pos 200) FILTER is '$record200_filter', expected lowQD"
+  exit 1
+fi
+check_file_exists "$meta_temp_dir/indexes/filtered11.tbi" "output index file"
+check_file_not_empty "$meta_temp_dir/indexes/filtered11.tbi" "output index file"
+check_file_not_exists "$output_vcf11.tbi" "index next to the output VCF (moved to --output_index)"
+
+log "✅ TEST 10 completed successfully"
+
+# --- Test Case 11: Missing --output_index ---
+log "Starting TEST 11: A missing --output_index fails"
+
+if "$meta_executable" \
+  --variant "$input_vcf" \
+  --output "$meta_temp_dir/no_output_index.vcf" > "$meta_temp_dir/test11.log" 2>&1; then
+  log_error "✗ $meta_name did not fail without --output_index"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test11.log" "Error: --output_index is required unless --create_output_variant_index is false." "error message"
+check_file_not_exists "$meta_temp_dir/no_output_index.vcf" "output VCF (GATK did not run)"
+
+log "✅ TEST 11 completed successfully"
 
 print_test_summary "All tests"

@@ -77,6 +77,14 @@ argument_groups:
           `--remove_duplicates`).
         required: true
         example: marked_duplicates.bam
+      - name: "--output_index"
+        type: file
+        direction: output
+        description: |
+          Output index file for `--output` (`<output without .bam>.bai`).
+          Required when `--create_index` is set, ignored otherwise.
+        must_exist: false
+        example: marked_duplicates.bai
       - name: "--metrics"
         alternatives: [-M]
         type: file
@@ -121,7 +129,8 @@ argument_groups:
         type: boolean_true
         description: |
           If set, create an index when writing a coordinate-sorted BAM
-          output file.
+          output file. The index is written to `--output_index`, which is
+          required when this is set.
       - name: "--duplex_umi"
         type: boolean_true
         description: |
