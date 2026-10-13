@@ -269,4 +269,53 @@ fi
 
 log "✅ TEST 8 completed successfully"
 
+# --- Test Case 9: Two input files ---
+log "Starting TEST 9: Two --input files give one recalibration table"
+
+# A second BAM with another read group of the same sample, as for a second
+# lane (5 reads at 51, 251, 451, 651 and 851)
+create_test_sam "$test_data_dir/reads_rg2.sam" seq1 1000 rg2 sample1 51 251 451 651 851
+sed -i 's/^read/rg2_read/' "$test_data_dir/reads_rg2.sam"
+sort_and_index_bam "$test_data_dir/reads_rg2.sam" "$test_data_dir/reads_rg2.sorted.bam"
+check_file_exists "$test_data_dir/reads_rg2.sorted.bai" "second BAM index"
+
+log "Executing $meta_name with two --input and --read_index files..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.sorted.bam" \
+  --read_index "$test_data_dir/reads.sorted.bai" \
+  --input "$test_data_dir/reads_rg2.sorted.bam" \
+  --read_index "$test_data_dir/reads_rg2.sorted.bai" \
+  --reference "$test_data_dir/ref.fasta" \
+  --reference_fai "$test_data_dir/ref.fasta.fai" \
+  --reference_dict "$test_data_dir/ref.dict" \
+  --known_sites "$known_sites1" \
+  --output "$meta_temp_dir/recal_two_inputs.table"
+
+log "Validating TEST 9 outputs..."
+check_file_contains "$meta_temp_dir/recal_two_inputs.table" "#:GATKReport" "recalibration table GATKReport header (two inputs)"
+
+# RecalTable0 has one row for each read group. The rg1 row must be the same
+# as for the first BAM alone (TEST 1), and the rg2 row has the bases of the 5
+# reads of the second BAM (5 x 100, none of them has the known site).
+rg_observations() {
+  awk -v rg="$2" '/^#:GATKTable:RecalTable0:/ {in_table = 1; next} in_table && $1 == rg {print $5; exit}' "$1"
+}
+rg1_observations=$(rg_observations "$meta_temp_dir/recal_two_inputs.table" rg1)
+rg2_observations=$(rg_observations "$meta_temp_dir/recal_two_inputs.table" rg2)
+expected_rg1_observations=$(rg_observations "$meta_temp_dir/recal1.table" rg1)
+if [[ -n "$rg1_observations" && "$rg1_observations" == "$expected_rg1_observations" ]]; then
+  log "✓ recalibration table has the rg1 observations of the first BAM ($rg1_observations)"
+else
+  log_error "✗ recalibration table has '$rg1_observations' rg1 observations, expected '$expected_rg1_observations'"
+  exit 1
+fi
+if [[ "$rg2_observations" == "500" ]]; then
+  log "✓ recalibration table has the rg2 observations of the second BAM ($rg2_observations)"
+else
+  log_error "✗ recalibration table has '$rg2_observations' rg2 observations, expected 500"
+  exit 1
+fi
+
+log "✅ TEST 9 completed successfully"
+
 print_test_summary "All tests"

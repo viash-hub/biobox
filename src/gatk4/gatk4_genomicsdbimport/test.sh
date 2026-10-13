@@ -204,10 +204,6 @@ check_file_contains "$meta_temp_dir/genomicsdb_workspace_bypass/callset.json" "s
 log "✅ TEST 4 completed successfully"
 
 # --- Test Case 5: Shared GATK engine options ---
-# GenomicsDBImport's output is a workspace directory, not a VCF/BAM file, so
-# --sites_only_vcf_output/--create_output_variant_index/--create_output_bam_index
-# are semantically inert here, but GATK accepts them without error, so we
-# just confirm the tool still runs successfully with all the flags set
 log "Starting TEST 5: Shared GATK engine options"
 
 log "Executing $meta_name with --interval_padding and other shared engine options..."
@@ -217,10 +213,7 @@ log "Executing $meta_name with --interval_padding and other shared engine option
   --intervals "$test_data_dir/intervals.list" \
   --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_engine" \
   --interval_padding 10 \
-  --sites_only_vcf_output \
-  --create_output_variant_index false \
-  --create_output_bam_index false \
-  --disable_tool_default_read_filters \
+  --lenient \
   --disable_sequence_dictionary_validation
 
 log "Validating TEST 5 outputs..."

@@ -9,9 +9,12 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 # unset "false" flags
 unset_if_false=(
+  par_lenient
   par_create_bam_output
   par_create_f1r2_tar_gz
+  par_disable_tool_default_annotations
   par_dont_use_soft_clipped_bases
+  par_enable_dynamic_read_disqualification_for_genotyping
   par_force_active
   par_force_call_filtered_alleles
   par_genotype_germline_sites
@@ -95,8 +98,7 @@ split_multiple_to_flags "$par_annotation" "--annotation" annotation_args
 split_multiple_to_flags "$par_annotation_group" "--annotation-group" annotation_group_args
 split_multiple_to_flags "$par_annotations_to_exclude" "--annotations-to-exclude" annotations_to_exclude_args
 split_multiple_to_flags "$par_kmer_size" "--kmer-size" kmer_size_args
-split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
-split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
+gatk_read_filter_args read_filter_args
 
 # Build command arguments array
 cmd_args=(
@@ -118,27 +120,33 @@ cmd_args=(
   ${par_bam_writer_type:+--bam-writer-type "$par_bam_writer_type"}
   ${par_base_quality_score_threshold:+--base-quality-score-threshold "$par_base_quality_score_threshold"}
   ${par_callable_depth:+--callable-depth "$par_callable_depth"}
+  ${par_disable_tool_default_annotations:+--disable-tool-default-annotations}
   ${par_dont_use_soft_clipped_bases:+--dont-use-soft-clipped-bases}
   ${par_downsampling_stride:+--downsampling-stride "$par_downsampling_stride"}
+  ${par_enable_dynamic_read_disqualification_for_genotyping:+--enable-dynamic-read-disqualification-for-genotyping}
   ${par_f1r2_max_depth:+--f1r2-max-depth "$par_f1r2_max_depth"}
   ${par_f1r2_median_mq:+--f1r2-median-mq "$par_f1r2_median_mq"}
   ${par_f1r2_min_bq:+--f1r2-min-bq "$par_f1r2_min_bq"}
   ${par_force_active:+--force-active}
   ${par_force_call_filtered_alleles:+--force-call-filtered-alleles}
   ${par_genotype_germline_sites:+--genotype-germline-sites}
+  ${par_genotype_germline_sites_fraction:+--genotype-germline-sites-fraction "$par_genotype_germline_sites_fraction"}
   ${par_genotype_pon_sites:+--genotype-pon-sites}
   ${par_ignore_itr_artifacts:+--ignore-itr-artifacts}
   ${par_initial_tumor_lod:+--initial-tumor-lod "$par_initial_tumor_lod"}
   "${kmer_size_args[@]}"
   ${par_max_assembly_region_size:+--max-assembly-region-size "$par_max_assembly_region_size"}
   ${par_max_mnp_distance:+--max-mnp-distance "$par_max_mnp_distance"}
+  ${par_max_read_length:+--max-read-length "$par_max_read_length"}
   ${par_max_population_af:+--max-population-af "$par_max_population_af"}
   ${par_max_reads_per_alignment_start:+--max-reads-per-alignment-start "$par_max_reads_per_alignment_start"}
   ${par_max_suspicious_reads_per_alignment_start:+--max-suspicious-reads-per-alignment-start "$par_max_suspicious_reads_per_alignment_start"}
   ${par_min_assembly_region_size:+--min-assembly-region-size "$par_min_assembly_region_size"}
   ${par_min_base_quality_score:+--min-base-quality-score "$par_min_base_quality_score"}
   ${par_min_pruning:+--min-pruning "$par_min_pruning"}
+  ${par_min_read_length:+--min-read-length "$par_min_read_length"}
   ${par_minimum_allele_fraction:+--minimum-allele-fraction "$par_minimum_allele_fraction"}
+  ${par_maximum_mapping_quality:+--maximum-mapping-quality "$par_maximum_mapping_quality"}
   ${par_minimum_mapping_quality:+--minimum-mapping-quality "$par_minimum_mapping_quality"}
   ${par_mitochondria_mode:+--mitochondria-mode}
   ${par_normal_lod:+--normal-lod "$par_normal_lod"}
@@ -152,9 +160,8 @@ cmd_args=(
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
   ${par_output_cram_version:+--output-cram-version "$par_output_cram_version"}
   "${read_filter_args[@]}"
-  "${disable_read_filter_args[@]}"
-  ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}
   ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
+  ${par_lenient:+--lenient}
 )
 
 # Run GATK Mutect2

@@ -491,4 +491,52 @@ fi
 
 log "✅ TEST 12 completed successfully"
 
+# --- Test Case 13: --variant_output_filtering ---
+log "Starting TEST 13: --variant_output_filtering STARTS_IN"
+
+filtering_input_vcf="$test_data_dir/filtering_input.vcf"
+{
+  printf '##fileformat=VCFv4.2\n'
+  printf '##contig=<ID=seq1,length=1000>\n'
+  printf '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n'
+  printf 'seq1\t200\tsnp\tG\tA\t100\t.\t.\n'
+  printf 'seq1\t400\tdeletion\tGATC\tG\t100\t.\t.\n'
+} > "$filtering_input_vcf"
+
+# The deletion (seq1:400-403) overlaps seq1:402-410 but does not start in it
+log "Executing $meta_name with --interval_strings and no --variant_output_filtering..."
+"$meta_executable" \
+  --variant "$filtering_input_vcf" \
+  --output "$meta_temp_dir/filtering_default.vcf" \
+  --create_output_variant_index false \
+  --interval_strings "seq1:190-210" \
+  --interval_strings "seq1:402-410"
+
+log "Executing $meta_name with --interval_strings and --variant_output_filtering STARTS_IN..."
+"$meta_executable" \
+  --variant "$filtering_input_vcf" \
+  --output "$meta_temp_dir/filtering_starts_in.vcf" \
+  --create_output_variant_index false \
+  --interval_strings "seq1:190-210" \
+  --interval_strings "seq1:402-410" \
+  --variant_output_filtering STARTS_IN
+
+log "Validating TEST 13 outputs..."
+selected_ids=$(grep -v '^#' "$meta_temp_dir/filtering_default.vcf" | cut -f3 | tr '\n' ' ')
+if [[ "$selected_ids" == "snp deletion " ]]; then
+  log "✓ Without a filtering mode, the output has the records that overlap the intervals: $selected_ids"
+else
+  log_error "✗ Output has records '$selected_ids', expected 'snp deletion '"
+  exit 1
+fi
+selected_ids=$(grep -v '^#' "$meta_temp_dir/filtering_starts_in.vcf" | cut -f3 | tr '\n' ' ')
+if [[ "$selected_ids" == "snp " ]]; then
+  log "✓ With STARTS_IN, the output has only the records that start in the intervals: $selected_ids"
+else
+  log_error "✗ Output has records '$selected_ids', expected 'snp '"
+  exit 1
+fi
+
+log "✅ TEST 13 completed successfully"
+
 print_test_summary "All tests"

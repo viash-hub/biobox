@@ -9,7 +9,7 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 # unset "false" flags
 unset_if_false=(
-  par_sites_only_vcf_output
+  par_lenient
   par_disable_tool_default_read_filters
   par_disable_sequence_dictionary_validation
 )
@@ -20,10 +20,13 @@ for par in "${unset_if_false[@]}"; do
 done
 
 # A CRAM file can only be decoded with the reference
-if [[ "$par_input" == *.cram && -z "$par_reference" ]]; then
-  echo "Error: --reference is required for CRAM input." >&2
-  exit 1
-fi
+IFS=';' read -ra input_files <<< "$par_input"
+for input_file in "${input_files[@]}"; do
+  if [[ "$input_file" == *.cram && -z "$par_reference" ]]; then
+    echo "Error: --reference is required for CRAM input." >&2
+    exit 1
+  fi
+done
 
 # Stage the interval files, the --variant VCF with its index and
 # (if provided) the reference trio into a temp dir so GATK can find the
@@ -53,9 +56,7 @@ fi
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
-# Convert semicolon-separated arguments to repeated flags
-split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
-split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
+gatk_read_filter_args read_filter_args
 
 # Build command arguments array
 cmd_args=(
@@ -66,17 +67,13 @@ cmd_args=(
   "${reference_args[@]}"
   ${par_max_depth_per_sample:+--max-depth-per-sample "$par_max_depth_per_sample"}
   ${par_maximum_population_allele_frequency:+--maximum-population-allele-frequency "$par_maximum_population_allele_frequency"}
+  ${par_maximum_mapping_quality:+--maximum-mapping-quality "$par_maximum_mapping_quality"}
   ${par_minimum_mapping_quality:+--minimum-mapping-quality "$par_minimum_mapping_quality"}
   ${par_minimum_population_allele_frequency:+--minimum-population-allele-frequency "$par_minimum_population_allele_frequency"}
   --tmp-dir "$tmp_dir"
-  ${par_sites_only_vcf_output:+--sites-only-vcf-output}
-  ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
-  ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
-  ${par_output_cram_version:+--output-cram-version "$par_output_cram_version"}
   "${read_filter_args[@]}"
-  "${disable_read_filter_args[@]}"
-  ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}
   ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
+  ${par_lenient:+--lenient}
 )
 
 # Run GATK GetPileupSummaries

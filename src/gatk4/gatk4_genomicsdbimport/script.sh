@@ -9,6 +9,7 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 # unset flags
 unset_if_false=(
+  par_lenient
   par_avoid_nio
   par_bypass_feature_reader
   par_consolidate
@@ -16,8 +17,6 @@ unset_if_false=(
   par_overwrite_existing_genomicsdb_workspace
   par_genomicsdb_shared_posixfs_optimizations
   par_validate_sample_name_map
-  par_sites_only_vcf_output
-  par_disable_tool_default_read_filters
   par_disable_sequence_dictionary_validation
 )
 
@@ -80,8 +79,6 @@ if [[ -n "$par_header" ]]; then
 fi
 
 # Convert semicolon-separated multi-value arguments into repeated flags
-split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
-split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
 
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
@@ -109,14 +106,8 @@ cmd_args=(
   ${par_overwrite_existing_genomicsdb_workspace:+--overwrite-existing-genomicsdb-workspace true}
   ${par_reader_threads:+--reader-threads "$par_reader_threads"}
   ${par_validate_sample_name_map:+--validate-sample-name-map true}
-  ${par_sites_only_vcf_output:+--sites-only-vcf-output}
-  ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
-  ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
-  ${par_output_cram_version:+--output-cram-version "$par_output_cram_version"}
-  "${read_filter_args[@]}"
-  "${disable_read_filter_args[@]}"
-  ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}
   ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
+  ${par_lenient:+--lenient}
 )
 
 # Run GATK GenomicsDBImport

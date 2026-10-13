@@ -438,4 +438,79 @@ check_file_not_contains "$meta_temp_dir/test13.log" "GetPileupSummaries done" "r
 
 log "✅ TEST 13 completed successfully"
 
+# --- Test Case 14: Two input files ---
+log "Starting TEST 14: Two --input files are counted together"
+
+# The same reads with other read names in another read group of the same
+# sample, as for a second lane
+awk 'BEGIN { OFS = "\t" }
+  /^@RG/ { sub(/ID:rg1/, "ID:rg2"); print; next }
+  /^@/ { print; next }
+  { $1 = "lane2_" $1; $12 = "RG:Z:rg2"; print }' "$test_data_dir/reads.sam" > "$test_data_dir/reads_rg2.sam"
+sort_and_index_bam "$test_data_dir/reads_rg2.sam" "$test_data_dir/reads_rg2.bam"
+check_file_exists "$test_data_dir/reads_rg2.bai" "second BAM index"
+
+log "Executing $meta_name with two --input and --read_index files..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.bam" \
+  --read_index "$test_data_dir/reads.bai" \
+  --input "$test_data_dir/reads_rg2.bam" \
+  --read_index "$test_data_dir/reads_rg2.bai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --intervals "$test_data_dir/common_snps.vcf" \
+  --maximum_population_allele_frequency 0.5 \
+  --output "$meta_temp_dir/pileups_two_inputs.table"
+
+log "Validating TEST 14 outputs..."
+check_file_contains "$meta_temp_dir/pileups_two_inputs.table" $'chr1\t50\t4\t2\t0\t0.3' "position 50 counts (reads of both inputs)"
+check_file_contains "$meta_temp_dir/pileups_two_inputs.table" $'chr1\t150\t2\t4\t0\t0.4' "position 150 counts (reads of both inputs)"
+
+log "Executing $meta_name with fewer --read_index files than --input files (should fail)..."
+if "$meta_executable" \
+  --input "$test_data_dir/reads.bam" \
+  --input "$test_data_dir/reads_rg2.bam" \
+  --read_index "$test_data_dir/reads.bai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --intervals "$test_data_dir/common_snps.vcf" \
+  --output "$meta_temp_dir/pileups_bad_index.table" > "$meta_temp_dir/test14.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with fewer --read_index files than --input files"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test14.log" "Error: --read_index must be given once for each file in --input" "error message"
+
+log "✅ TEST 14 completed successfully"
+
+# --- Test Case 15: Maximum mapping quality ---
+log "Starting TEST 15: Maximum mapping quality"
+
+log "Executing $meta_name on MQ 60 reads with --maximum_mapping_quality 50..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.bam" \
+  --read_index "$test_data_dir/reads.bai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --intervals "$test_data_dir/common_snps.vcf" \
+  --maximum_population_allele_frequency 0.5 \
+  --minimum_mapping_quality 30 \
+  --maximum_mapping_quality 50 \
+  --output "$meta_temp_dir/pileups_max_mq.table"
+
+# All MQ 60 reads are removed, so no sites are written
+check_file_not_contains "$meta_temp_dir/pileups_max_mq.table" $'chr1\t50\t' "position 50 (MQ 60 reads filtered)"
+check_file_not_contains "$meta_temp_dir/pileups_max_mq.table" $'chr1\t150\t' "position 150 (MQ 60 reads filtered)"
+
+log "Executing $meta_name on MQ 40 reads with --maximum_mapping_quality 50..."
+"$meta_executable" \
+  --input "$test_data_dir/reads_mq40.bam" \
+  --read_index "$test_data_dir/reads_mq40.bai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --intervals "$test_data_dir/common_snps.vcf" \
+  --maximum_population_allele_frequency 0.5 \
+  --minimum_mapping_quality 30 \
+  --maximum_mapping_quality 50 \
+  --output "$meta_temp_dir/pileups_max_mq40.table"
+
+check_file_contains "$meta_temp_dir/pileups_max_mq40.table" $'chr1\t50\t2\t1\t0\t0.3' "position 50 counts (MQ 40 reads kept)"
+
+log "✅ TEST 15 completed successfully"
+
 print_test_summary "All tests"

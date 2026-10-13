@@ -100,6 +100,11 @@ argument_groups:
 
   - name: "Options"
     arguments:
+      - name: "--allow_old_rms_mapping_quality_annotation_data"
+        type: boolean_true
+        description: |
+          Override to allow old `RMSMappingQuality` annotated VCFs to function.
+          Only valid if the `RMSMappingQuality` annotation is used.
       - name: "--annotation"
         alternatives: [-A]
         type: string
@@ -238,6 +243,18 @@ argument_groups:
           If not provided, a copy of a bgzipped `--dbsnp` file is indexed before
           the run. A plain `.vcf` file does not need an index.
         example: dbsnp.vcf.gz.tbi
+      - name: "--denovo_depth_threshold"
+        type: integer
+        description: |
+          Minimum depth (DP) for all trio members to be considered for de novo
+          calculation. Only valid if the `PossibleDeNovo` annotation is used.
+          Default: 0.
+      - name: "--denovo_parent_gq_threshold"
+        type: integer
+        description: |
+          Minimum genotype quality for parents to be considered for de novo
+          calculation (separate from the GQ threshold for the full trio). Only
+          valid if the `PossibleDeNovo` annotation is used. Default: 20.
       - name: "--disable_tool_default_annotations"
         type: boolean_true
         description: |
@@ -270,11 +287,11 @@ argument_groups:
         description: |
           Merge input GVCFs according to somatic (i.e. Mutect2) annotations
           (BETA).
-      - name: "--max_variants_per_shard"
+      - name: "--max_distance"
         type: integer
         description: |
-          If non-zero, partitions VCF output into shards, each containing
-          up to the given number of records. Default: 0.
+          Maximum distance (in bp) for variants to be grouped together. Used
+          together with `--combine_variants_distance`. Default: 2147483647.
       - name: "--pedigree"
         alternatives: [-ped]
         type: file
@@ -293,6 +310,8 @@ argument_groups:
           Restrict the output variants to ones that match the
           `--intervals` according to the specified matching mode.
         example: STARTS_IN
+  - __merge__: /src/gatk4/utils/engine_argument_group.yaml
+  - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
     description: |
       CombineGVCFs only writes a GVCF block that ends inside an interval. A
@@ -304,8 +323,6 @@ argument_groups:
 
       To limit the records of a GVCF to a region, use SelectVariants. To
       genotype a region, give the intervals to GenotypeGVCFs.
-
-__merge__: /src/gatk4/utils/common_argument_groups.yaml
 
 resources:
   - type: bash_script
