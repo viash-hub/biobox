@@ -35,8 +35,7 @@ stage_optional_vcf "$tmp_dir" "$par_dbsnp" "$par_dbsnp_index" --dbsnp dbsnp_args
 stage_interval_arguments "$tmp_dir" interval_args
 
 # Convert semicolon-separated multi-value arguments into repeated flags
-split_multiple_to_flags "$par_annotation" "--annotation" annotation_args
-split_multiple_to_flags "$par_annotation_group" "--annotation-group" annotation_group_args
+gatk_annotation_args annotation_args
 split_multiple_to_flags "$par_annotations_to_exclude" "--annotations-to-exclude" annotations_to_exclude_args
 split_multiple_to_flags "$par_founder_id" "--founder-id" founder_id_args
 
@@ -50,7 +49,6 @@ cmd_args=(
   --output "$par_output"
   ${par_allow_old_rms_mapping_quality_annotation_data:+--allow-old-rms-mapping-quality-annotation-data}
   "${annotation_args[@]}"
-  "${annotation_group_args[@]}"
   "${annotations_to_exclude_args[@]}"
   ${par_break_bands_at_multiples_of:+--break-bands-at-multiples-of "$par_break_bands_at_multiples_of"}
   ${par_call_genotypes:+--call-genotypes}
