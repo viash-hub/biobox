@@ -365,8 +365,52 @@ if "$meta_executable" \
   log_error "✗ $meta_name did not fail with --header and --variant"
   exit 1
 fi
-check_file_contains "$meta_temp_dir/test8_header_variant.log" "Error: --header can only be used with --sample_name_map" "error message"
+check_file_contains "$meta_temp_dir/test8_header_variant.log" "Error: --header with --variant requires --sample_name" "error message"
 
 log "✅ TEST 8 completed successfully"
+
+# --- Test Case 9: Rename staged --variant files with --sample_name ---
+log "Starting TEST 9: --sample_name with --variant"
+
+log "Executing $meta_name with --variant, --sample_name and --header..."
+"$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --sample_name renamed1 \
+  --sample_name renamed2 \
+  --header "$test_data_dir/sample1.g.vcf" \
+  --intervals "$test_data_dir/intervals.list" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_sample_name"
+
+log "Validating TEST 9 outputs..."
+check_file_exists "$meta_temp_dir/genomicsdb_workspace_sample_name/callset.json" "GenomicsDB callset.json (sample_name)"
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_sample_name/callset.json" "renamed1" "GenomicsDB callset.json renamed1"
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_sample_name/callset.json" "renamed2" "GenomicsDB callset.json renamed2"
+check_file_not_contains "$meta_temp_dir/genomicsdb_workspace_sample_name/callset.json" "\"sample1\"" "GenomicsDB callset.json (original sample1 name)"
+
+log "Executing $meta_name with fewer --sample_name values than --variant files..."
+if "$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --sample_name renamed1 \
+  --intervals "$test_data_dir/intervals.list" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_sample_name_count" > "$meta_temp_dir/test9_count.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with a --sample_name count mismatch"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test9_count.log" "Error: --sample_name must be given once for each file in --variant" "error message"
+
+log "Executing $meta_name with --sample_name and --sample_name_map..."
+if "$meta_executable" \
+  --sample_name_map "$test_data_dir/sample_map.tsv" \
+  --sample_name renamed1 \
+  --intervals "$test_data_dir/intervals.list" \
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_sample_name_map" > "$meta_temp_dir/test9_map.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --sample_name and --sample_name_map"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test9_map.log" "Error: --sample_name cannot be used together with --sample_name_map" "error message"
+
+log "✅ TEST 9 completed successfully"
 
 print_test_summary "All tests completed successfully"

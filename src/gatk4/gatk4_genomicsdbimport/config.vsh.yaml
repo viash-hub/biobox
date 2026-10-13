@@ -73,7 +73,27 @@ argument_groups:
           alternative to `--variant` and is a performance optimization for
           large cohorts, since it relaxes the normal checks for consistent
           headers.
+
+          The files listed in the map are not staged by Viash or Nextflow.
+          Each path must be reachable from where the component runs (for
+          example an absolute path on a shared file system or a remote URI),
+          and each index must be next to its file. To use a sample name map
+          with staged `--variant` files, use `--sample_name`.
         example: sample_map.tsv
+      - name: "--sample_name"
+        type: string
+        multiple: true
+        description: |
+          Sample names for the `--variant` files, matched by order. One must
+          be given for each `--variant` file.
+
+          If specified, a sample name map is written for the staged
+          `--variant` files and passed to GATK, with the same effect as
+          `--sample_name_map`: the sample names are taken from this argument
+          rather than the GVCF headers, and the header from the first sample
+          is treated as the merged header. Cannot be used together with
+          `--sample_name_map`.
+        example: [sample1, sample2]
       - name: "--intervals"
         alternatives: [-L]
         type: file
@@ -173,8 +193,9 @@ argument_groups:
           Cannot be used together with an incremental import into an
           existing GenomicsDB workspace.
 
-          Can only be used with `--sample_name_map`, not with `--variant`.
-          GATK fails when `--header` is used with `--variant`.
+          Can only be used with `--sample_name_map` or `--sample_name`. GATK
+          fails when `--header` is used with `--variant` files without a
+          sample name map.
         example: header.vcf.gz
       - name: "--header_index"
         type: file
