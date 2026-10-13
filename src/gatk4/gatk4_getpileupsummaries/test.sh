@@ -433,7 +433,7 @@ if "$meta_executable" \
   log_error "✗ $meta_name did not fail for a CRAM input without --reference"
   exit 1
 fi
-check_file_contains "$meta_temp_dir/test13.log" "Error: --reference is required for CRAM input." "error message"
+check_file_contains "$meta_temp_dir/test13.log" "Error: --reference is required for CRAM input or output." "error message"
 check_file_not_contains "$meta_temp_dir/test13.log" "GetPileupSummaries done" "run log (GATK did not run)"
 
 log "✅ TEST 13 completed successfully"

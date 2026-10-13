@@ -447,4 +447,4 @@ check_file_contains "$meta_temp_dir/output_new_options.vcf" "sample1" "output VC
 
 log "✅ TEST 13 completed successfully"
 
-print_test_summary "All tests completed successfully"
+print_test_summary "All tests"

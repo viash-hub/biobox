@@ -5,8 +5,7 @@
 
 set -eo pipefail
 
-# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
+source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 # Build command arguments array
 cmd_args=(
@@ -20,5 +19,5 @@ cmd_args=(
   ${par_uri:+--URI "$par_uri"}
 )
 
-# Run gatk CreateSequenceDictionary
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" CreateSequenceDictionary "${cmd_args[@]}"
+# Run GATK CreateSequenceDictionary
+run_gatk CreateSequenceDictionary "${cmd_args[@]}"

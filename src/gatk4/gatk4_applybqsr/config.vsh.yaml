@@ -105,7 +105,7 @@ argument_groups:
         direction: output
         description: |
           Output index file for `--output`. GATK writes a BAI format index
-          for both BAM and CRAM output. For a CRAM file,  GATK can read it, but
+          for both BAM and CRAM output. For a CRAM file, GATK can read it, but
           samtools cannot.
 
           Required when `--create_output_bam_index` is `true`, ignored when

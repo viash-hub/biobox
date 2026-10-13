@@ -106,16 +106,15 @@ require_output_index() {
 }
 
 # Move an index that GATK wrote next to an output to the path of the index
-# output argument. Does nothing if no index path is given or if both paths are
-# the same file.
+# output argument with move_if_needed. Does nothing if no index path is given.
 #
 # Usage: move_output_index "$gatk_index" "$par_output_index"
 move_output_index() {
   local gatk_index="$1"
   local output_index="$2"
 
-  if [[ -n "$gatk_index" && -n "$output_index" && ! "$gatk_index" -ef "$output_index" ]]; then
-    mv "$gatk_index" "$output_index"
+  if [[ -n "$gatk_index" && -n "$output_index" ]]; then
+    move_if_needed "$gatk_index" "$output_index"
   fi
 }
 
