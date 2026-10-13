@@ -16,7 +16,7 @@
 
 ## MINOR CHANGES
 
-* `gatk4/*`: Use shared interval arguments in all GATK4 components that support intervals (PR #xxx).
+* `gatk4/*`: Use shared interval arguments in all GATK4 components that support intervals (PR #270).
   - `--intervals` and `--exclude_intervals` can now be given more than once and can be BED, interval_list or VCF files, with matching `--intervals_index` and `--exclude_intervals_index` arguments
   - Add `--interval_set_rule`, `--interval_merging_rule` and `--interval_exclusion_padding` arguments
   - `gatk4_variantfiltration` now supports intervals
