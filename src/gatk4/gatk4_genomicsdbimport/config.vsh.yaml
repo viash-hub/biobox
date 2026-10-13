@@ -238,7 +238,7 @@ argument_groups:
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
     description: |
       Unlike most other GATK tools, GenomicsDBImport requires at least one
-      `--intervals` file.
+      interval (`--intervals` or `--interval_strings`).
 
       Each interval is imported into its own GenomicsDB array in the
       workspace. With `--merge_input_intervals`, the intervals on each

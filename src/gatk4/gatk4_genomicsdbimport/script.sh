@@ -26,8 +26,8 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
-if [[ -z "$par_intervals" ]]; then
-  echo "Error: --intervals is required." >&2
+if [[ -z "$par_intervals" && -z "$par_interval_strings" ]]; then
+  echo "Error: --intervals or --interval_strings is required." >&2
   exit 1
 fi
 if [[ -n "$par_variant_index" && -z "$par_variant" ]]; then

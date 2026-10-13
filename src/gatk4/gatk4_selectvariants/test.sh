@@ -419,4 +419,49 @@ fi
 
 log "✅ TEST 14 completed successfully"
 
+# --- Test Case 15: Interval strings ---
+log "Starting TEST 15: --interval_strings and --exclude_interval_strings"
+
+mkdir -p "$test_data_dir/strings"
+cp "$test_data_dir/variants.vcf" "$test_data_dir/strings/variants.vcf"
+echo "seq1:50-250" > "$test_data_dir/strings/region.intervals"
+
+log "Executing $meta_name with an --intervals file, --interval_strings and --exclude_interval_strings..."
+"$meta_executable" \
+  --variant "$test_data_dir/strings/variants.vcf" \
+  --output "$meta_temp_dir/strings_mixed.vcf" \
+  --output_index "$meta_temp_dir/strings_mixed.vcf.idx" \
+  --intervals "$test_data_dir/strings/region.intervals" \
+  --interval_strings "seq1:380-420" \
+  --exclude_interval_strings "seq1:190-210" 2> "$meta_temp_dir/test15_mixed.log"
+
+log "Validating TEST 15 outputs with mixed intervals..."
+selected_ids=$(grep -v '^#' "$meta_temp_dir/strings_mixed.vcf" | cut -f3 | tr '\n' ' ')
+if [[ "$selected_ids" == "snp1 indel2 " ]]; then
+  log "✓ Output has the records selected by the interval file and string, minus the excluded string: $selected_ids"
+else
+  log_error "✗ Output has records '$selected_ids', expected 'snp1 indel2 '"
+  exit 1
+fi
+
+log "Executing $meta_name with a plain --variant and only --interval_strings..."
+"$meta_executable" \
+  --variant "$test_data_dir/strings/variants.vcf" \
+  --output "$meta_temp_dir/strings_only.vcf" \
+  --output_index "$meta_temp_dir/strings_only.vcf.idx" \
+  --interval_strings "seq1:290-310" 2> "$meta_temp_dir/test15_only.log"
+
+log "Validating TEST 15 outputs with only interval strings..."
+selected_ids=$(grep -v '^#' "$meta_temp_dir/strings_only.vcf" | cut -f3 | tr '\n' ' ')
+if [[ "$selected_ids" == "indel1 " ]]; then
+  log "✓ Output has only the record selected by the interval string: $selected_ids"
+else
+  log_error "✗ Output has records '$selected_ids', expected 'indel1 '"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test15_only.log" "no index was provided" "run log (plain --variant indexed when interval strings are given)"
+check_file_not_exists "$test_data_dir/strings/variants.vcf.idx" "index next to the plain input"
+
+log "✅ TEST 15 completed successfully"
+
 print_test_summary "All tests completed successfully"

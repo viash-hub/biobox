@@ -21,6 +21,10 @@
   - Add `--interval_set_rule`, `--interval_merging_rule` and `--interval_exclusion_padding` arguments
   - `gatk4_variantfiltration` now supports intervals
 
+* `gatk4/*`: Add `--interval_strings` and `--exclude_interval_strings` to give intervals as strings (PR #271).
+  - They can be combined with the `--intervals` and `--exclude_intervals` files
+  - `gatk4_genomicsdbimport` and `gatk4_getpileupsummaries` need at least one of `--intervals` or `--interval_strings`
+
 * `minimap2/minimap2_index`: Add `--preset`, `--kmer_size`, `--window_size` and
   `--homopolymer_compressed` (PR #248). Previously every index was built with
   the default indexing parameters, so aligning against it with another preset
