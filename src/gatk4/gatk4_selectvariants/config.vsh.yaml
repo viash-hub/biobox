@@ -1,5 +1,4 @@
 name: gatk4_selectvariants
-namespace: gatk4
 description: |
   Selects a subset of variants from a VCF file based on various criteria.
 
@@ -9,27 +8,6 @@ description: |
   non-variant loci that meet certain requirements, or troubleshooting some
   unexpected results, to name a few.
 keywords: [variant selection, GATK, GATK4, VCF, filtering]
-links:
-  homepage: https://gatk.broadinstitute.org
-  documentation: https://gatk.broadinstitute.org/hc/en-us
-  repository: https://github.com/broadinstitute/gatk
-references:
-  bibtex:
-    - |
-      @book{VanderAuwera2020,
-        author = {{Van der Auwera}, Geraldine A. and O'Connor, Brian D.},
-        title = {Genomics in the Cloud: Using Docker, GATK, and WDL in Terra},
-        edition = {1st},
-        publisher = {O'Reilly Media},
-        year = {2020},
-        isbn = {9781491975190}
-      }
-license: Apache-2.0
-requirements:
-  commands: [gatk]
-authors:
-  - __merge__: /src/_authors/luke_zappia.yaml
-    roles: [author, maintainer]
 
 argument_groups:
   - name: "Input"
@@ -50,23 +28,9 @@ argument_groups:
           the run. A plain `.vcf` file does not need an index, unless an
           interval argument (for example `--intervals`) is given.
         example: variants.vcf.gz.tbi
-      - name: "--reference"
-        alternatives: [-R]
-        type: file
-        description: |
-          Reference genome FASTA file.
-
-          Optional for `SelectVariants` itself, but if provided,
-          `--reference_fai` and `--reference_dict` must be provided too.
-        example: reference.fasta
-      - name: "--reference_fai"
-        type: file
-        description: FASTA index (`.fai`) file for the reference genome.
-        example: reference.fasta.fai
-      - name: "--reference_dict"
-        type: file
-        description: Sequence dictionary (`.dict`) file for the reference genome.
-        example: reference.dict
+      - __merge__: /src/gatk4/utils/arguments/reference.yaml
+      - __merge__: /src/gatk4/utils/arguments/reference_fai.yaml
+      - __merge__: /src/gatk4/utils/arguments/reference_dict.yaml
 
   - name: "Output"
     arguments:
@@ -77,14 +41,7 @@ argument_groups:
         description: Output VCF file containing the selected variants.
         required: true
         example: selected.vcf.gz
-      - name: "--output_index"
-        type: file
-        direction: output
-        description: |
-          Output index file for `--output` (`.tbi` for a bgzipped
-          `.vcf.gz` or `.vcf.bgz` file, `.idx` otherwise). Required when
-          `--create_output_variant_index` is `true`, ignored when it is `false`.
-        must_exist: false
+      - __merge__: /src/gatk4/utils/arguments/vcf_output_index.yaml
         example: selected.vcf.gz.tbi
 
   - name: "Options"
@@ -330,33 +287,11 @@ argument_groups:
       - name: "--set_filtered_gt_to_nocall"
         type: boolean_true
         description: Set filtered genotypes to no-call.
-      - name: "--variant_output_filtering"
-        type: string
-        choices: [STARTS_IN, ENDS_IN, OVERLAPS, CONTAINED, ANYWHERE]
-        description: |
-          Restrict the output variants to ones that match the
-          `--intervals` according to the specified matching mode.
-        example: STARTS_IN
+      - __merge__: /src/gatk4/utils/arguments/variant_output_filtering.yaml
   - __merge__: /src/gatk4/utils/engine_argument_group.yaml
   - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
 
-resources:
-  - type: bash_script
-    path: script.sh
-  - path: /src/gatk4/utils/script_helpers.sh
-    dest: gatk4/script_helpers.sh
-
-test_resources:
-  - type: bash_script
-    path: test.sh
-  - path: /src/_utils/test_helpers.sh
-  - path: /src/gatk4/utils/test_helpers.sh
-    dest: gatk4/test_helpers.sh
-
-engines:
-  - __merge__: /src/gatk4/utils/common_engines.yaml
-
-runners:
-  - type: executable
-  - type: nextflow
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml

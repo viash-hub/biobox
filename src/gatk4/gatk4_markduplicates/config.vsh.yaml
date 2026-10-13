@@ -1,5 +1,4 @@
 name: gatk4_markduplicates
-namespace: gatk4
 description: |
   Identifies duplicate reads in a SAM/BAM/CRAM file.
 
@@ -21,21 +20,8 @@ description: |
   file indicating the numbers of duplicates for both single- and
   paired-end reads.
 keywords: [deduplication, alignment, BAM, GATK, GATK4, Picard]
-links:
-  homepage: https://gatk.broadinstitute.org
-  documentation: https://gatk.broadinstitute.org/hc/en-us
-  repository: https://github.com/broadinstitute/gatk
 references:
   bibtex:
-    - |
-      @book{VanderAuwera2020,
-        author = {{Van der Auwera}, Geraldine A. and O'Connor, Brian D.},
-        title = {Genomics in the Cloud: Using Docker, GATK, and WDL in Terra},
-        edition = {1st},
-        publisher = {O'Reilly Media},
-        year = {2020},
-        isbn = {9781491975190}
-      }
     - |
       @misc{Picard2019toolkit,
         title = {Picard toolkit},
@@ -44,12 +30,6 @@ references:
         journal = {Broad Institute, GitHub repository},
         howpublished = {\url{https://broadinstitute.github.io/picard/}}
       }
-license: Apache-2.0
-requirements:
-  commands: [gatk]
-authors:
-  - __merge__: /src/_authors/luke_zappia.yaml
-    roles: [author, maintainer]
 
 argument_groups:
   - name: "Input"
@@ -294,22 +274,6 @@ argument_groups:
           'STRICT'.
         choices: [STRICT, LENIENT, SILENT]
 
-resources:
-  - type: bash_script
-    path: script.sh
-  - path: /src/gatk4/utils/script_helpers.sh
-    dest: gatk4/script_helpers.sh
-
-test_resources:
-  - type: bash_script
-    path: test.sh
-  - path: /src/_utils/test_helpers.sh
-  - path: /src/gatk4/utils/test_helpers.sh
-    dest: gatk4/test_helpers.sh
-
-engines:
-  - __merge__: /src/gatk4/utils/common_engines.yaml
-
-runners:
-  - type: executable
-  - type: nextflow
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml
