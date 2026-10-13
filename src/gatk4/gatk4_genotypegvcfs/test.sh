@@ -7,24 +7,19 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+gatk4_test_init
 
 # --- Build shared reference fixtures ---
 create_test_reference "$test_data_dir/reference.fasta" 1 2000
 check_file_exists "$test_data_dir/reference.fasta" "test reference genome"
 check_file_exists "$test_data_dir/reference.dict" "reference sequence dictionary"
 check_file_exists "$test_data_dir/reference.fasta.fai" "reference FASTA index"
+
+reference_args=(
+  --reference "$test_data_dir/reference.fasta"
+  --reference_fai "$test_data_dir/reference.fasta.fai"
+  --reference_dict "$test_data_dir/reference.dict"
+)
 
 # --- Build a GVCF fixture by running HaplotypeCaller directly ---
 create_test_sam_reads "$test_data_dir/reads.sam" seq1 2000 rg1 sample1
@@ -50,9 +45,7 @@ log "Starting TEST 1: Default parameters"
 log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
   --variant "$test_data_dir/sample.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output.vcf" \
   --output_index "$meta_temp_dir/output.idx"
 
@@ -62,9 +55,8 @@ check_file_not_empty "$meta_temp_dir/output.vcf" "output VCF file"
 check_file_contains "$meta_temp_dir/output.vcf" "^##fileformat=VCF" "output VCF file header"
 check_file_contains "$meta_temp_dir/output.vcf" "sample1" "output VCF sample column"
 check_file_not_contains "$meta_temp_dir/output.vcf" "<NON_REF>" "output VCF should not contain GVCF placeholder allele"
-check_file_exists "$meta_temp_dir/output.idx" "output index file (Tribble index for a .vcf)"
+check_index_moved "$meta_temp_dir/output.idx" "$meta_temp_dir/output.vcf.idx" "output index file (Tribble index for a .vcf)"
 check_index_magic "$meta_temp_dir/output.idx" "TIDX" "output index file"
-check_file_not_exists "$meta_temp_dir/output.vcf.idx" "index next to the output VCF (moved to --output_index)"
 
 log "✅ TEST 1 completed successfully"
 
@@ -74,9 +66,7 @@ log "Starting TEST 2: Additional options"
 log "Executing $meta_name with additional options (--stand_call_conf is an alternative name)..."
 "$meta_executable" \
   --variant "$test_data_dir/sample.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_options.vcf" \
   --output_index "$meta_temp_dir/output_options.vcf.idx" \
   --include_non_variant_sites \
@@ -97,9 +87,7 @@ log "Starting TEST 3: Additional annotation and output-shaping options"
 log "Executing $meta_name with --annotation, --annotations_to_exclude, --call_genotypes, --sites_only_vcf_output, and --variant_output_filtering..."
 "$meta_executable" \
   --variant "$test_data_dir/sample.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_annotations.vcf" \
   --output_index "$meta_temp_dir/output_annotations.vcf.idx" \
   --annotation ChromosomeCounts \
@@ -131,9 +119,7 @@ log "Starting TEST 4: Shared GATK engine options"
 log "Executing $meta_name with --interval_padding and --create_output_variant_index false..."
 "$meta_executable" \
   --variant "$test_data_dir/sample.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_engine.vcf" \
   --interval_padding 10 \
   --create_output_variant_index false
@@ -162,9 +148,7 @@ gatk GenomicsDBImport \
 log "Executing $meta_name with GenomicsDB workspace input..."
 "$meta_executable" \
   --variant "$meta_temp_dir/genomicsdb_workspace" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_genomicsdb.vcf" \
   --output_index "$meta_temp_dir/output_genomicsdb.vcf.idx"
 
@@ -197,9 +181,7 @@ log "Executing $meta_name with .vcf.gz inputs and separate .tbi index files..."
   --dbsnp_index "$test_data_dir/separate_index/dbsnp.vcf.gz.tbi" \
   --population_callset "$test_data_dir/separate/population.vcf.gz" \
   --population_callset_index "$test_data_dir/separate_index/population.vcf.gz.tbi" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_separate.vcf" \
   --output_index "$meta_temp_dir/output_separate.vcf.idx" 2> "$meta_temp_dir/test6.log"
 
@@ -228,9 +210,7 @@ log "Executing $meta_name with unindexed .vcf.gz inputs..."
   --variant "$test_data_dir/no_index/sample.g.vcf.gz" \
   --dbsnp "$test_data_dir/no_index/dbsnp.vcf.gz" \
   --population_callset "$test_data_dir/no_index/population.vcf.gz" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_no_index.vcf" \
   --output_index "$meta_temp_dir/output_no_index.vcf.idx" 2> "$meta_temp_dir/test7.log"
 
@@ -247,40 +227,30 @@ log "✅ TEST 7 completed successfully"
 # --- Test Case 8: Index argument errors ---
 log "Starting TEST 8: Index argument errors"
 
-# Run $meta_executable with the given extra arguments, check that it fails and
-# that the log contains the expected error message
-expect_index_error() {
-  local message="$1"
-  local log_file="$2"
-  shift 2
-  if "$meta_executable" \
-    --reference "$test_data_dir/reference.fasta" \
-    --reference_fai "$test_data_dir/reference.fasta.fai" \
-    --reference_dict "$test_data_dir/reference.dict" \
-    --output "$meta_temp_dir/output_fail.vcf" \
-    --output_index "$meta_temp_dir/output_fail.vcf.idx" \
-    "$@" > "$log_file" 2>&1; then
-    log_error "✗ $meta_name did not fail with: $*"
-    exit 1
-  fi
-  check_file_contains "$log_file" "$message" "error message"
-}
+fail_args=(
+  "${reference_args[@]}"
+  --output "$meta_temp_dir/output_fail.vcf"
+  --output_index "$meta_temp_dir/output_fail.vcf.idx"
+)
 
 log "Executing $meta_name with --variant_index and a GenomicsDB workspace --variant..."
-expect_index_error "Error: --variant_index cannot be used when --variant is a GenomicsDB workspace directory" \
+check_fails_with "Error: --variant_index cannot be used when --variant is a GenomicsDB workspace directory" \
   "$meta_temp_dir/test8_workspace.log" \
+  "$meta_executable" "${fail_args[@]}" \
   --variant "$meta_temp_dir/genomicsdb_workspace" \
   --variant_index "$test_data_dir/separate_index/sample.g.vcf.gz.tbi"
 
 log "Executing $meta_name with --dbsnp_index and no --dbsnp..."
-expect_index_error "Error: --dbsnp_index requires --dbsnp" \
+check_fails_with "Error: --dbsnp_index requires --dbsnp" \
   "$meta_temp_dir/test8_dbsnp.log" \
+  "$meta_executable" "${fail_args[@]}" \
   --variant "$test_data_dir/sample.g.vcf" \
   --dbsnp_index "$test_data_dir/separate_index/dbsnp.vcf.gz.tbi"
 
 log "Executing $meta_name with --population_callset_index and no --population_callset..."
-expect_index_error "Error: --population_callset_index requires --population_callset" \
+check_fails_with "Error: --population_callset_index requires --population_callset" \
   "$meta_temp_dir/test8_population.log" \
+  "$meta_executable" "${fail_args[@]}" \
   --variant "$test_data_dir/sample.g.vcf" \
   --population_callset_index "$test_data_dir/separate_index/population.vcf.gz.tbi"
 
@@ -294,9 +264,7 @@ mkdir -p "$meta_temp_dir/gz_output" "$meta_temp_dir/gz_output_index"
 log "Executing $meta_name with a .vcf.gz --output and --output_index in a different directory..."
 "$meta_executable" \
   --variant "$test_data_dir/sample.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/gz_output/output.vcf.gz" \
   --output_index "$meta_temp_dir/gz_output_index/output.vcf.gz.tbi"
 
@@ -321,16 +289,11 @@ log "✅ TEST 9 completed successfully"
 # --- Test Case 10: Missing --output_index ---
 log "Starting TEST 10: A missing --output_index fails"
 
-if "$meta_executable" \
+check_fails_with "Error: --output_index is required unless --create_output_variant_index is false." "$meta_temp_dir/test10.log" \
+  "$meta_executable" \
   --variant "$test_data_dir/sample.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/no_output_index.vcf" > "$meta_temp_dir/test10.log" 2>&1; then
-  log_error "✗ $meta_name did not fail without --output_index"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test10.log" "Error: --output_index is required unless --create_output_variant_index is false." "error message"
+  "${reference_args[@]}" \
+  --output "$meta_temp_dir/no_output_index.vcf"
 check_file_not_exists "$meta_temp_dir/no_output_index.vcf" "output VCF (no run without --output_index)"
 
 log "✅ TEST 10 completed successfully"
@@ -355,9 +318,7 @@ create_test_vcf_gz_with_separate_index "$test_data_dir/intervals/include.vcf" \
 log "Executing $meta_name with two --intervals files and --exclude_intervals..."
 "$meta_executable" \
   --variant "$test_data_dir/sample.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_intervals.vcf" \
   --output_index "$meta_temp_dir/output_intervals.vcf.idx" \
   --intervals "$test_data_dir/intervals/include.bed" \
@@ -373,14 +334,8 @@ check_file_not_contains "$meta_temp_dir/test11.log" "no index was provided for '
 check_file_not_exists "$test_data_dir/intervals/include.vcf.gz.tbi" "index next to the interval VCF"
 
 # With --include_non_variant_sites there is one record for each position
-positions=$(grep -v '^#' "$meta_temp_dir/output_intervals.vcf" | cut -f2 | tr '\n' ' ')
-expected_positions=$({ seq 100 149; seq 161 200; seq 1001 1020; } | tr '\n' ' ')
-if [[ "$positions" == "$expected_positions" ]]; then
-  log "✓ Output has one record for each position in the selected intervals"
-else
-  log_error "✗ Output positions are '$positions', expected '$expected_positions'"
-  exit 1
-fi
+expected_positions=$({ seq 100 149; seq 161 200; seq 1001 1020; } | paste -sd ' ' -)
+check_vcf_column "$meta_temp_dir/output_intervals.vcf" 2 "$expected_positions" "output VCF (intervals) record positions"
 
 log "✅ TEST 11 completed successfully"
 
@@ -393,9 +348,7 @@ printf 'seq1\t599\t600\n' > "$test_data_dir/force_sites.bed"
 log "Executing $meta_name with --force_output_intervals and --force_output_interval_strings..."
 "$meta_executable" \
   --variant "$test_data_dir/sample.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_forced.vcf" \
   --create_output_variant_index false \
   --force_output_intervals "$test_data_dir/force_sites.bed" \
@@ -404,16 +357,9 @@ log "Executing $meta_name with --force_output_intervals and --force_output_inter
 log "Validating TEST 12 outputs..."
 check_file_exists "$meta_temp_dir/output_forced.vcf" "output VCF file (forced sites)"
 for pos in 500 600; do
-  if grep -v '^#' "$meta_temp_dir/output.vcf" | cut -f2 | grep -qx "$pos"; then
-    log_error "✗ Default output already has a record at seq1:$pos, so the test cannot check forced output"
-    exit 1
-  fi
-  if grep -v '^#' "$meta_temp_dir/output_forced.vcf" | cut -f2 | grep -qx "$pos"; then
-    log "✓ Output has a forced record at seq1:$pos"
-  else
-    log_error "✗ Output has no record at the forced site seq1:$pos"
-    exit 1
-  fi
+  # The default output must not have the site, else the check below proves nothing
+  check_vcf_lacks_record "$meta_temp_dir/output.vcf" $'^seq1\t'"$pos"$'\t' "default output VCF (TEST 1)"
+  check_vcf_has_record "$meta_temp_dir/output_forced.vcf" $'^seq1\t'"$pos"$'\t' "output VCF (forced sites)"
 done
 
 log "✅ TEST 12 completed successfully"
@@ -427,9 +373,7 @@ printf 'fam1\tsample1\tfather\tmother\t1\t0\nfam1\tfather\t0\t0\t1\t0\nfam1\tmot
 log "Executing $meta_name with the de novo and RMS mapping quality options..."
 "$meta_executable" \
   --variant "$test_data_dir/sample.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_new_options.vcf" \
   --create_output_variant_index false \
   --annotation RMSMappingQuality \

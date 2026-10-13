@@ -7,18 +7,7 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+gatk4_test_init
 
 # --- Build a small VCF with 2 SNPs and 2 indels ---
 log "Writing hand-crafted test VCF with SNP and indel records..."
@@ -53,21 +42,14 @@ check_file_exists "$meta_temp_dir/snps_only.vcf" "SNP-only output VCF"
 check_file_not_empty "$meta_temp_dir/snps_only.vcf" "SNP-only output VCF"
 check_file_contains "$meta_temp_dir/snps_only.vcf" "^##fileformat=VCF" "SNP-only output VCF header"
 
-record_count=$(grep -c "^seq1" "$meta_temp_dir/snps_only.vcf")
-if [[ "$record_count" -eq 2 ]]; then
-  log "✓ SNP-only output VCF contains expected number of records (2): $meta_temp_dir/snps_only.vcf"
-else
-  log_error "✗ SNP-only output VCF has $record_count records, expected 2: $meta_temp_dir/snps_only.vcf"
-  exit 1
-fi
+check_vcf_record_count "$meta_temp_dir/snps_only.vcf" 2 "SNP-only output VCF"
 
 check_file_contains "$meta_temp_dir/snps_only.vcf" "snp1" "SNP-only output VCF (snp1 record)"
 check_file_contains "$meta_temp_dir/snps_only.vcf" "snp2" "SNP-only output VCF (snp2 record)"
 check_file_not_contains "$meta_temp_dir/snps_only.vcf" "indel1" "SNP-only output VCF (indel1 record should be absent)"
 check_file_not_contains "$meta_temp_dir/snps_only.vcf" "indel2" "SNP-only output VCF (indel2 record should be absent)"
-check_file_exists "$meta_temp_dir/indexes/snps_only.idx" "output index file"
+check_index_moved "$meta_temp_dir/indexes/snps_only.idx" "$meta_temp_dir/snps_only.vcf.idx" "output index file"
 check_file_not_empty "$meta_temp_dir/indexes/snps_only.idx" "output index file"
-check_file_not_exists "$meta_temp_dir/snps_only.vcf.idx" "index next to the output VCF (moved to --output_index)"
 
 log "✅ TEST 1 completed successfully"
 
@@ -86,13 +68,7 @@ check_file_exists "$meta_temp_dir/indels_only.vcf" "INDEL-only output VCF"
 check_file_not_empty "$meta_temp_dir/indels_only.vcf" "INDEL-only output VCF"
 check_file_contains "$meta_temp_dir/indels_only.vcf" "^##fileformat=VCF" "INDEL-only output VCF header"
 
-record_count=$(grep -c "^seq1" "$meta_temp_dir/indels_only.vcf")
-if [[ "$record_count" -eq 2 ]]; then
-  log "✓ INDEL-only output VCF contains expected number of records (2): $meta_temp_dir/indels_only.vcf"
-else
-  log_error "✗ INDEL-only output VCF has $record_count records, expected 2: $meta_temp_dir/indels_only.vcf"
-  exit 1
-fi
+check_vcf_record_count "$meta_temp_dir/indels_only.vcf" 2 "INDEL-only output VCF"
 
 check_file_contains "$meta_temp_dir/indels_only.vcf" "indel1" "INDEL-only output VCF (indel1 record)"
 check_file_contains "$meta_temp_dir/indels_only.vcf" "indel2" "INDEL-only output VCF (indel2 record)"
@@ -115,13 +91,7 @@ log "Validating TEST 3 outputs..."
 check_file_exists "$meta_temp_dir/keep_ids.vcf" "keep-ids output VCF"
 check_file_not_empty "$meta_temp_dir/keep_ids.vcf" "keep-ids output VCF"
 
-record_count=$(grep -c "^seq1" "$meta_temp_dir/keep_ids.vcf")
-if [[ "$record_count" -eq 2 ]]; then
-  log "✓ keep-ids output VCF contains expected number of records (2): $meta_temp_dir/keep_ids.vcf"
-else
-  log_error "✗ keep-ids output VCF has $record_count records, expected 2: $meta_temp_dir/keep_ids.vcf"
-  exit 1
-fi
+check_vcf_record_count "$meta_temp_dir/keep_ids.vcf" 2 "keep-ids output VCF"
 
 check_file_contains "$meta_temp_dir/keep_ids.vcf" "snp1" "keep-ids output VCF (snp1 record)"
 check_file_contains "$meta_temp_dir/keep_ids.vcf" "indel2" "keep-ids output VCF (indel2 record)"
@@ -146,13 +116,7 @@ log "Validating TEST 4 outputs..."
 check_file_exists "$meta_temp_dir/small_indels.vcf" "small-indels output VCF"
 check_file_not_empty "$meta_temp_dir/small_indels.vcf" "small-indels output VCF"
 
-record_count=$(grep -c "^seq1" "$meta_temp_dir/small_indels.vcf")
-if [[ "$record_count" -eq 1 ]]; then
-  log "✓ small-indels output VCF contains expected number of records (1): $meta_temp_dir/small_indels.vcf"
-else
-  log_error "✗ small-indels output VCF has $record_count records, expected 1: $meta_temp_dir/small_indels.vcf"
-  exit 1
-fi
+check_vcf_record_count "$meta_temp_dir/small_indels.vcf" 1 "small-indels output VCF"
 
 check_file_contains "$meta_temp_dir/small_indels.vcf" "indel1" "small-indels output VCF (indel1 record)"
 check_file_not_contains "$meta_temp_dir/small_indels.vcf" "indel2" "small-indels output VCF (indel2 record should be absent, 3bp > max)"
@@ -207,13 +171,7 @@ log "Validating TEST 6 outputs..."
 check_file_exists "$meta_temp_dir/with_reference.vcf" "output VCF file (with reference)"
 check_file_not_empty "$meta_temp_dir/with_reference.vcf" "output VCF file (with reference)"
 
-record_count=$(grep -c "^seq1" "$meta_temp_dir/with_reference.vcf")
-if [[ "$record_count" -eq 2 ]]; then
-  log "✓ output VCF (with reference) contains expected number of records (2): $meta_temp_dir/with_reference.vcf"
-else
-  log_error "✗ output VCF (with reference) has $record_count records, expected 2: $meta_temp_dir/with_reference.vcf"
-  exit 1
-fi
+check_vcf_record_count "$meta_temp_dir/with_reference.vcf" 2 "output VCF (with reference)"
 
 log "✅ TEST 6 completed successfully"
 
@@ -280,13 +238,7 @@ log "Executing $meta_name with --concordance and --concordance_index..."
 
 log "Validating TEST 9 outputs..."
 check_file_exists "$meta_temp_dir/concordance.vcf" "concordance output VCF"
-record_count=$(grep -c "^seq1" "$meta_temp_dir/concordance.vcf")
-if [[ "$record_count" -eq 2 ]]; then
-  log "✓ concordance output VCF contains expected number of records (2): $meta_temp_dir/concordance.vcf"
-else
-  log_error "✗ concordance output VCF has $record_count records, expected 2: $meta_temp_dir/concordance.vcf"
-  exit 1
-fi
+check_vcf_record_count "$meta_temp_dir/concordance.vcf" 2 "concordance output VCF"
 check_file_contains "$meta_temp_dir/concordance.vcf" "snp1" "concordance output VCF (snp1 record)"
 check_file_contains "$meta_temp_dir/concordance.vcf" "indel2" "concordance output VCF (indel2 record)"
 check_file_not_contains "$meta_temp_dir/concordance.vcf" "snp2" "concordance output VCF (snp2 record should be absent)"
@@ -297,15 +249,12 @@ log "✅ TEST 9 completed successfully"
 # --- Test Case 10: An index without its input fails ---
 log "Starting TEST 10: --concordance_index without --concordance"
 
-if "$meta_executable" \
+check_fails_with "Error: --concordance_index requires --concordance" "$meta_temp_dir/test10.log" \
+  "$meta_executable" \
   --variant "$test_data_dir/variants.vcf" \
   --concordance_index "$test_data_dir/indexes/comparison.vcf.gz.tbi" \
   --output "$meta_temp_dir/index_only.vcf" \
-  --output_index "$meta_temp_dir/index_only.vcf.idx" > "$meta_temp_dir/test10.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --concordance_index but no --concordance"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test10.log" "Error: --concordance_index requires --concordance" "error message"
+  --output_index "$meta_temp_dir/index_only.vcf.idx"
 check_file_not_exists "$meta_temp_dir/index_only.vcf" "output VCF (GATK did not run)"
 
 log "✅ TEST 10 completed successfully"
@@ -355,29 +304,19 @@ log "Executing $meta_name with a .vcf.gz --output and --output_index..."
 
 log "Validating TEST 12 outputs..."
 check_file_exists "$meta_temp_dir/snps_only.vcf.gz" "bgzipped output VCF"
-record_count=$(zcat "$meta_temp_dir/snps_only.vcf.gz" | grep -c "^seq1")
-if [[ "$record_count" -eq 2 ]]; then
-  log "✓ bgzipped output VCF contains expected number of records (2)"
-else
-  log_error "✗ bgzipped output VCF has $record_count records, expected 2"
-  exit 1
-fi
-check_file_exists "$meta_temp_dir/indexes/snps_only.tbi" "output index file"
+check_vcf_record_count "$meta_temp_dir/snps_only.vcf.gz" 2 "bgzipped output VCF"
+check_index_moved "$meta_temp_dir/indexes/snps_only.tbi" "$meta_temp_dir/snps_only.vcf.gz.tbi" "output index file"
 check_file_not_empty "$meta_temp_dir/indexes/snps_only.tbi" "output index file"
-check_file_not_exists "$meta_temp_dir/snps_only.vcf.gz.tbi" "index next to the output VCF (moved to --output_index)"
 
 log "✅ TEST 12 completed successfully"
 
 # --- Test Case 13: Missing --output_index ---
 log "Starting TEST 13: A missing --output_index fails"
 
-if "$meta_executable" \
+check_fails_with "Error: --output_index is required unless --create_output_variant_index is false." "$meta_temp_dir/test13.log" \
+  "$meta_executable" \
   --variant "$test_data_dir/variants.vcf" \
-  --output "$meta_temp_dir/no_output_index.vcf" > "$meta_temp_dir/test13.log" 2>&1; then
-  log_error "✗ $meta_name did not fail without --output_index"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test13.log" "Error: --output_index is required unless --create_output_variant_index is false." "error message"
+  --output "$meta_temp_dir/no_output_index.vcf"
 check_file_not_exists "$meta_temp_dir/no_output_index.vcf" "output VCF (GATK did not run)"
 
 log "✅ TEST 13 completed successfully"
@@ -410,13 +349,7 @@ check_file_exists "$meta_temp_dir/intervals.vcf" "output VCF (intervals)"
 check_file_not_contains "$meta_temp_dir/test14.log" "no index was provided for '$test_data_dir/intervals/sites.vcf.gz'" "run log (no indexing of the interval VCF when --intervals_index is given)"
 check_file_not_exists "$test_data_dir/intervals/sites.vcf.gz.tbi" "index next to the interval VCF"
 
-ids=$(grep -v '^#' "$meta_temp_dir/intervals.vcf" | cut -f3 | tr '\n' ' ')
-if [[ "$ids" == "snp1 snp2 " ]]; then
-  log "✓ Output has only the records in the selected intervals: $ids"
-else
-  log_error "✗ Output records are '$ids', expected 'snp1 snp2 '"
-  exit 1
-fi
+check_vcf_column "$meta_temp_dir/intervals.vcf" 3 "snp1 snp2" "output VCF (records in the selected intervals)"
 
 log "✅ TEST 14 completed successfully"
 
@@ -437,13 +370,7 @@ log "Executing $meta_name with an --intervals file, --interval_strings and --exc
   --exclude_interval_strings "seq1:190-210" 2> "$meta_temp_dir/test15_mixed.log"
 
 log "Validating TEST 15 outputs with mixed intervals..."
-selected_ids=$(grep -v '^#' "$meta_temp_dir/strings_mixed.vcf" | cut -f3 | tr '\n' ' ')
-if [[ "$selected_ids" == "snp1 indel2 " ]]; then
-  log "✓ Output has the records selected by the interval file and string, minus the excluded string: $selected_ids"
-else
-  log_error "✗ Output has records '$selected_ids', expected 'snp1 indel2 '"
-  exit 1
-fi
+check_vcf_column "$meta_temp_dir/strings_mixed.vcf" 3 "snp1 indel2" "output VCF (interval file and string, minus the excluded string)"
 
 log "Executing $meta_name with a plain --variant and only --interval_strings..."
 "$meta_executable" \
@@ -453,13 +380,7 @@ log "Executing $meta_name with a plain --variant and only --interval_strings..."
   --interval_strings "seq1:290-310" 2> "$meta_temp_dir/test15_only.log"
 
 log "Validating TEST 15 outputs with only interval strings..."
-selected_ids=$(grep -v '^#' "$meta_temp_dir/strings_only.vcf" | cut -f3 | tr '\n' ' ')
-if [[ "$selected_ids" == "indel1 " ]]; then
-  log "✓ Output has only the record selected by the interval string: $selected_ids"
-else
-  log_error "✗ Output has records '$selected_ids', expected 'indel1 '"
-  exit 1
-fi
+check_vcf_column "$meta_temp_dir/strings_only.vcf" 3 "indel1" "output VCF (interval string only)"
 check_file_contains "$meta_temp_dir/test15_only.log" "no index was provided" "run log (plain --variant indexed when interval strings are given)"
 check_file_not_exists "$test_data_dir/strings/variants.vcf.idx" "index next to the plain input"
 
@@ -487,20 +408,8 @@ log "Executing $meta_name with --interval_strings and --variant_output_filtering
   --variant_output_filtering STARTS_IN
 
 log "Validating TEST 16 outputs..."
-selected_ids=$(grep -v '^#' "$meta_temp_dir/filtering_default.vcf" | cut -f3 | tr '\n' ' ')
-if [[ "$selected_ids" == "snp2 indel2 " ]]; then
-  log "✓ Without a filtering mode, the output has the records that overlap the intervals: $selected_ids"
-else
-  log_error "✗ Output has records '$selected_ids', expected 'snp2 indel2 '"
-  exit 1
-fi
-selected_ids=$(grep -v '^#' "$meta_temp_dir/filtering_starts_in.vcf" | cut -f3 | tr '\n' ' ')
-if [[ "$selected_ids" == "snp2 " ]]; then
-  log "✓ With STARTS_IN, the output has only the records that start in the intervals: $selected_ids"
-else
-  log_error "✗ Output has records '$selected_ids', expected 'snp2 '"
-  exit 1
-fi
+check_vcf_column "$meta_temp_dir/filtering_default.vcf" 3 "snp2 indel2" "output VCF (no filtering mode, records that overlap the intervals)"
+check_vcf_column "$meta_temp_dir/filtering_starts_in.vcf" 3 "snp2" "output VCF (STARTS_IN, records that start in the intervals)"
 
 log "✅ TEST 16 completed successfully"
 
@@ -515,13 +424,7 @@ for select_arg in --select --select_expressions; do
     --create_output_variant_index false \
     "$select_arg" "DP > 24"
 
-  selected_ids=$(grep -v '^#' "$meta_temp_dir/select${select_arg}.vcf" | cut -f3 | tr '\n' ' ')
-  if [[ "$selected_ids" == "snp2 indel2 " ]]; then
-    log "✓ $select_arg kept the records with DP > 24: $selected_ids"
-  else
-    log_error "✗ Output has records '$selected_ids', expected 'snp2 indel2 '"
-    exit 1
-  fi
+  check_vcf_column "$meta_temp_dir/select${select_arg}.vcf" 3 "snp2 indel2" "output VCF ($select_arg 'DP > 24')"
 done
 
 log "✅ TEST 17 completed successfully"

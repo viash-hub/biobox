@@ -7,18 +7,8 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+# Set up the test environment and the test data directory
+gatk4_test_init
 
 # --- Build shared fixtures: a real F1R2 tarball from Mutect2 ---
 create_test_mutect2_outputs "$test_data_dir"

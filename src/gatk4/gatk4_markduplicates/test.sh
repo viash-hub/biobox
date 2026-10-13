@@ -7,18 +7,7 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+gatk4_test_init
 
 # Generate a synthetic SAM fixture with a duplicate read pair: read1/read2
 # share the same position (1), read3/read4 sit at distinct positions.
@@ -160,9 +149,8 @@ log "Executing $meta_name with --create_index and --output_index..."
 log "Validating TEST 5 outputs..."
 check_file_exists "$test5_dir/marked_duplicates.bam" "dedup-tagged output BAM"
 check_file_not_empty "$test5_dir/marked_duplicates.bam" "dedup-tagged output BAM"
-check_file_exists "$test5_index_dir/marked.bai" "output BAM index"
+check_index_moved "$test5_index_dir/marked.bai" "$test5_dir/marked_duplicates.bai" "output BAM index"
 check_file_not_empty "$test5_index_dir/marked.bai" "output BAM index"
-check_file_not_exists "$test5_dir/marked_duplicates.bai" "index next to the output BAM (moved to --output_index)"
 check_file_not_exists "$test5_dir/marked_duplicates.bam.bai" "index next to the output BAM (moved to --output_index)"
 
 log "Executing $meta_name with --output_index at the path Picard writes..."
@@ -183,15 +171,12 @@ log "Starting TEST 6: --create_index requires --output_index"
 test6_dir="$meta_temp_dir/test6"
 mkdir -p "$test6_dir"
 
-if "$meta_executable" \
+check_fails_with "Error: --create_index requires --output_index." "$test6_dir/fail.log" \
+  "$meta_executable" \
   --input "$input_bam" \
   --output "$test6_dir/fail.bam" \
   --metrics "$test6_dir/fail_metrics.txt" \
-  --create_index > "$test6_dir/fail.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --create_index and no --output_index"
-  exit 1
-fi
-check_file_contains "$test6_dir/fail.log" "Error: --create_index requires --output_index." "error message"
+  --create_index
 check_file_not_exists "$test6_dir/fail.bam" "output BAM (should not be written)"
 
 log "Executing $meta_name with --output_index but without --create_index..."
@@ -276,14 +261,13 @@ if [[ "$(head -c 4 "$test8_dir/marked_duplicates.cram")" != "CRAM" ]]; then
   exit 1
 fi
 log "✓ Output has the CRAM magic bytes"
-check_file_exists "$test8_index_dir/marked.cram.bai" "output CRAM index"
+check_index_moved "$test8_index_dir/marked.cram.bai" "$test8_dir/marked_duplicates.cram.bai" "output CRAM index"
 check_file_not_empty "$test8_index_dir/marked.cram.bai" "output CRAM index"
 if [[ "$(head -c 3 "$test8_index_dir/marked.cram.bai")" != "BAI" ]]; then
   log_error "✗ Output index does not have the BAI magic bytes"
   exit 1
 fi
 log "✓ Output index has the BAI magic bytes"
-check_file_not_exists "$test8_dir/marked_duplicates.cram.bai" "index next to the output CRAM (moved to --output_index)"
 check_file_not_exists "$test8_dir/marked_duplicates.bai" "index next to the output CRAM"
 check_file_not_exists "$test8_dir/marked_duplicates.cram.crai" "CRAI index next to the output CRAM"
 
@@ -296,37 +280,28 @@ test9_dir="$meta_temp_dir/test9"
 mkdir -p "$test9_dir"
 
 log "Executing $meta_name with a CRAM --input and no --reference_sequence..."
-if "$meta_executable" \
+check_fails_with "Error: --reference_sequence is required for CRAM input or output." "$test9_dir/cram_in.log" \
+  "$meta_executable" \
   --input "$input_cram" \
   --output "$test9_dir/cram_in.bam" \
-  --metrics "$test9_dir/cram_in_metrics.txt" > "$test9_dir/cram_in.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with a CRAM --input and no --reference_sequence"
-  exit 1
-fi
-check_file_contains "$test9_dir/cram_in.log" "Error: --reference_sequence is required for CRAM input or output." "error message"
+  --metrics "$test9_dir/cram_in_metrics.txt"
 check_file_not_exists "$test9_dir/cram_in.bam" "output BAM (should not be written)"
 
 log "Executing $meta_name with a CRAM --output and no --reference_sequence..."
-if "$meta_executable" \
+check_fails_with "Error: --reference_sequence is required for CRAM input or output." "$test9_dir/cram_out.log" \
+  "$meta_executable" \
   --input "$input_bam" \
   --output "$test9_dir/cram_out.cram" \
-  --metrics "$test9_dir/cram_out_metrics.txt" > "$test9_dir/cram_out.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with a CRAM --output and no --reference_sequence"
-  exit 1
-fi
-check_file_contains "$test9_dir/cram_out.log" "Error: --reference_sequence is required for CRAM input or output." "error message"
+  --metrics "$test9_dir/cram_out_metrics.txt"
 check_file_not_exists "$test9_dir/cram_out.cram" "output CRAM (should not be written)"
 
 log "Executing $meta_name with --reference_sequence and no --reference_sequence_fai..."
-if "$meta_executable" \
+check_fails_with "Error: --reference_sequence_fai must be provided when --reference_sequence is set." "$test9_dir/no_fai.log" \
+  "$meta_executable" \
   --input "$input_cram" \
   --output "$test9_dir/no_fai.bam" \
   --metrics "$test9_dir/no_fai_metrics.txt" \
-  --reference_sequence "$reference" > "$test9_dir/no_fai.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --reference_sequence and no --reference_sequence_fai"
-  exit 1
-fi
-check_file_contains "$test9_dir/no_fai.log" "Error: --reference_sequence_fai must be provided when --reference_sequence is set." "error message"
+  --reference_sequence "$reference"
 check_file_not_exists "$test9_dir/no_fai.bam" "output BAM (should not be written)"
 
 log "✅ TEST 9 completed successfully"

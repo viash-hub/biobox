@@ -5,19 +5,10 @@
 
 # Source the centralized test helpers
 source "$meta_resources_dir/test_helpers.sh"
+source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+# Set up the test environment and the test data directory
+gatk4_test_init
 
 # --- Build shared pileup summary fixtures ---
 # Hand-crafted pileup summary tables in the GetPileupSummaries output format:
@@ -114,14 +105,11 @@ log "✅ TEST 3 completed successfully"
 # --- Test Case 4: --create_tumor_segmentation without a path ---
 log "Starting TEST 4: --create_tumor_segmentation without --tumor_segmentation fails"
 
-if "$meta_executable" \
+check_fails_with "Error: --create_tumor_segmentation requires --tumor_segmentation" "$meta_temp_dir/test4.log" \
+  "$meta_executable" \
   --input "$test_data_dir/tumor_pileups.table" \
   --output "$meta_temp_dir/contamination_bad.table" \
-  --create_tumor_segmentation > "$meta_temp_dir/test4.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --create_tumor_segmentation and no --tumor_segmentation"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test4.log" "Error: --create_tumor_segmentation requires --tumor_segmentation" "error message"
+  --create_tumor_segmentation
 
 log "✅ TEST 4 completed successfully"
 
