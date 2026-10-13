@@ -155,7 +155,13 @@ Follow the [GATK citation advice](https://gatk.broadinstitute.org/hc/en-us/artic
 
 ## Testing
 
-- The `test_helpers.sh` script has functions for creating synthetic test fixtures
+- The `test_helpers.sh` script has functions for creating synthetic test fixtures and for common checks:
+  - `gatk4_test_init` sets up the test environment and the `test_data_dir`
+  - `check_fails_with` runs a command that must fail and checks its error message
+  - `check_vcf_column`, `check_vcf_record_count`, `check_vcf_has_record` and `check_vcf_lacks_record` check VCF records
+  - `check_index_moved` checks that an index output is at the requested path and not next to the output
+  - `check_index_magic` checks the file signature of a `.tbi` or Tribble index
+- Use a local `reference_args` array when a test gives the same reference files many times
 - The GATK image has `samtools`, `bgzip` and `tabix` available for creating additional test files, as well as all GATK tools
 - Confirm expected behavior in the real container, not only in the GATK documentation.
   For example, side file names, index requirements and tool-default read filters.
