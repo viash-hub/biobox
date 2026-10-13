@@ -5,18 +5,16 @@
 
 set -eo pipefail
 
-[[ "$par_create_tumor_segmentation" == "false" ]] && unset par_create_tumor_segmentation
+source "$meta_resources_dir/gatk4/script_helpers.sh"
 
-if [[ -n "$par_create_tumor_segmentation" && -z "$par_tumor_segmentation" ]]; then
-  echo "Error: --create_tumor_segmentation requires --tumor_segmentation." >&2
-  exit 1
-fi
+# Unset "false" flags
+unset_if_false par_create_tumor_segmentation
 
-tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_calculatecontamination.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT
+# Check the arguments
+require_output_if_created "$par_create_tumor_segmentation" "$par_tumor_segmentation" \
+  --create_tumor_segmentation --tumor_segmentation
 
-# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
+setup_tmp_dir
 
 # Build command arguments array
 cmd_args=(
@@ -30,4 +28,4 @@ cmd_args=(
 )
 
 # Run GATK CalculateContamination
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" CalculateContamination "${cmd_args[@]}"
+run_gatk CalculateContamination "${cmd_args[@]}"

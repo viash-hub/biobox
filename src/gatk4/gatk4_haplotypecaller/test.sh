@@ -221,7 +221,8 @@ if "$meta_executable" \
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
   --dbsnp_index "$test_data_dir/indexes/dbsnp.vcf.gz.tbi" \
-  --output "$meta_temp_dir/output_bad.vcf" > "$meta_temp_dir/test7.log" 2>&1; then
+  --output "$meta_temp_dir/output_bad.vcf" \
+  --output_index "$meta_temp_dir/output_bad.vcf.idx" > "$meta_temp_dir/test7.log" 2>&1; then
   log_error "✗ $meta_name did not fail with --dbsnp_index and no --dbsnp"
   exit 1
 fi
@@ -437,7 +438,7 @@ check_fails_with() {
 
 check_fails_with "Error: --create_bam_output requires --bam_output\." "$meta_temp_dir/test12_bam_output.log" \
   --create_bam_output
-check_fails_with "Error: --create_bam_output requires --bam_output_index" "$meta_temp_dir/test12_bam_output_index.log" \
+check_fails_with "Error: --bam_output_index is required unless --create_output_bam_index is false\." "$meta_temp_dir/test12_bam_output_index.log" \
   --create_bam_output --bam_output "$meta_temp_dir/fail.bam"
 check_fails_with "Error: --bam_output must be a BAM file, GATK cannot write CRAM here." "$meta_temp_dir/test12_bam_output_cram.log" \
   --create_bam_output --bam_output "$meta_temp_dir/fail.cram" --bam_output_index "$meta_temp_dir/fail.crai"

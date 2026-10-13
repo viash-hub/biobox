@@ -300,7 +300,8 @@ log "Starting TEST 10: --concordance_index without --concordance"
 if "$meta_executable" \
   --variant "$test_data_dir/variants.vcf" \
   --concordance_index "$test_data_dir/indexes/comparison.vcf.gz.tbi" \
-  --output "$meta_temp_dir/index_only.vcf" > "$meta_temp_dir/test10.log" 2>&1; then
+  --output "$meta_temp_dir/index_only.vcf" \
+  --output_index "$meta_temp_dir/index_only.vcf.idx" > "$meta_temp_dir/test10.log" 2>&1; then
   log_error "✗ $meta_name did not fail with --concordance_index but no --concordance"
   exit 1
 fi
@@ -525,4 +526,4 @@ done
 
 log "✅ TEST 17 completed successfully"
 
-print_test_summary "All tests completed successfully"
+print_test_summary "All tests"

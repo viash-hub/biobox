@@ -7,11 +7,7 @@ set -eo pipefail
 
 source "$meta_resources_dir/gatk4/script_helpers.sh"
 
-tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_learnreadorientationmodel.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT
-
-# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
+setup_tmp_dir
 
 # Convert semicolon-separated arguments to repeated flags
 split_multiple_to_flags "$par_input" "--input" input_args
@@ -27,4 +23,4 @@ cmd_args=(
 )
 
 # Run GATK LearnReadOrientationModel
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" LearnReadOrientationModel "${cmd_args[@]}"
+run_gatk LearnReadOrientationModel "${cmd_args[@]}"
