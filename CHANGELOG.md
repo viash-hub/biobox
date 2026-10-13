@@ -20,7 +20,7 @@
 * `minimap2/minimap2_align`: Add `--output_index` to declare the BAM index as a
   tracked output (PR #248).
 
-* `gatk4`: Update the citations of all GATK4 components (PR #xxx).
+* `gatk4`: Update the citations of all GATK4 components (PR #266).
   All components cite recommended GATK book (Van der Auwera & O'Connor, 2020) and the paper that describes the tool, where there is one.
   `gatk4_markduplicates` and `gatk4_createsequencedictionary` also cite Picard.
 
