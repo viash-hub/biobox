@@ -46,6 +46,11 @@ If a new component needs new logic that another component could use, add it to t
   Check to see if these need to be mutually exclusive or if the tool accepts a mixture of strings and files.
 - When you generate `choices` from `help.txt` carefully check the list.
   Possible values may be split over lines or only be listed in the description.
+- Write a description that contains `: ` (for example "Default: 0.") as a block scalar (`description: |`).
+  In a one-line plain scalar, the `: ` breaks the YAML parsing.
+- Pass a `boolean_true` argument as a flag with no value to GATK engine tools (for example `--lenient`).
+  Picard tools (for example MarkDuplicates) need a value (`--CREATE_INDEX true`).
+  Unset `boolean_true` arguments that are `false` with `unset_if_false`, so that `${par_x:+--flag}` works.
 
 ## Companion files
 
@@ -111,14 +116,14 @@ The Viash Nextflow runner always gives every output argument a default path (`$i
 This is handled by adding a matching `--create_*` boolean argument and setting `must_exist: false` on the output path argument.
 The script should only create the output when `--create_*` is `true`.
 If `--create_*` is `true` and no output path is provided the script should error.
+Use `require_output_if_created` for this check, and `require_output_index` and `move_output_index` for index outputs.
 
 ## Resources
 
-Set the JVM heap from `meta_memory_mb` with a fallback:
+Run GATK and Picard tools with `run_gatk`, which sets the JVM heap from `meta_memory_mb` with a fallback:
 
 ```bash
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" <Tool> "${cmd_args[@]}"
+run_gatk <Tool> "${cmd_args[@]}"
 ```
 
 The `gatk` launcher has no default heap size of its own so a value must be set.
