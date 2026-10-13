@@ -367,7 +367,8 @@ log "Starting TEST 9: --mask_index without --mask"
 if "$meta_executable" \
   --variant "$input_vcf" \
   --mask_index "$test_data_dir/indexes/mask.vcf.gz.tbi" \
-  --output "$meta_temp_dir/index_only.vcf" > "$meta_temp_dir/test9.log" 2>&1; then
+  --output "$meta_temp_dir/index_only.vcf" \
+  --output_index "$meta_temp_dir/index_only.vcf.idx" > "$meta_temp_dir/test9.log" 2>&1; then
   log_error "✗ $meta_name did not fail with --mask_index but no --mask"
   exit 1
 fi

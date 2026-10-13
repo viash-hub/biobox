@@ -111,6 +111,8 @@ argument_groups:
 resources:
   - type: bash_script
     path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
 
 test_resources:
   - type: bash_script

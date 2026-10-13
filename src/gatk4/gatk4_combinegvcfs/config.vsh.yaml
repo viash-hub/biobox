@@ -46,7 +46,7 @@ argument_groups:
 
           Specify this argument once per input GVCF file.
         required: true
-        example: sample1.g.vcf.gz
+        example: [sample1.g.vcf.gz, sample2.g.vcf.gz]
       - name: "--variant_index"
         type: file
         multiple: true
@@ -60,7 +60,7 @@ argument_groups:
           If not provided, a copy of each bgzipped `--variant` file is indexed
           before the run. A plain `.vcf` file does not need an index, unless
           an interval argument (for example `--intervals`) is given.
-        example: sample1.g.vcf.gz.tbi
+        example: [sample1.g.vcf.gz.tbi]
       - name: "--reference"
         alternatives: [-R]
         type: file

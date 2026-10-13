@@ -7,54 +7,27 @@ set -eo pipefail
 
 source "$meta_resources_dir/gatk4/script_helpers.sh"
 
-# unset flags
-unset_if_false=(
-  par_remove_duplicates
-  par_remove_sequencing_duplicates
-  par_tag_duplicate_set_members
-  par_create_index
+unset_if_false \
+  par_remove_duplicates \
+  par_remove_sequencing_duplicates \
+  par_tag_duplicate_set_members \
+  par_create_index \
   par_duplex_umi
-)
 
-for par in "${unset_if_false[@]}"; do
-  test_val="${!par}"
-  [[ "$test_val" == "false" ]] && unset $par
-done
-
-move_output_index=""
-if [[ -n "$par_create_index" ]]; then
-  if [[ -z "$par_output_index" ]]; then
-    echo "Error: --create_index requires --output_index." >&2
-    exit 1
-  fi
-  move_output_index="true"
-  gatk_output_index=$(gatk_output_bam_index_path "$par_output")
-fi
-
+# Check the arguments
+require_output_if_created "$par_create_index" "$par_output_index" \
+  --create_index --output_index
 # A CRAM input or output needs the reference. Without it, Picard fails and
 # can leave an empty output file.
-if [[ -z "$par_reference_sequence" ]]; then
-  IFS=';' read -ra cram_check_inputs <<< "$par_input"
-  for cram_check_file in "${cram_check_inputs[@]}" "$par_output"; do
-    if [[ "$cram_check_file" == *.cram ]]; then
-      echo "Error: --reference_sequence is required for CRAM input or output." >&2
-      exit 1
-    fi
-  done
-fi
+require_reference_for_cram "$par_reference_sequence" --reference_sequence "$par_input" "$par_output"
 
-# Create a temporary directory for GATK's own scratch space
-tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_markduplicates.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT
+setup_tmp_dir
 
-# Stage the reference with its .fai index under matching names
+# Stage the inputs in a temp dir so that GATK can find the companion files
 staged_reference=""
 if [[ -n "$par_reference_sequence" ]]; then
-  staged_reference=$(stage_reference_fai "$tmp_dir" "$par_reference_sequence" "$par_reference_sequence_fai" --reference_sequence)
+  staged_reference=$(stage_reference_fai "$tmp_dir" "$par_reference_sequence" "$par_reference_sequence_fai" --reference_sequence) || exit 1
 fi
-
-# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
 # Convert semicolon-separated multi-value arguments into repeated flags
 split_multiple_to_flags "$par_input" "--INPUT" input_args
@@ -95,10 +68,10 @@ cmd_args=(
   ${par_validation_stringency:+--VALIDATION_STRINGENCY "$par_validation_stringency"}
 )
 
-# Run gatk MarkDuplicates
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" MarkDuplicates "${cmd_args[@]}"
+# Run GATK MarkDuplicates
+run_gatk MarkDuplicates "${cmd_args[@]}"
 
-# Move the output index to --output_index, if requested
-if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
-  mv "$gatk_output_index" "$par_output_index"
+# Move the output index to --output_index
+if is_true "$par_create_index"; then
+  move_output_index "$(gatk_output_bam_index_path "$par_output")" "$par_output_index"
 fi
