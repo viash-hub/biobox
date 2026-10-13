@@ -54,8 +54,7 @@ stage_optional_vcf "$tmp_dir" "$par_population_callset" "$par_population_callset
 stage_interval_arguments "$tmp_dir" interval_args
 
 # Convert semicolon-separated multi-value arguments into repeated flags
-split_multiple_to_flags "$par_annotation" "--annotation" annotation_args
-split_multiple_to_flags "$par_annotation_group" "--annotation-group" annotation_group_args
+gatk_annotation_args annotation_args
 split_multiple_to_flags "$par_annotations_to_exclude" "--annotations-to-exclude" annotations_to_exclude_args
 # Pass --force_output_intervals files first, then --force_output_interval_strings
 split_multiple_to_flags "$par_force_output_intervals" "--force-output-intervals" force_output_intervals_args
@@ -75,7 +74,6 @@ cmd_args=(
   ${par_allow_old_rms_mapping_quality_annotation_data:+--allow-old-rms-mapping-quality-annotation-data}
   ${par_annotate_with_num_discovered_alleles:+--annotate-with-num-discovered-alleles}
   "${annotation_args[@]}"
-  "${annotation_group_args[@]}"
   "${annotations_to_exclude_args[@]}"
   ${par_call_genotypes:+--call-genotypes}
   "${dbsnp_args[@]}"
