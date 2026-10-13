@@ -199,4 +199,71 @@ check_file_contains "$meta_temp_dir/test5.log" "Error: --output_index is require
 
 log "✅ TEST 5 completed successfully"
 
+# --- Test Case 6: Interval padding ---
+log "Starting TEST 6: --interval_padding and --interval_exclusion_padding"
+
+# Positions 241-245, which end 5bp before the call at position 250
+printf 'chr1\t240\t245\n' > "$test_data_dir/near_250.bed"
+
+log "Executing $meta_name with an --intervals file next to the call, without padding..."
+"$meta_executable" \
+  --variant "$test_data_dir/no_index/unfiltered.vcf" \
+  --stats "$test_data_dir/unfiltered.vcf.stats" \
+  "${reference_args[@]}" \
+  --intervals "$test_data_dir/near_250.bed" \
+  --output "$meta_temp_dir/filtered_no_padding.vcf" \
+  --output_index "$meta_temp_dir/filtered_no_padding.idx" \
+  --filtering_stats "$meta_temp_dir/filtering_stats_no_padding.tsv"
+
+filter_value=$(filter_at_250 "$meta_temp_dir/filtered_no_padding.vcf")
+if [[ -z "$filter_value" ]]; then
+  log "✓ The chr1:250 call is not in the output (outside the interval)"
+else
+  log_error "✗ Expected no chr1:250 call without padding, found FILTER '$filter_value'"
+  exit 1
+fi
+
+log "Executing $meta_name with the same --intervals file and --interval_padding 5..."
+"$meta_executable" \
+  --variant "$test_data_dir/no_index/unfiltered.vcf" \
+  --stats "$test_data_dir/unfiltered.vcf.stats" \
+  "${reference_args[@]}" \
+  --intervals "$test_data_dir/near_250.bed" \
+  --interval_padding 5 \
+  --output "$meta_temp_dir/filtered_padding.vcf" \
+  --output_index "$meta_temp_dir/filtered_padding.idx" \
+  --filtering_stats "$meta_temp_dir/filtering_stats_padding.tsv"
+
+filter_value=$(filter_at_250 "$meta_temp_dir/filtered_padding.vcf")
+if [[ "$filter_value" == "PASS" ]]; then
+  log "✓ The chr1:250 call is in the output (in the padded interval)"
+else
+  log_error "✗ Expected FILTER PASS for the chr1:250 call with padding, found '$filter_value'"
+  exit 1
+fi
+
+# Only --exclude_intervals is given, so the plain --variant must also be
+# indexed (GATK traverses by intervals)
+log "Executing $meta_name with the same file as --exclude_intervals and --interval_exclusion_padding 5..."
+"$meta_executable" \
+  --variant "$test_data_dir/no_index/unfiltered.vcf" \
+  --stats "$test_data_dir/unfiltered.vcf.stats" \
+  "${reference_args[@]}" \
+  --exclude_intervals "$test_data_dir/near_250.bed" \
+  --interval_exclusion_padding 5 \
+  --output "$meta_temp_dir/filtered_exclusion_padding.vcf" \
+  --output_index "$meta_temp_dir/filtered_exclusion_padding.idx" \
+  --filtering_stats "$meta_temp_dir/filtering_stats_exclusion_padding.tsv"
+
+filter_value=$(filter_at_250 "$meta_temp_dir/filtered_exclusion_padding.vcf")
+if [[ -z "$filter_value" ]]; then
+  log "✓ The chr1:250 call is not in the output (in the padded excluded interval)"
+else
+  log_error "✗ Expected no chr1:250 call with exclusion padding, found FILTER '$filter_value'"
+  exit 1
+fi
+check_file_not_exists "$test_data_dir/no_index/unfiltered.vcf.idx" "index next to the plain --variant"
+
+log "✅ TEST 6 completed successfully"
+
 print_test_summary "All tests"

@@ -11,6 +11,7 @@ All GATK4 components use the shared files in [`utils/`](utils/).
 |---|---|
 | `common_engines.yaml` | Shared engine definition merged into component configs. Change the container here to update all components. |
 | `common_argument_groups.yaml` | Common arguments shared by several components. Merged into the config for components that support those options. |
+| `interval_argument_group.yaml` | Interval arguments (`--intervals`, `--exclude_intervals`, their indexes, the interval rules and padding). Merged into `argument_groups` for every component that supports intervals. |
 | `script_helpers.sh` | Staging and argument helpers for `script.sh` (see below). |
 | `test_helpers.sh` | Synthetic test file fixtures and other shared helpers for `test.sh`. |
 
@@ -61,7 +62,10 @@ Each companion file needs its own argument, and the script links it next to the 
   - A `.vcf.gz` (or `.vcf.bgz`) without a `.tbi` fails ("An index is required but was not found")
   - A `.vcf.gz` made with `gzip` (not `bgzip`) cannot be indexed
 - **Intervals**: `--intervals` and `--exclude_intervals` can be BED, interval_list or VCF files.
-  Stage them with `stage_interval_files`, which matches the `*_index` files to the VCF files by order.
+  They are defined in `interval_argument_group.yaml`, and `stage_interval_arguments` stages them and builds all the interval flags.
+  It uses `stage_interval_files`, which matches the `*_index` files to the VCF files by order.
+  Use `gatk_uses_intervals` to decide if a plain `.vcf` main input needs an index (see VCF inputs above).
+  A group-level merge cannot change one argument, so tool-specific text goes in the group description and a required check goes in the script.
 
 The staging helpers run in `$(...)`, where `set -e` does not apply.
 So every step in them must exit explicitly on failure (`|| exit 1`).

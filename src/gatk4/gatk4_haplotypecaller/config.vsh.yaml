@@ -317,13 +317,6 @@ argument_groups:
         type: double
         description: |
           Heterozygosity for indel calling. Default: 0.000125.
-      - name: "--intervals"
-        alternatives: [-L]
-        type: file
-        description: |
-          One or more genomic intervals over which to operate, provided as
-          a file (e.g. BED, interval_list).
-        example: intervals.bed
       - name: "--kmer_size"
         type: integer
         multiple: true
@@ -411,6 +404,8 @@ argument_groups:
         description: |
           The minimum phred-scaled confidence threshold at which variants
           should be called. Default: 30.
+
+  - __merge__: /src/gatk4/utils/interval_argument_group.yaml
 
 __merge__: /src/gatk4/utils/common_argument_groups.yaml
 

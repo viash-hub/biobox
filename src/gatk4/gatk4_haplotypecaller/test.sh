@@ -244,4 +244,55 @@ check_file_contains "$meta_temp_dir/test8.log" "Error: --output_index is require
 
 log "✅ TEST 8 completed successfully"
 
+# --- Test Case 9: Multiple interval files with exclusions ---
+log "Starting TEST 9: Multiple --intervals files (BED and bgzipped VCF) with --exclude_intervals"
+
+# The territory is the union of seq1:1-300 (BED) and seq1:1550 (VCF), minus
+# seq1:101-150 (BED). In GVCF mode, the records cover all of the territory.
+printf 'seq1\t0\t300\n' > "$test_data_dir/intervals_a.bed"
+printf 'seq1\t100\t150\n' > "$test_data_dir/exclude.bed"
+create_test_known_sites_vcf "$test_data_dir/intervals_site.vcf" seq1 2000 1550
+create_test_vcf_gz_with_separate_index "$test_data_dir/intervals_site.vcf" \
+  "$test_data_dir/intervals_site.vcf.gz" "$test_data_dir/interval_indexes/intervals_site.vcf.gz.tbi"
+
+log "Executing $meta_name with two --intervals files, --intervals_index and --exclude_intervals..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.sorted.bam" \
+  --bai "$test_data_dir/reads.sorted.bai" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/output_intervals.g.vcf" \
+  --output_index "$meta_temp_dir/indexes/output_intervals.g.vcf.idx" \
+  --emit_ref_confidence GVCF \
+  --intervals "$test_data_dir/intervals_a.bed" \
+  --intervals "$test_data_dir/intervals_site.vcf.gz" \
+  --intervals_index "$test_data_dir/interval_indexes/intervals_site.vcf.gz.tbi" \
+  --interval_set_rule UNION \
+  --exclude_intervals "$test_data_dir/exclude.bed"
+
+log "Validating TEST 9 outputs..."
+check_file_exists "$meta_temp_dir/output_intervals.g.vcf" "output GVCF (multiple intervals)"
+check_file_exists "$meta_temp_dir/indexes/output_intervals.g.vcf.idx" "output index (multiple intervals)"
+
+# Merge the abutting GVCF records (POS to INFO/END) into regions
+covered=$(grep -v '^#' "$meta_temp_dir/output_intervals.g.vcf" | awk -F'\t' '
+  {
+    start = $2; end = $2
+    if (match($8, /(^|;)END=[0-9]+/)) { end = substr($8, RSTART, RLENGTH); sub(/.*END=/, "", end) }
+    if (n > 0 && start == region_end + 1) { region_end = end; next }
+    if (n > 0) printf "%d-%d ", region_start, region_end
+    region_start = start; region_end = end; n++
+  }
+  END { if (n > 0) printf "%d-%d ", region_start, region_end }')
+expected_covered="1-100 151-300 1550-1550 "
+if [[ "$covered" == "$expected_covered" ]]; then
+  log "✓ output GVCF only covers the selected territory: $covered"
+else
+  log_error "✗ output GVCF covers '$covered', expected '$expected_covered'"
+  exit 1
+fi
+
+log "✅ TEST 9 completed successfully"
+
 print_test_summary "All tests"

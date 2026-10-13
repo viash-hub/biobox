@@ -320,4 +320,65 @@ check_file_not_contains "$meta_temp_dir/test8_gzip.log" "GetPileupSummaries done
 
 log "✅ TEST 8 completed successfully"
 
+# --- Test Case 9: Interval padding ---
+log "Starting TEST 9: --interval_padding and --interval_exclusion_padding"
+
+# Positions 146-148, which end 2bp before the site at position 150
+printf 'chr1\t145\t148\n' > "$test_data_dir/near_150.bed"
+
+log "Executing $meta_name with an --intervals file next to position 150, without padding..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.bam" \
+  --bai "$test_data_dir/reads.bai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --intervals "$test_data_dir/near_150.bed" \
+  --maximum_population_allele_frequency 0.5 \
+  --output "$meta_temp_dir/pileups_no_padding.table"
+
+check_file_not_contains "$meta_temp_dir/pileups_no_padding.table" $'chr1\t150\t' "position 150 (outside the interval)"
+
+log "Executing $meta_name with the same --intervals file and --interval_padding 2..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.bam" \
+  --bai "$test_data_dir/reads.bai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --intervals "$test_data_dir/near_150.bed" \
+  --interval_padding 2 \
+  --maximum_population_allele_frequency 0.5 \
+  --output "$meta_temp_dir/pileups_padding.table"
+
+check_file_contains "$meta_temp_dir/pileups_padding.table" $'chr1\t150\t1\t2\t0\t0.4' "position 150 counts (in the padded interval)"
+
+log "Executing $meta_name with the same file as --exclude_intervals and --interval_exclusion_padding 2..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.bam" \
+  --bai "$test_data_dir/reads.bai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --intervals "$test_data_dir/whole_contig.bed" \
+  --exclude_intervals "$test_data_dir/near_150.bed" \
+  --interval_exclusion_padding 2 \
+  --maximum_population_allele_frequency 0.5 \
+  --output "$meta_temp_dir/pileups_exclusion_padding.table"
+
+check_file_contains "$meta_temp_dir/pileups_exclusion_padding.table" $'chr1\t50\t2\t1\t0\t0.3' "position 50 counts (not excluded)"
+check_file_not_contains "$meta_temp_dir/pileups_exclusion_padding.table" $'chr1\t150\t' "position 150 (in the padded excluded interval)"
+
+log "✅ TEST 9 completed successfully"
+
+# --- Test Case 10: No --intervals ---
+log "Starting TEST 10: No --intervals fails"
+
+if "$meta_executable" \
+  --input "$test_data_dir/reads.bam" \
+  --bai "$test_data_dir/reads.bai" \
+  --variant "$test_data_dir/common_snps.vcf" \
+  --output "$meta_temp_dir/pileups_no_intervals.table" > "$meta_temp_dir/test10.log" 2>&1; then
+  log_error "✗ $meta_name did not fail without --intervals"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test10.log" "Error: --intervals is required." "error message"
+check_file_not_contains "$meta_temp_dir/test10.log" "GetPileupSummaries done" "run log (GATK did not run)"
+
+log "✅ TEST 10 completed successfully"
+
 print_test_summary "All tests"

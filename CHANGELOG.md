@@ -16,6 +16,11 @@
 
 ## MINOR CHANGES
 
+* `gatk4/*`: Use shared interval arguments in all GATK4 components that support intervals (PR #270).
+  - `--intervals` and `--exclude_intervals` can now be given more than once and can be BED, interval_list or VCF files, with matching `--intervals_index` and `--exclude_intervals_index` arguments
+  - Add `--interval_set_rule`, `--interval_merging_rule` and `--interval_exclusion_padding` arguments
+  - `gatk4_variantfiltration` now supports intervals
+
 * `minimap2/minimap2_index`: Add `--preset`, `--kmer_size`, `--window_size` and
   `--homopolymer_compressed` (PR #248). Previously every index was built with
   the default indexing parameters, so aligning against it with another preset

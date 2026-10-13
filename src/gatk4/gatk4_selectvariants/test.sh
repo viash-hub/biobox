@@ -381,4 +381,42 @@ check_file_not_exists "$meta_temp_dir/no_output_index.vcf" "output VCF (GATK did
 
 log "✅ TEST 13 completed successfully"
 
+# --- Test Case 14: Multiple intervals, intersection and exclusion ---
+log "Starting TEST 14: Two --intervals files (BED and VCF) with --interval_set_rule INTERSECTION and --exclude_intervals"
+
+mkdir -p "$test_data_dir/intervals"
+# The intersection of seq1:50-350 (BED is 0-based) and the sites in
+# variants.vcf is snp1, snp2 and indel1. The exclusion of seq1:250-350
+# removes indel1.
+printf 'seq1\t49\t350\n' > "$test_data_dir/intervals/include.bed"
+printf 'seq1\t249\t350\n' > "$test_data_dir/intervals/exclude.bed"
+create_test_vcf_gz_with_separate_index "$test_data_dir/variants.vcf" \
+  "$test_data_dir/intervals/sites.vcf.gz" "$test_data_dir/intervals_index/sites.vcf.gz.tbi"
+
+log "Executing $meta_name with two --intervals files, INTERSECTION and --exclude_intervals..."
+"$meta_executable" \
+  --variant "$test_data_dir/variants.vcf" \
+  --intervals "$test_data_dir/intervals/include.bed" \
+  --intervals "$test_data_dir/intervals/sites.vcf.gz" \
+  --intervals_index "$test_data_dir/intervals_index/sites.vcf.gz.tbi" \
+  --interval_set_rule INTERSECTION \
+  --exclude_intervals "$test_data_dir/intervals/exclude.bed" \
+  --output "$meta_temp_dir/intervals.vcf" \
+  --output_index "$meta_temp_dir/intervals.vcf.idx" 2> "$meta_temp_dir/test14.log"
+
+log "Validating TEST 14 outputs..."
+check_file_exists "$meta_temp_dir/intervals.vcf" "output VCF (intervals)"
+check_file_not_contains "$meta_temp_dir/test14.log" "no index was provided for '$test_data_dir/intervals/sites.vcf.gz'" "run log (no indexing of the interval VCF when --intervals_index is given)"
+check_file_not_exists "$test_data_dir/intervals/sites.vcf.gz.tbi" "index next to the interval VCF"
+
+ids=$(grep -v '^#' "$meta_temp_dir/intervals.vcf" | cut -f3 | tr '\n' ' ')
+if [[ "$ids" == "snp1 snp2 " ]]; then
+  log "✓ Output has only the records in the selected intervals: $ids"
+else
+  log_error "✗ Output records are '$ids', expected 'snp1 snp2 '"
+  exit 1
+fi
+
+log "✅ TEST 14 completed successfully"
+
 print_test_summary "All tests completed successfully"

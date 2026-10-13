@@ -26,6 +26,10 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
+if [[ -z "$par_intervals" ]]; then
+  echo "Error: --intervals is required." >&2
+  exit 1
+fi
 if [[ -n "$par_variant_index" && -z "$par_variant" ]]; then
   echo "Error: --variant_index requires --variant." >&2
   exit 1
@@ -54,6 +58,7 @@ tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_genomicsdbimport.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 stage_vcfs_with_indexes "$tmp_dir" "$par_variant" "$par_variant_index" "--variant" "--variant" variant_args
+stage_interval_arguments "$tmp_dir" interval_args
 
 # Write a sample name map for the staged --variant files and pass it to GATK
 # in place of --variant
@@ -89,7 +94,7 @@ avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 cmd_args=(
   ${sample_name_map:+--sample-name-map "$sample_name_map"}
   --genomicsdb-workspace-path "$par_genomicsdb_workspace_path"
-  --intervals "$par_intervals"
+  "${interval_args[@]}"
   ${par_avoid_nio:+--avoid-nio true}
   ${par_batch_size:+--batch-size "$par_batch_size"}
   ${par_bypass_feature_reader:+--bypass-feature-reader true}
@@ -104,7 +109,6 @@ cmd_args=(
   ${par_overwrite_existing_genomicsdb_workspace:+--overwrite-existing-genomicsdb-workspace true}
   ${par_reader_threads:+--reader-threads "$par_reader_threads"}
   ${par_validate_sample_name_map:+--validate-sample-name-map true}
-  ${par_interval_padding:+--interval-padding "$par_interval_padding"}
   ${par_sites_only_vcf_output:+--sites-only-vcf-output}
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}

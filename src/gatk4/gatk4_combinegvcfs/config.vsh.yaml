@@ -59,7 +59,7 @@ argument_groups:
 
           If not provided, a copy of each bgzipped `--variant` file is indexed
           before the run. A plain `.vcf` file does not need an index, unless
-          `--intervals` is given.
+          `--intervals` or `--exclude_intervals` is given.
         example: sample1.g.vcf.gz.tbi
       - name: "--reference"
         alternatives: [-R]
@@ -262,19 +262,14 @@ argument_groups:
         type: boolean_true
         description: |
           Restrict variant output to sites that start within the provided
-          `--intervals` (only applies when an interval is specified).
+          `--intervals` (only applies when an interval is specified). GVCF
+          blocks that start before an interval are not written, even when they
+          overlap it.
       - name: "--input_is_somatic"
         type: boolean_true
         description: |
           Merge input GVCFs according to somatic (i.e. Mutect2) annotations
           (BETA).
-      - name: "--intervals"
-        alternatives: [-L]
-        type: file
-        description: |
-          One or more genomic intervals over which to operate, provided as
-          a file (e.g. BED, interval_list).
-        example: intervals.bed
       - name: "--max_variants_per_shard"
         type: integer
         description: |
@@ -298,6 +293,17 @@ argument_groups:
           Restrict the output variants to ones that match the
           `--intervals` according to the specified matching mode.
         example: STARTS_IN
+  - __merge__: /src/gatk4/utils/interval_argument_group.yaml
+    description: |
+      CombineGVCFs only writes a GVCF block that ends inside an interval. A
+      block that starts before an interval and ends after it is not written,
+      and GATK warns that the interval "cuts in the middle of one or more gVCF
+      blocks". With `--convert_to_base_pair_resolution`, the first record of
+      each interval has the position and reference base of the part of the
+      block before the interval, and the interval start position is missing.
+
+      To limit the records of a GVCF to a region, use SelectVariants. To
+      genotype a region, give the intervals to GenotypeGVCFs.
 
 __merge__: /src/gatk4/utils/common_argument_groups.yaml
 

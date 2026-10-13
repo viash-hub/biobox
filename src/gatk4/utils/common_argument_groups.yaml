@@ -1,14 +1,6 @@
 argument_groups:
   - name: "GATK Engine Options"
     arguments:
-      - name: "--interval_padding"
-        alternatives: [-ip]
-        type: integer
-        description: |
-          Amount of padding (in bp) to add to each interval specified via
-          `--intervals`, to capture flanking context (e.g. near
-          capture/exome-bait edges). Default: 0. A commonly-used value in
-          GATK's own exome workflows is `100`.
       - name: "--sites_only_vcf_output"
         type: boolean_true
         description: |
