@@ -54,7 +54,7 @@
 
 * `gatk4/gatk4_genomicsdbimport`: Stops with an error when `--header` is used with `--variant`, because GATK fails for this combination. (PR #267)
 
-* `gatk4/gatk4_genomicsdbimport`: Add `--sample_name` to rename the staged `--variant` files (PR #xxx).
+* `gatk4/gatk4_genomicsdbimport`: Add `--sample_name` to rename the staged `--variant` files (PR #268).
   The files listed in a `--sample_name_map` are not staged, so might not be reachable.
   `--sample_name` writes a sample name map for the staged `--variant` files, which also allows `--header` to be used with `--variant`.
 
