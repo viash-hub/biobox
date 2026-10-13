@@ -49,13 +49,12 @@ sort_and_index_bam() {
   log "✓ Sorted and indexed BAM: $output_bam (index: ${output_bam%.bam}.bai)"
 }
 
-# Count the number of reads in a SAM/BAM/CRAM file using GATK's CountReads
-# tool.
+# Count the number of reads in a SAM/BAM file with samtools
 #
 # Usage: count_bam_reads "/path/to/file.bam"
 count_bam_reads() {
   local bam_path="$1"
-  gatk CountReads --input "$bam_path" --verbosity ERROR 2>/dev/null | tail -n 1
+  samtools view -c "$bam_path"
 }
 
 # Create a synthetic reference FASTA together with its .fai and .dict
@@ -148,9 +147,16 @@ create_test_sam_reads() {
 # automatically from the position using the ATCG cycle, unless explicitly
 # overridden.
 #
-# Usage: create_test_known_sites_vcf "/path/to/known_sites.vcf" contig_name \
+# With `--no-index` as the first argument, the VCF is not indexed.
+#
+# Usage: create_test_known_sites_vcf [--no-index] "/path/to/known_sites.vcf" contig_name \
 #          contig_length position [ref_base] [alt_base]
 create_test_known_sites_vcf() {
+  local create_index="true"
+  if [[ "$1" == "--no-index" ]]; then
+    create_index="false"
+    shift
+  fi
   local vcf_path="$1"
   local contig_name="$2"
   local contig_length="$3"
@@ -169,9 +175,12 @@ create_test_known_sites_vcf() {
     printf '%s\t%d\t.\t%s\t%s\t50\tPASS\t.\n' "$contig_name" "$position" "$ref_base" "$alt_base"
   } > "$vcf_path"
 
-  gatk IndexFeatureFile --input "$vcf_path" --verbosity ERROR
-
-  log "✓ Wrote and indexed known-sites VCF: $vcf_path"
+  if [[ "$create_index" == "true" ]]; then
+    gatk IndexFeatureFile --input "$vcf_path" --verbosity ERROR
+    log "✓ Wrote and indexed known-sites VCF: $vcf_path"
+  else
+    log "✓ Wrote known-sites VCF (no index): $vcf_path"
+  fi
 }
 
 # Compress a VCF with bgzip and index it with tabix, then move the index to a
