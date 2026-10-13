@@ -1,0 +1,10 @@
+name: "--read_index"
+type: file
+multiple: true
+description: |
+  Index files for `--input` (`.bai` for a BAM file, `.crai` or `.bai`
+  for a CRAM file).
+
+  The index files are matched to `--input` by order. One index file
+  must be given for each `--input` file.
+required: true
