@@ -7,18 +7,8 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+# Set up the test environment and the test data directory
+gatk4_test_init
 
 # --- Build shared fixtures: a real Mutect2 run on a tumor/normal pair ---
 create_test_mutect2_outputs "$test_data_dir"
@@ -40,15 +30,8 @@ reference_args=(
   --reference_dict "$test_data_dir/reference.dict"
 )
 
-# Print the FILTER value of the chr1:250 call in a VCF
-filter_at_250() {
-  local vcf_path="$1"
-  if [[ "$vcf_path" == *.gz ]]; then
-    zcat "$vcf_path"
-  else
-    cat "$vcf_path"
-  fi | awk -F '\t' '!/^#/ && $1 == "chr1" && $2 == 250 { print $7 }'
-}
+# Regex prefix for the chr1:250 call up to its FILTER column (column 7)
+call_250_filter=$'^chr1\t250\t([^\t]*\t){4}'
 
 # --- Test Case 1: Required inputs only ---
 log "Starting TEST 1: Required inputs only"
@@ -65,13 +48,7 @@ log "Executing $meta_name with an unindexed --variant and --stats..."
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/filtered.vcf" "output VCF file"
 check_file_contains "$meta_temp_dir/filtered.vcf" "^##fileformat=VCF" "output VCF file header"
-filter_value=$(filter_at_250 "$meta_temp_dir/filtered.vcf")
-if [[ "$filter_value" == "PASS" ]]; then
-  log "✓ The chr1:250 call has FILTER PASS"
-else
-  log_error "✗ Expected FILTER PASS for the chr1:250 call, found '$filter_value'"
-  exit 1
-fi
+check_vcf_has_record "$meta_temp_dir/filtered.vcf" "${call_250_filter}PASS"$'\t' "output VCF (chr1:250 call has FILTER PASS)"
 check_file_exists "$meta_temp_dir/filtering_stats.tsv" "output filtering stats file"
 check_file_not_empty "$meta_temp_dir/filtering_stats.tsv" "output filtering stats file"
 check_file_not_exists "$meta_temp_dir/filtered.vcf.filteringStats.tsv" "default filtering stats file next to the output VCF"
@@ -109,15 +86,8 @@ log "Executing $meta_name with an indexed .vcf.gz --variant and all optional fil
 
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/filtered_all.vcf.gz" "output VCF file"
-filter_value=$(filter_at_250 "$meta_temp_dir/filtered_all.vcf.gz")
-if [[ -n "$filter_value" && "$filter_value" != "." ]]; then
-  log "✓ The chr1:250 call has a FILTER value: $filter_value"
-else
-  log_error "✗ The chr1:250 call has no FILTER value: '$filter_value'"
-  exit 1
-fi
-check_file_exists "$meta_temp_dir/filtered_all.tbi" "output index file"
-check_file_not_exists "$meta_temp_dir/filtered_all.vcf.gz.tbi" "index next to the output VCF (moved to --output_index)"
+check_vcf_has_record "$meta_temp_dir/filtered_all.vcf.gz" "${call_250_filter}"$'([^.\t][^\t]*|\\.[^\t]+)\t' "output VCF (chr1:250 call has a FILTER value)"
+check_index_moved "$meta_temp_dir/filtered_all.tbi" "$meta_temp_dir/filtered_all.vcf.gz.tbi" "output index file"
 check_file_exists "$meta_temp_dir/filtering_stats_all.tsv" "output filtering stats file"
 check_file_not_contains "$meta_temp_dir/test2.log" "Warning: no index was provided" "run log (no copy warning when the index is given)"
 
@@ -141,13 +111,7 @@ log "Executing $meta_name with --threshold_strategy CONSTANT and --min_reads_per
   --filtering_stats "$meta_temp_dir/filtering_stats_strand.tsv"
 
 log "Validating TEST 3 outputs..."
-filter_value=$(filter_at_250 "$meta_temp_dir/filtered_strand.vcf")
-if [[ "$filter_value" == *strict_strand* ]]; then
-  log "✓ The chr1:250 call has the strict_strand filter: $filter_value"
-else
-  log_error "✗ Expected the strict_strand FILTER for the chr1:250 call, found '$filter_value'"
-  exit 1
-fi
+check_vcf_has_record "$meta_temp_dir/filtered_strand.vcf" "${call_250_filter}"$'[^\t]*strict_strand' "output VCF (chr1:250 call has the strict_strand filter)"
 check_file_contains "$meta_temp_dir/filtered_strand.vcf" "threshold-strategy CONSTANT" "output VCF command line (--threshold_strategy)"
 
 log "✅ TEST 3 completed successfully"
@@ -171,13 +135,7 @@ log "Executing $meta_name with an --intervals BED file that has no calls..."
   --filtering_stats "$meta_temp_dir/filtering_stats_intervals.tsv"
 
 log "Validating TEST 4 outputs..."
-record_count=$(grep -vc '^#' "$meta_temp_dir/filtered_intervals.vcf" || true)
-if [[ "$record_count" -eq 0 ]]; then
-  log "✓ No calls outside --intervals"
-else
-  log_error "✗ Expected no calls in --intervals, found $record_count"
-  exit 1
-fi
+check_vcf_record_count "$meta_temp_dir/filtered_intervals.vcf" 0 "output VCF (no calls in --intervals)"
 check_file_not_exists "$meta_temp_dir/filtered_intervals.idx" "output index file"
 check_file_not_exists "$meta_temp_dir/filtered_intervals.vcf.idx" "index next to the output VCF"
 
@@ -186,16 +144,13 @@ log "✅ TEST 4 completed successfully"
 # --- Test Case 5: Missing --output_index ---
 log "Starting TEST 5: A missing --output_index fails"
 
-if "$meta_executable" \
+check_fails_with "Error: --output_index is required unless" "$meta_temp_dir/test5.log" \
+  "$meta_executable" \
   --variant "$test_data_dir/unfiltered.vcf" \
   --stats "$test_data_dir/unfiltered.vcf.stats" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/no_output_index.vcf" \
-  --filtering_stats "$meta_temp_dir/no_output_index.tsv" > "$meta_temp_dir/test5.log" 2>&1; then
-  log_error "✗ $meta_name did not fail without --output_index"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test5.log" "Error: --output_index is required unless" "error message"
+  --filtering_stats "$meta_temp_dir/no_output_index.tsv"
 
 log "✅ TEST 5 completed successfully"
 
@@ -215,13 +170,7 @@ log "Executing $meta_name with an --intervals file next to the call, without pad
   --output_index "$meta_temp_dir/filtered_no_padding.idx" \
   --filtering_stats "$meta_temp_dir/filtering_stats_no_padding.tsv"
 
-filter_value=$(filter_at_250 "$meta_temp_dir/filtered_no_padding.vcf")
-if [[ -z "$filter_value" ]]; then
-  log "✓ The chr1:250 call is not in the output (outside the interval)"
-else
-  log_error "✗ Expected no chr1:250 call without padding, found FILTER '$filter_value'"
-  exit 1
-fi
+check_vcf_lacks_record "$meta_temp_dir/filtered_no_padding.vcf" $'^chr1\t250\t' "output VCF (chr1:250 call outside the interval)"
 
 log "Executing $meta_name with the same --intervals file and --interval_padding 5..."
 "$meta_executable" \
@@ -234,13 +183,7 @@ log "Executing $meta_name with the same --intervals file and --interval_padding 
   --output_index "$meta_temp_dir/filtered_padding.idx" \
   --filtering_stats "$meta_temp_dir/filtering_stats_padding.tsv"
 
-filter_value=$(filter_at_250 "$meta_temp_dir/filtered_padding.vcf")
-if [[ "$filter_value" == "PASS" ]]; then
-  log "✓ The chr1:250 call is in the output (in the padded interval)"
-else
-  log_error "✗ Expected FILTER PASS for the chr1:250 call with padding, found '$filter_value'"
-  exit 1
-fi
+check_vcf_has_record "$meta_temp_dir/filtered_padding.vcf" "${call_250_filter}PASS"$'\t' "output VCF (chr1:250 call in the padded interval, FILTER PASS)"
 
 # Only --exclude_intervals is given, so the plain --variant must also be
 # indexed (GATK traverses by intervals)
@@ -255,13 +198,7 @@ log "Executing $meta_name with the same file as --exclude_intervals and --interv
   --output_index "$meta_temp_dir/filtered_exclusion_padding.idx" \
   --filtering_stats "$meta_temp_dir/filtering_stats_exclusion_padding.tsv"
 
-filter_value=$(filter_at_250 "$meta_temp_dir/filtered_exclusion_padding.vcf")
-if [[ -z "$filter_value" ]]; then
-  log "✓ The chr1:250 call is not in the output (in the padded excluded interval)"
-else
-  log_error "✗ Expected no chr1:250 call with exclusion padding, found FILTER '$filter_value'"
-  exit 1
-fi
+check_vcf_lacks_record "$meta_temp_dir/filtered_exclusion_padding.vcf" $'^chr1\t250\t' "output VCF (chr1:250 call in the padded excluded interval)"
 check_file_not_exists "$test_data_dir/no_index/unfiltered.vcf.idx" "index next to the plain --variant"
 
 log "✅ TEST 6 completed successfully"

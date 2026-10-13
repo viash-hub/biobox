@@ -7,24 +7,19 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+gatk4_test_init
 
 # --- Build shared reference ---
 create_test_reference "$test_data_dir/reference.fasta" 1 2000
 check_file_exists "$test_data_dir/reference.fasta" "test reference genome"
 check_file_exists "$test_data_dir/reference.dict" "reference sequence dictionary"
 check_file_exists "$test_data_dir/reference.fasta.fai" "reference FASTA index"
+
+reference_args=(
+  --reference "$test_data_dir/reference.fasta"
+  --reference_fai "$test_data_dir/reference.fasta.fai"
+  --reference_dict "$test_data_dir/reference.dict"
+)
 
 # --- Build two per-sample BAMs with distinct read groups/samples ---
 create_test_sam_reads "$test_data_dir/sample1.sam" seq1 2000 rg1 sample1
@@ -71,9 +66,7 @@ log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --variant "$test_data_dir/sample2.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/combined.g.vcf" \
   --output_index "$meta_temp_dir/combined.idx"
 
@@ -83,9 +76,8 @@ check_file_not_empty "$meta_temp_dir/combined.g.vcf" "combined GVCF file"
 check_file_contains "$meta_temp_dir/combined.g.vcf" "^##fileformat=VCF" "combined GVCF header"
 check_file_contains "$meta_temp_dir/combined.g.vcf" "sample1" "combined GVCF sample1 column"
 check_file_contains "$meta_temp_dir/combined.g.vcf" "sample2" "combined GVCF sample2 column"
-check_file_exists "$meta_temp_dir/combined.idx" "output index file (Tribble index for a .vcf)"
+check_index_moved "$meta_temp_dir/combined.idx" "$meta_temp_dir/combined.g.vcf.idx" "output index file (Tribble index for a .vcf)"
 check_index_magic "$meta_temp_dir/combined.idx" "TIDX" "output index file"
-check_file_not_exists "$meta_temp_dir/combined.g.vcf.idx" "index next to the output GVCF (moved to --output_index)"
 
 log "✅ TEST 1 completed successfully"
 
@@ -95,9 +87,7 @@ log "Starting TEST 2: Combine with additional options"
 log "Executing $meta_name with --break_bands_at_multiples_of and --annotation_group..."
 "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf;$test_data_dir/sample2.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/combined_options.g.vcf" \
   --output_index "$meta_temp_dir/combined_options.g.vcf.idx" \
   --break_bands_at_multiples_of 10 \
@@ -119,9 +109,7 @@ log "Executing $meta_name with --annotation, --annotations_to_exclude, --sites_o
 "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --variant "$test_data_dir/sample2.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/combined_annotations.g.vcf" \
   --output_index "$meta_temp_dir/combined_annotations.g.vcf.idx" \
   --annotation ChromosomeCounts \
@@ -154,9 +142,7 @@ log "Executing $meta_name with --interval_padding and --create_output_variant_in
 "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --variant "$test_data_dir/sample2.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/combined_engine.g.vcf" \
   --interval_padding 10 \
   --create_output_variant_index false
@@ -189,9 +175,7 @@ log "Executing $meta_name with .vcf.gz inputs and separate .tbi index files..."
   --variant_index "$test_data_dir/separate_index/sample2.g.vcf.gz.tbi" \
   --dbsnp "$test_data_dir/separate/dbsnp.vcf.gz" \
   --dbsnp_index "$test_data_dir/separate_index/dbsnp.vcf.gz.tbi" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/combined_separate.g.vcf" \
   --output_index "$meta_temp_dir/combined_separate.g.vcf.idx" 2> "$meta_temp_dir/test5.log"
 
@@ -220,9 +204,7 @@ log "Executing $meta_name with unindexed .vcf.gz inputs..."
   --variant "$test_data_dir/no_index/sample1.g.vcf.gz" \
   --variant "$test_data_dir/no_index/sample2.g.vcf.gz" \
   --dbsnp "$test_data_dir/no_index/dbsnp.vcf.gz" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/combined_no_index.g.vcf" \
   --output_index "$meta_temp_dir/combined_no_index.g.vcf.idx" 2> "$meta_temp_dir/test6.log"
 
@@ -240,33 +222,23 @@ log "✅ TEST 6 completed successfully"
 log "Starting TEST 7: Index argument errors"
 
 log "Executing $meta_name with 2 --variant files and 1 --variant_index file..."
-if "$meta_executable" \
+check_fails_with "Error: --variant_index must be given once for each file in --variant" "$meta_temp_dir/test7_mismatch.log" \
+  "$meta_executable" \
   --variant "$test_data_dir/separate/sample1.g.vcf.gz" \
   --variant "$test_data_dir/separate/sample2.g.vcf.gz" \
   --variant_index "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/combined_mismatch.g.vcf" \
-  --output_index "$meta_temp_dir/combined_mismatch.g.vcf.idx" > "$meta_temp_dir/test7_mismatch.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with 2 --variant files and 1 --variant_index file"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test7_mismatch.log" "Error: --variant_index must be given once for each file in --variant" "error message"
+  --output_index "$meta_temp_dir/combined_mismatch.g.vcf.idx"
 
 log "Executing $meta_name with --dbsnp_index and no --dbsnp..."
-if "$meta_executable" \
+check_fails_with "Error: --dbsnp_index requires --dbsnp" "$meta_temp_dir/test7_dbsnp.log" \
+  "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --dbsnp_index "$test_data_dir/separate_index/dbsnp.vcf.gz.tbi" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/combined_dbsnp_index.g.vcf" \
-  --output_index "$meta_temp_dir/combined_dbsnp_index.g.vcf.idx" > "$meta_temp_dir/test7_dbsnp.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --dbsnp_index and no --dbsnp"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test7_dbsnp.log" "Error: --dbsnp_index requires --dbsnp" "error message"
+  --output_index "$meta_temp_dir/combined_dbsnp_index.g.vcf.idx"
 
 log "✅ TEST 7 completed successfully"
 
@@ -279,9 +251,7 @@ log "Executing $meta_name with a .g.vcf.gz --output and --output_index in a diff
 "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --variant "$test_data_dir/sample2.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/gz_output/combined.g.vcf.gz" \
   --output_index "$meta_temp_dir/gz_output_index/combined.g.vcf.gz.tbi"
 
@@ -307,17 +277,12 @@ log "✅ TEST 8 completed successfully"
 # --- Test Case 9: Missing --output_index ---
 log "Starting TEST 9: A missing --output_index fails"
 
-if "$meta_executable" \
+check_fails_with "Error: --output_index is required unless --create_output_variant_index is false." "$meta_temp_dir/test9.log" \
+  "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --variant "$test_data_dir/sample2.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/no_output_index.g.vcf" > "$meta_temp_dir/test9.log" 2>&1; then
-  log_error "✗ $meta_name did not fail without --output_index"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test9.log" "Error: --output_index is required unless --create_output_variant_index is false." "error message"
+  "${reference_args[@]}" \
+  --output "$meta_temp_dir/no_output_index.g.vcf"
 check_file_not_exists "$meta_temp_dir/no_output_index.g.vcf" "output GVCF (no run without --output_index)"
 
 log "✅ TEST 9 completed successfully"
@@ -343,9 +308,7 @@ log "Executing $meta_name with two --intervals files and --exclude_intervals..."
 "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --variant "$test_data_dir/sample2.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/combined_intervals.g.vcf" \
   --output_index "$meta_temp_dir/combined_intervals.g.vcf.idx" \
   --intervals "$test_data_dir/intervals/include.bed" \
@@ -367,16 +330,8 @@ check_file_not_exists "$test_data_dir/intervals/include.vcf.gz.tbi" "index next 
 # position of the part of the block before it, not the interval start: POS 1
 # (for 1-100), 150 (for 150-161) and 201 (for 201-1001).
 check_file_contains "$meta_temp_dir/test10.log" "cuts in the middle of one or more gVCF blocks" "run log (GATK warning about cut blocks)"
-expected_positions=$( { echo 1; seq 101 150; seq 162 201; seq 1002 1020; } | tr '\n' ' ')
-actual_positions=$(grep -v '^#' "$meta_temp_dir/combined_intervals.g.vcf" | cut -f2 | tr '\n' ' ')
-if [[ "$actual_positions" == "$expected_positions" ]]; then
-  log "✓ Output has the expected record positions for the selected intervals"
-else
-  log_error "✗ Output record positions differ from the expected positions"
-  log_error "  expected: $expected_positions"
-  log_error "  actual:   $actual_positions"
-  exit 1
-fi
+expected_positions=$( { echo 1; seq 101 150; seq 162 201; seq 1002 1020; } | paste -sd ' ' -)
+check_vcf_column "$meta_temp_dir/combined_intervals.g.vcf" 2 "$expected_positions" "combined GVCF (intervals) record positions"
 
 log "✅ TEST 10 completed successfully"
 
@@ -391,9 +346,7 @@ log "Executing $meta_name with --combine_variants_distance, --max_distance, --de
 "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --variant "$test_data_dir/sample2.g.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/combined_new_options.g.vcf" \
   --create_output_variant_index false \
   --annotation RMSMappingQuality \

@@ -7,18 +7,7 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+gatk4_test_init
 
 # --- Build shared reference fixture ---
 create_test_reference "$test_data_dir/reference.fasta" 1 2000
@@ -316,49 +305,37 @@ log "✅ TEST 7 completed successfully"
 log "Starting TEST 8: Index argument errors"
 
 log "Executing $meta_name with 2 --variant files and 1 --variant_index file..."
-if "$meta_executable" \
+check_fails_with "Error: --variant_index must be given once for each file in --variant" "$meta_temp_dir/test8_mismatch.log" \
+  "$meta_executable" \
   --variant "$test_data_dir/separate/sample1.g.vcf.gz" \
   --variant "$test_data_dir/separate/sample2.g.vcf.gz" \
   --variant_index "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi" \
   --intervals "$test_data_dir/intervals.list" \
-  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_mismatch" > "$meta_temp_dir/test8_mismatch.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with 2 --variant files and 1 --variant_index file"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test8_mismatch.log" "Error: --variant_index must be given once for each file in --variant" "error message"
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_mismatch"
 
 log "Executing $meta_name with --variant_index and no --variant..."
-if "$meta_executable" \
+check_fails_with "Error: --variant_index requires --variant" "$meta_temp_dir/test8_variant.log" \
+  "$meta_executable" \
   --sample_name_map "$test_data_dir/sample_map.tsv" \
   --variant_index "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi" \
   --intervals "$test_data_dir/intervals.list" \
-  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_variant_index" > "$meta_temp_dir/test8_variant.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --variant_index and no --variant"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test8_variant.log" "Error: --variant_index requires --variant" "error message"
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_variant_index"
 
 log "Executing $meta_name with --header_index and no --header..."
-if "$meta_executable" \
+check_fails_with "Error: --header_index requires --header" "$meta_temp_dir/test8_header.log" \
+  "$meta_executable" \
   --sample_name_map "$test_data_dir/sample_map.tsv" \
   --header_index "$test_data_dir/separate_index/header.vcf.gz.tbi" \
   --intervals "$test_data_dir/intervals.list" \
-  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_header_index" > "$meta_temp_dir/test8_header.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --header_index and no --header"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test8_header.log" "Error: --header_index requires --header" "error message"
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_header_index"
 
 log "Executing $meta_name with --header and --variant..."
-if "$meta_executable" \
+check_fails_with "Error: --header with --variant requires --sample_name" "$meta_temp_dir/test8_header_variant.log" \
+  "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --header "$test_data_dir/sample1.g.vcf" \
   --intervals "$test_data_dir/intervals.list" \
-  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_header_variant" > "$meta_temp_dir/test8_header_variant.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --header and --variant"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test8_header_variant.log" "Error: --header with --variant requires --sample_name" "error message"
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_header_variant"
 
 log "✅ TEST 8 completed successfully"
 
@@ -382,27 +359,21 @@ check_file_contains "$meta_temp_dir/genomicsdb_workspace_sample_name/callset.jso
 check_file_not_contains "$meta_temp_dir/genomicsdb_workspace_sample_name/callset.json" "\"sample1\"" "GenomicsDB callset.json (original sample1 name)"
 
 log "Executing $meta_name with fewer --sample_name values than --variant files..."
-if "$meta_executable" \
+check_fails_with "Error: --sample_name must be given once for each file in --variant" "$meta_temp_dir/test9_count.log" \
+  "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --variant "$test_data_dir/sample2.g.vcf" \
   --sample_name renamed1 \
   --intervals "$test_data_dir/intervals.list" \
-  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_sample_name_count" > "$meta_temp_dir/test9_count.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with a --sample_name count mismatch"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test9_count.log" "Error: --sample_name must be given once for each file in --variant" "error message"
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_sample_name_count"
 
 log "Executing $meta_name with --sample_name and --sample_name_map..."
-if "$meta_executable" \
+check_fails_with "Error: --sample_name cannot be used together with --sample_name_map" "$meta_temp_dir/test9_map.log" \
+  "$meta_executable" \
   --sample_name_map "$test_data_dir/sample_map.tsv" \
   --sample_name renamed1 \
   --intervals "$test_data_dir/intervals.list" \
-  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_sample_name_map" > "$meta_temp_dir/test9_map.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --sample_name and --sample_name_map"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test9_map.log" "Error: --sample_name cannot be used together with --sample_name_map" "error message"
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_sample_name_map"
 
 log "✅ TEST 9 completed successfully"
 
@@ -479,14 +450,11 @@ log "✅ TEST 10 completed successfully"
 # --- Test Case 11: Missing --intervals ---
 log "Starting TEST 11: A missing --intervals fails"
 
-if "$meta_executable" \
+check_fails_with "Error: --intervals or --interval_strings is required." "$meta_temp_dir/test11.log" \
+  "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --variant "$test_data_dir/sample2.g.vcf" \
-  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_no_intervals" > "$meta_temp_dir/test11.log" 2>&1; then
-  log_error "✗ $meta_name did not fail without --intervals"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test11.log" "Error: --intervals or --interval_strings is required." "error message"
+  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_no_intervals"
 check_dir_not_exists "$meta_temp_dir/genomicsdb_workspace_no_intervals" "GenomicsDB workspace (no run without --intervals)"
 
 log "✅ TEST 11 completed successfully"

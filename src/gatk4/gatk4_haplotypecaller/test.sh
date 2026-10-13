@@ -7,24 +7,18 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+gatk4_test_init
 
 # --- Build shared reference and BAM fixtures ---
 create_test_reference "$test_data_dir/reference.fasta" 1 2000
 check_file_exists "$test_data_dir/reference.fasta" "test reference genome"
 check_file_exists "$test_data_dir/reference.dict" "reference sequence dictionary"
 check_file_exists "$test_data_dir/reference.fasta.fai" "reference FASTA index"
+reference_args=(
+  --reference "$test_data_dir/reference.fasta"
+  --reference_fai "$test_data_dir/reference.fasta.fai"
+  --reference_dict "$test_data_dir/reference.dict"
+)
 
 create_test_sam_reads "$test_data_dir/reads.sam" seq1 2000 rg1 sample1
 check_file_exists "$test_data_dir/reads.sam" "hand-crafted SAM reads"
@@ -42,9 +36,7 @@ log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output.vcf" \
   --output_index "$meta_temp_dir/indexes/output.idx"
 
@@ -53,9 +45,8 @@ check_file_exists "$meta_temp_dir/output.vcf" "output VCF file"
 check_file_not_empty "$meta_temp_dir/output.vcf" "output VCF file"
 check_file_contains "$meta_temp_dir/output.vcf" "^##fileformat=VCF" "output VCF file header"
 check_file_contains "$meta_temp_dir/output.vcf" "sample1" "output VCF sample column"
-check_file_exists "$meta_temp_dir/indexes/output.idx" "output index file"
+check_index_moved "$meta_temp_dir/indexes/output.idx" "$meta_temp_dir/output.vcf.idx" "output index file"
 check_file_not_empty "$meta_temp_dir/indexes/output.idx" "output index file"
-check_file_not_exists "$meta_temp_dir/output.vcf.idx" "index next to the output VCF (moved to --output_index)"
 
 log "✅ TEST 1 completed successfully"
 
@@ -66,9 +57,7 @@ log "Executing $meta_name with --emit_ref_confidence GVCF and a .g.vcf.gz output
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output.g.vcf.gz" \
   --output_index "$meta_temp_dir/indexes/output.g.tbi" \
   --emit_ref_confidence GVCF \
@@ -82,9 +71,8 @@ zcat "$meta_temp_dir/output.g.vcf.gz" > "$meta_temp_dir/output.g.vcf"
 check_file_not_empty "$meta_temp_dir/output.g.vcf" "output GVCF file"
 check_file_contains "$meta_temp_dir/output.g.vcf" "^##fileformat=VCF" "output VCF file header"
 check_file_contains "$meta_temp_dir/output.g.vcf" "^##GVCFBlock" "output GVCF block header"
-check_file_exists "$meta_temp_dir/indexes/output.g.tbi" "output index file"
+check_index_moved "$meta_temp_dir/indexes/output.g.tbi" "$meta_temp_dir/output.g.vcf.gz.tbi" "output index file"
 check_file_not_empty "$meta_temp_dir/indexes/output.g.tbi" "output index file"
-check_file_not_exists "$meta_temp_dir/output.g.vcf.gz.tbi" "index next to the output GVCF (moved to --output_index)"
 
 log "✅ TEST 2 completed successfully"
 
@@ -95,9 +83,7 @@ log "Executing $meta_name with sample-ploidy, output-mode, annotation and other 
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_tuned.vcf" \
   --output_index "$meta_temp_dir/output_tuned.vcf.idx" \
   --sample_ploidy 2 \
@@ -131,9 +117,7 @@ log "Executing $meta_name with --interval_padding, --sites_only_vcf_output, --cr
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_engine.vcf" \
   --interval_padding 10 \
   --sites_only_vcf_output \
@@ -168,9 +152,7 @@ log "Executing $meta_name with --dbsnp_index and --alleles_index..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --dbsnp "$test_data_dir/dbsnp.vcf.gz" \
   --dbsnp_index "$test_data_dir/indexes/dbsnp.vcf.gz.tbi" \
   --alleles "$test_data_dir/alleles.vcf.gz" \
@@ -182,7 +164,7 @@ log "Validating TEST 5 outputs..."
 check_file_exists "$meta_temp_dir/output_vcf_inputs.vcf" "output VCF file (VCF inputs)"
 check_file_contains "$meta_temp_dir/output_vcf_inputs.vcf" "^##fileformat=VCF" "output VCF file header (VCF inputs)"
 check_file_contains "$meta_temp_dir/output_vcf_inputs.vcf" "##INFO=<ID=DB," "output VCF DB INFO definition (from --dbsnp)"
-check_file_contains "$meta_temp_dir/output_vcf_inputs.vcf" $'^seq1\t100\t' "output VCF record at the force-called site (from --alleles)"
+check_vcf_has_record "$meta_temp_dir/output_vcf_inputs.vcf" $'^seq1\t100\t' "output VCF record at the force-called site (from --alleles)"
 check_file_not_exists "$test_data_dir/dbsnp.vcf.gz.tbi" "index next to the --dbsnp input"
 check_file_not_exists "$test_data_dir/alleles.vcf.gz.tbi" "index next to the --alleles input"
 
@@ -195,16 +177,14 @@ log "Executing $meta_name with a .vcf.gz --alleles file and no --alleles_index..
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --alleles "$test_data_dir/alleles.vcf.gz" \
   --output "$meta_temp_dir/output_no_index.vcf" \
   --output_index "$meta_temp_dir/output_no_index.vcf.idx" 2> "$meta_temp_dir/test6.log"
 
 log "Validating TEST 6 outputs..."
 check_file_exists "$meta_temp_dir/output_no_index.vcf" "output VCF file (no --alleles index)"
-check_file_contains "$meta_temp_dir/output_no_index.vcf" $'^seq1\t100\t' "output VCF record at the force-called site (no --alleles index)"
+check_vcf_has_record "$meta_temp_dir/output_no_index.vcf" $'^seq1\t100\t' "output VCF record at the force-called site (no --alleles index)"
 check_file_contains "$meta_temp_dir/test6.log" "no index was provided" "warning for the missing index"
 check_file_not_exists "$test_data_dir/alleles.vcf.gz.tbi" "index next to the --alleles input"
 
@@ -214,36 +194,26 @@ log "✅ TEST 6 completed successfully"
 log "Starting TEST 7: --dbsnp_index without --dbsnp"
 
 log "Executing $meta_name with --dbsnp_index and no --dbsnp (should fail)..."
-if "$meta_executable" \
+check_fails_with "Error: --dbsnp_index requires --dbsnp" "$meta_temp_dir/test7.log" \
+  "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --dbsnp_index "$test_data_dir/indexes/dbsnp.vcf.gz.tbi" \
   --output "$meta_temp_dir/output_bad.vcf" \
-  --output_index "$meta_temp_dir/output_bad.vcf.idx" > "$meta_temp_dir/test7.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --dbsnp_index and no --dbsnp"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test7.log" "Error: --dbsnp_index requires --dbsnp" "error message"
+  --output_index "$meta_temp_dir/output_bad.vcf.idx"
 
 log "✅ TEST 7 completed successfully"
 
 # --- Test Case 8: Missing --output_index ---
 log "Starting TEST 8: A missing --output_index fails"
 
-if "$meta_executable" \
+check_fails_with "Error: --output_index is required unless --create_output_variant_index is false." "$meta_temp_dir/test8.log" \
+  "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
-  --output "$meta_temp_dir/no_output_index.vcf" > "$meta_temp_dir/test8.log" 2>&1; then
-  log_error "✗ $meta_name did not fail without --output_index"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test8.log" "Error: --output_index is required unless --create_output_variant_index is false." "error message"
+  "${reference_args[@]}" \
+  --output "$meta_temp_dir/no_output_index.vcf"
 
 log "✅ TEST 8 completed successfully"
 
@@ -262,9 +232,7 @@ log "Executing $meta_name with two --intervals files, --intervals_index and --ex
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --output "$meta_temp_dir/output_intervals.g.vcf" \
   --output_index "$meta_temp_dir/indexes/output_intervals.g.vcf.idx" \
   --emit_ref_confidence GVCF \
@@ -308,6 +276,11 @@ create_test_somatic_reference "$test_data_dir/snv/reference.fasta"
 create_test_somatic_bam "$test_data_dir/snv/sample.bam" snv_sample rg1 mixed
 create_test_cram "$test_data_dir/snv/sample.bam" "$test_data_dir/snv/reference.fasta" \
   "$test_data_dir/cram/sample.cram" "$test_data_dir/cram_index/sample_index.crai"
+snv_reference_args=(
+  --reference "$test_data_dir/snv/reference.fasta"
+  --reference_fai "$test_data_dir/snv/reference.fasta.fai"
+  --reference_dict "$test_data_dir/snv/reference.dict"
+)
 
 for format in bam cram; do
   if [[ "$format" == "bam" ]]; then
@@ -321,15 +294,13 @@ for format in bam cram; do
   "$meta_executable" \
     --input "$reads" \
     --read_index "$reads_index" \
-    --reference "$test_data_dir/snv/reference.fasta" \
-    --reference_fai "$test_data_dir/snv/reference.fasta.fai" \
-    --reference_dict "$test_data_dir/snv/reference.dict" \
+    "${snv_reference_args[@]}" \
     --output "$meta_temp_dir/snv_$format.vcf" \
     --output_index "$meta_temp_dir/snv_$format.vcf.idx"
 done
 
 log "Validating TEST 10 outputs..."
-check_file_contains "$meta_temp_dir/snv_cram.vcf" $'^chr1\t250\t.\tT\tA\t' "SNV chr1:250 T>A called from the CRAM input"
+check_vcf_has_record "$meta_temp_dir/snv_cram.vcf" $'^chr1\t250\t.\tT\tA\t' "SNV chr1:250 T>A called from the CRAM input"
 bam_records=$(grep -v '^#' "$meta_temp_dir/snv_bam.vcf")
 cram_records=$(grep -v '^#' "$meta_temp_dir/snv_cram.vcf")
 if [[ "$cram_records" == "$bam_records" ]]; then
@@ -352,30 +323,23 @@ log "Executing $meta_name with two --input and two --read_index files..."
   --input "$test_data_dir/snv/normal.bam" \
   --read_index "$test_data_dir/snv/sample.bai" \
   --read_index "$test_data_dir/snv/normal.bai" \
-  --reference "$test_data_dir/snv/reference.fasta" \
-  --reference_fai "$test_data_dir/snv/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/snv/reference.dict" \
+  "${snv_reference_args[@]}" \
   --output "$meta_temp_dir/two_samples.vcf" \
   --output_index "$meta_temp_dir/two_samples.vcf.idx"
 
 log "Validating TEST 11 outputs..."
 check_file_contains "$meta_temp_dir/two_samples.vcf" $'^#CHROM.*\tFORMAT\tnormal_sample\tsnv_sample$' "output VCF columns for both samples"
-check_file_contains "$meta_temp_dir/two_samples.vcf" $'^chr1\t250\t.\tT\tA\t.*\t0/0:[^\t]*\t0/1:' "SNV chr1:250 T>A with a hom-ref and a het genotype"
+check_vcf_has_record "$meta_temp_dir/two_samples.vcf" $'^chr1\t250\t.\tT\tA\t.*\t0/0:[^\t]*\t0/1:' "SNV chr1:250 T>A with a hom-ref and a het genotype"
 
 log "Executing $meta_name with two --input files and one --read_index file (should fail)..."
-if "$meta_executable" \
+check_fails_with "Error: --read_index must be given once for each file in --input" "$meta_temp_dir/test11.log" \
+  "$meta_executable" \
   --input "$test_data_dir/snv/sample.bam" \
   --input "$test_data_dir/snv/normal.bam" \
   --read_index "$test_data_dir/snv/sample.bai" \
-  --reference "$test_data_dir/snv/reference.fasta" \
-  --reference_fai "$test_data_dir/snv/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/snv/reference.dict" \
+  "${snv_reference_args[@]}" \
   --output "$meta_temp_dir/fail.vcf" \
-  --output_index "$meta_temp_dir/fail.vcf.idx" > "$meta_temp_dir/test11.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with a missing --read_index"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test11.log" "Error: --read_index must be given once for each file in --input" "error message"
+  --output_index "$meta_temp_dir/fail.vcf.idx"
 
 log "✅ TEST 11 completed successfully"
 
@@ -385,9 +349,7 @@ log "Starting TEST 12: --bam_output with --create_bam_output"
 snv_args=(
   --input "$test_data_dir/snv/sample.bam"
   --read_index "$test_data_dir/snv/sample.bai"
-  --reference "$test_data_dir/snv/reference.fasta"
-  --reference_fai "$test_data_dir/snv/reference.fasta.fai"
-  --reference_dict "$test_data_dir/snv/reference.dict"
+  "${snv_reference_args[@]}"
 )
 
 log "Executing $meta_name with --create_bam_output, --bam_output and --bam_output_index..."
@@ -402,8 +364,8 @@ log "Executing $meta_name with --create_bam_output, --bam_output and --bam_outpu
 
 log "Validating TEST 12 outputs..."
 check_file_not_empty "$meta_temp_dir/bamout/haplotypes.bam" "output BAM file"
+check_index_moved "$meta_temp_dir/bamout_index/haplotypes_index.bai" "$meta_temp_dir/bamout/haplotypes.bai" "output BAM index file"
 check_file_not_empty "$meta_temp_dir/bamout_index/haplotypes_index.bai" "output BAM index file"
-check_file_not_exists "$meta_temp_dir/bamout/haplotypes.bai" "index next to the output BAM (moved to --bam_output_index)"
 if samtools view -H "$meta_temp_dir/bamout/haplotypes.bam" | grep -q $'^@RG\tID:ArtificialHaplotypeRG'; then
   log "✓ output BAM has the artificial haplotype read group"
 else
@@ -421,27 +383,20 @@ log "Executing $meta_name with --bam_output and no --create_bam_output..."
 check_file_not_exists "$meta_temp_dir/no_bamout/haplotypes.bam" "output BAM file (no --create_bam_output)"
 check_file_not_exists "$meta_temp_dir/no_bamout/haplotypes.bai" "output BAM index file (no --create_bam_output)"
 
-check_fails_with() {
-  local message="$1"
-  local log_file="$2"
-  shift 2
-  if "$meta_executable" \
-    "${snv_args[@]}" \
-    --output "$meta_temp_dir/fail.vcf" \
-    --output_index "$meta_temp_dir/fail.vcf.idx" \
-    "$@" > "$log_file" 2>&1; then
-    log_error "✗ $meta_name did not fail with: $*"
-    exit 1
-  fi
-  check_file_contains "$log_file" "$message" "error message"
-}
+# The command for the runs that must fail
+fail_cmd=(
+  "$meta_executable"
+  "${snv_args[@]}"
+  --output "$meta_temp_dir/fail.vcf"
+  --output_index "$meta_temp_dir/fail.vcf.idx"
+)
 
-check_fails_with "Error: --create_bam_output requires --bam_output\." "$meta_temp_dir/test12_bam_output.log" \
-  --create_bam_output
-check_fails_with "Error: --bam_output_index is required unless --create_output_bam_index is false\." "$meta_temp_dir/test12_bam_output_index.log" \
-  --create_bam_output --bam_output "$meta_temp_dir/fail.bam"
+check_fails_with "Error: --create_bam_output requires --bam_output." "$meta_temp_dir/test12_bam_output.log" \
+  "${fail_cmd[@]}" --create_bam_output
+check_fails_with "Error: --bam_output_index is required unless --create_output_bam_index is false." "$meta_temp_dir/test12_bam_output_index.log" \
+  "${fail_cmd[@]}" --create_bam_output --bam_output "$meta_temp_dir/fail.bam"
 check_fails_with "Error: --bam_output must be a BAM file, GATK cannot write CRAM here." "$meta_temp_dir/test12_bam_output_cram.log" \
-  --create_bam_output --bam_output "$meta_temp_dir/fail.cram" --bam_output_index "$meta_temp_dir/fail.crai"
+  "${fail_cmd[@]}" --create_bam_output --bam_output "$meta_temp_dir/fail.cram" --bam_output_index "$meta_temp_dir/fail.crai"
 check_file_not_contains "$meta_temp_dir/test12_bam_output_cram.log" "HaplotypeCaller done" "run log (GATK did not run)"
 
 log "✅ TEST 12 completed successfully"
@@ -466,11 +421,11 @@ log "Executing $meta_name with --population_callset and --population_callset_ind
 log "Validating TEST 13 outputs..."
 check_file_contains "$meta_temp_dir/population.vcf" "##INFO=<ID=PG," "output VCF genotype prior INFO definition (from --population_callset)"
 check_file_contains "$meta_temp_dir/population.vcf" " --use-posteriors-to-calculate-qual true" "GATK command line (from --use_posteriors_to_calculate_qual)"
-check_file_contains "$meta_temp_dir/population.vcf" $'^chr1\t250\t.\tT\tA\t' "SNV chr1:250 T>A"
+check_vcf_has_record "$meta_temp_dir/population.vcf" $'^chr1\t250\t.\tT\tA\t' "SNV chr1:250 T>A"
 check_file_not_exists "$test_data_dir/snv/population.vcf.gz.tbi" "index next to the --population_callset input"
 
 check_fails_with "Error: --population_callset_index requires --population_callset." "$meta_temp_dir/test13.log" \
-  --population_callset_index "$test_data_dir/snv/population_index/population.vcf.gz.tbi"
+  "${fail_cmd[@]}" --population_callset_index "$test_data_dir/snv/population_index/population.vcf.gz.tbi"
 
 log "✅ TEST 13 completed successfully"
 
@@ -498,7 +453,7 @@ log "Executing $meta_name with the new calling options..."
   --standard_min_confidence_threshold_for_calling 10
 
 log "Validating TEST 14 outputs..."
-check_file_contains "$meta_temp_dir/calling_options.vcf" $'^chr1\t250\t.\tT\tA\t' "SNV chr1:250 T>A"
+check_vcf_has_record "$meta_temp_dir/calling_options.vcf" $'^chr1\t250\t.\tT\tA\t' "SNV chr1:250 T>A"
 check_file_contains "$meta_temp_dir/calling_options.vcf" " --do-not-run-physical-phasing true" "GATK command line (from --do_not_run_physical_phasing)"
 check_file_contains "$meta_temp_dir/calling_options.vcf" " --mapping-quality-threshold-for-genotyping 30" "GATK command line (from --mapping_quality_threshold_for_genotyping)"
 check_file_contains "$meta_temp_dir/calling_options.vcf" " --max-mnp-distance 1" "GATK command line (from --max_mnp_distance)"
@@ -511,7 +466,7 @@ log "Executing $meta_name with --maximum_mapping_quality below the read mapping 
   --output "$meta_temp_dir/max_mapq.vcf" \
   --output_index "$meta_temp_dir/max_mapq.vcf.idx" \
   --maximum_mapping_quality 59
-check_file_not_contains "$meta_temp_dir/max_mapq.vcf" $'^chr1\t250\t' "SNV chr1:250 (all reads removed by --maximum_mapping_quality)"
+check_vcf_lacks_record "$meta_temp_dir/max_mapq.vcf" $'^chr1\t250\t' "SNV chr1:250 (all reads removed by --maximum_mapping_quality)"
 
 log "✅ TEST 14 completed successfully"
 

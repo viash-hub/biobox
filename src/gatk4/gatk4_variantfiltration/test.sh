@@ -7,18 +7,7 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+gatk4_test_init
 
 # --- Prepare shared reference files ---
 ref_fasta="$test_data_dir/reference.fasta"
@@ -71,9 +60,8 @@ log "Executing $meta_name with --filter_expression/--filter_name pairs..."
 log "Validating TEST 1 outputs..."
 check_file_exists "$output_vcf" "filtered VCF"
 check_file_not_empty "$output_vcf" "filtered VCF"
-check_file_exists "$meta_temp_dir/indexes/filtered1.idx" "output index file"
+check_index_moved "$meta_temp_dir/indexes/filtered1.idx" "$output_vcf.idx" "output index file"
 check_file_not_empty "$meta_temp_dir/indexes/filtered1.idx" "output index file"
-check_file_not_exists "$output_vcf.idx" "index next to the output VCF (moved to --output_index)"
 
 # Extract the FILTER column for each record so assertions can't be confused
 # by filter names appearing in other records.
@@ -91,12 +79,7 @@ check_file_not_empty "$record3_filter" "record 3 (pos 300) FILTER field"
 
 # Record 1: passes both filters -> PASS
 log "Checking record 1 (QD=20.0, FS=1.0, passes both filters) is marked PASS..."
-if [[ "$(cat "$record1_filter")" == "PASS" ]]; then
-  log "✓ record 1 (pos 100) FILTER is PASS"
-else
-  log_error "✗ record 1 (pos 100) FILTER is '$(cat "$record1_filter")', expected PASS"
-  exit 1
-fi
+check_vcf_has_record "$output_vcf" $'^seq1\t100\t([^\t]*\t){4}PASS\t' "filtered VCF (record 1 FILTER is PASS)"
 
 # Record 2: fails only the QD filter -> lowQD, and never highFS
 log "Checking record 2 (QD=1.0 only) is marked lowQD..."
@@ -364,15 +347,12 @@ log "✅ TEST 8 completed successfully"
 # --- Test Case 9: An index without its input fails ---
 log "Starting TEST 9: --mask_index without --mask"
 
-if "$meta_executable" \
+check_fails_with "Error: --mask_index requires --mask" "$meta_temp_dir/test9.log" \
+  "$meta_executable" \
   --variant "$input_vcf" \
   --mask_index "$test_data_dir/indexes/mask.vcf.gz.tbi" \
   --output "$meta_temp_dir/index_only.vcf" \
-  --output_index "$meta_temp_dir/index_only.vcf.idx" > "$meta_temp_dir/test9.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --mask_index but no --mask"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test9.log" "Error: --mask_index requires --mask" "error message"
+  --output_index "$meta_temp_dir/index_only.vcf.idx"
 check_file_not_exists "$meta_temp_dir/index_only.vcf" "output VCF (GATK did not run)"
 
 log "✅ TEST 9 completed successfully"
@@ -393,29 +373,19 @@ log "Executing $meta_name with a .vcf.gz --output and --output_index..."
 
 log "Validating TEST 10 outputs..."
 check_file_exists "$output_vcf11" "bgzipped filtered VCF"
-record200_filter=$(zcat "$output_vcf11" | awk -F'\t' '$2==200 {print $7}')
-if [[ "$record200_filter" == "lowQD" ]]; then
-  log "✓ record 2 (pos 200) FILTER is lowQD"
-else
-  log_error "✗ record 2 (pos 200) FILTER is '$record200_filter', expected lowQD"
-  exit 1
-fi
-check_file_exists "$meta_temp_dir/indexes/filtered11.tbi" "output index file"
+check_vcf_has_record "$output_vcf11" $'^seq1\t200\t([^\t]*\t){4}lowQD\t' "bgzipped filtered VCF (record 2 FILTER is lowQD)"
+check_index_moved "$meta_temp_dir/indexes/filtered11.tbi" "$output_vcf11.tbi" "output index file"
 check_file_not_empty "$meta_temp_dir/indexes/filtered11.tbi" "output index file"
-check_file_not_exists "$output_vcf11.tbi" "index next to the output VCF (moved to --output_index)"
 
 log "✅ TEST 10 completed successfully"
 
 # --- Test Case 11: Missing --output_index ---
 log "Starting TEST 11: A missing --output_index fails"
 
-if "$meta_executable" \
+check_fails_with "Error: --output_index is required unless --create_output_variant_index is false." "$meta_temp_dir/test11.log" \
+  "$meta_executable" \
   --variant "$input_vcf" \
-  --output "$meta_temp_dir/no_output_index.vcf" > "$meta_temp_dir/test11.log" 2>&1; then
-  log_error "✗ $meta_name did not fail without --output_index"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test11.log" "Error: --output_index is required unless --create_output_variant_index is false." "error message"
+  --output "$meta_temp_dir/no_output_index.vcf"
 check_file_not_exists "$meta_temp_dir/no_output_index.vcf" "output VCF (GATK did not run)"
 
 log "✅ TEST 11 completed successfully"
@@ -462,14 +432,7 @@ check_file_exists "$output_vcf12.idx" "output index (multiple intervals)"
 check_file_contains "$meta_temp_dir/test12.log" "Warning: no index was provided for '.*intervals_input.vcf'" "run log (copy of --variant indexed for traversal by intervals)"
 check_file_not_exists "$intervals_input_vcf.idx" "index next to the input VCF (a copy is indexed instead)"
 
-record_positions=$(grep -v '^#' "$output_vcf12" | cut -f2 | tr '\n' ' ')
-expected_positions="100 300 400 800 "
-if [[ "$record_positions" == "$expected_positions" ]]; then
-  log "✓ filtered VCF only has the records in the selected territory: $record_positions"
-else
-  log_error "✗ filtered VCF record positions are '$record_positions', expected '$expected_positions'"
-  exit 1
-fi
+check_vcf_column "$output_vcf12" 2 "100 300 400 800" "filtered VCF (records in the selected territory)"
 
 output_vcf12b="$meta_temp_dir/output12b/filtered.vcf"
 mkdir -p "$(dirname "$output_vcf12b")"
@@ -482,13 +445,7 @@ log "Executing $meta_name with a plain unindexed --variant and no intervals..."
 
 check_file_exists "$output_vcf12b" "filtered VCF (no intervals)"
 check_file_not_contains "$meta_temp_dir/test12b.log" "no index was provided" "run log (plain --variant used without an index)"
-record_count=$(grep -vc '^#' "$output_vcf12b")
-if [[ "$record_count" == "9" ]]; then
-  log "✓ filtered VCF (no intervals) has all 9 records"
-else
-  log_error "✗ filtered VCF (no intervals) has $record_count records, expected 9"
-  exit 1
-fi
+check_vcf_record_count "$output_vcf12b" 9 "filtered VCF (no intervals)"
 
 log "✅ TEST 12 completed successfully"
 
@@ -523,20 +480,8 @@ log "Executing $meta_name with --interval_strings and --variant_output_filtering
   --variant_output_filtering STARTS_IN
 
 log "Validating TEST 13 outputs..."
-selected_ids=$(grep -v '^#' "$meta_temp_dir/filtering_default.vcf" | cut -f3 | tr '\n' ' ')
-if [[ "$selected_ids" == "snp deletion " ]]; then
-  log "✓ Without a filtering mode, the output has the records that overlap the intervals: $selected_ids"
-else
-  log_error "✗ Output has records '$selected_ids', expected 'snp deletion '"
-  exit 1
-fi
-selected_ids=$(grep -v '^#' "$meta_temp_dir/filtering_starts_in.vcf" | cut -f3 | tr '\n' ' ')
-if [[ "$selected_ids" == "snp " ]]; then
-  log "✓ With STARTS_IN, the output has only the records that start in the intervals: $selected_ids"
-else
-  log_error "✗ Output has records '$selected_ids', expected 'snp '"
-  exit 1
-fi
+check_vcf_column "$meta_temp_dir/filtering_default.vcf" 3 "snp deletion" "output VCF (no filtering mode, records that overlap the intervals)"
+check_vcf_column "$meta_temp_dir/filtering_starts_in.vcf" 3 "snp" "output VCF (STARTS_IN, records that start in the intervals)"
 
 log "✅ TEST 13 completed successfully"
 

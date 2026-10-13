@@ -7,18 +7,8 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+# Set up the test environment and the test data directory
+gatk4_test_init
 
 # --- Build shared reference, VCF and BAM fixtures ---
 # A 200bp single-contig reference made entirely of "A" bases, so any read
@@ -31,6 +21,11 @@ a40=$(printf 'A%.0s' {1..40})
 printf '>chr1\n%s\n%s\n%s\n' "$a80" "$a80" "$a40" > "$test_data_dir/reference.fasta"
 gatk CreateSequenceDictionary -R "$test_data_dir/reference.fasta" -O "$test_data_dir/reference.dict" --VERBOSITY ERROR
 create_test_fasta_fai "$test_data_dir/reference.fasta" "$test_data_dir/reference.fasta.fai"
+reference_args=(
+  --reference "$test_data_dir/reference.fasta"
+  --reference_fai "$test_data_dir/reference.fasta.fai"
+  --reference_dict "$test_data_dir/reference.dict"
+)
 
 log "Writing common SNPs VCF..."
 cat > "$test_data_dir/common_snps.vcf" <<'VCF'
@@ -105,9 +100,7 @@ log "Executing $meta_name with a BED --intervals file and the reference trio..."
   --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/site_50.bed" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --maximum_population_allele_frequency 0.5 \
   --output "$meta_temp_dir/pileups_bed.table"
 
@@ -274,17 +267,14 @@ log "✅ TEST 6 completed successfully"
 # --- Test Case 7: --intervals_index count mismatch ---
 log "Starting TEST 7: --intervals_index count mismatch fails"
 
-if "$meta_executable" \
+check_fails_with "must be given once for each VCF file in --intervals" "$meta_temp_dir/test7.log" \
+  "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
   --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/site_50.bed" \
   --intervals_index "$test_data_dir/indexed/common_snps.vcf.idx" \
-  --output "$meta_temp_dir/pileups_bad.table" > "$meta_temp_dir/test7.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with an --intervals_index and no VCF --intervals file"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test7.log" "must be given once for each VCF file in --intervals" "error message"
+  --output "$meta_temp_dir/pileups_bad.table"
 
 log "✅ TEST 7 completed successfully"
 
@@ -306,15 +296,13 @@ check_file_contains "$meta_temp_dir/test8_bgz.log" "Warning: no index was provid
 
 # A .vcf.gz compressed with gzip (not bgzip) cannot be indexed
 gzip -c "$test_data_dir/common_snps.vcf" > "$test_data_dir/plain_gzip.vcf.gz"
-if "$meta_executable" \
+check_fails_with "Error: could not index '" "$meta_temp_dir/test8_gzip.log" \
+  "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
   --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/plain_gzip.vcf.gz" \
   --intervals "$test_data_dir/site_50.bed" \
-  --output "$meta_temp_dir/pileups_gzip.table" > "$meta_temp_dir/test8_gzip.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with a plain-gzip --variant"
-  exit 1
-fi
+  --output "$meta_temp_dir/pileups_gzip.table"
 check_file_contains "$meta_temp_dir/test8_gzip.log" "Error: could not index '.*plain_gzip.vcf.gz'" "error message"
 check_file_not_contains "$meta_temp_dir/test8_gzip.log" "GetPileupSummaries done" "run log (GATK did not run)"
 
@@ -368,15 +356,12 @@ log "✅ TEST 9 completed successfully"
 # --- Test Case 10: No --intervals ---
 log "Starting TEST 10: No --intervals fails"
 
-if "$meta_executable" \
+check_fails_with "Error: --intervals or --interval_strings is required." "$meta_temp_dir/test10.log" \
+  "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
   --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
-  --output "$meta_temp_dir/pileups_no_intervals.table" > "$meta_temp_dir/test10.log" 2>&1; then
-  log_error "✗ $meta_name did not fail without --intervals"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test10.log" "Error: --intervals or --interval_strings is required." "error message"
+  --output "$meta_temp_dir/pileups_no_intervals.table"
 check_file_not_contains "$meta_temp_dir/test10.log" "GetPileupSummaries done" "run log (GATK did not run)"
 
 log "✅ TEST 10 completed successfully"
@@ -409,9 +394,7 @@ create_test_cram "$test_data_dir/reads.bam" "$test_data_dir/reference.fasta" \
   --read_index "$test_data_dir/cram_index/reads_index.crai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/common_snps.vcf" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --maximum_population_allele_frequency 0.5 \
   --output "$meta_temp_dir/pileups_cram.table"
 
@@ -424,16 +407,13 @@ log "✅ TEST 12 completed successfully"
 # --- Test Case 13: CRAM input without --reference ---
 log "Starting TEST 13: CRAM --input without --reference fails"
 
-if "$meta_executable" \
+check_fails_with "Error: --reference is required for CRAM input or output." "$meta_temp_dir/test13.log" \
+  "$meta_executable" \
   --input "$test_data_dir/cram/reads.cram" \
   --read_index "$test_data_dir/cram_index/reads_index.crai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/common_snps.vcf" \
-  --output "$meta_temp_dir/pileups_cram_no_ref.table" > "$meta_temp_dir/test13.log" 2>&1; then
-  log_error "✗ $meta_name did not fail for a CRAM input without --reference"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test13.log" "Error: --reference is required for CRAM input or output." "error message"
+  --output "$meta_temp_dir/pileups_cram_no_ref.table"
 check_file_not_contains "$meta_temp_dir/test13.log" "GetPileupSummaries done" "run log (GATK did not run)"
 
 log "✅ TEST 13 completed successfully"
@@ -466,17 +446,14 @@ check_file_contains "$meta_temp_dir/pileups_two_inputs.table" $'chr1\t50\t4\t2\t
 check_file_contains "$meta_temp_dir/pileups_two_inputs.table" $'chr1\t150\t2\t4\t0\t0.4' "position 150 counts (reads of both inputs)"
 
 log "Executing $meta_name with fewer --read_index files than --input files (should fail)..."
-if "$meta_executable" \
+check_fails_with "Error: --read_index must be given once for each file in --input" "$meta_temp_dir/test14.log" \
+  "$meta_executable" \
   --input "$test_data_dir/reads.bam" \
   --input "$test_data_dir/reads_rg2.bam" \
   --read_index "$test_data_dir/reads.bai" \
   --variant "$test_data_dir/common_snps.vcf" \
   --intervals "$test_data_dir/common_snps.vcf" \
-  --output "$meta_temp_dir/pileups_bad_index.table" > "$meta_temp_dir/test14.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with fewer --read_index files than --input files"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test14.log" "Error: --read_index must be given once for each file in --input" "error message"
+  --output "$meta_temp_dir/pileups_bad_index.table"
 
 log "✅ TEST 14 completed successfully"
 
