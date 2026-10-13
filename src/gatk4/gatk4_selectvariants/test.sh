@@ -207,4 +207,124 @@ fi
 
 log "✅ TEST 6 completed successfully"
 
+# --- Test Case 7: Bgzipped --variant with a separate index ---
+log "Starting TEST 7: Bgzipped --variant with its index in a different directory"
+
+create_test_vcf_gz_with_separate_index "$test_data_dir/variants.vcf" \
+  "$test_data_dir/variants.vcf.gz" "$test_data_dir/indexes/variants.vcf.gz.tbi"
+
+log "Executing $meta_name with --variant .vcf.gz and --variant_index..."
+"$meta_executable" \
+  --variant "$test_data_dir/variants.vcf.gz" \
+  --variant_index "$test_data_dir/indexes/variants.vcf.gz.tbi" \
+  --output "$meta_temp_dir/from_vcf_gz.vcf" \
+  --select_type_to_include SNP 2>&1 | tee "$meta_temp_dir/test7.log"
+
+log "Validating TEST 7 outputs..."
+check_file_exists "$meta_temp_dir/from_vcf_gz.vcf" "output VCF file (from .vcf.gz)"
+check_file_contains "$meta_temp_dir/from_vcf_gz.vcf" "^##fileformat=VCF" "output VCF file (from .vcf.gz) header"
+check_file_contains "$meta_temp_dir/from_vcf_gz.vcf" "snp1" "output VCF file (from .vcf.gz) (snp1 record)"
+check_file_contains "$meta_temp_dir/from_vcf_gz.vcf" "snp2" "output VCF file (from .vcf.gz) (snp2 record)"
+check_file_not_contains "$meta_temp_dir/from_vcf_gz.vcf" "indel1" "output VCF file (from .vcf.gz) (indel1 record should be absent)"
+check_file_not_contains "$meta_temp_dir/test7.log" "no index was provided" "run log (index was provided)"
+check_file_not_exists "$test_data_dir/variants.vcf.gz.tbi" "index next to the input VCF"
+
+log "✅ TEST 7 completed successfully"
+
+# --- Test Case 8: Bgzipped --variant without an index ---
+log "Starting TEST 8: Bgzipped --variant without an index"
+
+bgzip -c "$test_data_dir/variants.vcf" > "$test_data_dir/variants_no_index.vcf.gz"
+
+log "Executing $meta_name with --variant .vcf.gz and no index..."
+"$meta_executable" \
+  --variant "$test_data_dir/variants_no_index.vcf.gz" \
+  --output "$meta_temp_dir/from_vcf_gz_no_index.vcf" \
+  --select_type_to_include SNP 2>&1 | tee "$meta_temp_dir/test8.log"
+
+log "Validating TEST 8 outputs..."
+check_file_exists "$meta_temp_dir/from_vcf_gz_no_index.vcf" "output VCF file (from .vcf.gz without index)"
+check_file_contains "$meta_temp_dir/from_vcf_gz_no_index.vcf" "snp1" "output VCF file (from .vcf.gz without index) (snp1 record)"
+check_file_contains "$meta_temp_dir/test8.log" "Warning: no index was provided for '.*variants_no_index.vcf.gz'" "run log (copy of --variant indexed)"
+check_file_not_exists "$test_data_dir/variants_no_index.vcf.gz.tbi" "index next to the input VCF (a copy is indexed instead)"
+
+log "✅ TEST 8 completed successfully"
+
+# --- Test Case 9: --concordance with a separate index ---
+log "Starting TEST 9: Bgzipped --concordance with its index in a different directory"
+
+# The comparison VCF has only the snp1 and indel2 records
+grep -v -e "snp2" -e "indel1" "$test_data_dir/variants.vcf" > "$test_data_dir/comparison.vcf"
+create_test_vcf_gz_with_separate_index "$test_data_dir/comparison.vcf" \
+  "$test_data_dir/comparison.vcf.gz" "$test_data_dir/indexes/comparison.vcf.gz.tbi"
+
+log "Executing $meta_name with --concordance and --concordance_index..."
+"$meta_executable" \
+  --variant "$test_data_dir/variants.vcf" \
+  --concordance "$test_data_dir/comparison.vcf.gz" \
+  --concordance_index "$test_data_dir/indexes/comparison.vcf.gz.tbi" \
+  --output "$meta_temp_dir/concordance.vcf"
+
+log "Validating TEST 9 outputs..."
+check_file_exists "$meta_temp_dir/concordance.vcf" "concordance output VCF"
+record_count=$(grep -c "^seq1" "$meta_temp_dir/concordance.vcf")
+if [[ "$record_count" -eq 2 ]]; then
+  log "✓ concordance output VCF contains expected number of records (2): $meta_temp_dir/concordance.vcf"
+else
+  log_error "✗ concordance output VCF has $record_count records, expected 2: $meta_temp_dir/concordance.vcf"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/concordance.vcf" "snp1" "concordance output VCF (snp1 record)"
+check_file_contains "$meta_temp_dir/concordance.vcf" "indel2" "concordance output VCF (indel2 record)"
+check_file_not_contains "$meta_temp_dir/concordance.vcf" "snp2" "concordance output VCF (snp2 record should be absent)"
+check_file_not_exists "$test_data_dir/comparison.vcf.gz.tbi" "index next to the --concordance VCF"
+
+log "✅ TEST 9 completed successfully"
+
+# --- Test Case 10: An index without its input fails ---
+log "Starting TEST 10: --concordance_index without --concordance"
+
+if "$meta_executable" \
+  --variant "$test_data_dir/variants.vcf" \
+  --concordance_index "$test_data_dir/indexes/comparison.vcf.gz.tbi" \
+  --output "$meta_temp_dir/index_only.vcf" > "$meta_temp_dir/test10.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --concordance_index but no --concordance"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test10.log" "Error: --concordance_index requires --concordance" "error message"
+check_file_not_exists "$meta_temp_dir/index_only.vcf" "output VCF (GATK did not run)"
+
+log "✅ TEST 10 completed successfully"
+
+# --- Test Case 11: Plain --variant without an index ---
+log "Starting TEST 11: Plain --variant without an index, with and without --intervals"
+
+mkdir -p "$test_data_dir/plain"
+cp "$test_data_dir/variants.vcf" "$test_data_dir/plain/variants.vcf"
+echo "seq1:50-250" > "$test_data_dir/plain/region.intervals"
+
+log "Executing $meta_name with a plain --variant and no --intervals..."
+"$meta_executable" \
+  --variant "$test_data_dir/plain/variants.vcf" \
+  --output "$meta_temp_dir/plain_all.vcf" 2> "$meta_temp_dir/test11_all.log"
+
+log "Validating TEST 11 outputs without --intervals..."
+check_file_contains "$meta_temp_dir/plain_all.vcf" "indel2" "output VCF (all records)"
+check_file_not_contains "$meta_temp_dir/test11_all.log" "no index was provided" "run log (plain VCF used without an index)"
+check_file_not_exists "$test_data_dir/plain/variants.vcf.idx" "index next to the plain input"
+
+log "Executing $meta_name with a plain --variant and --intervals..."
+"$meta_executable" \
+  --variant "$test_data_dir/plain/variants.vcf" \
+  --intervals "$test_data_dir/plain/region.intervals" \
+  --output "$meta_temp_dir/plain_region.vcf" 2> "$meta_temp_dir/test11_region.log"
+
+log "Validating TEST 11 outputs with --intervals..."
+check_file_contains "$meta_temp_dir/plain_region.vcf" "snp2" "output VCF (record in the interval)"
+check_file_not_contains "$meta_temp_dir/plain_region.vcf" "indel2" "output VCF (record outside the interval)"
+check_file_contains "$meta_temp_dir/test11_region.log" "no index was provided" "run log (indexing warning with --intervals)"
+check_file_not_exists "$test_data_dir/plain/variants.vcf.idx" "index next to the plain input"
+
+log "✅ TEST 11 completed successfully"
+
 print_test_summary "All tests completed successfully"

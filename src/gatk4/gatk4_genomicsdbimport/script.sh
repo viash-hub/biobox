@@ -26,8 +26,30 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
+if [[ -n "$par_variant_index" && -z "$par_variant" ]]; then
+  echo "Error: --variant_index requires --variant." >&2
+  exit 1
+fi
+if [[ -n "$par_header_index" && -z "$par_header" ]]; then
+  echo "Error: --header_index requires --header." >&2
+  exit 1
+fi
+# GATK fails with "/ by zero" when --header is used with --variant
+if [[ -n "$par_header" && -n "$par_variant" ]]; then
+  echo "Error: --header can only be used with --sample_name_map, not with --variant." >&2
+  exit 1
+fi
+
+# Stage the inputs into a temp dir so GATK can find the companion files
+tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_genomicsdbimport.XXXXXX")
+trap 'rm -rf "$tmp_dir"' EXIT
+
+stage_vcfs_with_indexes "$tmp_dir" "$par_variant" "$par_variant_index" "--variant" "--variant" variant_args
+if [[ -n "$par_header" ]]; then
+  staged_header=$(stage_vcf_with_index "$tmp_dir" "$par_header" "$par_header_index" header) || exit 1
+fi
+
 # Convert semicolon-separated multi-value arguments into repeated flags
-split_multiple_to_flags "$par_variant" "--variant" variant_args
 split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
 split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
 
@@ -50,7 +72,7 @@ cmd_args=(
   ${par_genomicsdb_segment_size:+--genomicsdb-segment-size "$par_genomicsdb_segment_size"}
   ${par_genomicsdb_shared_posixfs_optimizations:+--genomicsdb-shared-posixfs-optimizations true}
   ${par_genomicsdb_vcf_buffer_size:+--genomicsdb-vcf-buffer-size "$par_genomicsdb_vcf_buffer_size"}
-  ${par_header:+--header "$par_header"}
+  ${staged_header:+--header "$staged_header"}
   ${par_max_num_intervals_to_import_in_parallel:+--max-num-intervals-to-import-in-parallel "$par_max_num_intervals_to_import_in_parallel"}
   ${par_merge_contigs_into_num_partitions:+--merge-contigs-into-num-partitions "$par_merge_contigs_into_num_partitions"}
   ${par_merge_input_intervals:+--merge-input-intervals true}
@@ -69,4 +91,7 @@ cmd_args=(
 )
 
 # Run GATK GenomicsDBImport
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" GenomicsDBImport "${variant_args[@]}" "${cmd_args[@]}"
+gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" GenomicsDBImport \
+  "${variant_args[@]}" \
+  "${cmd_args[@]}" \
+  --tmp-dir "$tmp_dir"

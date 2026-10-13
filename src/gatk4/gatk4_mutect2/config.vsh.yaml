@@ -370,9 +370,10 @@ argument_groups:
           order as the VCF files in `--exclude_intervals`. Other interval
           files do not get an index.
 
-          If not provided, a copy of each VCF `--exclude_intervals` file is
-          indexed before the run. If provided, one index must be given for
-          each VCF file in `--exclude_intervals`.
+          If not provided, a copy of each bgzipped VCF `--exclude_intervals`
+          file is indexed before the run. A plain `.vcf` file does not need an
+          index. If provided, one index must be given for each VCF file in
+          `--exclude_intervals`.
         example: [exclude_intervals.vcf.gz.tbi]
       - name: "--f1r2_max_depth"
         type: integer
@@ -446,9 +447,10 @@ argument_groups:
           the VCF files in `--intervals`. Other interval files do not get
           an index.
 
-          If not provided, a copy of each VCF `--intervals` file is indexed
-          before the run. If provided, one index must be given for each VCF
-          file in `--intervals`.
+          If not provided, a copy of each bgzipped VCF `--intervals` file is
+          indexed before the run. A plain `.vcf` file does not need an index.
+          If provided, one index must be given for each VCF file in
+          `--intervals`.
         example: [intervals.vcf.gz.tbi]
       - name: "--kmer_size"
         type: integer

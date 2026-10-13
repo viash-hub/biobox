@@ -41,7 +41,10 @@ stage_interval_files "$tmp_dir" "$par_exclude_intervals" "$par_exclude_intervals
   --exclude_intervals --exclude-intervals exclude_intervals_args
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
-staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant)
+# GATK reads a plain --variant VCF without an index, unless it must traverse
+# by intervals
+variant_index_optional=$([[ -z "$par_intervals" && -z "$par_exclude_intervals" ]] && echo true || echo false)
+staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
 
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))

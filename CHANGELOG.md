@@ -47,6 +47,13 @@
 * `minimap2/minimap2_align`: Reject `--cigar_bam` without `--bam` and
   `--cigar_paf` with `--bam` instead of silently ignoring the flag (PR #248).
 
+* `gatk4/*`: Add index arguments for all VCF inputs (PR #267).
+  Previously the index of a `.vcf.gz` input was not staged, so GATK could not find it and the run failed.
+  If no index is given, a bgzipped input is copied and indexed before the run.
+  A plain `.vcf` input is copied and indexed only if GATK needs an index for it.
+
+* `gatk4/gatk4_genomicsdbimport`: Stops with an error when `--header` is used with `--variant`, because GATK fails for this combination. (PR #267)
+
 # biobox 0.5.0
 
 ## BREAKING CHANGES

@@ -31,12 +31,24 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
-# Stage the reference trio into a temp dir using matching basenames so
-# GATK can find them
+if [[ -n "$par_dbsnp_index" && -z "$par_dbsnp" ]]; then
+  echo "Error: --dbsnp_index requires --dbsnp." >&2
+  exit 1
+fi
+if [[ -n "$par_population_callset_index" && -z "$par_population_callset" ]]; then
+  echo "Error: --population_callset_index requires --population_callset." >&2
+  exit 1
+fi
+if [[ -d "$par_variant" && -n "$par_variant_index" ]]; then
+  echo "Error: --variant_index cannot be used when --variant is a GenomicsDB workspace directory." >&2
+  exit 1
+fi
+
+# Stage the inputs into a temp dir so GATK can find the companion files
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_genotypegvcfs.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
-staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
+staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict") || exit 1
 
 # GATK requires a literal `gendb://` prefix to recognize a GenomicsDB
 # workspace. The `--variant` argument may be either a single GVCF file or a
@@ -44,7 +56,17 @@ staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_refere
 if [ -d "$par_variant" ]; then
   variant_arg="gendb://$par_variant"
 else
-  variant_arg="$par_variant"
+  # GATK reads a plain --variant VCF without an index, unless it must traverse
+  # by intervals
+  variant_index_optional=$([[ -z "$par_intervals" ]] && echo true || echo false)
+  variant_arg=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
+fi
+if [[ -n "$par_dbsnp" ]]; then
+  staged_dbsnp=$(stage_vcf_with_index "$tmp_dir" "$par_dbsnp" "$par_dbsnp_index" dbsnp) || exit 1
+fi
+if [[ -n "$par_population_callset" ]]; then
+  # GATK reads a plain --population_callset VCF without an index
+  staged_population_callset=$(stage_vcf_with_index "$tmp_dir" "$par_population_callset" "$par_population_callset_index" population_callset true) || exit 1
 fi
 
 # Convert semicolon-separated multi-value arguments into repeated flags
@@ -68,7 +90,7 @@ cmd_args=(
   "${annotation_group_args[@]}"
   "${annotations_to_exclude_args[@]}"
   ${par_call_genotypes:+--call-genotypes}
-  ${par_dbsnp:+--dbsnp "$par_dbsnp"}
+  ${staged_dbsnp:+--dbsnp "$staged_dbsnp"}
   ${par_disable_tool_default_annotations:+--disable-tool-default-annotations}
   ${par_enable_all_annotations:+--enable-all-annotations}
   "${force_output_intervals_args[@]}"
@@ -92,7 +114,7 @@ cmd_args=(
   ${par_num_reference_samples_if_no_call:+--num-reference-samples-if-no-call "$par_num_reference_samples_if_no_call"}
   ${par_only_output_calls_starting_in_intervals:+--only-output-calls-starting-in-intervals}
   ${par_pedigree:+--pedigree "$par_pedigree"}
-  ${par_population_callset:+--population-callset "$par_population_callset"}
+  ${staged_population_callset:+--population-callset "$staged_population_callset"}
   ${par_sample_ploidy:+--sample-ploidy "$par_sample_ploidy"}
   ${par_somatic_quality_threshold:+--somatic-quality-threshold "$par_somatic_quality_threshold"}
   ${par_stand_call_conf:+--standard-min-confidence-threshold-for-calling "$par_stand_call_conf"}

@@ -7,13 +7,30 @@ set -eo pipefail
 
 source "$meta_resources_dir/gatk4/script_helpers.sh"
 
-# Stage the reference trio and BAM/BAI into a temp dir using matching
-# basenames so GATK can find them
+# Check that an index is only given with its VCF input
+if [[ -n "$par_alleles_index" && -z "$par_alleles" ]]; then
+  echo "Error: --alleles_index requires --alleles." >&2
+  exit 1
+fi
+if [[ -n "$par_dbsnp_index" && -z "$par_dbsnp" ]]; then
+  echo "Error: --dbsnp_index requires --dbsnp." >&2
+  exit 1
+fi
+
+# Stage the reference trio, BAM/BAI and VCF inputs into a temp dir using
+# matching basenames so GATK can find them
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_haplotypecaller.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
 staged_bam=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
+
+if [[ -n "$par_alleles" ]]; then
+  staged_alleles=$(stage_vcf_with_index "$tmp_dir" "$par_alleles" "$par_alleles_index" alleles) || exit 1
+fi
+if [[ -n "$par_dbsnp" ]]; then
+  staged_dbsnp=$(stage_vcf_with_index "$tmp_dir" "$par_dbsnp" "$par_dbsnp_index" dbsnp) || exit 1
+fi
 
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
@@ -52,14 +69,14 @@ cmd_args=(
   --native-pair-hmm-threads "${meta_cpus:-1}"
   ${par_active_probability_threshold:+--active-probability-threshold "$par_active_probability_threshold"}
   ${par_activeregion_alt_multiplier:+--activeregion-alt-multiplier "$par_activeregion_alt_multiplier"}
-  ${par_alleles:+--alleles "$par_alleles"}
+  ${staged_alleles:+--alleles "$staged_alleles"}
   "${annotation_args[@]}"
   "${annotation_group_args[@]}"
   "${annotations_to_exclude_args[@]}"
   ${par_assembly_region_padding:+--assembly-region-padding "$par_assembly_region_padding"}
   ${par_base_quality_score_threshold:+--base-quality-score-threshold "$par_base_quality_score_threshold"}
   ${par_contamination_fraction_to_filter:+--contamination-fraction-to-filter "$par_contamination_fraction_to_filter"}
-  ${par_dbsnp:+--dbsnp "$par_dbsnp"}
+  ${staged_dbsnp:+--dbsnp "$staged_dbsnp"}
   ${par_disable_optimizations:+--disable-optimizations}
   ${par_dont_use_soft_clipped_bases:+--dont-use-soft-clipped-bases}
   ${par_emit_ref_confidence:+--emit-ref-confidence "$par_emit_ref_confidence"}

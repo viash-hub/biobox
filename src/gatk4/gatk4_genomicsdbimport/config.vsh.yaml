@@ -45,6 +45,17 @@ argument_groups:
           Each file must contain data for only a single sample. Either this
           or `--sample_name_map` must be specified.
         example: sample1.g.vcf.gz
+      - name: "--variant_index"
+        type: file
+        multiple: true
+        description: |
+          Index files for `--variant` (`.tbi` for a `.vcf.gz` file, `.idx`
+          for a `.vcf` file).
+
+          The index files are matched to `--variant` by order. If index files
+          are provided, one must be given for each `--variant` file. If not
+          provided, a copy of each `--variant` file is indexed before the run.
+        example: sample1.g.vcf.gz.tbi
       - name: "--sample_name_map"
         type: file
         description: |
@@ -161,7 +172,18 @@ argument_groups:
 
           Cannot be used together with an incremental import into an
           existing GenomicsDB workspace.
-        example: header.vcf
+
+          Can only be used with `--sample_name_map`, not with `--variant`.
+          GATK fails when `--header` is used with `--variant`.
+        example: header.vcf.gz
+      - name: "--header_index"
+        type: file
+        description: |
+          Index file for `--header` (`.tbi` for a `.vcf.gz` file, `.idx` for
+          a `.vcf` file).
+
+          If not provided, a copy of `--header` is indexed before the run.
+        example: header.vcf.gz.tbi
       - name: "--max_num_intervals_to_import_in_parallel"
         type: integer
         description: |
