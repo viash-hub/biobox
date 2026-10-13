@@ -5,19 +5,9 @@
 
 # Source the centralized test helpers
 source "$meta_resources_dir/test_helpers.sh"
+source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+gatk4_test_init
 
 # --- Test Case 1: Basic sequence dictionary creation ---
 log "Starting TEST 1: Basic sequence dictionary creation"
@@ -98,4 +88,4 @@ check_file_line_count "$meta_temp_dir/ref4.dict" 3 "sequence dictionary file lim
 
 log "✅ TEST 4 completed successfully"
 
-print_test_summary "All tests completed successfully"
+print_test_summary "All tests"

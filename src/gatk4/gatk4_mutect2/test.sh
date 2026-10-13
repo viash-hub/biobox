@@ -7,18 +7,8 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+# Set up the test environment and the test data directory
+gatk4_test_init
 
 # --- Build shared reference and BAM fixtures ---
 # A 500bp reference with a known SNV at chr1:250 (T>A). The tumor BAM has the
@@ -40,17 +30,8 @@ reference_args=(
   --reference_dict "$test_data_dir/reference.dict"
 )
 
-# Check that a VCF has the somatic test SNV at chr1:250
-check_snv_called() {
-  local vcf_path="$1"
-  local description="$2"
-  if grep -v '^#' "$vcf_path" | grep -q $'^chr1\t250\t.\tT\tA\t'; then
-    log "✓ $description has the chr1:250 T>A call"
-  else
-    log_error "✗ $description does not have the chr1:250 T>A call"
-    exit 1
-  fi
-}
+# Regex for a VCF record of the somatic test SNV at chr1:250 (T>A)
+snv_250=$'^chr1\t250\t.\tT\tA\t'
 
 # --- Test Case 1: Tumor-normal mode ---
 log "Starting TEST 1: Tumor-normal mode"
@@ -74,12 +55,11 @@ check_file_exists "$meta_temp_dir/tumor_normal.vcf" "output VCF file"
 check_file_contains "$meta_temp_dir/tumor_normal.vcf" "^##fileformat=VCF" "output VCF file header"
 check_file_contains "$meta_temp_dir/tumor_normal.vcf" "^##normal_sample=normal" "output VCF normal sample header"
 check_file_contains "$meta_temp_dir/tumor_normal.vcf" "^##tumor_sample=tumor" "output VCF tumor sample header"
-check_snv_called "$meta_temp_dir/tumor_normal.vcf" "output VCF file"
+check_vcf_has_record "$meta_temp_dir/tumor_normal.vcf" "$snv_250" "output VCF file (chr1:250 T>A call)"
 check_file_exists "$meta_temp_dir/tumor_normal.stats" "output stats file"
 check_file_contains "$meta_temp_dir/tumor_normal.stats" "callable" "output stats file"
 check_file_not_exists "$meta_temp_dir/tumor_normal.vcf.stats" "stats file next to the output VCF (moved to --output_stats)"
-check_file_exists "$meta_temp_dir/tumor_normal.idx" "output index file (Tribble index for a .vcf)"
-check_file_not_exists "$meta_temp_dir/tumor_normal.vcf.idx" "index next to the output VCF (moved to --output_index)"
+check_index_moved "$meta_temp_dir/tumor_normal.idx" "$meta_temp_dir/tumor_normal.vcf.idx" "output index file (Tribble index for a .vcf)"
 check_file_exists "$meta_temp_dir/tumor_normal_f1r2.tar.gz" "output F1R2 tarball"
 check_file_not_empty "$meta_temp_dir/tumor_normal_f1r2.tar.gz" "output F1R2 tarball"
 
@@ -102,16 +82,12 @@ mkdir -p "$meta_temp_dir/tumor_only"
 
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/tumor_only/tumor_only.vcf.gz" "output VCF file"
-if zcat "$meta_temp_dir/tumor_only/tumor_only.vcf.gz" | grep -q '^##normal_sample='; then
-  log_error "✗ Tumor-only output VCF has a normal sample header"
-  exit 1
-fi
 zcat "$meta_temp_dir/tumor_only/tumor_only.vcf.gz" > "$meta_temp_dir/tumor_only/tumor_only.vcf"
+check_file_not_contains "$meta_temp_dir/tumor_only/tumor_only.vcf" "^##normal_sample=" "tumor-only output VCF normal sample header"
 check_file_contains "$meta_temp_dir/tumor_only/tumor_only.vcf" "^##tumor_sample=tumor" "output VCF tumor sample header"
-check_snv_called "$meta_temp_dir/tumor_only/tumor_only.vcf" "output VCF file"
+check_vcf_has_record "$meta_temp_dir/tumor_only/tumor_only.vcf" "$snv_250" "output VCF file (chr1:250 T>A call)"
 check_file_exists "$meta_temp_dir/tumor_only/tumor_only.vcf.gz.stats" "output stats file"
-check_file_exists "$meta_temp_dir/tumor_only/tumor_only.tbi" "output index file (tabix index for a .vcf.gz)"
-check_file_not_exists "$meta_temp_dir/tumor_only/tumor_only.vcf.gz.tbi" "index next to the output VCF (moved to --output_index)"
+check_index_moved "$meta_temp_dir/tumor_only/tumor_only.tbi" "$meta_temp_dir/tumor_only/tumor_only.vcf.gz.tbi" "output index file (tabix index for a .vcf.gz)"
 
 log "Checking that only the expected files were written..."
 expected_files=$'tumor_only.tbi\ntumor_only.vcf\ntumor_only.vcf.gz\ntumor_only.vcf.gz.stats'
@@ -163,7 +139,7 @@ log "Executing $meta_name with an unindexed --germline_resource, an indexed --pa
   --output_index "$meta_temp_dir/resources.idx" 2>&1 | tee "$meta_temp_dir/test3.log"
 
 log "Validating TEST 3 outputs..."
-check_snv_called "$meta_temp_dir/resources.vcf" "output VCF file"
+check_vcf_has_record "$meta_temp_dir/resources.vcf" "$snv_250" "output VCF file (chr1:250 T>A call)"
 check_file_contains "$meta_temp_dir/resources.vcf" "germline-resource" "output VCF command line (germline resource used)"
 check_file_contains "$meta_temp_dir/resources.vcf" "panel-of-normals" "output VCF command line (panel of normals used)"
 check_file_contains "$meta_temp_dir/test3.log" "Warning: no index was provided for '.*germline_resource.vcf'" "run log (copy warning for the germline resource)"
@@ -201,11 +177,10 @@ log "Executing $meta_name with --bam_output and calling, annotation and assembly
   --dont_use_soft_clipped_bases
 
 log "Validating TEST 4 outputs..."
-check_snv_called "$meta_temp_dir/options.vcf" "output VCF file"
+check_vcf_has_record "$meta_temp_dir/options.vcf" "$snv_250" "output VCF file (chr1:250 T>A call)"
 check_file_exists "$meta_temp_dir/bamout.bam" "output bamout file"
 check_file_not_empty "$meta_temp_dir/bamout.bam" "output bamout file"
-check_file_exists "$meta_temp_dir/bamout_index.bai" "output bamout index file"
-check_file_not_exists "$meta_temp_dir/bamout.bai" "index next to the bamout file (moved to --bam_output_index)"
+check_index_moved "$meta_temp_dir/bamout_index.bai" "$meta_temp_dir/bamout.bai" "output bamout index file"
 check_file_contains "$meta_temp_dir/options.vcf" "max-mnp-distance 0" "output VCF command line (--max_mnp_distance)"
 check_file_contains "$meta_temp_dir/options.vcf" "pcr-indel-model NONE" "output VCF command line (--pcr_indel_model)"
 
@@ -245,61 +220,50 @@ log "✅ TEST 5 completed successfully"
 # --- Test Case 6: Invalid argument combinations ---
 log "Starting TEST 6: Invalid argument combinations fail"
 
-if "$meta_executable" \
+check_fails_with "Error: --read_index must be given once for each file in --input" "$meta_temp_dir/test6.log" \
+  "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
   --input "$test_data_dir/normal.bam" \
   --read_index "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/mismatch.vcf" \
   --output_stats "$meta_temp_dir/mismatch.stats" \
-  --output_index "$meta_temp_dir/mismatch.idx" > "$meta_temp_dir/test6.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with 2 --input files and 1 --read_index file"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test6.log" "Error: --read_index must be given once for each file in --input" "error message"
+  --output_index "$meta_temp_dir/mismatch.idx"
 
-if "$meta_executable" \
+check_fails_with "Error: --create_f1r2_tar_gz requires --f1r2_tar_gz" "$meta_temp_dir/test6_f1r2.log" \
+  "$meta_executable" \
   --input "$test_data_dir/tumor.bam" \
   --read_index "$test_data_dir/tumor.bai" \
   "${reference_args[@]}" \
   --output "$meta_temp_dir/no_f1r2.vcf" \
   --output_stats "$meta_temp_dir/no_f1r2.stats" \
   --output_index "$meta_temp_dir/no_f1r2.idx" \
-  --create_f1r2_tar_gz > "$meta_temp_dir/test6_f1r2.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --create_f1r2_tar_gz and no --f1r2_tar_gz"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test6_f1r2.log" "Error: --create_f1r2_tar_gz requires --f1r2_tar_gz" "error message"
+  --create_f1r2_tar_gz
 
-# Run $meta_executable with extra arguments and check that it fails with a
-# message
-check_fails_with() {
-  local message="$1"
-  local log_file="$2"
-  shift 2
-  if "$meta_executable" \
-    --input "$test_data_dir/tumor.bam" \
-    --read_index "$test_data_dir/tumor.bai" \
-    "${reference_args[@]}" \
-    --output "$meta_temp_dir/fail.vcf" \
-    --output_stats "$meta_temp_dir/fail.stats" \
-    "$@" > "$log_file" 2>&1; then
-    log_error "✗ $meta_name did not fail with: $*"
-    exit 1
-  fi
-  check_file_contains "$log_file" "$message" "error message"
-}
+# The arguments of a tumor-only run that the cases below add to
+fail_args=(
+  --input "$test_data_dir/tumor.bam"
+  --read_index "$test_data_dir/tumor.bai"
+  "${reference_args[@]}"
+  --output "$meta_temp_dir/fail.vcf"
+  --output_stats "$meta_temp_dir/fail.stats"
+)
 
-check_fails_with "Error: --output_index is required unless" "$meta_temp_dir/test6_output_index.log"
-check_fails_with "Error: --create_bam_output requires --bam_output\." "$meta_temp_dir/test6_bam_output.log" \
+check_fails_with "Error: --output_index is required unless" "$meta_temp_dir/test6_output_index.log" \
+  "$meta_executable" "${fail_args[@]}"
+check_fails_with "Error: --create_bam_output requires --bam_output." "$meta_temp_dir/test6_bam_output.log" \
+  "$meta_executable" "${fail_args[@]}" \
   --output_index "$meta_temp_dir/fail.idx" --create_bam_output
 check_fails_with "Error: --bam_output_index is required unless --create_output_bam_index is false." "$meta_temp_dir/test6_bam_output_index.log" \
+  "$meta_executable" "${fail_args[@]}" \
   --output_index "$meta_temp_dir/fail.idx" --create_bam_output --bam_output "$meta_temp_dir/fail.bam"
 check_fails_with "Error: --bam_output must be a BAM file, GATK cannot write CRAM here." "$meta_temp_dir/test6_bam_output_cram.log" \
+  "$meta_executable" "${fail_args[@]}" \
   --output_index "$meta_temp_dir/fail.idx" --create_bam_output --bam_output "$meta_temp_dir/fail.cram" \
   --bam_output_index "$meta_temp_dir/fail.crai"
 check_file_not_contains "$meta_temp_dir/test6_bam_output_cram.log" "Mutect2 done" "run log (GATK did not run)"
 check_fails_with "Error: --alleles_index requires --alleles." "$meta_temp_dir/test6_alleles_index.log" \
+  "$meta_executable" "${fail_args[@]}" \
   --output_index "$meta_temp_dir/fail.idx" --alleles_index "$test_data_dir/indexed/pon.vcf.idx"
 
 log "✅ TEST 6 completed successfully"
@@ -359,13 +323,8 @@ log "Executing $meta_name with --alleles and --alleles_index..."
   --output_index "$meta_temp_dir/alleles.idx"
 
 log "Validating TEST 8 outputs..."
-check_snv_called "$meta_temp_dir/alleles.vcf" "output VCF file"
-if grep -v '^#' "$meta_temp_dir/alleles.vcf" | grep -q $'^chr1\t300\t'; then
-  log "✓ The force-called chr1:300 allele is in the output"
-else
-  log_error "✗ The force-called chr1:300 allele is not in the output"
-  exit 1
-fi
+check_vcf_has_record "$meta_temp_dir/alleles.vcf" "$snv_250" "output VCF file (chr1:250 T>A call)"
+check_vcf_has_record "$meta_temp_dir/alleles.vcf" $'^chr1\t300\t' "output VCF file (force-called chr1:300 allele)"
 
 log "✅ TEST 8 completed successfully"
 
@@ -385,11 +344,7 @@ log "Executing $meta_name with an --intervals file next to the SNV, without padd
   --output_stats "$meta_temp_dir/no_padding.stats" \
   --output_index "$meta_temp_dir/no_padding.idx"
 
-if grep -v '^#' "$meta_temp_dir/no_padding.vcf" | grep -q $'^chr1\t250\t'; then
-  log_error "✗ The chr1:250 SNV is in the output without padding"
-  exit 1
-fi
-log "✓ The chr1:250 SNV is not in the output (outside the interval)"
+check_vcf_lacks_record "$meta_temp_dir/no_padding.vcf" $'^chr1\t250\t' "output VCF file (chr1:250 SNV outside the interval)"
 
 log "Executing $meta_name with the same --intervals file, --interval_padding 5 and --interval_merging_rule OVERLAPPING_ONLY..."
 "$meta_executable" \
@@ -403,7 +358,7 @@ log "Executing $meta_name with the same --intervals file, --interval_padding 5 a
   --output_stats "$meta_temp_dir/padding.stats" \
   --output_index "$meta_temp_dir/padding.idx"
 
-check_snv_called "$meta_temp_dir/padding.vcf" "output VCF file (padded interval)"
+check_vcf_has_record "$meta_temp_dir/padding.vcf" "$snv_250" "output VCF file (padded interval) (chr1:250 T>A call)"
 check_file_contains "$meta_temp_dir/padding.vcf" "interval-padding 5" "output VCF command line (--interval_padding)"
 check_file_contains "$meta_temp_dir/padding.vcf" "interval-merging-rule OVERLAPPING_ONLY" "output VCF command line (--interval_merging_rule)"
 
@@ -429,7 +384,7 @@ create_test_cram "$test_data_dir/tumor.bam" "$test_data_dir/reference.fasta" \
 log "Validating TEST 10 outputs..."
 check_file_contains "$meta_temp_dir/cram_normal.vcf" "^##normal_sample=normal" "output VCF normal sample header (CRAM input)"
 check_file_contains "$meta_temp_dir/cram_normal.vcf" "^##tumor_sample=tumor" "output VCF tumor sample header (CRAM input)"
-check_snv_called "$meta_temp_dir/cram_normal.vcf" "output VCF file (CRAM input)"
+check_vcf_has_record "$meta_temp_dir/cram_normal.vcf" "$snv_250" "output VCF file (CRAM input) (chr1:250 T>A call)"
 check_file_exists "$meta_temp_dir/cram_normal.idx" "output index file (CRAM input)"
 
 log "✅ TEST 10 completed successfully"
@@ -450,11 +405,7 @@ log "Executing $meta_name with --min_read_length 101..."
 
 log "Validating TEST 11 outputs..."
 check_file_contains "$meta_temp_dir/test11.log" "16 read(s) filtered by: ReadLengthReadFilter" "run log (all 16 reads filtered)"
-if grep -v '^#' "$meta_temp_dir/min_read_length.vcf" | grep -q .; then
-  log_error "✗ output VCF has calls, expected none when all reads are filtered"
-  exit 1
-fi
-log "✓ output VCF has no calls when all reads are filtered"
+check_vcf_record_count "$meta_temp_dir/min_read_length.vcf" 0 "output VCF file (all reads filtered)"
 
 log "✅ TEST 11 completed successfully"
 
@@ -478,7 +429,7 @@ log "Executing $meta_name with the options..."
   --output_index "$meta_temp_dir/options2.idx" > "$meta_temp_dir/test12.log" 2>&1
 
 log "Validating TEST 12 outputs..."
-check_snv_called "$meta_temp_dir/options2.vcf" "output VCF file (options)"
+check_vcf_has_record "$meta_temp_dir/options2.vcf" "$snv_250" "output VCF file (options) (chr1:250 T>A call)"
 check_file_contains "$meta_temp_dir/test12.log" "0 read(s) filtered by: ReadLengthReadFilter" "run log (no reads filtered by length)"
 check_file_contains "$meta_temp_dir/test12.log" "0 read(s) filtered by: MappingQualityReadFilter" "run log (no reads filtered by mapping quality)"
 check_file_contains "$meta_temp_dir/options2.vcf" "max-read-length 100" "output VCF command line (--max_read_length)"

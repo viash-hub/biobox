@@ -7,18 +7,7 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+gatk4_test_init
 
 #############################################
 # Shared fixtures: reference genome + BAM
@@ -28,6 +17,11 @@ create_test_reference "$test_data_dir/ref.fasta" 1 1000
 check_file_exists "$test_data_dir/ref.fasta" "test reference genome"
 check_file_exists "$test_data_dir/ref.dict" "reference sequence dictionary"
 check_file_exists "$test_data_dir/ref.fasta.fai" "reference FASTA index"
+reference_args=(
+  --reference "$test_data_dir/ref.fasta"
+  --reference_fai "$test_data_dir/ref.fasta.fai"
+  --reference_dict "$test_data_dir/ref.dict"
+)
 
 sam_file="$test_data_dir/reads.sam"
 create_test_sam_reads "$sam_file" seq1 1000 rg1 sample1 10 100
@@ -49,9 +43,7 @@ log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/ref.fasta" \
-  --reference_fai "$test_data_dir/ref.fasta.fai" \
-  --reference_dict "$test_data_dir/ref.dict" \
+  "${reference_args[@]}" \
   --known_sites "$known_sites1" \
   --output "$meta_temp_dir/recal1.table"
 
@@ -74,9 +66,7 @@ log "Executing $meta_name with multiple known-sites files and custom options..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/ref.fasta" \
-  --reference_fai "$test_data_dir/ref.fasta.fai" \
-  --reference_dict "$test_data_dir/ref.dict" \
+  "${reference_args[@]}" \
   --known_sites "$known_sites1" \
   --known_sites "$known_sites2" \
   --low_quality_tail 5 \
@@ -103,9 +93,7 @@ log "Executing $meta_name with --interval_padding, --read_filter and --disable_t
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/ref.fasta" \
-  --reference_fai "$test_data_dir/ref.fasta.fai" \
-  --reference_dict "$test_data_dir/ref.dict" \
+  "${reference_args[@]}" \
   --known_sites "$known_sites1" \
   --interval_padding 10 \
   --read_filter MappingQualityReadFilter \
@@ -131,9 +119,7 @@ log "Executing $meta_name with --known_sites_index..."
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/ref.fasta" \
-  --reference_fai "$test_data_dir/ref.fasta.fai" \
-  --reference_dict "$test_data_dir/ref.dict" \
+  "${reference_args[@]}" \
   --known_sites "$test_data_dir/known_sites1.vcf.gz" \
   --known_sites "$test_data_dir/known_sites2.vcf.gz" \
   --known_sites_index "$test_data_dir/indexes/known_sites1.vcf.gz.tbi" \
@@ -156,9 +142,7 @@ log "Executing $meta_name with a .vcf.gz known-sites file and no --known_sites_i
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/ref.fasta" \
-  --reference_fai "$test_data_dir/ref.fasta.fai" \
-  --reference_dict "$test_data_dir/ref.dict" \
+  "${reference_args[@]}" \
   --known_sites "$test_data_dir/known_sites1.vcf.gz" \
   --output "$meta_temp_dir/recal_no_index.table" 2> "$meta_temp_dir/test5.log"
 
@@ -174,20 +158,15 @@ log "✅ TEST 5 completed successfully"
 log "Starting TEST 6: Fewer --known_sites_index files than --known_sites files"
 
 log "Executing $meta_name with two known-sites files and one index (should fail)..."
-if "$meta_executable" \
+check_fails_with "Error: --known_sites_index must be given once for each file in --known_sites" "$meta_temp_dir/test6.log" \
+  "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/ref.fasta" \
-  --reference_fai "$test_data_dir/ref.fasta.fai" \
-  --reference_dict "$test_data_dir/ref.dict" \
+  "${reference_args[@]}" \
   --known_sites "$test_data_dir/known_sites1.vcf.gz" \
   --known_sites "$test_data_dir/known_sites2.vcf.gz" \
   --known_sites_index "$test_data_dir/indexes/known_sites1.vcf.gz.tbi" \
-  --output "$meta_temp_dir/recal_bad.table" > "$meta_temp_dir/test6.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with fewer --known_sites_index files than --known_sites files"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test6.log" "Error: --known_sites_index must be given once for each file in --known_sites" "error message"
+  --output "$meta_temp_dir/recal_bad.table"
 
 log "✅ TEST 6 completed successfully"
 
@@ -207,9 +186,7 @@ log "Executing $meta_name with two --intervals files, --intervals_index and --in
 "$meta_executable" \
   --input "$test_data_dir/reads.sorted.bam" \
   --read_index "$test_data_dir/reads.sorted.bai" \
-  --reference "$test_data_dir/ref.fasta" \
-  --reference_fai "$test_data_dir/ref.fasta.fai" \
-  --reference_dict "$test_data_dir/ref.dict" \
+  "${reference_args[@]}" \
   --known_sites "$known_sites1" \
   --output "$meta_temp_dir/recal_intervals.table" \
   --intervals "$test_data_dir/intervals_a.bed" \
@@ -243,9 +220,7 @@ log "Executing $meta_name with a CRAM --input and --read_index..."
 "$meta_executable" \
   --input "$test_data_dir/cram/reads.cram" \
   --read_index "$test_data_dir/cram_index/reads.cram.crai" \
-  --reference "$test_data_dir/ref.fasta" \
-  --reference_fai "$test_data_dir/ref.fasta.fai" \
-  --reference_dict "$test_data_dir/ref.dict" \
+  "${reference_args[@]}" \
   --known_sites "$known_sites1" \
   --output "$meta_temp_dir/recal_cram.table"
 
@@ -285,9 +260,7 @@ log "Executing $meta_name with two --input and --read_index files..."
   --read_index "$test_data_dir/reads.sorted.bai" \
   --input "$test_data_dir/reads_rg2.sorted.bam" \
   --read_index "$test_data_dir/reads_rg2.sorted.bai" \
-  --reference "$test_data_dir/ref.fasta" \
-  --reference_fai "$test_data_dir/ref.fasta.fai" \
-  --reference_dict "$test_data_dir/ref.dict" \
+  "${reference_args[@]}" \
   --known_sites "$known_sites1" \
   --output "$meta_temp_dir/recal_two_inputs.table"
 

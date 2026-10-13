@@ -7,18 +7,7 @@
 source "$meta_resources_dir/test_helpers.sh"
 source "$meta_resources_dir/gatk4/test_helpers.sh"
 
-# Initialize test environment with strict error handling
-setup_test_env
-
-#############################################
-# Test execution with centralized functions
-#############################################
-
-log "Starting tests for $meta_name"
-
-# Create test data directory
-test_data_dir="$meta_temp_dir/test_data"
-mkdir -p "$test_data_dir"
+gatk4_test_init
 
 #############################################
 # Shared fixtures: reference genome + BAM + BQSR recal table
@@ -67,9 +56,7 @@ log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
   --read_index "$test_data_dir/sample.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test1/output.bam" \
   --output_index "$meta_temp_dir/test1_index/recalibrated.bai"
@@ -77,9 +64,8 @@ log "Executing $meta_name with basic parameters..."
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/test1/output.bam" "recalibrated BAM"
 check_file_not_empty "$meta_temp_dir/test1/output.bam" "recalibrated BAM"
-check_file_exists "$meta_temp_dir/test1_index/recalibrated.bai" "output BAM index"
+check_index_moved "$meta_temp_dir/test1_index/recalibrated.bai" "$meta_temp_dir/test1/output.bai" "output BAM index"
 check_file_not_empty "$meta_temp_dir/test1_index/recalibrated.bai" "output BAM index"
-check_file_not_exists "$meta_temp_dir/test1/output.bai" "index next to the output BAM (moved to --output_index)"
 
 log "Validating recalibrated BAM with ValidateSamFile..."
 gatk ValidateSamFile \
@@ -104,9 +90,7 @@ log "Executing $meta_name with advanced parameters..."
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
   --read_index "$test_data_dir/sample.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test2/output.bam" \
   --output_index "$meta_temp_dir/test2/output.bai" \
@@ -160,9 +144,7 @@ log "Executing $meta_name with --interval_padding, --read_validation_stringency,
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
   --read_index "$test_data_dir/sample.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test4/output.bam" \
   --interval_padding 10 \
@@ -182,15 +164,12 @@ log "Starting TEST 5: --output_index is required unless --create_output_bam_inde
 
 mkdir -p "$meta_temp_dir/test5"
 
-if "$meta_executable" \
+check_fails_with "Error: --output_index is required unless --create_output_bam_index is false." "$meta_temp_dir/test5/run.log" \
+  "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
   --read_index "$test_data_dir/sample.sorted.bai" \
   --bqsr_recal_file "$recal_table" \
-  --output "$meta_temp_dir/test5/output.bam" > "$meta_temp_dir/test5/run.log" 2>&1; then
-  log_error "✗ $meta_name did not fail without --output_index"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test5/run.log" "Error: --output_index is required unless --create_output_bam_index is false." "error message"
+  --output "$meta_temp_dir/test5/output.bam"
 check_file_not_exists "$meta_temp_dir/test5/output.bam" "output BAM (should not be written)"
 
 log "✅ TEST 5 completed successfully"
@@ -212,9 +191,7 @@ log "Executing $meta_name with two --intervals files, --intervals_index and --ex
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
   --read_index "$test_data_dir/sample.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test6/output.bam" \
   --output_index "$meta_temp_dir/test6/output.bai" \
@@ -253,9 +230,7 @@ log "Executing $meta_name with a CRAM --input and --read_index..."
 "$meta_executable" \
   --input "$test_data_dir/cram/sample.cram" \
   --read_index "$test_data_dir/cram_index/sample.cram.crai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test7/output.bam" \
   --output_index "$meta_temp_dir/test7/output.bai"
@@ -290,17 +265,14 @@ log "Executing $meta_name with a CRAM --output..."
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
   --read_index "$test_data_dir/sample.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test8/output.cram" \
   --output_index "$meta_temp_dir/test8_index/output.cram.bai"
 
 log "Validating TEST 8 outputs..."
 check_file_exists "$meta_temp_dir/test8/output.cram" "recalibrated CRAM"
-check_file_exists "$meta_temp_dir/test8_index/output.cram.bai" "output CRAM index"
-check_file_not_exists "$meta_temp_dir/test8/output.cram.bai" "index next to the output CRAM (moved to --output_index)"
+check_index_moved "$meta_temp_dir/test8_index/output.cram.bai" "$meta_temp_dir/test8/output.cram.bai" "output CRAM index"
 check_file_not_exists "$meta_temp_dir/test8/output.cram.crai" "CRAI index next to the output CRAM"
 check_file_not_exists "$meta_temp_dir/test8/output.bai" "BAI index next to the output CRAM"
 
@@ -332,16 +304,13 @@ log "Starting TEST 9: CRAM --input without --reference"
 
 mkdir -p "$meta_temp_dir/test9"
 
-if "$meta_executable" \
+check_fails_with "Error: --reference is required for CRAM input or output." "$meta_temp_dir/test9/run.log" \
+  "$meta_executable" \
   --input "$test_data_dir/cram/sample.cram" \
   --read_index "$test_data_dir/cram_index/sample.cram.crai" \
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test9/output.bam" \
-  --output_index "$meta_temp_dir/test9/output.bai" > "$meta_temp_dir/test9/run.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with a CRAM --input and no --reference"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test9/run.log" "Error: --reference is required for CRAM input or output." "error message"
+  --output_index "$meta_temp_dir/test9/output.bai"
 check_file_not_exists "$meta_temp_dir/test9/output.bam" "output BAM (should not be written)"
 
 log "✅ TEST 9 completed successfully"
@@ -356,9 +325,7 @@ log "Executing $meta_name with --inverted_read_filter MappedReadFilter..."
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
   --read_index "$test_data_dir/sample.sorted.bai" \
-  --reference "$test_data_dir/reference.fasta" \
-  --reference_fai "$test_data_dir/reference.fasta.fai" \
-  --reference_dict "$test_data_dir/reference.dict" \
+  "${reference_args[@]}" \
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test10/output.bam" \
   --output_index "$meta_temp_dir/test10/output.bai" \
@@ -488,17 +455,14 @@ log "Starting TEST 13: Fewer --read_index files than --input files fails"
 
 mkdir -p "$meta_temp_dir/test13"
 
-if "$meta_executable" \
+check_fails_with "Error: --read_index must be given once for each file in --input" "$meta_temp_dir/test13/run.log" \
+  "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
   --input "$test_data_dir/sample_rg2.sorted.bam" \
   --read_index "$test_data_dir/sample.sorted.bai" \
   --bqsr_recal_file "$recal_table_two" \
   --output "$meta_temp_dir/test13/output.bam" \
-  --output_index "$meta_temp_dir/test13/output.bai" > "$meta_temp_dir/test13/run.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with fewer --read_index files than --input files"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test13/run.log" "Error: --read_index must be given once for each file in --input" "error message"
+  --output_index "$meta_temp_dir/test13/output.bai"
 check_file_not_exists "$meta_temp_dir/test13/output.bam" "output BAM (should not be written)"
 
 log "✅ TEST 13 completed successfully"
