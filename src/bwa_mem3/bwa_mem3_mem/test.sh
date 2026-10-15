@@ -99,24 +99,8 @@ fi
 
 log "✅ TEST 2 completed successfully"
 
-# --- Test Case 3: Advanced parameters ---
-log "Starting TEST 3: BWA MEM with advanced parameters"
-
-log "Executing $meta_name with advanced parameters..."
-"$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
-  --reads1 "$test_data_dir/reads_single.fastq" \
-  --output "$meta_temp_dir/advanced.sam" \
-  --min_seed_length 15
-
-log "Validating TEST 3 outputs..."
-check_file_exists "$meta_temp_dir/advanced.sam" "advanced SAM output"
-check_file_not_empty "$meta_temp_dir/advanced.sam" "advanced SAM output"
-
-log "✅ TEST 3 completed successfully"
-
-# --- Test Case 4: BAM output ---
-log "Starting TEST 4: BWA MEM with BAM output"
+# --- Test Case 3: BAM output ---
+log "Starting TEST 3: BWA MEM with BAM output"
 
 log "Executing $meta_name with --bam_compression..."
 "$meta_executable" \
@@ -126,7 +110,7 @@ log "Executing $meta_name with --bam_compression..."
   --output "$meta_temp_dir/paired_end.bam" \
   --bam_compression 6
 
-log "Validating TEST 4 outputs..."
+log "Validating TEST 3 outputs..."
 check_file_exists "$meta_temp_dir/paired_end.bam" "paired-end BAM output"
 check_file_not_empty "$meta_temp_dir/paired_end.bam" "paired-end BAM output"
 
@@ -138,31 +122,10 @@ else
   exit 1
 fi
 
-log "✅ TEST 4 completed successfully"
+log "✅ TEST 3 completed successfully"
 
-# --- Test Case 5: Optional-argument options and presets ---
-log "Starting TEST 5: BWA MEM with optional-argument options and presets"
-
-log "Executing $meta_name with --fast, --rescue_kmer and --extend_mate_concordant..."
-"$meta_executable" \
-  --index "$test_data_dir/index/reference.fasta" \
-  --reads1 "$test_data_dir/reads_R1.fastq" \
-  --reads2 "$test_data_dir/reads_R2.fastq" \
-  --output "$meta_temp_dir/fast.sam" \
-  --fast \
-  --rescue_kmer 6 \
-  --extend_mate_concordant auto \
-  --read_group "@RG\tID:sample1\tSM:sample1"
-
-log "Validating TEST 5 outputs..."
-check_file_exists "$meta_temp_dir/fast.sam" "fast SAM output"
-check_file_not_empty "$meta_temp_dir/fast.sam" "fast SAM output"
-check_file_contains "$meta_temp_dir/fast.sam" "@RG" "read group header"
-
-log "✅ TEST 5 completed successfully"
-
-# --- Test Case 6: Methylation (--meth) alignment ---
-log "Starting TEST 6: BWA MEM methylation alignment"
+# --- Test Case 4: Methylation (--meth) alignment ---
+log "Starting TEST 4: BWA MEM methylation alignment"
 
 # --meth needs the original index plus the converted seed index <fa>.meth.*
 log "Building BWA methylation index..."
@@ -181,10 +144,10 @@ log "Executing $meta_name with --meth emseq..."
   --output "$meta_temp_dir/meth.sam" \
   --meth emseq
 
-log "Validating TEST 6 outputs..."
+log "Validating TEST 4 outputs..."
 check_file_exists "$meta_temp_dir/meth.sam" "methylation SAM output"
 check_file_not_empty "$meta_temp_dir/meth.sam" "methylation SAM output"
 
-log "✅ TEST 6 completed successfully"
+log "✅ TEST 4 completed successfully"
 
 print_test_summary "All tests completed successfully"

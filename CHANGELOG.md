@@ -4,8 +4,8 @@
 
 * `snpeff`: Added `snpeff_download`: Download a pre-built SnpEff reference genome database (PR #224)
 
-* `bwa_mem3`: Added support for bwa-mem3, a drop-in replacement for bwa-mem2 with BAM output and inline methylation (EM-seq/TAPS) alignment (PR #xxx):
-  - `bwa_mem3/bwa_mem3_mem`: Align single-end or paired-end reads against a bwa-mem3 index, writing SAM or BAM.
+* `bwa_mem3`: Added support for bwa-mem3, a drop-in replacement for bwa-mem2 with BAM output and inline methylation (EM-seq/TAPS) alignment:
+  - `bwa_mem3/bwa_mem3_mem`: Align single-end or paired-end reads against a bwa-mem3 index, writing SAM or BAM (PR #276).
 
 ## MINOR CHANGES
 
