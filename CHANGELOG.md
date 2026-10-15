@@ -83,6 +83,9 @@
 
 * `cellranger_mkref`: updated Cell Ranger to v10 (PR #240).
 
+* `bwa_mem3`: Added support for bwa-mem3, a drop-in replacement for bwa-mem2 with BAM output and inline methylation (EM-seq/TAPS) alignment:
+  - `bwa_mem3/bwa_mem3_mem`: Align single-end or paired-end reads against a bwa-mem3 index, writing SAM or BAM (PR #276).
+
 ## MINOR CHANGES
 
 * `bases2fastq`: Bump version to 2.4.0 (PR #221).
