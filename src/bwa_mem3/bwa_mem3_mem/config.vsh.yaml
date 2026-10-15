@@ -83,6 +83,14 @@ argument_groups:
         type: double
         description: Look for internal seeds inside a seed longer than {-k} * FLOAT.
         default: 1.5
+      - name: "--split_width"
+        alternatives: [-s]
+        type: integer
+        description: |
+          Re-seed (second seeding pass) only seeds with at most INT occurrences. Under `--meth --fast`
+          this is set to 2 unless given explicitly. Default is 10.
+        example: 10
+        min: 0
       - name: "--seed_occurrence"
         alternatives: [-y]
         type: integer
@@ -247,6 +255,17 @@ argument_groups:
         description: |
           Map Hi-C reads; equivalent to -5SP (`-P` alone still runs mate rescue; use `--hic` to skip
           it too).
+      - name: "--read_type"
+        alternatives: [-x]
+        type: string
+        description: |
+          Read type preset. Explicitly set options override the preset values. bwa-mem3 warns that
+          it does not work well with long reads or contigs; prefer minimap2 for those.
+            * `pacbio`, `pbref`: -k17 -W40 -r10 -A1 -B1 -O1 -E1 -L0 (PacBio reads to ref).
+            * `ont2d`: -k14 -W20 -r10 -A1 -B1 -O1 -E1 -L0 (Oxford Nanopore 2D-reads to ref).
+            * `intractg`: -B9 -O16 -L5 (intra-species contigs to ref).
+        choices: [pacbio, pbref, ont2d, intractg]
+        example: pacbio
       - name: "--fast"
         type: boolean_true
         description: |
@@ -464,7 +483,7 @@ argument_groups:
         type: string
         description: |
           Which Bismark tags to emit: `all`, `none`, a comma-separated list (e.g. `XR,XG`), or
-          exclusions prefixed with `-` (e.g. `-XM`). XM:Z dominates the BAM's aux payload; `-XM` drops
+          exclusions prefixed with `^` or `-` (e.g. `^XM`, `-XM`). XM:Z dominates the BAM's aux payload; `-XM` drops
           it for callers that recompute from the reference (MethylDackel, biscuit). Keep XM for
           Bismark-family tools. Default is all.
         example: "all"
@@ -499,7 +518,9 @@ argument_groups:
     arguments:
       - name: "--seed_order"
         type: string
-        description: Seed emission order before chaining. Default is off.
+        description: |
+          Seed emission order before chaining. `off` and `local-longest` are the documented modes;
+          `global-longest`, `absorb-count` and `most-absorb` are advanced modes. Default is off.
         choices: ["off", local-longest, global-longest, absorb-count, most-absorb]
         example: "off"
 
