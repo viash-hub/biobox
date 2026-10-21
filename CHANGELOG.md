@@ -36,6 +36,12 @@
 
 ## MINOR CHANGES
 
+* `gatk4/*`: Standardise component behaviour (PR #274).
+  - `gatk4_selectvariants` now passes its temp dir to GATK
+  - `gatk4_mutect2` stops with an error when an index is given without its resource VCF
+  - `gatk4_applybqsr`, `gatk4_getpileupsummaries`, `gatk4_selectvariants` and `gatk4_variantfiltration` stop with an error when `--reference_fai` or `--reference_dict` is given without `--reference`
+  - Standardise argument groups and descriptions across components
+
 * `gatk4/*`: Add `--lenient` to all components with GATK engine options, and `--read_validation_stringency` and `--inverted_read_filter` to the components that read BAM/CRAM files (PR #273).
 
 * `gatk4/*`: Add missing arguments (PR #273).

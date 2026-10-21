@@ -1,0 +1,22 @@
+namespace: gatk4
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  bibtex:
+    - |
+      @book{VanderAuwera2020,
+        author = {{Van der Auwera}, Geraldine A. and O'Connor, Brian D.},
+        title = {Genomics in the Cloud: Using Docker, GATK, and WDL in Terra},
+        edition = {1st},
+        publisher = {O'Reilly Media},
+        year = {2020},
+        isbn = {9781491975190}
+      }
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]

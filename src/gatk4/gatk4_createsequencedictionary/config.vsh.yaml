@@ -1,5 +1,4 @@
 name: gatk4_createsequencedictionary
-namespace: gatk4
 description: |
   Creates a sequence dictionary (`.dict` file) for a reference sequence.
 
@@ -9,21 +8,8 @@ description: |
   dictionary is required by many GATK tools (such as `HaplotypeCaller`)
   that process the reference genome.
 keywords: [reference, indexing, GATK, GATK4, sequence dictionary]
-links:
-  homepage: https://gatk.broadinstitute.org
-  documentation: https://gatk.broadinstitute.org/hc/en-us
-  repository: https://github.com/broadinstitute/gatk
 references:
   bibtex:
-    - |
-      @book{VanderAuwera2020,
-        author = {{Van der Auwera}, Geraldine A. and O'Connor, Brian D.},
-        title = {Genomics in the Cloud: Using Docker, GATK, and WDL in Terra},
-        edition = {1st},
-        publisher = {O'Reilly Media},
-        year = {2020},
-        isbn = {9781491975190}
-      }
     - |
       @misc{Picard2019toolkit,
         title = {Picard toolkit},
@@ -32,12 +18,6 @@ references:
         journal = {Broad Institute, GitHub repository},
         howpublished = {\url{https://broadinstitute.github.io/picard/}}
       }
-license: Apache-2.0
-requirements:
-  commands: [gatk]
-authors:
-  - __merge__: /src/_authors/luke_zappia.yaml
-    roles: [author, maintainer]
 
 argument_groups:
   - name: "Input"
@@ -108,18 +88,6 @@ argument_groups:
           describing where the reference file can be found. If not supplied,
           the absolute path of the input reference file is used.
 
-resources:
-  - type: bash_script
-    path: script.sh
-
-test_resources:
-  - type: bash_script
-    path: test.sh
-  - path: /src/_utils/test_helpers.sh
-
-engines:
-  - __merge__: /src/gatk4/utils/common_engines.yaml
-
-runners:
-  - type: executable
-  - type: nextflow
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml

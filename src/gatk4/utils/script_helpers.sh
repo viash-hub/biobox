@@ -27,6 +27,118 @@ split_multiple_to_flags() {
   fi
 }
 
+# Return success if a boolean argument value is set and not "false"
+#
+# Usage: if is_true "$par_flag"; then ...; fi
+is_true() {
+  [[ -n "${1:-}" && "$1" != "false" ]]
+}
+
+# Unset `boolean_true` argument variables that are "false", so that
+# `${par_x:+--flag}` only adds the flag when the argument is set.
+# Only use it for `boolean_true` arguments.
+#
+# Usage: unset_if_false par_a par_b ...
+unset_if_false() {
+  local par
+  for par in "$@"; do
+    if [[ "${!par:-}" == "false" ]]; then
+      unset "$par"
+    fi
+  done
+}
+
+# Create a temp dir for the component in $meta_temp_dir and remove it when the
+# script exits. Sets the `tmp_dir` variable. Call it directly, not in $(...),
+# so that the trap is set in the main shell.
+#
+# Usage: setup_tmp_dir
+setup_tmp_dir() {
+  tmp_dir=$(mktemp -d "$meta_temp_dir/${meta_name}.XXXXXX") || exit 1
+  trap 'rm -rf "$tmp_dir"' EXIT
+}
+
+# Run a GATK (or Picard) tool with the JVM heap set to 80% of the memory given
+# to the task (fallback 3072 MB, as in the nf-core GATK4 modules). The other 20%
+# is left for memory outside the heap.
+#
+# Usage: run_gatk Tool [arguments...]
+run_gatk() {
+  local tool="$1"
+  shift
+  local avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
+  gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" "$tool" "$@"
+}
+
+# Stop with an error if an output that is only written on request is requested
+# (`--create_*` is set) but its path is not given.
+#
+# Usage: require_output_if_created "$par_create_x" "$par_x" --create_x --x
+require_output_if_created() {
+  local create="$1"
+  local output="$2"
+  local create_arg="$3"
+  local output_arg="$4"
+
+  if is_true "$create" && [[ -z "$output" ]]; then
+    echo "Error: $create_arg requires $output_arg." >&2
+    exit 1
+  fi
+}
+
+# Stop with an error if an index output is not given although GATK will write
+# the index. For the GATK index options (`--create_output_variant_index`,
+# `--create_output_bam_index`), the index is written unless the option is
+# "false".
+#
+# Usage: require_output_index "$par_output_index" "$par_create_output_variant_index" \
+#          --output_index --create_output_variant_index
+require_output_index() {
+  local output_index="$1"
+  local create_index="$2"
+  local index_arg="$3"
+  local create_arg="$4"
+
+  if [[ "$create_index" != "false" && -z "$output_index" ]]; then
+    echo "Error: $index_arg is required unless $create_arg is false." >&2
+    exit 1
+  fi
+}
+
+# Move an index that GATK wrote next to an output to the path of the index
+# output argument. Does nothing if no index path is given or if both paths are
+# the same file.
+#
+# Usage: move_output_index "$gatk_index" "$par_output_index"
+move_output_index() {
+  local gatk_index="$1"
+  local output_index="$2"
+
+  if [[ -n "$gatk_index" && -n "$output_index" && ! "$gatk_index" -ef "$output_index" ]]; then
+    mv "$gatk_index" "$output_index"
+  fi
+}
+
+# Stop with an error if a CRAM file is used and no reference is given.
+#
+# Usage: require_reference_for_cram "$par_reference" --reference "$par_input" "$par_output" ...
+require_reference_for_cram() {
+  local reference="$1"
+  local reference_arg="$2"
+  shift 2
+
+  local value file files
+  for value in "$@"; do
+    IFS=';' read -ra files <<< "$value"
+    for file in "${files[@]}"; do
+      if [[ "$file" == *.cram && -z "$reference" ]]; then
+        echo "Error: $reference_arg is required for CRAM input or output." >&2
+        exit 1
+      fi
+    done
+  done
+}
+
 # Symlink a reference FASTA and its .fai/.dict into a temp dir under matching
 # basenames, so GATK can find them
 #
@@ -48,6 +160,32 @@ stage_reference_trio() {
   ln -s "$(readlink -f "$reference_dict")" "$tmp_dir/reference.dict" || exit 1
 
   echo "$tmp_dir/reference.fasta"
+}
+
+# Stage an optional reference trio with stage_reference_trio and build the
+# GATK flags for it. The result is empty if no reference is given. Stops with
+# an error if the .fai or .dict is given without the reference.
+#
+# Usage: stage_optional_reference "$tmp_dir" "$par_reference" "$par_reference_fai" \
+#          "$par_reference_dict" result_array_name
+stage_optional_reference() {
+  local tmp_dir="$1"
+  local reference="$2"
+  local reference_fai="$3"
+  local reference_dict="$4"
+  local -n reference_args_ref="$5"
+
+  reference_args_ref=()
+  if [[ -z "$reference" ]]; then
+    if [[ -n "$reference_fai" || -n "$reference_dict" ]]; then
+      echo "Error: --reference_fai and --reference_dict require --reference." >&2
+      exit 1
+    fi
+    return 0
+  fi
+  local staged_reference
+  staged_reference=$(stage_reference_trio "$tmp_dir" "$reference" "$reference_fai" "$reference_dict") || exit 1
+  reference_args_ref=(--reference "$staged_reference")
 }
 
 # Build the GATK flags for one or more read files (BAM or CRAM) and their
@@ -145,13 +283,39 @@ stage_vcf_with_index() {
   else
     echo "Warning: no index was provided for '$vcf'. Copying and indexing it, which can be slow for a large file. Provide an index to skip this step." >&2
     cp "$(readlink -f "$vcf")" "$staged_vcf" || exit 1
-    if ! gatk IndexFeatureFile --input "$staged_vcf" --verbosity ERROR >&2; then
+    if ! run_gatk IndexFeatureFile --input "$staged_vcf" --verbosity ERROR >&2; then
       echo "Error: could not index '$vcf'. A .vcf.gz file must be compressed with bgzip." >&2
       exit 1
     fi
   fi
 
   echo "$staged_vcf"
+}
+
+# Stage an optional VCF (or other feature file) input with stage_vcf_with_index
+# and add the GATK flag for it to an array. The GATK flag is the argument name
+# with dashes (for example `--dbsnp` or `--population-callset`). Stops with an
+# error if the index is given without the input.
+#
+# Usage: stage_optional_vcf "$tmp_dir" "$par_x" "$par_x_index" --x result_array_name [index_optional]
+stage_optional_vcf() {
+  local tmp_dir="$1"
+  local vcf="$2"
+  local vcf_index="$3"
+  local arg_name="$4"
+  local -n vcf_args_ref="$5"
+  local index_optional="${6:-false}"
+
+  if [[ -z "$vcf" ]]; then
+    if [[ -n "$vcf_index" ]]; then
+      echo "Error: ${arg_name}_index requires $arg_name." >&2
+      exit 1
+    fi
+    return 0
+  fi
+  local staged_vcf
+  staged_vcf=$(stage_vcf_with_index "$tmp_dir" "$vcf" "$vcf_index" "${arg_name#--}" "$index_optional") || exit 1
+  vcf_args_ref+=("${arg_name//_/-}" "$staged_vcf")
 }
 
 # Stage one or more VCFs given as a semicolon-separated `multiple: true`
@@ -275,10 +439,108 @@ stage_interval_arguments() {
   )
 }
 
+# Build the GATK flags for the shared "GATK Engine Options" group
+# (engine_argument_group.yaml) and the temp dir. The argument values are read
+# from the `par_*` variables of that group.
+#
+# Usage: gatk_engine_args "$tmp_dir" result_array_name
+gatk_engine_args() {
+  local tmp_dir="$1"
+  local -n engine_args_ref="$2"
+
+  engine_args_ref=(--tmp-dir "$tmp_dir")
+  if is_true "${par_disable_sequence_dictionary_validation:-}"; then
+    engine_args_ref+=(--disable-sequence-dictionary-validation)
+  fi
+  if is_true "${par_lenient:-}"; then
+    engine_args_ref+=(--lenient)
+  fi
+}
+
+# Build the GATK flags for the shared "GATK VCF Output Options" group
+# (vcf_output_argument_group.yaml).
+#
+# Usage: gatk_vcf_output_args result_array_name
+gatk_vcf_output_args() {
+  local -n vcf_output_args_ref="$1"
+
+  vcf_output_args_ref=(
+    ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
+  )
+  if is_true "${par_sites_only_vcf_output:-}"; then
+    vcf_output_args_ref+=(--sites-only-vcf-output)
+  fi
+}
+
+# Build the GATK flags for the shared "GATK BAM Output Options" group
+# (bam_output_argument_group.yaml).
+#
+# Usage: gatk_bam_output_args result_array_name
+gatk_bam_output_args() {
+  local -n bam_output_args_ref="$1"
+
+  bam_output_args_ref=(
+    ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
+    ${par_output_cram_version:+--output-cram-version "$par_output_cram_version"}
+  )
+}
+
+# Build the GATK flags for the shared "GATK Annotation Options" group
+# (annotation_argument_group.yaml). The component adds the flags for its own
+# annotation arguments (for example `--annotations-to-exclude`).
+#
+# Usage: gatk_annotation_args result_array_name
+gatk_annotation_args() {
+  local -n annotation_args_ref="$1"
+
+  local annotation_flags=()
+  local annotation_group_flags=()
+  split_multiple_to_flags "$par_annotation" "--annotation" annotation_flags
+  split_multiple_to_flags "$par_annotation_group" "--annotation-group" annotation_group_flags
+  annotation_args_ref=("${annotation_flags[@]}" "${annotation_group_flags[@]}")
+}
+
+# Build the GATK flags for the shared "GATK Assembly Options" group
+# (assembly_argument_group.yaml). The checks for `--bam_output` and the move of
+# `--bam_output_index` stay in the component script.
+#
+# Usage: gatk_assembly_args result_array_name
+gatk_assembly_args() {
+  local -n assembly_args_ref="$1"
+
+  local kmer_size_flags=()
+  split_multiple_to_flags "$par_kmer_size" "--kmer-size" kmer_size_flags
+
+  assembly_args_ref=(
+    ${par_active_probability_threshold:+--active-probability-threshold "$par_active_probability_threshold"}
+    ${par_assembly_region_padding:+--assembly-region-padding "$par_assembly_region_padding"}
+    ${par_bam_writer_type:+--bam-writer-type "$par_bam_writer_type"}
+    ${par_base_quality_score_threshold:+--base-quality-score-threshold "$par_base_quality_score_threshold"}
+    "${kmer_size_flags[@]}"
+    ${par_max_assembly_region_size:+--max-assembly-region-size "$par_max_assembly_region_size"}
+    ${par_max_reads_per_alignment_start:+--max-reads-per-alignment-start "$par_max_reads_per_alignment_start"}
+    ${par_min_assembly_region_size:+--min-assembly-region-size "$par_min_assembly_region_size"}
+    ${par_min_base_quality_score:+--min-base-quality-score "$par_min_base_quality_score"}
+    ${par_min_pruning:+--min-pruning "$par_min_pruning"}
+    ${par_pcr_indel_model:+--pcr-indel-model "$par_pcr_indel_model"}
+  )
+  if is_true "${par_create_bam_output:-}"; then
+    assembly_args_ref+=(--bam-output "$par_bam_output")
+  fi
+  if is_true "${par_dont_use_soft_clipped_bases:-}"; then
+    assembly_args_ref+=(--dont-use-soft-clipped-bases)
+  fi
+  if is_true "${par_force_active:-}"; then
+    assembly_args_ref+=(--force-active)
+  fi
+  if is_true "${par_force_call_filtered_alleles:-}"; then
+    assembly_args_ref+=(--force-call-filtered-alleles)
+  fi
+}
+
 # Build the GATK flags for all the arguments in the shared "GATK Read Filter
 # Options" group (read_argument_group.yaml). The argument values are read from
-# the `par_*` variables of that group, and boolean_true values must already be
-# unset when they are "false".
+# the `par_*` variables of that group.
 #
 # Usage: gatk_read_filter_args result_array_name
 gatk_read_filter_args() {
@@ -301,13 +563,15 @@ gatk_read_filter_args() {
     "${read_filter_flags[@]}"
     "${disable_read_filter_flags[@]}"
     "${inverted_read_filter_flags[@]}"
-    ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}
     ${par_read_validation_stringency:+--read-validation-stringency "$par_read_validation_stringency"}
     ${par_keep_read_group:+--keep-read-group "$par_keep_read_group"}
     "${sample_flags[@]}"
     "${library_flags[@]}"
     "${read_group_black_list_flags[@]}"
   )
+  if is_true "${par_disable_tool_default_read_filters:-}"; then
+    read_filter_args_ref+=(--disable-tool-default-read-filters)
+  fi
 }
 
 # Print "true" if any of the shared interval arguments select intervals, and
@@ -320,6 +584,16 @@ gatk_uses_intervals() {
     echo "true"
   else
     echo "false"
+  fi
+}
+
+# Stop with an error if no interval is given, for tools that require one.
+#
+# Usage: require_intervals
+require_intervals() {
+  if [[ -z "${par_intervals:-}" && -z "${par_interval_strings:-}" ]]; then
+    echo "Error: --intervals or --interval_strings is required." >&2
+    exit 1
   fi
 }
 

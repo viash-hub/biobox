@@ -7,56 +7,30 @@ set -eo pipefail
 
 source "$meta_resources_dir/gatk4/script_helpers.sh"
 
-# unset flags
-unset_if_false=(
-  par_lenient
-  par_allow_old_rms_mapping_quality_annotation_data
-  par_annotate_with_num_discovered_alleles
-  par_call_genotypes
-  par_disable_sequence_dictionary_validation
-  par_disable_tool_default_annotations
-  par_enable_all_annotations
-  par_genomicsdb_shared_posixfs_optimizations
-  par_genomicsdb_use_bcf_codec
-  par_include_non_variant_sites
-  par_input_is_somatic
-  par_keep_combined_raw_annotations
-  par_merge_input_intervals
-  par_sites_only_vcf_output
+unset_if_false \
+  par_allow_old_rms_mapping_quality_annotation_data \
+  par_annotate_with_num_discovered_alleles \
+  par_call_genotypes \
+  par_disable_tool_default_annotations \
+  par_enable_all_annotations \
+  par_genomicsdb_shared_posixfs_optimizations \
+  par_genomicsdb_use_bcf_codec \
+  par_include_non_variant_sites \
+  par_input_is_somatic \
+  par_keep_combined_raw_annotations \
+  par_merge_input_intervals \
   par_use_posteriors_to_calculate_qual
-)
 
-for par in "${unset_if_false[@]}"; do
-  test_val="${!par}"
-  [[ "$test_val" == "false" ]] && unset $par
-done
-
-if [[ -n "$par_dbsnp_index" && -z "$par_dbsnp" ]]; then
-  echo "Error: --dbsnp_index requires --dbsnp." >&2
-  exit 1
-fi
-if [[ -n "$par_population_callset_index" && -z "$par_population_callset" ]]; then
-  echo "Error: --population_callset_index requires --population_callset." >&2
-  exit 1
-fi
+# Check the arguments
 if [[ -d "$par_variant" && -n "$par_variant_index" ]]; then
   echo "Error: --variant_index cannot be used when --variant is a GenomicsDB workspace directory." >&2
   exit 1
 fi
+require_output_index "$par_output_index" "$par_create_output_variant_index" \
+  --output_index --create_output_variant_index
 
-move_output_index=""
-if [[ "$par_create_output_variant_index" != "false" ]]; then
-  if [[ -z "$par_output_index" ]]; then
-    echo "Error: --output_index is required unless --create_output_variant_index is false." >&2
-    exit 1
-  fi
-  move_output_index="true"
-  gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
-fi
-
-# Stage the inputs into a temp dir so GATK can find the companion files
-tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_genotypegvcfs.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT
+# Stage the inputs in a temp dir so that GATK can find the companion files
+setup_tmp_dir
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict") || exit 1
 
@@ -71,18 +45,16 @@ else
   variant_index_optional=$([[ "$(gatk_uses_intervals)" == "true" ]] && echo false || echo true)
   variant_arg=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
 fi
-if [[ -n "$par_dbsnp" ]]; then
-  staged_dbsnp=$(stage_vcf_with_index "$tmp_dir" "$par_dbsnp" "$par_dbsnp_index" dbsnp) || exit 1
-fi
-if [[ -n "$par_population_callset" ]]; then
-  # GATK reads a plain --population_callset VCF without an index
-  staged_population_callset=$(stage_vcf_with_index "$tmp_dir" "$par_population_callset" "$par_population_callset_index" population_callset true) || exit 1
-fi
+dbsnp_args=()
+stage_optional_vcf "$tmp_dir" "$par_dbsnp" "$par_dbsnp_index" --dbsnp dbsnp_args
+# GATK reads a plain --population_callset VCF without an index
+population_callset_args=()
+stage_optional_vcf "$tmp_dir" "$par_population_callset" "$par_population_callset_index" \
+  --population_callset population_callset_args true
 stage_interval_arguments "$tmp_dir" interval_args
 
 # Convert semicolon-separated multi-value arguments into repeated flags
-split_multiple_to_flags "$par_annotation" "--annotation" annotation_args
-split_multiple_to_flags "$par_annotation_group" "--annotation-group" annotation_group_args
+gatk_annotation_args annotation_args
 split_multiple_to_flags "$par_annotations_to_exclude" "--annotations-to-exclude" annotations_to_exclude_args
 # Pass --force_output_intervals files first, then --force_output_interval_strings
 split_multiple_to_flags "$par_force_output_intervals" "--force-output-intervals" force_output_intervals_args
@@ -90,19 +62,21 @@ split_multiple_to_flags "$par_force_output_interval_strings" "--force-output-int
 split_multiple_to_flags "$par_founder_id" "--founder-id" founder_id_args
 split_multiple_to_flags "$par_keep_specific_combined_raw_annotation" "--keep-specific-combined-raw-annotation" keep_specific_combined_raw_annotation_args
 
-# Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
-avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
+gatk_engine_args "$tmp_dir" engine_args
+gatk_vcf_output_args vcf_output_args
 
 # Build command arguments array
 cmd_args=(
+  --variant "$variant_arg"
+  --reference "$staged_reference"
+  --output "$par_output"
   ${par_allele_fraction_error:+--allele-fraction-error "$par_allele_fraction_error"}
   ${par_allow_old_rms_mapping_quality_annotation_data:+--allow-old-rms-mapping-quality-annotation-data}
   ${par_annotate_with_num_discovered_alleles:+--annotate-with-num-discovered-alleles}
   "${annotation_args[@]}"
-  "${annotation_group_args[@]}"
   "${annotations_to_exclude_args[@]}"
   ${par_call_genotypes:+--call-genotypes}
-  ${staged_dbsnp:+--dbsnp "$staged_dbsnp"}
+  "${dbsnp_args[@]}"
   ${par_denovo_depth_threshold:+--denovo-depth-threshold "$par_denovo_depth_threshold"}
   ${par_denovo_parent_gq_threshold:+--denovo-parent-gq-threshold "$par_denovo_parent_gq_threshold"}
   ${par_disable_tool_default_annotations:+--disable-tool-default-annotations}
@@ -127,28 +101,21 @@ cmd_args=(
   ${par_merge_input_intervals:+--merge-input-intervals}
   ${par_num_reference_samples_if_no_call:+--num-reference-samples-if-no-call "$par_num_reference_samples_if_no_call"}
   ${par_pedigree:+--pedigree "$par_pedigree"}
-  ${staged_population_callset:+--population-callset "$staged_population_callset"}
+  "${population_callset_args[@]}"
   ${par_sample_ploidy:+--sample-ploidy "$par_sample_ploidy"}
   ${par_somatic_quality_threshold:+--somatic-quality-threshold "$par_somatic_quality_threshold"}
   ${par_standard_min_confidence_threshold_for_calling:+--standard-min-confidence-threshold-for-calling "$par_standard_min_confidence_threshold_for_calling"}
   ${par_tumor_lod_to_emit:+--tumor-lod-to-emit "$par_tumor_lod_to_emit"}
   ${par_use_posteriors_to_calculate_qual:+--use-posteriors-to-calculate-qual}
   ${par_variant_output_filtering:+--variant-output-filtering "$par_variant_output_filtering"}
+  "${vcf_output_args[@]}"
+  "${engine_args[@]}"
 )
 
 # Run GATK GenotypeGVCFs
-gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" GenotypeGVCFs \
-  --variant "$variant_arg" \
-  --reference "$staged_reference" \
-  --output "$par_output" \
-  "${cmd_args[@]}" \
-  --tmp-dir "$tmp_dir" \
-  ${par_sites_only_vcf_output:+--sites-only-vcf-output} \
-  ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"} \
-  ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation} \
-  ${par_lenient:+--lenient}
+run_gatk GenotypeGVCFs "${cmd_args[@]}"
 
-# Move the output index to --output_index, if requested
-if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
-  mv "$gatk_output_index" "$par_output_index"
+# Move the output index to --output_index
+if [[ "$par_create_output_variant_index" != "false" ]]; then
+  move_output_index "$(gatk_output_vcf_index_path "$par_output")" "$par_output_index"
 fi
