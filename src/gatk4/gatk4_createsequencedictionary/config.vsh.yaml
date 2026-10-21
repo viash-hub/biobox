@@ -84,6 +84,7 @@ argument_groups:
         type: integer
         description: |
           Stop after writing this many sequences. For testing.
+          Default: 2147483647 (all sequences).
         example: 100
       - name: "--species"
         alternatives: [-SP]

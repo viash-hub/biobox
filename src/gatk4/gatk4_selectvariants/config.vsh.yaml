@@ -194,42 +194,55 @@ argument_groups:
         description: Store the original `DP` value after subsetting.
       - name: "--max_filtered_genotypes"
         type: integer
-        description: Maximum number of samples filtered at the genotype level.
+        description: |
+          Maximum number of samples filtered at the genotype level.
+          Default: 2147483647.
         example: 10
       - name: "--max_fraction_filtered_genotypes"
         type: double
-        description: Maximum fraction of samples filtered at the genotype level.
+        description: |
+          Maximum fraction of samples filtered at the genotype level.
+          Default: 1.0.
         example: 0.5
       - name: "--max_indel_size"
         type: integer
-        description: Maximum size of indels to include.
+        description: |
+          Maximum size of indels to include. Default: 2147483647.
         example: 50
       - name: "--max_nocall_fraction"
         type: double
-        description: Maximum fraction of samples with no-call genotypes.
+        description: |
+          Maximum fraction of samples with no-call genotypes. Default: 1.0.
         example: 0.5
       - name: "--max_nocall_number"
         type: integer
-        description: Maximum number of samples with no-call genotypes.
+        description: |
+          Maximum number of samples with no-call genotypes. Default: 2147483647.
         example: 5
       - name: "--mendelian_violation"
         type: boolean_true
         description: Output Mendelian violation sites only.
       - name: "--mendelian_violation_qual_threshold"
         type: double
-        description: Minimum GQ score for each trio member to accept a site as a Mendelian violation.
+        description: |
+          Minimum GQ score for each trio member to accept a site as a Mendelian
+          violation. Default: 0.0.
         example: 30.0
       - name: "--min_filtered_genotypes"
         type: integer
-        description: Minimum number of samples filtered at the genotype level.
+        description: |
+          Minimum number of samples filtered at the genotype level. Default: 0.
         example: 1
       - name: "--min_fraction_filtered_genotypes"
         type: double
-        description: Minimum fraction of samples filtered at the genotype level.
+        description: |
+          Minimum fraction of samples filtered at the genotype level.
+          Default: 0.0.
         example: 0.1
       - name: "--min_indel_size"
         type: integer
-        description: Minimum size of indels to include.
+        description: |
+          Minimum size of indels to include. Default: 0.
         example: 1
       - name: "--pedigree"
         alternatives: [-ped]
@@ -246,7 +259,7 @@ argument_groups:
         type: double
         description: |
           Select a fraction of genotypes at random from the input and
-          set them to no-call.
+          set them to no-call. Default: 0.0.
         example: 0.1
       - name: "--remove_unused_alternates"
         type: boolean_true
@@ -254,7 +267,8 @@ argument_groups:
       - name: "--restrict_alleles_to"
         type: string
         choices: [ALL, BIALLELIC, MULTIALLELIC]
-        description: Select only variants of a particular allelicity.
+        description: |
+          Select only variants of a particular allelicity. Default: ALL.
         example: BIALLELIC
       - name: "--sample_expressions"
         alternatives: [-se]
@@ -270,8 +284,8 @@ argument_groups:
         multiple: true
         description: Include genotypes from this sample. Can be specified multiple times.
         example: [sample1, sample2]
-      - name: "--select_expressions"
-        alternatives: [--select]
+      - name: "--select"
+        alternatives: [--select_expressions]
         type: string
         multiple: true
         description: |
@@ -292,7 +306,8 @@ argument_groups:
       - name: "--select_random_fraction"
         alternatives: [-fraction]
         type: double
-        description: Select a fraction of variants at random from the input.
+        description: |
+          Select a fraction of variants at random from the input. Default: 1.0.
         example: 0.5
       - name: "--select_type_to_exclude"
         alternatives: [-xl-select-type]
@@ -315,9 +330,16 @@ argument_groups:
       - name: "--set_filtered_gt_to_nocall"
         type: boolean_true
         description: Set filtered genotypes to no-call.
+      - name: "--variant_output_filtering"
+        type: string
+        choices: [STARTS_IN, ENDS_IN, OVERLAPS, CONTAINED, ANYWHERE]
+        description: |
+          Restrict the output variants to ones that match the
+          `--intervals` according to the specified matching mode.
+        example: STARTS_IN
+  - __merge__: /src/gatk4/utils/engine_argument_group.yaml
+  - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
-
-__merge__: /src/gatk4/utils/common_argument_groups.yaml
 
 resources:
   - type: bash_script

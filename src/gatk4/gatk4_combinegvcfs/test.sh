@@ -380,4 +380,37 @@ fi
 
 log "✅ TEST 10 completed successfully"
 
+# --- Test Case 11: Grouping distance, de novo and RMS mapping quality options ---
+log "Starting TEST 11: --combine_variants_distance, --max_distance and annotation-dependent options"
+
+# A trio pedigree: sample1 is the child of sample2 and a parent that is not in
+# the GVCFs
+printf 'fam1\tsample1\tsample2\tmother\t1\t0\nfam1\tsample2\t0\t0\t1\t0\nfam1\tmother\t0\t0\t2\t0\n' > "$test_data_dir/trio.ped"
+
+log "Executing $meta_name with --combine_variants_distance, --max_distance, --denovo_depth_threshold, --denovo_parent_gq_threshold and --allow_old_rms_mapping_quality_annotation_data..."
+"$meta_executable" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/combined_new_options.g.vcf" \
+  --create_output_variant_index false \
+  --annotation RMSMappingQuality \
+  --annotation PossibleDeNovo \
+  --pedigree "$test_data_dir/trio.ped" \
+  --combine_variants_distance 10 \
+  --max_distance 100 \
+  --denovo_depth_threshold 5 \
+  --denovo_parent_gq_threshold 10 \
+  --allow_old_rms_mapping_quality_annotation_data
+
+log "Validating TEST 11 outputs..."
+check_file_exists "$meta_temp_dir/combined_new_options.g.vcf" "combined GVCF file (new options)"
+check_file_contains "$meta_temp_dir/combined_new_options.g.vcf" "^##fileformat=VCF" "combined GVCF (new options) header"
+check_file_contains "$meta_temp_dir/combined_new_options.g.vcf" "sample1" "combined GVCF (new options) sample1 column"
+check_file_contains "$meta_temp_dir/combined_new_options.g.vcf" "sample2" "combined GVCF (new options) sample2 column"
+
+log "✅ TEST 11 completed successfully"
+
 print_test_summary "All tests"

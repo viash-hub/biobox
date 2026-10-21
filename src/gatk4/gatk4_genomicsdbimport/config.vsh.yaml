@@ -235,6 +235,7 @@ argument_groups:
           If set, enable checks on the `--sample_name_map` file. Verifies
           that feature readers are valid and shows a warning if sample
           names do not match with the headers.
+  - __merge__: /src/gatk4/utils/engine_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
     description: |
       Unlike most other GATK tools, GenomicsDBImport requires at least one
@@ -244,8 +245,6 @@ argument_groups:
       workspace. With `--merge_input_intervals`, the intervals on each
       contig are merged into one array, which also contains the data in
       between them.
-
-__merge__: /src/gatk4/utils/common_argument_groups.yaml
 
 resources:
   - type: bash_script
