@@ -8,8 +8,7 @@
 * `gatk4/*`: Rename `--bai` to `--read_index` (PR #272).
   The index is now passed to GATK with `--read-index`, so it can be a `.bai` for a BAM file or a `.crai` for a CRAM file.
 
-* `gatk4`: Split the shared GATK engine arguments into engine, read filter, VCF output and BAM output groups (PR #273).
-  Each component now has only the shared arguments that apply to its tool.
+* `gatk4`: Each component now has only the shared engine arguments that apply to its tool. (PR #273).
 
 * `gatk4/*`: Remove arguments that do not work as a component argument (PR #273).
   - Remove 8 read filters from the `--read_filter` choices, because they need a setting that the components do not have
