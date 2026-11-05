@@ -80,7 +80,7 @@ check_outputs "$test_1_output" \
 log "Cleanup"
 rm -rf "$test_1_output"
 
-log "Run dupRadar on single-end test data, without output paths (default <id>_* names)"
+log "Run dupRadar on single-end test data, with only the required output"
 test_2_output="$meta_temp_dir/output2"
 mkdir -p "$test_2_output"
 
@@ -90,22 +90,20 @@ mkdir -p "$test_2_output"
     --input_bam "$input_bam" \
     --input_gtf "$input_gtf" \
     --id "test" \
-    --strandedness 1
+    --strandedness 1 \
+    --output_dupmatrix "$test_2_output/dup_matrix.txt"
 )
 
-check_outputs "$test_2_output" \
-  test_dupMatrix.txt \
-  test_dup_intercept_mqc.txt \
-  test_duprateExpBoxplot.pdf \
-  test_duprate_exp_densplot.pdf \
-  test_duprateExpDensCurve_mqc.txt \
-  test_expressionHist.pdf \
-  test_intercept_slope.txt
+log "Checking that only the duplication matrix is created"
+check_file_exists "$test_2_output/dup_matrix.txt" "duplication matrix"
+check_file_not_empty "$test_2_output/dup_matrix.txt" "duplication matrix"
+n_files=$(find "$test_2_output" -type f | wc -l | tr -d ' ')
+[ "$n_files" -eq 1 ] || { log_error "Expected 1 output file in test 2, found $n_files"; exit 1; }
 
 log "Cleanup"
 rm -rf "$test_2_output"
 
-log "Run dupRadar on single-end test data, with only some output paths (rest default <id>_* names)"
+log "Run dupRadar on single-end test data, with only some optional output paths"
 test_3_output="$meta_temp_dir/output3"
 mkdir -p "$test_3_output"
 
@@ -116,22 +114,22 @@ mkdir -p "$test_3_output"
     --input_gtf "$input_gtf" \
     --id "test" \
     --strandedness 1 \
-    --output_dupmatrix "$test_3_output/custom_dup_matrix.txt" \
-    --output_intercept_slope "$test_3_output/custom_intercept_slope.txt"
+    --output_dupmatrix "$test_3_output/dup_matrix.txt" \
+    --output_duprate_exp_boxplot "$test_3_output/duprate_exp_boxplot.pdf" \
+    --output_intercept_slope "$test_3_output/intercept_slope.txt"
 )
 
-check_outputs "$test_3_output" \
-  custom_dup_matrix.txt \
-  test_dup_intercept_mqc.txt \
-  test_duprateExpBoxplot.pdf \
-  test_duprate_exp_densplot.pdf \
-  test_duprateExpDensCurve_mqc.txt \
-  test_expressionHist.pdf \
-  custom_intercept_slope.txt
+log "Checking that the requested outputs exist"
+check_file_exists "$test_3_output/dup_matrix.txt" "duplication matrix"
+check_file_not_empty "$test_3_output/dup_matrix.txt" "duplication matrix"
+check_file_exists "$test_3_output/duprate_exp_boxplot.pdf" "duplication rate boxplot"
+check_file_not_empty "$test_3_output/duprate_exp_boxplot.pdf" "duplication rate boxplot"
+check_file_exists "$test_3_output/intercept_slope.txt" "intercept and slope"
+check_file_not_empty "$test_3_output/intercept_slope.txt" "intercept and slope"
 
-log "Checking that given output paths replace the default names"
-check_file_not_exists "$test_3_output/test_dupMatrix.txt" "default duplication matrix"
-check_file_not_exists "$test_3_output/test_intercept_slope.txt" "default intercept and slope"
+log "Checking that outputs nobody asked for are not created"
+n_files=$(find "$test_3_output" -type f | wc -l | tr -d ' ')
+[ "$n_files" -eq 3 ] || { log_error "Expected 3 output files in test 3, found $n_files"; exit 1; }
 
 log "Cleanup"
 rm -rf "$test_3_output"

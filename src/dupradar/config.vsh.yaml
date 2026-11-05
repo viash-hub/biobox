@@ -23,19 +23,20 @@ links:
   homepage: https://bioconductor.org/packages/release/bioc/html/dupRadar.html
   documentation: https://bioconductor.org/packages/release/bioc/vignettes/dupRadar/inst/doc/dupRadar.html
   repository: https://github.com/ssayols/dupRadar
-references: 
+references:
   doi: "10.1186/s12859-016-1276-2"
 license: GPL-3.0
 
 argument_groups:
 - name: Input
-  arguments: 
+  arguments:
   - name: --id
     type: string
-    description: Sample ID
+    description: |
+      Sample ID
     default: "id"
   - name: --input_bam
-    type: file 
+    type: file
     required: true
     description: |
       Path to input alignment file in BAM format. Duplicates must already be
@@ -43,13 +44,15 @@ argument_groups:
       `samtools markdup`; dupRadar does not mark them itself.
     example: "path/to/file.bam"
   - name: --input_gtf
-    type: file 
+    type: file
     required: true
-    description: Path to GTF annotation file.
+    description: |
+      Path to GTF annotation file.
     example: "path/to/file.gtf"
   - name: --paired
     type: boolean_true
-    description: Add flag if input alignment file consists of paired reads
+    description: |
+      Add flag if input alignment file consists of paired reads
   - name: --strandedness
     type: integer
     choices: [0, 1, 2]
@@ -57,18 +60,21 @@ argument_groups:
       Strandedness of the library: 0 = unstranded, 1 = forward (stranded),
       2 = reverse (reversely stranded).
     default: 0
-    
+
 - name: Output
-  arguments: 
+  arguments:
   - name: --output_dupmatrix
     type: file
     direction: output
-    description: path to output file (txt) of duplicate tag counts
+    required: true
+    description:
+      Path to output file (txt) of duplicate tag counts
     example: "path/to/dup_matrix.txt"
   - name: --output_dup_intercept_mqc
     type: file
     direction: output
-    description: path to output file (txt) of multiqc intercept value DupRadar
+    description: |
+      Path to output file (txt) of multiqc intercept value DupRadar
     example: "path/to/dup_intercept_mqc.txt"
   - name: --output_duprate_exp_boxplot
     type: file
@@ -97,7 +103,8 @@ argument_groups:
   - name: --output_intercept_slope
     type: file
     direction: output
-    description: output file (txt) with progression of duplication rate values
+    description: |
+      Path to output file (txt) containing the intercept and slope of the fitted duplication model
     example: "path/to/intercept_slope.txt"
 
 resources:
@@ -120,5 +127,5 @@ engines:
           - 'Rscript -e ''cat("dupradar: ", as.character(packageVersion("dupRadar")), "\n", sep = "")'' > /var/software_versions.txt'
 
 runners:
-  - type: executable  
+  - type: executable
   - type: nextflow

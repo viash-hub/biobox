@@ -27,21 +27,9 @@ stranded <- par$strandedness
 paired <- par$paired
 threads <- meta$cpus %||% 1L
 
-# Fall back to the original dupRadar file names when no path is given
-output_dupmatrix <- par$output_dupmatrix %||%
-  paste0(id, "_dupMatrix.txt")
-output_intercept_mqc <- par$output_dup_intercept_mqc %||%
-  paste0(id, "_dup_intercept_mqc.txt")
-output_boxplot <- par$output_duprate_exp_boxplot %||%
-  paste0(id, "_duprateExpBoxplot.pdf")
-output_densplot <- par$output_duprate_exp_densplot %||%
-  paste0(id, "_duprate_exp_densplot.pdf")
-output_denscurve_mqc <- par$output_duprate_exp_denscurve_mqc %||%
-  paste0(id, "_duprateExpDensCurve_mqc.txt")
-output_histogram <- par$output_expression_histogram %||%
-  paste0(id, "_expressionHist.pdf")
-output_intercept_slope <- par$output_intercept_slope %||%
-  paste0(id, "_intercept_slope.txt")
+# output_dupmatrix is a required output file; all other outputs are
+# optional and only written when their path is given
+output_dupmatrix <- par$output_dupmatrix
 
 if (!grepl("\\.bam$", input_bam)) {
   stop("--input_bam must be a BAM file (.bam), got: ", input_bam)
@@ -89,25 +77,37 @@ save_plot <- function(path, plot_fun, main) {
 }
 
 # 2D density scatter plot
-save_plot(output_densplot, duprateExpDensPlot, "Density scatter plot")
+if (!is.null(par$output_duprate_exp_densplot)) {
+  save_plot(
+    par$output_duprate_exp_densplot, duprateExpDensPlot, "Density scatter plot"
+  )
+}
 # Distribution of expression box plot
-save_plot(
-  output_boxplot, duprateExpBoxplot, "Percent Duplication by Expression"
-)
+if (!is.null(par$output_duprate_exp_boxplot)) {
+  save_plot(
+    par$output_duprate_exp_boxplot, duprateExpBoxplot,
+    "Percent Duplication by Expression"
+  )
+}
 # Distribution of RPK values per gene
-save_plot(
-  output_histogram, expressionHist, "Distribution of RPK values per gene"
-)
+if (!is.null(par$output_expression_histogram)) {
+  save_plot(
+    par$output_expression_histogram, expressionHist,
+    "Distribution of RPK values per gene"
+  )
+}
 
 message(">> Running duprateExpFit")
 fit <- duprateExpFit(DupMat = dm)
-message(">> Writing intercept and slope to ", output_intercept_slope)
-cat(
-  paste("- dupRadar Int (duprate at low read counts):", fit$intercept),
-  paste("- dupRadar Sl (progression of the duplication rate):", fit$slope),
-  fill = TRUE, labels = id,
-  file = output_intercept_slope, append = FALSE
-)
+if (!is.null(par$output_intercept_slope)) {
+  message(">> Writing intercept and slope to ", par$output_intercept_slope)
+  cat(
+    paste("- dupRadar Int (duprate at low read counts):", fit$intercept),
+    paste("- dupRadar Sl (progression of the duplication rate):", fit$slope),
+    fill = TRUE, labels = id,
+    file = par$output_intercept_slope, append = FALSE
+  )
+}
 
 # Create a multiqc file dupInt
 sample_name <- gsub("Aligned.sortedByCoord.out.markDups", "", id)
@@ -124,12 +124,16 @@ line <- "#id: DupInt
 #        format: '{:.2f}%'
 Sample dupRadar_intercept"
 
-message(">> Writing MultiQC intercept table to ", output_intercept_mqc)
-write(line, file = output_intercept_mqc, append = FALSE)
-write(
-  paste(sample_name, fit$intercept),
-  file = output_intercept_mqc, append = TRUE
-)
+if (!is.null(par$output_dup_intercept_mqc)) {
+  message(
+    ">> Writing MultiQC intercept table to ", par$output_dup_intercept_mqc
+  )
+  write(line, file = par$output_dup_intercept_mqc, append = FALSE)
+  write(
+    paste(sample_name, fit$intercept),
+    file = par$output_dup_intercept_mqc, append = TRUE
+  )
+}
 
 # Get numbers from dupRadar GLM
 curve_x <- sort(log10(dm$RPK))
@@ -180,11 +184,16 @@ line <- "#id: dupradar
 #          width: 1"
 # nolint end
 
-message(">> Writing MultiQC density curve to ", output_denscurve_mqc)
-write(line, file = output_denscurve_mqc, append = FALSE)
-write.table(
-  cbind(curve_x, curve_y),
-  file = output_denscurve_mqc,
-  quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE
-)
+if (!is.null(par$output_duprate_exp_denscurve_mqc)) {
+  message(
+    ">> Writing MultiQC density curve to ",
+    par$output_duprate_exp_denscurve_mqc
+  )
+  write(line, file = par$output_duprate_exp_denscurve_mqc, append = FALSE)
+  write.table(
+    cbind(curve_x, curve_y),
+    file = par$output_duprate_exp_denscurve_mqc,
+    quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE
+  )
+}
 message("> Done running dupRadar")

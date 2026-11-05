@@ -1,26 +1,3 @@
----
-title: "Using the dupRadar package"
-author: "Sergi Sayols, Holger Klein"
-date: "June 23, 2015"
-output:
-    BiocStyle::html_document:
-    toc: true
----
-<!--
-% \VignetteEngine{knitr::rmarkdown}
-% \VignetteIndexEntry{Using dupRadar}
--->
-
-```{r pre,echo=FALSE,results='hide'}
-library(knitr)
-opts_chunk$set(warning=FALSE,message=FALSE,cache=TRUE)
-```
-```{r style,echo=FALSE,results='asis'}
-BiocStyle::markdown()
-```
-
-
-
 # Introduction to dupRadar
 
 RNA-Seq experiments are a common strategy nowadays to quantify the gene 
