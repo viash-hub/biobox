@@ -9,6 +9,9 @@
   - `gatk4/gatk4_learnreadorientationmodel`: Learn a read orientation bias model from the F1R2 counts of Mutect2.
   - `gatk4/gatk4_filtermutectcalls`: Filter the raw somatic calls of Mutect2.
 
+* `bwa_mem3`: Added support for bwa-mem3, a short-read aligner derived from bwa-mem2 with methylation alignment support:
+  - `bwa_mem3/bwa_mem3_index`: Create BWA-MEM3 index files for a reference genome, optionally including a methylation (`--meth`) seed index (PR #265).
+
 ## MINOR CHANGES
 
 * `minimap2/minimap2_index`: Add `--preset`, `--kmer_size`, `--window_size` and
@@ -82,9 +85,6 @@
 ## MAJOR CHANGES
 
 * `cellranger_mkref`: updated Cell Ranger to v10 (PR #240).
-
-* `bwa_mem3`: Added support for bwa-mem3, a short-read aligner derived from bwa-mem2 with methylation alignment support:
-  - `bwa_mem3/bwa_mem3_index`: Create BWA-MEM3 index files for a reference genome, optionally including a methylation (`--meth`) seed index (PR #265).
 
 ## MINOR CHANGES
 
