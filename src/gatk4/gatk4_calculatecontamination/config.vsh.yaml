@@ -1,0 +1,107 @@
+name: gatk4_calculatecontamination
+namespace: gatk4
+description: |
+  Calculates the fraction of reads that come from cross-sample
+  contamination.
+
+  Uses the pileup summary table of a tumor sample, as produced by
+  `gatk4 GetPileupSummaries`, and optionally the pileup summary table of
+  a matched normal sample. The output contamination table and tumor
+  segmentation table are used by `gatk4 FilterMutectCalls`
+  (`--contamination_table` and `--tumor_segmentation`) to filter somatic
+  calls that are caused by contamination.
+
+  If a matched normal is given, the sites that are homozygous in the
+  normal sample are used to improve the contamination estimate of the
+  tumor sample.
+keywords: [variant calling, somatic, GATK, GATK4, Mutect2, contamination]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--input"
+        alternatives: [-I]
+        type: file
+        description: |
+          Pileup summary table of the tumor sample, as produced by
+          `gatk4 GetPileupSummaries`.
+        required: true
+        example: tumor_pileups.table
+      - name: "--matched_normal"
+        alternatives: [-matched]
+        type: file
+        description: |
+          Pileup summary table of the matched normal sample, as produced by
+          `gatk4 GetPileupSummaries`.
+        example: normal_pileups.table
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: |
+          Output table with the contamination estimate of the tumor sample.
+        required: true
+        example: contamination.table
+      - name: "--create_tumor_segmentation"
+        type: boolean_true
+        description: |
+          Write the segmentation of the tumor sample to `--tumor_segmentation`.
+          If true, `--tumor_segmentation` must be set.
+      - name: "--tumor_segmentation"
+        alternatives: [-segments]
+        type: file
+        direction: output
+        description: |
+          Output table with the segmentation of the tumor sample by minor
+          allele fraction. Ignored when `--create_tumor_segmentation` is
+          false.
+        must_exist: false
+        example: segmentation.table
+
+  - name: "Options"
+    arguments:
+      - name: "--high_coverage_ratio_threshold"
+        type: double
+        description: |
+          The maximum coverage of a site relative to the mean coverage.
+          Default: 3.0.
+      - name: "--low_coverage_ratio_threshold"
+        type: double
+        description: |
+          The minimum coverage of a site relative to the median coverage.
+          Default: 0.5.
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow

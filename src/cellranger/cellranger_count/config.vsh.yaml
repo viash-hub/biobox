@@ -93,7 +93,6 @@ argument_groups:
           - `'fiveprime'` for Single Cell 5'
           - `'SC3Pv1'` or `'SC3Pv2'` or `'SC3Pv3'` or `'SC3Pv4'` for
           Single Cell 3' v1/v2/v3/v4
-          - `'SC3Pv3LT'` for Single Cell 3' v3 LT
           - `'SC3Pv3HT'` for Single Cell 3' v3 HT
           - `'SC5P-PE'` or `'SC5P-PE-v3'` or `'SC5P-R2'` or `'SC5P-R2-v3'` for Single Cell 5', paired-end/R2-only
           - `'SC-FB'` for Single Cell Antibody-only 3' v2 or 5'
@@ -101,6 +100,23 @@ argument_groups:
           To analyze the GEX portion of multiome data, chemistry must be set to `'ARC-v1'`.
 
           See the [10x Genomics FAQ](https://kb.10xgenomics.com/hc/en-us/articles/115003764132-How-does-Cell-Ranger-auto-detect-chemistry-) for more information on how chemistry is detected.
+        # NOTE: even though --help lists `SC3Pv3LT`, it is no longer supported and raises an error when used...
+        choices: [
+          "auto",
+          "threeprime",
+          "fiveprime",
+          "SC3Pv1",
+          "SC3Pv2",
+          "SC3Pv3",
+          "SC3Pv4",
+          "SC3Pv3HT",
+          "SC5P-PE",
+          "SC5P-PE-v3",
+          "SC5P-R2",
+          "SC5P-R2-v3",
+          "SC-FB",
+          "ARC-v1"
+        ]
       - name: --cell_annotation_model
         type: string
         description: |
@@ -163,12 +179,18 @@ test_resources:
     path: test.sh
 engines:
   - type: docker
-    image: quay.io/nf-core/cellranger:8.0.0
+    image: debian:latest
     setup:
+      # quay.io/nf-core/cellranger:10.0.0 is based on bookworm (which has been deprecated)
+      # So use `debian:latest` and use a `COPY --from=...`
       - type: docker
+        copy: 
+          - "--from=quay.io/nf-core/cellranger:10.0.0 /opt/cellranger-10.0.0 /opt/cellranger-10.0.0"
         run: |
           DEBIAN_FRONTEND=noninteractive apt update && \
-          apt upgrade -y && apt install -y procps && rm -rf /var/lib/apt/lists/*
+          apt upgrade -y && apt install -y procps file && rm -rf /var/lib/apt/lists/* && \
+          ln -s /opt/cellranger-10.0.0/bin/cellranger /usr/bin/cellranger && \
+          cellranger telemetry disable
       - type: docker
         run: |
           cellranger --version | sed 's/ cellranger-/: /' > /var/software_versions.txt

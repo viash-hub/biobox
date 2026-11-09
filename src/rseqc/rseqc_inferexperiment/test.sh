@@ -9,7 +9,6 @@ echo ">>> Prepare test output data"
 
 cat > "$meta_resources_dir/test_data/strandedness.txt" <<EOF
 
-
 This is PairEnd Data
 Fraction of reads failed to determine: 0.0000
 Fraction of reads explained by "1++,1--,2+-,2-+": 1.0000
@@ -17,7 +16,7 @@ Fraction of reads explained by "1+-,1-+,2++,2--": 0.0000
 EOF
 
 cat > "$meta_resources_dir/test_data/strandedness2.txt" <<EOF
-Unknown Data type
+Unknown data type: Mixture
 EOF
 
 ################################################################################

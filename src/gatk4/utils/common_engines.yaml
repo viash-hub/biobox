@@ -1,0 +1,6 @@
+type: docker
+image: broadinstitute/gatk:4.7.0.0
+setup:
+  - type: docker
+    run: |
+      gatk --version 2>&1 | grep "Genome Analysis Toolkit" | sed 's/^/gatk4: /' > /var/software_versions.txt
