@@ -20,9 +20,23 @@ argument_groups:
     arguments:
       - name: "--index"
         type: file
-        description: BWA index base name (prefix of .amb, .ann, .bwt.2bit.64, .pac files).
+        description: |
+          Directory containing the BWA-MEM3 index files (`.amb`, `.ann`, `.bwt.2bit.64` and `.pac`),
+          as produced by `bwa_mem3_index`. For `--meth`, the directory must also contain the converted
+          seed index (`.meth.amb`, `.meth.ann`, `.meth.bwt.2bit.64`, `.meth.pac`) built with
+          `bwa_mem3_index --meth`. When the directory holds a single index, its base name is derived
+          from the contents of the directory; when it holds more than one, use `--index_prefix` to
+          select one.
         required: true
-        example: "path/to/reference.fasta"
+        example: "path/to/bwa_index/"
+      - name: "--index_prefix"
+        type: string
+        description: |
+          Base name of the index to use from the `--index` directory, that is, the name the index
+          files share with their extensions (`.amb`, `.ann`, `.bwt.2bit.64`, `.pac`) removed.
+          Required when the directory contains more than one index; when omitted, the single index
+          present in the directory is used.
+        example: hg38
       - name: "--reads1"
         type: file
         description: Input FASTQ file with first reads in pair (R1) or single-end reads.
@@ -66,8 +80,8 @@ argument_groups:
       - name: "--min_seed_length"
         alternatives: [-k]
         type: integer
-        description: Minimum seed length.
-        default: 19
+        description: Minimum seed length. Overridden by `--read_type` unless set. Default is 19.
+        example: 19
       - name: "--band_width"
         alternatives: [-w]
         type: integer
@@ -81,8 +95,11 @@ argument_groups:
       - name: "--reseed_ratio"
         alternatives: [-r]
         type: double
-        description: Look for internal seeds inside a seed longer than {-k} * FLOAT.
-        default: 1.5
+        description: |
+          Re-seeding factor: seeds longer than `--min_seed_length` * FLOAT are re-seeded internally to
+          find sub-seeds. Lower values give higher sensitivity at greater cost; higher values (e.g. 10)
+          suppress the second seeding round. Overridden by `--read_type` unless set. Default is 1.5.
+        example: 1.5
       - name: "--split_width"
         alternatives: [-s]
         type: integer
@@ -205,8 +222,10 @@ argument_groups:
       - name: "--seeded_bases"
         alternatives: [-W]
         type: integer
-        description: Discard a chain if seeded bases shorter than INT.
-        default: 0
+        description: |
+          Discard a chain if seeded bases shorter than INT. Overridden by `--read_type` unless set.
+          Default is 0.
+        example: 0
       - name: "--min_ext_len"
         type: integer
         description: |

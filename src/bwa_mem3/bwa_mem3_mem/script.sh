@@ -41,6 +41,32 @@ elif [[ -n "$par_extend_mate_concordant" ]]; then
   extend_mate_concordant_arg="--extend-mate-concordant=$par_extend_mate_concordant"
 fi
 
+# Resolve the index prefix from the --index directory (--index_prefix selects one if there are several)
+index_dir="${par_index%/}"
+
+if [[ ! -d "$index_dir" ]]; then
+  echo "Error: --index must be a directory containing the bwa-mem3 index files," >&2
+  echo "but '$index_dir' is not a directory." >&2
+  exit 1
+fi
+
+# Skip the --meth seed index (<prefix>.meth.*): bwa-mem3 finds it from the base prefix
+index_name="${par_index_prefix:-*}"
+
+mapfile -d '' -t bwt_files < <(find -L "$index_dir" -maxdepth 1 \
+  -name "$index_name.bwt.2bit.64" ! -name "*.meth.bwt.2bit.64" -type f -print0)
+
+if [[ "${#bwt_files[@]}" -eq 0 ]]; then
+  echo "Error: No bwa-mem3 index found in '$index_dir': expected a '$index_name.bwt.2bit.64' file." >&2
+  exit 1
+elif [[ "${#bwt_files[@]}" -gt 1 ]]; then
+  echo "Error: Multiple bwa-mem3 indices found in '$index_dir': ${bwt_files[*]}." >&2
+  echo "Use --index_prefix to select one of them by base name." >&2
+  exit 1
+fi
+
+index_prefix="${bwt_files[0]%.bwt.2bit.64}"
+
 # Build the command
 # Options with an optional argument (--bam, --rescue-kmer, --extend-mate-concordant,
 # --meth, --meth-seed-prune) only bind their value when written as --opt=VALUE.
@@ -142,7 +168,7 @@ cmd_args=(
   ${par_legacy_reader:+--legacy-reader}
 
   # Index and input files
-  "$par_index"
+  "$index_prefix"
   "$par_reads1"
   ${par_reads2:+"$par_reads2"}
 )
