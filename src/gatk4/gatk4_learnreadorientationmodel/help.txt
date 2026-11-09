@@ -1,0 +1,73 @@
+```sh
+docker run --rm broadinstitute/gatk:4.7.0.0 gatk LearnReadOrientationModel --help
+```
+
+Using GATK jar /gatk/gatk-package-4.7.0.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /gatk/gatk-package-4.7.0.0-local.jar LearnReadOrientationModel --help
+USAGE: LearnReadOrientationModel [arguments]
+
+Get the maximum likelihood estimates of artifact prior probabilities in the orientation bias mixture model filter
+Version:4.7.0.0
+
+
+Required Arguments:
+
+--input,-I <File>             One or more .tar.gz containing outputs of CollectF1R2Counts  This argument must be
+                              specified at least once. Required. 
+
+--output,-O <File>            tar.gz of artifact prior tables  Required. 
+
+
+Optional Arguments:
+
+--arguments_file <File>       read one or more arguments files and add them to the command line  This argument may be
+                              specified 0 or more times. Default value: null. 
+
+--convergence-threshold <Double>
+                              Stop the EM when the distance between parameters between iterations falls below this value
+                              Default value: 1.0E-4. 
+
+--gatk-config-file <String>   A configuration file to use with the GATK.  Default value: null. 
+
+--gcs-max-retries,-gcs-retries <Integer>
+                              If the GCS bucket channel errors out, how many times it will attempt to re-initiate the
+                              connection  Default value: 20. 
+
+--gcs-project-for-requester-pays <String>
+                              Project to bill when accessing "requester pays" buckets. If unset, these buckets cannot be
+                              accessed.  User must have storage.buckets.get permission on the bucket being accessed. 
+                              Default value: . 
+
+--help,-h <Boolean>           display the help message  Default value: false. Possible values: {true, false} 
+
+--max-depth <Integer>         sites with depth higher than this value will be grouped  Default value: 200. 
+
+--num-em-iterations <Integer> give up on EM after this many iterations  Default value: 20. 
+
+--QUIET <Boolean>             Whether to suppress job-summary info on System.err.  Default value: false. Possible
+                              values: {true, false} 
+
+--tmp-dir <GATKPath>          Temp directory to use.  Default value: null. 
+
+--use-jdk-deflater,-jdk-deflater <Boolean>
+                              Whether to use the JdkDeflater (as opposed to IntelDeflater)  Default value: false.
+                              Possible values: {true, false} 
+
+--use-jdk-inflater,-jdk-inflater <Boolean>
+                              Whether to use the JdkInflater (as opposed to IntelInflater)  Default value: false.
+                              Possible values: {true, false} 
+
+--verbosity <LogLevel>        Control verbosity of logging.  Default value: INFO. Possible values: {ERROR, WARNING,
+                              INFO, DEBUG} 
+
+--version <Boolean>           display the version number for this tool  Default value: false. Possible values: {true,
+                              false} 
+
+
+Advanced Arguments:
+
+--showHidden <Boolean>        display hidden arguments  Default value: false. Possible values: {true, false} 
+
+Tool returned:
+0

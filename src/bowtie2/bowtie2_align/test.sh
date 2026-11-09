@@ -44,7 +44,7 @@ log "Starting TEST 1: Single-end alignment"
 
 log "Executing $meta_name with single-end reads..."
 "$meta_executable" \
-  --index "$test_data_dir/index/genome" \
+  --index "$test_data_dir/index" \
   --unpaired "$test_data_dir/reads_single.fastq" \
   --output "$meta_temp_dir/single_end.sam"
 
@@ -67,7 +67,7 @@ log "Starting TEST 2: Paired-end alignment"
 
 log "Executing $meta_name with paired-end reads..."
 "$meta_executable" \
-  --index "$test_data_dir/index/genome" \
+  --index "$test_data_dir/index" \
   --mate1 "$test_data_dir/reads_R1.fastq" \
   --mate2 "$test_data_dir/reads_R2.fastq" \
   --output "$meta_temp_dir/paired_end.sam"
@@ -91,7 +91,7 @@ log "Starting TEST 3: Advanced alignment parameters"
 
 log "Executing $meta_name with advanced parameters..."
 "$meta_executable" \
-  --index "$test_data_dir/index/genome" \
+  --index "$test_data_dir/index" \
   --unpaired "$test_data_dir/reads_single.fastq" \
   --output "$meta_temp_dir/advanced.sam" \
   --threads 2 \
@@ -109,7 +109,7 @@ log "Starting TEST 4: Output format options"
 
 log "Executing $meta_name with BAM output..."
 "$meta_executable" \
-  --index "$test_data_dir/index/genome" \
+  --index "$test_data_dir/index" \
   --unpaired "$test_data_dir/reads_single.fastq" \
   --output "$meta_temp_dir/output.bam" \
   --threads 2
@@ -131,5 +131,137 @@ else
 fi
 
 log "✅ TEST 4 completed successfully"
+
+# --- Test Case 5: Large index directory ---
+log "Starting TEST 5: Large index directory"
+
+log "Building a 'large' bowtie2 index (.bt2l files)..."
+mkdir -p "$test_data_dir/large_index"
+bowtie2-build --large-index "$test_data_dir/genome.fasta" "$test_data_dir/large_index/genome" >/dev/null 2>&1
+check_file_exists "$test_data_dir/large_index/genome.1.bt2l" "large bowtie2 index file"
+
+log "Executing $meta_name with a large index directory..."
+"$meta_executable" \
+  --index "$test_data_dir/large_index" \
+  --unpaired "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/large_index.sam"
+
+log "Validating TEST 5 outputs..."
+check_file_exists "$meta_temp_dir/large_index.sam" "large index SAM output"
+check_file_not_empty "$meta_temp_dir/large_index.sam" "large index SAM output"
+
+if head -5 "$meta_temp_dir/large_index.sam" | grep -q "^@"; then
+  log "✓ SAM file contains proper headers"
+else
+  log_error "SAM file does not contain proper headers"
+  exit 1
+fi
+
+log "✅ TEST 5 completed successfully"
+
+# --- Test Case 6: Directory without index files ---
+log "Starting TEST 6: Directory without bowtie2 index files"
+
+mkdir -p "$test_data_dir/empty_index"
+
+log "Executing $meta_name with an index directory that holds no index files..."
+if "$meta_executable" \
+  --index "$test_data_dir/empty_index" \
+  --unpaired "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/empty_index.sam" 2> "$meta_temp_dir/empty_index.log"; then
+  log_error "Expected failure when the index directory contains no index files"
+  exit 1
+fi
+
+log "Validating TEST 6 outputs..."
+check_file_contains "$meta_temp_dir/empty_index.log" "no bowtie2 index files" "error message about missing index files"
+
+log "✅ TEST 6 completed successfully"
+
+# --- Test Case 7: Directory with multiple indices ---
+log "Starting TEST 7: Directory containing multiple bowtie2 indices"
+
+mkdir -p "$test_data_dir/multi_index"
+cp "$test_data_dir/index/genome".*.bt2 "$test_data_dir/multi_index/"
+for file in "$test_data_dir/index/genome".*.bt2; do
+  cp "$file" "$test_data_dir/multi_index/other$(basename "$file" | sed 's/^genome//')"
+done
+
+log "Executing $meta_name with an index directory that holds two indices..."
+if "$meta_executable" \
+  --index "$test_data_dir/multi_index" \
+  --unpaired "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/multi_index.sam" 2> "$meta_temp_dir/multi_index.log"; then
+  log_error "Expected failure when the index directory contains multiple indices"
+  exit 1
+fi
+
+log "Validating TEST 7 outputs..."
+check_file_contains "$meta_temp_dir/multi_index.log" "multiple bowtie2 indices" "error message about multiple indices"
+check_file_contains "$meta_temp_dir/multi_index.log" "index_prefix" "error message pointing at --index_prefix"
+
+log "✅ TEST 7 completed successfully"
+
+# --- Test Case 8: Index directory of symlinks ---
+log "Starting TEST 8: Index directory containing symlinks"
+
+log "Creating an index directory of symlinks, as a workflow engine would stage it..."
+mkdir -p "$test_data_dir/symlink_index"
+ln -s "$test_data_dir/index/genome".*.bt2 "$test_data_dir/symlink_index/"
+
+log "Executing $meta_name with a symlinked index directory..."
+"$meta_executable" \
+  --index "$test_data_dir/symlink_index" \
+  --unpaired "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/symlink_index.sam"
+
+log "Validating TEST 8 outputs..."
+check_file_exists "$meta_temp_dir/symlink_index.sam" "symlinked index SAM output"
+check_file_not_empty "$meta_temp_dir/symlink_index.sam" "symlinked index SAM output"
+
+log "✅ TEST 8 completed successfully"
+
+# --- Test Case 9: Selecting one index out of a directory holding several ---
+log "Starting TEST 9: Selecting an index with --index_prefix"
+
+# The directory built for TEST 7 holds the 'genome' and 'other' indices, so the
+# prefix is what decides which of the two the reads are aligned against.
+log "Executing $meta_name with --index_prefix on an ambiguous index directory..."
+"$meta_executable" \
+  --index "$test_data_dir/multi_index" \
+  --index_prefix "other" \
+  --unpaired "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/index_prefix.sam"
+
+log "Validating TEST 9 outputs..."
+check_file_exists "$meta_temp_dir/index_prefix.sam" "selected-index SAM output"
+check_file_not_empty "$meta_temp_dir/index_prefix.sam" "selected-index SAM output"
+
+if head -5 "$meta_temp_dir/index_prefix.sam" | grep -q "^@"; then
+  log "✓ SAM file contains proper headers"
+else
+  log_error "SAM file does not contain proper headers"
+  exit 1
+fi
+
+log "✅ TEST 9 completed successfully"
+
+# --- Test Case 10: An index prefix that is not present ---
+log "Starting TEST 10: Index prefix that is not present"
+
+log "Executing $meta_name with an index prefix that is not present..."
+if "$meta_executable" \
+  --index "$test_data_dir/index" \
+  --index_prefix "not_an_index" \
+  --unpaired "$test_data_dir/reads_single.fastq" \
+  --output "$meta_temp_dir/unknown_prefix.sam" 2> "$meta_temp_dir/unknown_prefix.log"; then
+  log_error "Expected failure when the index prefix is not present in the index directory"
+  exit 1
+fi
+
+log "Validating TEST 10 outputs..."
+check_file_contains "$meta_temp_dir/unknown_prefix.log" "not_an_index" "error message naming the index prefix"
+
+log "✅ TEST 10 completed successfully"
 
 print_test_summary "All tests completed successfully"

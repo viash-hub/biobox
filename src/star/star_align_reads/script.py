@@ -52,13 +52,16 @@ par["readFilesIn"] = readFilesIn
 
 ##################################################
 
-# determine readFilesCommand
-if input_r1[0].endswith(".gz"):
+# determine readFilesCommand, unless the user already specified one
+if par.get("read_files_command"):
+    print(">> Using the user-specified read_files_command", flush=True)
+    pass
+elif input_r1[0].endswith(".gz"):
     print(">> Input files are gzipped, setting readFilesCommand to zcat", flush=True)
-    par["readFilesCommand"] = "zcat"
+    par["read_files_command"] = "zcat"
 elif input_r1[0].endswith(".bz2"):
     print(">> Input files are bzipped, setting readFilesCommand to bzcat", flush=True)
-    par["readFilesCommand"] = "bzcat"
+    par["read_files_command"] = "bzcat"
 
 ##################################################
 # store output paths

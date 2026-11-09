@@ -96,7 +96,7 @@ cellranger count \
   ${par_no_libraries:+--no-libraries} \
   ${par_check_library_compatibility:+"--check-library-compatibility=${par_check_library_compatibility}"} \
   ${par_cell_annotation_model:+"--cell-annotation-model=${par_cell_annotation_model}"} \
-  ${par_min_cripser_umi:+"--min-cripser-umi=${par_min_cripser_umi}"} \
+  ${par_min_crispr_umi:+"--min-crispr-umi=${par_min_crispr_umi}"} \
   ${par_tenx_cloud_token:+"--tenx-cloud-token-path=${par_tenx_cloud_token}"} \
   ${par_dry:+--dry-run}
 

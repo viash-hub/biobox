@@ -1,0 +1,558 @@
+name: gatk4_mutect2
+namespace: gatk4
+description: |
+  Calls somatic SNVs and indels via local assembly of haplotypes.
+
+  Mutect2 calls somatic short variants in one or more tumor samples,
+  optionally with one or more matched normal samples (tumor-normal mode)
+  or without a normal sample (tumor-only mode). A germline resource (for
+  example gnomAD) and a panel of normals can be used to separate somatic
+  variants from germline variants and technical artifacts.
+
+  The output is a raw, unfiltered VCF file, a stats file and (optionally)
+  the F1R2 counts. Use `gatk4 LearnReadOrientationModel` on the F1R2
+  counts and `gatk4 FilterMutectCalls` on the VCF and stats files to get
+  the filtered somatic calls.
+keywords: [variant calling, somatic, GATK, GATK4, Mutect2, SNV, indel]
+links:
+  homepage: https://gatk.broadinstitute.org
+  documentation: https://gatk.broadinstitute.org/hc/en-us
+  repository: https://github.com/broadinstitute/gatk
+references:
+  doi: 10.1101/201178
+license: Apache-2.0
+requirements:
+  commands: [gatk]
+authors:
+  - __merge__: /src/_authors/luke_zappia.yaml
+    roles: [author, maintainer]
+
+argument_groups:
+  - name: "Input"
+    arguments:
+      - name: "--input"
+        alternatives: [-I]
+        type: file
+        multiple: true
+        description: |
+          Input BAM file(s) containing the reads of the tumor and (if any)
+          the normal samples.
+
+          The files must be coordinate-sorted and indexed (see `--bai`).
+          Specify this argument once per input BAM file. The normal
+          samples are identified with `--normal_sample`.
+        required: true
+        example: [tumor.bam, normal.bam]
+      - name: "--bai"
+        type: file
+        multiple: true
+        description: |
+          BAM index file(s) (`.bai`) for the input BAM file(s), in the same
+          order as `--input`.
+        required: true
+        example: [tumor.bam.bai, normal.bam.bai]
+      - name: "--reference"
+        alternatives: [-R]
+        type: file
+        description: Reference sequence FASTA file.
+        required: true
+        example: reference.fasta
+      - name: "--reference_fai"
+        type: file
+        description: FASTA index file (`.fai`) for the reference sequence.
+        required: true
+        example: reference.fasta.fai
+      - name: "--reference_dict"
+        type: file
+        description: Sequence dictionary (`.dict`) file for the reference sequence.
+        required: true
+        example: reference.dict
+      - name: "--normal_sample"
+        alternatives: [-normal]
+        type: string
+        multiple: true
+        description: |
+          Sample name(s) of the normal sample(s), as given by the `SM` tag
+          of the `@RG` header lines in `--input`.
+
+          All other samples in `--input` are tumor samples. If not
+          provided, Mutect2 runs in tumor-only mode.
+        example: [normal]
+      - name: "--germline_resource"
+        type: file
+        description: |
+          Population VCF file of germline variants with allele frequencies
+          in the `AF` INFO field (for example gnomAD), used to calculate the
+          probability that a variant is germline.
+        example: af-only-gnomad.vcf.gz
+      - name: "--germline_resource_index"
+        type: file
+        description: |
+          Index file for `--germline_resource` (`.tbi` for a `.vcf.gz`
+          file, `.idx` for a `.vcf` file).
+
+          If not provided, a copy of `--germline_resource` is indexed
+          before the run.
+        example: af-only-gnomad.vcf.gz.tbi
+      - name: "--panel_of_normals"
+        alternatives: [-pon]
+        type: file
+        description: |
+          Panel of normals VCF file of sites that are seen in normal
+          samples, used to filter technical artifacts.
+        example: pon.vcf.gz
+      - name: "--panel_of_normals_index"
+        type: file
+        description: |
+          Index file for `--panel_of_normals` (`.tbi` for a `.vcf.gz` file,
+          `.idx` for a `.vcf` file).
+
+          If not provided, a copy of `--panel_of_normals` is indexed before
+          the run.
+        example: pon.vcf.gz.tbi
+      - name: "--alleles"
+        type: file
+        description: |
+          VCF file with the set of alleles to force-call regardless of
+          evidence.
+        example: alleles.vcf.gz
+      - name: "--alleles_index"
+        type: file
+        description: |
+          Index file for `--alleles` (`.tbi` for a `.vcf.gz` file, `.idx`
+          for a `.vcf` file).
+
+          If not provided, a copy of `--alleles` is indexed before the run.
+        example: alleles.vcf.gz.tbi
+
+  - name: "Output"
+    arguments:
+      - name: "--output"
+        alternatives: [-O]
+        type: file
+        direction: output
+        description: |
+          Output VCF file with the raw, unfiltered somatic calls, used as
+          input to `gatk4 FilterMutectCalls`.
+        required: true
+        example: unfiltered.vcf.gz
+      - name: "--output_stats"
+        type: file
+        direction: output
+        description: |
+          Output stats file of the calling run, used as input to
+          `gatk4 FilterMutectCalls` (`--stats`).
+        required: true
+        example: unfiltered.vcf.gz.stats
+      - name: "--output_index"
+        type: file
+        direction: output
+        description: |
+          Output index file for `--output` (`.tbi` for a bgzipped
+          `.vcf.gz` or `.vcf.bgz` file, `.idx` otherwise). Required when
+          `--create_output_variant_index` is `true`, ignored when it is `false`.
+        must_exist: false
+        example: unfiltered.vcf.gz.tbi
+      - name: "--create_f1r2_tar_gz"
+        type: boolean_true
+        description: |
+          Collect the F1R2 counts and write them to `--f1r2_tar_gz`.
+      - name: "--f1r2_tar_gz"
+        type: file
+        direction: output
+        description: |
+          Output `.tar.gz` file with the F1R2 counts. Required when
+          `--create_f1r2_tar_gz` is `true`, ignored when it is `false`.
+        must_exist: false
+        example: f1r2.tar.gz
+      - name: "--create_bam_output"
+        type: boolean_true
+        description: |
+          Write the assembled haplotypes to `--bam_output`.
+      - name: "--bam_output"
+        alternatives: [-bamout]
+        type: file
+        direction: output
+        description: |
+          Output BAM file with the assembled haplotypes (see
+          `--bam_writer_type`). Required when `--create_bam_output` is
+          `true`, ignored when it is `false`.
+        must_exist: false
+        example: bamout.bam
+      - name: "--bam_output_index"
+        type: file
+        direction: output
+        description: |
+          Output index file (`.bai`) for `--bam_output`. Required when
+          `--create_bam_output` is `true` and `--create_output_bam_index`
+          is `true`, ignored otherwise.
+        must_exist: false
+        example: bamout.bai
+
+  - name: "Options"
+    arguments:
+      - name: "--active_probability_threshold"
+        type: double
+        description: |
+          Minimum probability for a locus to be considered active.
+          Default: 0.002.
+      - name: "--af_of_alleles_not_in_resource"
+        alternatives: [-default-af]
+        type: double
+        description: |
+          Population allele fraction assigned to alleles that are not found
+          in `--germline_resource`. The default value (-1.0) makes Mutect2
+          derive a value from the data. Default: -1.0.
+      - name: "--annotation"
+        alternatives: [-A]
+        type: string
+        multiple: true
+        description: |
+          One or more specific annotations to add to variant calls, e.g.
+          `OrientationBiasReadCounts`.
+        example: [OrientationBiasReadCounts]
+        choices:
+          - AlleleFraction
+          - AllelePseudoDepth
+          - AS_BaseQualityRankSumTest
+          - AS_FisherStrand
+          - AS_InbreedingCoeff
+          - AS_MappingQualityRankSumTest
+          - AS_QualByDepth
+          - AS_ReadPosRankSumTest
+          - AS_RMSMappingQuality
+          - AS_StrandBiasMutectAnnotation
+          - AS_StrandOddsRatio
+          - AssemblyComplexity
+          - BaseQuality
+          - BaseQualityHistogram
+          - BaseQualityRankSumTest
+          - ChromosomeCounts
+          - ClippingRankSumTest
+          - CountNs
+          - Coverage
+          - CycleSkipStatus
+          - DepthPerAlleleBySample
+          - DepthPerSampleHC
+          - ExcessHet
+          - FisherStrand
+          - FragmentDepthPerAlleleBySample
+          - FragmentLength
+          - GcContent
+          - GenotypeSummaries
+          - HaplotypeFilteringAnnotation
+          - HmerIndelLength
+          - HmerIndelNuc
+          - HmerMotifs
+          - InbreedingCoeff
+          - IndelClassify
+          - IndelLength
+          - LikelihoodRankSumTest
+          - MappingQuality
+          - MappingQualityRankSumTest
+          - MappingQualityZero
+          - OrientationBiasReadCounts
+          - OriginalAlignment
+          - PossibleDeNovo
+          - QualByDepth
+          - RawGtCount
+          - ReadPosition
+          - ReadPosRankSumTest
+          - ReferenceBases
+          - RMSMappingQuality
+          - SampleList
+          - StrandBiasBySample
+          - StrandOddsRatio
+          - TandemRepeat
+          - TransmittedSingleton
+          - UniqueAltReadCount
+          - VariantType
+      - name: "--annotation_group"
+        alternatives: [-G]
+        type: string
+        multiple: true
+        description: |
+          One or more groups of annotations to apply to variant calls.
+        example: [StandardMutectAnnotation]
+        choices:
+          - AlleleSpecificAnnotation
+          - AS_StandardAnnotation
+          - GenotypeAnnotation
+          - InfoFieldAnnotation
+          - JumboGenotypeAnnotation
+          - JumboInfoAnnotation
+          - ReducibleAnnotation
+          - StandardAnnotation
+          - StandardFlowBasedAnnotation
+          - StandardHCAnnotation
+          - StandardMutectAnnotation
+          - VariantAnnotation
+      - name: "--annotations_to_exclude"
+        alternatives: [-AX]
+        type: string
+        multiple: true
+        description: |
+          One or more specific annotations to exclude from variant calls.
+        example: [TandemRepeat]
+        choices:
+          - AS_StrandBiasMutectAnnotation
+          - BaseQuality
+          - Coverage
+          - DepthPerAlleleBySample
+          - DepthPerSampleHC
+          - FragmentDepthPerAlleleBySample
+          - FragmentLength
+          - MappingQuality
+          - OrientationBiasReadCounts
+          - ReadPosition
+          - StrandBiasBySample
+          - TandemRepeat
+      - name: "--assembly_region_padding"
+        type: integer
+        description: |
+          Number of additional bases of context to include around each
+          assembly region. Default: 100.
+      - name: "--bam_writer_type"
+        type: string
+        description: |
+          Which haplotypes to write to `--bam_output`.
+          Default: 'CALLED_HAPLOTYPES'.
+        choices:
+          - ALL_POSSIBLE_HAPLOTYPES
+          - CALLED_HAPLOTYPES
+          - NO_HAPLOTYPES
+          - CALLED_HAPLOTYPES_NO_READS
+      - name: "--base_quality_score_threshold"
+        type: integer
+        description: |
+          Base qualities below this threshold are reduced to the minimum
+          (6). Default: 18.
+      - name: "--callable_depth"
+        type: integer
+        description: |
+          Minimum depth for a site to be considered callable in the Mutect2
+          stats. Does not affect genotyping. Default: 10.
+      - name: "--dont_use_soft_clipped_bases"
+        type: boolean_true
+        description: |
+          Do not analyze soft-clipped bases in the reads.
+      - name: "--downsampling_stride"
+        alternatives: [-stride]
+        type: integer
+        description: |
+          Downsample a pool of reads that start within a range of one or
+          more bases. Default: 1.
+      - name: "--exclude_intervals"
+        alternatives: [-XL]
+        type: file
+        multiple: true
+        description: |
+          One or more genomic intervals to exclude from processing,
+          provided as files (e.g. BED, interval_list or VCF).
+        example: [exclude_intervals.bed]
+      - name: "--exclude_intervals_index"
+        type: file
+        multiple: true
+        description: |
+          Index files for the VCF files in `--exclude_intervals` (`.tbi`
+          for a `.vcf.gz` file, `.idx` for a `.vcf` file), in the same
+          order as the VCF files in `--exclude_intervals`. Other interval
+          files do not get an index.
+
+          If not provided, a copy of each VCF `--exclude_intervals` file is
+          indexed before the run. If provided, one index must be given for
+          each VCF file in `--exclude_intervals`.
+        example: [exclude_intervals.vcf.gz.tbi]
+      - name: "--f1r2_max_depth"
+        type: integer
+        description: |
+          Sites with a depth higher than this value are grouped together in
+          the F1R2 counts. Default: 200.
+      - name: "--f1r2_median_mq"
+        type: integer
+        description: |
+          Skip sites with a median mapping quality below this value in the
+          F1R2 counts. Default: 50.
+      - name: "--f1r2_min_bq"
+        type: integer
+        description: |
+          Exclude bases below this quality from the F1R2 pileup.
+          Default: 20.
+      - name: "--force_active"
+        type: boolean_true
+        description: |
+          If set, all regions are marked as active, disabling the active
+          region detection step.
+      - name: "--force_call_filtered_alleles"
+        alternatives: [-genotype-filtered-alleles]
+        type: boolean_true
+        description: |
+          Force-call the filtered alleles in `--alleles`.
+      - name: "--genotype_germline_sites"
+        type: boolean_true
+        description: |
+          Call all apparent germline sites, even though they will be
+          filtered later.
+      - name: "--genotype_pon_sites"
+        type: boolean_true
+        description: |
+          Call the sites in `--panel_of_normals`, even though they will be
+          filtered later.
+      - name: "--ignore_itr_artifacts"
+        type: boolean_true
+        description: |
+          Turn off the read transformer that clips artifacts associated
+          with end repair insertions near inverted tandem repeats.
+      - name: "--initial_tumor_lod"
+        alternatives: [-init-lod]
+        type: double
+        description: |
+          Log 10 odds threshold to consider a pileup active. Default: 2.0.
+      - name: "--interval_set_rule"
+        alternatives: [-isr]
+        type: string
+        description: |
+          Set merging approach to use to combine the `--intervals` inputs.
+          Default: 'UNION'.
+        choices: [UNION, INTERSECTION]
+      - name: "--intervals"
+        alternatives: [-L]
+        type: file
+        multiple: true
+        description: |
+          One or more genomic intervals over which to operate, provided as
+          files (e.g. BED, interval_list or VCF).
+
+          Specify this argument more than once to combine intervals (see
+          `--interval_set_rule`).
+        example: [intervals.bed]
+      - name: "--intervals_index"
+        type: file
+        multiple: true
+        description: |
+          Index files for the VCF files in `--intervals` (`.tbi` for a
+          `.vcf.gz` file, `.idx` for a `.vcf` file), in the same order as
+          the VCF files in `--intervals`. Other interval files do not get
+          an index.
+
+          If not provided, a copy of each VCF `--intervals` file is indexed
+          before the run. If provided, one index must be given for each VCF
+          file in `--intervals`.
+        example: [intervals.vcf.gz.tbi]
+      - name: "--kmer_size"
+        type: integer
+        multiple: true
+        description: |
+          Kmer size(s) to use in the read threading assembler. Default:
+          10, 25.
+      - name: "--max_assembly_region_size"
+        type: integer
+        description: |
+          Maximum size of an assembly region. Default: 300.
+      - name: "--max_mnp_distance"
+        alternatives: [-mnp-dist]
+        type: integer
+        description: |
+          Two or more phased substitutions separated by this distance or
+          less are merged into MNPs. Set to `0` when calling the normal
+          samples for a panel of normals. Default: 1.
+      - name: "--max_population_af"
+        alternatives: [-max-af]
+        type: double
+        description: |
+          Maximum population allele frequency in tumor-only mode.
+          Default: 0.01.
+      - name: "--max_reads_per_alignment_start"
+        type: integer
+        description: |
+          Maximum number of reads to retain per alignment start position.
+
+          Reads above this threshold will be downsampled. Set to `0` to
+          disable. Default: 50.
+      - name: "--max_suspicious_reads_per_alignment_start"
+        type: integer
+        description: |
+          Maximum number of suspicious reads (mediocre mapping quality or
+          too many substitutions) allowed in a downsampling stride. Set to
+          `0` to disable. Default: 0.
+      - name: "--min_assembly_region_size"
+        type: integer
+        description: |
+          Minimum size of an assembly region. Default: 50.
+      - name: "--min_base_quality_score"
+        alternatives: [-mbq]
+        type: integer
+        description: |
+          Minimum base quality required to consider a base for calling.
+          Default: 10.
+      - name: "--min_pruning"
+        type: integer
+        description: |
+          Minimum support to not prune paths in the assembly graph.
+          Default: 2.
+      - name: "--minimum_allele_fraction"
+        alternatives: [-min-AF]
+        type: double
+        description: |
+          Lower bound of the variant allele fractions to consider when
+          calculating the variant LOD. Default: 0.0.
+      - name: "--minimum_mapping_quality"
+        type: integer
+        description: |
+          Minimum mapping quality (inclusive) of the reads to keep, used by
+          the tool-default mapping quality read filter. Default: 20.
+      - name: "--mitochondria_mode"
+        type: boolean_true
+        description: |
+          Mitochondria mode, sets the emission and initial LODs to 0.
+      - name: "--normal_lod"
+        type: double
+        description: |
+          Log 10 odds threshold for calling a normal variant non-germline.
+          Default: 2.2.
+      - name: "--pcr_indel_model"
+        type: string
+        description: |
+          The PCR indel model to use.
+
+          Set this parameter to `NONE` to disable the PCR indel model, for
+          example when using PCR-free sequencing data. Default:
+          'CONSERVATIVE'.
+        choices: [NONE, HOSTILE, AGGRESSIVE, CONSERVATIVE]
+      - name: "--pcr_indel_qual"
+        type: integer
+        description: |
+          Phred-scaled PCR indel quality for overlapping fragments.
+          Default: 40.
+      - name: "--pcr_snv_qual"
+        type: integer
+        description: |
+          Phred-scaled PCR SNV quality for overlapping fragments.
+          Default: 40.
+      - name: "--tumor_lod_to_emit"
+        alternatives: [-emit-lod]
+        type: double
+        description: |
+          Log 10 odds threshold to emit a variant to the VCF. Default: 3.0.
+
+__merge__: /src/gatk4/utils/common_argument_groups.yaml
+
+resources:
+  - type: bash_script
+    path: script.sh
+  - path: /src/gatk4/utils/script_helpers.sh
+    dest: gatk4/script_helpers.sh
+
+test_resources:
+  - type: bash_script
+    path: test.sh
+  - path: /src/_utils/test_helpers.sh
+  - path: /src/gatk4/utils/test_helpers.sh
+    dest: gatk4/test_helpers.sh
+
+engines:
+  - __merge__: /src/gatk4/utils/common_engines.yaml
+
+runners:
+  - type: executable
+  - type: nextflow
