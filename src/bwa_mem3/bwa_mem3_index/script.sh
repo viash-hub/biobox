@@ -40,7 +40,7 @@ cmd_args=(
   ${par_emit_unpacked_ref:+--emit-unpacked-ref}
   ${par_sa_sample_rate:+-u "$par_sa_sample_rate"}
   ${meta_cpus:+-t "$meta_cpus"}
-  ${meta_memory_gb:+--max-memory "${meta_memory_gb}G"}
+  ${meta_memory_mb:+--max-memory "$(( meta_memory_mb * 8 / 10 ))M"}
   --tmp-dir "$tmp_dir"
 )
 
