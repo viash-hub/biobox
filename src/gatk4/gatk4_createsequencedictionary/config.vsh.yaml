@@ -1,4 +1,7 @@
 name: gatk4_createsequencedictionary
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml
 description: |
   Creates a sequence dictionary (`.dict` file) for a reference sequence.
 
@@ -77,7 +80,3 @@ argument_groups:
           URI to put in the `UR` field of the sequence dictionary entries,
           describing where the reference file can be found. If not supplied,
           the absolute path of the input reference file is used.
-
-__merge__:
-  - /src/gatk4/utils/common_metadata.yaml
-  - /src/gatk4/utils/common_resources.yaml

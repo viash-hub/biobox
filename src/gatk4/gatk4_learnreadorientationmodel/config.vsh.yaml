@@ -1,4 +1,7 @@
 name: gatk4_learnreadorientationmodel
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml
 description: |
   Learns a read orientation bias model from the F1R2 counts collected by
   `gatk4 Mutect2`.
@@ -56,7 +59,3 @@ argument_groups:
         description: |
           Give up on the EM algorithm after this many iterations.
           Default: 20.
-
-__merge__:
-  - /src/gatk4/utils/common_metadata.yaml
-  - /src/gatk4/utils/common_resources.yaml

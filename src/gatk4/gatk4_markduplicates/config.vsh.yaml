@@ -1,4 +1,7 @@
 name: gatk4_markduplicates
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml
 description: |
   Identifies duplicate reads in a SAM/BAM/CRAM file.
 
@@ -263,7 +266,3 @@ argument_groups:
           qualities, tags) do not otherwise need to be decoded. Default:
           'STRICT'.
         choices: [STRICT, LENIENT, SILENT]
-
-__merge__:
-  - /src/gatk4/utils/common_metadata.yaml
-  - /src/gatk4/utils/common_resources.yaml

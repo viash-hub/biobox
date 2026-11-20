@@ -1,4 +1,7 @@
 name: gatk4_applybqsr
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml
 description: |
   Apply a linear base quality recalibration model trained with the
   BaseRecalibrator tool.
@@ -129,7 +132,3 @@ argument_groups:
   - __merge__: /src/gatk4/utils/read_argument_group.yaml
   - __merge__: /src/gatk4/utils/bam_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
-
-__merge__:
-  - /src/gatk4/utils/common_metadata.yaml
-  - /src/gatk4/utils/common_resources.yaml

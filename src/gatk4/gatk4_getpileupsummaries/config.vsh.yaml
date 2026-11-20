@@ -1,4 +1,7 @@
 name: gatk4_getpileupsummaries
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml
 description: |
   Summarizes the read counts of a sample at a set of known variant sites,
   for use in the estimation of cross-sample contamination.
@@ -110,7 +113,3 @@ argument_groups:
       `--intervals`. To summarize only the sites in a set of targets, give
       a target BED file and the `--variant` VCF to `--intervals` and use
       `--interval_set_rule INTERSECTION`.
-
-__merge__:
-  - /src/gatk4/utils/common_metadata.yaml
-  - /src/gatk4/utils/common_resources.yaml

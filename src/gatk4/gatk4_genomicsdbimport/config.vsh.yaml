@@ -1,4 +1,7 @@
 name: gatk4_genomicsdbimport
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml
 description: |
   Imports single-sample GVCFs into a GenomicsDB before joint genotyping.
 
@@ -207,7 +210,3 @@ argument_groups:
 #                        file URI. The files listed in the map are not
 #                        staged by Viash or Nextflow, so it is replaced by
 #                        `--variant` together with `--sample_name`.
-
-__merge__:
-  - /src/gatk4/utils/common_metadata.yaml
-  - /src/gatk4/utils/common_resources.yaml

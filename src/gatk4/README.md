@@ -27,7 +27,8 @@ Use the helpers instead of writing the same logic again in a component.
 Merge only the shared argument groups that apply to the tool, so that each component has only arguments that change what the tool does.
 Prefer groups over single-argument files.
 A component can add arguments to a merged group and override the group `description`, but it cannot change individual arguments of the group.
-Merge the root files at the end of the config, because a block scalar at the end of a YAML file loses its trailing newline.
+Merge the root files with one `__merge__` list directly after `name:`, where other components define their metadata.
+Viash drops the final line break of a config file, so if a config ends with a block scalar (for example an argument `description: |`), that text loses its trailing newline. This does not change the `--help` output.
 List fields (`choices`, list `example`) of a merged argument cannot be shortened, so shared files only use string examples.
 If a new component needs new logic that another component could use, add it to the helpers.
 
