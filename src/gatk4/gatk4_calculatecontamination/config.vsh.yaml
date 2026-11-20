@@ -1,4 +1,7 @@
 name: gatk4_calculatecontamination
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml
 description: |
   Calculates the fraction of reads that come from cross-sample
   contamination.
@@ -72,7 +75,3 @@ argument_groups:
         description: |
           The minimum coverage of a site relative to the median coverage.
           Default: 0.5.
-
-__merge__:
-  - /src/gatk4/utils/common_metadata.yaml
-  - /src/gatk4/utils/common_resources.yaml

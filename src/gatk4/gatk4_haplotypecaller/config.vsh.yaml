@@ -1,4 +1,7 @@
 name: gatk4_haplotypecaller
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml
 description: |
   Calls germline SNVs and indels via local re-assembly of haplotypes.
 
@@ -305,7 +308,3 @@ argument_groups:
   - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/bam_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
-
-__merge__:
-  - /src/gatk4/utils/common_metadata.yaml
-  - /src/gatk4/utils/common_resources.yaml

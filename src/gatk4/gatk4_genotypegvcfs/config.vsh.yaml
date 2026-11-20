@@ -1,4 +1,7 @@
 name: gatk4_genotypegvcfs
+__merge__:
+  - /src/gatk4/utils/common_metadata.yaml
+  - /src/gatk4/utils/common_resources.yaml
 description: |
   Perform joint genotyping on one or more samples previously called with
   HaplotypeCaller in GVCF mode.
@@ -334,7 +337,3 @@ argument_groups:
   - __merge__: /src/gatk4/utils/engine_argument_group.yaml
   - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
-
-__merge__:
-  - /src/gatk4/utils/common_metadata.yaml
-  - /src/gatk4/utils/common_resources.yaml
