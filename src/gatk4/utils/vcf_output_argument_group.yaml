@@ -1,0 +1,14 @@
+name: "GATK VCF Output Options"
+arguments:
+  - name: "--sites_only_vcf_output"
+    type: boolean_true
+    description: |
+      Only emit site-level information in the output VCF/GVCF, dropping
+      the FORMAT/genotype columns. Useful for producing a compact,
+      privacy-preserving sites-only VCF (e.g. for public release or QC).
+  - name: "--create_output_variant_index"
+    alternatives: [-OVI]
+    type: boolean
+    description: |
+      Create a VCF index (`.tbi` for a bgzipped VCF, `.idx` otherwise)
+      when writing a coordinate-sorted VCF output. Default: true.

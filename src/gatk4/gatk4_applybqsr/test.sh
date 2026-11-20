@@ -52,6 +52,12 @@ gatk BaseRecalibrator \
 check_file_exists "$recal_table" "BQSR recalibration table"
 check_file_not_empty "$recal_table" "BQSR recalibration table"
 
+reference_args=(
+  --reference "$test_data_dir/reference.fasta"
+  --reference_fai "$test_data_dir/reference.fasta.fai"
+  --reference_dict "$test_data_dir/reference.dict"
+)
+
 # --- Test Case 1: Basic ApplyBQSR ---
 log "Starting TEST 1: Basic ApplyBQSR"
 
@@ -150,7 +156,7 @@ log "Starting TEST 4: Shared GATK engine options"
 
 mkdir -p "$meta_temp_dir/test4"
 
-log "Executing $meta_name with --interval_padding, --sites_only_vcf_output, --create_output_variant_index false, --create_output_bam_index false..."
+log "Executing $meta_name with --interval_padding, --read_validation_stringency, --lenient and --create_output_bam_index false..."
 "$meta_executable" \
   --input "$test_data_dir/sample.sorted.bam" \
   --read_index "$test_data_dir/sample.sorted.bai" \
@@ -160,8 +166,8 @@ log "Executing $meta_name with --interval_padding, --sites_only_vcf_output, --cr
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test4/output.bam" \
   --interval_padding 10 \
-  --sites_only_vcf_output \
-  --create_output_variant_index false \
+  --read_validation_stringency LENIENT \
+  --lenient \
   --create_output_bam_index false
 
 log "Validating TEST 4 outputs..."
@@ -339,5 +345,162 @@ check_file_contains "$meta_temp_dir/test9/run.log" "Error: --reference is requir
 check_file_not_exists "$meta_temp_dir/test9/output.bam" "output BAM (should not be written)"
 
 log "✅ TEST 9 completed successfully"
+
+# --- Test Case 10: Inverted read filter ---
+log "Starting TEST 10: --inverted_read_filter"
+
+mkdir -p "$meta_temp_dir/test10"
+
+# All test reads are mapped, so the inverted MappedReadFilter removes all of them
+log "Executing $meta_name with --inverted_read_filter MappedReadFilter..."
+"$meta_executable" \
+  --input "$test_data_dir/sample.sorted.bam" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --bqsr_recal_file "$recal_table" \
+  --output "$meta_temp_dir/test10/output.bam" \
+  --output_index "$meta_temp_dir/test10/output.bai" \
+  --inverted_read_filter MappedReadFilter
+
+log "Validating TEST 10 outputs..."
+read_count=$(samtools view -c "$meta_temp_dir/test10/output.bam")
+if [[ "$read_count" -eq 0 ]]; then
+  log "✓ Output BAM has no reads with the inverted MappedReadFilter"
+else
+  log_error "✗ Output BAM has $read_count reads, expected 0 with the inverted MappedReadFilter"
+  exit 1
+fi
+
+log "✅ TEST 10 completed successfully"
+
+# --- Test Case 11: Two input files ---
+log "Starting TEST 11: Two --input files give one output BAM"
+
+mkdir -p "$meta_temp_dir/test11"
+
+# A second BAM with another read group and sample (10 reads at 51, 151, ...,
+# 951), and a recalibration table made from both BAMs
+positions_rg2=()
+for ((i = 0; i < 10; i++)); do
+  positions_rg2+=("$((i * 100 + 51))")
+done
+create_test_sam "$test_data_dir/reads_rg2.sam" seq1 2000 rg2 sample2 "${positions_rg2[@]}"
+sed -i 's/^read/rg2_read/' "$test_data_dir/reads_rg2.sam"
+sort_and_index_bam "$test_data_dir/reads_rg2.sam" "$test_data_dir/sample_rg2.sorted.bam"
+check_file_exists "$test_data_dir/sample_rg2.sorted.bai" "second BAM index"
+
+recal_table_two="$test_data_dir/recal_two.table"
+gatk BaseRecalibrator \
+  --input "$test_data_dir/sample.sorted.bam" \
+  --input "$test_data_dir/sample_rg2.sorted.bam" \
+  --reference "$test_data_dir/reference.fasta" \
+  --known-sites "$known_sites_vcf" \
+  --output "$recal_table_two" \
+  --verbosity ERROR
+check_file_exists "$recal_table_two" "BQSR recalibration table for two BAMs"
+
+log "Executing $meta_name with two --input and --read_index files..."
+"$meta_executable" \
+  --input "$test_data_dir/sample.sorted.bam" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
+  --input "$test_data_dir/sample_rg2.sorted.bam" \
+  --read_index "$test_data_dir/sample_rg2.sorted.bai" \
+  "${reference_args[@]}" \
+  --bqsr_recal_file "$recal_table_two" \
+  --output "$meta_temp_dir/test11/output.bam" \
+  --output_index "$meta_temp_dir/test11/output.bai"
+
+log "Validating TEST 11 outputs..."
+check_file_exists "$meta_temp_dir/test11/output.bam" "recalibrated BAM (two inputs)"
+check_file_exists "$meta_temp_dir/test11/output.bai" "output BAM index (two inputs)"
+
+read_count=$(samtools view -c "$meta_temp_dir/test11/output.bam")
+if [[ "$read_count" == "30" ]]; then
+  log "✓ output BAM has the reads of both inputs ($read_count reads)"
+else
+  log_error "✗ output BAM has $read_count reads, expected 30"
+  exit 1
+fi
+read_groups=$(samtools view -H "$meta_temp_dir/test11/output.bam" | grep '^@RG' | cut -f2 | sort | tr '\n' ' ')
+if [[ "$read_groups" == "ID:rg1 ID:rg2 " ]]; then
+  log "✓ output BAM header has the read groups of both inputs: $read_groups"
+else
+  log_error "✗ output BAM header read groups are '$read_groups', expected 'ID:rg1 ID:rg2 '"
+  exit 1
+fi
+
+log "✅ TEST 11 completed successfully"
+
+# --- Test Case 12: Read group and sample read filters ---
+log "Starting TEST 12: --keep_read_group and --sample read filter values"
+
+mkdir -p "$meta_temp_dir/test12"
+
+# Check that a BAM has the expected number of reads and that all of them
+# have the expected read group
+check_read_group_reads() {
+  local bam="$1" expected_count="$2" expected_rg="$3"
+  local count other_count
+  count=$(samtools view -c "$bam")
+  other_count=$(samtools view "$bam" | grep -vc "RG:Z:${expected_rg}$" || true)
+  if [[ "$count" == "$expected_count" && "$other_count" == "0" ]]; then
+    log "✓ $(basename "$bam") has only the $count reads of read group $expected_rg"
+  else
+    log_error "✗ $(basename "$bam") has $count reads ($other_count not in $expected_rg), expected $expected_count reads of $expected_rg"
+    exit 1
+  fi
+}
+
+log "Executing $meta_name with --read_filter ReadGroupReadFilter --keep_read_group rg2..."
+"$meta_executable" \
+  --input "$test_data_dir/sample.sorted.bam" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
+  --input "$test_data_dir/sample_rg2.sorted.bam" \
+  --read_index "$test_data_dir/sample_rg2.sorted.bai" \
+  --bqsr_recal_file "$recal_table_two" \
+  --output "$meta_temp_dir/test12/keep_rg2.bam" \
+  --output_index "$meta_temp_dir/test12/keep_rg2.bai" \
+  --read_filter ReadGroupReadFilter \
+  --keep_read_group rg2
+
+check_read_group_reads "$meta_temp_dir/test12/keep_rg2.bam" 10 rg2
+
+log "Executing $meta_name with --read_filter SampleReadFilter --sample sample1..."
+"$meta_executable" \
+  --input "$test_data_dir/sample.sorted.bam" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
+  --input "$test_data_dir/sample_rg2.sorted.bam" \
+  --read_index "$test_data_dir/sample_rg2.sorted.bai" \
+  --bqsr_recal_file "$recal_table_two" \
+  --output "$meta_temp_dir/test12/sample1.bam" \
+  --output_index "$meta_temp_dir/test12/sample1.bai" \
+  --read_filter SampleReadFilter \
+  --sample sample1
+
+check_read_group_reads "$meta_temp_dir/test12/sample1.bam" 20 rg1
+
+log "✅ TEST 12 completed successfully"
+
+# --- Test Case 13: --read_index count mismatch ---
+log "Starting TEST 13: Fewer --read_index files than --input files fails"
+
+mkdir -p "$meta_temp_dir/test13"
+
+if "$meta_executable" \
+  --input "$test_data_dir/sample.sorted.bam" \
+  --input "$test_data_dir/sample_rg2.sorted.bam" \
+  --read_index "$test_data_dir/sample.sorted.bai" \
+  --bqsr_recal_file "$recal_table_two" \
+  --output "$meta_temp_dir/test13/output.bam" \
+  --output_index "$meta_temp_dir/test13/output.bai" > "$meta_temp_dir/test13/run.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with fewer --read_index files than --input files"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test13/run.log" "Error: --read_index must be given once for each file in --input" "error message"
+check_file_not_exists "$meta_temp_dir/test13/output.bam" "output BAM (should not be written)"
+
+log "✅ TEST 13 completed successfully"
 
 print_test_summary "All tests"
