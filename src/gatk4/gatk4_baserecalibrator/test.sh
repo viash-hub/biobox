@@ -191,4 +191,45 @@ check_file_contains "$meta_temp_dir/test6.log" "Error: --known_sites_index must 
 
 log "✅ TEST 6 completed successfully"
 
+# --- Test Case 7: Intersection of multiple interval files ---
+log "Starting TEST 7: Multiple --intervals files (BED and bgzipped VCF) with --interval_set_rule INTERSECTION"
+
+# Reads start at 1, 101, ..., 901 (100bp each). The area is the
+# intersection of seq1:401-800 (BED) and seq1:650 (VCF), so only the read at
+# 601 is used (100 bases, no known site in it). With UNION, the reads at 401,
+# 501, 601 and 701 would be used.
+printf 'seq1\t400\t800\n' > "$test_data_dir/intervals_a.bed"
+create_test_known_sites_vcf "$test_data_dir/intervals_site.vcf" seq1 1000 650
+create_test_vcf_gz_with_separate_index "$test_data_dir/intervals_site.vcf" \
+  "$test_data_dir/intervals_site.vcf.gz" "$test_data_dir/interval_indexes/intervals_site.vcf.gz.tbi"
+
+log "Executing $meta_name with two --intervals files, --intervals_index and --interval_set_rule INTERSECTION..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.sorted.bam" \
+  --bai "$test_data_dir/reads.sorted.bai" \
+  --reference "$test_data_dir/ref.fasta" \
+  --reference_fai "$test_data_dir/ref.fasta.fai" \
+  --reference_dict "$test_data_dir/ref.dict" \
+  --known_sites "$known_sites1" \
+  --output "$meta_temp_dir/recal_intervals.table" \
+  --intervals "$test_data_dir/intervals_a.bed" \
+  --intervals "$test_data_dir/intervals_site.vcf.gz" \
+  --intervals_index "$test_data_dir/interval_indexes/intervals_site.vcf.gz.tbi" \
+  --interval_set_rule INTERSECTION
+
+log "Validating TEST 7 outputs..."
+check_file_exists "$meta_temp_dir/recal_intervals.table" "recalibration table (multiple intervals)"
+
+# The read group row of RecalTable0 has the number of observed bases
+observations=$(awk '/^#:GATKTable:RecalTable0:/ {in_table = 1; next} in_table && $1 == "rg1" {print $5; exit}' \
+  "$meta_temp_dir/recal_intervals.table")
+if [[ "$observations" == "100" ]]; then
+  log "✓ recalibration table only has the bases of the read in the selected territory ($observations observations)"
+else
+  log_error "✗ recalibration table has '$observations' observations, expected 100"
+  exit 1
+fi
+
+log "✅ TEST 7 completed successfully"
+
 print_test_summary "All tests"

@@ -335,4 +335,53 @@ check_file_not_exists "$meta_temp_dir/no_output_index.vcf" "output VCF (no run w
 
 log "✅ TEST 10 completed successfully"
 
+# --- Test Case 11: Multiple intervals, exclusion and interval VCF index ---
+log "Starting TEST 11: Two --intervals files (BED and VCF), --exclude_intervals and --intervals_index"
+
+mkdir -p "$test_data_dir/intervals"
+# Include seq1:100-200 (BED is 0-based) and seq1:1001-1020 (the 20bp REF
+# allele of the VCF record), exclude seq1:150-160
+printf 'seq1\t99\t200\n' > "$test_data_dir/intervals/include.bed"
+printf 'seq1\t149\t160\n' > "$test_data_dir/intervals/exclude.bed"
+{
+  echo "##fileformat=VCFv4.2"
+  echo "##contig=<ID=seq1,length=2000>"
+  printf '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n'
+  printf 'seq1\t1001\t.\tATCGATCGATCGATCGATCG\tA\t50\tPASS\t.\n'
+} > "$test_data_dir/intervals/include.vcf"
+create_test_vcf_gz_with_separate_index "$test_data_dir/intervals/include.vcf" \
+  "$test_data_dir/intervals/include.vcf.gz" "$test_data_dir/intervals_index/include.vcf.gz.tbi"
+
+log "Executing $meta_name with two --intervals files and --exclude_intervals..."
+"$meta_executable" \
+  --variant "$test_data_dir/sample.g.vcf" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --output "$meta_temp_dir/output_intervals.vcf" \
+  --output_index "$meta_temp_dir/output_intervals.vcf.idx" \
+  --intervals "$test_data_dir/intervals/include.bed" \
+  --intervals "$test_data_dir/intervals/include.vcf.gz" \
+  --intervals_index "$test_data_dir/intervals_index/include.vcf.gz.tbi" \
+  --exclude_intervals "$test_data_dir/intervals/exclude.bed" \
+  --interval_set_rule UNION \
+  --include_non_variant_sites 2> "$meta_temp_dir/test11.log"
+
+log "Validating TEST 11 outputs..."
+check_file_exists "$meta_temp_dir/output_intervals.vcf" "output VCF file (intervals)"
+check_file_not_contains "$meta_temp_dir/test11.log" "no index was provided for '$test_data_dir/intervals/include.vcf.gz'" "run log (no indexing of the interval VCF when --intervals_index is given)"
+check_file_not_exists "$test_data_dir/intervals/include.vcf.gz.tbi" "index next to the interval VCF"
+
+# With --include_non_variant_sites there is one record for each position
+positions=$(grep -v '^#' "$meta_temp_dir/output_intervals.vcf" | cut -f2 | tr '\n' ' ')
+expected_positions=$({ seq 100 149; seq 161 200; seq 1001 1020; } | tr '\n' ' ')
+if [[ "$positions" == "$expected_positions" ]]; then
+  log "✓ Output has one record for each position in the selected intervals"
+else
+  log_error "✗ Output positions are '$positions', expected '$expected_positions'"
+  exit 1
+fi
+
+log "✅ TEST 11 completed successfully"
+
 print_test_summary "All tests completed successfully"

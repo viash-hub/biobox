@@ -32,12 +32,13 @@ if [[ "$par_create_output_bam_index" != "false" ]]; then
   gatk_output_index=$(gatk_output_bam_index_path "$par_output")
 fi
 
-# Stage the BAM/BAI, and the reference if provided, into a temp dir using
-# matching basenames so GATK can find them.
+# Stage the BAM/BAI, the interval files and the reference (if provided) into
+# a temp dir using matching basenames so GATK can find them.
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_applybqsr.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 staged_bam=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
+stage_interval_arguments "$tmp_dir" interval_args
 
 reference_args=()
 if [[ -n "$par_reference" ]]; then
@@ -77,16 +78,14 @@ cmd_args=(
   --output "$par_output"
   ${par_allow_missing_read_group:+--allow-missing-read-group}
   ${par_emit_original_quals:+--emit-original-quals}
-  ${par_exclude_intervals:+--exclude-intervals "$par_exclude_intervals"}
   ${par_global_qscore_prior:+--global-qscore-prior "$par_global_qscore_prior"}
-  ${par_intervals:+--intervals "$par_intervals"}
+  "${interval_args[@]}"
   ${par_use_original_qualities:+--use-original-qualities}
   ${par_preserve_qscores_less_than:+--preserve-qscores-less-than "$par_preserve_qscores_less_than"}
   ${par_round_down_quantized:+--round-down-quantized}
   "${static_quantized_quals_args[@]}"
   "${quantize_quals_args[@]}"
   --tmp-dir "$tmp_dir"
-  ${par_interval_padding:+--interval-padding "$par_interval_padding"}
   ${par_sites_only_vcf_output:+--sites-only-vcf-output}
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
