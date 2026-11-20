@@ -81,6 +81,20 @@ argument_groups:
 
           At least one known-sites VCF file must be provided.
         example: [dbsnp.vcf, mills_indels.vcf]
+      - name: "--known_sites_index"
+        type: file
+        multiple: true
+        description: |
+          Index files for `--known_sites` (`.tbi` for a `.vcf.gz` file,
+          `.idx` for a `.vcf` file).
+
+          The index files are matched to `--known_sites` by order. If index
+          files are provided, one must be given for each `--known_sites`
+          file.
+
+          If not provided, a copy of each `--known_sites` file is indexed
+          before the run.
+        example: [dbsnp.vcf.idx, mills_indels.vcf.idx]
 
   - name: "Output"
     arguments:
