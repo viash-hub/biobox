@@ -77,6 +77,32 @@ rm "$test_dir/compressed.sorted.bam" "$test_dir/compressed.sorted.bam.txt"
 
 ############################################################################################
 
+echo ">>> Test 4: Sorting a BAM file with CPU and memory settings"
+
+"$meta_executable" \
+  --input "$test_dir/a.bam" \
+  --output "$test_dir/resources.sorted.bam" \
+  ---cpus 2 \
+  ---memory 1GB
+
+echo ">>> Check if output file exists"
+[ ! -f "$test_dir/resources.sorted.bam" ] \
+    && echo "Output file resources.sorted.bam does not exist" && exit 1
+
+echo ">>> Check if threads and memory were passed to samtools sort"
+samtools view -H "$test_dir/resources.sorted.bam" | grep '^@PG.*samtools sort' \
+    | grep -E -- '-@ 2 -m [0-9]+M' > /dev/null \
+    || { echo "samtools sort was not run with -@ and -m"; exit 1; }
+
+echo ">>> Check if output matches expected output"
+samtools view "$test_dir/resources.sorted.bam" -o "$test_dir/resources.sorted.bam.txt"
+diff -a "$test_dir/resources.sorted.bam.txt" "$out_dir/a_ref.sorted.txt" \
+    || (echo "Output file resources.sorted.bam does not match expected output" && exit 1)
+
+rm "$test_dir/resources.sorted.bam" "$test_dir/resources.sorted.bam.txt"
+
+############################################################################################
+
 
 echo "All tests succeeded!"
 exit 0
