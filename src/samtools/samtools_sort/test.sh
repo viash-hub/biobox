@@ -21,6 +21,7 @@ echo ">>> Check if output is empty"
     && echo "Output file a.sorted.bam is empty" && exit 1
 
 echo ">>> Check if output matches expected output"
+samtools view "$test_dir/a.sorted.bam" -o "$test_dir/a.sorted.bam.txt"
 diff -a "$test_dir/a.sorted.bam.txt" "$out_dir/a_ref.sorted.txt" \
     || (echo "Output file a.sorted.bam does not match expected output" && exit 1)
 
@@ -44,6 +45,7 @@ echo ">>> Check if output is empty"
     && echo "Output file ascii.sorted.bam is empty" && exit 1
 
 echo ">>> Check if output matches expected output"
+samtools view "$test_dir/ascii.sorted.bam" -o "$test_dir/ascii.sorted.bam.txt"
 diff -a "$test_dir/ascii.sorted.bam.txt" "$out_dir/ascii_ref.sorted.txt" \
     || (echo "Output file ascii.sorted.bam does not match expected output" && exit 1)
 
@@ -67,6 +69,7 @@ echo ">>> Check if output is empty"
     && echo "Output file compressed.sorted.bam is empty" && exit 1
 
 echo ">>> Check if output matches expected output" #
+samtools view "$test_dir/compressed.sorted.bam" -o "$test_dir/compressed.sorted.bam.txt"
 diff "$test_dir/compressed.sorted.bam.txt" "$out_dir/compressed_ref.sorted.txt" \
     || (echo "Output file compressed.sorted.bam does not match expected output" && exit 1)
 
