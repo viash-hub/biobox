@@ -2,6 +2,9 @@
 
 ## BREAKING CHANGES
 
+* `gatk4/*`: Add `--output_index` to declare the index of `--output` as an output (PR #269).
+  Previously GATK wrote the index next to `--output` but it was not an output of the component.
+
 * `gatk4/gatk4_genomicsdbimport`: Remove `--sample_name_map` and make `--variant` required (PR #268).
   The files listed in a sample name map are not staged by Viash or Nextflow, so might not be reachable.
   Use `--variant` together with `--sample_name` instead.

@@ -95,6 +95,15 @@ argument_groups:
           format (`.vcf`/`.vcf.gz`).
         required: true
         example: output.vcf
+      - name: "--output_index"
+        type: file
+        direction: output
+        description: |
+          Output index file for `--output` (`.tbi` for a bgzipped
+          `.vcf.gz` or `.vcf.bgz` file, `.idx` otherwise). Required when
+          `--create_output_variant_index` is `true`, ignored when it is `false`.
+        must_exist: false
+        example: output.vcf.idx
 
   - name: "Options"
     arguments:

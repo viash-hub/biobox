@@ -169,14 +169,12 @@ gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" Mutect2 "${cmd_args[
 
 # Mutect2 has no argument to set the path of its stats file. It always writes
 # it next to the output VCF, so move it to --output_stats.
-if [[ ! "${par_output}.stats" -ef "$par_output_stats" ]]; then
-  mv "${par_output}.stats" "$par_output_stats"
-fi
+move_if_needed "${par_output}.stats" "$par_output_stats"
 
 # Move indexes if requested
-if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
-  mv "$gatk_output_index" "$par_output_index"
+if [[ -n "$move_output_index" ]]; then
+  move_if_needed "$gatk_output_index" "$par_output_index"
 fi
-if [[ -n "$move_bam_output_index" && ! "$gatk_bam_output_index" -ef "$par_bam_output_index" ]]; then
-  mv "$gatk_bam_output_index" "$par_bam_output_index"
+if [[ -n "$move_bam_output_index" ]]; then
+  move_if_needed "$gatk_bam_output_index" "$par_bam_output_index"
 fi

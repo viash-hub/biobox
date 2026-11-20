@@ -197,6 +197,26 @@ create_test_vcf_gz_with_separate_index() {
   check_file_exists "$index_path" "separate index for $vcf_gz_path"
 }
 
+# Check the magic bytes of an index file: "TBI" for a tabix index (after
+# decompression), "TIDX" for a Tribble index
+#
+# Usage: check_index_magic "/path/to/index" TBI|TIDX "description"
+check_index_magic() {
+  local file="$1" magic="$2" description="$3"
+  local found
+  if [[ "$magic" == "TBI" ]]; then
+    found=$(gzip -dc "$file" | head -c 3)
+  else
+    found=$(head -c 4 "$file")
+  fi
+  if [[ "$found" == "$magic" ]]; then
+    log "✓ $description has the $magic magic bytes"
+  else
+    log_error "✗ $description does not have the $magic magic bytes"
+    exit 1
+  fi
+}
+
 # Somatic variant calling fixtures
 #
 # A 500bp single-contig ("chr1") reference with a known SNV at 1-based
