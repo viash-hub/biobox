@@ -26,26 +26,14 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
-if [[ -n "$par_variant_index" && -z "$par_variant" ]]; then
-  echo "Error: --variant_index requires --variant." >&2
-  exit 1
-fi
 if [[ -n "$par_header_index" && -z "$par_header" ]]; then
   echo "Error: --header_index requires --header." >&2
   exit 1
 fi
-if [[ -n "$par_sample_name" && -n "$par_sample_name_map" ]]; then
-  echo "Error: --sample_name cannot be used together with --sample_name_map." >&2
-  exit 1
-fi
-if [[ -n "$par_sample_name" && -z "$par_variant" ]]; then
-  echo "Error: --sample_name requires --variant." >&2
-  exit 1
-fi
 # GATK fails with "/ by zero" when --header is used with --variant files
 # without a sample name map
-if [[ -n "$par_header" && -n "$par_variant" && -z "$par_sample_name" ]]; then
-  echo "Error: --header with --variant requires --sample_name." >&2
+if [[ -n "$par_header" && -z "$par_sample_name" ]]; then
+  echo "Error: --header requires --sample_name." >&2
   exit 1
 fi
 
@@ -57,7 +45,6 @@ stage_vcfs_with_indexes "$tmp_dir" "$par_variant" "$par_variant_index" "--varian
 
 # Write a sample name map for the staged --variant files and pass it to GATK
 # in place of --variant
-sample_name_map="$par_sample_name_map"
 if [[ -n "$par_sample_name" ]]; then
   IFS=';' read -ra sample_names <<< "$par_sample_name"
   if [[ ${#sample_names[@]} -ne $(( ${#variant_args[@]} / 2 )) ]]; then

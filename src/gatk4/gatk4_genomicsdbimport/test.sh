@@ -98,19 +98,15 @@ fi
 
 log "✅ TEST 1 completed successfully"
 
-# --- Test Case 2: Import using --sample_name_map instead of --variant ---
-log "Starting TEST 2: GenomicsDBImport with --sample_name_map"
+# --- Test Case 2: Import using a sample name map written for --sample_name ---
+log "Starting TEST 2: GenomicsDBImport with --sample_name"
 
-log "Writing sample name map..."
-printf 'sample1\t%s\nsample2\t%s\n' \
-  "$test_data_dir/sample1.g.vcf" \
-  "$test_data_dir/sample2.g.vcf" \
-  > "$test_data_dir/sample_map.tsv"
-check_file_exists "$test_data_dir/sample_map.tsv" "sample name map"
-
-log "Executing $meta_name with --sample_name_map and extra options..."
+log "Executing $meta_name with --sample_name and extra options..."
 "$meta_executable" \
-  --sample_name_map "$test_data_dir/sample_map.tsv" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --sample_name sample1 \
+  --sample_name sample2 \
   --intervals "$test_data_dir/intervals.list" \
   --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_map" \
   --batch_size 1 \
@@ -121,12 +117,12 @@ log "Executing $meta_name with --sample_name_map and extra options..."
   --merge_contigs_into_num_partitions 1
 
 log "Validating TEST 2 outputs..."
-check_dir_exists "$meta_temp_dir/genomicsdb_workspace_map" "GenomicsDB workspace directory (sample_name_map)"
-check_file_exists "$meta_temp_dir/genomicsdb_workspace_map/callset.json" "GenomicsDB callset.json (sample_name_map)"
-check_file_exists "$meta_temp_dir/genomicsdb_workspace_map/vidmap.json" "GenomicsDB vidmap.json (sample_name_map)"
-check_file_exists "$meta_temp_dir/genomicsdb_workspace_map/vcfheader.vcf" "GenomicsDB vcfheader.vcf (sample_name_map)"
-check_file_contains "$meta_temp_dir/genomicsdb_workspace_map/callset.json" "sample1" "GenomicsDB callset.json sample1 (sample_name_map)"
-check_file_contains "$meta_temp_dir/genomicsdb_workspace_map/callset.json" "sample2" "GenomicsDB callset.json sample2 (sample_name_map)"
+check_dir_exists "$meta_temp_dir/genomicsdb_workspace_map" "GenomicsDB workspace directory (sample_name)"
+check_file_exists "$meta_temp_dir/genomicsdb_workspace_map/callset.json" "GenomicsDB callset.json (sample_name)"
+check_file_exists "$meta_temp_dir/genomicsdb_workspace_map/vidmap.json" "GenomicsDB vidmap.json (sample_name)"
+check_file_exists "$meta_temp_dir/genomicsdb_workspace_map/vcfheader.vcf" "GenomicsDB vcfheader.vcf (sample_name)"
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_map/callset.json" "sample1" "GenomicsDB callset.json sample1 (sample_name)"
+check_file_contains "$meta_temp_dir/genomicsdb_workspace_map/callset.json" "sample2" "GenomicsDB callset.json sample2 (sample_name)"
 
 log "✅ TEST 2 completed successfully"
 
@@ -135,7 +131,10 @@ log "Starting TEST 3: GenomicsDBImport with --header"
 
 log "Executing $meta_name with --header..."
 "$meta_executable" \
-  --sample_name_map "$test_data_dir/sample_map.tsv" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --sample_name sample1 \
+  --sample_name sample2 \
   --intervals "$test_data_dir/intervals.list" \
   --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_header" \
   --header "$test_data_dir/sample1.g.vcf"
@@ -176,19 +175,15 @@ gatk HaplotypeCaller \
 check_file_exists "$test_data_dir/sample2.g.vcf.gz" "sample2 block-compressed GVCF"
 check_file_exists "$test_data_dir/sample2.g.vcf.gz.tbi" "sample2 block-compressed GVCF index"
 
-log "Writing sample name map for block-compressed GVCFs..."
-printf 'sample1\t%s\nsample2\t%s\n' \
-  "$test_data_dir/sample1.g.vcf.gz" \
-  "$test_data_dir/sample2.g.vcf.gz" \
-  > "$test_data_dir/sample_map_gz.tsv"
-check_file_exists "$test_data_dir/sample_map_gz.tsv" "sample name map (block-compressed)"
-
-# Note: --avoid_nio cannot be used together with --variant, only with
-# --sample_name_map, and GATK additionally requires --header to be set
-# whenever --avoid_nio is used
+# Note: GATK only allows --avoid_nio with a sample name map (so with
+# --sample_name), and additionally requires --header to be set whenever
+# --avoid_nio is used
 log "Executing $meta_name with --bypass_feature_reader and --avoid_nio..."
 "$meta_executable" \
-  --sample_name_map "$test_data_dir/sample_map_gz.tsv" \
+  --variant "$test_data_dir/sample1.g.vcf.gz" \
+  --variant "$test_data_dir/sample2.g.vcf.gz" \
+  --sample_name sample1 \
+  --sample_name sample2 \
   --intervals "$test_data_dir/intervals.list" \
   --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_bypass" \
   --bypass_feature_reader \
@@ -236,7 +231,7 @@ log "✅ TEST 5 completed successfully"
 # --- Test Case 6: Index files in a different directory ---
 # In GATK 4.7.0.0, --header together with --variant fails with
 # "java.lang.ArithmeticException: / by zero", so --header is tested with
-# --sample_name_map
+# --sample_name
 log "Starting TEST 6: --variant_index and --header_index in a different directory"
 
 mkdir -p "$test_data_dir/separate"
@@ -265,9 +260,14 @@ check_file_not_contains "$meta_temp_dir/test6.log" "no index was provided" "run 
 check_file_not_exists "$test_data_dir/separate/sample1.g.vcf.gz.tbi" "index next to the sample1 input"
 check_file_not_exists "$test_data_dir/separate/sample2.g.vcf.gz.tbi" "index next to the sample2 input"
 
-log "Executing $meta_name with --sample_name_map, a .vcf.gz --header and a separate .tbi index file..."
+log "Executing $meta_name with --sample_name, a .vcf.gz --header and a separate .tbi index file..."
 "$meta_executable" \
-  --sample_name_map "$test_data_dir/sample_map.tsv" \
+  --variant "$test_data_dir/separate/sample1.g.vcf.gz" \
+  --variant "$test_data_dir/separate/sample2.g.vcf.gz" \
+  --variant_index "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi" \
+  --variant_index "$test_data_dir/separate_index/sample2.g.vcf.gz.tbi" \
+  --sample_name sample1 \
+  --sample_name sample2 \
   --intervals "$test_data_dir/intervals.list" \
   --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_separate_header" \
   --header "$test_data_dir/separate/header.vcf.gz" \
@@ -304,9 +304,12 @@ check_file_contains "$meta_temp_dir/genomicsdb_workspace_no_index/callset.json" 
 check_file_contains "$meta_temp_dir/test7.log" "no index was provided" "run log (indexing warning)"
 check_file_not_exists "$test_data_dir/no_index/sample1.g.vcf.gz.tbi" "index next to the sample1 input"
 
-log "Executing $meta_name with --sample_name_map and an unindexed .vcf.gz --header..."
+log "Executing $meta_name with --sample_name and an unindexed .vcf.gz --header..."
 "$meta_executable" \
-  --sample_name_map "$test_data_dir/sample_map.tsv" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --sample_name sample1 \
+  --sample_name sample2 \
   --intervals "$test_data_dir/intervals.list" \
   --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_no_index_header" \
   --header "$test_data_dir/no_index/header.vcf.gz" 2> "$meta_temp_dir/test7_header.log"
@@ -334,20 +337,12 @@ if "$meta_executable" \
 fi
 check_file_contains "$meta_temp_dir/test8_mismatch.log" "Error: --variant_index must be given once for each file in --variant" "error message"
 
-log "Executing $meta_name with --variant_index and no --variant..."
-if "$meta_executable" \
-  --sample_name_map "$test_data_dir/sample_map.tsv" \
-  --variant_index "$test_data_dir/separate_index/sample1.g.vcf.gz.tbi" \
-  --intervals "$test_data_dir/intervals.list" \
-  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_variant_index" > "$meta_temp_dir/test8_variant.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --variant_index and no --variant"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test8_variant.log" "Error: --variant_index requires --variant" "error message"
-
 log "Executing $meta_name with --header_index and no --header..."
 if "$meta_executable" \
-  --sample_name_map "$test_data_dir/sample_map.tsv" \
+  --variant "$test_data_dir/sample1.g.vcf" \
+  --variant "$test_data_dir/sample2.g.vcf" \
+  --sample_name sample1 \
+  --sample_name sample2 \
   --header_index "$test_data_dir/separate_index/header.vcf.gz.tbi" \
   --intervals "$test_data_dir/intervals.list" \
   --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_header_index" > "$meta_temp_dir/test8_header.log" 2>&1; then
@@ -356,16 +351,16 @@ if "$meta_executable" \
 fi
 check_file_contains "$meta_temp_dir/test8_header.log" "Error: --header_index requires --header" "error message"
 
-log "Executing $meta_name with --header and --variant..."
+log "Executing $meta_name with --header and no --sample_name..."
 if "$meta_executable" \
   --variant "$test_data_dir/sample1.g.vcf" \
   --header "$test_data_dir/sample1.g.vcf" \
   --intervals "$test_data_dir/intervals.list" \
   --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_header_variant" > "$meta_temp_dir/test8_header_variant.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --header and --variant"
+  log_error "✗ $meta_name did not fail with --header and no --sample_name"
   exit 1
 fi
-check_file_contains "$meta_temp_dir/test8_header_variant.log" "Error: --header with --variant requires --sample_name" "error message"
+check_file_contains "$meta_temp_dir/test8_header_variant.log" "Error: --header requires --sample_name" "error message"
 
 log "✅ TEST 8 completed successfully"
 
@@ -399,17 +394,6 @@ if "$meta_executable" \
   exit 1
 fi
 check_file_contains "$meta_temp_dir/test9_count.log" "Error: --sample_name must be given once for each file in --variant" "error message"
-
-log "Executing $meta_name with --sample_name and --sample_name_map..."
-if "$meta_executable" \
-  --sample_name_map "$test_data_dir/sample_map.tsv" \
-  --sample_name renamed1 \
-  --intervals "$test_data_dir/intervals.list" \
-  --genomicsdb_workspace_path "$meta_temp_dir/genomicsdb_workspace_sample_name_map" > "$meta_temp_dir/test9_map.log" 2>&1; then
-  log_error "✗ $meta_name did not fail with --sample_name and --sample_name_map"
-  exit 1
-fi
-check_file_contains "$meta_temp_dir/test9_map.log" "Error: --sample_name cannot be used together with --sample_name_map" "error message"
 
 log "✅ TEST 9 completed successfully"
 

@@ -1,5 +1,11 @@
 # biobox x.x.x
 
+## BREAKING CHANGES
+
+* `gatk4/gatk4_genomicsdbimport`: Remove `--sample_name_map` and make `--variant` required (PR #268).
+  The files listed in a sample name map are not staged by Viash or Nextflow, so might not be reachable.
+  Use `--variant` together with `--sample_name` instead.
+
 ## NEW FUNCTIONALITY
 
 * `gatk4`: Add components for GATK4 somatic variant calling (PR #249):
@@ -57,9 +63,8 @@
 
 * `gatk4/gatk4_genomicsdbimport`: Stops with an error when `--header` is used with `--variant`, because GATK fails for this combination. (PR #267)
 
-* `gatk4/gatk4_genomicsdbimport`: Add `--sample_name` to rename the staged `--variant` files (PR #268).
-  The files listed in a `--sample_name_map` are not staged, so might not be reachable.
-  `--sample_name` writes a sample name map for the staged `--variant` files, which also allows `--header` to be used with `--variant`.
+* `gatk4/gatk4_genomicsdbimport`: Add `--sample_name` to set the sample names of the `--variant` files (PR #268).
+  `--sample_name` writes a sample name map for the staged `--variant` files.
 
 # biobox 0.5.0
 
