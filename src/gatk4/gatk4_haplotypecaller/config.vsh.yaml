@@ -42,14 +42,16 @@ argument_groups:
         alternatives: [-I]
         type: file
         description: |
-          Input BAM file containing reads to call variants from.
+          Input BAM or CRAM file containing reads to call variants from.
 
-          The file must be coordinate-sorted and indexed (see `--bai`).
+          The file must be coordinate-sorted and indexed (see `--read_index`).
+          A CRAM file is decoded with `--reference`.
         required: true
         example: sample.bam
-      - name: "--bai"
+      - name: "--read_index"
         type: file
-        description: BAM index file (`.bai`) for the input BAM file.
+        description: |
+          Index file for `--input` (`.bai` for BAM, `.crai` or `.bai` for CRAM).
         required: true
         example: sample.bam.bai
       - name: "--reference"

@@ -27,13 +27,13 @@ if [[ "$par_create_output_variant_index" != "false" ]]; then
   gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
 fi
 
-# Stage the reference trio, BAM/BAI, VCF inputs and interval files into a temp
-# dir using matching basenames so GATK can find them
+# Stage the reference trio, VCF inputs and interval files into a temp dir using
+# matching basenames so GATK can find them
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_haplotypecaller.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
-staged_bam=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
+gatk_read_args "$par_input" "$par_read_index" read_args
 
 if [[ -n "$par_alleles" ]]; then
   staged_alleles=$(stage_vcf_with_index "$tmp_dir" "$par_alleles" "$par_alleles_index" alleles) || exit 1
@@ -74,7 +74,7 @@ split_multiple_to_flags "$par_kmer_size" "--kmer-size" kmer_size_args
 
 # Build command arguments array
 cmd_args=(
-  --input "$staged_bam"
+  "${read_args[@]}"
   --output "$par_output"
   --reference "$staged_reference"
   --native-pair-hmm-threads "${meta_cpus:-1}"
