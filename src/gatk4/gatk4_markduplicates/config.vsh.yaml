@@ -36,14 +36,6 @@ references:
         year = {2020},
         isbn = {9781491975190}
       }
-    - |
-      @misc{Picard2019toolkit,
-        title = {Picard toolkit},
-        year = {2019},
-        publisher = {Broad Institute},
-        journal = {Broad Institute, GitHub repository},
-        howpublished = {\url{https://broadinstitute.github.io/picard/}}
-      }
 license: Apache-2.0
 requirements:
   commands: [gatk]
