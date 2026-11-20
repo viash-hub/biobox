@@ -39,7 +39,7 @@ stage_interval_arguments "$tmp_dir" interval_args
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
 # GATK reads a plain --variant VCF without an index, unless it must traverse
-# by intervals (--intervals or --exclude_intervals)
+# by intervals (any interval argument)
 variant_index_optional=$([[ "$(gatk_uses_intervals)" == "true" ]] && echo false || echo true)
 staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
 

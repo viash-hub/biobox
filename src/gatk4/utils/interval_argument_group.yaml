@@ -9,7 +9,7 @@ arguments:
       files (e.g. BED, interval_list or VCF).
 
       Specify this argument more than once to combine intervals (see
-      `--interval_set_rule`).
+      `--interval_set_rule`). Can be combined with `--interval_strings`.
     example: [intervals.bed]
   - name: "--intervals_index"
     type: file
@@ -25,6 +25,14 @@ arguments:
       If provided, one index must be given for each VCF file in
       `--intervals`.
     example: [intervals.vcf.gz.tbi]
+  - name: "--interval_strings"
+    type: string
+    multiple: true
+    description: |
+      One or more genomic intervals over which to operate, provided as
+      strings (e.g. `chr1:100-200` or a whole contig such as `chr1`). Can be
+      combined with `--intervals` files.
+    example: ["chr1:100-200"]
   - name: "--exclude_intervals"
     alternatives: [-XL]
     type: file
@@ -47,12 +55,20 @@ arguments:
       index. If provided, one index must be given for each VCF file in
       `--exclude_intervals`.
     example: [exclude_intervals.vcf.gz.tbi]
+  - name: "--exclude_interval_strings"
+    type: string
+    multiple: true
+    description: |
+      One or more genomic intervals to exclude from processing, provided as
+      strings (e.g. `chr1:100-200` or a whole contig such as `chr1`). Can be
+      combined with `--exclude_intervals` files.
+    example: ["chr1:150-160"]
   - name: "--interval_set_rule"
     alternatives: [-isr]
     type: string
     description: |
-      Set merging approach to use for combining the `--intervals`
-      inputs. Default: 'UNION'.
+      Set merging approach to use for combining the `--intervals` and
+      `--interval_strings` inputs. Default: 'UNION'.
     choices: [UNION, INTERSECTION]
   - name: "--interval_merging_rule"
     alternatives: [-imr]
@@ -67,10 +83,10 @@ arguments:
     type: integer
     description: |
       Amount of padding (in bp) to add to each interval in
-      `--intervals`. Default: 0.
+      `--intervals` and `--interval_strings`. Default: 0.
   - name: "--interval_exclusion_padding"
     alternatives: [-ixp]
     type: integer
     description: |
       Amount of padding (in bp) to add to each interval in
-      `--exclude_intervals`. Default: 0.
+      `--exclude_intervals` and `--exclude_interval_strings`. Default: 0.

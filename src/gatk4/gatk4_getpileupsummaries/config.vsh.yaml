@@ -124,7 +124,8 @@ argument_groups:
 
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
     description: |
-      At least one `--intervals` file is required.
+      At least one interval (`--intervals` or `--interval_strings`) is
+      required.
 
       To summarize all the sites in `--variant`, give the same VCF file to
       `--intervals`. To summarize only the sites in a set of targets, give

@@ -47,7 +47,7 @@ trap 'rm -rf "$tmp_dir"' EXIT
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict") || exit 1
 # GATK reads a plain --variant VCF without an index, unless it must traverse
-# by intervals (--intervals or --exclude_intervals)
+# by intervals (any interval argument)
 variant_index_optional=$([[ "$(gatk_uses_intervals)" == "true" ]] && echo false || echo true)
 stage_vcfs_with_indexes "$tmp_dir" "$par_variant" "$par_variant_index" "--variant" "--variant" variant_args "$variant_index_optional"
 if [[ -n "$par_dbsnp" ]]; then

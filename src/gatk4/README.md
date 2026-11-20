@@ -62,6 +62,8 @@ Each companion file needs its own argument, and the script links it next to the 
   - A `.vcf.gz` (or `.vcf.bgz`) without a `.tbi` fails ("An index is required but was not found")
   - A `.vcf.gz` made with `gzip` (not `bgzip`) cannot be indexed
 - **Intervals**: `--intervals` and `--exclude_intervals` can be BED, interval_list or VCF files.
+  `--interval_strings` and `--exclude_interval_strings` take the same intervals as strings (for example `chr1:100-200`).
+  GATK accepts a mixture of files and strings, so they are not mutually exclusive.
   They are defined in `interval_argument_group.yaml`, and `stage_interval_arguments` stages them and builds all the interval flags.
   It uses `stage_interval_files`, which matches the `*_index` files to the VCF files by order.
   Use `gatk_uses_intervals` to decide if a plain `.vcf` main input needs an index (see VCF inputs above).
