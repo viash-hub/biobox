@@ -45,6 +45,3 @@ samtools sort \
     ${par_reference:+--reference "$par_reference"} \
     -o "$par_output" \
     "$par_input"
-
-# save text files containing the output of samtools view for later comparison
-samtools view "$par_output" -o "$par_output".txt
