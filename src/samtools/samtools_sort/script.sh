@@ -22,8 +22,19 @@ for par in ${unset_if_false[@]}; do
     [[ "$test_val" == "false" ]] && unset $par
 done
 
+# -m is the memory per thread and "-@ N" means N additional threads, so samtools
+# can use (N + 1) * -m in total. Give 80% of the memory to the sort and keep the
+# rest for other samtools overhead.
+if [[ -n "${meta_memory_mb:-}" ]]; then
+    mem_per_thread=$(( meta_memory_mb * 8 / 10 / ( ${meta_cpus:-0} + 1 ) ))
+    if [[ "$mem_per_thread" -lt 128 ]]; then
+        mem_per_thread=128
+    fi
+fi
 
 samtools sort \
+    ${meta_cpus:+-@ "$meta_cpus"} \
+    ${mem_per_thread:+-m "${mem_per_thread}M"} \
     ${par_compression:+-l "$par_compression"} \
     ${par_uncompressed:+-u} \
     ${par_minimiser:+-M} \
@@ -45,6 +56,3 @@ samtools sort \
     ${par_reference:+--reference "$par_reference"} \
     -o "$par_output" \
     "$par_input"
-
-# save text files containing the output of samtools view for later comparison
-samtools view "$par_output" -o "$par_output".txt
