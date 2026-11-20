@@ -1,0 +1,105 @@
+name: "GATK Assembly Options"
+arguments:
+  - name: "--create_bam_output"
+    type: boolean_true
+    description: |
+      Write the assembled haplotypes to `--bam_output`.
+  - name: "--bam_output"
+    alternatives: [-bamout]
+    type: file
+    direction: output
+    description: |
+      Output BAM file with the assembled haplotypes (see
+      `--bam_writer_type`). Required when `--create_bam_output` is
+      `true`, ignored when it is `false`.
+    must_exist: false
+    example: bamout.bam
+  - name: "--bam_output_index"
+    type: file
+    direction: output
+    description: |
+      Output index file (`.bai`) for `--bam_output`. Required when
+      `--create_bam_output` is `true` and `--create_output_bam_index`
+      is `true`, ignored otherwise.
+    must_exist: false
+    example: bamout.bai
+  - name: "--bam_writer_type"
+    type: string
+    description: |
+      Which haplotypes to write to `--bam_output`.
+      Default: 'CALLED_HAPLOTYPES'.
+    choices:
+      - ALL_POSSIBLE_HAPLOTYPES
+      - CALLED_HAPLOTYPES
+      - NO_HAPLOTYPES
+      - CALLED_HAPLOTYPES_NO_READS
+  - name: "--active_probability_threshold"
+    type: double
+    description: |
+      Minimum probability for a locus to be considered active.
+      Default: 0.002.
+  - name: "--assembly_region_padding"
+    type: integer
+    description: |
+      Number of additional bases of context to include around each
+      assembly region. Default: 100.
+  - name: "--base_quality_score_threshold"
+    type: integer
+    description: |
+      Base qualities below this threshold are reduced to the minimum
+      (6). Default: 18.
+  - name: "--dont_use_soft_clipped_bases"
+    type: boolean_true
+    description: |
+      Do not analyze soft-clipped bases in the reads.
+  - name: "--force_active"
+    type: boolean_true
+    description: |
+      If set, all regions are marked as active, disabling the active
+      region detection step.
+  - name: "--force_call_filtered_alleles"
+    alternatives: [-genotype-filtered-alleles]
+    type: boolean_true
+    description: |
+      Force-call the filtered alleles in `--alleles`.
+  - name: "--kmer_size"
+    type: integer
+    multiple: true
+    description: |
+      Kmer size(s) to use in the read threading assembler. Default:
+      10, 25.
+  - name: "--max_assembly_region_size"
+    type: integer
+    description: |
+      Maximum size of an assembly region. Default: 300.
+  - name: "--max_reads_per_alignment_start"
+    type: integer
+    description: |
+      Maximum number of reads to retain per alignment start position.
+
+      Reads above this threshold will be downsampled. Set to `0` to
+      disable. Default: 50.
+  - name: "--min_assembly_region_size"
+    type: integer
+    description: |
+      Minimum size of an assembly region. Default: 50.
+  - name: "--min_base_quality_score"
+    alternatives: [-mbq]
+    type: integer
+    description: |
+      Minimum base quality required to consider a base for calling.
+      Default: 10.
+  - name: "--min_pruning"
+    type: integer
+    description: |
+      Minimum support to not prune paths in the assembly graph.
+      Default: 2.
+  - name: "--pcr_indel_model"
+    type: string
+    description: |
+      The PCR indel model to use.
+
+      Set this parameter to `NONE` to disable the PCR indel model, for
+      example when using PCR-free sequencing data. Default:
+      'CONSERVATIVE'.
+    choices: [NONE, HOSTILE, AGGRESSIVE, CONSERVATIVE]
