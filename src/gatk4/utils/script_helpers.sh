@@ -250,6 +250,21 @@ gatk_output_vcf_index_path() {
   esac
 }
 
+# Move a file from a source location to a destination location only if they are
+# not the same file. The check is needed because `mv` fails if the source and
+# the destination are the same file. An existing file at a different destination
+# is overwritten.
+#
+# Usage: move_if_needed "$gatk_output_index" "$par_output_index"
+move_if_needed() {
+  local source="$1"
+  local destination="$2"
+
+  if [[ ! "$source" -ef "$destination" ]]; then
+    mv "$source" "$destination"
+  fi
+}
+
 # Print the path of the index that GATK writes next to a BAM output
 # (`<output without .bam>.bai`).
 #

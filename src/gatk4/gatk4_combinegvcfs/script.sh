@@ -107,6 +107,6 @@ gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" CombineGVCFs \
   --tmp-dir "$tmp_dir"
 
 # Move the output index to --output_index, if requested
-if [[ -n "$move_output_index" && ! "$gatk_output_index" -ef "$par_output_index" ]]; then
-  mv "$gatk_output_index" "$par_output_index"
+if [[ -n "$move_output_index" ]]; then
+  move_if_needed "$gatk_output_index" "$par_output_index"
 fi
