@@ -1,0 +1,13 @@
+name: "GATK Engine Options"
+arguments:
+  - name: "--disable_sequence_dictionary_validation"
+    type: boolean_true
+    description: |
+      Do not check the input sequence dictionaries for compatibility.
+      Useful when combining files from different sources with
+      mismatched (but compatible) dictionaries. Use at your own risk.
+  - name: "--lenient"
+    alternatives: [-LE]
+    type: boolean_true
+    description: |
+      Lenient processing of VCF files.

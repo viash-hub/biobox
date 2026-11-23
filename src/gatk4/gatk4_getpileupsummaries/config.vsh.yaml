@@ -38,19 +38,28 @@ argument_groups:
       - name: "--input"
         alternatives: [-I]
         type: file
+        multiple: true
         description: |
-          Input BAM or CRAM file containing the reads to summarize.
+          One or more input BAM or CRAM files containing the reads to
+          summarize. The reads from all files are counted together in one
+          output table, for example when the reads of a sample are in
+          several files.
 
-          The file must be coordinate-sorted and indexed (see `--read_index`).
-          A CRAM file requires `--reference`.
+          The files must be coordinate-sorted and indexed (see
+          `--read_index`). A CRAM file requires `--reference`.
         required: true
-        example: sample.bam
+        example: [sample.bam]
       - name: "--read_index"
         type: file
+        multiple: true
         description: |
-          Index file for `--input` (`.bai` for BAM, `.crai` or `.bai` for CRAM).
+          Index files for `--input` (`.bai` for BAM, `.crai` or `.bai` for
+          CRAM).
+
+          The index files are matched to `--input` by order. One index file
+          must be given for each `--input` file.
         required: true
-        example: sample.bam.bai
+        example: [sample.bam.bai]
       - name: "--variant"
         alternatives: [-V]
         type: file
@@ -111,6 +120,12 @@ argument_groups:
         description: |
           Maximum population allele frequency of the sites to consider.
           Default: 0.2.
+      - name: "--maximum_mapping_quality"
+        type: integer
+        description: |
+          Maximum mapping quality (inclusive) of the reads to keep, used by
+          the tool-default mapping quality read filter. If not set, there is
+          no maximum.
       - name: "--minimum_mapping_quality"
         type: integer
         description: |
@@ -124,6 +139,8 @@ argument_groups:
           low value increases accuracy at the expense of speed.
           Default: 0.01.
 
+  - __merge__: /src/gatk4/utils/engine_argument_group.yaml
+  - __merge__: /src/gatk4/utils/read_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
     description: |
       At least one interval (`--intervals` or `--interval_strings`) is
@@ -133,8 +150,6 @@ argument_groups:
       `--intervals`. To summarize only the sites in a set of targets, give
       a target BED file and the `--variant` VCF to `--intervals` and use
       `--interval_set_rule INTERSECTION`.
-
-__merge__: /src/gatk4/utils/common_argument_groups.yaml
 
 resources:
   - type: bash_script

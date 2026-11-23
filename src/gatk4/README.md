@@ -10,12 +10,16 @@ All GATK4 components use the shared files in [`utils/`](utils/).
 | File | Use |
 |---|---|
 | `common_engines.yaml` | Shared engine definition merged into component configs. Change the container here to update all components. |
-| `common_argument_groups.yaml` | Common arguments shared by several components. Merged into the config for components that support those options. |
+| `engine_argument_group.yaml` | General GATK engine arguments. Merged into `argument_groups` for every component that runs a GATK engine tool (not Picard tools or tools without GATK engine options). |
+| `read_argument_group.yaml` | Read filter and read validation arguments. Merged into `argument_groups` for every component whose tool reads BAM/CRAM files. |
+| `vcf_output_argument_group.yaml` | VCF output arguments. Merged into `argument_groups` for every component that writes a VCF. |
+| `bam_output_argument_group.yaml` | BAM/CRAM output arguments. Merged into `argument_groups` for every component that writes a BAM or CRAM file. |
 | `interval_argument_group.yaml` | Interval arguments (`--intervals`, `--exclude_intervals`, their indexes, the interval rules and padding). Merged into `argument_groups` for every component that supports intervals. |
 | `script_helpers.sh` | Staging and argument helpers for `script.sh` (see below). |
 | `test_helpers.sh` | Synthetic test file fixtures and other shared helpers for `test.sh`. |
 
 Use the helpers instead of writing the same logic again in a component.
+Merge only the shared argument groups that apply to the tool, so that each component has only arguments that change what the tool does.
 If a new component needs new logic that another component could use, add it to the helpers.
 
 ## Arguments
@@ -32,8 +36,10 @@ If a new component needs new logic that another component could use, add it to t
   - Flow-based (Ultima) and Permutect options
   - Debug outputs
   - Deprecated options
-  - General engine options that are not in `common_argument_groups.yaml`
+  - General engine options that are not in the shared argument groups
 - Include the settings for tool-default read filters when users need to change them
+- Build the flags of the shared read filter group with `gatk_read_filter_args`.
+  A read filter can only be in the `--read_filter` choices if the group also has the arguments it requires.
 - GATK lists `--input` (reads) for many tools, but a tool does not always use it.
   Check each tool before you add it.
 - An argument that GATK accepts as a string or a file needs two arguments so that Nextflow can stage the file.
@@ -92,7 +98,7 @@ Examples:
 | Mutect2 stats | `gatk4_mutect2` | `<output>.stats` | Required `--output_stats`, moved after the run |
 | FilterMutectCalls filtering stats | `gatk4_filtermutectcalls` | `<output>.filteringStats.tsv` | Required `--filtering_stats`, passed to GATK |
 | VCF index | `gatk4_combinegvcfs`, `gatk4_filtermutectcalls`, `gatk4_genotypegvcfs`, `gatk4_haplotypecaller`, `gatk4_mutect2`, `gatk4_selectvariants`, `gatk4_variantfiltration` | `<output>.tbi` for `.vcf.gz`/`.vcf.bgz`, `<output>.idx` otherwise (`gatk_output_vcf_index_path`) | `--output_index`, required unless `--create_output_variant_index` is `false`, moved after the run |
-| BAM/CRAM index | `gatk4_applybqsr`, `gatk4_markduplicates`, `gatk4_mutect2` | `<output without .bam>.bai` for BAM, `<output>.bai` (BAI format, not readable by samtools) for CRAM (`gatk_output_bam_index_path`) | For example `--output_index`, required unless `--create_output_bam_index` is `false` (`--create_index` is set for `gatk4_markduplicates`) |
+| BAM/CRAM index | `gatk4_applybqsr`, `gatk4_haplotypecaller`, `gatk4_markduplicates`, `gatk4_mutect2` | `<output without .bam>.bai` for BAM, `<output>.bai` (BAI format, not readable by samtools) for CRAM (`gatk_output_bam_index_path`) | For example `--output_index`, required unless `--create_output_bam_index` is `false` (`--create_index` is set for `gatk4_markduplicates`) |
 
 If two output arguments interact, the script should check the provided values are allowed before the run and stop with a clear error.
 

@@ -9,9 +9,9 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 
 # unset flags
 [[ "$par_use_original_qualities" == "false" ]] && unset par_use_original_qualities
-[[ "$par_sites_only_vcf_output" == "false" ]] && unset par_sites_only_vcf_output
 [[ "$par_disable_tool_default_read_filters" == "false" ]] && unset par_disable_tool_default_read_filters
 [[ "$par_disable_sequence_dictionary_validation" == "false" ]] && unset par_disable_sequence_dictionary_validation
+[[ "$par_lenient" == "false" ]] && unset par_lenient
 
 # Stage the reference trio, known-sites VCFs and interval files into a temp
 # dir using matching basenames so GATK can find them. The read index is passed
@@ -25,9 +25,7 @@ stage_vcfs_with_indexes "$tmp_dir" "$par_known_sites" "$par_known_sites_index" \
   --known_sites --known-sites known_sites_args
 stage_interval_arguments "$tmp_dir" interval_args
 
-# Convert semicolon-separated arguments to repeated flags
-split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
-split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
+gatk_read_filter_args read_filter_args
 
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
@@ -48,14 +46,9 @@ cmd_args=(
   ${par_preserve_qscores_less_than:+--preserve-qscores-less-than "$par_preserve_qscores_less_than"}
   ${par_quantizing_levels:+--quantizing-levels "$par_quantizing_levels"}
   ${par_use_original_qualities:+--use-original-qualities}
-  ${par_sites_only_vcf_output:+--sites-only-vcf-output}
-  ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"}
-  ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"}
-  ${par_output_cram_version:+--output-cram-version "$par_output_cram_version"}
   "${read_filter_args[@]}"
-  "${disable_read_filter_args[@]}"
-  ${par_disable_tool_default_read_filters:+--disable-tool-default-read-filters}
   ${par_disable_sequence_dictionary_validation:+--disable-sequence-dictionary-validation}
+  ${par_lenient:+--lenient}
 )
 
 # Run GATK BaseRecalibrator
