@@ -13,16 +13,17 @@ source "$meta_resources_dir/gatk4/script_helpers.sh"
 [[ "$par_disable_tool_default_read_filters" == "false" ]] && unset par_disable_tool_default_read_filters
 [[ "$par_disable_sequence_dictionary_validation" == "false" ]] && unset par_disable_sequence_dictionary_validation
 
-# Stage the reference trio and BAM/BAI into a temp dir using matching
-# basenames so GATK can find them
+# Stage the reference trio, BAM/BAI and known-sites VCFs into a temp dir
+# using matching basenames so GATK can find them
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_baserecalibrator.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
 staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
 staged_bam=$(stage_bam_bai "$tmp_dir" "$par_input" "$par_bai")
+stage_vcfs_with_indexes "$tmp_dir" "$par_known_sites" "$par_known_sites_index" \
+  --known_sites --known-sites known_sites_args
 
 # Convert semicolon-separated arguments to repeated flags
-split_multiple_to_flags "$par_known_sites" "--known-sites" known_sites_args
 split_multiple_to_flags "$par_read_filter" "--read-filter" read_filter_args
 split_multiple_to_flags "$par_disable_read_filter" "--disable-read-filter" disable_read_filter_args
 

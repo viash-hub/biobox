@@ -141,4 +141,76 @@ fi
 
 log "✅ TEST 4 completed successfully"
 
+# --- Test Case 5: Bgzipped --dbsnp and --alleles files with separate indexes ---
+log "Starting TEST 5: Bgzipped --dbsnp and --alleles files with separate indexes"
+
+create_test_known_sites_vcf "$test_data_dir/sites.vcf" seq1 2000 100
+create_test_vcf_gz_with_separate_index "$test_data_dir/sites.vcf" \
+  "$test_data_dir/dbsnp.vcf.gz" "$test_data_dir/indexes/dbsnp.vcf.gz.tbi"
+create_test_vcf_gz_with_separate_index "$test_data_dir/sites.vcf" \
+  "$test_data_dir/alleles.vcf.gz" "$test_data_dir/indexes/alleles.vcf.gz.tbi"
+
+log "Executing $meta_name with --dbsnp_index and --alleles_index..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.sorted.bam" \
+  --bai "$test_data_dir/reads.sorted.bai" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --dbsnp "$test_data_dir/dbsnp.vcf.gz" \
+  --dbsnp_index "$test_data_dir/indexes/dbsnp.vcf.gz.tbi" \
+  --alleles "$test_data_dir/alleles.vcf.gz" \
+  --alleles_index "$test_data_dir/indexes/alleles.vcf.gz.tbi" \
+  --output "$meta_temp_dir/output_vcf_inputs.vcf"
+
+log "Validating TEST 5 outputs..."
+check_file_exists "$meta_temp_dir/output_vcf_inputs.vcf" "output VCF file (VCF inputs)"
+check_file_contains "$meta_temp_dir/output_vcf_inputs.vcf" "^##fileformat=VCF" "output VCF file header (VCF inputs)"
+check_file_contains "$meta_temp_dir/output_vcf_inputs.vcf" "##INFO=<ID=DB," "output VCF DB INFO definition (from --dbsnp)"
+check_file_contains "$meta_temp_dir/output_vcf_inputs.vcf" $'^seq1\t100\t' "output VCF record at the force-called site (from --alleles)"
+check_file_not_exists "$test_data_dir/dbsnp.vcf.gz.tbi" "index next to the --dbsnp input"
+check_file_not_exists "$test_data_dir/alleles.vcf.gz.tbi" "index next to the --alleles input"
+
+log "✅ TEST 5 completed successfully"
+
+# --- Test Case 6: Bgzipped --alleles file without an index ---
+log "Starting TEST 6: Bgzipped --alleles file without an index"
+
+log "Executing $meta_name with a .vcf.gz --alleles file and no --alleles_index..."
+"$meta_executable" \
+  --input "$test_data_dir/reads.sorted.bam" \
+  --bai "$test_data_dir/reads.sorted.bai" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --alleles "$test_data_dir/alleles.vcf.gz" \
+  --output "$meta_temp_dir/output_no_index.vcf" 2> "$meta_temp_dir/test6.log"
+
+log "Validating TEST 6 outputs..."
+check_file_exists "$meta_temp_dir/output_no_index.vcf" "output VCF file (no --alleles index)"
+check_file_contains "$meta_temp_dir/output_no_index.vcf" $'^seq1\t100\t' "output VCF record at the force-called site (no --alleles index)"
+check_file_contains "$meta_temp_dir/test6.log" "no index was provided" "warning for the missing index"
+check_file_not_exists "$test_data_dir/alleles.vcf.gz.tbi" "index next to the --alleles input"
+
+log "✅ TEST 6 completed successfully"
+
+# --- Test Case 7: --dbsnp_index without --dbsnp ---
+log "Starting TEST 7: --dbsnp_index without --dbsnp"
+
+log "Executing $meta_name with --dbsnp_index and no --dbsnp (should fail)..."
+if "$meta_executable" \
+  --input "$test_data_dir/reads.sorted.bam" \
+  --bai "$test_data_dir/reads.sorted.bai" \
+  --reference "$test_data_dir/reference.fasta" \
+  --reference_fai "$test_data_dir/reference.fasta.fai" \
+  --reference_dict "$test_data_dir/reference.dict" \
+  --dbsnp_index "$test_data_dir/indexes/dbsnp.vcf.gz.tbi" \
+  --output "$meta_temp_dir/output_bad.vcf" > "$meta_temp_dir/test7.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --dbsnp_index and no --dbsnp"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test7.log" "Error: --dbsnp_index requires --dbsnp" "error message"
+
+log "✅ TEST 7 completed successfully"
+
 print_test_summary "All tests"

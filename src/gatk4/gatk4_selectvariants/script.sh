@@ -32,6 +32,42 @@ for par in "${unset_if_false[@]}"; do
   [[ "$test_val" == "false" ]] && unset $par
 done
 
+# Check that each index is given together with its input
+if [[ -n "$par_concordance_index" && -z "$par_concordance" ]]; then
+  echo "Error: --concordance_index requires --concordance." >&2
+  exit 1
+fi
+if [[ -n "$par_discordance_index" && -z "$par_discordance" ]]; then
+  echo "Error: --discordance_index requires --discordance." >&2
+  exit 1
+fi
+
+# Stage the --variant VCF and the comparison VCFs with their indexes and (if
+# provided) the reference trio into a temp dir so GATK can find the companion
+# files
+tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_selectvariants.XXXXXX")
+trap 'rm -rf "$tmp_dir"' EXIT
+
+# GATK reads a plain --variant VCF without an index, unless it must traverse
+# by intervals
+variant_index_optional=$([[ -z "$par_intervals" && -z "$par_exclude_intervals" ]] && echo true || echo false)
+staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
+
+staged_concordance=""
+if [[ -n "$par_concordance" ]]; then
+  staged_concordance=$(stage_vcf_with_index "$tmp_dir" "$par_concordance" "$par_concordance_index" concordance) || exit 1
+fi
+staged_discordance=""
+if [[ -n "$par_discordance" ]]; then
+  staged_discordance=$(stage_vcf_with_index "$tmp_dir" "$par_discordance" "$par_discordance_index" discordance) || exit 1
+fi
+
+reference_args=()
+if [[ -n "$par_reference" ]]; then
+  staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict") || exit 1
+  reference_args=(--reference "$staged_reference")
+fi
+
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
 
@@ -51,26 +87,15 @@ split_multiple_to_flags "$par_select_genotype_expressions" "--select-genotype-ex
 split_multiple_to_flags "$par_select_type_to_include" "--select-type-to-include" select_type_to_include_args
 split_multiple_to_flags "$par_select_type_to_exclude" "--select-type-to-exclude" select_type_to_exclude_args
 
-# Stage the reference trio into a temp dir using matching basenames so GATK
-# can find them, if provided
-tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_selectvariants.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT
-
-reference_args=()
-if [[ -n "$par_reference" ]]; then
-  staged_reference=$(stage_reference_trio "$tmp_dir" "$par_reference" "$par_reference_fai" "$par_reference_dict")
-  reference_args=(--reference "$staged_reference")
-fi
-
 # Build command arguments array
 cmd_args=(
-  --variant "$par_variant"
+  --variant "$staged_variant"
   --output "$par_output"
   "${reference_args[@]}"
   ${par_apply_jexl_filters_first:+--apply-jexl-filters-first}
   ${par_call_genotypes:+--call-genotypes}
-  ${par_concordance:+--concordance "$par_concordance"}
-  ${par_discordance:+--discordance "$par_discordance"}
+  ${staged_concordance:+--concordance "$staged_concordance"}
+  ${staged_discordance:+--discordance "$staged_discordance"}
   "${drop_genotype_annotation_args[@]}"
   "${drop_info_annotation_args[@]}"
   ${par_exclude_filtered:+--exclude-filtered}
