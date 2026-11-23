@@ -67,7 +67,7 @@ if [ -d "$par_variant" ]; then
   variant_arg="gendb://$par_variant"
 else
   # GATK reads a plain --variant VCF without an index, unless it must traverse
-  # by intervals (--intervals or --exclude_intervals)
+  # by intervals (any interval argument)
   variant_index_optional=$([[ "$(gatk_uses_intervals)" == "true" ]] && echo false || echo true)
   variant_arg=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
 fi
