@@ -43,6 +43,10 @@
 * `minimap2/minimap2_align`: Reject `--cigar_bam` without `--bam` and
   `--cigar_paf` with `--bam` instead of silently ignoring the flag (PR #248).
 
+* `samtools/samtools_sort`: Pass `-@` and `-m` arguments to `samtools sort`, using `meta_cpus` and `meta_memory_mb` (PR #280).
+
+* `samtools/samtools_sort`: Stop writing an undocumented SAM text copy of the output to `<output>.txt` (PR #280).
+
 # biobox 0.5.0
 
 ## BREAKING CHANGES
