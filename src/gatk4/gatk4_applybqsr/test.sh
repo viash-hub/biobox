@@ -55,7 +55,7 @@ check_file_not_empty "$recal_table" "BQSR recalibration table"
 # --- Test Case 1: Basic ApplyBQSR ---
 log "Starting TEST 1: Basic ApplyBQSR"
 
-mkdir -p "$meta_temp_dir/test1"
+mkdir -p "$meta_temp_dir/test1" "$meta_temp_dir/test1_index"
 
 log "Executing $meta_name with basic parameters..."
 "$meta_executable" \
@@ -65,11 +65,15 @@ log "Executing $meta_name with basic parameters..."
   --reference_fai "$test_data_dir/reference.fasta.fai" \
   --reference_dict "$test_data_dir/reference.dict" \
   --bqsr_recal_file "$recal_table" \
-  --output "$meta_temp_dir/test1/output.bam"
+  --output "$meta_temp_dir/test1/output.bam" \
+  --output_index "$meta_temp_dir/test1_index/recalibrated.bai"
 
 log "Validating TEST 1 outputs..."
 check_file_exists "$meta_temp_dir/test1/output.bam" "recalibrated BAM"
 check_file_not_empty "$meta_temp_dir/test1/output.bam" "recalibrated BAM"
+check_file_exists "$meta_temp_dir/test1_index/recalibrated.bai" "output BAM index"
+check_file_not_empty "$meta_temp_dir/test1_index/recalibrated.bai" "output BAM index"
+check_file_not_exists "$meta_temp_dir/test1/output.bai" "index next to the output BAM (moved to --output_index)"
 
 log "Validating recalibrated BAM with ValidateSamFile..."
 gatk ValidateSamFile \
@@ -99,6 +103,7 @@ log "Executing $meta_name with advanced parameters..."
   --reference_dict "$test_data_dir/reference.dict" \
   --bqsr_recal_file "$recal_table" \
   --output "$meta_temp_dir/test2/output.bam" \
+  --output_index "$meta_temp_dir/test2/output.bai" \
   --intervals "$intervals_bed" \
   --static_quantized_quals 10 \
   --static_quantized_quals 20 \
@@ -108,6 +113,7 @@ log "Executing $meta_name with advanced parameters..."
 log "Validating TEST 2 outputs..."
 check_file_exists "$meta_temp_dir/test2/output.bam" "recalibrated BAM with options"
 check_file_not_empty "$meta_temp_dir/test2/output.bam" "recalibrated BAM with options"
+check_file_exists "$meta_temp_dir/test2/output.bai" "output BAM index (same path GATK writes)"
 
 log "Validating recalibrated BAM with ValidateSamFile..."
 gatk ValidateSamFile \
@@ -129,11 +135,13 @@ log "Executing $meta_name without a reference..."
   --input "$test_data_dir/sample.sorted.bam" \
   --bai "$test_data_dir/sample.sorted.bai" \
   --bqsr_recal_file "$recal_table" \
-  --output "$meta_temp_dir/test3/output.bam"
+  --output "$meta_temp_dir/test3/output.bam" \
+  --output_index "$meta_temp_dir/test3/output.bai"
 
 log "Validating TEST 3 outputs..."
 check_file_exists "$meta_temp_dir/test3/output.bam" "recalibrated BAM without reference"
 check_file_not_empty "$meta_temp_dir/test3/output.bam" "recalibrated BAM without reference"
+check_file_exists "$meta_temp_dir/test3/output.bai" "output BAM index without reference"
 
 log "✅ TEST 3 completed successfully"
 
@@ -162,5 +170,23 @@ check_file_not_empty "$meta_temp_dir/test4/output.bam" "recalibrated BAM (engine
 check_file_not_exists "$meta_temp_dir/test4/output.bai" "output BAM index (should not exist with --create_output_bam_index false)"
 
 log "✅ TEST 4 completed successfully"
+
+# --- Test Case 5: Missing --output_index ---
+log "Starting TEST 5: --output_index is required unless --create_output_bam_index is false"
+
+mkdir -p "$meta_temp_dir/test5"
+
+if "$meta_executable" \
+  --input "$test_data_dir/sample.sorted.bam" \
+  --bai "$test_data_dir/sample.sorted.bai" \
+  --bqsr_recal_file "$recal_table" \
+  --output "$meta_temp_dir/test5/output.bam" > "$meta_temp_dir/test5/run.log" 2>&1; then
+  log_error "✗ $meta_name did not fail without --output_index"
+  exit 1
+fi
+check_file_contains "$meta_temp_dir/test5/run.log" "Error: --output_index is required unless --create_output_bam_index is false." "error message"
+check_file_not_exists "$meta_temp_dir/test5/output.bam" "output BAM (should not be written)"
+
+log "✅ TEST 5 completed successfully"
 
 print_test_summary "All tests"

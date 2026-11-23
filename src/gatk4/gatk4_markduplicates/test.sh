@@ -50,6 +50,7 @@ check_file_not_empty "$test1_dir/marked_duplicates.bam" "dedup-tagged output BAM
 check_file_exists "$test1_dir/marked_dup_metrics.txt" "duplication metrics file"
 check_file_not_empty "$test1_dir/marked_dup_metrics.txt" "duplication metrics file"
 check_file_contains "$test1_dir/marked_dup_metrics.txt" "ESTIMATED_LIBRARY_SIZE" "duplication metrics file"
+check_file_not_exists "$test1_dir/marked_duplicates.bai" "output BAM index (should not exist without --create_index)"
 
 log "✅ TEST 1 completed successfully"
 
@@ -140,5 +141,70 @@ check_file_not_empty "$test4_dir/marked_dup_metrics.txt" "merged duplication met
 check_file_contains "$test4_dir/marked_dup_metrics.txt" "ESTIMATED_LIBRARY_SIZE" "merged duplication metrics file"
 
 log "✅ TEST 4 completed successfully"
+
+# --- Test Case 5: Create an index at a different path ---
+log "Starting TEST 5: --create_index with --output_index in a different directory"
+
+test5_dir="$meta_temp_dir/test5"
+test5_index_dir="$meta_temp_dir/test5_index"
+mkdir -p "$test5_dir" "$test5_index_dir"
+
+log "Executing $meta_name with --create_index and --output_index..."
+"$meta_executable" \
+  --input "$input_bam" \
+  --output "$test5_dir/marked_duplicates.bam" \
+  --metrics "$test5_dir/marked_dup_metrics.txt" \
+  --create_index \
+  --output_index "$test5_index_dir/marked.bai"
+
+log "Validating TEST 5 outputs..."
+check_file_exists "$test5_dir/marked_duplicates.bam" "dedup-tagged output BAM"
+check_file_not_empty "$test5_dir/marked_duplicates.bam" "dedup-tagged output BAM"
+check_file_exists "$test5_index_dir/marked.bai" "output BAM index"
+check_file_not_empty "$test5_index_dir/marked.bai" "output BAM index"
+check_file_not_exists "$test5_dir/marked_duplicates.bai" "index next to the output BAM (moved to --output_index)"
+check_file_not_exists "$test5_dir/marked_duplicates.bam.bai" "index next to the output BAM (moved to --output_index)"
+
+log "Executing $meta_name with --output_index at the path Picard writes..."
+"$meta_executable" \
+  --input "$input_bam" \
+  --output "$test5_dir/same_path.bam" \
+  --metrics "$test5_dir/same_path_metrics.txt" \
+  --create_index \
+  --output_index "$test5_dir/same_path.bai"
+
+check_file_exists "$test5_dir/same_path.bai" "output BAM index (same path Picard writes)"
+
+log "✅ TEST 5 completed successfully"
+
+# --- Test Case 6: Index argument checks ---
+log "Starting TEST 6: --create_index requires --output_index"
+
+test6_dir="$meta_temp_dir/test6"
+mkdir -p "$test6_dir"
+
+if "$meta_executable" \
+  --input "$input_bam" \
+  --output "$test6_dir/fail.bam" \
+  --metrics "$test6_dir/fail_metrics.txt" \
+  --create_index > "$test6_dir/fail.log" 2>&1; then
+  log_error "✗ $meta_name did not fail with --create_index and no --output_index"
+  exit 1
+fi
+check_file_contains "$test6_dir/fail.log" "Error: --create_index requires --output_index." "error message"
+check_file_not_exists "$test6_dir/fail.bam" "output BAM (should not be written)"
+
+log "Executing $meta_name with --output_index but without --create_index..."
+"$meta_executable" \
+  --input "$input_bam" \
+  --output "$test6_dir/no_index.bam" \
+  --metrics "$test6_dir/no_index_metrics.txt" \
+  --output_index "$test6_dir/no_index_out.bai"
+
+check_file_exists "$test6_dir/no_index.bam" "dedup-tagged output BAM"
+check_file_not_exists "$test6_dir/no_index_out.bai" "output BAM index (ignored without --create_index)"
+check_file_not_exists "$test6_dir/no_index.bai" "index next to the output BAM"
+
+log "✅ TEST 6 completed successfully"
 
 print_test_summary "All tests"
