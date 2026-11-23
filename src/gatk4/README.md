@@ -106,6 +106,17 @@ The fallback memory value of `3072` is the same value used by `nf-core` GATK4 mo
 
 Give `--native-pair-hmm-threads` from `meta_cpus` for tools that have it.
 
+## Citations
+
+Follow the [GATK citation advice](https://gatk.broadinstitute.org/hc/en-us/articles/360035530852-How-should-I-cite-GATK-in-my-own-publications).
+
+- Every component cites the book that GATK asks users to cite (Van der Auwera & O'Connor, 2020).
+  The book has no DOI so it is a `bibtex` entry.
+- Add the DOI of a paper that describes the tool, if there is one.
+  For example, Poplin et al. (2017) for HaplotypeCaller and joint calling or Benjamin et al. (2019) for Mutect2.
+- Picard tools (for example MarkDuplicates) also cite Picard with the `bibtex` entry from the [Picard README](https://github.com/broadinstitute/picard#citing).
+- Only cite a paper for a tool if it describes that tool, not because the tool is used in the same workflow.
+
 ## Testing
 
 - The `test_helpers.sh` script has functions for creating synthetic test fixtures
