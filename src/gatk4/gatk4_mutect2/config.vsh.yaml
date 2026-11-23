@@ -46,20 +46,21 @@ argument_groups:
         type: file
         multiple: true
         description: |
-          Input BAM file(s) containing the reads of the tumor and (if any)
-          the normal samples.
+          Input BAM or CRAM file(s) containing the reads of the tumor and
+          (if any) the normal samples. BAM and CRAM files can be mixed.
 
-          The files must be coordinate-sorted and indexed (see `--bai`).
-          Specify this argument once per input BAM file. The normal
-          samples are identified with `--normal_sample`.
+          The files must be coordinate-sorted and indexed (see
+          `--read_index`). A CRAM file is decoded with `--reference`.
+          Specify this argument once per input file. The normal samples are
+          identified with `--normal_sample`.
         required: true
         example: [tumor.bam, normal.bam]
-      - name: "--bai"
+      - name: "--read_index"
         type: file
         multiple: true
         description: |
-          BAM index file(s) (`.bai`) for the input BAM file(s), in the same
-          order as `--input`.
+          Index file(s) for `--input` (`.bai` for BAM, `.crai` or `.bai` for
+          CRAM), one for each input file. They are matched to `--input` by order.
         required: true
         example: [tumor.bam.bai, normal.bam.bai]
       - name: "--reference"

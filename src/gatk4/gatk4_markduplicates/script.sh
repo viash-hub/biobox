@@ -31,9 +31,27 @@ if [[ -n "$par_create_index" ]]; then
   gatk_output_index=$(gatk_output_bam_index_path "$par_output")
 fi
 
+# A CRAM input or output needs the reference. Without it, Picard fails and
+# can leave an empty output file.
+if [[ -z "$par_reference_sequence" ]]; then
+  IFS=';' read -ra cram_check_inputs <<< "$par_input"
+  for cram_check_file in "${cram_check_inputs[@]}" "$par_output"; do
+    if [[ "$cram_check_file" == *.cram ]]; then
+      echo "Error: --reference_sequence is required for CRAM input or output." >&2
+      exit 1
+    fi
+  done
+fi
+
 # Create a temporary directory for GATK's own scratch space
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_markduplicates.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
+
+# Stage the reference with its .fai index under matching names
+staged_reference=""
+if [[ -n "$par_reference_sequence" ]]; then
+  staged_reference=$(stage_reference_fai "$tmp_dir" "$par_reference_sequence" "$par_reference_sequence_fai" --reference_sequence)
+fi
 
 # Compute available memory for the JVM (80% of allocated memory, fallback to 3072MB)
 avail_mem_mb=$(( ${meta_memory_mb:-3072} * 8 / 10 ))
@@ -68,7 +86,7 @@ cmd_args=(
   ${par_read_name_regex:+--READ_NAME_REGEX "$par_read_name_regex"}
   ${par_read_one_barcode_tag:+--READ_ONE_BARCODE_TAG "$par_read_one_barcode_tag"}
   ${par_read_two_barcode_tag:+--READ_TWO_BARCODE_TAG "$par_read_two_barcode_tag"}
-  ${par_reference_sequence:+--REFERENCE_SEQUENCE "$par_reference_sequence"}
+  ${staged_reference:+--REFERENCE_SEQUENCE "$staged_reference"}
   ${par_remove_duplicates:+--REMOVE_DUPLICATES true}
   ${par_remove_sequencing_duplicates:+--REMOVE_SEQUENCING_DUPLICATES true}
   ${par_sorting_collection_size_ratio:+--SORTING_COLLECTION_SIZE_RATIO "$par_sorting_collection_size_ratio"}
