@@ -1,0 +1,7 @@
+name: "--reference"
+alternatives: [-R]
+type: file
+description: |
+  Reference sequence FASTA file. Must be given together with
+  `--reference_fai` and `--reference_dict`.
+example: reference.fasta

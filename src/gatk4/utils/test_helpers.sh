@@ -49,13 +49,12 @@ sort_and_index_bam() {
   log "✓ Sorted and indexed BAM: $output_bam (index: ${output_bam%.bam}.bai)"
 }
 
-# Count the number of reads in a SAM/BAM/CRAM file using GATK's CountReads
-# tool.
+# Count the number of reads in a SAM/BAM file with samtools
 #
 # Usage: count_bam_reads "/path/to/file.bam"
 count_bam_reads() {
   local bam_path="$1"
-  gatk CountReads --input "$bam_path" --verbosity ERROR 2>/dev/null | tail -n 1
+  samtools view -c "$bam_path"
 }
 
 # Create a synthetic reference FASTA together with its .fai and .dict
@@ -148,9 +147,16 @@ create_test_sam_reads() {
 # automatically from the position using the ATCG cycle, unless explicitly
 # overridden.
 #
-# Usage: create_test_known_sites_vcf "/path/to/known_sites.vcf" contig_name \
+# With `--no-index` as the first argument, the VCF is not indexed.
+#
+# Usage: create_test_known_sites_vcf [--no-index] "/path/to/known_sites.vcf" contig_name \
 #          contig_length position [ref_base] [alt_base]
 create_test_known_sites_vcf() {
+  local create_index="true"
+  if [[ "$1" == "--no-index" ]]; then
+    create_index="false"
+    shift
+  fi
   local vcf_path="$1"
   local contig_name="$2"
   local contig_length="$3"
@@ -169,9 +175,12 @@ create_test_known_sites_vcf() {
     printf '%s\t%d\t.\t%s\t%s\t50\tPASS\t.\n' "$contig_name" "$position" "$ref_base" "$alt_base"
   } > "$vcf_path"
 
-  gatk IndexFeatureFile --input "$vcf_path" --verbosity ERROR
-
-  log "✓ Wrote and indexed known-sites VCF: $vcf_path"
+  if [[ "$create_index" == "true" ]]; then
+    gatk IndexFeatureFile --input "$vcf_path" --verbosity ERROR
+    log "✓ Wrote and indexed known-sites VCF: $vcf_path"
+  else
+    log "✓ Wrote known-sites VCF (no index): $vcf_path"
+  fi
 }
 
 # Compress a VCF with bgzip and index it with tabix, then move the index to a
@@ -342,4 +351,144 @@ create_test_mutect2_outputs() {
     --verbosity ERROR
 
   log "✓ Created Mutect2 outputs in: $out_dir"
+}
+
+# Set up the test environment for a GATK4 component test: strict error
+# handling, a start log line and an empty test data directory. Sets the
+# `test_data_dir` variable.
+#
+# Usage: gatk4_test_init
+gatk4_test_init() {
+  setup_test_env
+  log "Starting tests for $meta_name"
+  test_data_dir="$meta_temp_dir/test_data"
+  mkdir -p "$test_data_dir"
+}
+
+# Run a command that must fail, and check that its output has the expected
+# error message. The output (stdout and stderr) is written to the log file.
+# The message is searched as a fixed string.
+#
+# Usage: check_fails_with "Error: expected message" "/path/to/run.log" command [arguments...]
+check_fails_with() {
+  local message="$1"
+  local log_file="$2"
+  shift 2
+
+  if "$@" > "$log_file" 2>&1; then
+    log_error "✗ The command did not fail (expected '$message'): $*"
+    exit 1
+  fi
+  if grep -qF -- "$message" "$log_file"; then
+    log "✓ The command failed with the expected message '$message'"
+  else
+    log_error "✗ The command failed without the expected message '$message': $log_file"
+    tail -n 20 "$log_file" >&2
+    exit 1
+  fi
+}
+
+# Print the values of one column of the records of a VCF (plain or gzipped),
+# separated by spaces. For example column 2 gives the positions and column 3
+# the IDs.
+#
+# Usage: values=$(vcf_column "/path/to/file.vcf" column)
+vcf_column() {
+  local vcf_path="$1"
+  local column="$2"
+
+  if [[ "$vcf_path" == *.gz ]]; then
+    zcat "$vcf_path"
+  else
+    cat "$vcf_path"
+  fi | awk -F '\t' -v col="$column" '!/^#/ {printf "%s%s", sep, $col; sep = " "} END {print ""}'
+}
+
+# Check that one column of the VCF records has exactly the expected values
+# (space-separated, in order).
+#
+# Usage: check_vcf_column "/path/to/file.vcf" column "expected values" "description"
+check_vcf_column() {
+  local vcf_path="$1"
+  local column="$2"
+  local expected="$3"
+  local description="${4:-VCF}"
+
+  local actual
+  actual=$(vcf_column "$vcf_path" "$column")
+  if [[ "$actual" == "$expected" ]]; then
+    log "✓ $description has the expected values in column $column: $expected"
+  else
+    log_error "✗ $description has '$actual' in column $column, expected '$expected': $vcf_path"
+    exit 1
+  fi
+}
+
+# Check the number of records (non-header lines) of a VCF (plain or gzipped).
+#
+# Usage: check_vcf_record_count "/path/to/file.vcf" count "description"
+check_vcf_record_count() {
+  local vcf_path="$1"
+  local expected="$2"
+  local description="${3:-VCF}"
+
+  local actual
+  if [[ "$vcf_path" == *.gz ]]; then
+    actual=$(zcat "$vcf_path" | grep -vc '^#' || true)
+  else
+    actual=$(grep -vc '^#' "$vcf_path" || true)
+  fi
+  if [[ "$actual" -eq "$expected" ]]; then
+    log "✓ $description has $expected record(s)"
+  else
+    log_error "✗ $description has $actual record(s), expected $expected: $vcf_path"
+    exit 1
+  fi
+}
+
+# Check that a VCF (plain or gzipped) has, or does not have, a record that
+# matches an extended regular expression (for example $'^chr1\t250\t').
+#
+# Usage: check_vcf_has_record "/path/to/file.vcf" "regex" "description"
+#        check_vcf_lacks_record "/path/to/file.vcf" "regex" "description"
+check_vcf_has_record() {
+  local vcf_path="$1"
+  local regex="$2"
+  local description="${3:-VCF}"
+
+  if { if [[ "$vcf_path" == *.gz ]]; then zcat "$vcf_path"; else cat "$vcf_path"; fi; } | grep -v '^#' | grep -qE -- "$regex"; then
+    log "✓ $description has a record that matches '$regex'"
+  else
+    log_error "✗ $description has no record that matches '$regex': $vcf_path"
+    exit 1
+  fi
+}
+
+check_vcf_lacks_record() {
+  local vcf_path="$1"
+  local regex="$2"
+  local description="${3:-VCF}"
+
+  if { if [[ "$vcf_path" == *.gz ]]; then zcat "$vcf_path"; else cat "$vcf_path"; fi; } | grep -v '^#' | grep -qE -- "$regex"; then
+    log_error "✗ $description has a record that matches '$regex': $vcf_path"
+    exit 1
+  else
+    log "✓ $description has no record that matches '$regex'"
+  fi
+}
+
+# Check that an index output was moved to the requested path: it exists there
+# and no index is left at the path where GATK writes it by default.
+#
+# Usage: check_index_moved "$requested_index" "$gatk_default_index" "description"
+check_index_moved() {
+  local requested_index="$1"
+  local default_index="$2"
+  local description="${3:-index}"
+
+  check_file_exists "$requested_index" "$description"
+  if [[ "$requested_index" -ef "$default_index" ]]; then
+    return 0
+  fi
+  check_file_not_exists "$default_index" "$description at the default path"
 }
