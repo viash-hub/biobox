@@ -59,3 +59,5 @@ argument_groups:
         description: |
           Give up on the EM algorithm after this many iterations.
           Default: 20.
+
+# Resources and engines are defined in common_resources.yaml, which is merged above.

@@ -230,3 +230,5 @@ argument_groups:
   - __merge__: /src/gatk4/utils/engine_argument_group.yaml
   - __merge__: /src/gatk4/utils/vcf_output_argument_group.yaml
   - __merge__: /src/gatk4/utils/interval_argument_group.yaml
+
+# Resources and engines are defined in common_resources.yaml, which is merged above.

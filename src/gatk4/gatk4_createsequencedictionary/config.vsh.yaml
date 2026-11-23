@@ -80,3 +80,5 @@ argument_groups:
           URI to put in the `UR` field of the sequence dictionary entries,
           describing where the reference file can be found. If not supplied,
           the absolute path of the input reference file is used.
+
+# Resources and engines are defined in common_resources.yaml, which is merged above.

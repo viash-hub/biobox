@@ -266,3 +266,5 @@ argument_groups:
           qualities, tags) do not otherwise need to be decoded. Default:
           'STRICT'.
         choices: [STRICT, LENIENT, SILENT]
+
+# Resources and engines are defined in common_resources.yaml, which is merged above.

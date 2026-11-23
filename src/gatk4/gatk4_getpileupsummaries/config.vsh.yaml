@@ -113,3 +113,5 @@ argument_groups:
       `--intervals`. To summarize only the sites in a set of targets, give
       a target BED file and the `--variant` VCF to `--intervals` and use
       `--interval_set_rule INTERSECTION`.
+
+# Resources and engines are defined in common_resources.yaml, which is merged above.

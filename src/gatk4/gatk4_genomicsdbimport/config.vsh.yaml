@@ -210,3 +210,5 @@ argument_groups:
 #                        file URI. The files listed in the map are not
 #                        staged by Viash or Nextflow, so it is replaced by
 #                        `--variant` together with `--sample_name`.
+
+# Resources and engines are defined in common_resources.yaml, which is merged above.

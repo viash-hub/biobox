@@ -75,3 +75,5 @@ argument_groups:
         description: |
           The minimum coverage of a site relative to the median coverage.
           Default: 0.5.
+
+# Resources and engines are defined in common_resources.yaml, which is merged above.
