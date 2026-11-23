@@ -9,6 +9,9 @@
   - `gatk4/gatk4_learnreadorientationmodel`: Learn a read orientation bias model from the F1R2 counts of Mutect2.
   - `gatk4/gatk4_filtermutectcalls`: Filter the raw somatic calls of Mutect2.
 
+* `bwa_mem3`: Added support for bwa-mem3, a drop-in replacement for bwa-mem2 with BAM output and inline methylation (EM-seq/TAPS) alignment:
+  - `bwa_mem3/bwa_mem3_mem`: Align single-end or paired-end reads against a bwa-mem3 index, writing SAM or BAM (PR #276).
+
 ## MINOR CHANGES
 
 * `minimap2/minimap2_index`: Add `--preset`, `--kmer_size`, `--window_size` and
