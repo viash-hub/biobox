@@ -49,33 +49,6 @@ argument_groups:
         description: BAM index file (`.bai`) for the input BAM file.
         required: true
         example: sample.bam.bai
-      - name: "--intervals"
-        alternatives: [-L]
-        type: file
-        multiple: true
-        description: |
-          One or more genomic intervals over which to operate, provided as
-          files (e.g. BED, interval_list or VCF).
-
-          To summarize all the sites in `--variant`, give the same VCF
-          file to `--intervals`. Specify this argument more than once to
-          combine intervals (see `--interval_set_rule`).
-        required: true
-        example: [intervals.bed]
-      - name: "--intervals_index"
-        type: file
-        multiple: true
-        description: |
-          Index files for the VCF files in `--intervals` (`.tbi` for a
-          `.vcf.gz` file, `.idx` for a `.vcf` file), in the same order as
-          the VCF files in `--intervals`. Other interval files do not get
-          an index.
-
-          If not provided, a copy of each bgzipped VCF `--intervals` file is
-          indexed before the run. A plain `.vcf` file does not need an index.
-          If provided, one index must be given for each VCF file in
-          `--intervals`.
-        example: [intervals.vcf.gz.tbi]
       - name: "--variant"
         alternatives: [-V]
         type: file
@@ -124,37 +97,6 @@ argument_groups:
 
   - name: "Options"
     arguments:
-      - name: "--exclude_intervals"
-        alternatives: [-XL]
-        type: file
-        multiple: true
-        description: |
-          One or more genomic intervals to exclude from processing,
-          provided as files (e.g. BED, interval_list or VCF).
-        example: [exclude_intervals.bed]
-      - name: "--exclude_intervals_index"
-        type: file
-        multiple: true
-        description: |
-          Index files for the VCF files in `--exclude_intervals` (`.tbi`
-          for a `.vcf.gz` file, `.idx` for a `.vcf` file), in the same
-          order as the VCF files in `--exclude_intervals`. Other interval
-          files do not get an index.
-
-          If not provided, a copy of each bgzipped VCF `--exclude_intervals`
-          file is indexed before the run. A plain `.vcf` file does not need an
-          index. If provided, one index must be given for each VCF file in
-          `--exclude_intervals`.
-        example: [exclude_intervals.vcf.gz.tbi]
-      - name: "--interval_set_rule"
-        alternatives: [-isr]
-        type: string
-        description: |
-          Set merging approach to use to combine the `--intervals` inputs.
-          For example, use `INTERSECTION` with a target BED file and the
-          `--variant` VCF to summarize only the sites in the targets.
-          Default: 'UNION'.
-        choices: [UNION, INTERSECTION]
       - name: "--max_depth_per_sample"
         type: integer
         description: |
@@ -179,6 +121,15 @@ argument_groups:
           Minimum population allele frequency of the sites to consider. A
           low value increases accuracy at the expense of speed.
           Default: 0.01.
+
+  - __merge__: /src/gatk4/utils/interval_argument_group.yaml
+    description: |
+      At least one `--intervals` file is required.
+
+      To summarize all the sites in `--variant`, give the same VCF file to
+      `--intervals`. To summarize only the sites in a set of targets, give
+      a target BED file and the `--variant` VCF to `--intervals` and use
+      `--interval_set_rule INTERSECTION`.
 
 __merge__: /src/gatk4/utils/common_argument_groups.yaml
 

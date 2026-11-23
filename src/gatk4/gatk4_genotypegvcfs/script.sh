@@ -67,8 +67,8 @@ if [ -d "$par_variant" ]; then
   variant_arg="gendb://$par_variant"
 else
   # GATK reads a plain --variant VCF without an index, unless it must traverse
-  # by intervals
-  variant_index_optional=$([[ -z "$par_intervals" ]] && echo true || echo false)
+  # by intervals (--intervals or --exclude_intervals)
+  variant_index_optional=$([[ "$(gatk_uses_intervals)" == "true" ]] && echo false || echo true)
   variant_arg=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
 fi
 if [[ -n "$par_dbsnp" ]]; then
@@ -78,6 +78,7 @@ if [[ -n "$par_population_callset" ]]; then
   # GATK reads a plain --population_callset VCF without an index
   staged_population_callset=$(stage_vcf_with_index "$tmp_dir" "$par_population_callset" "$par_population_callset_index" population_callset true) || exit 1
 fi
+stage_interval_arguments "$tmp_dir" interval_args
 
 # Convert semicolon-separated multi-value arguments into repeated flags
 split_multiple_to_flags "$par_annotation" "--annotation" annotation_args
@@ -114,7 +115,7 @@ cmd_args=(
   ${par_include_non_variant_sites:+--include-non-variant-sites}
   ${par_indel_heterozygosity:+--indel-heterozygosity "$par_indel_heterozygosity"}
   ${par_input_is_somatic:+--input-is-somatic}
-  ${par_intervals:+--intervals "$par_intervals"}
+  "${interval_args[@]}"
   ${par_keep_combined_raw_annotations:+--keep-combined-raw-annotations}
   "${keep_specific_combined_raw_annotation_args[@]}"
   ${par_max_alternate_alleles:+--max-alternate-alleles "$par_max_alternate_alleles"}
@@ -140,7 +141,6 @@ gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" GenotypeGVCFs \
   --output "$par_output" \
   "${cmd_args[@]}" \
   --tmp-dir "$tmp_dir" \
-  ${par_interval_padding:+--interval-padding "$par_interval_padding"} \
   ${par_sites_only_vcf_output:+--sites-only-vcf-output} \
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"} \
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"} \

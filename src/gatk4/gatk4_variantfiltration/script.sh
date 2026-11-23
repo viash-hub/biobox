@@ -42,20 +42,24 @@ if [[ "$par_create_output_variant_index" != "false" ]]; then
   gatk_output_index=$(gatk_output_vcf_index_path "$par_output")
 fi
 
-# Stage the --variant VCF and the --mask file with their indexes and (if
-# provided) the reference trio into a temp dir so GATK can find the companion
-# files
+# Stage the --variant VCF, the --mask file and the interval files with their
+# indexes and (if provided) the reference trio into a temp dir so GATK can find
+# the companion files
 tmp_dir=$(mktemp -d "$meta_temp_dir/gatk4_variantfiltration.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 
-# GATK reads a plain --variant VCF without an index
-staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant true) || exit 1
+# GATK reads a plain --variant VCF without an index, but only when it does not
+# traverse by intervals (it then needs random access to the file)
+variant_index_optional=$([[ "$(gatk_uses_intervals)" == "true" ]] && echo false || echo true)
+staged_variant=$(stage_vcf_with_index "$tmp_dir" "$par_variant" "$par_variant_index" variant "$variant_index_optional") || exit 1
 
 # GATK needs an index for every --mask file, also a plain BED or VCF
 staged_mask=""
 if [[ -n "$par_mask" ]]; then
   staged_mask=$(stage_vcf_with_index "$tmp_dir" "$par_mask" "$par_mask_index" mask) || exit 1
 fi
+
+stage_interval_arguments "$tmp_dir" interval_args
 
 reference_args=()
 if [[ -n "$par_reference" ]]; then
@@ -101,8 +105,8 @@ gatk --java-options "-Xmx${avail_mem_mb}M -XX:-UsePerfData" VariantFiltration \
   "${genotype_filter_expression_args[@]}" \
   "${genotype_filter_name_args[@]}" \
   "${extra_args[@]}" \
+  "${interval_args[@]}" \
   --tmp-dir "$tmp_dir" \
-  ${par_interval_padding:+--interval-padding "$par_interval_padding"} \
   ${par_sites_only_vcf_output:+--sites-only-vcf-output} \
   ${par_create_output_variant_index:+--create-output-variant-index "$par_create_output_variant_index"} \
   ${par_create_output_bam_index:+--create-output-bam-index "$par_create_output_bam_index"} \
